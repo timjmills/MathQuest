@@ -327,6 +327,13 @@ function footprintClass(q, template, size) {
     // A horizontal fact ("24 ÷ 6 = ___") is one line with one short answer (critic round 2, H5:
     // six division facts filled a page, every cell 80% empty).
     if (isAcrossFact(q, template)) return 'short';
+    // The same holds for the kit's one-line equation with one box ("[ ] + 2 = 11"): 2 x 8 fits where
+    // the dense standard ceiling stopped at 2 x 5 (kit lint PAGEFILL, 2026-10-02). The ÷ bracket
+    // and fraction-bar notations are taller and keep the standard class.
+    if (template === 'equation') {
+        const en = String(((q.cell && q.cell.payload) || {}).notation || '');
+        if (en !== 'bracket' && en !== 'fraction') return 'short';
+    }
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -793,6 +800,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
+        }
+        // 2026-10-02 (L-KEY AK-4): the pupil page draws the adapter's writing row only where the key
+        // cannot write into the cell's own slot - the very test the key applies below - so a key and
+        // its pupil page always carry the same named slots.
+        if (legacy && ctx.state === 'blank' && STAMP_RE.test(html)) {
+            const bare = html.replace(STAMP_RE, '');
+            return legacyKeyFill(bare, q0, key) !== null ? bare : html;
         }
         if (!legacy || ctx.state !== 'answered') return html;
         // The legacy key: the answer in the pupil's own slot when there is one, else the stamp.
@@ -1626,14 +1640,48 @@ export async function buildSheet(req = {}) {
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
-            for (let pass = 0; pass < 3; pass++) {
+            // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
+            // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
+            // that was dealt short items printed three of them over a 20-35 % empty strip (kit lint
+            // PAGEFILL, 2026-09-26). A pool page is sized by the items it HOLDS: the count grows or
+            // shrinks with them until it settles, and the largest count that fits is kept.
+            const pool = !sec.count && shared[si] === null && sec.skills.length === 1 && isMixedMetaSkill(sec.skills[0].skillId);
+            let fitBest = 0;
+            for (let pass = 0; pass < (pool ? 6 : 3); pass++) {
                 items = finalRun(sec, si, base, want, probe);
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
-                sec.floor = floorWith(si, probe.items.concat(items));
+                sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
                 const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                if (pool) {
+                    if (again >= want) fitBest = Math.max(fitBest, want);
+                    if (again === want) break;
+                    // grown past a count that fitted and now shrinking: settle on the one that fitted
+                    const next = again > want ? again : fitBest > 0 && fitBest < want ? fitBest : again;
+                    if (next === want || (next > want && fitBest >= next)) break;
+                    want = next;
+                    continue;
+                }
                 if (again >= want) break;
                 want = again;
+            }
+            if (pool && fitBest > 0 && items.length !== fitBest) {
+                items = finalRun(sec, si, base, fitBest, probe);
+                sec.floor = floorWith(si, items);
+            }
+            // A pool's count estimate comes from the few items it has dealt (their rows); one more
+            // item is tried while the page still holds it WITH ROOM FOR ONE MORE (the estimate
+            // draws every row at one height; the page lays them as dealt, so the last item of a
+            // count that only just fits could spill to a second page), so a page of short items
+            // is filled.
+            if (pool && fitBest > 0) {
+                for (let g = 0; g < 16 && items.length < MAX_ITEMS; g++) {
+                    const more = finalRun(sec, si, base, items.length + 1, probe);
+                    sec.floor = floorWith(si, more);
+                    const cap = capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, more), n, lctx)) * pagesWanted;
+                    if (cap <= more.length) { sec.floor = floorWith(si, items); break; }
+                    items = more;
+                }
             }
             hostItems = hostItems.concat(items);
         });

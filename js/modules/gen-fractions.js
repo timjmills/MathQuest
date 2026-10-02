@@ -3582,6 +3582,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     + `<div style="font-weight:700;margin-bottom:4px;">Target: ${targetLabel}</div>`
                     + `<div style="border:1.5px solid #000;height:2.2em;margin:0 auto 8px;max-width:22em;"></div>`
                     + `<div>${palette.map(t => _tile(t.n, t.d)).join('')}</div></div>`;
+                // Paper (2026-09-26): the kit `frac-wall` cell - the whole, one row of pieces per size
+                // offered (stacked labels, TY-7), and one "1 over a box" slot per piece of the key's
+                // combination. The screen keeps its drag-the-tiles widget.
+                if (isWhole && _combo && _combo.length) {
+                    q.cell = { template: 'frac-wall', v: 1, payload: {
+                        dens: palette.map(t => t.d),
+                        combo: _combo.map(f => Number(String(f).split('/')[1])),
+                    } };
+                }
                 return;
 
             } else if (fracSkill === "fraction_number_line") {
@@ -3654,7 +3663,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         svg += `<circle cx="${dx}" cy="${lineY}" r="7" fill="var(--accent-green)" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/>`;
                     }
 
-                    return `<svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;width:100%;" id="${lineId}_svg">${svg}</svg>`;
+                    return `<svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:140mm;width:100%;" id="${lineId}_svg">${svg}</svg>`;
                 }
 
                 // Weighted random type selection

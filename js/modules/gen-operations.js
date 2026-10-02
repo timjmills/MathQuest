@@ -1246,7 +1246,9 @@ function _generateLadderV2(q, skill, helpers, range) {
         }
         // The hidden digit lives in one of the two printed operand rows. The answer row is the
         // one thing the cell must SHOW, so it is never the hole.
-        const t = Math.max(String(a).length, String(b).length) + 1;
+        // The stack template's tracks are sized by the ANSWER too (stack.js tracksOf), so the hole's
+        // index must be counted on the same tracks: a 2-digit x 1-digit item has a 3-digit answer.
+        const t = Math.max(String(a).length, String(b).length, String(total).length) + 1;
         const rowPick = rng(0, 1);                       // 0 = the top number, 1 = the bottom
         const src = String(rowPick === 0 ? a : b).padStart(t, ' ');
         const positions = [];
@@ -1721,13 +1723,14 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
             + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
             + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
-        q.visual = _wsCell(
-            `<div style="display:inline-flex;align-items:flex-end;font-size:1.9rem;font-weight:700;">`
-            + `<span style="padding-bottom:6px;">${divisor}</span>`
-            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
-            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
-            + `<div style="margin-top:8px;font-size:1rem;">Write a digit in <b>every</b> place of the answer.</div>`);
-        q.printFormat = 'long-division';
+        // The kit's `short-division` bus stop (lint 2026-09-26: the legacy bracket was Arial and had
+        // no named slot): a quotient box over EVERY digit, so the pupil sees the place the 0 must
+        // fill, and the exchange boxes carry what is left to the next digit. Paper, key and the
+        // screen twin are the same drawing; the quotient boxes are typed one digit each.
+        const _zqPayload = { dividend, divisor, level: 1 };
+        q.cell = { template: 'short-division', v: 1, payload: _zqPayload };
+        q.visual = _kitTwin('short-division', _zqPayload, { join: '' });
+        q.printFormat = 'short-div-kit';
         q.notation = 'bracket';
         return true;
     }
@@ -2082,7 +2085,10 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s']);
+// Adding and subtracting tens / hundreds ("60 + 10 = [ ]") are mental facts read across, whatever
+// their digits: the kit's horizontal fact, never a column (lint AK-4 on the legacy cell, 2026-09-26).
+const _KIT_ACROSS_SKILLS = new Set(['add_sub_10s', 'add_sub_100s']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
 /**
@@ -2110,6 +2116,11 @@ function _applyKitFactCell(q, skill, range) {
             return;
         }
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        return;
+    }
+    if (_KIT_ACROSS_SKILLS.has(skill) && (op === '+' || op === '-')) {
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        q.notation = 'across';
         return;
     }
     const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
@@ -2759,6 +2770,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = 'Count the rows, then the dots in one row. Multiply rows by dots in a row.';
                     q.visual = q.visual.replace(/<div style="margin-top:6px;[^>]*>[^<]*<\/div>/, '');
                 }
+                // 2026-10-02 (print-check backlog, TY-1 / TY-11 / H13 / AK-4): the kit's `arrays`
+                // template draws the dots (4 mm minimum, fixed pitch), the count-all box is a named
+                // slot, and the "R rows x C columns" caption (an Arial SVG line under 8 pt) is the
+                // item's own text, which the kit prints in Andika.
+                const _daPayload = { kind: 'count_all', rows, cols };
+                q.cell = { template: 'arrays', v: 1, payload: _daPayload };
+                q.visual = _kitTwin('arrays', _daPayload);
                 q.printFormat = 'dot-array-visual';
                 q.skillLabel = 'Dot Array Multiplication';
                 return;
@@ -3377,7 +3395,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <rect x="${60 + barBW}" y="20" width="${barAW - barBW}" height="${barH}" rx="4" fill="${colorDiff}" opacity="0.3" stroke="${colorDiff}" stroke-width="2" stroke-dasharray="5,3"/>
                         <text x="${60 + barBW + (barAW - barBW) / 2}" y="${20 + barH / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="${colorDiff}">?</text>
                         <!-- Difference label -->
-                        <text x="${60 + barBW + (barAW - barBW) / 2}" y="${svgH - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="${colorDiff}">Difference = ?</text>
+                        <text x="${60 + barBW + (barAW - barBW) / 2}" y="${svgH - 10}" text-anchor="middle" font-size="13" font-weight="700" fill="${colorDiff}">Difference = ?</text>
                     </svg>
                 </div>`;
                 q.options = buildNumericOptions(difference);
@@ -3640,6 +3658,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         </div>`).join('')}
                     </div>
                 </div>`;
+                // 2026-10-02 (L-KEY AK-4, TY-1): the one-notation division family (the default) is the kit's
+                // `fact-family` cell (op '*'): bond of the three numbers, one line per fact, one named
+                // box per fact. The bracket / fraction notations keep the legacy drawing.
+                if (notation === 'symbol') {
+                    const _mfPayload = { a: factor1, b: factor2, op: '*' };
+                    q.cell = { template: 'fact-family', v: 1, payload: _mfPayload };
+                    q.visual = _kitTwin('fact-family', _mfPayload);
+                }
                 q.options = [];
                 return;
             }
@@ -4105,10 +4131,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const a = rng(2, 9);
                     const b = rng(2, 9);
                     const product = a * b;
-                    q.text = `If ${a} x ${b} = ${product}, what is ${b} x ${a}?`;
+                    q.text = `If ${a} × ${b} = ${product}, what is ${b} × ${a}?`;
                     q.ans = product;
                     q.a = b; q.b = a; q.op = '×';
-                    q.hint = `Commutative property: changing the order doesn't change the product. ${a} x ${b} = ${b} x ${a}`;
+                    q.hint = `Commutative property: changing the order doesn't change the product. ${a} × ${b} = ${b} × ${a}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(product);
 
@@ -4135,26 +4161,24 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Commutative Property</div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
+                                                <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
                             <div>
-                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-green);">${a} x ${b}</div>
-                                <svg width="${w1}" height="${h1}" viewBox="0 0 ${w1} ${h1}" style="max-width:100%;">
+                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-green);">${a} × ${b}</div>
+                                <svg width="${w1}" height="${h1}" viewBox="0 0 ${w1} ${h1}" style="max-width:100%;height:22mm;width:auto;">
                                     <rect x="0" y="0" width="${w1}" height="${h1}" rx="8" fill="var(--bg-card)" stroke="var(--accent-green)" stroke-width="2"/>
                                     ${dots1}
                                 </svg>
                             </div>
                             <div style="font-size:1.5rem;font-weight:700;color:var(--text-dim);">=</div>
                             <div>
-                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-orange);">${b} x ${a}</div>
-                                <svg width="${w2}" height="${h2}" viewBox="0 0 ${w2} ${h2}" style="max-width:100%;">
+                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-orange);">${b} × ${a}</div>
+                                <svg width="${w2}" height="${h2}" viewBox="0 0 ${w2} ${h2}" style="max-width:100%;height:22mm;width:auto;">
                                     <rect x="0" y="0" width="${w2}" height="${h2}" rx="8" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
                                     ${dots2}
                                 </svg>
                             </div>
                         </div>
-                        <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Same product, different order!</div>
-                    </div>`;
+                                            </div>`;
 
                 } else if (propType === 'distributive') {
                     const a = rng(3, 8);
@@ -4162,9 +4186,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const b = rng(2, 9);
                     const missingPart = a - splitPart;
                     const product = a * b;
-                    q.text = `${a} x ${b} = ${splitPart} x ${b} + ___ x ${b}. What is the missing number?`;
+                    q.text = `${a} × ${b} = ${splitPart} × ${b} + ___ × ${b}. What is the missing number?`;
                     q.ans = missingPart;
-                    q.hint = `Distributive property: ${a} x ${b} = (${splitPart} + ?) x ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
+                    q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ?) × ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(missingPart);
 
@@ -4188,28 +4212,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     splitDots += `<line x1="${pad - 5}" y1="${lineY}" x2="${svgW - pad + 5}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2" stroke-dasharray="6,4"/>`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distributive Property</div>
-                        <div style="margin-bottom:8px;font-size:1.1rem;">${a} x ${b} = <span style="color:var(--accent-green);">${splitPart} x ${b}</span> + <span style="color:var(--accent-orange);">? x ${b}</span></div>
-                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                                                <div style="margin-bottom:8px;font-size:1.1rem;">${a} × ${b} = <span style="color:var(--accent-green);">${splitPart} × ${b}</span> + <span style="color:var(--accent-orange);">? × ${b}</span></div>
+                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:22mm;width:auto;">
                             <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="8" fill="var(--bg-card)" stroke="var(--accent-cyan)" stroke-width="2"/>
                             ${splitDots}
                         </svg>
-                        <div style="display:flex;justify-content:center;gap:15px;margin-top:8px;font-size:0.85rem;">
-                            <span style="color:var(--accent-green);">${splitPart} rows</span>
-                            <span style="color:var(--accent-orange);">? rows</span>
-                        </div>
                     </div>`;
 
                 } else if (propType === 'identity') {
                     const num = rng(2, 12);
                     const order = pick(['num_first', 'one_first']);
                     if (order === 'num_first') {
-                        q.text = `What is ${num} x 1?`;
+                        q.text = `What is ${num} × 1?`;
                     } else {
-                        q.text = `What is 1 x ${num}?`;
+                        q.text = `What is 1 × ${num}?`;
                     }
                     q.ans = num;
-                    q.hint = `Identity property: Any number times 1 equals itself. ${num} x 1 = ${num}`;
+                    q.hint = `Identity property: Any number times 1 equals itself. ${num} × 1 = ${num}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(num);
 
@@ -4217,12 +4236,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Identity Property</div>
                         <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                             <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">x</span>
+                            <span style="margin:0 8px;">×</span>
                             <span style="color:var(--accent-orange);font-weight:700;">1</span>
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 1 = that number</div>
+                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 1 = that number</div>
                     </div>`;
 
                 } else {
@@ -4230,12 +4249,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const num = rng(1, 12);
                     const order = pick(['num_first', 'zero_first']);
                     if (order === 'num_first') {
-                        q.text = `What is ${num} x 0?`;
+                        q.text = `What is ${num} × 0?`;
                     } else {
-                        q.text = `What is 0 x ${num}?`;
+                        q.text = `What is 0 × ${num}?`;
                     }
                     q.ans = 0;
-                    q.hint = `Zero property: Any number times 0 equals 0. ${num} x 0 = 0`;
+                    q.hint = `Zero property: Any number times 0 equals 0. ${num} × 0 = 0`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(0);
 
@@ -4243,12 +4262,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Zero Property</div>
                         <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                             <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">x</span>
+                            <span style="margin:0 8px;">×</span>
                             <span style="color:var(--accent-orange);font-weight:700;">0</span>
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 0 = 0</div>
+                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 0 = 0</div>
                     </div>`;
                 }
 
@@ -4389,6 +4408,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     : `Think: What number makes this subtraction true?`;
                 q.missingNumberData = { position, a, b, c };
                 q.printFormat = "missing-number";
+                // The kit's `equation` cell (lint AK-4, 2026-09-26: the legacy sentence's 40 px box
+                // was not a named slot, so the key stamped its answer under the cell). One box
+                // width for the whole page: the widest answer the band allows (L-LEAK).
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: position.includes('add') || position === 'sum' ? '+' : '-', result: c,
+                    unknown: position === 'first_add' || position === 'minuend' ? 'a' : position === 'second_add' || position === 'subtrahend' ? 'b' : 'result',
+                    digits: String(missingMax).length + (useDec ? dp + 1 : 0),
+                } };
                 q.options = buildNumericOptions(ans);
                 return;
             }
@@ -4561,13 +4588,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
                 // P11: a ÷ item written on a bracket or a fraction bar prints that way too (the kit's
-                // `equation` cell, its ÷ notation branch); Across keeps the one-line legacy cell.
-                if ((q.notation === 'bracket' || q.notation === 'fraction') && q.op === '÷') {
-                    q.cell = { template: 'equation', v: 1, payload: {
-                        a, b, op: '/', result: c, notation: q.notation, digits: String(ans).length,
-                        unknown: position === 'dividend' ? 'a' : position === 'divisor' ? 'b' : 'result',
-                    } };
-                }
+                // `equation` cell, its ÷ notation branch); Across is the same cell as one sentence
+                // (lint AK-4, 2026-09-26: the legacy box was not a named slot). One box width for the
+                // page: the widest answer the band allows, never this answer's own length (L-LEAK).
+                const _mmDiv2 = q.op === '÷';
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: _mmDiv2 ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length,
+                    ...(_mmDiv2 && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
+                    unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
+                } };
                 
                 q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">
                     ${displayText || text}

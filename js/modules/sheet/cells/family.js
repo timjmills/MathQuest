@@ -34,8 +34,17 @@ const EQ_EM = 0.85;                 // a family line's digit size, relative to t
 
 /* ---------------------------------------------------------------------- fact family */
 
+/** The whole of the family: the sum, or the product when `op` is '*' (multiply and divide). */
+const wholeOf = (p) => (p.op === '*' ? Number(p.a) * Number(p.b) : Number(p.a) + Number(p.b));
 const facts = (p) => {
-    const a = Number(p.a), b = Number(p.b), w = a + b;
+    const a = Number(p.a), b = Number(p.b), w = wholeOf(p);
+    if (p.op === '*') {
+        // multiply and divide: a square number has two facts, not four (2026-10-02, 5 x 5 = 25 and 25 / 5 = 5)
+        const sq = a === b;
+        return sq
+            ? [{ a, op: '×', b, ans: w }, { a: w, op: '÷', b: a, ans: a }]
+            : [{ a, op: '×', b, ans: w }, { a: b, op: '×', b: a, ans: w }, { a: w, op: '÷', b: a, ans: b }, { a: w, op: '÷', b, ans: a }];
+    }
     return [
         { a, op: '+', b, ans: w },
         { a: b, op: '+', b: a, ans: w },
@@ -45,7 +54,7 @@ const facts = (p) => {
 };
 
 function bondSVG(g, p) {
-    const a = Number(p.a), b = Number(p.b), w = a + b;
+    const a = Number(p.a), b = Number(p.b), w = wholeOf(p);
     const fs = g.pt * 0.8 * PT_MM;                   // numbers in the bond, mm
     const r = fs * 0.95;
     const W = r * 6 + 4, H = r * 5 + 2;
@@ -68,7 +77,7 @@ function bondSVG(g, p) {
  *   'answer'            the operands, the answer a box (the old form: complete each fact)
  */
 const GIVEN = {
-    anchor: (f) => (f.op === '+' ? ['a'] : ['b']),
+    anchor: (f) => (f.op === '+' || f.op === '×' ? ['a'] : ['b']),
     none: () => [],
     answer: () => ['a', 'b'],
 };
@@ -115,7 +124,7 @@ register('fact-family', {
             return o;
         });
         // One box width for every box: the whole's digits (L-LEAK: no box tells a length).
-        const n = String(Number(p.a) + Number(p.b)).length;
+        const n = String(wholeOf(p)).length;
         const bw = boxMm(g, n);
         const input = (b) => `<input type="text" class="fact-family-input" inputmode="numeric" autocomplete="off" data-eq="${b.i}" data-part="${b.part}" data-answer="${esc(b.value)}" data-ws-slot="${b.id}" data-ws-shape="box" aria-label="fact ${b.i + 1} ${b.part === 'c' ? 'answer' : 'number'}" `
             + `style="box-sizing:border-box;width:${(bw / (g.E * EQ_EM)).toFixed(3)}em;height:${(g.stripMm / (g.E * EQ_EM)).toFixed(3)}em;border:${HAIR} solid ${INK.ink};border-radius:${(g.rMm / (g.E * EQ_EM)).toFixed(3)}em;background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`;
@@ -161,7 +170,7 @@ register('fact-family', {
         const bond = bondSVG(g, p);
         // The wider of the bond and one fact line (three places, at most two of them boxes,
         // two operators and four gaps at 0.85 of the digit size), plus the side pads.
-        const n = String(Number(p.a) + Number(p.b)).length;
+        const n = String(wholeOf(p)).length;
         const bw = boxMm(g, n);
         const boxes = Math.max(...facts(p).map((f) => 3 - givenOf(p, ctx)(f).length)) + (p.fix ? 1 : 0);
         const line = (Math.max(0, 3 - boxes) * n * 0.56 + 2 + 4 * 0.28) * g.E * EQ_EM + boxes * bw;

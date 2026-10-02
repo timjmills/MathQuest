@@ -1,0 +1,68 @@
+ws-print-lint: source kit, 27 skill(s)
+  counting:count_objects: 2+1 pages, 0 finding(s)
+  counting:count_sequence: 2+1 pages, 0 finding(s)
+  counting:number_seq_fill: 2+1 pages, 0 finding(s)
+  counting:mixed_counting: 2+1 pages, 0 finding(s)
+  comparing:compare_groups: 2+1 pages, 0 finding(s)
+  comparing:compare_objects: 2+1 pages, 0 finding(s)
+  comparing:classify_count: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing: 2+1 pages, 0 finding(s)
+  composing:number_bonds: 2+1 pages, 0 finding(s)
+  composing:make_ten: 2+1 pages, 0 finding(s)
+  composing:teen_compose: 2+1 pages, 0 finding(s)
+  composing:tens_foundation_visual: 2+1 pages, 0 finding(s)
+  composing:hundreds_chart_fill: 2+1 pages, 0 finding(s)
+  composing:ten_frame_build: 2+1 pages, 0 finding(s)
+  composing:ten_frame_build_teen: 2+1 pages, 0 finding(s)
+  composing:base10_build: 2+1 pages, 0 finding(s)
+  composing:base10_regroup: 2+1 pages, 0 finding(s)
+  composing:base10_build_hundreds: 2+1 pages, 0 finding(s)
+  composing:odd_even: 2+1 pages, 0 finding(s)
+  composing:select_even_odd: 2+1 pages, 0 finding(s)
+  composing:number_word_form: 2+1 pages, 0 finding(s)
+  composing:fraction_number_line: 2+1 pages, 2 finding(s)
+  composing:whole_as_fraction: 2+1 pages, 0 finding(s)
+  composing:compose_whole: 2+1 pages, 0 finding(s)
+  composing:mixed_composing: 2+1 pages, 1 finding(s)
+  composing:number_chart_fill: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all: 2+1 pages, 0 finding(s)
+
+document                            pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+counting:count_objects                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting:count_sequence               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting:number_seq_fill              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting:mixed_counting               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:compare_groups              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:compare_objects             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:classify_count              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:number_bonds                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:make_ten                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:teen_compose                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:tens_foundation_visual      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:hundreds_chart_fill         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:ten_frame_build             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:ten_frame_build_teen        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:base10_build                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:base10_regroup              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:base10_build_hundreds       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:odd_even                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:select_even_odd             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:number_word_form            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:fraction_number_line        2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:whole_as_fraction           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:compose_whole               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing             2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .  FAIL
+composing:number_chart_fill           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                         .     .    .    .        .     .       3    .     .       .     .    .      .       .
+
+composing:fraction_number_line (Fractions on Number Line (Visual))
+  [L-DENSITY H13 major] x2 (p1,2 cells 1,1) one empty band 65.7 mm tall in a 198.4 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "a. What fraction or mixed nu..."
+
+composing:mixed_composing (Mixed Number Sense)
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 79 mm tall under the problems (30% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+wrote design/audit/runs/wave1-D/full-k2.json
+
+ws-print-lint: WOULD FAIL - 27 document(s), source kit; 3 finding(s) in 2 document(s) [report-only, exit 0]

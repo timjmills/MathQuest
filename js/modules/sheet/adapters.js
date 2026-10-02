@@ -166,15 +166,17 @@ const NO_SUCH_FORMAT = '__ws_no_such_print_format__';
  * CSS at all, and the gap the stylesheet adds later simply widens it.
  */
 function stamp(key, ctx) {
-    if (ctx.state === 'blank') return '';
-    const value = ctx.state === 'wrong'
-        ? (ctx.wrong && ctx.wrong.value !== undefined ? ctx.wrong.value : '')
-        : (key && key.display !== undefined ? key.display : '');
-    if (value === '' || value === null || value === undefined) return '';
-    const ink = ctx.state === 'traced' ? 'trace' : 'solid';
-    const cls = ctx.state === 'traced' && ctx.photocopySafe ? ' ws-dotted' : ctx.state === 'traced' ? ' ws-trace' : '';
-    return `<div class="ws-legacy-answer" data-ws-stamp="1" data-ws-slot="answer" data-ws-shape="line" data-ws-ink="${ink}">`
-        + `<span class="ws-zone">Answer:</span> <span class="ws-legacy-value${cls}">${esc(value)}</span></div>`;
+    // 2026-10-02 (print-check backlog, L-KEY AK-4): the row exists in EVERY state. It used to be
+    // omitted on the pupil page ('blank'), so the key had a named slot the pupil page did not and
+    // the key was not a facsimile. The same writing line (the kit's own `blank()`, never restyled
+    // here) is now drawn blank for the pupil and filled on the key, at one width taken from the
+    // answer's own length, so paper, key and screen agree.
+    const shown = key && key.display !== undefined ? String(key.display) : '';
+    const wrongValue = ctx.state === 'wrong' && ctx.wrong && ctx.wrong.value !== undefined ? String(ctx.wrong.value) : '';
+    if (ctx.state !== 'wrong' && shown === '') return '';
+    const digits = Math.max(4, shown.length, wrongValue.length);
+    const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, key);
+    return `<div class="ws-legacy-answer" data-ws-stamp="1"><span class="ws-zone">Answer:</span> ${slot}</div>`;
 }
 
 /**

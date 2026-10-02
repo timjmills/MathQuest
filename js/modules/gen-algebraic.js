@@ -5,7 +5,7 @@ import { createNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { optionsFor, pvCap } from './skill-options.js';
 import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
-import { numeralTracksHTML } from './sheet/index.js';
+import { numeralTracksHTML, k2Twin } from './sheet/index.js';
 import { generateFunctionTable } from './gen-function-table.js';
 import { genNumberPatterns } from './gen-mult-patterns.js';
 
@@ -1330,11 +1330,18 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     : "Odd numbers end in 1, 3, 5, 7, or 9.";
                 q.printFormat = 'multi-select';
                 q.skillLabel = 'Select Even/Odd';
+                // Paper (2026-09-26): the kit `parity` cell, the numbers in two rows; the key rings
+                // the even ones and crosses out the odd ones. The screen keeps its multi-select widget.
+                q._variant = 'sort';
+                q.cell = { template: 'parity', v: 1, payload: { task: 'sort', nums: allNums } };
                 return;
             }
 
             if (patternSkill === "odd_even") {
-                // Grade 2: Odd or Even — 3 problem types
+                // Grade 2 (2.OA.C.3): odd or even - three problem types, drawn by the kit `parity`
+                // cell on paper and on screen (2026-09-26). The old cells were colour tiles with
+                // translucent white borders and printed on the legacy path, whose answer key did not
+                // match the pupil page (ws-print-lint INK-2, AK-4).
                 const maxNum = Math.max(10, Math.min(range, 100));
                 q.skillLabel = 'Odd/Even';
                 q.printFormat = 'odd-even';
@@ -1342,87 +1349,37 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 const oeRoll = Math.random();
                 let oeType;
                 if (oeRoll < 0.40) oeType = 'single';      // Type 1: Is N odd or even? (40%)
-                else if (oeRoll < 0.70) oeType = 'select';  // Type 2: Select all odd/even from 5 (30%)
+                else if (oeRoll < 0.70) oeType = 'select';  // Type 2: circle even / cross out odd (30%)
                 else oeType = 'which';                       // Type 3: Which of 3 is odd/even? (30%)
 
                 if (oeType === 'single') {
-                    // Type 1: Classic — Is this number odd or even?
-                    //
-                    // Bounded at 20 (review, 2026-09-20) because this is the CONCRETE type: its
-                    // cell is a picture of the number split into pairs, and a picture has to show
-                    // the whole number or it is not a picture of it. It used to deal up to Max
-                    // Number and cap the drawing at ten pairs, so "Is 87 odd or even?" printed
-                    // twenty circles — a pupil who counts what is drawn gets 20. Two-digit
-                    // numbers are still taught by this skill: the 'which' type below deals up to
-                    // maxNum and answers abstractly, which is where a number too big to draw
-                    // belongs.
+                    // Type 1, the CONCRETE type: the number and the number drawn as dots in pairs.
+                    // Bounded at 20 (review, 2026-09-20) so the picture is the whole number (ten
+                    // pairs and a leftover at most); larger numbers are the 'which' type's.
+                    // Nothing in the cell names the verdict (the old caption "One circle has no
+                    // partner!" answered the question).
                     const num = rng(1, Math.min(maxNum, 20));
                     const isEven = num % 2 === 0;
                     q.text = `Is ${num} odd or even?`;
                     q.ans = isEven ? "Even" : "Odd";
-                    q.answerType = "multiple-choice";
-                    q.options = ["Odd", "Even"];
-                    q.hint = `If a number can be split into two equal groups with nothing left over, it's even. Otherwise it's odd.`;
-
-                    // Visual: paired circles.
-                    //
-                    // TWO DEFECTS FIXED HERE (review, 2026-09-20), both of which the printed
-                    // page showed and no test catches:
-                    //
-                    //  1. THE CELL PRINTED THE ANSWER. A caption under the circles read "All
-                    //     circles are paired!" / "One circle has no partner!", and the truncation
-                    //     line read "... (43 pairs + 1 left over)". Both say odd-or-even in
-                    //     words, which is the whole question. A pupil could mark the page without
-                    //     looking at the number. Gone: the picture is the scaffold, the verdict is
-                    //     the pupil's.
-                    //
-                    //  2. THE PICTURE DID NOT MATCH THE NUMBER. Above 20 the drawing was capped
-                    //     at ten pairs, so "Is 87 odd or even?" printed twenty circles, and the
-                    //     leftover circle — the one thing the representation exists to show — was
-                    //     suppressed exactly when the number was odd and large. Counting what is
-                    //     drawn gave 20, not 87.
-                    //
-                    // So the circles are drawn ONLY when every one of them fits (num <= 20, ten
-                    // pairs plus a possible leftover). Above that the cell is the numeral and the
-                    // question, which is the abstract item this skill ends at anyway; the print
-                    // handler for 'odd-even' is guarded on `problem.visual`, so an empty visual
-                    // falls through to the plain cell rather than breaking.
-                    const pairCount = Math.floor(num / 2);
-                    const hasLeftover = num % 2 !== 0;
-                    const drawable = pairCount <= 10;
-                    const showPairs = drawable ? pairCount : 0;
-                    const showLeftover = drawable && hasLeftover;
-
-                    let circleRows = '';
-                    for (let i = 0; i < showPairs; i++) {
-                        circleRows += `<div style="display:flex;gap:4px;">
-                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
-                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
-                        </div>`;
-                    }
-                    if (showLeftover) {
-                        circleRows += `<div style="display:flex;gap:4px;">
-                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-orange);border:2px solid rgba(255,255,255,0.3);"></div>
-                            <div style="width:20px;height:20px;border-radius:50%;border:2px dashed var(--text-dim);opacity:0.3;"></div>
-                        </div>`;
-                    }
-
-                    q.visual = drawable
-                        ? `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Odd or Even?</div>
-                        <div style="display:inline-flex;flex-direction:column;gap:4px;align-items:center;padding:12px 20px;background:var(--bg-card);border-radius:12px;">
-                            ${circleRows}
-                        </div>
-                    </div>`
-                        : '';
+                    q.printAnswer = q.ans;
+                    q.acceptedAnswers = [q.ans, q.ans.toLowerCase()];
+                    q.printText = 'Odd or even? Check one box.';
+                    q.answerType = "text";
+                    q.selfAnswering = true;
+                    q.options = [];
+                    q.hint = `Make pairs. If every dot has a partner, the number is even. If one is left over, it is odd.`;
+                    q._variant = 'pairs';
+                    q.cell = { template: 'parity', v: 1, payload: { task: 'pairs', n: num, correct: isEven ? 1 : 0 } };
+                    q.visual = k2Twin('parity', q.cell.payload);
 
                 } else if (oeType === 'select') {
-                    // Type 2: Select all odd/even numbers from a list of 5
+                    // Type 2: a set of five numbers. Paper: circle the even ones, cross out the odd
+                    // ones (the key marks both). Screen: the multi-select widget (as select_even_odd),
+                    // "Click all the EVEN numbers."
                     const targetType = pick(["odd", "even"]);
                     const targetCount = rng(2, 4); // 2-4 numbers match
                     const nonTargetCount = 5 - targetCount;
-
-                    // Generate numbers ensuring exact target/non-target split
                     const targetNums = [];
                     const nonTargetNums = [];
                     while (targetNums.length < targetCount) {
@@ -1435,49 +1392,28 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         const fits = targetType === "even" ? n % 2 !== 0 : n % 2 === 0;
                         if (fits && !nonTargetNums.includes(n) && !targetNums.includes(n)) nonTargetNums.push(n);
                     }
-
-                    // Shuffle all 5 numbers together
                     const allNums = shuffle([...targetNums, ...nonTargetNums]);
-                    // Store correct indices (which positions are targets)
-                    const correctIndices = [];
-                    allNums.forEach((n, i) => {
-                        const isTarget = targetType === "even" ? n % 2 === 0 : n % 2 !== 0;
-                        if (isTarget) correctIndices.push(i);
-                    });
-
+                    const options = allNums.map((n, i) => ({
+                        id: 'opt' + i,
+                        label: String(n),
+                        correct: targetType === "even" ? n % 2 === 0 : n % 2 !== 0
+                    }));
                     q.text = `Click all the ${targetType.toUpperCase()} numbers.`;
-                    q.ans = correctIndices.join(',');
-                    // The same sort, so the same printed string (BD-14). q.ans is a list of
-                    // POSITIONS because that is what the screen widget checks — a printed key
-                    // reading "0,2" cannot be marked against, so the paper key names the numbers.
+                    q.ans = options.filter(o => o.correct).map(o => o.id);
+                    q.options = options;
+                    q.answerType = 'multi-select-check';
+                    // Paper says what a pencil does, and the key names both groups (BD-14).
                     q.printText = ODD_EVEN_SORT_PRINT;
                     q.printAnswer = oddEvenSortKey(allNums);
-                    q.answerType = "odd-even-select";
-                    q.oeNumbers = allNums;
-                    q.oeTarget = targetType;
-                    q.oeCorrectIndices = correctIndices;
-                    q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers ${targetType === "even" ? "can be divided by 2 with no remainder (end in 0, 2, 4, 6, 8)" : "have a remainder of 1 when divided by 2 (end in 1, 3, 5, 7, 9)"}.`;
-
-                    const boxes = allNums.map((n, i) =>
-                        `<div class="oe-num-box" id="oeBox${i}" onclick="selectOddEvenNumber(${i})" style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);cursor:pointer;transition:all 0.2s;user-select:none;">${n}</div>`
-                    ).join('');
-
-                    // No heading and no caption inside the cell. The old ones restated the
-                    // instruction inside the cell (BD-10) and, because the print path keeps the
-                    // visual, the caption printed "Click each even number, then check your
-                    // answer." at a pupil holding a pencil. The instruction above the boxes says
-                    // what to do; the button is screen furniture and print strips it.
-                    q.visual = `<div style="text-align:center;">
-                        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0;">
-                            ${boxes}
-                        </div>
-                        <button class="btn btn-primary" id="checkOddEvenBtn" onclick="checkOddEvenSelection()" style="margin-top:12px;">Check Answer</button>
-                    </div>`;
+                    q.printFormat = 'multi-select';
+                    q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers ${targetType === "even" ? "end in 0, 2, 4, 6 or 8" : "end in 1, 3, 5, 7 or 9"}.`;
+                    q._variant = 'sort';
+                    // print only: the screen draws the multi-select widget from q.options
+                    q.cell = { template: 'parity', v: 1, payload: { task: 'sort', nums: allNums, caption: true } };
 
                 } else {
-                    // Type 3: Which of these 3 numbers is odd/even?
+                    // Type 3: Which of these 3 numbers is odd/even? (abstract: up to Max Number)
                     const targetType = pick(["odd", "even"]);
-                    // Generate 1 target and 2 non-targets
                     let target;
                     do { target = rng(1, maxNum); } while ((targetType === "even") !== (target % 2 === 0));
                     const others = [];
@@ -1487,27 +1423,18 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         if (!isTarget && n !== target && !others.includes(n)) others.push(n);
                     }
                     const choices = shuffle([target, ...others]);
-
                     q.text = `Which number is ${targetType}?`;
                     q.ans = String(target);
-                    q.answerType = "multiple-choice";
-                    q.options = choices.map(String);
+                    q.printAnswer = String(target);
+                    q.acceptedAnswers = [String(target)];
+                    q.printText = 'Read the question. Check one box.';
+                    q.answerType = "text";
+                    q.selfAnswering = true;
+                    q.options = [];
                     q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers end in ${targetType === "even" ? "0, 2, 4, 6, or 8" : "1, 3, 5, 7, or 9"}.`;
-
-                    const numBoxes = choices.map(n => {
-                        const isE = n % 2 === 0;
-                        return `<div style="text-align:center;">
-                            <div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);">${n}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">${isE ? 'ends in ' + (n % 10) : 'ends in ' + (n % 10)}</div>
-                        </div>`;
-                    }).join('');
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Which is ${targetType === "even" ? "Even" : "Odd"}?</div>
-                        <div style="display:flex;justify-content:center;gap:16px;margin:12px 0;">
-                            ${numBoxes}
-                        </div>
-                    </div>`;
+                    q._variant = 'which';
+                    q.cell = { template: 'parity', v: 1, payload: { task: 'which', nums: choices, target: targetType, correct: choices.indexOf(target) } };
+                    q.visual = k2Twin('parity', q.cell.payload);
                 }
                 return;
             } else if (patternSkill === "pattern_relationship") {

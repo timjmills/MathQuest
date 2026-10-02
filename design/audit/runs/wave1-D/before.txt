@@ -1,0 +1,218 @@
+ws-print-lint: source kit, 33 skill(s)
+  addition:add_sub_10s: 2+1 pages, 1 finding(s)
+  addition:add_sub_100s: 2+1 pages, 1 finding(s)
+  addition:number_families_add: 2+1 pages, 1 finding(s)
+  addition:number_families_add_med: 2+1 pages, 1 finding(s)
+  addition:number_families_add_hard: 2+1 pages, 1 finding(s)
+  addition:comparison_word: 2+1 pages, 16 finding(s)
+  subtraction:missing_add_sub: 2+1 pages, 1 finding(s)
+  subtraction:unknown_start_wp: 2+1 pages, 1 finding(s)
+  subtraction:mixed_subtraction: 2+1 pages, 3 finding(s)
+  multiplication:dot_array_mult: 2+1 pages, 31 finding(s)
+  multiplication:mult_properties: 2+1 pages, 3 finding(s)
+  multiplication:mult_comparison: 2+1 pages, 1 finding(s)
+  multiplication:area_model_mult_hard: 2+1 pages, 9 finding(s)
+  multiplication:mult_div_fact_family: 2+1 pages, 1 finding(s)
+  multiplication:number_families_mult: 2+1 pages, 1 finding(s)
+  multiplication:number_families_mult_med: 2+1 pages, 1 finding(s)
+  multiplication:number_families_mult_hard: 2+1 pages, 1 finding(s)
+  multiplication:mixed_multiplication: 2+1 pages, 4 finding(s)
+  multiplication:mult_missing_digit: 2+1 pages, 1 finding(s)
+  division:box_division_easy: 2+1 pages, 1 finding(s)
+  division:box_division_hard: 2+1 pages, 1 finding(s)
+  division:area_model_div_2by1: 2+1 pages, 13 finding(s)
+  division:area_model_div_3by1: 2+1 pages, 13 finding(s)
+  division:missing_mult_div: 2+1 pages, 1 finding(s)
+  division:mixed_mult_div: 2+1 pages, 16 finding(s)
+  division:div_zero_in_quotient: 2+1 pages, 77 finding(s)
+  composing:odd_even: 2+1 pages, 136 finding(s)
+  composing:select_even_odd: 2+1 pages, 1 finding(s)
+  composing:compose_whole: 2+1 pages, 81 finding(s)
+  composing:mixed_composing: 2+1 pages, 6 finding(s)
+  counting_mixed:counting_all: 2+1 pages, 2 finding(s)
+  composing:fraction_number_line: 2+1 pages, 12 finding(s)
+  composing:whole_as_fraction: 2+1 pages, 24 finding(s)
+  (app console: 5 error(s), first: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID)
+
+document                                    pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+addition:add_sub_10s                          2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+addition:add_sub_100s                         2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+addition:number_families_add                  2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+addition:number_families_add_med              2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+addition:number_families_add_hard             2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+addition:comparison_word                      2+1k    .     .    8    8        .     .       .    .     .       .     .    .      .       .  FAIL
+subtraction:missing_add_sub                   2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+subtraction:unknown_start_wp                  2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+subtraction:mixed_subtraction                 2+1k    .     .    .    .        .     .       3    .     .       .     .    .      .       .  FAIL
+multiplication:dot_array_mult                 2+1k    .     .   14   12        .     .       4    1     .       .     .    .      .       .  FAIL
+multiplication:mult_properties                2+1k    .     2    .    .        .     .       1    .     .       .     .    .      .       .  FAIL
+multiplication:mult_comparison                2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .  FAIL
+multiplication:area_model_mult_hard           2+1k    .     .    8    .        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:mult_div_fact_family           2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:number_families_mult           2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:number_families_mult_med       2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:number_families_mult_hard      2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:mixed_multiplication           2+1k    .     .    .    .        .     .       4    .     .       .     .    .      .       .  FAIL
+multiplication:mult_missing_digit             2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:box_division_easy                    2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:box_division_hard                    2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:area_model_div_2by1                  2+1k    .     .   12    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:area_model_div_3by1                  2+1k    .     .   12    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:missing_mult_div                     2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+division:mixed_mult_div                       2+1k    .     .    .    .        .     .      16    .     .       .     .    .      .       .  FAIL
+division:div_zero_in_quotient                 2+1k    .     .   76    .        .     .       .    1     .       .     .    .      .       .  FAIL
+composing:odd_even                            2+1k  134     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:select_even_odd                     2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .  FAIL
+composing:compose_whole                       2+1k    .     .   80    .        .     .       .    1     .       .     .    .      .       .  FAIL
+composing:mixed_composing                     2+1k    .     .    4    .        .     .       2    .     .       .     .    .      .       .  FAIL
+counting_mixed:counting_all                   2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:fraction_number_line                2+1k    .     .   10    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:whole_as_fraction                   2+1k    .     .   24    .        .     .       .    .     .       .     .    .      .       .  FAIL
+TOTAL                                               134     2  248   20        .     .      37   22     .       .     .    .      .       .
+
+addition:add_sub_10s (Add & Subtract by 10s)
+  [L-KEY AK-4 critical] (p2) key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)
+
+addition:add_sub_100s (Add & Subtract by 100s)
+  [L-KEY AK-4 critical] (p2) key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)
+
+addition:number_families_add (Number Families (Add & Subtract))
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+addition:number_families_add_med (Number Families - Medium)
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+addition:number_families_add_hard (Number Families - Hard)
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+addition:comparison_word (How Many More/Fewer? (Visual))
+  [L-FONT TY-2 major] x8 (p1,2 cells 1,2,3,4,1,2,3,4) font-weight 600: Andika has only 400 and 700 (TY-2)
+      e.g. <text> "Difference = ?"
+  [L-SIZE TY-11 major] x8 (p1,2 cells 1,2,3,4,1,2,3,4) 7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "Difference = ?"
+
+subtraction:missing_add_sub (Missing Numbers (+/−))
+  [L-KEY AK-4 critical] (p2) key page 2 has 20 answer slots, pupil page 1 has 0 (AK-4)
+
+subtraction:unknown_start_wp (Unknown Start Word Problems (Visual))
+  [L-KEY AK-4 critical] (p2) key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)
+
+subtraction:mixed_subtraction (Mixed Subtraction)
+  [L-DENSITY H13 major] x2 (p1,2 cells 1,1) one empty band 29.1 mm wide in a 92.3 mm cell (32%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "a. 2 5 − 2 3" | <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "a. 2 5 − 2 3 2"
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 79 mm tall under the problems (30% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+multiplication:dot_array_mult (Dot Array Multiplication (B&W))
+  [L-KEY AK-4 critical] (p2) key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-1 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) font-family "Arial, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <text> "5 rows × 4 columns" | <text> "9 rows × 8 columns"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 6 text run(s) embedded in "LiberationSans", not Andika (e.g. "5 rows × 4 columns") (TY-1, TY-3)
+  [L-SIZE TY-11 major] x2 (p1,2 cells 6,6) 7.3 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "8 rows × 10 columns"
+  [L-SIZE TY-11 major] x10 (p1,2 cells 1,2,3,4,5,1,2,3...) 7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "5 rows × 4 columns" | <text> "9 rows × 8 columns"
+  [L-DENSITY H13 major] x4 (p1,2 cells 4,5,4,5) one empty band 37.4 mm tall in a 112.9 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "d. 2 × 2 = 2 rows × 2 column..." | <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "e. 3 × 2 = 3 rows × 2 column..."
+
+multiplication:mult_properties (Multiplication Properties (Visual))
+  [L-EMOJI TY-6 major] x2 (p1,2 cells 1,1) "What is 0 x 8?": multiplication written with a letter x or asterisk; the operator is the true glyph U+00D7 (TY-6)
+      e.g. <div> "What is 0 x 8?"
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 157 mm tall under the problems (59% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+multiplication:mult_comparison (Times as Many Word Problems (Visual))
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 61 mm tall under the problems (23% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+multiplication:area_model_mult_hard (Area Model (2×2 and 2×3))
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-2 major] x8 (p1,2 cells 1,2,3,4,1,2,3,4) font-weight 900: Andika has only 400 and 700 (TY-2)
+      e.g. <strong> "44 × 55" | <strong> "28 × 126"
+
+multiplication:mult_div_fact_family (Multiplication Fact Families)
+  [L-KEY AK-4 critical] (p2) key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)
+
+multiplication:number_families_mult (Number Families (Multiply & Divide))
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+multiplication:number_families_mult_med (Number Families - Medium)
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+multiplication:number_families_mult_hard (Number Families - Hard)
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+multiplication:mixed_multiplication (Mixed Multiplication)
+  [L-DENSITY H13 major] x4 (p1,2 cells 1,3,1,3) one empty band 37.1 mm tall in a 112.8 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "a. 4 × 4 2 5 6" | <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "c. 3 × 1 0"
+
+multiplication:mult_missing_digit (Find the Missing Digit (Multiplication))
+  [L-KEY AK-2 critical] (p2) key page 2: 5 of 18 answer slot(s) carry no answer (AK-2, AK-4)
+
+division:box_division_easy (Box Method Division (2÷1 digit))
+  [L-KEY AK-4 critical] (p2) key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)
+
+division:box_division_hard (Box Method Division (3÷1 digit))
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+
+division:area_model_div_2by1 (Area Model Division (2÷1 digit))
+  [L-KEY AK-4 critical] (p2) key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-2 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) font-weight 900: Andika has only 400 and 700 (TY-2)
+      e.g. <strong> "66 ÷ 6" | <strong> "24 ÷ 2"
+
+division:area_model_div_3by1 (Area Model Division (3÷1 digit))
+  [L-KEY AK-4 critical] (p2) key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-2 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) font-weight 900: Andika has only 400 and 700 (TY-2)
+      e.g. <strong> "153 ÷ 3" | <strong> "213 ÷ 3"
+
+division:missing_mult_div (Missing Factors (×/÷))
+  [L-KEY AK-4 critical] (p2) key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)
+
+division:mixed_mult_div (Mixed Multiplication & Division)
+  [L-DENSITY H13 major] x16 (p1,2 cells 1,2,3,4,6,7,11,12...) one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "a. 30 ÷ 3 =" | <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "b. 21 ÷ 3 ="
+
+division:div_zero_in_quotient (Zero in the Quotient)
+  [L-KEY AK-4 critical] (p2) key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-1 major] x72 (p1,2 cells 1,1,1,1,1,1,1,1...) font-family "Arial, Helvetica, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <div> "9" | <div> "4"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 16 text run(s) embedded in "LiberationSans-Bold", not Andika (e.g. "9") (TY-1, TY-3)
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 20 text run(s) embedded in "LiberationSans", not Andika (e.g. "−") (TY-1, TY-3)
+
+composing:odd_even (Odd or Even? (Visual))
+  [L-INK INK-2 major] x132 (p1,2 cells 1,1,1,1,2,2,2,2...) border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)
+      e.g. <div>
+  [L-INK INK-2 major] x2 (p1,2) printed page 1: 66 paint(s) with opacity below 1 (INK-2)
+  [L-DENSITY H13 major] x2 (p1,2 cells 1,1) one empty band 36.1 mm tall in a 112.8 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "a. Is 4 odd or even? Answer:" | <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "a. Is 4 odd or even? Answer:..."
+
+composing:select_even_odd (Circle the Even or Odd Numbers (MAP))
+  [L-KEY AK-4 critical] (p2) key page 2 has 8 answer slots, pupil page 1 has 0 (AK-4)
+
+composing:compose_whole (Compose 1 Whole from Unit Fractions)
+  [L-KEY AK-4 critical] (p2) key page 2 has 3 answer slots, pupil page 1 has 0 (AK-4)
+  [L-FONT TY-2 major] x6 (p1,2 cells 1,2,3,1,2,3) font-style italic: no italic anywhere (TY-2, AX-3)
+      e.g. <div> "Write the fractions you used..."
+  [L-FONT TY-7 major] x74 (p1,2 cells 1,1,1,1,1,1,1,1...) slash fraction "1/2": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <span.tile> "1/2" | <span.tile> "1/4"
+
+composing:mixed_composing (Mixed Number Sense)
+  [L-FONT TY-2 major] x4 (p1,2 cells 1,1,1,1) font-weight 600: Andika has only 400 and 700 (TY-2)
+      e.g. <span.num> "?" | <span.den> "1"
+  [L-DENSITY H13 major] x2 (p1,2 cells 3,3) one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--tenframe[data-ws-cell="tenframe"]> "c. 5"
+
+counting_mixed:counting_all (All Counting & Cardinality)
+  [L-DENSITY H13 major] x2 (p1,2 cells 4,4) one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--tenframe[data-ws-cell="tenframe"]> "d. 10"
+
+composing:fraction_number_line (Fractions on Number Line (Visual))
+  [L-FONT TY-1 major] x8 (p1,2 cells 1,1,1,1,1,1,1,1) font-family ""Open Sans", Inter, system-ui, -apple-system, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <text> "0" | <text> "1"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 4 text run(s) embedded in "DejaVuSans-Bold", not Andika (e.g. "0") (TY-1, TY-3)
+  [L-DENSITY H13 major] x2 (p1,2 cells 1,1) one empty band 74.6 mm tall in a 226 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mq-legacy[data-ws-cell="legacy"]> "a. What fraction or mixed nu..."
+
+composing:whole_as_fraction (Whole Numbers as Fractions (Visual))
+  [L-FONT TY-2 major] x24 (p1,2 cells 1,1,2,2,3,3,4,4...) font-weight 600: Andika has only 400 and 700 (TY-2)
+      e.g. <span.num> "?" | <span.den> "1"
+wrote design/audit/runs/wave1-D/before.json
+
+ws-print-lint: WOULD FAIL - 33 document(s), source kit; 463 finding(s) in 33 document(s) [report-only, exit 0]

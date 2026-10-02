@@ -126,6 +126,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'count-all': 'Count them all. Write how many.',
     'count-kind': 'Count one kind. Write how many.',
     'count-tens': 'Write how many tens.',
+    'check-odd-even': 'Odd or even? Check one box.',
+    'check-asked': 'Read the question. Check one box.',
+    'circle-even': 'Circle the even numbers. Cross out the odd numbers.',
+    'make-whole': 'Use the pieces. Write the fractions that make 1 whole.',
     'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
     // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,

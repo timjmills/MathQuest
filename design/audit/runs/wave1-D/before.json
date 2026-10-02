@@ -1,0 +1,5538 @@
+{
+ "tool": "ws-print-lint",
+ "source": "kit",
+ "lints": [
+  "L-INK",
+  "L-EMOJI",
+  "L-FONT",
+  "L-SIZE",
+  "L-OVERFLOW",
+  "L-SPLIT",
+  "L-DENSITY",
+  "L-KEY",
+  "L-VERBS",
+  "L-ANSAREA",
+  "L-INPUT",
+  "L-CCSS",
+  "L-ANCHOR",
+  "L-SUPPORT"
+ ],
+ "documents": [
+  {
+   "id": "addition:add_sub_10s",
+   "label": "Add & Subtract by 10s",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s",
+   "label": "Add & Subtract by 100s",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "addition:number_families_add",
+   "label": "Number Families (Add & Subtract)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "addition:number_families_add_med",
+   "label": "Number Families - Medium",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "addition:number_families_add_hard",
+   "label": "Number Families - Hard",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "addition:comparison_word",
+   "label": "How Many More/Fewer? (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 8,
+    "L-SIZE": 8,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.4 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"Difference = ?\"",
+     "page": 2,
+     "cell": 4
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub",
+   "label": "Missing Numbers (+/−)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 20 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "subtraction:unknown_start_wp",
+   "label": "Unknown Start Word Problems (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "subtraction:mixed_subtraction",
+   "label": "Mixed Subtraction",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 3,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 29.1 mm wide in a 92.3 mm cell (32%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--stack[data-ws-cell=\"stack\"]> \"a. 2 5 − 2 3\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 29.1 mm wide in a 92.3 mm cell (32%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--stack[data-ws-cell=\"stack\"]> \"a. 2 5 − 2 3 2\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "msg": "page 1: an empty strip 79 mm tall under the problems (30% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)",
+     "page": 1
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:dot_array_mult",
+   "label": "Dot Array Multiplication (B&W)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 14,
+    "L-SIZE": 12,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 4,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 1: 6 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"5 rows × 4 columns\") (TY-1, TY-3)",
+     "page": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"5 rows × 4 columns\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"9 rows × 8 columns\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"3 rows × 7 columns\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"2 rows × 2 columns\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"3 rows × 2 columns\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"8 rows × 10 columns\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 2: 6 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"5 rows × 4 columns\") (TY-1, TY-3)",
+     "page": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"5 rows × 4 columns\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"9 rows × 8 columns\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"3 rows × 7 columns\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"2 rows × 2 columns\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"3 rows × 2 columns\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"8 rows × 10 columns\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"5 rows × 4 columns\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"9 rows × 8 columns\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"3 rows × 7 columns\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"2 rows × 2 columns\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"3 rows × 2 columns\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.3 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"8 rows × 10 columns\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"5 rows × 4 columns\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"9 rows × 8 columns\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"3 rows × 7 columns\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"2 rows × 2 columns\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"3 rows × 2 columns\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-SIZE",
+     "rule": "TY-11",
+     "sev": "major",
+     "msg": "7.3 pt text: nothing a pupil reads is under 8 pt (TY-11)",
+     "el": "<text> \"8 rows × 10 columns\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.4 mm tall in a 112.9 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"d. 2 × 2 = 2 rows × 2 column...\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 35.1 mm tall in a 112.9 mm cell (31%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"e. 3 × 2 = 3 rows × 2 column...\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.4 mm tall in a 112.9 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"d. 2 × 2 = 2 rows × 2 column...\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 35.1 mm tall in a 112.9 mm cell (31%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"e. 3 × 2 = 3 rows × 2 column...\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_properties",
+   "label": "Multiplication Properties (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 2,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 1,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-EMOJI",
+     "rule": "TY-6",
+     "sev": "major",
+     "msg": "\"What is 0 x 8?\": multiplication written with a letter x or asterisk; the operator is the true glyph U+00D7 (TY-6)",
+     "el": "<div> \"What is 0 x 8?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "TY-6",
+     "sev": "major",
+     "msg": "\"What is 0 x 8?\": multiplication written with a letter x or asterisk; the operator is the true glyph U+00D7 (TY-6)",
+     "el": "<div> \"What is 0 x 8?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "msg": "page 1: an empty strip 157 mm tall under the problems (59% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)",
+     "page": 1
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_comparison",
+   "label": "Times as Many Word Problems (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 1,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "msg": "page 1: an empty strip 61 mm tall under the problems (23% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)",
+     "page": 1
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:area_model_mult_hard",
+   "label": "Area Model (2×2 and 2×3)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 8,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"44 × 55\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"28 × 126\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"82 × 399\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"14 × 54\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"44 × 55\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"28 × 126\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"82 × 399\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"14 × 54\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_div_fact_family",
+   "label": "Multiplication Fact Families",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:number_families_mult",
+   "label": "Number Families (Multiply & Divide)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:number_families_mult_med",
+   "label": "Number Families - Medium",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:number_families_mult_hard",
+   "label": "Number Families - Hard",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication",
+   "label": "Mixed Multiplication",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 4,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.1 mm tall in a 112.8 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--stack[data-ws-cell=\"stack\"]> \"a. 4 × 4 2 5 6\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 35.1 mm tall in a 112.9 mm cell (31%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"c. 3 × 1 0\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.1 mm tall in a 112.8 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--stack[data-ws-cell=\"stack\"]> \"a. 6 4 × 4 2 5 6\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 35.1 mm tall in a 112.9 mm cell (31%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"c. 3 × 1 0 3 0\"",
+     "page": 2,
+     "cell": 3
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_missing_digit",
+   "label": "Find the Missing Digit (Multiplication)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-2",
+     "sev": "critical",
+     "msg": "key page 2: 5 of 18 answer slot(s) carry no answer (AK-2, AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:box_division_easy",
+   "label": "Box Method Division (2÷1 digit)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:box_division_hard",
+   "label": "Box Method Division (3÷1 digit)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:area_model_div_2by1",
+   "label": "Area Model Division (2÷1 digit)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 12,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"66 ÷ 6\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"24 ÷ 2\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"64 ÷ 8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"85 ÷ 5\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"56 ÷ 4\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"84 ÷ 7\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"66 ÷ 6\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"24 ÷ 2\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"64 ÷ 8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"85 ÷ 5\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"56 ÷ 4\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"84 ÷ 7\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:area_model_div_3by1",
+   "label": "Area Model Division (3÷1 digit)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 12,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"153 ÷ 3\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"213 ÷ 3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"231 ÷ 7\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"156 ÷ 6\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"232 ÷ 8\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"189 ÷ 7\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"153 ÷ 3\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"213 ÷ 3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"231 ÷ 7\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"156 ÷ 6\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"232 ÷ 8\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)",
+     "el": "<strong> \"189 ÷ 7\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div",
+   "label": "Missing Factors (×/÷)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 18 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:mixed_mult_div",
+   "label": "Mixed Multiplication & Division",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 16,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. 30 ÷ 3 =\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"b. 21 ÷ 3 =\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"c. 2 ÷ 1 =\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"d. 36 ÷ 6 =\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"f. 77 ÷ 7 =\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"g. 16 ÷ 2 =\"",
+     "page": 1,
+     "cell": 7
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"k. 8 ÷ 8 =\"",
+     "page": 1,
+     "cell": 11
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"l. 36 ÷ 9 =\"",
+     "page": 1,
+     "cell": 12
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. 30 ÷ 3 = 10\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"b. 21 ÷ 3 = 7\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"c. 2 ÷ 1 = 2\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"d. 36 ÷ 6 = 6\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"f. 77 ÷ 7 = 11\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"g. 16 ÷ 2 = 8\"",
+     "page": 2,
+     "cell": 7
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"k. 8 ÷ 8 = 1\"",
+     "page": 2,
+     "cell": 11
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 18.3 mm tall in a 56.3 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"l. 36 ÷ 9 = 4\"",
+     "page": 2,
+     "cell": 12
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:div_zero_in_quotient",
+   "label": "Zero in the Quotient",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 76,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 1: 16 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"9\") (TY-1, TY-3)",
+     "page": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 1: 20 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"−\") (TY-1, TY-3)",
+     "page": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"9\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"9\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"0\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"1\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"6\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"0\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 2: 16 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"9\") (TY-1, TY-3)",
+     "page": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 2: 20 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"−\") (TY-1, TY-3)",
+     "page": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"9\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"9\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"0\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"1\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"6\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"5\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"3\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"0\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<div> \"↓\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<span> \"−\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:odd_even",
+   "label": "Odd or Even? (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 134,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "printed page 1: 66 paint(s) with opacity below 1 (INK-2)",
+     "page": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "printed page 2: 66 paint(s) with opacity below 1 (INK-2)",
+     "page": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-2",
+     "sev": "major",
+     "msg": "border (all sides) is semi-transparent (rgba(255, 255, 255, 0.3)): no opacity below 1 (INK-2)",
+     "el": "<div>",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 36.1 mm tall in a 112.8 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. Is 4 odd or even? Answer:\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 36.1 mm tall in a 112.8 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. Is 4 odd or even? Answer:...\"",
+     "page": 2,
+     "cell": 1
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:select_even_odd",
+   "label": "Circle the Even or Odd Numbers (MAP)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 8 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:compose_whole",
+   "label": "Compose 1 Whole from Unit Fractions",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 80,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)",
+     "el": "<div> \"Write the fractions you used...\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/2\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/3\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/3\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/6\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/4\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "msg": "slash fraction \"1/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)",
+     "el": "<span.tile> \"1/8\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 3 answer slots, pupil page 1 has 0 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing",
+   "label": "Mixed Number Sense",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 4,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--tenframe[data-ws-cell=\"tenframe\"]> \"c. 5\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--tenframe[data-ws-cell=\"tenframe\"]> \"c. 5\"",
+     "page": 2,
+     "cell": 3
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all",
+   "label": "All Counting & Cardinality",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--tenframe[data-ws-cell=\"tenframe\"]> \"d. 10\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 40.7 mm tall in a 112.9 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--tenframe[data-ws-cell=\"tenframe\"]> \"d. 10\"",
+     "page": 2,
+     "cell": 4
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:fraction_number_line",
+   "label": "Fractions on Number Line (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 10,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 1: 4 text run(s) embedded in \"DejaVuSans-Bold\", not Andika (e.g. \"0\") (TY-1, TY-3)",
+     "page": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"0\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"1\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"2\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "printed page 2: 4 text run(s) embedded in \"DejaVuSans-Bold\", not Andika (e.g. \"0\") (TY-1, TY-3)",
+     "page": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"0\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"1\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"2\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)",
+     "el": "<text> \"?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 74.6 mm tall in a 226 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. What fraction or mixed nu...\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 71.8 mm tall in a 226 mm cell (32%): the row is sized for a taller item than it holds (RUBRIC H13)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"a. What fraction or mixed nu...\"",
+     "page": 2,
+     "cell": 1
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "composing:whole_as_fraction",
+   "label": "Whole Numbers as Fractions (Visual)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 24,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"2\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"6\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"3\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"2\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"6\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"3\"",
+     "page": 2,
+     "cell": 5
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.num> \"?\"",
+     "page": 2,
+     "cell": 6
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)",
+     "el": "<span.den> \"1\"",
+     "page": 2,
+     "cell": 6
+    }
+   ],
+   "notes": []
+  }
+ ]
+}

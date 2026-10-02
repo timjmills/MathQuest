@@ -126,7 +126,7 @@ register('equation', {
         const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
         const wMm = chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         return {
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction',
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + (p.notation === 'fraction' ? ctx.metrics.writeMm + 4 : 1.5)) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction',
             factLike: false, maxCols: 4, stretchCap: STRETCH_CAP.equation,
         };
     },
