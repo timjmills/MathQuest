@@ -1561,3 +1561,7 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 .dark .map-launch-k2, .dark-theme .map-launch-k2 { color: #5EEAD4; }
 .dark .map-launch-35, .dark-theme .map-launch-35 { color: #FDBA74; }
 .dark .map-launch-mixed, .dark-theme .map-launch-mixed { color: #C4B5FD; }
+
+/* ---- Start cards: dark-theme focus ring reaches 3:1 against the dark section (critic R2-D1). */
+.dark .mode-cards .student-start-btn:focus-visible,
+.dark-theme .mode-cards .student-start-btn:focus-visible { outline-color: #B5A5F4; }
