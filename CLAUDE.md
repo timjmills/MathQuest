@@ -504,7 +504,7 @@ Extensive SVG generation functions across 5 modules:
 
 ## Agents — model and effort (owner rule, 2026-10-02)
 
-Every subagent (builders, fixers, critics, explorers) runs on **Sonnet at LOW effort by default**. Escalate only when a
+Every subagent (builders, fixers, critics, explorers) runs on **Sonnet 5.5 at LOW effort by default** (the owner sees Sonnet 5.5 listed in the program; the Agent tool alias is `sonnet`, which maps to the newest Sonnet available). Escalate only when a
 problem persists and the lower setting cannot solve it, one step at a time:
 
 1. Sonnet, low — the default for every agent.
