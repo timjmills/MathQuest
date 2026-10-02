@@ -1375,6 +1375,75 @@ html body .hint-speak-btn { min-width: 44px; min-height: 44px; }
 .student-start-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
 @media (max-width: 480px) { .student-start-btn { flex: 1 1 44%; max-width: none; min-height: 56px; padding: 10px 12px; font-size: 1.05rem; } }
 
+/* ---- WAVE 1 / A2 (2026-10-02). Per-box feedback: each answer box turns green when right, red when
+   wrong (screen-cell.js wireLiveCorrect / markBoxSubmitted). PRACTICE CARD and ONLINE WORKSHEET
+   only; the quiz never wires it (it would reveal answers); print never shows it.
+   INK-6 spirit: colour is never the only cue. A right box has a SOLID green edge and a tick; a wrong
+   box has a DASHED red edge and a cross. The tick / cross is an 18 px badge on the box's OUTER top-right
+   corner (screen-cell.js draws it, so it never sits on the digits). Tokens: AA on white (green 5.6:1,
+   red 6.5:1); the digits stay black on the pale fills. No motion, so nothing to reduce.
+   ONE look for every answer box: the older per-box paints (.box-correct / .box-wrong, .correct / .wrong,
+   the inline green and red of the area-model, family and expanded-form checkers) give way to it. */
+:root {
+    --mq-box-ok: #1B7A43;  --mq-box-ok-bg: #E3F4EA;
+    --mq-box-bad: #B3261E; --mq-box-bad-bg: #FDE7E4;
+}
+html body .mq-scell.mq-scell.mq-scell input.mq-live-correct {
+    background-color: var(--mq-box-ok-bg) !important; border-color: var(--mq-box-ok) !important;
+    box-shadow: inset 0 0 0 3px var(--mq-box-ok) !important; color: #000 !important;
+}
+html body .mq-scell.mq-scell.mq-scell input.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg) !important; border-color: var(--mq-box-bad) !important;
+    box-shadow: none !important; color: #000 !important;
+    /* the second cue besides colour and the cross: a DASHED edge (the right box's edge is solid) */
+    border-style: dashed !important; outline: 3px dashed var(--mq-box-bad) !important; outline-offset: -3px !important;
+}
+/* a column stack's digit and regroup boxes carry their own edge (the kit's) */
+html body .mq-scell.mq-scell.mq-scell .mq-kit input.mq-digit.mq-live-wrong,
+html body .mq-scell.mq-scell.mq-scell .mq-kit input.mq-carry.mq-live-wrong,
+html body .mq-scell.mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-wrong.mq-live-wrong {
+    border-style: dashed !important; border-color: var(--mq-box-bad) !important; box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg) !important; outline: 3px dashed var(--mq-box-bad) !important; outline-offset: -3px !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-correct.mq-live-correct {
+    border-style: solid !important; border-color: var(--mq-box-ok) !important; background-color: var(--mq-box-ok-bg) !important;
+    box-shadow: inset 0 0 0 3px var(--mq-box-ok) !important;
+}
+/* a drawn tile or cell box that carries its edge on the wrapper */
+html body .mq-scell.mq-scell.mq-scell [data-mq-cell]:has(> input.mq-live-correct),
+html body .mq-scell.mq-scell.mq-scell .mq-cellbox:has(> input.mq-live-correct) { border-color: var(--mq-box-ok) !important; background: var(--mq-box-ok-bg) !important; }
+html body .mq-scell.mq-scell.mq-scell [data-mq-cell]:has(> input.mq-live-wrong),
+html body .mq-scell.mq-scell.mq-scell .mq-cellbox:has(> input.mq-live-wrong) { border-color: var(--mq-box-bad) !important; background: var(--mq-box-bad-bg) !important; border-style: dashed !important; }
+/* a tile (count rows, chart gaps) keeps its own white fill and its input is clear: the fill goes on the input */
+html body .mq-scell.mq-scell.mq-scell [data-mq-cell] > input.mq-cellslot.mq-live-correct { background-color: var(--mq-box-ok-bg) !important; box-shadow: none !important; }
+html body .mq-scell.mq-scell.mq-scell [data-mq-cell] > input.mq-cellslot.mq-live-wrong { background-color: var(--mq-box-bad-bg) !important; box-shadow: none !important; }
+/* coordinate boxes sit in the card's answer area, beside the plane, outside the cell */
+html body #questionCard .ci-host input.mq-live-correct, html body #questionCard #answerInputArea input.mq-live-correct {
+    background-color: var(--mq-box-ok-bg) !important; border-color: var(--mq-box-ok) !important; color: #000 !important;
+}
+html body #questionCard .ci-host input.mq-live-wrong, html body #questionCard #answerInputArea input.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg) !important; border-color: var(--mq-box-bad) !important; color: #000 !important; border-style: dashed !important;
+}
+/* one cue, not two: no older round badge on a judged digit box, no clear-x on a wrong ordering box */
+html body .mq-scell .mq-kit .ab:has(> input.mq-live-correct)::after,
+html body .mq-scell .mq-kit .ab:has(> input.mq-live-wrong)::after { content: none !important; display: none !important; }
+html body input.mq-live-wrong + button[onclick*="unifiedOrderBoxClear"] { display: none !important; }
+/* the tick / cross badge (screen-cell.js keeps it on the box's outer top-right corner) */
+.mq-live-badge {
+    position: absolute; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%;
+    background-color: #fff; background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
+    border: 2px solid var(--mq-box-ok); pointer-events: none; margin: 0; padding: 0;
+}
+.mq-live-badge[data-kind="ok"] {
+    border-color: var(--mq-box-ok);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.5 10.5l4.2 4.2L16.5 5.5' fill='none' stroke='%231B7A43' stroke-width='4.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.mq-live-badge[data-kind="bad"] {
+    border-color: var(--mq-box-bad);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 4.5l11 11M15.5 4.5l-11 11' fill='none' stroke='%23B3261E' stroke-width='4.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+@media print { .mq-live-badge { display: none !important; } }
+
 /* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten at SP-10's 34.5 x 44 px or more:
    its writing slots and inputs fill their square and never widen it (the generic 44 px floor on a
    [data-mq-cell] would push each slot into its neighbour), and on a phone the chart takes the card's
@@ -1436,3 +1505,63 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 .mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .k2-swipe-cue { display: none !important; } }
+
+/* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
+   place of the mode cards, each in its original mode-card colour (ui-components.css .mode-card:nth-child). */
+.mode-cards > .student-start-wrap { grid-column: 1 / -1; }
+.student-start-wrap #studentStartSkill { text-align: center; margin: 0 0 10px; font-size: 1.15rem; font-weight: 900; }
+.mode-cards .student-start-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 0; }
+.mode-cards .student-start-btn { max-width: none; min-height: 72px; color: var(--mq-ink, #1a1a1a); border-width: 2px; border-style: solid; }
+.mode-cards .student-start-btn[data-mode="practice"] { background: linear-gradient(180deg, #FFFFFF 0%, #B5D8FF 100%); border-color: #5A9DEE; box-shadow: 0 4px 0 0 #5A9DEE; }
+.mode-cards .student-start-btn[data-mode="boss"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-add) 100%); border-color: var(--mq-op-add-d); box-shadow: 0 4px 0 0 var(--mq-op-add-d); }
+.mode-cards .student-start-btn[data-mode="race"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-sub) 100%); border-color: var(--mq-op-sub-d); box-shadow: 0 4px 0 0 var(--mq-op-sub-d); }
+.mode-cards .student-start-btn[data-mode="worksheet"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-div) 100%); border-color: var(--mq-op-div-d); box-shadow: 0 4px 0 0 var(--mq-op-div-d); }
+.mode-cards .student-start-btn:active { transform: translateY(3px); box-shadow: none; }
+@media (max-width: 480px) { .mode-cards .student-start-btn { min-height: 64px; font-size: 1.05rem; padding: 10px 8px; } }
+
+/* ---- WAVE 1 fix 2 (owner 2026-10-02): the Start buttons take the SHAPE of the penguin card / the
+   original mode cards: tall rounded tiles, big icon over the name, one row beside the penguin
+   (2 x 2 on a phone). Colours stay the per-mode rules above. */
+.choose-mode-row .mode-cards:has(.student-start-wrap) { align-content: stretch; }
+.mode-cards > .student-start-wrap { display: flex; align-self: stretch; }
+.mode-cards .student-start-buttons { flex: 1 1 auto; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.mode-cards .student-start-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+    min-height: 160px; height: 100%; padding: 18px 14px 22px; border-radius: var(--mq-r-xl, 22px);
+    border-width: 2px; text-align: center; font-size: 1.15rem; line-height: 1.2;
+    transition: transform 80ms ease, box-shadow 80ms ease, border-color 0.2s ease, background 0.2s ease;
+}
+.mode-cards .student-start-btn .mode-icon { font-size: 2.6rem; margin-bottom: 10px; }
+.mode-cards .student-start-btn .mode-name { font-weight: 900; font-size: 1.15rem; }
+.mode-cards .student-start-btn:hover { transform: translateY(-3px); }
+.mode-cards .student-start-btn[data-mode="practice"]:hover { border-color: #3B82CC; box-shadow: 0 7px 0 0 #3B82CC; background: linear-gradient(180deg, #B5D8FF 0%, #7CB6F5 100%); }
+.mode-cards .student-start-btn[data-mode="boss"]:hover { border-color: #D86680; box-shadow: 0 7px 0 0 #D86680; background: linear-gradient(180deg, var(--mq-op-add) 0%, var(--mq-op-add-d) 100%); }
+.mode-cards .student-start-btn[data-mode="race"]:hover { border-color: #D88A4A; box-shadow: 0 7px 0 0 #D88A4A; background: linear-gradient(180deg, var(--mq-op-sub) 0%, var(--mq-op-sub-d) 100%); }
+.mode-cards .student-start-btn[data-mode="worksheet"]:hover { border-color: #4DAA7C; box-shadow: 0 7px 0 0 #4DAA7C; background: linear-gradient(180deg, var(--mq-op-div) 0%, var(--mq-op-div-d) 100%); }
+.mode-cards .student-start-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 rgba(0,0,0,0.15); }
+@media (max-width: 780px) {
+    .mode-cards .student-start-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .mode-cards .student-start-btn { min-height: 140px; height: auto; padding: 16px 10px 18px; }
+}
+
+/* ---- WAVE 1 fix 3 (critic 2026-10-02): dark theme keeps dark ink on the pastel tiles and the penguin
+   bubble; a visible focus ring; icons line up per row on a phone; the skill line wraps evenly. */
+.dark .mode-cards .student-start-btn, .dark-theme .mode-cards .student-start-btn { color: #2B2840; }
+.dark #mqHomeMascot .mq-mascot-bubble, .dark-theme #mqHomeMascot .mq-mascot-bubble { background: #fff; color: #2B2840; }
+.mode-cards .student-start-btn:focus-visible { outline: 3px solid #5E3FCC; outline-offset: 3px; }
+#studentStartSkill { text-wrap: balance; }
+@media (max-width: 780px) {
+    .mode-cards .student-start-btn { justify-content: flex-start; }
+    .mode-cards .student-start-btn .mode-name { min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
+}
+
+/* ---- WAVE 1 fix 4 (2026-10-02): MAP K-2 / 3-5 / K-5 buttons readable in dark theme (>= 4.5:1).
+   Light theme, position and size unchanged; only text and fill change under .dark / .dark-theme. */
+.dark .map-launch-btn, .dark-theme .map-launch-btn { background: linear-gradient(180deg, #2A2540 0%, #221E36 100%); }
+.dark .map-launch-k2, .dark-theme .map-launch-k2 { color: #5EEAD4; }
+.dark .map-launch-35, .dark-theme .map-launch-35 { color: #FDBA74; }
+.dark .map-launch-mixed, .dark-theme .map-launch-mixed { color: #C4B5FD; }
+
+/* ---- Start cards: dark-theme focus ring reaches 3:1 against the dark section (critic R2-D1). */
+.dark .mode-cards .student-start-btn:focus-visible,
+.dark-theme .mode-cards .student-start-btn:focus-visible { outline-color: #B5A5F4; }

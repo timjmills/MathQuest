@@ -10,7 +10,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -495,8 +495,8 @@ function _mountQuizCell(flatIdx) {
     if (test && test.settings && test.settings.showFeedback === 'instant') {
         const qd2 = state.quizAllQuestions[flatIdx].question.questionData;
         const kind2 = cellKindFor({ ...qd2, options: [] });
-        const single = document.getElementById('qtAnswerInput');
-        try { wireLiveCorrect(cellEl, { q: qd2, kind: kind2, single }); } catch (e) { /* optional */ }
+        // Wave 1 / A2: NO per-box green or red in a quiz (it would reveal the answers); per-box
+        // feedback is the practice card's and the online worksheet's.
         // the item's support ladder so far (support-ladder.js)
         try { drawLadder(cellEl, qd2, { kind: kind2, categoryId: qd2.categoryId, skillId: qd2.skillId || state.quizAllQuestions[flatIdx].question.skillId }); } catch (e) { /* optional */ }
     }

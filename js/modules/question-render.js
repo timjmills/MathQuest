@@ -1594,6 +1594,8 @@ function _applyScreenCell() {
     // Green as soon as it is right (owner request 2026-09-25): every digit box, regroup box and
     // answer slot of the cell marks itself when its value is the one it should hold.
     try { wireLiveCorrect(paper, { q, kind, single: input }); } catch (e) { /* marking is optional */ }
+    // coordinate boxes live in the answer area beside the plane (the .ci-host moved there)
+    try { if (q && q.answerType === 'coord-input') wireLiveCorrect(document.getElementById('answerInputArea'), { q }); } catch (e) { /* optional */ }
     // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
     // changes, the mono pass re-inks it and the repeated prompt is looked for again.
     monoCell(paper, {
