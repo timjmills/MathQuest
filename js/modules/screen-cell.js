@@ -554,9 +554,74 @@ function _toControl(e) {
 
 const LIVE_FN = new WeakMap();        // a box judged by a function of its value (a rule table's "make" rows)
 
+/*
+ * The tick / cross badge sits on the box's OUTER top-right corner, never on its digits. It is a
+ * fixed-position span kept in step with its box by one animation-frame loop that runs only while a
+ * badge exists: the box's own classes say which badge it shows (none when it is neither right nor
+ * wrong); it is hidden while the box is hidden or off screen and gone with the box. Its z-index sits
+ * under headers and dialogs, so they cover it as they cover the box.
+ */
+const BADGES = new Map();
+let _badgeLoop = 0;
+let _badgeSeq = 0;
+const _BADGE_AT = [[12, 11], [9, 14], [6, 18], [-1, 12]];   // [px in from the box's right edge, px up from its top]
+let _measureCtx = null;
+/** Where the pupil's digits are in a box (viewport px): the text's width, and the cap height about the middle. */
+function _writtenRect(el, r) {
+    const v = String(el.value || '');
+    if (!v) return null;
+    try {
+        _measureCtx = _measureCtx || document.createElement('canvas').getContext('2d');
+        const cs = getComputedStyle(el);
+        _measureCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const tw = _measureCtx.measureText(v).width;
+        const fs = parseFloat(cs.fontSize) || 16;
+        const pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0, bw = parseFloat(cs.borderLeftWidth) || 0;
+        const left = /left|start/.test(cs.textAlign) ? r.left + bw + pl : r.left + pl + (r.width - pl - pr) / 2 - tw / 2;
+        return { l: left, r: left + tw, t: r.top + r.height / 2 - 0.36 * fs, b: r.top + r.height / 2 + 0.36 * fs };
+    } catch (e) { return null; }
+}
+function _badgeTick() {
+    _badgeLoop = 0;
+    BADGES.forEach((b, el) => {
+        const kind = el.classList.contains('mq-live-wrong') ? 'bad' : el.classList.contains('mq-live-correct') ? 'ok' : '';
+        if (!el.isConnected || !kind) { b.remove(); BADGES.delete(el); delete el.dataset.mqBadge; return; }
+        b.dataset.kind = kind;
+        const r = el.getBoundingClientRect();
+        let show = r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+        b.style.display = show ? '' : 'none';
+        if (show) {
+            // the corner position that keeps clear of the digits: tucked in (a roomy box), then further
+            // out (a box the digits nearly fill), finally just outside the right edge
+            const t = _writtenRect(el, r);
+            let pos = _BADGE_AT[_BADGE_AT.length - 1];
+            for (const c of _BADGE_AT) {
+                const L = r.right - c[0], T = r.top - c[1];
+                if (!t || L + 18 <= t.l || L >= t.r || T + 18 <= t.t || T >= t.b) { pos = c; break; }
+            }
+            b.style.left = Math.round(r.right - pos[0]) + 'px'; b.style.top = Math.round(r.top - pos[1]) + 'px';
+        }
+    });
+    if (BADGES.size) _badgeLoop = requestAnimationFrame(_badgeTick);
+}
+function _badgeTrack(el) {
+    if (typeof document === 'undefined' || !document.body) return;
+    if (!BADGES.has(el)) {
+        const b = document.createElement('span');
+        b.className = 'mq-live-badge';
+        b.setAttribute('aria-hidden', 'true');
+        const id = String(++_badgeSeq);
+        b.dataset.id = id; el.dataset.mqBadge = id;
+        document.body.appendChild(b);
+        BADGES.set(el, b);
+    }
+    if (!_badgeLoop) _badgeLoop = requestAnimationFrame(_badgeTick);
+}
+
 function _liveSet(el, ok, bad) {
     el.classList.toggle('mq-live-correct', ok);
     el.classList.toggle('mq-live-wrong', bad);
+    if (ok || bad) _badgeTrack(el);
     if (bad) {
         el.setAttribute('aria-invalid', 'true');
         // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
@@ -619,7 +684,17 @@ function _liveBindFn(el, fn, group = []) {
     LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
-        const again = (final) => { _liveMark(el, final); group.forEach((o) => { if (o !== el && String(o.value || '').trim()) _liveMark(o, o !== document.activeElement); }); };
+        // The other boxes of the group are re-judged as UNFINISHED (a half-typed In number must not turn
+        // its neighbours red); a box that is already red stays red unless it is now right.
+        const again = (final) => {
+            _liveMark(el, final);
+            group.forEach((o) => {
+                if (o === el || !String(o.value || '').trim()) return;
+                const wasRed = o.classList.contains('mq-live-wrong');
+                _liveMark(o, false);
+                if (wasRed && !o.classList.contains('mq-live-correct')) _liveSet(o, false, true);
+            });
+        };
         el.addEventListener('input', () => again(false));
         el.addEventListener('change', () => again(false));
         el.addEventListener('blur', (e) => again(!_toControl(e)));
@@ -638,6 +713,7 @@ export function markBoxSubmitted(el, ok) {
     if (!el.offsetWidth && !el.offsetHeight) return;
     el.classList.toggle('mq-live-correct', !!ok);
     el.classList.toggle('mq-live-wrong', !ok);
+    _badgeTrack(el);
     if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     if (el.dataset.mqSubmitMark !== '1') {
         el.dataset.mqSubmitMark = '1';

@@ -1,6 +1,7 @@
 import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
+import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
@@ -2422,6 +2423,7 @@ export function checkWorksheetAnswer(idx) {
 export function checkAllWorksheet() {
     let correct = 0;
     let skipped = 0;
+    let helped = 0;
     const totalAll = state.worksheetQs.length;
 
     state.worksheetQs.forEach((q, idx) => {
@@ -2858,7 +2860,18 @@ export function checkAllWorksheet() {
             card.style.border = "2px solid var(--incorrect)";
         }
 
-        if (isCorrect) correct++;
+        if (isCorrect) {
+            correct++;
+            // owner 2026-10-02: a helped item (a box went red before it was right) is recorded like
+            // a second-try correct - a miss then a hit in the skill's progress. A worksheet awards no
+            // XP or streak, so progress is all there is. Once per item, however often Check all runs.
+            if (q._helped && !q._helpedLogged) {
+                q._helpedLogged = true;
+                helped++;
+                const sk = q.skillId || state.skill;
+                if (sk) { updateSkillProgress(sk, false); updateSkillProgress(sk, true); }
+            } else if (q._helped) helped++;
+        }
     });
 
     // Skipped problems are excluded from the denominator so percent reflects
@@ -2876,10 +2889,13 @@ export function checkAllWorksheet() {
     const skipNote = skipped > 0
         ? ` <span style="color:var(--accent-cyan); font-size:1rem;">• Skipped: ${skipped}</span>`
         : '';
+    const helpNote = helped > 0
+        ? ` <span style="color:var(--accent-cyan); font-size:1rem;">• Helped: ${helped}</span>`
+        : '';
     document.getElementById("worksheetResult").innerHTML = `
         <span style="color:${isPassing ? 'var(--correct)' : 'var(--incorrect)'}; font-size:1.3rem;">
             Score: ${correct}/${total} (${percentage}%)
-        </span>${skipNote}
+        </span>${skipNote}${helpNote}
     `;
 
     if (total > 0 && correct === total) confetti();

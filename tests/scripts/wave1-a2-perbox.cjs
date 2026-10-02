@@ -114,6 +114,7 @@ async function typeInto(page, i, text) {
 }
 
 async function info(page, i) {
+  await sleep(80);                       // the badge follows its box on the next animation frames
   return page.evaluate((i) => {
     const el = document.querySelector(`[data-t="${i}"]`);
     const cs = getComputedStyle(el);
@@ -123,14 +124,34 @@ async function info(page, i) {
       const wrap = el.closest('[data-mq-cell], .mq-cellbox');
       if (wrap) fill = getComputedStyle(wrap).backgroundColor;
     }
-    return { os: cs.outlineStyle, sz: cs.backgroundSize, ok: el.classList.contains("mq-live-correct"), bad: el.classList.contains("mq-live-wrong"), img: cs.backgroundImage, bg: fill, focus: document.activeElement === el, inv: el.getAttribute('aria-invalid'), val: el.value };
+    // the tick / cross badge: its box, and whether it touches the text the pupil wrote
+    let badge = null;
+    const bEl = el.dataset.mqBadge ? document.querySelector(`.mq-live-badge[data-id="${el.dataset.mqBadge}"]`) : null;
+    if (bEl) {
+      const br = bEl.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const tw = ctx.measureText(el.value || '').width;
+      const fs = parseFloat(cs.fontSize);
+      const pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0, bw = parseFloat(cs.borderLeftWidth) || 0;
+      const left = /left|start/.test(cs.textAlign) ? er.left + bw + pl : er.left + pl + (er.width - pl - pr) / 2 - tw / 2;
+      const t = { l: left, r: left + tw, t: er.top + er.height / 2 - 0.36 * fs, b: er.top + er.height / 2 + 0.36 * fs };
+      const overlap = tw > 0 && !(br.right <= t.l || br.left >= t.r || br.bottom <= t.t || br.top >= t.b);
+      badge = { kind: bEl.dataset.kind, show: getComputedStyle(bEl).display !== 'none', w: Math.round(br.width), h: Math.round(br.height), overlap,
+        outside: br.top < er.top + 1 && br.right > er.right - 14 };
+    }
+    const sib = el.nextElementSibling;
+    const clr = sib && sib.tagName === 'BUTTON' ? getComputedStyle(sib).display : null;
+    return { os: cs.outlineStyle, bs: cs.borderStyle, badge, clr, ok: el.classList.contains("mq-live-correct"), bad: el.classList.contains("mq-live-wrong"), bg: fill, focus: document.activeElement === el, inv: el.getAttribute('aria-invalid'), val: el.value, helped: !!(el.closest('.problem-card, #questionCard') || {dataset: {}}).dataset.mqHelped };
   }, i);
 }
 
 const blurAll = (page) => page.evaluate(() => { const a = document.activeElement; if (a && a.blur) a.blur(); });
-const hasMark = (r) => /url\(/.test(r.img);
+const hasMark = (r) => !!r.badge && r.badge.show && ((r.bad && r.badge.kind === 'bad') || (r.ok && r.badge.kind === 'ok'));
+const noOverlap = (r) => !!r.badge && !r.badge.overlap;
 const dashedWrong = (r) => r.os === 'dashed';
-const bigMark = (r) => /^1[6-8]px/.test(r.sz);
+const bigMark = (r) => !!r.badge && r.badge.w >= 16 && r.badge.w <= 18 && r.badge.outside;
 
 async function run(w) {
   const { page, problems, close } = await open({ seed: 5, viewport: { width: w, height: 900, deviceScaleFactor: 1 } });
@@ -149,7 +170,8 @@ async function run(w) {
         const bad = wrongOf(t.exp[0]);
         await typeInto(page, 0, bad);
         let r = await info(page, 0);
-        check(r.bad && !r.ok && hasMark(r), `${tag0} wrong single box turns red with a cross as soon as it is filled (${JSON.stringify({ bad: r.bad, img: hasMark(r) })})`);
+        check(r.bad && !r.ok && hasMark(r), `${tag0} wrong single box turns red with a cross as soon as it is filled (${JSON.stringify({ bad: r.bad, badge: r.badge })})`);
+        check(noOverlap(r), `${tag0} the badge does not touch the digit (${JSON.stringify(r.badge)})`);
         await blurAll(page);
         r = await info(page, 0);
         check(r.bad && r.bg === BAD_BG, `${tag0} red fill once the pupil leaves it (${r.bg})`);
@@ -165,7 +187,17 @@ async function run(w) {
         r = await info(page, 0);
         // a worksheet's right answer disables its box and advances; the class stays
         check(r.ok && !r.bad && hasMark(r) && r.bg === OK_BG, `${tag0} corrected box turns green with a tick (${r.bg})`);
-        if (host === 'worksheet') { await shotAfter(page, host, s, w, 'green'); check(await page.evaluate(() => window.state.worksheetQs[0]._helped === true), `${tag0} the item is recorded as helped (a box went red first)`); }
+        if (host === 'worksheet') { await shotAfter(page, host, s, w, 'green'); check(await page.evaluate(() => window.state.worksheetQs[0]._helped === true), `${tag0} the item is recorded as helped (a box went red first)`);
+          const prog = await page.evaluate((p0) => {
+            const sk = window.state.worksheetQs[0].skillId || window.state.skill;
+            const before = (window.state.skillProgress[sk] || { total: 0 }).total;
+            window.checkAllWorksheet();
+            window.checkAllWorksheet();          // twice: recorded once
+            const after = (window.state.skillProgress[sk] || { total: 0 }).total;
+            return { d: after - before, txt: document.getElementById('worksheetResult').textContent };
+          });
+          check(prog.d === 2, `${tag0} Check all records the helped item like a second-try correct: a miss then a hit, once (${prog.d})`);
+          check(/Helped: 1/.test(prog.txt), `${tag0} the worksheet result says how many were helped (${prog.txt.replace(/\s+/g, ' ').trim()})`); }
         continue;
       }
       // a row / stack: box 0 right, box 1 wrong, the rest empty
@@ -178,7 +210,10 @@ async function run(w) {
       if (t.n > 1) {
         r1 = await info(page, 1);
         check(r1.bad && !r1.ok && hasMark(r1) && r1.bg === BAD_BG && r1.inv === 'true', `${tag0} wrong box turns red with a cross (${r1.bg})`);
-        check(dashedWrong(r1) && !dashedWrong(r0) && bigMark(r1) && bigMark(r0), `${tag0} wrong box has a dashed edge (right is solid) and the corner marks are 16-18 px (${r1.os}/${r0.os}, ${r0.sz})`);
+        check(dashedWrong(r1) && !dashedWrong(r0) && bigMark(r1) && bigMark(r0), `${tag0} wrong box has a dashed edge (right is solid) and the badges are 16-18 px on the outer corner (${r1.os}/${r0.os}, ${JSON.stringify(r0.badge)})`);
+        check(noOverlap(r0) && noOverlap(r1), `${tag0} the badges do not touch the digits (${JSON.stringify([r0.badge && r0.badge.overlap, r1.badge && r1.badge.overlap])})`);
+        if (s.kind === 'stack') check(r1.bs === 'dashed', `${tag0} a column stack's wrong digit box has a dashed edge (${r1.bs})`);
+        if (s.exp === 'order' && host === 'card') check(r1.clr === 'none', `${tag0} a red ordering box shows no second x (${r1.clr})`);
       }
       if (t.n > 2) {
         const r2 = await info(page, 2);
@@ -202,7 +237,7 @@ async function run(w) {
         await typeInto(page, 1, t.exp[1]);
         await blurAll(page); await sleep(100);
         e1 = await info(page, 1);
-        check(e1.ok && !e1.bad && hasMark(e1) && e1.bg === OK_BG, `${tag0} corrected box turns green with a tick (${e1.bg})`);
+        check(e1.ok && !e1.bad && hasMark(e1) && e1.bg === OK_BG, `${tag0} corrected box turns green with a tick (${e1.bg} ${JSON.stringify(e1.badge)} ${e1.ok})`);
       }
     }
   }
@@ -295,6 +330,25 @@ async function run(w) {
     await typeInto(page, 2, '3'); await blurAll(page); await sleep(100);
     const dup = await info(page, 2);
     check(dup.bad && !dup.ok, `${tag0} an In number another row already uses turns red`);
+    // key by key (row 1 In = 1; row 2 In typed 1 then 0 toward 10): nothing goes red on the way, no "helped" flag
+    await boot(page);
+    await setup(page, host, { c: 'algebra', k: 'function_table_easy', kind: 'sel', opts: { task: 'make' } });
+    await page.evaluate((host) => {
+      const root = host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0');
+      Array.from(root.querySelectorAll('input.mq-cellslot:not(.mq-cellslot-host)')).forEach((e, i) => e.setAttribute('data-t', String(i)));
+    }, host);
+    await typeInto(page, 0, '1');                       // row 1 In
+    await page.evaluate(() => { document.querySelector('[data-t="2"]').focus(); });
+    const walk = [];
+    for (const key of ['1', '0']) {
+      await page.keyboard.type(key, { delay: 15 }); await sleep(120);
+      const st = await page.evaluate((host) => {
+        const root = host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0');
+        return { red: root.querySelectorAll('.mq-live-wrong').length, helped: !!root.dataset.mqHelped };
+      }, host);
+      walk.push(st);
+    }
+    check(walk.every((x) => x.red === 0 && !x.helped), `${tag0} typing 1 then 0 toward 10 turns nothing red and flags nothing helped (${JSON.stringify(walk)})`);
   }
   // the quiz: no per-box colour, even with instant feedback
   for (const [c, k, sel] of [['multiplication', 'count_by_tables', 'input.mq-cellslot'], ['addition', 'add_sub_fact_family', 'input.fact-family-input'], ['multiplication', 'area_model_mult', 'input.area-model-input, input.area-model-total']]) {
@@ -322,7 +376,7 @@ async function run(w) {
     await blurAll(page); await sleep(150);
     const any = await page.evaluate(() => document.querySelectorAll('#quizTakeView .mq-live-correct, #quizTakeView .mq-live-wrong').length);
     check(any === 0, `${tag0} no per-box green or red in the quiz (${any})`);
-    const bgs = await page.evaluate(() => Array.from(document.querySelectorAll('#quizTakeView input')).map((e) => getComputedStyle(e).backgroundImage).filter((b) => /url\(/.test(b)).length);
+    const bgs = await page.evaluate(() => document.querySelectorAll('.mq-live-badge').length);
     check(bgs === 0, `${tag0} no corner marks in the quiz (${bgs})`);
   }
   const errs = problems.filter((p) => !/favicon/.test(p.text));
