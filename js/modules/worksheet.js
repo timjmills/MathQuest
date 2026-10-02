@@ -2446,7 +2446,9 @@ function wsLogProgress(q, card, isCorrect, pre) {
     if (!q || q._skipped) return;
     const sk = q.skillId || state.skill;
     if (!sk) return;
-    if (pre.stale) return;
+    // Check all writes the right answer into a wrong or blank card: that item is "revealed" and earns no
+    // more credit (a pupil copying the shown answer back is not a correct answer), unless it already scored
+    if (q._revealed && !q._progHit) return;
     const log = (ok) => {
         updateSkillProgress(sk, ok);
         try { if (typeof window.recordPracticeLog === 'function') window.recordPracticeLog(sk, ok, 0); } catch (e) { /* optional */ }
@@ -2458,6 +2460,7 @@ function wsLogProgress(q, card, isCorrect, pre) {
         log(true); q._progHit = true;
     } else {
         if (pre.touched && !q._progMiss && !q._progHit) { log(false); q._progMiss = true; }
+        q._revealed = true;                              // this pass showed the answer (or the item stays wrong)
         card.querySelectorAll('input:not([type="hidden"]), textarea').forEach((e) => { e.dataset.mqRevealed = '1'; });
     }
 }

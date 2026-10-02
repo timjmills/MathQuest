@@ -195,3 +195,67 @@ Two corrections to the work in progress before committing it:
 ## To pass round 4
 
 Fix defect 1 (blocking) and defect 2. Commit the `wsLogProgress` work with correction (a). Fix defect 3 if you want C3 above 8. Re-run perbox with the overlay and multi-box helped assertions, re-shoot the PNGs, and re-view the stack, count_by and settings-open screens.
+
+# Round 4
+
+Graded commit a38d3d2 (on b04b792). Critic: Opus, low effort, independent. No code edited, nothing committed. (A throwaway probe was run from `tests/scripts/` and then deleted.)
+
+## Verdict: FAIL (C1 8 · C2 7 · C3 8 · C4 8)
+
+## Runs
+
+- `wave1-a2-perbox.cjs`: **OK**, 59 PASS, 0 FAIL, no console errors. New assertions that pass:
+  - no badge shows over the open settings panel (card and worksheet, 390);
+  - no badge shows through the open hint box;
+  - the area-model worksheet item that was helped logs a miss then a hit;
+  - the progress matrix: clean = 1, helped = 2, wrong = 1, blank = 0; Check all again adds 0; wrong then put right adds only its hit.
+- `ws-screen-answer.cjs --skills count_by_tables,hundreds_chart_fill,add_facts,add_100_regroup`:
+  - **First run FAIL**: the add_100_regroup worksheet scored 2/3, with every item showing `number:?`.
+  - The rerun was **OK** (card, worksheet and quiz all ok; live green ok).
+  - This is intermittent, and it was not seen in round 3. Note 2.
+- `test-wrong-retry-skip.cjs`: OVERALL PASS on both a38d3d2 and base `/home/user/MathQuest` (4911898). I could not reproduce the wording flake on either tree. The test drives skip and retry wording, not the per-box classes, so I accept it as test fragility unrelated to A2.
+- Probe at 390, badges inside scrolled containers (hundreds chart and count_by row, card and worksheet):
+  - Only the count_by worksheet cell actually scrolls horizontally (336/328 px).
+  - After swiping it fully, each badge stayed at dx -7..-8, dy -10 from its box corner in the next frame and after 300 ms.
+  - No badge was shown for a box scrolled out of its row.
+  - At 390 the charts fit without a swipe row, so the SP-11a swipe case is not exercised by today's content. The design is right for it: badges are children of the card, get repositioned on a captured scroll, and are clipped by the card. One caveat: a badge is not clipped by an *inner* `overflow:auto` row, because it is a child of the card and not of the row. If a future row scrolls a box out of view, its badge will hang at the row's edge. This is minor (note 3).
+- I viewed all 58 PNGs, as four montages, plus the probe shots. Badges sit on the outer corner in every shot and are clear of digits, arcs, sum bars and labels:
+  - count_by: the ✗ on 55 now sits right of the arc, not on it;
+  - add_facts: the ✗ is above the bar's end;
+  - mixed number: clear of the colon.
+  - Stack at 390: the ✓ for the tens digit sits in the 2 px gap at the shared corner of the next box. It touches the neighbour's corner but none of its digits. This is acceptable.
+
+## Round-3 defects
+
+| # | Defect | Status |
+|---|---|---|
+| 1 | badge paints over overlays | **Fixed.** The badge is `position:absolute` inside `#questionCard` / `.problem-card`, has no z-index, and is hidden while the item's hint is open. Verified by perbox and by the shots. |
+| 2 | multi-box helped on worksheet | **Fixed.** `itemWasHelped(card)` is read in `checkAllWorksheet` for every type; the area-model assertion passes. |
+| 3 | badge on neighbouring ink | **Fixed.** `_badgeSpot` searches positions around the box against obstacles: other inputs, sampled arc strokes, text and borders. |
+| 5 | rAF loop every frame | **Fixed.** Placement now runs from a ResizeObserver, scroll and resize. |
+
+## Defects (ranked, §6 form)
+
+1. **C2, major, -1. BLOCKING.** A pupil can earn clean progress hits by retyping answers that Check all revealed.
+   - Where: `worksheet.js` `wsPre` / `wsLogProgress`. Check all writes the right answer into a blank or wrong card and sets `data-mq-revealed`. Any `input` event clears that mark, so the card is no longer "stale" and the next Check all grades it as the pupil's own work.
+   - Observed (probe, add_facts worksheet at 390):
+     - Item 0 is left blank. Check all writes `13` into it, and progress is `null`.
+     - Clear the box, type `13`, Check all again. Progress becomes `{correct:1,total:1,streak:1,mastery:100}`.
+     - That is a **clean hit for a problem the pupil never solved**. Repeating it across the sheet drives mastery to 100 %, adaptive difficulty up, and the item out of spaced review.
+   - The wrong-then-revealed path has the same fault. The pupil copies the shown answer back, and the item logs miss + hit, the same record as an honest helped correct.
+   - Expected: once an item's answer has been revealed, nothing more is recorded for it.
+   - Fix: when Check all reveals an answer, set `q._revealed = true`. At the top of `wsLogProgress`, add `if (q._revealed && !q._progHit) return;`. Set the flag before the reveal, but only for items that were not correct on that pass. The DOM `mqRevealed` mark can stay for display, but it must not be the guard.
+   - Check: in perbox worksheet progress, leave one item blank, Check all, retype the revealed answer, Check all, and assert that progress is unchanged. Do the same for a wrong item: assert exactly 1 miss and no hit.
+   - Raises C2 to 8.
+2. **Note, C4, possible flake:** the first `ws-screen-answer` run graded the add_100_regroup worksheet 2/3. The rerun passed. Possible causes:
+   - the new `setTimeout` re-placements at 150/600 ms;
+   - the per-call `_obstacles` walk, which runs `getComputedStyle` on every element in the host, delaying the harness's typing.
+
+   Run it 5x. If it fails again, record which item and why.
+3. **Note, C3, minor, latent:** a badge is clipped by the card, not by an inner horizontally scrolling row. When a box is scrolled out of such a row, its badge stays at the row's edge, overlapping the next content.
+   - Fix: in `_badgePlace`, hide the badge when the box's rect lies outside its nearest `overflow-x:auto|scroll` ancestor's rect.
+4. **Note, efficiency:** `_obstacles` runs `querySelectorAll('*')` plus `getComputedStyle` per element for each badge placement, and placements fire per badge on every card resize or scroll frame. This is fine at 10 boxes. On the hundreds chart with many gaps on a phone, cache the obstacle list per host per rAF.
+
+## To pass round 5
+
+Fix defect 1 and add its two assertions. Run ws-screen-answer for add_100_regroup five times clean.

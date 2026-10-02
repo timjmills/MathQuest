@@ -404,13 +404,15 @@ async function run(w) {
     await page.evaluate(() => window.checkAllWorksheet());
     const p2 = await snap();
     check(p2.t === p1.t && p2.c === p1.c, `${tag0} Check all again does not count anything twice (${p2.t - p1.t}, ${p2.c - p1.c})`);
-    await typeCard(2, answers[2]);                                  // the wrong one is put right
+    // the answers Check all revealed are not credit: blank item 3 and wrong item 2, copied back, add nothing
+    await typeCard(3, answers[3]);                                  // the blank item, retyped with the revealed answer
+    await typeCard(2, answers[2]);                                  // the wrong item, copied back
     await page.evaluate(() => window.checkAllWorksheet());
     const p3 = await snap();
-    check(p3.t - p2.t === 1 && p3.c - p2.c === 1, `${tag0} a wrong item later put right adds only its hit, so it too ends as a miss then a hit (${p3.t - p2.t}, ${p3.c - p2.c})`);
+    check(p3.t === p2.t && p3.c === p2.c, `${tag0} retyping an answer Check all revealed earns no credit (blank stays nothing, wrong stays exactly one miss, no hit) (${p3.t - p2.t}, ${p3.c - p2.c})`);
     await page.evaluate(() => window.checkAllWorksheet());
     const p4 = await snap();
-    check(p4.t === p3.t, `${tag0} and still only once (${p4.t - p3.t})`);
+    check(p4.t === p3.t && p4.c === p3.c, `${tag0} and still nothing on another Check all (${p4.t - p3.t})`);
   }
   // a "make your own" rule table has no fixed answer: each box is judged from the rule
   for (const host of ['card', 'worksheet']) {

@@ -682,7 +682,16 @@ function _badgePlace(el) {
     const r = el.getBoundingClientRect();
     // not shown while the box is not, nor while this item's hint box is open over it
     const hintOpen = !!host.querySelector('.hint-popup.active');
-    if (!r.width || !r.height || hintOpen) { b.style.display = 'none'; return; }
+    // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
+    let clipped = false;
+    for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') && a.scrollWidth > a.clientWidth + 1) {
+            const q = a.getBoundingClientRect();
+            if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
+        }
+    }
+    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
     b.style.display = '';
     const c = _badgeSpot(el, r, host);
     const hr = host.getBoundingClientRect();
@@ -732,11 +741,12 @@ function _badgeTrack(el) {
             window.addEventListener('resize', _badgeSoon);
         }
     }
-    _badgePlace(el);
     _badgeSoon();
-    // the layout settles after the verdict (fonts, a ladder step, the screen-fit pass)
-    setTimeout(() => _badgePlace(el), 150);
-    setTimeout(() => _badgePlace(el), 600);
+    // the layout settles after the verdict (fonts, a ladder step, the screen-fit pass); never while the
+    // pupil is typing in this card (the scan must not slow the keys)
+    const settle = () => { const a = document.activeElement; if (!(a && a.tagName === 'INPUT' && host.contains(a))) _badgePlace(el); };
+    setTimeout(settle, 150);
+    setTimeout(settle, 600);
 }
 
 function _liveSet(el, ok, bad) {
