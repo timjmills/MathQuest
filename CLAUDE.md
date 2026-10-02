@@ -502,20 +502,18 @@ Extensive SVG generation functions across 5 modules:
 - Never say "done" unless you have confirmed it works end to end
 - When creating or updating skills, ALWAYS research reference sites first (see "Researching Skills" section above)
 
-## Agents — model and effort (owner rule, 2026-10-02)
+## Agents — model and effort (owner rule, 2026-10-02, revised the same day)
 
-Every subagent (builders, fixers, critics, explorers) runs on **Sonnet 5.5 at LOW effort by default** (the owner sees Sonnet 5.5 listed in the program; the Agent tool alias is `sonnet`, which maps to the newest Sonnet available). Escalate only when a
-problem persists and the lower setting cannot solve it, one step at a time:
+Every subagent (builders, fixers, critics, explorers) runs on **Opus 5.5 at LOW effort by default** (owner, 2026-10-02:
+"change the agents to opus 5.5 low"; this replaces the earlier Sonnet-low default). Escalate only when a problem
+persists and low effort cannot solve it:
 
-1. Sonnet, low — the default for every agent.
-2. Sonnet, medium — only after a persistent, unsolved issue.
-3. Opus, low.
-4. Opus, medium — the ceiling. Never go higher.
+1. Opus, low — the default for every agent (profile `mq-opus-low`).
+2. Opus, medium — only after a persistent, unsolved issue (profile `mq-opus-medium`). The ceiling; never go higher.
 
 How to call them:
-- **Model:** pass `model: "sonnet"` (or `"opus"` when escalating) on every Agent call.
+- **Model:** pass `model: "opus"` on every Agent call, with `subagent_type: "mq-opus-low"` (or `"mq-opus-medium"` when escalating).
 - **Effort:** the Agent tool has no effort argument; effort comes from the agent definition's frontmatter
-  (`.claude/agents/*.md`, `effort: low|medium`). Use the low-effort definitions by default and the medium ones only
-  when escalating.
-- Profiles live in `.claude/agents/` (`mq-sonnet-low`, `mq-sonnet-medium`, `mq-opus-low`, `mq-opus-medium`). They load at session start; in a session started before they existed, use `general-purpose` with `model: "sonnet"` (verified 2026-10-02: reports Sonnet 5.5, claude-sonnet-5-5).
+  (`.claude/agents/*.md`, `effort: low|medium`). The agent cannot see its own effort setting, so it cannot confirm it.
+- The `mq-sonnet-*` profiles stay in `.claude/agents/` but are no longer used by default.
 - Say in the agent's brief which step it is on and why, if it was escalated. Record escalations in `design/STATUS.md`.
