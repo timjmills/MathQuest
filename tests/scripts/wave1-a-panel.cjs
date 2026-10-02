@@ -38,8 +38,17 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       await page.click(sel);
       await page.waitForSelector('#skillOptionsPopover', { timeout: 5000 });
       await new Promise((r) => setTimeout(r, 300));
+      // Calculator and Skip live in the "Pupil play" disclosure (group 'play'): its summary names both
+      // values at rest; opening it shows both controls.
+      const play = await page.evaluate(() => {
+        const d = document.querySelector('#skillOptionsPopover details.sko-play');
+        return d ? { summary: d.querySelector('summary').innerText.replace(/\s+/g, ' ') } : null;
+      });
+      check(!!play && /Pupil play/i.test(play.summary) && /Calculator/i.test(play.summary) && /Skip/i.test(play.summary), `${ref} Pupil play summary names both settings: ${play ? play.summary : 'no disclosure'}`);
+      await page.evaluate(() => { const d = document.querySelector('#skillOptionsPopover details.sko-play'); if (d && !d.open) d.querySelector('summary').click(); });
+      await new Promise((r) => setTimeout(r, 200));
       const text = await page.evaluate(() => document.getElementById('skillOptionsPopover').innerText.replace(/\n+/g, ' | '));
-      check(/Skip appears after/i.test(text) && /Calculator/i.test(text), `${ref} panel text shows both controls: ${text.slice(0, 200)}`);
+      check(/Skip appears after/i.test(text) && /Calculator/i.test(text), `${ref} opened Pupil play shows both controls: ${text.slice(0, 200)}`);
       const el = await page.$('#skillOptionsPopover');
       await el.screenshot({ path: path.join(OUT, `option-panel-${categoryId}-${skillId}.png`) });
       await page.evaluate(() => { const p = document.getElementById('skillOptionsPopover'); if (p) p.remove(); });
