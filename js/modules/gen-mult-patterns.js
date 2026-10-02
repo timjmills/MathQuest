@@ -92,7 +92,18 @@ export function genCountByTables(q) {
     const untouched = tables.length === 12;
     if (untouched) tables = tables.filter((v) => v >= 2);
     let t;
-    if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
+    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : 6;   // a page without a stated count: six rows
+    if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
+        // In order, every table ticked: the page walks up the tables, spread across 2 to 12
+        // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
+        if (_page <= tables.length) {
+            // one table from each stretch of the list, so the pages differ but always climb
+            const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
+            t = tables[randInt(lo, hi)];
+        } else t = tables[idx % tables.length];
+    } else if (untouched && opt('order') !== 'mixed') {
+        t = tables[idx % tables.length];                // live play, in order: 2, 3, 4 ... 12, round again
+    } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
         // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
         // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
         // tables; page-deal.js shuffles each round from the page's own seeded rng.

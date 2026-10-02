@@ -1180,7 +1180,7 @@ function spanGrades(sk) {
  * than the default is said too ("I Can add 6 (facts to 10)", "I Can add facts to 10").
  * factSetTitle() owns the set's name, so the header, the cell label and the key agree.
  */
-function optionTitle(sk, baseICan) {
+function optionTitleBase(sk, baseICan) {
     let set = '', bandDef = null, band;
     try {
         set = factSetTitle(sk.categoryId, sk.skillId, sk.opts || {});
@@ -1199,6 +1199,17 @@ function optionTitle(sk, baseICan) {
     const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}
+
+/** The page title for the chosen options; a count-by row of 15 jumps names 15, not 12 (wave 1 lane C). */
+function optionTitle(sk, baseICan) {
+    const t = optionTitleBase(sk, baseICan);
+    try {
+        if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
+            return (t || baseICan || '').replace(/\bto 12\b/, 'to 15');
+        }
+    } catch (e) { /* keep the base title */ }
+    return t;
 }
 
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
