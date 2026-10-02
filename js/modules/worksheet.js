@@ -2420,6 +2420,48 @@ export function checkWorksheetAnswer(idx) {
     }
 }
 
+/**
+ * Owner 2026-10-02: every online-worksheet problem reaches the skill's progress (and, through it, the
+ * spaced-repetition record, the practice log and adaptive difficulty) when the worksheet is checked,
+ * by the same API the practice card uses:
+ *   clean correct -> a hit;  helped (a box went red before it was right) -> a miss then a hit, like a
+ *   second-try correct;  answered but wrong -> a miss;  blank / skipped -> nothing (no attempt was made).
+ * Once per item however often Check all runs: a wrong item that is later put right adds only its hit
+ * (so it too ends as a miss then a hit); a worksheet awards no XP or streak.
+ */
+function wsPre(card) {
+    const ins = Array.from(card.querySelectorAll('input:not([type="hidden"]), textarea'));
+    const touched = ins.some((e) => String(e.value || '').trim() !== '')
+        || !!card.querySelector('[aria-checked="true"], .selected, .answer-btn.correct, .answer-btn.incorrect, .dnd-tile.placed, .mq-tried');
+    // Check all writes the right answer into a wrong or blank card and marks its boxes revealed; the pupil
+    // typing in a box clears that mark. A card whose boxes are all still revealed holds no new work.
+    const stale = ins.length > 0 && ins.every((e) => e.dataset.mqRevealed === '1');
+    return { touched, stale };
+}
+if (typeof document !== 'undefined' && !window.__mqRevealBound) {
+    window.__mqRevealBound = true;
+    document.addEventListener('input', (e) => { if (e.target && e.target.dataset && e.target.dataset.mqRevealed) delete e.target.dataset.mqRevealed; }, true);
+}
+function wsLogProgress(q, card, isCorrect, pre) {
+    if (!q || q._skipped) return;
+    const sk = q.skillId || state.skill;
+    if (!sk) return;
+    if (pre.stale) return;
+    const log = (ok) => {
+        updateSkillProgress(sk, ok);
+        try { if (typeof window.recordPracticeLog === 'function') window.recordPracticeLog(sk, ok, 0); } catch (e) { /* optional */ }
+        try { if (state.adaptiveModeEnabled && typeof window.recordAdaptiveAnswer === 'function') window.recordAdaptiveAnswer(sk, ok); } catch (e) { /* optional */ }
+    };
+    if (isCorrect) {
+        if (q._progHit) return;
+        if (q._helped && !q._progMiss) { log(false); q._progMiss = true; }
+        log(true); q._progHit = true;
+    } else {
+        if (pre.touched && !q._progMiss && !q._progHit) { log(false); q._progMiss = true; }
+        card.querySelectorAll('input:not([type="hidden"]), textarea').forEach((e) => { e.dataset.mqRevealed = '1'; });
+    }
+}
+
 export function checkAllWorksheet() {
     let correct = 0;
     let skipped = 0;
@@ -2432,6 +2474,10 @@ export function checkAllWorksheet() {
         // Skipped problems: do NOT grade, do NOT count in the total. Just
         // tally for the score-card breakdown.
         if (q && q._skipped) { skipped++; return; }
+        // taken BEFORE grading: Check all writes the right answer into a wrong or blank card
+        const _pre = wsPre(card);
+        // a helped item: a box went red before it was right (any multi-box type, not only the one-box path)
+        if (itemWasHelped(card)) q._helped = true;
 
         let value = '';
         let isCorrect = false;
@@ -2860,18 +2906,9 @@ export function checkAllWorksheet() {
             card.style.border = "2px solid var(--incorrect)";
         }
 
-        if (isCorrect) {
-            correct++;
-            // owner 2026-10-02: a helped item (a box went red before it was right) is recorded like
-            // a second-try correct - a miss then a hit in the skill's progress. A worksheet awards no
-            // XP or streak, so progress is all there is. Once per item, however often Check all runs.
-            if (q._helped && !q._helpedLogged) {
-                q._helpedLogged = true;
-                helped++;
-                const sk = q.skillId || state.skill;
-                if (sk) { updateSkillProgress(sk, false); updateSkillProgress(sk, true); }
-            } else if (q._helped) helped++;
-        }
+        if (isCorrect) correct++;
+        if (isCorrect && q._helped) helped++;
+        wsLogProgress(q, card, isCorrect, _pre);
     });
 
     // Skipped problems are excluded from the denominator so percent reflects

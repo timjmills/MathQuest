@@ -119,3 +119,79 @@ Graded commit 41cb2af (on top of 11541d7). Critic: Opus, low effort, independent
 ## To pass round 3
 
 Fix defects 1 and 2, which are required. Fix 3 and 4 as well, since they are cheap. Then re-run `wave1-a2-perbox.cjs` with the new assertions and re-shoot the PNGs.
+
+# Round 3
+
+Graded commit b04b792 (on top of 41cb2af). Critic: Opus, low effort, independent. No code edited.
+**Note:** while I graded, the tree held UNCOMMITTED builder edits to `js/modules/worksheet.js` (`wsLogProgress`) and `tests/scripts/wave1-a2-perbox.cjs`. My runs therefore exercised b04b792 plus that work in progress. The grade below is for b04b792. The work in progress is discussed under "Builder's question".
+
+## Verdict: FAIL (C1 8 · C2 8 · C3 7 · C4 8)
+
+## Runs
+
+- `wave1-a2-perbox.cjs`: **OK**. Every line PASS at 1280 and 390, on the card, the worksheet and the quiz. That includes the new key-by-key make-table check, the badge geometry check (18 px, outside, no overlap with own digits), and no console errors.
+- `ws-screen-answer.cjs --skills multiplication:count_by_tables,composing:hundreds_chart_fill,addition:add_facts,addition:add_100_regroup`: **OK**. Card, worksheet and quiz were all ok (3/3), and live green was ok.
+- My own probe, with the rule read from `ftCheck`, at 1280, on the card (n+1) and the worksheet (n+7):
+  - Row 1 Out typed digit by digit (`1`→`15`). The partial `1` is neutral, never red.
+  - Row 1 In = 1, then row 2 In typed `1`→`10`. On the `1` keystroke, row 1 In and row 2 Out go neutral (a true duplicate in progress). They are never red, and they come back green on `0`.
+  - Row 2 In retyped `10`→`12` while its Out held 11. The Out goes neutral, never red.
+  - `data-mq-helped` stayed unset throughout, on both hosts. **Defect 1 of round 2 is fixed.**
+- My badge probe: an 8-item count_by worksheet with three items filled right and wrong.
+  - After a window scroll of 400, an inner-container scroll, and a resize from 1280 to 390: every visible badge stayed within 12 px of its box's top-right corner. No badge was detached, no off-screen box showed a badge, and no badge overlapped a neighbour's digits.
+  - **Opening an overlay failed**: see defect 1.
+- I viewed all 58 PNGs, plus my own probe shots.
+
+## Round-2 defects
+
+| # | Round-2 defect | Status |
+|---|---|---|
+| 1 | make-table false red / helped | **Fixed** (verified by hand and by the new perbox assertion) |
+| 2 | mark on the digits | **Fixed for the box's own digits.** A new layering fault was introduced (defect 1 below) |
+| 3 | two × on a red order box | **Fixed.** The clear × is hidden on a red box (`card-order_negatives-*`) |
+| 4 | solid edge on a wrong stack digit | **Fixed.** Dashed on digit, carry and `.ab/.rg` (`card-add_100_regroup-*`, `worksheet-add_100_regroup-*`) |
+| 5 | worksheet helped | **Partly fixed.** "Helped: N" and a miss then a hit work for single-box items only (defect 2) |
+
+## Defects (ranked, §6 form)
+
+1. **C3, major, -2. BLOCKING.** The tick/cross badge paints over overlays.
+   - Where: `css/screen-cell.css` `.mq-live-badge { position: fixed; z-index: 30 }`, appended to `document.body` by `screen-cell.js` `_badgeTrack`. The code comment says "its z-index sits under headers and dialogs". That is not true.
+   - Observed at 390 on the worksheet:
+     - The **Advanced Settings slide-out**: a green ✓ floats on top of the white panel, near its bottom-right corner.
+     - The **Hint callout** of item 1: the ✓ of a box hidden underneath shows through on top of the orange hint box.
+   - A pupil sees a stray verdict mark on a dialog that has nothing to do with it.
+   - Expected: a badge is covered by anything that covers its box.
+   - Fix: do not portal the badge to `body`. Append it to the item host (`#questionCard` / `.problem-card`, both positioned). Give it `position:absolute`, at `r.right - host.left - pos[0] + host.scrollLeft` and `r.top - host.top - pos[1]`, and drop the z-index (or use `z-index:1` inside the host). It then scrolls, clips and stacks with its box. The rAF loop is only needed for re-layout, so a `ResizeObserver` on the host is enough. An alternative that keeps fixed positioning: in `_badgeTick`, hide the badge when `document.elementFromPoint(centre)` is not inside the box's host. This is fragile with `pointer-events`.
+   - Check: in perbox, open the settings panel (`toggleSettings`) and a Hint. For each shown badge, assert that `elementFromPoint` at the badge centre (with the badge given `pointer-events:auto` for the test) is the badge only when the host also wins at that point. Simpler: assert that no badge is shown while `#settingsPanel.open` covers its rect.
+   - Raises C3 to 8. Defect 3 is needed for 9.
+2. **C1/C2, minor, -1.** A helped multi-box worksheet item is never counted as helped.
+   - Where: `worksheet.js:2392`. `q._helped` is set only in `checkWorksheetAnswer`, the single-input path. For area model, fact family, expanded form, order, coordinates, chart, count-by and the stack, `checkAllWorksheet` grades through its own branches and never reads `itemWasHelped(card)`.
+   - So, for example, an area-model item whose box went red and was then fixed is logged as clean, with no "Helped" count. This contradicts the owner rule on exactly the boxes Wave 1 A2 added.
+   - Fix: in `checkAllWorksheet`, before logging, add `if (itemWasHelped(card)) q._helped = true;`.
+   - Check: in perbox worksheet progress, add an area_model_mult item (red then right) and assert `Helped: 1` and a miss then a hit.
+3. **C3, minor.** In tight layouts the badge still lands on neighbouring ink: a box edge, an arc or a label. It does not land on digits.
+   - `card-add_100_regroup-*-390.png` / `worksheet-add_100_regroup-*-1280.png`: the ones-digit's ✓ sits on the top-left corner and edge of the adjacent red tens box.
+   - `card-count_by_tables-*`: the ✗ on 55 crosses the jump arc above it.
+   - `worksheet-add_facts-red-390.png`: the ✗ sits on the sum bar.
+   - `card-mixed_improper_visual-*-390.png`: the ✓ touches the colon of "Mixed Number:".
+   - Fix: add a neighbour test to the `_BADGE_AT` candidate search. Reject a position that intersects any other `input` rect in the same host, and prefer the `[-1,12]` "just outside" slot when the right-hand neighbour is closer than 10 px. For a stack, put the badge on the outer corner of the answer row only for the rightmost digit, and above the box (`[w/2, 20]`) for the others.
+4. **Note (not A2, pre-existing, also in 41cb2af):** `card-count_by_tables-*-390.png` cuts off the bottom row of boxes and the cell's bottom edge. The cell box clips its third row on the phone card. Lane C should file this.
+5. **Note, efficiency:** `_badgeTick` runs `getComputedStyle` plus `measureText` per badge on every animation frame for as long as any badge exists, which is the whole worksheet session. This is cheap at 10 badges, but at 30+ badges on a phone it adds continuous load. Defect 1's fix (host-relative and observer-driven) removes it.
+
+## Builder's question: worksheet progress for clean answers
+
+**Verdict: yes, b04b792 is inconsistent, and it is worse than neutral.** At b04b792, a clean worksheet answer records nothing, while a helped one records a miss and a hit. A pupil who needed help on one item and got nine right cleanly ends up with 1/2 = 50 % for that worksheet in progress. Without that one stumble, the same pupil would have no record at all. "Records like a second-try correct" only makes sense if a first-try correct records a hit, as it does on the card. So recording only the helped items punishes them relative to nothing.
+
+**Exact fix.** This is what the uncommitted `wsLogProgress` in the tree already does, and it is right. Call it once per item from `checkAllWorksheet` with the guards `q._progHit` / `q._progMiss`:
+- clean correct: `updateSkillProgress(sk, true)`
+- helped correct: `false`, then `true`
+- answered but wrong: `false`
+- blank or skipped: nothing
+- wrong, later put right: only the hit is added
+
+Two corrections to the work in progress before committing it:
+- (a) Add `if (itemWasHelped(card)) q._helped = true;` at the top of `wsLogProgress` (defect 2). Without it, multi-box helped items log as clean.
+- (b) Keep XP and streak out of it, since a worksheet awards none. The work in progress already does that.
+
+## To pass round 4
+
+Fix defect 1 (blocking) and defect 2. Commit the `wsLogProgress` work with correction (a). Fix defect 3 if you want C3 above 8. Re-run perbox with the overlay and multi-box helped assertions, re-shoot the PNGs, and re-view the stack, count_by and settings-open screens.

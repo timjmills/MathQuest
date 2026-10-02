@@ -555,16 +555,17 @@ function _toControl(e) {
 const LIVE_FN = new WeakMap();        // a box judged by a function of its value (a rule table's "make" rows)
 
 /*
- * The tick / cross badge sits on the box's OUTER top-right corner, never on its digits. It is a
- * fixed-position span kept in step with its box by one animation-frame loop that runs only while a
- * badge exists: the box's own classes say which badge it shows (none when it is neither right nor
- * wrong); it is hidden while the box is hidden or off screen and gone with the box. Its z-index sits
- * under headers and dialogs, so they cover it as they cover the box.
+ * The tick / cross badge sits on the box's OUTER corner, never on its digits, and clear of everything
+ * else in the item (another answer box, a jump arc, a bar or rule, a label). It is a child of the item's
+ * own card (#questionCard / .problem-card), placed against that card, so a dialog, the settings panel or
+ * the hint box covers it exactly as it covers the box. It is placed again when the box or the card
+ * changes size (ResizeObserver), on resize, and when the card scrolls; the box's own classes say which
+ * badge it shows and it goes with the box.
  */
-const BADGES = new Map();
-let _badgeLoop = 0;
+const BADGES = new Map();            // box -> { b: the badge span, host: the item card }
 let _badgeSeq = 0;
-const _BADGE_AT = [[12, 11], [9, 14], [6, 18], [-1, 12]];   // [px in from the box's right edge, px up from its top]
+let _badgeRO = null;
+let _badgeRaf = 0;
 let _measureCtx = null;
 /** Where the pupil's digits are in a box (viewport px): the text's width, and the cap height about the middle. */
 function _writtenRect(el, r) {
@@ -581,41 +582,161 @@ function _writtenRect(el, r) {
         return { l: left, r: left + tw, t: r.top + r.height / 2 - 0.36 * fs, b: r.top + r.height / 2 + 0.36 * fs };
     } catch (e) { return null; }
 }
-function _badgeTick() {
-    _badgeLoop = 0;
-    BADGES.forEach((b, el) => {
-        const kind = el.classList.contains('mq-live-wrong') ? 'bad' : el.classList.contains('mq-live-correct') ? 'ok' : '';
-        if (!el.isConnected || !kind) { b.remove(); BADGES.delete(el); delete el.dataset.mqBadge; return; }
-        b.dataset.kind = kind;
-        const r = el.getBoundingClientRect();
-        let show = r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
-        b.style.display = show ? '' : 'none';
-        if (show) {
-            // the corner position that keeps clear of the digits: tucked in (a roomy box), then further
-            // out (a box the digits nearly fill), finally just outside the right edge
-            const t = _writtenRect(el, r);
-            let pos = _BADGE_AT[_BADGE_AT.length - 1];
-            for (const c of _BADGE_AT) {
-                const L = r.right - c[0], T = r.top - c[1];
-                if (!t || L + 18 <= t.l || L >= t.r || T + 18 <= t.t || T >= t.b) { pos = c; break; }
-            }
-            b.style.left = Math.round(r.right - pos[0]) + 'px'; b.style.top = Math.round(r.top - pos[1]) + 'px';
-        }
+const _rectOf = (q) => ({ l: q.left, r: q.right, t: q.top, b: q.bottom });
+const _overlapArea = (a, b) => Math.max(0, Math.min(a.r, b.r) - Math.max(a.l, b.l)) * Math.max(0, Math.min(a.b, b.b) - Math.max(a.t, b.t));
+const _BOX_FRAME = 'table, tr, td, th, tbody, [data-mq-cell], .k2-tile, .ab, .rg, .mq-cellbox, .mq-slothost';
+const _BADGE_SKIP = '.mq-wsbar, .hint-popup, button, .mq-live-badge, .mq-sr, script, style';
+
+/** What a badge must not sit on in this item (viewport rects): the digits written in the box, other answer
+ *  boxes, drawn arcs and lines, text (labels, numbers, signs) and the rules and bars (element borders). */
+function _obstacles(host, el, r) {
+    const out = [];
+    const w = _writtenRect(el, r);
+    if (w) out.push(w);
+    host.querySelectorAll('input:not([type="hidden"]), textarea').forEach((o) => {
+        if (o === el) return;
+        const q = o.getBoundingClientRect();
+        if (q.width && q.height) out.push(_rectOf(q));
     });
-    if (BADGES.size) _badgeLoop = requestAnimationFrame(_badgeTick);
+    host.querySelectorAll('svg path, svg line, svg polyline, svg text').forEach((o) => {
+        if (o.closest(_BADGE_SKIP)) return;
+        if (o.tagName === 'path' && typeof o.getTotalLength === 'function' && typeof o.getScreenCTM === 'function') {
+            // a curve (a jump arc) is its stroke, not the empty box around it: sample along it
+            try {
+                const m = o.getScreenCTM(); const svg = o.ownerSVGElement; const len = o.getTotalLength();
+                if (m && svg && len > 0) {
+                    for (let d = 0; d <= len + 0.1; d += 4) {
+                        const pt = svg.createSVGPoint(); const p0 = o.getPointAtLength(Math.min(d, len)); pt.x = p0.x; pt.y = p0.y;
+                        const sp = pt.matrixTransform(m);
+                        out.push({ l: sp.x - 1.5, r: sp.x + 1.5, t: sp.y - 1.5, b: sp.y + 1.5 });
+                    }
+                    return;
+                }
+            } catch (e) { /* fall back to the box */ }
+        }
+        const q = o.getBoundingClientRect();
+        if (q.width || q.height) out.push(_rectOf(q));
+    });
+    const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+    const rng = document.createRange();
+    while (walker.nextNode()) {
+        const t = walker.currentNode;
+        if (!/\S/.test(t.nodeValue || '')) continue;
+        const pe = t.parentElement;
+        if (!pe || pe.closest(_BADGE_SKIP) || pe.tagName === 'OPTION') continue;
+        rng.selectNodeContents(t);
+        Array.from(rng.getClientRects()).forEach((q) => { if (q.width && q.height) out.push(_rectOf(q)); });
+    }
+    host.querySelectorAll('*').forEach((o) => {
+        if (o === el || o.contains(el) || o.closest(_BADGE_SKIP) || o.tagName === 'svg' || o.closest('svg')) return;
+        // a grid's own lines and an answer box's own tile are the box's surroundings, not rules to keep clear of
+        if (o.matches(_BOX_FRAME)) return;
+        const cs = getComputedStyle(o);
+        if (cs.display === 'none' || cs.visibility === 'hidden') return;
+        const q = o.getBoundingClientRect();
+        if (!q.width || !q.height) return;
+        const e = (side) => (cs['border' + side + 'Style'] !== 'none' ? parseFloat(cs['border' + side + 'Width']) || 0 : 0);
+        const T = e('Top'), B = e('Bottom'), Lf = e('Left'), Rt = e('Right');
+        if (T >= 1) out.push({ l: q.left, r: q.right, t: q.top, b: q.top + T });
+        if (B >= 1) out.push({ l: q.left, r: q.right, t: q.bottom - B, b: q.bottom });
+        if (Lf >= 1) out.push({ l: q.left, r: q.left + Lf, t: q.top, b: q.bottom });
+        if (Rt >= 1) out.push({ l: q.right - Rt, r: q.right, t: q.top, b: q.bottom });
+    });
+    return out;
+}
+
+/** Where the badge goes: as near the box's top-right corner as it can sit without touching anything. The
+ *  band around the box (and its inside, if the box is roomy) is searched in 3 px steps, nearest the corner
+ *  first, outside the box before inside; the position with no overlap is taken, else the least overlap. */
+function _badgeSpot(el, r, host) {
+    const w = r.width, h = r.height;
+    const cands = [];
+    for (let L = -19; L <= w + 1; L += 3) {
+        for (let T = -19; T <= h + 1; T += 3) {
+            const cx = L + 9, cy = T + 9;
+            const inside = cx > 6 && cx < w - 6 && cy > 6 && cy < h - 6;
+            // only the band around the box, or the inside of a roomy box
+            if (!inside && !(cx < 3 || cx > w - 3 || cy < 3 || cy > h - 3)) continue;
+            cands.push({ c: [L, T], d: Math.hypot(cx - w, cy) + (inside ? 14 : 0) });
+        }
+    }
+    cands.sort((x, y) => x.d - y.d);
+    const obs = _obstacles(host, el, r);
+    let best = [w - 12, -11], bestArea = Infinity;
+    for (const { c } of cands) {
+        const box = { l: r.left + c[0], r: r.left + c[0] + 18, t: r.top + c[1], b: r.top + c[1] + 18 };
+        let area = 0;
+        for (const o of obs) { area += _overlapArea(box, o); if (area >= bestArea) break; }
+        if (area < bestArea) { best = c; bestArea = area; if (area === 0) break; }
+    }
+    return best;
+}
+
+function _badgePlace(el) {
+    const rec = BADGES.get(el);
+    if (!rec) return;
+    const { b, host } = rec;
+    const kind = el.classList.contains('mq-live-wrong') ? 'bad' : el.classList.contains('mq-live-correct') ? 'ok' : '';
+    if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
+    b.dataset.kind = kind;
+    const r = el.getBoundingClientRect();
+    // not shown while the box is not, nor while this item's hint box is open over it
+    const hintOpen = !!host.querySelector('.hint-popup.active');
+    if (!r.width || !r.height || hintOpen) { b.style.display = 'none'; return; }
+    b.style.display = '';
+    const c = _badgeSpot(el, r, host);
+    const hr = host.getBoundingClientRect();
+    b.style.left = Math.round(r.left + c[0] - hr.left - host.clientLeft + host.scrollLeft) + 'px';
+    b.style.top = Math.round(r.top + c[1] - hr.top - host.clientTop + host.scrollTop) + 'px';
+}
+function _badgeDrop(el) {
+    const rec = BADGES.get(el);
+    if (!rec) return;
+    rec.b.remove();
+    BADGES.delete(el);
+    if (_badgeRO) { try { _badgeRO.unobserve(el); } catch (e) { /* gone */ } }
+    delete el.dataset.mqBadge;
+}
+/** Badges whose box has left the page (a new question drew over the card) go with it. */
+export function pruneBadges() {
+    Array.from(BADGES.keys()).forEach((el) => { if (!el.isConnected) _badgeDrop(el); });
+}
+function _badgePlaceAll() {
+    _badgeRaf = 0;
+    Array.from(BADGES.keys()).forEach(_badgePlace);
+}
+function _badgeSoon() {
+    if (!_badgeRaf && typeof requestAnimationFrame === 'function') _badgeRaf = requestAnimationFrame(_badgePlaceAll);
 }
 function _badgeTrack(el) {
     if (typeof document === 'undefined' || !document.body) return;
+    const host = el.closest('#questionCard, .problem-card');
+    if (!host) return;
+    pruneBadges();
     if (!BADGES.has(el)) {
+        if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
         const b = document.createElement('span');
         b.className = 'mq-live-badge';
         b.setAttribute('aria-hidden', 'true');
         const id = String(++_badgeSeq);
         b.dataset.id = id; el.dataset.mqBadge = id;
-        document.body.appendChild(b);
-        BADGES.set(el, b);
+        host.appendChild(b);
+        BADGES.set(el, { b, host });
+        if (typeof ResizeObserver === 'function') {
+            _badgeRO = _badgeRO || new ResizeObserver(_badgeSoon);
+            _badgeRO.observe(el); _badgeRO.observe(host);
+        }
+        if (host.dataset.mqBadgeHost !== '1') {
+            host.dataset.mqBadgeHost = '1';
+            host.addEventListener('scroll', _badgeSoon, true);
+            window.addEventListener('resize', _badgeSoon);
+        }
     }
-    if (!_badgeLoop) _badgeLoop = requestAnimationFrame(_badgeTick);
+    _badgePlace(el);
+    _badgeSoon();
+    // the layout settles after the verdict (fonts, a ladder step, the screen-fit pass)
+    setTimeout(() => _badgePlace(el), 150);
+    setTimeout(() => _badgePlace(el), 600);
 }
 
 function _liveSet(el, ok, bad) {
@@ -908,6 +1029,7 @@ function _slotExpectations(q, count, join) {
  */
 export function wireLiveCorrect(root, { q = null, kind = null, single = null } = {}) {
     if (!root || !q) return 0;
+    pruneBadges();
     const _h = root.closest && root.closest('.problem-card, #questionCard');
     if (_h && !(_h.id === 'questionCard' && root.id === 'answerInputArea')) delete _h.dataset.mqHelped;   // a new item starts clean
     let n = 0;

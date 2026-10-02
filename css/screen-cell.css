@@ -1430,7 +1430,7 @@ html body .mq-scell .mq-kit .ab:has(> input.mq-live-wrong)::after { content: non
 html body input.mq-live-wrong + button[onclick*="unifiedOrderBoxClear"] { display: none !important; }
 /* the tick / cross badge (screen-cell.js keeps it on the box's outer top-right corner) */
 .mq-live-badge {
-    position: fixed; z-index: 30; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%;
+    position: absolute; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%;
     background-color: #fff; background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
     border: 2px solid var(--mq-box-ok); pointer-events: none; margin: 0; padding: 0;
 }

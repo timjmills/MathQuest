@@ -57,7 +57,7 @@ async function setup(page, host, s) {
       for (let t = 0; t < 60; t++) { st.currentQ = window.generateQuestion(); if (fits(st.currentQ)) break; }
       window.renderQuestion();
     } else {
-      st.gameMode = 'worksheet'; st.problemCount = 2;
+      st.gameMode = 'worksheet'; st.problemCount = s.count || 2;
       const fits = (q) => q && (!s.want || q.answerType === s.want) && (!s.size || (s.size === 'big') === (String(q.ans).length >= 2));
       for (let t = 0; t < 60; t++) { window.initWorksheet(); if (fits(st.worksheetQs[0])) break; }
     }
@@ -114,7 +114,7 @@ async function typeInto(page, i, text) {
 }
 
 async function info(page, i) {
-  await sleep(80);                       // the badge follows its box on the next animation frames
+  await sleep(150);                       // the badge follows its box on the next animation frames
   return page.evaluate((i) => {
     const el = document.querySelector(`[data-t="${i}"]`);
     const cs = getComputedStyle(el);
@@ -138,8 +138,39 @@ async function info(page, i) {
       const left = /left|start/.test(cs.textAlign) ? er.left + bw + pl : er.left + pl + (er.width - pl - pr) / 2 - tw / 2;
       const t = { l: left, r: left + tw, t: er.top + er.height / 2 - 0.36 * fs, b: er.top + er.height / 2 + 0.36 * fs };
       const overlap = tw > 0 && !(br.right <= t.l || br.left >= t.r || br.bottom <= t.t || br.top >= t.b);
-      badge = { kind: bEl.dataset.kind, show: getComputedStyle(bEl).display !== 'none', w: Math.round(br.width), h: Math.round(br.height), overlap,
-        outside: br.top < er.top + 1 && br.right > er.right - 14 };
+      // everything else in the item the badge must not sit on: other answer boxes, arcs and lines, labels, rules
+      const host = el.closest('#questionCard, .problem-card');
+      const hits = [];
+      const meets = (q, what) => { if (q.width > 0 && q.height > 0 && !(br.right <= q.left + 0.5 || br.left >= q.right - 0.5 || br.bottom <= q.top + 0.5 || br.top >= q.bottom - 0.5)) hits.push(what); };
+      host.querySelectorAll('input:not([type="hidden"])').forEach((o) => { if (o !== el) meets(o.getBoundingClientRect(), 'box'); });
+      host.querySelectorAll('svg path, svg line, svg polyline, svg text').forEach((o) => {
+        if (o.closest('button, .mq-wsbar')) return;
+        if (o.tagName === 'path' && o.getTotalLength) {      // an arc is its stroke: walk along it
+          const m = o.getScreenCTM(); const svg = o.ownerSVGElement; const len = o.getTotalLength();
+          for (let d = 0; d <= len + 0.1; d += 3) {
+            const pt = svg.createSVGPoint(); const p0 = o.getPointAtLength(Math.min(d, len)); pt.x = p0.x; pt.y = p0.y;
+            const sp = pt.matrixTransform(m);
+            if (sp.x > br.left + 0.5 && sp.x < br.right - 0.5 && sp.y > br.top + 0.5 && sp.y < br.bottom - 0.5) { hits.push('drawing:path:' + (o.getAttribute('d') || '').slice(0, 40)); break; }
+          }
+        } else meets(o.getBoundingClientRect(), 'drawing:' + o.tagName + ':' + (o.getAttribute('d') || o.textContent || '').slice(0, 30));
+      });
+      const wk = document.createTreeWalker(host, NodeFilter.SHOW_TEXT); const rg = document.createRange();
+      while (wk.nextNode()) {
+        const tn = wk.currentNode; const pe = tn.parentElement;
+        if (!/\S/.test(tn.nodeValue || '') || !pe || pe.closest('button, .mq-wsbar, .hint-popup, .mq-sr, .mq-live-badge, script, style')) continue;
+        rg.selectNodeContents(tn); Array.from(rg.getClientRects()).forEach((q) => meets(q, 'label'));
+      }
+      host.querySelectorAll('*').forEach((o) => {
+        if (o === el || o.contains(el) || o.closest('button, .mq-wsbar, .hint-popup, .mq-live-badge, svg')) return;
+        if (o.matches('table, tr, td, th, tbody, [data-mq-cell], .k2-tile, .ab, .rg, .mq-cellbox, .mq-slothost')) return;
+        const c2 = getComputedStyle(o); const q = o.getBoundingClientRect();
+        if (c2.display === 'none' || !q.width || !q.height) return;
+        const bt = c2.borderTopStyle !== 'none' ? parseFloat(c2.borderTopWidth) : 0, bb = c2.borderBottomStyle !== 'none' ? parseFloat(c2.borderBottomWidth) : 0;
+        if (bt >= 1) meets({ left: q.left, right: q.right, top: q.top, bottom: q.top + bt, width: q.width, height: bt }, 'bar');
+        if (bb >= 1) meets({ left: q.left, right: q.right, top: q.bottom - bb, bottom: q.bottom, width: q.width, height: bb }, 'bar');
+      });
+      badge = { hits, area: el.dataset.mqBadgeArea, kind: bEl.dataset.kind, show: getComputedStyle(bEl).display !== 'none', w: Math.round(br.width), h: Math.round(br.height), overlap,
+        outside: !(br.left + br.width / 2 > er.left + 6 && br.left + br.width / 2 < er.right - 6 && br.top + br.height / 2 > er.top + 6 && br.top + br.height / 2 < er.bottom - 6) };
     }
     const sib = el.nextElementSibling;
     const clr = sib && sib.tagName === 'BUTTON' ? getComputedStyle(sib).display : null;
@@ -149,7 +180,7 @@ async function info(page, i) {
 
 const blurAll = (page) => page.evaluate(() => { const a = document.activeElement; if (a && a.blur) a.blur(); });
 const hasMark = (r) => !!r.badge && r.badge.show && ((r.bad && r.badge.kind === 'bad') || (r.ok && r.badge.kind === 'ok'));
-const noOverlap = (r) => !!r.badge && !r.badge.overlap;
+const noOverlap = (r) => !!r.badge && !r.badge.overlap && r.badge.hits.length === 0;
 const dashedWrong = (r) => r.os === 'dashed';
 const bigMark = (r) => !!r.badge && r.badge.w >= 16 && r.badge.w <= 18 && r.badge.outside;
 
@@ -211,7 +242,7 @@ async function run(w) {
         r1 = await info(page, 1);
         check(r1.bad && !r1.ok && hasMark(r1) && r1.bg === BAD_BG && r1.inv === 'true', `${tag0} wrong box turns red with a cross (${r1.bg})`);
         check(dashedWrong(r1) && !dashedWrong(r0) && bigMark(r1) && bigMark(r0), `${tag0} wrong box has a dashed edge (right is solid) and the badges are 16-18 px on the outer corner (${r1.os}/${r0.os}, ${JSON.stringify(r0.badge)})`);
-        check(noOverlap(r0) && noOverlap(r1), `${tag0} the badges do not touch the digits (${JSON.stringify([r0.badge && r0.badge.overlap, r1.badge && r1.badge.overlap])})`);
+        check(noOverlap(r0) && noOverlap(r1), `${tag0} the badges stay clear of the digits, other boxes, arcs, bars and labels (${JSON.stringify([r0.badge, r1.badge])})`);
         if (s.kind === 'stack') check(r1.bs === 'dashed', `${tag0} a column stack's wrong digit box has a dashed edge (${r1.bs})`);
         if (s.exp === 'order' && host === 'card') check(r1.clr === 'none', `${tag0} a red ordering box shows no second x (${r1.clr})`);
       }
@@ -302,6 +333,84 @@ async function run(w) {
     check(got.streak === (helped ? 2 : 3), `${tag0} streak ${helped ? 'not extended (2)' : 'extended (3)'} (${got.streak})`);
     check(got.dp === (helped ? 2 : 1), `${tag0} progress records ${helped ? 'a miss then a hit (2)' : 'one hit (1)'} (${got.dp})`);
     check(got.tries === 0, `${tag0} the red box added no wrong try (${got.tries})`);
+  }
+  // a badge goes with its box: a dialog, the settings panel or the hint box covers it as it covers the box
+  for (const host of ['card', 'worksheet']) {
+    const tag0 = `[${w} ${host} badge under panels]`;
+    await boot(page);
+    await setup(page, host, { c: 'multiplication', k: 'count_by_tables', kind: 'row' });
+    const t = await tag(page, host, { kind: 'row' });
+    await typeInto(page, 0, t.exp[0]); await typeInto(page, 1, wrongOf(t.exp[1])); await blurAll(page); await sleep(300);
+    const covered = (what) => page.evaluate((what) => {
+      const badges = Array.from(document.querySelectorAll('.mq-live-badge')).filter((b) => getComputedStyle(b).display !== 'none');
+      const cover = what === 'settings' ? document.getElementById('settingsPanel') : document.querySelector('.hint-popup.active, #hintPopup.active, .hint-modal');
+      const cr = cover ? cover.getBoundingClientRect() : null;
+      const bad = [];
+      badges.forEach((b) => {
+        const r = b.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const inside = cr && x >= cr.left && x <= cr.right && y >= cr.top && y <= cr.bottom;
+        if (inside && document.elementFromPoint(x, y) === b) bad.push('visible over the ' + what);
+      });
+      return { n: badges.length, bad, cover: !!cover, inside: cr ? Math.round(cr.width) : 0 };
+    }, what);
+    await page.evaluate(() => window.openSettingsPanel && window.openSettingsPanel()); await sleep(500);
+    const a = await covered('settings');
+    check(a.bad.length === 0, `${tag0} no badge shows over the open settings panel (${JSON.stringify(a)})`);
+    await page.evaluate(() => window.closeSettingsPanel && window.closeSettingsPanel()); await sleep(400);
+    if (host === 'card') await page.evaluate(() => window.showHint && window.showHint()); else await page.evaluate(() => window.toggleHint && window.toggleHint(0));
+    await sleep(500);
+    const h = await covered('hint');
+    check(h.bad.length === 0, `${tag0} no badge shows through the open hint box (${JSON.stringify(h)})`);
+  }
+  // a multi-box worksheet item that went red first is "helped" too (not only the one-box path)
+  {
+    const tag0 = `[${w} worksheet area model helped]`;
+    await boot(page);
+    await setup(page, 'worksheet', { c: 'multiplication', k: 'area_model_mult', kind: 'sel', sel: 'input.area-model-input, input.area-model-total', exp: 'answer' });
+    const t = await tag(page, 'worksheet', { kind: 'sel', sel: 'input.area-model-input, input.area-model-total', exp: 'answer' });
+    const skill = await page.evaluate(() => window.state.worksheetQs[0].skillId || window.state.skill);
+    const snap = () => page.evaluate((sk) => { const p = window.state.skillProgress[sk] || { total: 0, correct: 0 }; return { t: p.total, c: p.correct }; }, skill);
+    const p0 = await snap();
+    await typeInto(page, 0, wrongOf(t.exp[0]));
+    const red = await info(page, 0);
+    check(red.bad, `${tag0} the wrong part turns red first`);
+    for (let i = 0; i < t.n; i++) await typeInto(page, i, t.exp[i]);
+    await sleep(300);
+    await page.evaluate(() => window.checkAllWorksheet());
+    const p1 = await snap();
+    check(await page.evaluate(() => window.state.worksheetQs[0]._helped === true), `${tag0} the item is recorded as helped`);
+    check(p1.t - p0.t === 2 && p1.c - p0.c === 1, `${tag0} counted as a miss then a hit (${p1.t - p0.t}, ${p1.c - p0.c})`);
+  }
+  // owner 2026-10-02: every worksheet problem reaches skill progress at Check all, once
+  {
+    const tag0 = `[${w} worksheet progress]`;
+    await boot(page);
+    await setup(page, 'worksheet', { c: 'addition', k: 'add_facts', kind: 'single', count: 4 });
+    const typeCard = async (i, text) => {
+      await page.evaluate((i) => { const el = document.getElementById(`ws_input_${i}`); el.disabled = false; el.focus(); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }, i);
+      await page.keyboard.type(text, { delay: 15 }); await sleep(120);
+    };
+    const answers = await page.evaluate(() => window.state.worksheetQs.map((q) => String(q.ans)));
+    const wrong = (a) => (a.length === 1 ? String(Number(a) === 9 ? 8 : Number(a) + 1) : a.replace(/[0-9]$/, (m) => String((Number(m) + 1) % 10)));
+    const snap = () => page.evaluate(() => { const p = window.state.skillProgress.add_facts || { total: 0, correct: 0 }; return { t: p.total, c: p.correct }; });
+    await typeCard(0, answers[0]);                                  // clean correct
+    await typeCard(1, wrong(answers[1])); await typeCard(1, answers[1]);   // red first, then right: helped
+    await typeCard(2, wrong(answers[2]));                           // wrong
+    // card 3 stays blank
+    const p0 = await snap();
+    await page.evaluate(() => window.checkAllWorksheet());
+    const p1 = await snap();
+    check(p1.t - p0.t === 4 && p1.c - p0.c === 2, `${tag0} clean = a hit (1), helped = a miss then a hit (2), wrong = a miss (1), blank = nothing: +4 recorded, +2 correct (${p1.t - p0.t}, ${p1.c - p0.c})`);
+    await page.evaluate(() => window.checkAllWorksheet());
+    const p2 = await snap();
+    check(p2.t === p1.t && p2.c === p1.c, `${tag0} Check all again does not count anything twice (${p2.t - p1.t}, ${p2.c - p1.c})`);
+    await typeCard(2, answers[2]);                                  // the wrong one is put right
+    await page.evaluate(() => window.checkAllWorksheet());
+    const p3 = await snap();
+    check(p3.t - p2.t === 1 && p3.c - p2.c === 1, `${tag0} a wrong item later put right adds only its hit, so it too ends as a miss then a hit (${p3.t - p2.t}, ${p3.c - p2.c})`);
+    await page.evaluate(() => window.checkAllWorksheet());
+    const p4 = await snap();
+    check(p4.t === p3.t, `${tag0} and still only once (${p4.t - p3.t})`);
   }
   // a "make your own" rule table has no fixed answer: each box is judged from the rule
   for (const host of ['card', 'worksheet']) {
