@@ -221,3 +221,58 @@ The paper side is fixed. The screen twin's new slot overlay (chartwindow.js:191)
 ## What raises each criterion
 - **C1 and C4 (7 → 9):** fix D.
 - **C2 and C3:** unchanged from round 2.
+
+# Round 4 (critic, Opus low, head 697e562)
+
+**Verdict: FAIL.** C1 6 · C2 8 · C3 8 · C4 6.
+
+## Gates and probes run
+- `ws-screen-answer --skills composing:hundreds_chart_fill,composing:number_chart_fill,multiplication:count_by_tables`: OK. Card, worksheet 3/3, quiz 3/3 and live green all passed.
+- DOM probe, practice card, `grid:'whole', gaps:'pattern'`, seed 1, DPR 1:
+  - **1280:** computed td font-size is **15.36 px**. Squares are 41.9 × 46.8 px and the chart is 420 px wide inside a 1160 px card. Page scroll-x is 0. There were no console errors.
+  - **390:** font-size is 40 px. Squares are 79.6 × 56 px and the chart is 797 px wide inside a 370 px card. Page scroll-x is 0.
+- 390 Tab probe: I tabbed through all 30 empty squares from the keyboard. All 30 were inside the visible window when they took focus. `data-mq-end` set itself on the last box. **SP-11a focus scroll: PASS.**
+- I viewed every PNG under onepage-12/ (6 sets), rows-screen/, whole-pattern-screen/ (including the cue and scrolled-end shots and worksheet-390), whole-pattern-S/L, and L/ and S/.
+
+## Owner rulings, judged
+- **SP-11a wording is fine.** It is narrow (10-column charts only, 480 px and under), dated, states page scroll-x 0 and names its files. The cue is black on white and has a 2 px rule above it. It sits under the chart (card-390-cue, worksheet-390) and never over a square. It is gone at the end (card-390-scrolled-end), and it is hidden in print. **Implementation: PASS.**
+  - Minor: the arrow (34 px) reads as a medium arrow, not the "large arrow" the rule names. This is not blocking.
+- **onePage:**
+  - All six A4/Letter sets are ×1–×12 in order, on one page plus one key page.
+  - Max blanks prints only the start number. Fill-two prints two numbers.
+  - Printed digits are about 16 pt and legible.
+  - Key boxes holding "100", "108", "121" and "144" are filled edge to edge with almost no clearance (Letter-default and A4-fill-two keys, rows i–l). On the pupil page the same box is about 11 mm wide for three handwritten digits, which is tight for SPED hands. Acceptable as an opt-in page.
+  - The forced S/12 behaviour is stated only in the option's help text. The size picker still shows the teacher's own size; see defect G.
+
+## Ranked defects (round 4)
+
+### F. Round-3 defect D is NOT fixed: the ten-column chart still shrinks to about 15 px digits on desktop (C1 6, C4 6). TY-10 "content never shrinks to fit".
+- **Where:** the screen twin's fit pass, `js/modules/screen-cell.js` lines 2204–2216. It lowers `--mq-k2` to `K2_FLOOR_PX` because the twin is wider than its box. The CSS rule `font-size:min(calc(var(--mq-k2)*6.4),4vw)` (`css/screen-cell.css:1331`) then gives 2.4 × 6.4 = 15.36 px.
+- **Seen in:**
+  - The probe above.
+  - whole-pattern-screen/card-1280.png: the chart is 420 px wide inside a 720 px frame.
+  - whole-pattern-screen/worksheet-1280.png: the card now spans the row, but the chart is still about 470 px of about 1100 px, with squares of about 45 px.
+  - rows-screen card and worksheet at 1280.
+- **The builder's figures are wrong.** It reported 33.4 px (card 1280) and 33.18 px (worksheet 1280). Those are the values before the fit pass, not what renders.
+- **Fix:**
+  1. In the fit pass, skip any twin that contains `.k2-chart-ten`, for example `if (twin.querySelector('.k2-chart-ten')) return;` before the shrink.
+  2. Give the desktop ten-column chart its width from its digits, as the phone rule does: at ≥ 481 px, `.k2-chart.k2-chart-ten{--mq-chfs:48px (card/quiz) | 29px (worksheet); width:calc(10*(var(--mq-chd)*0.58*var(--mq-chfs)+10px))}`.
+  3. Let `#questionCard.mq-card:has(.k2-chart-ten)` and `#questionPaper` widen past the 720 px SP-12 cap to `min(96vw, 960px)`. Record that as SP-12a, beside SP-11a.
+- **Measured target:**
+  - Card at 1280: digits are at least 48 px, which is the 768 floor. 56 px cannot fit "100" in 10 columns within 960 px, so 48 px is the honest target, and the rule should say so.
+  - Worksheet at 1280: digits are at least 29 px and squares at least 60 px.
+  - Quiz: the same as the card.
+  - "100" has at least 4 px clearance in its own square.
+- **Round-4 question (33.4 vs 48/56):** even if 33.4 px had really rendered, it would still breach the 48 px card floor. The 720 px cap is the cause, so the fix is the cap exception in step 3, not smaller digits.
+
+### G. The UI does not show that onePage overrides size, the row count, the "Line runs to" option, the ticked tables and the order (C3 8, does not block alone).
+- **Where:** `normaliseRequest` in `js/modules/print-sheet.js` silently sets size S, count 12, pages 1 and columns 1. The print dialog still shows the teacher's own values.
+- **Fix:** when `onePage` is on, have the print dialog (`teacher-print.js`) show size as "S (set by All 12 tables on one page)" and disable it. Do the same for count, pages, columns, `jumps`, the table ticks and `order`.
+
+### H (minor). On the one-page sheet, the blank boxes hold three-digit answers with little room.
+- **Seen in:** the A4 and Letter pupil pages. About 30 mm of the page is unused below row l.
+- **Fix:** spend that height on `ws-cell-compact` box width or height, for example raising `baseH` back to `writeMm + 2.5`, as long as the page still fits.
+
+## What raises each criterion
+- **C1 and C4 (6 → 9):** fix F, then re-measure at 1280 from the DOM after the fit pass.
+- **C3:** fix G.

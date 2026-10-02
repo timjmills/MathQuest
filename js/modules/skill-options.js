@@ -1303,9 +1303,12 @@ const _hopLine = (div) => [
         help: 'A number over each drawn hop (in the model and the key) so the pupil counts the hops. None is the fade.',
     },
 ];
+// Critic round 4 (G): "All 12 tables on one page" overrides these controls, so the panel shows the value it
+// forces, disabled, with the reason (skill-options-ui.js optionControlHTML reads `lockedBy`).
+const _onePageLock = (v) => (cur) => (cur && cur.onePage ? { v, why: 'Set by "All 12 tables on one page".' } : null);
 const CB_CHART_LINE_OPTIONS = {
     'multiplication:count_by_tables': [
-        _cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'),
+        { ..._cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'), lockedBy: _onePageLock(Array.from({ length: 12 }, (_, k) => k + 1)) },
         {
             // Wave 1 lane C (owner, overdue): the first two numbers print so the pupil can SEE the step.
             id: 'fill', label: 'Numbers printed to start', type: 'enum', default: 'two', group: 'support',
@@ -1319,6 +1322,7 @@ const CB_CHART_LINE_OPTIONS = {
             id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'layout',
             values: [{ v: 12, l: '12 jumps (to 12 ×)' }, { v: 15, l: '15 jumps (to 15 ×; the row wraps to two lines)' }],
             help: 'How many numbers the row holds: 12 (the table to × 12) or 15 (on to × 15).',
+            lockedBy: _onePageLock(12),
         },
         {
             // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
@@ -1332,6 +1336,7 @@ const CB_CHART_LINE_OPTIONS = {
             id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
             values: [{ v: 'inorder', l: 'In order (2, 3, 4 …)' }, { v: 'mixed', l: 'Mixed tables' }],
             help: 'In order runs the ticked tables smallest first down the page; mixed shuffles them.',
+            lockedBy: _onePageLock('inorder'),
         },
         _cbShape('box'),
     ],
@@ -3448,6 +3453,13 @@ export function normalizeOptions(categoryId, skillId, opts) {
             const list = Array.isArray(v) ? v : (v === undefined || v === null ? null : [v]);
             if (list) out[def.id] = list.filter(x => legal.has(x));
         }
+    }
+    // A control another option overrides (`lockedBy`, count_by_tables "All 12 tables on one page")
+    // reads as the value that prints, so the sheet title, the summary and the page agree (round 4, G).
+    for (const def of defs) {
+        if (typeof def.lockedBy !== 'function') continue;
+        const lock = def.lockedBy(out);
+        if (lock) out[def.id] = Array.isArray(lock.v) ? lock.v.slice() : lock.v;
     }
     return out;
 }

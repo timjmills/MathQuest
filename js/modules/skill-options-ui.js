@@ -154,6 +154,10 @@ export function skillHasOfferedOptions(categoryId, skillId) {
  */
 export function optionControlHTML(def, cur, color, h) {
     def = _liveDef(def);
+    // A control another option overrides (count_by_tables "All 12 tables on one page"): show the value
+    // it forces, disabled, with the reason - never the teacher's own value, which will not print.
+    const lock = typeof def.lockedBy === 'function' ? def.lockedBy(cur || {}) : null;
+    if (lock) return _lockedControlHTML(def, lock);
     const v = cur[def.id];
     const tip = def.help ? ` title="${escHTML(def.help)}"` : '';
     const id = escHTML(def.id);
@@ -231,6 +235,18 @@ export function optionControlHTML(def, cur, color, h) {
         <select style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;text-overflow:ellipsis;"
             onchange="${h.set(id, 'this.value')}">${opts}</select>${full}
     </label>${extra}`;
+}
+
+function _lockedControlHTML(def, lock) {
+    const vals = def.values || [];
+    const shown = def.type === 'set'
+        ? (Array.isArray(lock.v) && lock.v.length === vals.length && def.allLabel ? def.allLabel : (Array.isArray(lock.v) ? lock.v.join(', ') : String(lock.v)))
+        : ((vals.find(x => x.v === lock.v) || {}).l || String(lock.v));
+    return `<div class="sko-locked" data-sko-locked="${escHTML(def.id)}" aria-disabled="true" style="display:flex;flex-direction:column;gap:4px;font-size:0.82rem;color:var(--text);min-width:0;opacity:0.85;">
+        <span style="font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
+        <select disabled aria-label="${escHTML(def.label)}" style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 6px;border:1px dashed var(--border);border-radius:6px;background:transparent;color:var(--text);font-size:0.82rem;"><option selected>${escHTML(shown)}</option></select>
+        <span style="font-size:0.72rem;color:var(--text-dim);">${escHTML(lock.why)}</span>
+    </div>`;
 }
 
 let _measureCtx = null;

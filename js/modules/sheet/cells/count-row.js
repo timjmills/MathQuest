@@ -50,6 +50,8 @@ const TAB_MM = { S: 12, M: 12.5, L: 13.5 };
 const GAP_MM = 1.5;
 /** The width a one-column cell gives its content (186 mm less the cell's pads). */
 const LIVE_MM = 172;
+const COMPACT_LIVE_MM = 178;  // the one-page sheet's single full-width column (critic round 4, H)
+const COMPACT_GAP_MM = 1;      // and a tighter gap, so the box takes the width (3-digit keys keep clear space)
 /** Most boxes in one row of the screen twin: four (and the step tab) fit a 390 px phone at >= 44 px a box. */
 const TWIN_ROW = 4;
 
@@ -72,24 +74,29 @@ function geom(p, ctx) {
     // one box width for every table, so the rows of a page line up.
     const wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
     const tab = look === 'arcs' && p.tab ? TAB_MM[size] + 2 : 0;
-    const baseH = S(ctx).writeMm + (p.compact ? 2 : 2.5);   // compact (12 tables on one page): less chrome, never smaller digits
-    let boxW = (look === 'arcs' ? PITCH[size] - GAP_MM : 14) + wide;
+    // compact (12 tables on one page): less chrome, never smaller digits. Critic round 4 (H): the page had
+    // about 30 mm spare under row l, so the boxes take it - taller (+3 mm, the most Letter still holds on one page) and wider (the one-column cell's
+    // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
+    const baseH = S(ctx).writeMm + (p.compact ? 3 : 2.5);
+    const live = p.compact ? COMPACT_LIVE_MM : LIVE_MM;
+    const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
+    let boxW = (look === 'arcs' ? PITCH[size] - gap : 14) + wide;
     let perRow = n;
     if (look === 'arcs') {
-        const fitPitch = (LIVE_MM - tab + GAP_MM) / n;
-        if (shape === 'box' && fitPitch - GAP_MM >= MIN_BOX[size] + wide) boxW = Math.min(boxW, fitPitch - GAP_MM);
+        const fitPitch = (live - tab + gap) / n;
+        if (shape === 'box' && fitPitch - gap >= MIN_BOX[size] + wide) boxW = p.compact ? fitPitch - gap : Math.min(boxW, fitPitch - gap);
         else perRow = Math.ceil(n / 2);
     }
     const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
-    const pitch = sz.w + GAP_MM;
-    const fitN = Math.max(1, Math.floor((LIVE_MM - tab + GAP_MM) / pitch));
+    const pitch = sz.w + gap;
+    const fitN = Math.max(1, Math.floor((live - tab + gap) / pitch));
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
     const arcH = look === 'arcs' ? (p.compact ? 3 : 3.8) : 0;
     // the compact page prints its digits at the size's working size (16 pt at S, TY-10), not the 0.64 of it
     const pt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
-    return { size, n, look, shape, w: sz.w, h: sz.h, pitch, tab, perRow, rows, arcH, pt };
+    return { size, n, look, shape, w: sz.w, h: sz.h, pitch, gap, tab, perRow, rows, arcH, pt };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -137,7 +144,7 @@ function stepTab(ctx, g, text) {
 
 /** The hop arcs over one row of `k` numbers. */
 function arcsSVG(ctx, g, k) {
-    const W = k * g.pitch - GAP_MM, H = g.arcH;
+    const W = k * g.pitch - g.gap, H = g.arcH;
     let d = '';
     for (let i = 0; i < k - 1; i++) {
         const a = i * g.pitch + g.w / 2 + 1.2, b = (i + 1) * g.pitch + g.w / 2 - 1.2;
@@ -197,7 +204,7 @@ register('count-row', {
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line" style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div style="display:flex;gap:${L(ctx, GAP_MM)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
+                + `<div style="display:flex;gap:${L(ctx, g.gap)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -227,7 +234,7 @@ register('count-row', {
     },
     footprint(p, ctx) {
         const g = geom(p, ctx || {});
-        const w = g.tab + g.perRow * g.pitch - GAP_MM + 4;
+        const w = g.tab + g.perRow * g.pitch - g.gap + 4;
         const h = g.rows * (g.arcH + g.h) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).

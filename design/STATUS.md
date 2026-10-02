@@ -113,3 +113,4 @@ To recreate a lane: `git worktree add .claude/worktrees/<lane> -b <local-name> o
    from the Next column", at most 8 agents, browser gates one at a time.
 3. Critic every lane before merge; merge + full gates + stamp (`ws-stamp-assets`) + deploy what passes.
 4. To build on resume (owner rulings of 2026-09-27): red answers on keys (a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
+- 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).

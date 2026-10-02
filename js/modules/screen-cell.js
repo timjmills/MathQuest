@@ -2201,7 +2201,10 @@ export function fitTwinRows(root) {
             row.dataset.mqWrapped = '1';
             changed = true;
         });
-        // one item still wider than the cell: the drawing's millimetre shrinks to fit
+        // one item still wider than the cell: the drawing's millimetre shrinks to fit - except a
+        // ten-column chart, whose squares are sized from the host's digits and which swipes inside
+        // its own cell instead (TY-10, SP-11a / SP-12a; critic round 4 defect F)
+        if (twin.querySelector('.k2-chart-ten')) return;
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
