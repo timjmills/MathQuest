@@ -16,6 +16,21 @@ const pageErrors = [];
 
 function log(...args) { console.log('[TEST]', ...args); }
 
+// Wrong-answer feedback: the app picks its message at random from WRONG_MESSAGES in
+// js/modules/answer-check.js (or a misconception tip), always prefixed with "❌". Read the list
+// from the source so the test never hard-codes a subset of the wording.
+const WRONG_MESSAGES = (() => {
+  const src = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'js', 'modules', 'answer-check.js'), 'utf8');
+  const m = src.match(/const WRONG_MESSAGES = \[([\s\S]*?)\];/);
+  if (!m) throw new Error('test-wrong-retry-skip: WRONG_MESSAGES not found in answer-check.js');
+  return [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]);
+})();
+function isWrongFeedback(text) {
+  const t = String(text || '').trim();
+  if (!t) return false;
+  return t.startsWith('❌') || WRONG_MESSAGES.some(w => t.includes(w)) || /That's not/i.test(t);
+}
+
 async function shot(page, name) {
     try { await page.screenshot({ path: path.join(SHOT_DIR, `${name}.png`), fullPage: false }); }
     catch {}
@@ -180,7 +195,7 @@ async function runMapPracticeScenario(page, tier, label) {
     if (after1.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 1st wrong`);
     if (after1.mapItemCount !== startItemCount) throw new Error(`${label}: mapItemCount advanced after wrong (${startItemCount} -> ${after1.mapItemCount})`);
     if (after1.currentQText !== startQText) throw new Error(`${label}: question text changed after wrong attempt #1`);
-    if (!/not quite|try again|one more look|peek|answered/i.test(after1.feedbackText)) throw new Error(`${label}: feedback should say "not quite" / "try again", got "${after1.feedbackText}"`);
+    if (!isWrongFeedback(after1.feedbackText)) throw new Error(`${label}: feedback is not a wrong-answer message: "${after1.feedbackText}"`);
     if (r1.kind === 'mc-click' && after1.wrongChoiceCount < 1) throw new Error(`${label}: MC button not crossed out after wrong`);
     if (r1.kind !== 'mc-click' && after1.historyChips < 1) log(`  (note) no history chip — submission may have been auto-submitted differently`);
     await shot(page, `${label}-02-after-wrong-1`);
@@ -350,7 +365,7 @@ async function runStandardPracticeScenario(page) {
     if (after1.attemptCount !== 1) throw new Error(`${label}: expected 1 attempt, got ${after1.attemptCount}`);
     if (after1.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 1st`);
     if (after1.currentQText !== startQText) throw new Error(`${label}: question changed after wrong #1`);
-    if (!/not quite|try again|one more look|peek|answered|That's not/i.test(after1.feedbackText)) throw new Error(`${label}: bad feedback "${after1.feedbackText}"`);
+    if (!isWrongFeedback(after1.feedbackText)) throw new Error(`${label}: feedback is not a wrong-answer message: "${after1.feedbackText}"`);
     if (r1.kind === 'mc-click' && after1.wrongChoiceCount < 1) throw new Error(`${label}: MC button not crossed out after wrong`);
 
     // Wrong #2
