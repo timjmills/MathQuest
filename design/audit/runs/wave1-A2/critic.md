@@ -259,3 +259,71 @@ Graded commit a38d3d2 (on b04b792). Critic: Opus, low effort, independent. No co
 ## To pass round 5
 
 Fix defect 1 and add its two assertions. Run ws-screen-answer for add_100_regroup five times clean.
+
+# Round 5
+
+Graded commit d815bc3 (code: 36bb0bd + d815bc3 on a38d3d2). Critic: Opus, medium effort, independent. No code edited, nothing committed. Probes ran from the scratchpad. The gate runs re-shot the PNGs, so the tree was restored to HEAD before viewing.
+
+## Verdict: PASS (C1 8 · C2 8 · C3 8 · C4 8). This is the merge decision: merge.
+
+## Runs (all on d815bc3 unless marked)
+
+- `wave1-a2-perbox.cjs`: **OK**, 0 FAIL, no console errors. This includes the two new assertions: a revealed blank or wrong answer, retyped, earns no credit, and another Check all still adds nothing.
+- `wave1-a-probe.cjs`: **OK**, no problems.
+- `ws-screen-answer --skills count_by_tables,hundreds_chart_fill,add_facts,add_100_regroup`: **OK**. Card, worksheet 3/3 and quiz 3/3 for each, and live green ok.
+- `ws-screen-answer --skills addition:add_100_regroup`, 3 further runs: **3/3 OK**, worksheet 3/3 each time. With the 1 run above, that is 4 more clean runs. With the builder's runs, I count no flake since round 4.
+- `ws-screen-slots`, same 4 skills: **OK**. 16 renders, 0 doubled answer areas, 0 paper verbs.
+- **Merge dry run onto `claude/sweet-newton-c8wrv1` (93d873f):**
+  - `git merge-tree` is clean, with **no conflicting files**. The only file both sides touched is `css/screen-cell.css`, and it auto-merges.
+  - On a throwaway worktree of the merged tree (since removed), these all pass: `ws-boot-smoke` OK; `ws-code-snapshot` OK (608 codes / 35 categories, nothing moved); `wave1-a2-perbox` OK; `ws-screen-answer` on the 4 skills OK; `test-wrong-retry-skip` OVERALL PASS; `node --input-type=module --check` OK on `screen-cell.js`, `worksheet.js` and `answer-check.js`.
+
+## Round-4 fixes, verified by my own probes (390 and 1280, real clicks and keys, no forced `disabled=false`)
+
+| # | Probe | Result |
+|---|---|---|
+| 1a | add_facts worksheet with 4 items: item 1 wrong, item 2 clean, items 0 and 3 blank. Check all. | Progress +2 recorded / +1 correct: item 1 a miss, item 2 a hit, the blanks nothing. **Correct.** |
+| 1b | Blank item 0: click it, select all, retype the revealed answer, Tab. Its single-card per-input check fires. Then Check all. | Progress unchanged. Banner `dailyTotal`, `dailyCorrect` and effort unchanged. **No credit.** |
+| 1c | Wrong item 1: copy the revealed answer back, then Check all. | Progress unchanged. It stays **exactly one miss**. |
+| 1d | Revealed blank item 3: type it wrong, then right, then Check all. | Progress unchanged. |
+| 1e | After a reveal, press **New Worksheet** on the score overlay (`newWorksheet`). | All flags on the new items are false. Two clean answers + Check all = +2/+2. **No leak** into a new sheet. |
+| 1f | Reload the page. | `worksheetQs` is empty and progress keeps only the honest records. Nothing about the old sheet comes back. |
+| 2 | add_100_regroup, count_by_tables, hundreds_chart_fill, on card and worksheet, at 390 and 1280. Type a wrong digit into every box while keeping focus in the card, so both settle passes are skipped. Wait 900 ms, blur, then force a fresh placement (`resize`) and compare. | **No badge stale** in any of the 12 cases. The rAF placement (`_badgeSoon`) and the ResizeObserver still run while typing; only the delayed 150/600 ms passes skip. |
+| 3 | A long count row at 390. In live content no box can scroll out: the card at ×12 with 15 jumps wraps to 4 rows with no scroller; the worksheet cell scrolls 336/328 px, an 8 px overflow. So I made a synthetic swipe row (the worksheet count_by cell held to 170 px, no wrap, 416/168 px) and scrolled it to 0, 0.5 and 1. | Every box scrolled fully out has its badge **hidden**. A partly visible box keeps its badge, inside the row. No badge is left hanging at the row edge. **Fixed.** |
+
+## PNGs viewed
+
+- All 58 in `wave1-A2/`: 4 montages plus individual views of the add_100_regroup, count_by and hundreds chart shots at 390.
+- All 12 re-shot in `wave1-A/`.
+- In every A2 shot the badges sit on the box's outer corner, clear of digits, arcs and labels. The quiz is not coloured.
+
+## Defects (ranked, §6 form)
+
+1. **C3, minor, pre-existing (not A2; present on base 93d873f): the count_by_tables practice card at 390 shrinks while the pupil types.**
+   - Where: `card-count_by_tables-green-red-empty-390.png`, row 3. My probe at ×4 (default options) and at ×12 with 15 jumps, base and lane.
+   - Observed:
+     - Each typed box narrows the drawing: box width 44 → 40 px, row pitch 66 → 47 px.
+     - The bottom row is cut off by the cell frame. In the committed PNG, its boxes are cut at half height.
+     - Arcs then overprint boxes. The A2 badges have no ink-free corner left, so ✗ on 21/41 touches an arc.
+   - The geometry trace is the same on base and lane, so A2 does not cause it.
+   - Expected: the drawing keeps its size once drawn, and no row is clipped.
+   - Fix: find the per-input re-fit of the count_by row and stop it rescaling on input: the screen-fit pass (`fitTwinRows`) or the count-row cell's input wiring in `screen-cell.js`. Out of A2's lane; it goes to the count_by owner (Lane C).
+   - Check: type all boxes at 390, and box rects stay the same within 1 px.
+   - This does not block A2.
+2. **C2, minor, note for the owner: a wrong item is closed after the first Check all, even where Check all did not write the answer in.**
+   - Where: `worksheet.js:2463`. `q._revealed = true` is set on every wrong or blank verdict, whether or not that answer type reveals.
+   - Effect: a pupil who later self-corrects a wrong multi-box item earns no hit. This matches the ruling as written ("wrong = a miss").
+   - If the owner wants a self-correction counted as helped (miss + hit) on types that do not reveal, set the flag only where the reveal writes a value.
+   - No score change.
+3. **Minor, dead code:** `wsPre().stale` (`worksheet.js:2438`) and the document `input` listener that clears `data-mq-revealed` (`:2441-2444`) no longer guard anything.
+   - Fix: remove both, or keep the mark only for display and say so in the comment.
+   - Check: perbox still OK.
+4. **Note, efficiency (carried from round 4, note 4):** each placement runs the `_obstacles` walk (`getComputedStyle` on every element in the host). The clip test adds a short ancestor walk.
+   - Not measurable at today's box counts, and the 4 extra add_100_regroup runs were clean.
+   - Fix if a 100-gap chart lags on a phone: cache the obstacle list per host per animation frame.
+
+## Scores
+
+- **C1 8.** The pupil sees right/wrong per box with a shape cue on both hosts, and nothing in the quiz. To reach 10: fix defect 1 upstream, so the count row stays still while the pupil types.
+- **C2 8.** Progress follows the rulings exactly (clean, helped, wrong, blank), counts each item once, and revealed answers earn nothing, by every route I tried. To reach 10: settle defect 2 with the owner and remove the dead guard.
+- **C3 8.** Badges stay clear of ink and overlays, follow layout changes, and hide in swipe rows. To reach 10: fix the upstream count_by shrink, defect 1.
+- **C4 8.** Black-and-white cells are unchanged, and the colour is limited to the answer place on screen hosts. To reach 10: as C3.
