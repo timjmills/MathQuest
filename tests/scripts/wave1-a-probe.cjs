@@ -72,6 +72,7 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       const stops = (bg) => (bg.match(/rgba?\([^)]*\)|#[0-9a-f]{6}/gi) || []).map((c) => c[0] === '#' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)) : rgb(c));
       const out = Array.from(document.querySelectorAll('.student-start-btn')).map((b) => { const c = getComputedStyle(b); const fg = rgb(c.color); const st = stops(c.backgroundImage); return { m: b.dataset.mode, min: Math.min(...st.map((s) => cr(fg, s))) }; });
       const bub = document.querySelector('#mqHomeMascot .mq-mascot-bubble'); const bc = getComputedStyle(bub);
+      document.querySelectorAll('.map-launch-btn').forEach((b) => { const c = getComputedStyle(b); const fg = rgb(c.color); const st = stops(c.backgroundImage); out.push({ m: 'MAP ' + b.textContent.trim().replace(/^\S+\s*MAP\s*/, ''), min: st.length ? Math.min(...st.map((x) => cr(fg, x))) : cr(fg, rgb(c.backgroundColor)) }); });
       out.push({ m: 'bubble', min: cr(rgb(bc.color), rgb(bc.backgroundColor)) });
       return out;
     });

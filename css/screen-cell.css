@@ -1485,3 +1485,10 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
     .mode-cards .student-start-btn { justify-content: flex-start; }
     .mode-cards .student-start-btn .mode-name { min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
 }
+
+/* ---- WAVE 1 fix 4 (2026-10-02): MAP K-2 / 3-5 / K-5 buttons readable in dark theme (>= 4.5:1).
+   Light theme, position and size unchanged; only text and fill change under .dark / .dark-theme. */
+.dark .map-launch-btn, .dark-theme .map-launch-btn { background: linear-gradient(180deg, #2A2540 0%, #221E36 100%); }
+.dark .map-launch-k2, .dark-theme .map-launch-k2 { color: #5EEAD4; }
+.dark .map-launch-35, .dark-theme .map-launch-35 { color: #FDBA74; }
+.dark .map-launch-mixed, .dark-theme .map-launch-mixed { color: #C4B5FD; }
