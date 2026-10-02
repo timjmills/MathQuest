@@ -1318,4 +1318,14 @@ html body .mq-scell .k2-chart [data-mq-cell] > input.mq-cellslot { width: 100% !
 @media (max-width: 480px) {
     #gameView #questionCard.mq-card #questionPaper > #visualAid:has(.k2-chart) { grid-column: 1 / -1 !important; }
     #gameView #questionCard.mq-card:has(.k2-chart) { padding-left: 6px; padding-right: 6px; }
+    #gameView #questionCard.mq-card #questionPaper:has(.k2-chart) { padding-top: 0 !important; padding-bottom: 0 !important; grid-template-rows: auto 0px auto auto auto 0px !important; }
+    .mq-scell .k2-chartwindow, .mq-scell .k2-chartwindow .k2-chart { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
 }
+
+/* Wave 1 lane C: an online-worksheet card holding a ten-column number chart takes the whole grid row
+   (worksheet.js marks it mq-span-row / data-mq-span, which layoutWorksheetGrid keeps), so its squares
+   keep the host's digit size. Additive. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard[data-mq-span="1"]:has(.k2-chart) { grid-column: 1 / -1; }
+/* The practice card and the quiz are wider than a worksheet card but their squares are no wider: the
+   chart's digits stay clear of the square edges ("100" keeps >= 4 px each side). Additive. */
+html body #questionCard .mq-scell .k2-chart td, html body .qt-question-card .mq-scell .k2-chart td { font-size: min(calc(var(--mq-k2) * 6.4), 4vw) !important; }

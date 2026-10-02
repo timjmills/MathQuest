@@ -85,7 +85,7 @@ register('chartwindow', {
                     const k = blanks.indexOf(n);
                     const base = ten
                         ? `box-sizing:border-box;width:10%;height:max(44px,min(${L(ctx, c.h)},11vw));padding:0;position:relative;text-align:center;vertical-align:middle;`
-                            + `font-size:min(${P(ctx, pt)},4.6vw,${L(ctx, 5.2)});font-weight:400;line-height:1;`
+                            + `font-size:min(${P(ctx, pt)},4vw);font-weight:400;line-height:1;`
                         : `box-sizing:border-box;width:${L(ctx, c.w)};height:${L(ctx, c.h)};padding:0;position:relative;text-align:center;vertical-align:middle;`
                             + `font-size:${P(ctx, pt)};font-weight:400;line-height:1;`;
                     if (k < 0) {

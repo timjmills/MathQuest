@@ -1528,6 +1528,9 @@ function _wsRenderCard(grid, q, i) {
                 if (row) row.style.display = 'none';
             }
         }
+        // a ten-column number chart keeps rows of ten at the host's digit size: its card takes the whole row
+        const _chartRow = cellEl.querySelector('.k2-chart tr');
+        if (_chartRow && _chartRow.children.length === 10) { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
         if (twin) {
             const inp = document.getElementById(`ws_input_${i}`);
             wireRingGroups(cellEl);
