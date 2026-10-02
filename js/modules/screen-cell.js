@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -536,7 +536,48 @@ const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replac
 const LIVE_NUM = new WeakSet();       // a single numeric answer place: "7.0" and "7" are the same number
 const _isNum = (v) => v !== '' && v !== '-' && v !== '.' && Number.isFinite(Number(v));
 
+// Leaving a box for the item's own Hint / Read / Check / speaker / Skip is not "leaving the box":
+// the entry may be half typed, so it is not judged (red) until the pupil goes to another answer
+// box or away from the item. relatedTarget covers keyboard and most pointers; the pointerdown
+// stamp covers browsers whose buttons take no focus on click.
+const _CONTROL_SEL = 'button, a[href], [role="button"], .hint-popup, .mq-wsbar, #hintBtn, .hint-btn, .ws-tts-btn';
+let _lastControlDown = 0;
+if (typeof document !== 'undefined' && !window.__mqCtlDownBound) {
+    window.__mqCtlDownBound = true;
+    document.addEventListener('pointerdown', (e) => { if (e.target && e.target.closest && e.target.closest(_CONTROL_SEL)) _lastControlDown = Date.now(); }, true);
+}
+function _toControl(e) {
+    const t = e && e.relatedTarget;
+    if (t && t.closest && t.closest(_CONTROL_SEL)) return true;
+    return !t && Date.now() - _lastControlDown < 700;
+}
+
+const LIVE_FN = new WeakMap();        // a box judged by a function of its value (a rule table's "make" rows)
+
+function _liveSet(el, ok, bad) {
+    el.classList.toggle('mq-live-correct', ok);
+    el.classList.toggle('mq-live-wrong', bad);
+    if (bad) {
+        el.setAttribute('aria-invalid', 'true');
+        // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
+        const host = el.closest('.problem-card, #questionCard');
+        if (host) host.dataset.mqHelped = '1';
+    } else el.removeAttribute('aria-invalid');
+}
+
+/** Did any box of this item (the practice card, or a worksheet card) go red since it was drawn? */
+export function itemWasHelped(host) {
+    return !!host && host.dataset && host.dataset.mqHelped === '1';
+}
+
 function _liveMark(el, final) {
+    const fn = LIVE_FN.get(el);
+    if (fn) {
+        const raw = String(el.value == null ? '' : el.value).trim();
+        const verdict = raw === '' ? null : fn(raw);
+        _liveSet(el, verdict === true, verdict === false && !!final);
+        return;
+    }
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
@@ -545,10 +586,10 @@ function _liveMark(el, final) {
     const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
     // a single answer place judges on fill only when its answer is a number (anything else waits for Check)
     const judgeable = !el.hasAttribute('data-mq-single') || num;
-    const bad = !ok && v !== '' && judgeable && (!!final || v.length >= maxLen);
-    el.classList.toggle('mq-live-correct', ok);
-    el.classList.toggle('mq-live-wrong', bad);
-    if (bad) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+    // a number entry that starts with 0 is still being written ("07" is accepted for 7): not red yet
+    const zeroLead = num && /^-?0/.test(v) && v.length < maxLen + 1;
+    const bad = !ok && v !== '' && judgeable && ((!!final) || (v.length >= maxLen && !zeroLead));
+    _liveSet(el, ok, bad);
 }
 
 function _liveBind(el, expected, { single = false, numeric = false } = {}) {
@@ -560,8 +601,28 @@ function _liveBind(el, expected, { single = false, numeric = false } = {}) {
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
         el.addEventListener('input', () => _liveMark(el, false));
-        el.addEventListener('change', () => _liveMark(el, true));
-        el.addEventListener('blur', () => _liveMark(el, true));
+        el.addEventListener('change', () => _liveMark(el, false));      // the blur that follows judges it
+        el.addEventListener('blur', (e) => _liveMark(el, !_toControl(e)));
+    }
+    _liveMark(el, false);
+    return true;
+}
+
+/**
+ * Bind a box to a judge: fn(value) -> true | false | null (null: cannot be judged yet). `group` is
+ * the other boxes the verdict depends on (a rule table's Out box depends on its In box): when one
+ * of them changes, the rest are judged again - a box the pupil has left is judged as final.
+ */
+function _liveBindFn(el, fn, group = []) {
+    if (!el || typeof fn !== 'function') return false;
+    LIVE_FN.set(el, fn);
+    LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
+    if (el.dataset.mqLive !== '1') {
+        el.dataset.mqLive = '1';
+        const again = (final) => { _liveMark(el, final); group.forEach((o) => { if (o !== el && String(o.value || '').trim()) _liveMark(o, o !== document.activeElement); }); };
+        el.addEventListener('input', () => again(false));
+        el.addEventListener('change', () => again(false));
+        el.addEventListener('blur', (e) => again(!_toControl(e)));
     }
     _liveMark(el, false);
     return true;
@@ -593,6 +654,7 @@ export function unwireLiveCorrect(el) {
     if (!el) return;
     LIVE_EXPECT.delete(el);
     LIVE_NUM.delete(el);
+    LIVE_FN.delete(el);
     el.removeAttribute('data-mq-single');
     el.classList.remove('mq-live-correct', 'mq-live-wrong');
     el.removeAttribute('aria-invalid');
@@ -642,6 +704,103 @@ export function stackExpectations(k) {
     return out;
 }
 
+const _ftNum = (s) => (/^\d+$/.test(String(s).replace(/,/g, '').trim()) ? Number(String(s).replace(/,/g, '')) : NaN);
+const _ftSameRule = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((s, i) => s.op === b[i].op && Number(s.n) === Number(b[i].n));
+
+/**
+ * A rule table's boxes, in reading order (the slots of ftSlots). A table with a fixed answer
+ * (outputs / inputs / mixed / rule tasks) judges each box against its slot's value, the way
+ * ftAnswerMatches does. A "make your own" table has no fixed answer, so each box is judged from
+ * the rule: an Out box must be the rule applied to its row's In box, an In box a whole number
+ * that no other row uses, the check box the rule's value.
+ */
+function _bindFunctionTable(boxes, p) {
+    const slots = ftSlots(p);
+    if (!slots.length || slots.length !== boxes.length) return 0;
+    let n = 0;
+    if (p.task === 'make') {
+        const rows = {};
+        slots.forEach((s, k) => { if (s.row !== undefined) (rows[s.row] = rows[s.row] || {})[s.col] = boxes[k]; });
+        const inBoxes = Object.values(rows).map((r) => r.in).filter(Boolean);
+        const outAll = [...inBoxes, ...Object.values(rows).map((r) => r.out).filter(Boolean)];
+        slots.forEach((s, k) => {
+            const b = boxes[k];
+            let fn = null;
+            if (s.id === 'chk') fn = (v) => _ftNum(v) === Number(p.check.y);
+            else if (s.col === 'in') fn = (v) => Number.isFinite(_ftNum(v)) && inBoxes.filter((o) => o !== b && _ftNum(o.value) === _ftNum(v)).length === 0;
+            else if (s.col === 'out') {
+                const inEl = rows[s.row] && rows[s.row].in;
+                fn = (v) => { const i = inEl ? _ftNum(inEl.value) : NaN; return Number.isFinite(i) ? applyRule(p.rule, i) === _ftNum(v) : null; };
+            }
+            if (fn && _liveBindFn(b, fn, outAll)) n++;
+        });
+        return n;
+    }
+    slots.forEach((s, k) => {
+        const b = boxes[k];
+        let ok = false;
+        if (s.kind === 'sign') ok = _liveBindFn(b, (v) => signOf(v) !== '' && signOf(v) === signOf(s.value));
+        else if (s.kind === 'rule') ok = _liveBindFn(b, (v) => _ftSameRule(parseRule(v), p.rule));
+        else ok = _liveBindFn(b, (v) => _ftNum(v) === Number(s.value));
+        if (ok) n++;
+    });
+    return n;
+}
+
+const _fracNorm = (s) => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toLowerCase();
+
+function _bindOwnBoxes(root, q) {
+    let n = 0;
+    const bind = (el, expected, opts) => { if (el && el.dataset.mqLive !== '1' && _liveBind(el, expected, opts)) n++; };
+    // data-answer, compared exactly (the older checkers compare the trimmed text)
+    root.querySelectorAll('input.fact-family-input[data-answer], input.number-family-input[data-answer], input.area-model-input[data-answer], input.area-model-total[data-answer], input.fp-input[data-answer]')
+        .forEach((el) => bind(el, String(el.dataset.answer).replace(/,/g, '')));
+    // expanded form: the place-value part as a number
+    root.querySelectorAll('input.expanded-input-box[data-expected]').forEach((el) => bind(el, el.getAttribute('data-expected'), { numeric: true }));
+    if (q && Array.isArray(q.expandedValues)) {
+        root.querySelectorAll('input.ws-expanded-input').forEach((el) => {
+            const v = q.expandedValues[Number(el.getAttribute('data-expanded-idx'))];
+            if (v !== undefined) bind(el, String(v), { numeric: true });
+        });
+    }
+    // coordinates: point idx, x then y
+    if (q && Array.isArray(q.ans) && q.ans.every((p) => p && typeof p === 'object' && 'x' in p)) {
+        root.querySelectorAll('input.ci-x, input.ci-y').forEach((el) => {
+            const pt = q.ans[Number(el.getAttribute('data-point'))];
+            if (pt) bind(el, String(el.classList.contains('ci-x') ? pt.x : pt.y), { numeric: true });
+        });
+    }
+    // perimeter + area
+    if (q && q.dualAnswers) {
+        bind(root.querySelector('#perimeterInput, [id^="ws_perimeter_"]'), String(q.dualAnswers.perimeter), { numeric: true });
+        bind(root.querySelector('#areaInput, [id^="ws_area_"]'), String(q.dualAnswers.area), { numeric: true });
+    }
+    // mixed number + improper fraction: the checker's own compare (trim, collapse spaces, lower-case)
+    if (q && q.dualFractionAnswers) {
+        [['#mixedInput', q.dualFractionAnswers.mixed], ['#improperInput', q.dualFractionAnswers.improper]].forEach(([sel, want]) => {
+            const el = root.querySelector(sel);
+            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want))) n++;
+        });
+    }
+    // ordering boxes: the n-th item of the answer (text, else the same number)
+    if (q && typeof q.ans === 'string' && root.querySelector('input.order-input-box, input.ws-order-input')) {
+        const parts = q.ans.split(',').map((s) => s.trim());
+        root.querySelectorAll('input.order-input-box, input.ws-order-input').forEach((el) => {
+            const want = parts[Number(el.getAttribute('data-order-idx'))];
+            if (want !== undefined && el.dataset.mqLive !== '1') {
+                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); })) n++;
+            }
+        });
+    }
+    // a legacy column's answer boxes (no kit slot ids): the answer's digits, right-aligned
+    const cols = Array.from(root.querySelectorAll('input.column-answer-input:not(.column-carry-input):not([data-ws-slot])'));
+    if (cols.length && q && q.ans != null && /^-?[\d,]+$/.test(String(q.ans))) {
+        const d = String(q.ans).replace(/[^0-9]/g, '');
+        cols.forEach((el, i) => { const at = d.length - cols.length + i; if (at >= 0) bind(el, d[at]); });
+    }
+    return n;
+}
+
 /** The value each of a multi-slot answer's boxes should hold (reading order), or null. */
 function _slotExpectations(q, count, join) {
     if (!q || !count) return null;
@@ -673,6 +832,8 @@ function _slotExpectations(q, count, join) {
  */
 export function wireLiveCorrect(root, { q = null, kind = null, single = null } = {}) {
     if (!root || !q) return 0;
+    const _h = root.closest && root.closest('.problem-card, #questionCard');
+    if (_h && !(_h.id === 'questionCard' && root.id === 'answerInputArea')) delete _h.dataset.mqHelped;   // a new item starts clean
     let n = 0;
     // 1. a kit stack: each answer digit, each regroup box that should hold something
     const stk = root.querySelector('.ws-stack');
@@ -695,8 +856,16 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
         const joinEl = boxes[0].closest('[data-mq-join]');
         const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
         const exp = _slotExpectations(q, boxes.length, join);
-        if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
+        if (q.ftCheck) n += _bindFunctionTable(boxes, q.ftCheck);
+        else if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
     }
+    // 2b. WAVE 1 / A2: the older drawings that answer in their own boxes. Each judges against the
+    // value its own checker uses (never a stricter one):
+    //   fact / number family, area model, factor-pair blanks: the box's `data-answer`, exact;
+    //   expanded form: `data-expected`, as a number; coordinates: the point's x / y;
+    //   perimeter + area: `dualAnswers`; mixed + improper: `dualFractionAnswers`; ordering: the
+    //   n-th item of the answer; a legacy column's answer boxes: the answer's digits, right-aligned.
+    n += _bindOwnBoxes(root, q);
     // 3. the host's one answer place: the whole value, never a prefix
     if (single && !single.classList.contains('mq-cellslot-host') && single.type !== 'hidden') {
         const a = q.ans;

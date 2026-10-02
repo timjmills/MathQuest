@@ -26,6 +26,17 @@ const SCENARIOS = [
   { c: 'composing', k: 'hundreds_chart_fill', kind: 'row', shot: true },
   { c: 'addition', k: 'add_100_regroup', kind: 'stack', shot: true },
   { c: 'addition', k: 'add_facts', kind: 'single', shot: true },
+  // "every answer box" (owner 2026-10-02): the older multi-box drawings, same look
+  { c: 'addition', k: 'add_sub_fact_family', kind: 'sel', sel: 'input.fact-family-input', exp: 'answer', shot: true },
+  { c: 'addition', k: 'number_families_add', kind: 'sel', sel: 'input.number-family-input', exp: 'answer', shot: true },
+  { c: 'multiplication', k: 'area_model_mult', kind: 'sel', sel: 'input.area-model-input, input.area-model-total', exp: 'answer', shot: true },
+  { c: 'placevalue', k: 'expand', kind: 'sel', sel: { card: 'input.expanded-input-box', worksheet: 'input.ws-expanded-input' }, exp: 'expanded', shot: true },
+  { c: 'area_perimeter', k: 'area_perimeter', kind: 'sel', sel: 'input.dual-answer-input', exp: 'dual', shot: true },
+  { c: 'fractions', k: 'mixed_improper_visual', kind: 'sel', sel: '#mixedInput, #improperInput', exp: 'frac', shot: true },
+  { c: 'integers', k: 'order_negatives', kind: 'sel', sel: { card: 'input.order-input-box', worksheet: 'input.ws-order-input' }, exp: 'order', shot: true },
+  { c: 'number_theory', k: 'factors_identify', kind: 'sel', sel: 'input.fp-input', exp: 'answer', shot: true },
+  { c: 'coordinates', k: 'coordinate_graph', kind: 'sel', sel: 'input.ci-x, input.ci-y', exp: 'coord', want: 'coord-input', shot: true },
+  { c: 'algebra', k: 'function_table_easy', kind: 'sel', sel: 'input.mq-cellslot:not(.mq-cellslot-host)', exp: 'parts', shot: true },
 ];
 
 async function boot(page) {
@@ -38,11 +49,17 @@ async function setup(page, host, s) {
   await page.evaluate((host, s) => {
     const st = window.state;
     st.category = s.c; st.skill = s.k; st.range = 100; st.decimalPlaces = 0; st.isMixedMode = false; st.quizMode = false; st.hasAnswered = false;
+    st.skillOptions = s.opts || null;
     if (host === 'card') {
       st.gameMode = 'practice'; st.currentQAttempts = 0;
-      window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
+      window.showView('gameView');
+      const fits = (q) => (!s.want || q.answerType === s.want) && (!s.size || (s.size === 'big') === (String(q.ans).length >= 2));
+      for (let t = 0; t < 60; t++) { st.currentQ = window.generateQuestion(); if (fits(st.currentQ)) break; }
+      window.renderQuestion();
     } else {
-      st.gameMode = 'worksheet'; st.problemCount = 2; window.initWorksheet();
+      st.gameMode = 'worksheet'; st.problemCount = 2;
+      const fits = (q) => q && (!s.want || q.answerType === s.want) && (!s.size || (s.size === 'big') === (String(q.ans).length >= 2));
+      for (let t = 0; t < 60; t++) { window.initWorksheet(); if (fits(st.worksheetQs[0])) break; }
     }
   }, host, s);
   await sleep(host === 'card' ? 600 : 1100);
@@ -65,6 +82,21 @@ async function tag(page, host, s) {
       els = els.filter((e) => Number(e.getAttribute('data-ws-slot').slice(4)) < d.length)
         .sort((a, b) => Number(b.getAttribute('data-ws-slot').slice(4)) - Number(a.getAttribute('data-ws-slot').slice(4)));
       exp = els.map((e) => d[d.length - 1 - Number(e.getAttribute('data-ws-slot').slice(4))]);
+    } else if (s.kind === 'sel') {
+      const sel = typeof s.sel === 'string' ? s.sel : s.sel[host];
+      els = Array.from(root.querySelectorAll(sel)).filter((e) => e.offsetWidth > 0 && e.type !== 'hidden');
+      exp = els.map((e, i) => {
+        switch (s.exp) {
+          case 'answer': return e.dataset.answer;
+          case 'expected': return e.getAttribute('data-expected');
+          case 'expanded': return String(q.expandedValues ? q.expandedValues[i] : e.getAttribute('data-expected'));
+          case 'order': return q.ans.split(',')[i].trim();
+          case 'dual': return String(i === 0 ? q.dualAnswers.perimeter : q.dualAnswers.area);
+          case 'frac': return i === 0 ? q.dualFractionAnswers.mixed : q.dualFractionAnswers.improper;
+          case 'coord': { const p = q.ans[Number(e.getAttribute('data-point'))]; return String(e.classList.contains('ci-x') ? p.x : p.y); }
+          default: return q.ans.split(/\s*,\s*/)[i];
+        }
+      });
     } else {
       els = [document.getElementById(host === 'card' ? 'answerInput' : 'ws_input_0')];
       exp = [ans];
@@ -91,12 +123,14 @@ async function info(page, i) {
       const wrap = el.closest('[data-mq-cell], .mq-cellbox');
       if (wrap) fill = getComputedStyle(wrap).backgroundColor;
     }
-    return { ok: el.classList.contains("mq-live-correct"), bad: el.classList.contains("mq-live-wrong"), img: cs.backgroundImage, bg: fill, focus: document.activeElement === el, inv: el.getAttribute('aria-invalid'), val: el.value };
+    return { os: cs.outlineStyle, sz: cs.backgroundSize, ok: el.classList.contains("mq-live-correct"), bad: el.classList.contains("mq-live-wrong"), img: cs.backgroundImage, bg: fill, focus: document.activeElement === el, inv: el.getAttribute('aria-invalid'), val: el.value };
   }, i);
 }
 
 const blurAll = (page) => page.evaluate(() => { const a = document.activeElement; if (a && a.blur) a.blur(); });
 const hasMark = (r) => /url\(/.test(r.img);
+const dashedWrong = (r) => r.os === 'dashed';
+const bigMark = (r) => /^1[6-8]px/.test(r.sz);
 
 async function run(w) {
   const { page, problems, close } = await open({ seed: 5, viewport: { width: w, height: 900, deviceScaleFactor: 1 } });
@@ -131,7 +165,7 @@ async function run(w) {
         r = await info(page, 0);
         // a worksheet's right answer disables its box and advances; the class stays
         check(r.ok && !r.bad && hasMark(r) && r.bg === OK_BG, `${tag0} corrected box turns green with a tick (${r.bg})`);
-        if (host === 'worksheet') await shotAfter(page, host, s, w, 'green');
+        if (host === 'worksheet') { await shotAfter(page, host, s, w, 'green'); check(await page.evaluate(() => window.state.worksheetQs[0]._helped === true), `${tag0} the item is recorded as helped (a box went red first)`); }
         continue;
       }
       // a row / stack: box 0 right, box 1 wrong, the rest empty
@@ -144,6 +178,7 @@ async function run(w) {
       if (t.n > 1) {
         r1 = await info(page, 1);
         check(r1.bad && !r1.ok && hasMark(r1) && r1.bg === BAD_BG && r1.inv === 'true', `${tag0} wrong box turns red with a cross (${r1.bg})`);
+        check(dashedWrong(r1) && !dashedWrong(r0) && bigMark(r1) && bigMark(r0), `${tag0} wrong box has a dashed edge (right is solid) and the corner marks are 16-18 px (${r1.os}/${r0.os}, ${r0.sz})`);
       }
       if (t.n > 2) {
         const r2 = await info(page, 2);
@@ -171,12 +206,101 @@ async function run(w) {
       }
     }
   }
-  // the quiz: no per-box colour, even with instant feedback
-  {
+  // blur must not judge a half-typed entry when the pupil goes to the item's own Hint; a leading 0 is not red
+  for (const host of ['card', 'worksheet']) {
+    for (const mode of ['big', 'small']) {
+      const tag0 = `[${w} ${host} add_facts ${mode === 'big' ? 'Hint after a half-typed entry' : 'leading zero'}]`;
+      await boot(page);
+      await setup(page, host, { c: 'addition', k: 'add_facts', kind: 'single', size: mode });
+      const t = await tag(page, host, { kind: 'single' });
+      const ans = String(t.exp[0]);
+      if ((mode === 'big') !== (ans.length >= 2)) { check(false, `${tag0} item has a ${mode} answer (${ans})`); continue; }
+      if (mode === 'big') {
+        await typeInto(page, 0, ans[0]);
+        await page.click(host === 'card' ? '#hintBtn' : '#ws_card_0 .hint-btn'); await sleep(250);
+        const r = await info(page, 0);
+        check(!r.bad && !r.ok, `${tag0} the box stays neutral (${JSON.stringify({ bad: r.bad, val: r.val })})`);
+        await page.evaluate(() => { if (window.closeHintPopup) window.closeHintPopup(); });
+        // leaving for nothing else (the page) does judge it
+        await page.evaluate(() => { const el = document.querySelector('[data-t="0"]'); el.focus(); }); await sleep(800);
+        await blurAll(page); await sleep(100);
+        const r2 = await info(page, 0);
+        check(r2.bad, `${tag0} leaving the item to nothing else does judge it (${r2.bad})`);
+      } else {
+        await typeInto(page, 0, '0');
+        let r = await info(page, 0);
+        check(!r.bad && !r.ok, `${tag0} "0" for ${ans} is neutral while typing (${JSON.stringify({ bad: r.bad })})`);
+        await typeInto(page, 0, '0' + ans);
+        r = await info(page, 0);
+        check(r.ok && !r.bad, `${tag0} "0${ans}" for ${ans} turns green (${JSON.stringify({ ok: r.ok })})`);
+      }
+    }
+  }
+  // owner XP ruling (2026-10-02): an item whose box went red before it was checked right is "helped":
+  // still correct, half XP, the streak not extended, progress records a miss then a hit
+  for (const helped of [false, true]) {
+    const tag0 = `[${w} card add_facts ${helped ? 'red then green' : 'clean'}]`;
     await boot(page);
-    const res = await page.evaluate(async () => {
+    await setup(page, 'card', { c: 'addition', k: 'add_facts', kind: 'single' });
+    const t = await tag(page, 'card', { kind: 'single' });
+    const ans = String(t.exp[0]);
+    await page.evaluate(() => {
+      window.__xp = []; window.flashXpBurst = (c, txt) => window.__xp.push(String(txt));
+      window.state.sessionStreak = 2;
+      const sp = window.state.skillProgress && window.state.skillProgress[window.state.skill];
+      window.__p0 = sp ? sp.total : 0;
+    });
+    if (helped) {
+      const bad = ans.length === 1 ? String(Number(ans) === 9 ? 8 : Number(ans) + 1) : wrongOf(ans);
+      await typeInto(page, 0, bad);
+      const r = await info(page, 0);
+      check(r.bad, `${tag0} the wrong entry "${bad}" turns the box red first`);
+    }
+    await typeInto(page, 0, ans);
+    await sleep(500);
+    const got = await page.evaluate(() => {
+      const sp = window.state.skillProgress && window.state.skillProgress[window.state.skill];
+      return { xp: window.__xp.slice(), streak: window.state.sessionStreak, dp: (sp ? sp.total : 0) - window.__p0, correct: window.state.lastAnswerCorrect, tries: window.state.currentQAttempts || 0 };
+    });
+    check(got.correct === true, `${tag0} the item counts as correct`);
+    check(got.xp.length === 1 && got.xp[0] === (helped ? '+5 XP' : '+10 XP'), `${tag0} XP ${helped ? 'halved' : 'full'} (${JSON.stringify(got.xp)})`);
+    check(got.streak === (helped ? 2 : 3), `${tag0} streak ${helped ? 'not extended (2)' : 'extended (3)'} (${got.streak})`);
+    check(got.dp === (helped ? 2 : 1), `${tag0} progress records ${helped ? 'a miss then a hit (2)' : 'one hit (1)'} (${got.dp})`);
+    check(got.tries === 0, `${tag0} the red box added no wrong try (${got.tries})`);
+  }
+  // a "make your own" rule table has no fixed answer: each box is judged from the rule
+  for (const host of ['card', 'worksheet']) {
+    const tag0 = `[${w} ${host} function_table make]`;
+    await boot(page);
+    await setup(page, host, { c: 'algebra', k: 'function_table_easy', kind: 'sel', opts: { task: 'make' } });
+    const t = await page.evaluate((host) => {
+      const q = host === 'card' ? window.state.currentQ : window.state.worksheetQs[0];
+      const root = host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0');
+      const els = Array.from(root.querySelectorAll('input.mq-cellslot:not(.mq-cellslot-host)'));
+      els.forEach((e, i) => e.setAttribute('data-t', String(i)));
+      const p = q.ftCheck;
+      const ap = (x) => { let v = x; for (const st of p.rule) v = st.op === '+' ? v + st.n : st.op === '-' ? v - st.n : st.op === 'x' ? v * st.n : v / st.n; return v; };
+      return { task: p && p.task, n: els.length, rows: (p && p.rows || []).length, rule: JSON.stringify(p && p.rule), ap: [3, 4].map(ap) };
+    }, host);
+    if (t.task !== 'make' || t.n < 4) { check(false, `${tag0} a make table with In/Out boxes (${JSON.stringify(t)})`); continue; }
+    // row 0: In 3, Out right; row 1: In 4, Out wrong
+    await typeInto(page, 0, '3'); await typeInto(page, 1, String(t.ap[0])); await typeInto(page, 2, '4'); await typeInto(page, 3, String(t.ap[1] + 1));
+    await blurAll(page); await sleep(150);
+    const r = [];
+    for (let i = 0; i < 4; i++) r.push(await info(page, i));
+    check(r[0].ok && r[1].ok && r[2].ok && !r[3].ok && r[3].bad && hasMark(r[1]) && hasMark(r[3]), `${tag0} Out judged from the rule on its In box: right row green, wrong Out red (${JSON.stringify(r.map((x) => x.ok ? 'ok' : x.bad ? 'bad' : '-'))})`);
+    await typeInto(page, 3, String(t.ap[1])); await blurAll(page); await sleep(100);
+    const fixed = await info(page, 3);
+    check(fixed.ok && !fixed.bad, `${tag0} the corrected Out turns green`);
+    await typeInto(page, 2, '3'); await blurAll(page); await sleep(100);
+    const dup = await info(page, 2);
+    check(dup.bad && !dup.ok, `${tag0} an In number another row already uses turns red`);
+  }
+  // the quiz: no per-box colour, even with instant feedback
+  for (const [c, k, sel] of [['multiplication', 'count_by_tables', 'input.mq-cellslot'], ['addition', 'add_sub_fact_family', 'input.fact-family-input'], ['multiplication', 'area_model_mult', 'input.area-model-input, input.area-model-total']]) {
+    await boot(page);
+    const res = await page.evaluate(async (c, k) => {
       try {
-        const c = 'multiplication', k = 'count_by_tables';
         window.state.range = 100; window.state.decimalPlaces = 0;
         const q = window.generateQuestionFor({ category: c, skill: k, seed: 7, itemIndex: 0 });
         const questions = [{ id: 0, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, q)) }];
@@ -187,23 +311,19 @@ async function run(w) {
         window.startQuizTest();
         return { ans: String(q.ans) };
       } catch (e) { return { err: String(e.message || e) }; }
-    });
+    }, c, k);
     await sleep(700);
-    if (res.err) check(false, `[${w} quiz] built (${res.err})`);
-    else {
-      const exp = res.ans.split(/\s*,\s*/);
-      const n = await page.evaluate(() => document.querySelectorAll('#quizTakeView input.mq-cellslot:not(.mq-cellslot-host)').length);
-      check(n >= 1, `[${w} quiz] the quiz item has ${n} answer box(es)`);
-      for (let i = 0; i < Math.min(n, 2); i++) {
-        await page.evaluate((i) => { const els = Array.from(document.querySelectorAll('#quizTakeView input.mq-cellslot:not(.mq-cellslot-host)')); els.forEach((e, j) => e.setAttribute('data-t', String(j))); }, i);
-        await typeInto(page, i, i === 0 ? exp[0] : wrongOf(exp[1]));
-      }
-      await blurAll(page); await sleep(150);
-      const any = await page.evaluate(() => document.querySelectorAll('#quizTakeView .mq-live-correct, #quizTakeView .mq-live-wrong').length);
-      check(any === 0, `[${w} quiz] no per-box green or red in the quiz (${any})`);
-      const bgs = await page.evaluate(() => Array.from(document.querySelectorAll('#quizTakeView input.mq-cellslot')).map((e) => getComputedStyle(e).backgroundImage).filter((b) => /url\(/.test(b)).length);
-      check(bgs === 0, `[${w} quiz] no corner marks in the quiz (${bgs})`);
-    }
+    const tag0 = `[${w} quiz ${k}]`;
+    if (res.err) { check(false, `${tag0} built (${res.err})`); continue; }
+    const exp = res.ans.split(/\s*,\s*/);
+    const n = await page.evaluate((sel) => { const els = Array.from(document.querySelectorAll('#quizTakeView ' + sel.split(',').map((x) => x.trim()).join(', #quizTakeView '))).filter((e) => e.offsetWidth > 0 && !e.classList.contains('mq-cellslot-host')); els.forEach((e, j) => e.setAttribute('data-t', String(j))); return els.length; }, sel);
+    check(n >= 1, `${tag0} the quiz item has ${n} answer box(es)`);
+    for (let i = 0; i < Math.min(n, 2); i++) await typeInto(page, i, i === 0 ? exp[0] : wrongOf(exp[1] || exp[0]));
+    await blurAll(page); await sleep(150);
+    const any = await page.evaluate(() => document.querySelectorAll('#quizTakeView .mq-live-correct, #quizTakeView .mq-live-wrong').length);
+    check(any === 0, `${tag0} no per-box green or red in the quiz (${any})`);
+    const bgs = await page.evaluate(() => Array.from(document.querySelectorAll('#quizTakeView input')).map((e) => getComputedStyle(e).backgroundImage).filter((b) => /url\(/.test(b)).length);
+    check(bgs === 0, `${tag0} no corner marks in the quiz (${bgs})`);
   }
   const errs = problems.filter((p) => !/favicon/.test(p.text));
   check(errs.length === 0, `[${w}] no console errors ${errs.length ? JSON.stringify(errs.slice(0, 3)) : ''}`);

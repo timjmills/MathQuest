@@ -11,7 +11,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, itemWasHelped, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -2346,8 +2346,11 @@ export function checkWorksheetAnswer(idx) {
     if (isNumeric) {
         const expectedDigits = String(q.ans).replace(/[^0-9]/g, '').length;
         const userDigits = value.replace(/[^0-9]/g, '').length;
+        const cleanedForZero = value.replace(/,/g, '');
 
-        if (userDigits < expectedDigits || expectedDigits === 0) {
+        // a leading 0 is still being written ("07" is accepted for 7), so "0" is not yet a wrong answer
+        const _writingZero = /^-?0\d*$/.test(cleanedForZero) && Number(cleanedForZero) !== Number(q.ans) && userDigits <= expectedDigits;
+        if (userDigits < expectedDigits || expectedDigits === 0 || _writingZero) {
             // Still typing — reset any wrong styling so student can retry
             input.style.borderColor = "var(--accent-cyan)";
             input.style.background = "var(--bg-card-light)";
@@ -2381,6 +2384,11 @@ export function checkWorksheetAnswer(idx) {
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
         markBoxSubmitted(input, true);      // Wave 1 / A2: the one answer place shows the verdict too
+        // a support-ladder "Not yet..." line from an earlier try is stale now
+        card.querySelectorAll('.mq-ladder-msg').forEach((el) => el.remove());
+        // owner 2026-10-02: a box that went red first makes this item "helped" (correct, counted like
+        // a second-try correct; a worksheet awards no per-item XP or streak, so it is recorded on the item)
+        if (itemWasHelped(card)) q._helped = true;
         input.disabled = true;
         wsRecordAnswer(idx, true);
 
