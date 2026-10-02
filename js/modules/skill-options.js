@@ -406,8 +406,27 @@ export const SKILL_OPTIONS = {
 // choice: Max Number lowered below the place's floor (a nearest-100 item needs three digits).
 //
 // GROUPS. Every control carries `group` — 'difficulty' (Harder / easier), 'support' (Support) or
-// 'layout' (Layout) — which the panel (skill-options-ui.js) uses to set the controls out under
+// 'layout' (Layout), plus 'play' (pupil play: calculator, skip — shown in a collapsed disclosure, never counted as at rest) — which the panel (skill-options-ui.js) uses to set the controls out under
 // those three headings, and a one-line `help` in plain teacher English.
+
+/**
+ * PUPIL-PLAY settings (calculator, skip) live in their own group, 'play'. The panel shows them
+ * inside one collapsed disclosure, so they are NOT controls "at rest": the teacher panel keeps its
+ * at-most-5 resting controls. `restingOptions` is the one place that says which controls those are;
+ * the panel (skill-options-ui.js) and ws-supports-unit both use it.
+ */
+export const PLAY_GROUP = 'play';
+export const isPlayOption = (def) => !!def && def.group === PLAY_GROUP;
+/** The controls the panel shows at rest: those that apply now and are not inside the collapsed play group. */
+export function restingOptions(defs, cur) {
+    return (defs || []).filter((d) => !isPlayOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
+}
+/** The play disclosure's summary line: "Calculator off · Skip after 5". */
+export function playSummary(defs, cur) {
+    return (defs || []).filter(isPlayOption)
+        .map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label))
+        .join(' · ');
+}
 
 /** Max Number's app default. At this value the Max Number setting counts as "not chosen". */
 export const APP_DEFAULT_RANGE = 100;
@@ -3251,12 +3270,14 @@ _ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) =
 export const calculatorOption = () => ({
     id: 'calculator', label: 'Calculator', type: 'bool', default: false,
     help: 'Show the pupil a calculator button on this skill. Off unless you turn it on.',
+    group: PLAY_GROUP, summary: (v) => (v ? 'Calculator on' : 'Calculator off'),
 });
 // `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
 // appears. Per skill, default 5; 0 turns Skip off for the skill.
 export const skipAfterOption = () => ({
     id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
     help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
+    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
 });
 export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
