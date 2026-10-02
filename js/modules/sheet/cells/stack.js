@@ -128,8 +128,11 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
     // row - share one geometry: the key never redraws the problem higher or its Check lower.
     if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
-    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
+    // Owner ruling 2026-10-02 (SL-3): the open zone is drawn as one full box (CSS .ansrow), and the
+    // key's digits sit INSIDE that same box: a subgrid row on the stack's own tracks.
+    const keyRow = (cells) => `<span class="ansrow ansrow--key" style="display:grid;grid-template-columns:subgrid">${cells}</span>`;
+    if (answer === 'traced' && ans !== null) html += keyRow(pad(String(ans)).map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`).join(''));
+    if (answer === 'solid' && ans !== null) html += keyRow(pad(String(ans)).map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join(''));
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;

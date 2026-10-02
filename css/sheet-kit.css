@@ -335,3 +335,22 @@
 :is(.ws-page, .ws-sheet) .ws-fact .ws-factans {
     box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
     margin: 1mm -0.1em 0; padding: 0 calc(0.1em - var(--ws-hair)); }
+
+/* ---------- WAVE 1 / 1.1 (cont.): slot contents and the column stack's open zone (owner ruling 2026-10-02, additive) ----------
+   A key value sits centred inside the box. The stack's open answer row (.ansrow, same height
+   var(--ws-answer)) is one full box across the stack's tracks; the key's digits fill it on the same tracks. */
+:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]) { text-align: center; line-height: calc(var(--ws-hw) - 2 * var(--ws-hair)); }
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow { box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); }
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow--key > span { display: flex; align-items: center; justify-content: center; }
+/* The fact's answer box reaches 0.25 em past the digit tracks each side, so a two-digit key answer
+   ("10", "12") keeps clear white inside the outline at S; the tracks themselves do not move. */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans { margin-left: -0.25em; margin-right: -0.25em; padding-left: calc(0.25em - var(--ws-hair)); padding-right: calc(0.25em - var(--ws-hair)); }
+
+/* ---------- WAVE 1 / 1.1 (cont.): legacy-wrapped cells (owner ruling 2026-10-02, additive) ----------
+   A legacy horizontal question ends in a stretching ruled answer place (`flex:1; border-bottom:2px`).
+   Inside a kit page that place is drawn as the same full black box, at least 24 mm wide and Hw tall;
+   when the question leaves too little room the box wraps to its own line instead of shrinking. */
+:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem { flex-wrap: wrap; row-gap: 1mm; }
+:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem > span[style*="border-bottom:2px solid #000"] {
+    flex: 1 0 24mm !important; min-width: 24mm; box-sizing: border-box; min-height: var(--ws-hw, 8mm);
+    border: var(--ws-hair, 0.75pt) solid var(--ws-ink, #000) !important; border-radius: var(--ws-slot-r, 1.25mm); }

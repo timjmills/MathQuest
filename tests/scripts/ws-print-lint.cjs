@@ -862,7 +862,7 @@ function wsLintPage(cfg) {
         const walker = document.createTreeWalker(ri.el, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {
             const p = n.parentElement;
-            if (p && visible(p) && !p.closest(TEACHER_SEL) && /_{3,}/.test(n.nodeValue)) F('L-ANSAREA', 'SL-6', 'major', p, `blank drawn with underscore characters "${n.nodeValue.trim().slice(0, 24)}": blanks are ruled lines or boxes (SL-6)`, 'underscore blank');
+            if (p && visible(p) && !p.closest(TEACHER_SEL) && /_{3,}/.test(n.nodeValue)) F('L-ANSAREA', 'SL-6', 'major', p, `blank drawn with underscore characters "${n.nodeValue.trim().slice(0, 24)}": blanks are drawn boxes (SL-6, SL-3 as changed 2026-10-02)`, 'underscore blank');
         }
     }
     // H12: an item that says draw / build / show needs room to draw the model
