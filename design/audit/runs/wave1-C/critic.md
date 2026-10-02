@@ -321,3 +321,39 @@ The paper side is fixed. The screen twin's new slot overlay (chartwindow.js:191)
 - **Fix:** add a grey fill (`background: var(--surface-2)` or the dim token) to `.sko-locked select` and `.tv-select:disabled`, and `cursor: not-allowed`.
 ### K. The one-page print has about 15 mm unused on A4 (C1, minor).
 - **Fix:** raise `baseH` to `writeMm + 4` in `count-row.js` when `p.compact`. Keep it only if the Letter set still paginates to 1 + 1 page.
+
+# Follow-ups (critic, Opus low, head 98757f9): items I, J, K
+
+**Verdict: PASS.** C1 8 · C2 9 · C3 8 · C4 8. Nothing is blocking.
+
+## Checks
+- **I.** I ran `wave1-c-chart-metrics.cjs` myself and read the full output. It prints OK on 25 host rows.
+  - Rows window (rows/scatter and rows/row):
+    - Worksheet: squares 48.1 px, input 46.1 px.
+    - Card and quiz: 79.7 px, or 66.4 px at 390.
+    - Clear space round every printed number: at least 4.7 px everywhere, and 6.8–11.5 px on the two-digit windows.
+  - Whole chart: unchanged. Squares 93.5 / 60.5 px, "100" has 4.3–4.8 px clear, and nothing swipes at 1280.
+  - Page sideways scroll is 0 everywhere.
+- **J.**
+  - The G shots show locked Tables, "Line runs to" and Columns with a grey fill. The fill is `--ws-grey` #949494 at 25%, which is the single grey token.
+  - Locked Size S/M/L reads as disabled.
+  - The CSS change only adds new rules at the end of `teacher-brand.css`. No existing rule was edited.
+- **K.**
+  - I viewed the onepage-12 pupil pages and keys: Letter-default pupil and key, A4-max-blanks pupil, and Letter-max-blanks-fill-two key. Each is 1 pupil page + 1 key page, with 12 rows and no clipping.
+  - Spare space under row l: about 12 mm on A4. Letter is at capacity.
+- **The "2+1k" mismatch is a reporting label in the lint, not a real defect.**
+  - `ws-print-lint` kit mode sets `info.pages` to the count of ALL `.ws-page` elements in the combined pupil+key document, and `keyPages` to the key pages in it (lines 1351–1352). "2+1k" therefore means 2 pages in total, of which 1 is the key: 1 pupil page + 1 key page.
+  - The lint does pass `opts` into `buildSheet`. My probe called `buildSheet` with onePage for independent and more-practice, on A4 and Letter, at sizes S, M and L, with default, blanks:max and two-printed options. Every call gave pageCount 1 and keyPageCount 1, with 1 `[data-ws-page]` in the pupil HTML and 1 in the key HTML.
+  - The "24 problems on 2 pages" in the print dialog is 2 practice letters (A and B), which is correct.
+
+## Ranked defects (none blocking)
+### I-2. Regression: the rows window now swipes at 820 on the card and the quiz (C4).
+- **Where:** `css/screen-cell.css`, the `--mq-chw` padding term `max(10px, 0.5*fs*(3-d))`.
+- **What it does:** at 48 px it gives 79.7 px squares, so the chart is 798 px wide. That does not fit the 727 px card or the 714 px quiz, so the 3 × 10 window swipes. In round 5 it fitted at 657 px.
+- **Fix:** cap the padding at the card size, e.g. `max(10px, min(0.5*fs, 14px)*(3-d))`. That gives 69.7 px squares and a 697 px chart, which fits and keeps 44 px or more everywhere.
+### I-3. On the worksheet at 1280 the rows chart is small in its card (C1, minor).
+- The chart is 483 px wide in a 1100 px card.
+### L-1. Lint label (harness, minor).
+- "N+Mk" reads as N pupil pages + M key pages, but it means the total including the key. Print `pupil+key` explicitly.
+### Carried from round 4, H.
+- The key's three-digit answers (108–144) still sit tight in their boxes. This is accepted because the one-page layout is opt-in.

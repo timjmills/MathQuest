@@ -1408,7 +1408,7 @@ html body #questionCard .mq-scell .k2-chart td, html body .qt-question-card .mq-
 .mq-scell .k2-chartwindow:has(> .k2-chart-ten) { overflow-x: auto; scrollbar-width: auto; scrollbar-color: #000 #ddd; padding-bottom: 4px; width: 100%; min-width: 0; max-width: 100%; -webkit-overflow-scrolling: touch; }
 .mq-scell .k2-twin:has(.k2-chart-ten), .mq-scell .ws-cell:has(.k2-chart-ten) { min-width: 0; max-width: 100%; }
 html body .mq-scell .k2-chart.k2-chart-ten {
-    --mq-chfs: 29px; --mq-chw: max(44px, calc(var(--mq-chd, 3) * 0.58 * var(--mq-chfs) + max(10px, 0.5 * var(--mq-chfs) * (3 - var(--mq-chd, 3)))));
+    --mq-chfs: 29px; --mq-chw: max(44px, calc(var(--mq-chd, 3) * 0.58 * var(--mq-chfs) + max(10px, min(0.5 * var(--mq-chfs), 14px) * (3 - var(--mq-chd, 3)))));
     width: calc(10 * var(--mq-chw)) !important; max-width: none !important; table-layout: fixed;
 }
 html body #questionCard .mq-scell .k2-chart.k2-chart-ten, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten { --mq-chfs: 48px; }
