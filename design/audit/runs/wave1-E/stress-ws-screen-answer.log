@@ -1,0 +1,15 @@
+# command: /tmp/mq-browser-run.sh --exclusive node tests/scripts/ws-screen-answer.cjs --stress 10 --hosts worksheet --no-live
+# date: 2026-10-02T13:54:29Z  tree: 9fb3af7+uncommitted fix round  cpus: 4
+stressed run 1/10: OK (204.8 s, 4 CPU burners)
+stressed run 2/10: OK (209.6 s, 4 CPU burners)
+stressed run 3/10: OK (205.2 s, 4 CPU burners)
+stressed run 4/10: OK (205.4 s, 4 CPU burners)
+stressed run 5/10: OK (205.9 s, 4 CPU burners)
+stressed run 6/10: OK (205.3 s, 4 CPU burners)
+stressed run 7/10: OK (203.3 s, 4 CPU burners)
+stressed run 8/10: OK (201.8 s, 4 CPU burners)
+stressed run 9/10: OK (192.6 s, 4 CPU burners)
+stressed run 10/10: OK (196.3 s, 4 CPU burners)
+ws-screen-answer --stress: 10/10 passes
+ws-screen-answer: OK
+# exit 0

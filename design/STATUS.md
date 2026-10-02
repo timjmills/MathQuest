@@ -106,4 +106,29 @@ To recreate a lane: `git worktree add .claude/worktrees/<lane> -b <local-name> o
 2. If the worktrees survive: resume each lane with "resumed after owner pause; your tree is WIP-committed; continue
    from the Next column", at most 8 agents, browser gates one at a time.
 3. Critic every lane before merge; merge + full gates + stamp (`ws-stamp-assets`) + deploy what passes.
-4. To build on resume (owner rulings of 2026-09-27): red answers on keys (a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
+4. To build on resume (owner rulings of 2026-09-27): reddish-orange answers on keys (MASTER_PLAN 4.4; a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
+
+## 7. Independent planning review (2026-10-02, Wave 1 start) — open items
+
+Fixed at once: key colour wording (INK-31, PT-KEY-1a, §6 here) now says reddish orange; CLAUDE.md file and code counts.
+Still open, for the owner or a later wave:
+- Teacher files: `teacher-shell/print/library/quiz-ui/sets/standards.js` and the `ws-teacher-*` gates are on this branch, while `sheet/papers.js` and `prerequisite-skills.js` exist only on `wip-teacher-ui`; a live-vs-branch table is needed before Wave 3.
+- One deploy-gate list: CLAUDE.md "Checks to run" omits `ws-screen-answer`, `ws-screen-slots`, `ws-share-options` and the `ws-teacher-*` gates.
+- Backlog items with no wave owner (BACKLOG.md top: div_remainders counters, nl_sub, add_5_pictures, money_compare panels, mixed_placevalue, round_nl_hundred_thousands, support ladder on worksheet/quiz hosts, expand double edge) → fold into Wave 5.
+- Owner answered 2026-10-02 (now in MASTER_PLAN "Owner answers"): Practice map = MAP strand picker; money_count defaults to mixed coins; skip N is per skill (default 5); each passing lane deploys.
+- Research credentials file (`~/.claude/projects/*/memory/credentials.md`) is not present in this container, so MathWorksheets4Kids / IXL logins are unavailable to agents.
+- The `effort:` field in `.claude/agents/*.md` cannot be seen by the agent itself; the model (Sonnet 5.5) was confirmed, the effort setting was not observable.
+- Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
+- 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.
+
+## 8. Container fix: browser gates and the proxy CA (2026-10-02)
+
+Browser gates failed with `net::ERR_CERT_AUTHORITY_INVALID` on every CDN (fonts, jsDelivr, cdnjs): Chromium's NSS store
+`/root/.pki/nssdb` was empty, so it did not trust the cloud container's proxy CA. This is environment, not app code. Fix
+(rerun in any new container before browser gates; never disable TLS checks instead):
+
+    apt-get install -y libnss3-tools
+    mkdir -p /tmp/cabits && cd /tmp/cabits && awk '/BEGIN CERT/{n++} {print > ("c" n ".pem")}' /root/.ccr/ca-bundle.crt
+    for f in c*.pem; do s=$(openssl x509 -in $f -noout -subject); case "$s" in *Anthropic*) certutil -d sql:/root/.pki/nssdb -A -t "C,," -n "$(echo "$s" | sed 's/.*CN = //; s/,.*//')" -i $f;; esac; done
+
+Gate failures and load numbers measured before this fix (~12:30 UTC) are not trustworthy and are being rerun.

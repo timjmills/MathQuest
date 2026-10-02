@@ -226,6 +226,11 @@ Rules for the critic:
 - **Evidence or nothing.** Every score below 10 names at least one defect with its location
   (page, item letter or number, host and width). Every defect names the criterion it costs and a
   concrete fix.
+- **Actionable or nothing (owner 2026-10-02).** Every defect says where (file:line, or PNG name + item /
+  region), what is wrong (observed vs expected, with the measurement), which criterion it costs and how many
+  points, the exact fix (what to change, to what value, in which file / function) and the check that proves it
+  is fixed. Every criterion below 10 also says what would raise it to 10. "Improve spacing" or "polish" is not
+  a finding.
 - **Severity:** `critical` (triggers a cap), `major` (costs ≥ 2 points), `minor` (costs 1).
 - **No praise, no hedging.** Report problems. "Looks fine" is not a finding.
 - **Grade what is rendered,** not what the generator intends. If the PNG shows it, it is real.

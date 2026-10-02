@@ -969,20 +969,33 @@ export function layoutWorksheetGrid(grid) {
 }
 
 let _wsLayoutTimers = [];
+let _wsSchedPending = false;   // the first-render passes (80/320/900 ms) are still due
 function _wsScheduleLayout(grid) {
     _wsLayoutTimers.forEach(t => clearTimeout(t));
     layoutWorksheetGrid(grid);
     if (!document.querySelector('.problem-card.mq-active-problem')) setActiveProblem(0);
+    // data-mq-laid-out is '0' while a scheduled layout pass is still due (first render, or a resize
+    // re-layout) and '1' after the last scheduled pass. A widget that mounts later can still move
+    // cards, so a driver also waits for the card rects to hold still before tapping by coordinates.
+    grid.dataset.mqLaidOut = '0';
     // widgets and their stylesheets mount a moment later (dynamic import): lay out again
-    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => layoutWorksheetGrid(grid), ms));
+    _wsSchedPending = true;
+    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => {
+        layoutWorksheetGrid(grid);
+        if (ms === 900) { _wsSchedPending = false; grid.dataset.mqLaidOut = '1'; }
+    }, ms));
 }
 if (typeof window !== 'undefined') {
     let _wsResizeT = 0;
     window.addEventListener('resize', () => {
         clearTimeout(_wsResizeT);
+        const g0 = document.getElementById('worksheetGrid');
+        const relayout = !!(g0 && g0.classList.contains('mq-wsfit') && g0.clientWidth);
+        if (relayout) g0.dataset.mqLaidOut = '0';   // a re-layout is pending
         _wsResizeT = setTimeout(() => {
             const g = document.getElementById('worksheetGrid');
             if (g && g.classList.contains('mq-wsfit') && g.clientWidth) layoutWorksheetGrid(g);
+            if (g && !_wsSchedPending) g.dataset.mqLaidOut = '1';
         }, 150);
     });
 }
