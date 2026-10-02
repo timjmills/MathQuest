@@ -20,14 +20,14 @@
             "perPage": 10,
             "pages": 1,
             "cellW": 93,
-            "cellH": 43.15,
+            "cellH": 38.2,
             "requested": "auto",
             "clamped": false,
             "note": "Dense: 2 x 5, cells sized to the problems.",
             "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 16 pt. Dense: 2 x 5, cells sized to the problems.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 31.1,
+            "hMin": 27.8,
             "anchorMm": 0,
             "blocks": null
           }
@@ -54,23 +54,23 @@
           "ans": "700",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -82,23 +82,23 @@
           "ans": "200",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -110,23 +110,23 @@
           "ans": "11000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -138,23 +138,23 @@
           "ans": "8000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -166,23 +166,23 @@
           "ans": "400",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -194,23 +194,23 @@
           "ans": "10000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -222,23 +222,23 @@
           "ans": "2000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -250,23 +250,23 @@
           "ans": "30",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -278,23 +278,23 @@
           "ans": "2000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -306,23 +306,23 @@
           "ans": "5000",
           "measured": {
             "1": {
-              "hMm": 20.5,
+              "hMm": 17.1,
               "fits": true
             },
             "2": {
-              "hMm": 31.1,
+              "hMm": 27.8,
               "fits": true
             },
             "3": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "4": {
-              "hMm": 39.7,
+              "hMm": 36.4,
               "fits": false
             },
             "5": {
-              "hMm": 48.3,
+              "hMm": 45,
               "fits": false
             }
           }
@@ -339,7 +339,7 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 143,
+          "words": 133,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -363,7 +363,7 @@
         ],
         "problems": [],
         "fonts": {
-          "Andika": 54
+          "Andika": 44
         },
         "fontsReady": true,
         "andika": true

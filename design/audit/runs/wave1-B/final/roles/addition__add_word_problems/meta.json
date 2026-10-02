@@ -1,0 +1,1729 @@
+{
+  "skill": "addition:add_word_problems",
+  "category": "addition",
+  "skillId": "add_word_problems",
+  "label": "Addition Word Problems",
+  "grade": "2",
+  "dir": "addition__add_word_problems",
+  "roles": {
+    "error-analysis": {
+      "fits": {
+        "cols": 1,
+        "rows": 2,
+        "perPage": 2,
+        "pages": 1,
+        "note": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "role": "error-analysis",
+            "cols": 1,
+            "rows": 2,
+            "mode": "below",
+            "perPage": 2,
+            "pages": 1,
+            "count": 2,
+            "cellH": 113.5,
+            "gridH": 227,
+            "clamped": false,
+            "note": "",
+            "notes": [],
+            "digitPt": 28,
+            "size": "L",
+            "look": "ican",
+            "cls": "standard",
+            "line": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 28 pt."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 571257,
+      "title": "I Can solve addition stories",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some pencils. Kofi got 57 more pencils. Now Kofi has 60 pencils. How ma",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 95.5,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 86.5,
+                "stack": 95.5
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 130,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 130
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 20 apples. Lena has 27 more apples than Ben. How many apples does Lena h",
+          "ans": "47",
+          "measured": {
+            "1": {
+              "hMm": 95.5,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 86.5,
+                "stack": 95.5
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 130,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 130
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 21 cookies. Lena gets 16 more cookies. How many cookies does Lena have ",
+          "ans": "37",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 50 buttons. Aya has 16 buttons. How many buttons do they have in all?",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 52 dollars. Aya gets 87 more dollars. How many dollars does Aya have now",
+          "ans": "139",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some stamps. Ravi got 85 more stamps. Now Ravi has 87 stamps. How many ",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 95.5,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 86.5,
+                "stack": 95.5
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 130,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 130
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 82 beads. Tom has 27 more beads than Zara. How many beads does Tom have",
+          "ans": "109",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 42 dollars. Sam has 35 dollars. How many dollars do they have in all?",
+          "ans": "77",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 15 cards. Sam gets 48 more cards. How many cards does Sam have now?",
+          "ans": "63",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some marbles. Leo got 62 more marbles. Now Leo has 84 marbles. How many ",
+          "ans": "22",
+          "measured": {
+            "1": {
+              "hMm": 95.5,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 86.5,
+                "stack": 95.5
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 130,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 130
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 69 books. Mia gets 75 more books. How many books does Mia have now?",
+          "ans": "144",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some stickers. Ana got 50 more stickers. Now Ana has 86 stickers. How ma",
+          "ans": "36",
+          "measured": {
+            "1": {
+              "hMm": 95.5,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 86.5,
+                "stack": 95.5
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 130,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 130
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 88 pencils. Noor gets 12 more pencils. How many pencils does Noor have ",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar has 20 apples. Kofi has 19 apples. How many apples do they have in all?",
+          "ans": "39",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi has 62 cookies. Kofi gets 16 more cookies. How many cookies does Kofi have ",
+          "ans": "78",
+          "measured": {
+            "1": {
+              "hMm": 87.1,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": 78.1,
+                "stack": 87.1
+              },
+              "inkW": {
+                "below": 177,
+                "stack": 177
+              },
+              "innerMm": 184.942
+            },
+            "2": {
+              "hMm": 123.6,
+              "fits": true,
+              "modes": {
+                "incol": null,
+                "beside": null,
+                "below": null,
+                "stack": 123.6
+              },
+              "inkW": {
+                "stack": 84.4
+              },
+              "innerMm": 92.339
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "error-analysis-p1.png",
+          "words": 132,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "error-analysis-key-p1.png",
+          "words": 138,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 63
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 66
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "lesson": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 4,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 2 pages. Fits: an anchor chart of 4 steps, 2 warm-up, 1 guided and 0 independent on 1 page. No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 2 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 4,
+      "keyPageCount": 4,
+      "seed": 251786,
+      "title": "I Can solve addition stories",
+      "notes": [
+        "No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "Tall problems: 2 rows per page.",
+        "1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 11 pencils. Zara wants 54 pencils. How many more pencils does Zara need",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 92 apples. Sam has 89 apples. How many apples do they have in all?",
+          "ans": "181",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 64 cookies. Sam gets 2 more cookies. How many cookies does Sam have now?",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 24 buttons. Leo wants 95 buttons. How many more buttons does Leo need?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 18 crayons. Mia gets 17 more crayons. How many crayons does Mia have now",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 20 stamps. Noor has 66 stamps. How many stamps do they have in all?",
+          "ans": "86",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 82 beads. Noor gets 35 more beads. How many beads does Noor have now?",
+          "ans": "117",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar has 47 shells. Kofi has 14 shells. How many shells do they have in all?",
+          "ans": "61",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi has 78 cards. Kofi gets 22 more cards. How many cards does Kofi have now?",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 34 marbles. Lena has 51 marbles. How many marbles do they have in all?",
+          "ans": "85",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 40 books. Lena wants 46 books. How many more books does Lena need?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had some stickers. Yuki got 82 more stickers. Now Yuki has 86 stickers. How",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 93.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 89,
+              "fits": false
+            },
+            "4": {
+              "hMm": 89,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 68 pencils. Aya gets 20 more pencils. How many pencils does Aya have now",
+          "ans": "88",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi has 69 apples. Zara has 64 apples. How many apples do they have in all?",
+          "ans": "133",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 47 cookies. Zara gets 66 more cookies. How many cookies does Zara have ",
+          "ans": "113",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some buttons. Tom got 87 more buttons. Now Tom has 95 buttons. How many ",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 93.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 89,
+              "fits": false
+            },
+            "4": {
+              "hMm": 89,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "6 + 14 = ?",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "900 − 100 = ?",
+          "ans": "800",
+          "measured": {
+            "1": {
+              "hMm": 20,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 11 pencils. Zara wants 54 pencils. How many more pencils does Zara need",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 92 apples. Sam has 89 apples. How many apples do they have in all?",
+          "ans": "181",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 64 cookies. Sam gets 2 more cookies. How many cookies does Sam have now?",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 24 buttons. Leo wants 95 buttons. How many more buttons does Leo need?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 18 crayons. Mia gets 17 more crayons. How many crayons does Mia have now",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 20 stamps. Noor has 66 stamps. How many stamps do they have in all?",
+          "ans": "86",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 82 beads. Noor gets 35 more beads. How many beads does Noor have now?",
+          "ans": "117",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar has 47 shells. Kofi has 14 shells. How many shells do they have in all?",
+          "ans": "61",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi has 78 cards. Kofi gets 22 more cards. How many cards does Kofi have now?",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 34 marbles. Lena has 51 marbles. How many marbles do they have in all?",
+          "ans": "85",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 40 books. Lena wants 46 books. How many more books does Lena need?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had some stickers. Yuki got 82 more stickers. Now Yuki has 86 stickers. How",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 93.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 89,
+              "fits": false
+            },
+            "4": {
+              "hMm": 89,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 68 pencils. Aya gets 20 more pencils. How many pencils does Aya have now",
+          "ans": "88",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi has 69 apples. Zara has 64 apples. How many apples do they have in all?",
+          "ans": "133",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 47 cookies. Zara gets 66 more cookies. How many cookies does Zara have ",
+          "ans": "113",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 82.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some buttons. Tom got 87 more buttons. Now Tom has 95 buttons. How many ",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 93.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 89,
+              "fits": false
+            },
+            "4": {
+              "hMm": 89,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "6 + 14 = ?",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "900 − 100 = ?",
+          "ans": "800",
+          "measured": {
+            "1": {
+              "hMm": 20,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 34 books. Sam wants 87 books. How many more books does Sam need?",
+          "ans": "53",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 44 stickers. Leo wants 58 stickers. How many more stickers does Leo need",
+          "ans": "14",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 98 pencils. Mia gets 36 more pencils. How many pencils does Mia have now",
+          "ans": "134",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 100 apples. Noor has 8 apples. How many apples do they have in all?",
+          "ans": "108",
+          "measured": {
+            "1": {
+              "hMm": 88.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 82.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 7 cookies. Noor gets 32 more cookies. How many cookies does Noor have n",
+          "ans": "39",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar has 53 buttons. Kofi has 16 buttons. How many buttons do they have in all?",
+          "ans": "69",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 87.2,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "lesson-p1.png",
+          "words": 177,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-p2.png",
+          "words": 126,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-p3.png",
+          "words": 141,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-p4.png",
+          "words": 89,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-key-p1.png",
+          "words": 179,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-key-p2.png",
+          "words": 139,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-key-p3.png",
+          "words": 178,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-key-p4.png",
+          "words": 109,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 4,
+        "cells": [
+          4,
+          3,
+          4,
+          2
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 209
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 4,
+        "cells": [
+          4,
+          3,
+          4,
+          2
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 271
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

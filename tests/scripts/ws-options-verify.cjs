@@ -539,7 +539,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             const MARK = {
                 digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg/,
                 one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)/,
-                off: /ws-line--off|ws-factans--off|class="ansrow"/,
+                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"/,   // a key's open zone: plain digits, no box
             };
             try {
                 const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });

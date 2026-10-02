@@ -1511,12 +1511,18 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
    inside; the black outline is the cue. Compatible with Lane A2: a per-box live fill
    (.mq-live-ok / .mq-live-wrong) overrides background-color, a wrong box may switch to a dashed
    border. Focus / active highlight is Lane A's (above). */
-/* Specificity 0 (:where): any Lane A2 rule (.mq-live-ok / .mq-live-wrong fill, dashed red wrong
-   border) written with !important at ANY specificity wins over this one without a war. */
-:where(html .mq-scell input.mq-slot:not(.mq-slot--circle)) {
-    border-width: 1px !important; border-style: solid !important; border-color: #000 !important;
-    border-radius: var(--mq-slot-r, 6px) !important;
+/* No specificity war with Lane A2 (`html body .mq-scell.mq-scell.mq-scell input.mq-live-correct /
+   .mq-live-wrong`, (0,4,3), !important): the colour, style and fill of the box are set at (0,3,2), below
+   A2, so a right box's green and a wrong box's dashed red always win. Only the WIDTHS and the radius,
+   which A2 never sets, are set by the host-specific selectors that must beat the older line-slot rules. */
+html .mq-scell input.mq-slot:not(.mq-slot--circle) {
+    border-style: solid !important; border-color: #000 !important;
     background-color: rgba(148, 148, 148, 0.14) !important;
+}
+html .mq-scell input.mq-slot:not(.mq-slot--circle),
+html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:not(.mq-slot--circle),
+html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--circle) {
+    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
 }
 
 /* WAVE 1 / 1.1 (additive, critic B D2): a `___` blank inside question text (.answer-blank-inline) is a
@@ -1539,7 +1545,8 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 :where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="first"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-left-color: #000 !important; }
 :where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="last"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-right-color: #000 !important; }
 :where(.mq-scell .ws-stack.mq-ans-off .ab > input.mq-digit) { border-color: transparent !important; border-bottom-color: #000 !important; border-radius: 0 !important; }
-:where(.mq-scell .mq-ansoff input) { border-color: transparent !important; border-bottom: 2px solid #000 !important; border-radius: 0 !important; }
+html .mq-scell .mq-ansoff input.mq-slot { border-color: transparent !important; border-bottom-color: #000 !important; }
+html body .mq-scell.mq-scell .mq-ansoff.mq-ansoff.mq-ansoff.mq-ansoff input.mq-slot.mq-slot { border-width: 0 0 2px !important; border-radius: 0 !important; }
 .mq-kit .ws-stack.mq-eqdigits { display: inline-flex !important; vertical-align: middle; grid-template-columns: none; }
 .mq-kit .ws-stack.mq-eqdigits > .ab { width: auto; }
 /* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
@@ -1601,3 +1608,8 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 /* ---- Start cards: dark-theme focus ring reaches 3:1 against the dark section (critic R2-D1). */
 .dark .mode-cards .student-start-btn:focus-visible,
 .dark-theme .mode-cards .student-start-btn:focus-visible { outline-color: #B5A5F4; }
+/* (critic B D2) a kit twin's in-drawing line slot (place-value disks, a value line ...) is the same
+   full box on screen: widths and radius only, so A2's per-box colours still decide the edge colour. */
+html body .mq-scell.mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
+}

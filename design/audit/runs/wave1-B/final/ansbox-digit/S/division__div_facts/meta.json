@@ -619,7 +619,7 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 139,
+          "words": 143,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -654,7 +654,7 @@
     "card-1280": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "36 ÷ 9 = ?",
+      "text": "12 ÷ 3 = ?",
       "ans": "4",
       "measure": {
         "hScroll": 0,
@@ -725,7 +725,7 @@
     "card-820": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "20 ÷ 5 = ?",
+      "text": "40 ÷ 10 = ?",
       "ans": "4",
       "measure": {
         "hScroll": 0,
@@ -796,7 +796,7 @@
     "card-390": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "48 ÷ 12 = ?",
+      "text": "24 ÷ 6 = ?",
       "ans": "4",
       "measure": {
         "hScroll": 0,
