@@ -1,5 +1,8 @@
 # Status and handover — paused 2026-09-26 (owner: "stop our work for now, keep track of what is done")
 
+> **2026-10-02: the work order is now `design/MASTER_PLAN.md`** (8 waves in the owner's order; owner to confirm the order before work starts). Key answer colour changed to **reddish orange**.
+
+
 Read this first when work resumes. It records what is live, what each work lane had done when it paused, what the
 independent critics last found, and the next step for each lane. Owner rulings are recorded in the design docs named
 below; this file only points to them.
@@ -33,7 +36,7 @@ below; this file only points to them.
 | Retire the I Can look; Daily look everywhere, single-skill pages keep an I Can line | `PAGE_TYPES.md` (on the teacher-UI lane branch) |
 | Rounding: plain rounding with a written answer, and one number rounded to 2+ places | met (critic pv-r3) |
 | Per-part "New numbers" for the built lessons; per-section refresh noted as a later option | `LESSON_LIBRARY_PLAN.md` §8e |
-| **2026-09-27, recorded, not built:** answers on every printed key are red (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
+| **2026-09-27, recorded, not built:** answers on every printed key are reddish orange (owner 2026-10-02; was red) (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
 | **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker; several skills can be selected in one go in thumbnail or list view | `design/TEACHER_SCREENS.md` "Selecting skills" |
 
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
