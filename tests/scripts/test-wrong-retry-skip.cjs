@@ -25,10 +25,20 @@ const WRONG_MESSAGES = (() => {
   if (!m) throw new Error('test-wrong-retry-skip: WRONG_MESSAGES not found in answer-check.js');
   return [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]);
 })();
+// The support ladder (js/modules/support-ladder.js messageFor) answers a wrong try with its own calm
+// lines instead: "Not yet. Use <support>, then try again.", "Not yet. Now …", "Here is how. Finish it,
+// then try again." Their fixed openings are read from the source too.
+const LADDER_OPENINGS = (() => {
+  const src = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'js', 'modules', 'support-ladder.js'), 'utf8');
+  const body = (src.match(/function messageFor\(e\) \{([\s\S]*?)\n\}/) || [])[1];
+  if (!body) throw new Error('test-wrong-retry-skip: messageFor not found in support-ladder.js');
+  return [...new Set([...body.matchAll(/['`]([A-Z][a-z]+(?: [a-z]+)*\.)/g)].map(x => x[1]))];
+})();
 function isWrongFeedback(text) {
   const t = String(text || '').trim();
   if (!t) return false;
-  return t.startsWith('❌') || WRONG_MESSAGES.some(w => t.includes(w)) || /That's not/i.test(t);
+  return t.startsWith('❌') || WRONG_MESSAGES.some(w => t.includes(w))
+    || LADDER_OPENINGS.some(o => t.startsWith(o)) || /That's not/i.test(t);
 }
 
 async function shot(page, name) {
