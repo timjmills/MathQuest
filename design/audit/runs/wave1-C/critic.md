@@ -108,3 +108,116 @@ The default L pages are 8 to 9 on all four criteria: count_by_tables independent
 - **C2:** fix defects 1-4, 8 and 9. Add content-audit rules for fill=half/one, jumps=15 and the run-edge rule, so the options are gated, not only rendered.
 - **C3:** fix defect 5. Also give the L count-by row's trailing arc a target: the last arc on line 1 points into empty space past the line end.
 - **C4:** fix defect 7.
+
+---
+
+# Round 2 (critic, Opus low, head 7629238)
+
+**Verdict: FAIL.** C1 7 · C2 8 · C3 8 · C4 7.
+
+The paper side is fixed. The screen twin's new slot overlay (chartwindow.js:191) brought in a regression that every 10-column chart on screen shows.
+
+## Gates run
+- `ws-content-audit --skill hundreds_chart_fill,number_chart_fill,count_by_tables`: OK, 0 fails. The comma list now works (defect 10 fixed). The notes are as before: number_chart_fill is "unaudited" (no count band), and count_by_tables has "11 distinct in 240" and "zero-facts".
+- `ws-print-lint --source kit` on the 3 skills (independent): 0 findings.
+- `ws-print-lint --roles review` on number_chart_fill: 15 findings. **They pre-exist.** The same 15 come back on base d7d4059, extracted with `git archive` to a scratch directory, with nothing stashed. None comes from this lane:
+  - 1 × AK-4 critical: key page 2 has 9 answer slots, pupil page 1 has 8.
+  - 2 × TY-2: italic "Write the fractions you used…".
+  - 12 × TY-7: slash fractions "1/2" and "1/4" on tiles.
+
+  The italic and slash-fraction findings are all in cell 5, a fraction item that the review mixer pulls in. The AK-4 is the review role's key pagination. These belong to the review role or mixer and the fraction tile cell, not to Lane C.
+- **Default pages are unchanged.** The independent and test answers for hundreds_chart_fill and number_chart_fill, at L and at S, match the wave1-C run item for item.
+
+## Round-1 defects
+1. **Fixed.** The S count-by page climbs 2 to 12 once, rows a to k, with no repeat.
+2. **Fixed.** The title reads "I Can count by 1 to 12 (15 jumps)" on the page and the key.
+3. **Fixed.** Runs stay one square in from the edge (gaps-row-L a to f), the help text matches, and the run rule in the audit is real: it checks a printed neighbour in the run's direction at both ends and a length of at least 2 along a row.
+4. **Fixed.** The 6 whole charts on worksheet-1280 are all different, and the audit fails a repeat in the first 12.
+5. **Partly fixed.** At S the whole chart has L-size digits and fills about 85 % of the cell height (735 of 860 px), leaving about 60 px top and bottom. **Acceptable.** That is under 1 square of slack, and 19.5 mm is the measured Letter limit. Below the LESSONS_LEARNED "wasted space" bar, so no defect.
+6. **Fixed in layout.** The 390 px card shows rows of ten. See new defects A and B.
+7. **Fixed on paper.** Baselines are steady on all paper PNGs checked. Regressed on screen: see defect A.
+8. **Fixed.** Live play goes back to the shuffled round; the climb applies only when `itemIndex` is set.
+9. **Fixed for rows.** For a column run in a 3-row window, `len = min(n, R-2)` = 1, so the "column run" is one box, the middle row only. That is a legitimate count-on-by-10 item with a number above and below, but it is the same as scatter. Not a defect, only a note: the option teaches more with grid=rows (5 rows) or whole.
+10. **Fixed.**
+
+## Other items asked
+- **Layout-unit assertion.** Not weakened. It changed only to match the new FILL style string, and it still asserts that a printed number sits in a full-square line box.
+- **Turn arrows on 15-jump rows (paper, jumps15-L).** These help. The ⤵ at the end of line 1 gives the last hop a landing place, and the → into line 2 shows the count goes on. They are thin hairlines and do not compete with the digits. Keep them.
+- **Content-audit sweeps.** These are real, not decorative. The 5 count-by and 14 chart option combos are each sampled with 80 items through the same rules as the defaults, and a fail fails the skill.
+
+## Ranked defects (round 2)
+
+### A. Screen chart: the heavy slot overlay spills into the next square and covers its number (C1 7, C4 7)
+- **Where:** js/modules/sheet/cells/chartwindow.js:191. This is the overlay `<span>` with `border:B(ctx,1.5)` in the twin, inside a `width:10%` td.
+- **Seen in:**
+  - rows-screen/card-390.png, row 41: a bar cuts the "4" of "43".
+  - whole-pattern-screen/card-390.png, row 11: "|13".
+  - whole-pattern-screen/worksheet-1280.png, item 3, bottom row: "|100".
+  - In the same files, the heavy boxes sit off the grid lines in every row.
+- **What is wrong:**
+  - The overlay is absolutely positioned against a td.
+  - In `border-collapse` tables, Chrome does not reliably make a td the containing block for absolutely positioned children.
+  - The input inside the slot also grows the box, so the 1.5 px frame lands on the neighbour.
+  - A pupil reads "43" as "|43".
+- **Fix:** put `position:relative` on a wrapper `<div style="position:relative;width:100%;height:100%">` inside the td, and put both spans inside that wrapper. Or drop the overlay and use `outline:${B(ctx,1.5)} solid ${INK};outline-offset:-${B(ctx,1.5)}` on the slot span, which draws inside the square and never changes the box. Keep the paper path as it is.
+- **Check:** in card-390 and worksheet-1280, no square shows a stray vertical line, and every heavy box sits exactly on its grid lines (pixel-compare the box edges with the column rules: no more than 1 px apart).
+
+### B. 390 px chart squares are about 32 px wide, below SP-10's 34.5 px exception (C1, minor)
+- **Where:** card-390 for both the whole chart and rows. The table is about 322 px inside the card padding and the bordered visual frame.
+- **What is wrong:** SP-10 and PT-SCR-3 allow only 34.5 × 44 for a 10-column chart on a phone. 32 px is a breach of the standard, by 2.5 px.
+- **Fix:** when `ten && isTwin`, remove the visual frame's inner padding and border for this template, or set a negative inline margin, so the table spans the card's full inner width: 358 px at 390, which is 35.8 px per square.
+- **Check:** at 390 px, the measured td width is at least 34.5 px and the height at least 44 px, with no horizontal page scroll.
+
+### C. Paper whole chart: the empty squares still look a hair off the grid (C4, cosmetic)
+- **Where:** whole-pattern-S independent-p1, rows 1 to 2 and rows 5 to 6.
+- **What is wrong:** the edges of the empty squares step by about 1 to 2 px against the neighbouring rules. The likely cause is the same overlay span sitting on a collapsed-border td.
+- **Fix:** the fix for defect A covers this. Use one drawing for the empty square: the td border only, with no overlay on paper, since paper uses 0.75 for both anyway.
+- **Check:** pixel-compare the edges of one row's squares: no more than 1 px spread.
+
+## What raises each criterion
+- **C1 (7 → 9 or more):** fix A and B.
+- **C4 (7 → 9 or more):** fix A and C.
+- **C2 and C3 (8):** C2 rises with a deeper column-run option on 3-row windows, or by naming it honestly in the help text. C3 rises by tightening the slack around the S whole chart where the page allows (A4 can take 20.5 mm squares, so key the square height to the paper size).
+
+# Round 3 (critic, Opus low, head 8ea9d8d)
+
+**Verdict: FAIL.** C1 7 · C2 8 · C3 8 · C4 7.
+
+## Gates run
+- `ws-screen-answer --skills composing:hundreds_chart_fill,composing:number_chart_fill,multiplication:count_by_tables`: all OK (card, worksheet 3/3, quiz 3/3, live green).
+- I viewed rows-screen/*, whole-pattern-screen/*, whole-pattern-S, L/ and the count-by worksheet. I measured digit heights from the PNGs and did not run a DOM probe. The digit sizes I read agree with the builder's own figures.
+
+## Round-2 defects
+- **A (overlay spill): fixed.** No bars cut into numbers on card-390, card-1280 or the worksheets. Empty squares sit on the grid lines.
+- **B (390 squares): fixed.** Rows of ten span the card, every number is readable, and "100" fits. The chart sits inside the card's white frame at 8 to 362 px of 370, so it does not overhang. **Acceptable.**
+- **C (paper edge steps): fixed.** The whole-pattern-S independent page has even borders and fills its cell.
+
+## Ranked defects (round 3)
+
+### D. The online worksheet shrinks the ten-column chart's digits to about 16 px (C1 7, C4 7). This breaks "content never shrinks to fit".
+- **Where:**
+  - `js/modules/sheet/cells/chartwindow.js:88`, the new cap `font-size:min(P, 4.6vw, L(ctx,5.2))`.
+  - The worksheet grid, which puts a ten-column chart in a cell one third of the row wide.
+- **Seen in:** whole-pattern-screen/worksheet-1280.png and rows-screen/worksheet-1280.png.
+  - The squares are about 30 × 75 px.
+  - The digits are about 16 px.
+  - The two-digit numbers touch both side borders: "54 55" read as one run, and "99100" runs together in items 1, 2, 4 and 6.
+  - The five-column window on the same host (L/…/worksheet-1280.png) draws digits at about 32 px, so the same skill drops to half size on one host.
+  - The card at 1280 px also lost size: digits went from about 34 to about 28 px with no need, because its squares are 70 px wide.
+- **Fix:**
+  1. Remove the `L(ctx,5.2)` term from the cap.
+  2. In `css/screen-cell.css`, add additive rules so that a worksheet item holding `.k2-chart` with 10 columns spans the full row, with `grid-column: 1 / -1` on the worksheet card that contains it.
+- **Measured target:**
+  - At 1280 px, each square is at least 60 px wide (the row is about 1100 px, so about 100 px each).
+  - Digits match the card's `P(ctx,pt)`, which is at least 28 px and the same as the five-column window.
+  - "100" has at least 4 px of clearance on each side.
+  - At 390 px the existing ≥ 34.5 × 44 px rule stays.
+
+### E (minor, does not block). At 390 px there is an empty strip about 10 px high above and below the chart table.
+- **Seen in:** both card-390.png files.
+- **What is wrong:** the strip is wasted height inside the frame.
+- **Fix:** zero the chart wrapper's vertical padding inside `@media (max-width:480px)`.
+
+## What raises each criterion
+- **C1 and C4 (7 → 9):** fix D.
+- **C2 and C3:** unchanged from round 2.
