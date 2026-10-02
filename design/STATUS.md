@@ -115,7 +115,8 @@ Still open, for the owner or a later wave:
 - Teacher files: `teacher-shell/print/library/quiz-ui/sets/standards.js` and the `ws-teacher-*` gates are on this branch, while `sheet/papers.js` and `prerequisite-skills.js` exist only on `wip-teacher-ui`; a live-vs-branch table is needed before Wave 3.
 - One deploy-gate list: CLAUDE.md "Checks to run" omits `ws-screen-answer`, `ws-screen-slots`, `ws-share-options` and the `ws-teacher-*` gates.
 - Backlog items with no wave owner (BACKLOG.md top: div_remainders counters, nl_sub, add_5_pictures, money_compare panels, mixed_placevalue, round_nl_hundred_thousands, support ladder on worksheet/quiz hosts, expand double edge) → fold into Wave 5.
-- Owner questions not yet carried into MASTER_PLAN: what the "Practice map" tile opens; keep money_count's all-same-coin default?
+- Owner answered 2026-10-02 (now in MASTER_PLAN "Owner answers"): Practice map = MAP strand picker; money_count defaults to mixed coins; skip N is per skill (default 5); each passing lane deploys.
+- Research credentials file (`~/.claude/projects/*/memory/credentials.md`) is not present in this container, so MathWorksheets4Kids / IXL logins are unavailable to agents.
 - The `effort:` field in `.claude/agents/*.md` cannot be seen by the agent itself; the model (Sonnet 5.5) was confirmed, the effort setting was not observable.
 - Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
 - 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.

@@ -38,6 +38,11 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Calculator | Per skill, teacher option, off by default |
 | Faded packets | A skill-worksheet option that fades supports after x problems |
 | WRM page | Teacher-facing only; from a small step or unit: print a worksheet, send a practice code, make a quiz |
+| Deploy | Each Wave 1 lane deploys (push to master) as soon as it passes critic ≥ 8 + full gates + stamp (owner 2026-10-02) |
+| Skip setting | Per skill, default 5 wrong tries; travels with the skill (skill option) |
+| money_count default | Mixed coins by default; "all the same coin" stays a teacher choice |
+| Practice map tile | Opens a **MAP strand picker**: each strand lists its MAP skills; from a strand or skill the teacher can print practice or send a practice link (MAP skills only) |
+| MAP representations | MAP keeps moving between two representations (picture → equation, model → number, graph → sentence, story → operation…). Build **more practice skills of this two-representation kind** (see 6.4) |
 
 ## Wave 1 — Correct the program
 
@@ -67,7 +72,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 | # | Item |
 |---|---|
-| 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. |
+| 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. **Practice map** opens the MAP strand picker (strands → their MAP skills → print practice / send practice link; MAP skills only). |
 | 3.2 | Gallery picker by default wherever skills are chosen: Big 3 / Medium 4 / Small 5 across plus a list view; search, Grade, Domain, Topic; select many at once. |
 | 3.3 | Sets auto-save in the browser until deleted; a Sets area lists every set for any paper, quiz or code. |
 | 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz. Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
@@ -133,6 +138,11 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 The emphasis throughout is moving between representations: picture → equation, equation → meaning, graph →
 sentence, model → number, story → operation, shape → property.
+
+**6.4 Two-representation skills (owner 2026-10-02):** audit every MAP strand for the representation pairs MAP tests
+(picture ↔ equation, model ↔ number, graph ↔ sentence, story ↔ operation, shape ↔ property, number line ↔ number,
+clock ↔ time words, array ↔ multiplication) and build a "match the two" form for each pair that has none, as options
+on existing skills where the content fits and new skills where it does not; each tagged and critic ≥ 8.
 
 **6.3 MAP practice set:** seven strands (Number & place value, Operations & algebra, Multiplication & division,
 Fractions & decimals, Measurement, Geometry, Data & graphing), picking from these skills. Today the MAP engine uses
