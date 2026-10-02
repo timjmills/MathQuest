@@ -1037,7 +1037,7 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
         ok((renderCell(am, ctxL()).match(/class="area-model-total-row"/g) || []).length >= 4, 'area model: its flex rows are exempt from the worksheet wrap rule');
         // Chart window: numbers in a fixed line box; the window clears the item letter.
         const cw = renderCell(T('chartwindow', { rows: [3, 4, 5], cols: [2, 3, 4, 5, 6], blanks: [45, 57] }), ctxL());
-        ok(/<td[^>]*><span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">44<\/span>/.test(cw), 'chart window: a printed number sits in a fixed line box');
+        ok(/<td[^>]*><span style="position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;">44<\/span>/.test(cw), 'chart window: a printed number sits in a fixed line box (absolute fill: one baseline per row, whatever its neighbour\'s border)');
         ok(/k2-chart[^>]*margin:4\.5mm auto 0/.test(cw), 'chart window: the window clears the item letter');
         // Word picture: the work box is named.
         ok(/Draw or work here/.test(renderCell(T('wordpic', { lines: ['Ann has 2.', 'Ben has 3.', 'How many?'], a: 2, b: 3, shape: 'ball', unit: 'balls', ans: 5 }), ctxL())), 'word picture: the work box is labelled');

@@ -90,6 +90,11 @@
     "wpBank": "8B",
     "wpBar": "8C",
     "bars": "9F",
+    "fill": "2U",
+    "jumps": "2V",
+    "gaps": "2W",
+    "grid": "2X",
+    "onePage": "2Y",
     "calculator": "6X",
     "skipAfter": "6Y"
   },
@@ -631,6 +636,24 @@
       "vertical": "V",
       "horizontal": "H"
     },
+    "fill": {
+      "two": "T",
+      "one": "O",
+      "half": "H"
+    },
+    "jumps": {},
+    "gaps": {
+      "scatter": "S",
+      "row": "R",
+      "column": "C",
+      "pattern": "P"
+    },
+    "grid": {
+      "window": "W",
+      "rows": "R",
+      "whole": "F"
+    },
+    "onePage": {},
     "calculator": {},
     "skipAfter": {}
   },
@@ -662,6 +685,8 @@
     "wpCues": "bool",
     "wpBank": "bool",
     "wpBar": "bool",
+    "jumps": "decimal",
+    "onePage": "bool",
     "calculator": "bool",
     "skipAfter": "decimal"
   },
@@ -677,6 +702,7 @@
     "8D-8O": "build lane data",
     "8P-8Z": "build lane numtheory",
     "5N-5Z": "lessons, support ladder and later waves",
+    "2U-2Z": "wave 1 lane C: skip-count lines and the number grid",
     "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)"
   }
 }

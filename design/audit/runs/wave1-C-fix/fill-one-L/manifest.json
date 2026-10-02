@@ -1,0 +1,424 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 5,
+          "perPage": 5,
+          "pages": 1,
+          "note": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 5,
+              "perPage": 5,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 1 x 5, cells sized to the problems.",
+              "line": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 43.9,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 244652,
+        "title": "I Can count by 1 to 12",
+        "notes": [
+          "Dense: 1 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 2. Write the missing numbers.",
+            "ans": "6, 8, 14, 16, 22, 24",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 3. Write the missing numbers.",
+            "ans": "9, 12, 18, 24, 30, 33",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 4. Write the missing numbers.",
+            "ans": "12, 20, 24, 36, 40, 48",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 5. Write the missing numbers.",
+            "ans": "10, 25, 35, 40, 55, 60",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 6. Write the missing numbers.",
+            "ans": "12, 24, 36, 54, 66, 72",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 87,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 120,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 54
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 84
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "more-practice": {
+        "fits": {
+          "cols": 1,
+          "rows": 5,
+          "perPage": 5,
+          "pages": 1,
+          "note": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 5,
+              "perPage": 5,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 1 x 5, cells sized to the problems.",
+              "line": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 43.7,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 720587,
+        "title": "I Can count by 1 to 12",
+        "notes": [
+          "Dense: 1 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 2. Write the missing numbers.",
+            "ans": "6, 10, 14, 18, 20, 22",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 3. Write the missing numbers.",
+            "ans": "6, 15, 21, 27, 33, 36",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 4. Write the missing numbers.",
+            "ans": "8, 20, 28, 32, 40, 48",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 5. Write the missing numbers.",
+            "ans": "15, 25, 35, 40, 50, 60",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 6. Write the missing numbers.",
+            "ans": "18, 30, 42, 48, 60, 72",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "more-practice-p1.png",
+            "words": 87,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "more-practice-key-p1.png",
+            "words": 120,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 54
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 84
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

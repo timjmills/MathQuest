@@ -52,7 +52,8 @@ const has = k => process.argv.includes('--' + k);
 // whether a given item appears.
 const N = parseInt(arg('n', '240'), 10);
 const PAGE = 6;                       // items on one of the owner's pages
-const ONLY_SKILL = arg('skill', null);
+const ONLY_SKILL = arg('skill', null);               // one skill id, or a comma list (a,b,c)
+const ONLY_SKILLS = ONLY_SKILL ? ONLY_SKILL.split(',').map(x => x.trim()).filter(Boolean) : null;
 const ONLY_CAT = arg('category', null);
 const ONLY_FAMILY = arg('family', null);
 const JSON_OUT = arg('json', null);
@@ -629,6 +630,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
         if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+            item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
             item.visPlain = String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400);
         }
         if (tm) {
@@ -823,20 +825,45 @@ function pictureRules(items, F) {
             // 2026-09-25 (owner): a window is 1 to 3 consecutive chart rows (the chart to 10 is its
             // one row; number_chart_fill runs past row 9) by 5 columns (4 on number_chart_fill), or by the whole row of 10.
             const consecutive = (a) => a.every((v, i) => !i || v === a[i - 1] + 1);
-            if (rows.length < 1 || rows.length > 3 || !(cols.length === 4 || cols.length === 5 || cols.length === 10) || !consecutive(rows) || !consecutive(cols)
-                || rows.some(r => r < 0 || r > 999) || cols.some(c => c < 0 || c > 9)) bad.push(`the window is not 1-3 rows x 4, 5 or 10 columns of the chart (${rows.length} x ${cols.length})`);
+            if (rows.length < 1 || rows.length > (cols.length === 10 ? 10 : 3) || !(cols.length === 4 || cols.length === 5 || cols.length === 10) || !consecutive(rows) || !consecutive(cols)
+                || rows.some(r => r < 0 || r > 999) || cols.some(c => c < 0 || c > 9)) bad.push(`the window is not 1-3 rows x 4, 5 or 10 columns of the chart (${rows.length} x ${cols.length})`);   // the whole chart (grid=whole) is up to 10 rows of ten
             if (!blanks.length || blanks.some(b => !inWin(b))) bad.push(`a gap outside its window (${blanks.join(', ')})`);
             if (key.join(',') !== blanks.slice().sort((a, b) => a - b).join(',')) bad.push(`the key ${key.join(', ')} is not the gaps ${blanks.join(', ')} in reading order`);
             for (const b of blanks) {
                 const row = (n) => Math.floor((n - 1) / 10);
                 const nb = [b - 1, b + 1].filter(n => row(n) === row(b)).concat([b - 10, b + 10]).filter(inWin);
-                if (!nb.some(n => !blanks.includes(n))) bad.push(`the gap ${b} has no printed neighbour`);
+                // (a gap inside a run is judged by the RUN rule below: its run's ends must be printed)
+                if (!(it.opts && (it.opts.gaps === 'row' || it.opts.gaps === 'column')) && !nb.some(n => !blanks.includes(n))) bad.push(`the gap ${b} has no printed neighbour`);
                 spots.add(`${rows.indexOf(Math.floor((b - 1) / 10))}:${cols.indexOf((b - 1) % 10)}`);
+            }
+            // RUN RULE (wave 1 lane C critic): under gaps=row / gaps=column a run of gaps keeps a
+            // PRINTED square in its own direction at both ends (inside the window, never on its
+            // edge), so there is always a number to count on from; a run along a row is two or more boxes.
+            const gp = it.opts && it.opts.gaps;
+            if (gp === 'row' || gp === 'column') {
+                const stepN = gp === 'row' ? 1 : 10;
+                const rowOf = (n) => Math.floor((n - 1) / 10);
+                const set = new Set(blanks);
+                for (const b of blanks) {
+                    if (set.has(b - stepN)) continue;                        // not the start of a run
+                    let e = b, len = 1;
+                    while (set.has(e + stepN)) { e += stepN; len++; }
+                    const before = b - stepN, after = e + stepN;
+                    const ok = (n) => inWin(n) && !set.has(n) && (gp === 'column' || rowOf(n) === rowOf(b));
+                    if (!ok(before) || !ok(after)) bad.push(`a ${gp} run ${b}-${e} has no printed number at ${!ok(before) ? 'its start' : 'its end'} in its direction`);
+                    if (gp === 'row' && len < 2) bad.push(`a run along a row is one box (${b}): that is scatter`);
+                }
             }
         }
         if (bad.length) F('chart-window', `${bad.length} chart windows are wrong: ${show(bad)}`);
+        // A whole chart is one to a page: charts must not repeat inside a page-run of items (first 12).
+        const wholeCharts = chart.filter(it => it.opts && it.opts.grid === 'whole').slice(0, 12);
+        if (wholeCharts.length >= 6) {
+            const fp = new Set(wholeCharts.map(it => (it.cellP.blanks || []).join(',')));
+            if (fp.size < wholeCharts.length) F('chart-window', `the whole chart repeats: ${fp.size} different charts in ${wholeCharts.length} items`);
+        }
         const places = Math.max(...chart.map(it => ((it.cellP || {}).rows || []).length * ((it.cellP || {}).cols || []).length));
-        if (chart.length >= 20 && spots.size < Math.min(8, places - 2)) F('chart-window', `the gaps sit in only ${spots.size} of the window's ${places} places across ${chart.length} items: deal them over the window`);
+        if (chart.length >= 20 && !chart.some(it => it.opts && (it.opts.gaps === 'row' || it.opts.gaps === 'column' || it.opts.gaps === 'pattern')) && spots.size < Math.min(8, places - 2)) F('chart-window', `the gaps sit in only ${spots.size} of the window's ${places} places across ${chart.length} items: deal them over the window`);
     }
     // seq-track
     const seq = live.filter(it => it.cellT === 'seqstrip');
@@ -886,11 +913,20 @@ function countByRules(items, F) {
         const p = it.cellP || {};
         if (it.cellT === 'count-row' && it.countBy) {
             const { step, values, blanks, pct } = it.countBy;
-            if (values.length !== 12 || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the 12 multiples of ${step}: ${values.join(', ')}`);
+            const fill = it.countBy.fill || 'one', nJ = it.countBy.jumps || 12;
+            if (![12, 15].includes(values.length) || values.length !== nJ || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the ${nJ} multiples of ${step}: ${values.join(', ')}`);
             if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
-            const k = pct >= 100 ? 11 : Math.max(1, Math.round(pct / 100 * 11));
-            if (blanks.length !== k) bad.row.push(`${pct}% blank should leave ${k} of 11 gaps, not ${blanks.length}`);
-            if (pct < 100 && blanks.length && blanks.every((b, i) => b === 12 - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
+            // ONE PAGE (owner 2026-10-02): rows are x 1 .. x 12 in order, twelve jumps long whatever "jumps" says.
+            if (it.opts && it.opts.onePage) {
+                const at = live.filter(x => x.cellT === 'count-row' && x.countBy).indexOf(it);
+                if (step !== (at % 12) + 1) bad.row.push(`one page: row ${at + 1} counts by ${step}, not ${(at % 12) + 1}`);
+                if (values.length !== 12) bad.row.push(`one page: a row of ${values.length} jumps (must be 12)`);
+            }
+            if (fill !== 'one' && blanks.includes(1)) bad.row.push(`the second number is blank under fill=${fill}`);
+            const pool = values.length - (fill === 'one' ? 1 : 2);
+            const k = fill === 'half' ? Math.min(pool, Math.floor(values.length / 2)) : (pct >= 100 ? pool : Math.max(1, Math.round(pct / 100 * pool)));
+            if (blanks.length !== k) bad.row.push(`${fill} / ${pct}% blank should leave ${k} of ${pool} gaps, not ${blanks.length}`);
+            if (pct < 100 && blanks.length && blanks.every((b, i) => b === values.length - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
             const key = keyOf(it);
             if (key.join(',') !== blanks.map(i => values[i]).join(',')) bad.row.push(`the key ${key.join(', ')} is not the row at its gaps`);
             if (JSON.stringify(p.values) !== JSON.stringify(values) || JSON.stringify(p.blanks) !== JSON.stringify(blanks)) bad.row.push('the drawn row is not the declared row');
@@ -975,6 +1011,17 @@ function bondRules(items, F) {
     const [top, n] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
     if (n / live.length > 0.2) F('bond-spread', `the answer ${top} is dealt on ${n} of ${live.length} bonds (more than 1 in 5): spread the answers`);
 }
+
+/** Option values sampled besides the defaults, per skill (the count-by row and the number charts). */
+const OPTION_SWEEPS = {
+    'multiplication:count_by_tables': [{ fill: 'one' }, { fill: 'half' }, { jumps: 15 }, { jumps: 15, fill: 'half' }, { order: 'mixed' },
+        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 }],
+    'composing:hundreds_chart_fill': [
+        { grid: 'rows' }, { grid: 'whole' }, { grid: 'whole', gaps: 'pattern' }, { grid: 'whole', gaps: 'row' }, { grid: 'whole', gaps: 'column' },
+        { gaps: 'row' }, { gaps: 'column' }, { gaps: 'pattern' }, { grid: 'rows', gaps: 'row' }, { grid: 'rows', gaps: 'column' }, { gaps: 'row', tiles: 3 },
+    ],
+    'composing:number_chart_fill': [{ gaps: 'row' }, { gaps: 'column' }, { gaps: 'pattern' }],
+};
 
 // fnv1a: a per-skill seed that depends on the skill id alone, so --skill reproduces the full run
 function seedFor(key) {
@@ -2273,7 +2320,7 @@ function selfTest() {
     for (const s of skills) if (EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`)) s.family = EXTRA_SKILLS.get(`${s.categoryId}:${s.skillId}`);
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
-    if (ONLY_SKILL) skills = skills.filter(s => s.skillId === ONLY_SKILL);
+    if (ONLY_SKILLS) skills = skills.filter(s => ONLY_SKILLS.includes(s.skillId));
     if (!skills.length) { console.error(`ws-content-audit: FAIL - no skill matched ${[ONLY_FAMILY, ONLY_CAT, ONLY_SKILL].filter(Boolean).join(' ')}`); await app.close(); process.exit(1); }
 
     // Which skills let the teacher tick a notation, so stacked+across on one page is a choice
@@ -2437,7 +2484,20 @@ function selfTest() {
             categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: 100,
             k2: family === 'k2', tm: family === 'tm',
         });
-        out.push({ ...skill, ...audit(skill, items) });
+        const res = audit(skill, items);
+        // OPTION SWEEPS (wave 1 lane C critic): the defaults are not the only thing a skill promises.
+        // Each listed option value is sampled on its own and held to the same rules, with the value
+        // named in the message; a fail here fails the skill like any other.
+        for (const combo of OPTION_SWEEPS[`${s.categoryId}:${s.skillId}`] || []) {
+            const extra = await app.page.evaluate(sampleInPage, {
+                categoryId: s.categoryId, skillId: s.skillId, n: Math.min(N, 80), baseSeed: baseSeed + 7, range: 100,
+                k2: family === 'k2', tm: family === 'tm', opts: combo,
+            });
+            extra.forEach(it => { if (it && !it.error && !it.empty) it.opts = Object.assign({}, it.opts || {}, combo); });
+            const sub = audit(skill, extra);
+            for (const f of sub.fails) res.fails.push({ cls: f.cls, msg: `[${JSON.stringify(combo)}] ${f.msg}` });
+        }
+        out.push({ ...skill, ...res });
     }
     await app.close();
 
