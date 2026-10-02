@@ -565,6 +565,19 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                         const wrong = (k) => {
                             const q0 = st.worksheetQs[0], inp = document.getElementById('ws_input_0') || document.querySelector('#ws_card_0 input');
                             if (!q0 || !inp) return false;
+                            const n = q0._mqSlots | 0;
+                            if (n > 1) {
+                                // a multi-slot card: the pupil erases the boxes and fills them again; every box feeds the
+                                // hidden card input (joined with ", ") and the card is graded the moment the LAST box is in,
+                                // so one round of entries is one wrong check (not one per box)
+                                const boxes = Array.from(document.querySelectorAll('#ws_card_0 input')).filter(e => e !== inp && !e.disabled && e.type !== 'hidden' && e.type !== 'checkbox');
+                                const fire = (b) => b.dispatchEvent(new Event('input', { bubbles: true }));
+                                const before = q0._wrongChecks || 0;
+                                if (boxes.length >= n) { boxes.forEach(b => { b.value = ''; fire(b); }); boxes.forEach((b, j) => { b.value = String(7770 + k + j); fire(b); }); }
+                                else inp.value = Array.from({ length: n }, (_, j) => String(7770 + k + j)).join(', ');
+                                if ((q0._wrongChecks || 0) === before) W.checkWorksheetAnswer(0);
+                                return true;
+                            }
                             inp.value = String((Number(q0.ans) || 0) + 7777 + k); W.checkWorksheetAnswer(0); return true;
                         };
                         if (value === 0) { if (card()) fail('screen/worksheet', 'skipAfter 0 must render no per-card Skip'); }
