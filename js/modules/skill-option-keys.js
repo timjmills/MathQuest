@@ -161,6 +161,7 @@ export const MULTI_KEYS = Object.freeze({
     jumps: '2V',         // count_by_tables: the row runs to 12 or to 15 jumps
     gaps: '2W',          // hundreds_chart_fill, number_chart_fill: which squares are empty (scatter / row / column / pattern)
     grid: '2X',          // hundreds_chart_fill, number_chart_fill: the grid size (window / rows / whole)
+    onePage: '2Y',       // count_by_tables: all twelve tables, x 1 to x 12, on one page
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -382,7 +383,7 @@ export const SCALAR_ONLY = Object.freeze({
     // P9 step 8 (block 0)
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
-    missing: 'decimal', rule: 'bool', jumps: 'decimal',
+    missing: 'decimal', rule: 'bool', jumps: 'decimal', onePage: 'bool',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
     // block 6 (O2 ladders)

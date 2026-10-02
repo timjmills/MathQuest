@@ -97,8 +97,17 @@ function normaliseRequest(req = {}) {
             noCap: !!(s && s.noCap),
         }))
         .filter((s) => s.skills.length);
+    // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
+    // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
+    let onePage = false;
+    for (const sec of sections) {
+        const on = sec.skills.some((k) => {
+            try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+        });
+        if (on) { sec.count = 12; sec.pages = 1; sec.columns = 1; onePage = true; }
+    }
     return {
-        role, size, look, paper, seed, sections,
+        role, size: onePage ? 'S' : size, look, paper, seed, sections,
         form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
@@ -851,7 +860,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         visual: !!q.visual,
         footprint: fp,
         fclass: footprintClass(q, template, printSize),
-        cellCls: legacy ? 'mq-legacy' : '',
+        cellCls: (legacy ? 'mq-legacy' : '') + (q.cell && q.cell.payload && q.cell.payload.compact ? ' ws-cell-compact' : ''),
         key,
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.

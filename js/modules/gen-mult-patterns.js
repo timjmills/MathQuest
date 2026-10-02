@@ -111,9 +111,12 @@ export function genCountByTables(q) {
     } else {
         t = tables[idx % tables.length];
     }
+    // Owner 2026-10-02: "All 12 tables on one page" deals x 1 to x 12 in order on a printed page (live play deals as usual).
+    const onePage = !!opt('onePage') && Number.isFinite(state.itemIndex);
+    if (onePage) t = (idx % 12) + 1;
     _lastTable = t;
     // Wave 1 lane C: the row runs to 12 or 15 jumps; the first one, two or about half the numbers print.
-    const n = Number(opt('jumps')) === 15 ? 15 : 12;
+    const n = !onePage && Number(opt('jumps')) === 15 ? 15 : 12;
     const values = Array.from({ length: n }, (_, i) => t * (i + 1));
     const pct = Number(opt('missing')) || 50;
     const fill = opt('fill') || 'two';
@@ -143,6 +146,7 @@ export function genCountByTables(q) {
     q.hint = `Each number is ${t} more than the one before. Count on by ${t}.`;
     q.skillLabel = `Count by ${t}`;
     const payload = { values, blanks, look: 'arcs', tab: String(t), shape };
+    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // twelve rows on one page: tighter chrome, digits at the S working size
     q.cell = { template: 'count-row', v: 1, payload };
     q.visual = k2Twin('count-row', payload);
     q.printFormat = 'count-row';

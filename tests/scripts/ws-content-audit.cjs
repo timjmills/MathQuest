@@ -916,6 +916,12 @@ function countByRules(items, F) {
             const fill = it.countBy.fill || 'one', nJ = it.countBy.jumps || 12;
             if (![12, 15].includes(values.length) || values.length !== nJ || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the ${nJ} multiples of ${step}: ${values.join(', ')}`);
             if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
+            // ONE PAGE (owner 2026-10-02): rows are x 1 .. x 12 in order, twelve jumps long whatever "jumps" says.
+            if (it.opts && it.opts.onePage) {
+                const at = live.filter(x => x.cellT === 'count-row' && x.countBy).indexOf(it);
+                if (step !== (at % 12) + 1) bad.row.push(`one page: row ${at + 1} counts by ${step}, not ${(at % 12) + 1}`);
+                if (values.length !== 12) bad.row.push(`one page: a row of ${values.length} jumps (must be 12)`);
+            }
             if (fill !== 'one' && blanks.includes(1)) bad.row.push(`the second number is blank under fill=${fill}`);
             const pool = values.length - (fill === 'one' ? 1 : 2);
             const k = fill === 'half' ? Math.min(pool, Math.floor(values.length / 2)) : (pct >= 100 ? pool : Math.max(1, Math.round(pct / 100 * pool)));
@@ -1008,7 +1014,8 @@ function bondRules(items, F) {
 
 /** Option values sampled besides the defaults, per skill (the count-by row and the number charts). */
 const OPTION_SWEEPS = {
-    'multiplication:count_by_tables': [{ fill: 'one' }, { fill: 'half' }, { jumps: 15 }, { jumps: 15, fill: 'half' }, { order: 'mixed' }],
+    'multiplication:count_by_tables': [{ fill: 'one' }, { fill: 'half' }, { jumps: 15 }, { jumps: 15, fill: 'half' }, { order: 'mixed' },
+        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 }],
     'composing:hundreds_chart_fill': [
         { grid: 'rows' }, { grid: 'whole' }, { grid: 'whole', gaps: 'pattern' }, { grid: 'whole', gaps: 'row' }, { grid: 'whole', gaps: 'column' },
         { gaps: 'row' }, { gaps: 'column' }, { gaps: 'pattern' }, { grid: 'rows', gaps: 'row' }, { grid: 'rows', gaps: 'column' }, { gaps: 'row', tiles: 3 },

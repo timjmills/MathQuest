@@ -72,7 +72,7 @@ function geom(p, ctx) {
     // one box width for every table, so the rows of a page line up.
     const wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
     const tab = look === 'arcs' && p.tab ? TAB_MM[size] + 2 : 0;
-    const baseH = S(ctx).writeMm + 2.5;
+    const baseH = S(ctx).writeMm + (p.compact ? 2 : 2.5);   // compact (12 tables on one page): less chrome, never smaller digits
     let boxW = (look === 'arcs' ? PITCH[size] - GAP_MM : 14) + wide;
     let perRow = n;
     if (look === 'arcs') {
@@ -86,8 +86,9 @@ function geom(p, ctx) {
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
-    const arcH = look === 'arcs' ? 3.8 : 0;
-    const pt = Math.min(digitPt(ctx) * 0.64, 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
+    const arcH = look === 'arcs' ? (p.compact ? 3 : 3.8) : 0;
+    // the compact page prints its digits at the size's working size (16 pt at S, TY-10), not the 0.64 of it
+    const pt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
     return { size, n, look, shape, w: sz.w, h: sz.h, pitch, tab, perRow, rows, arcH, pt };
 }
 

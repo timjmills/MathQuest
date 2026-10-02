@@ -1320,6 +1320,13 @@ const CB_CHART_LINE_OPTIONS = {
             values: [{ v: 12, l: '12 jumps (to 12 ×)' }, { v: 15, l: '15 jumps (to 15 ×; the row wraps to two lines)' }],
             help: 'How many numbers the row holds: 12 (the table to × 12) or 15 (on to × 15).',
         },
+        {
+            // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
+            id: 'onePage', label: 'All 12 tables on one page', type: 'bool', default: false, group: 'layout',
+            help: 'Prints exactly twelve rows, the tables x 1 to x 12 in order, on ONE page (and its key on one page), at the smallest print size so all twelve fit. '
+                + 'The row is always 12 jumps long (15 jumps cannot fit, so "Line runs to" is ignored) and the ticked tables and "Order of the rows" are ignored. '
+                + 'The numbers printed to start and "Numbers left blank" still apply, up to every number after the starting ones left blank.',
+        },
         _cbPercent(50),
         {
             id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
