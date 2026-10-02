@@ -102,10 +102,21 @@ export function genCountByTables(q) {
         t = tables[idx % tables.length];
     }
     _lastTable = t;
-    const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
+    // Wave 1 lane C: the row runs to 12 or 15 jumps; the first one, two or about half the numbers print.
+    const n = Number(opt('jumps')) === 15 ? 15 : 12;
+    const values = Array.from({ length: n }, (_, i) => t * (i + 1));
     const pct = Number(opt('missing')) || 50;
-    const pool = Array.from({ length: 11 }, (_, i) => i + 1);          // the first number always shows
-    const blanks = spreadBlanks(pool, pctCount(pct, 11));
+    const fill = opt('fill') || 'two';
+    let blanks;
+    if (fill === 'half') {
+        // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
+        const pool = Array.from({ length: n - 2 }, (_, i) => i + 2);
+        blanks = spreadBlanks(pool, Math.min(pool.length, Math.floor(n / 2)));
+    } else {
+        const skip = fill === 'one' ? 1 : 2;                              // the numbers that always show
+        const pool = Array.from({ length: n - skip }, (_, i) => i + skip);
+        blanks = spreadBlanks(pool, pctCount(pct, pool.length));
+    }
     const parts = blanks.map(i => values[i]);
     const shape = opt('shape') || 'box';
 
@@ -117,8 +128,8 @@ export function genCountByTables(q) {
     q.answerType = 'text';
     q.selfAnswering = true;
     q.options = [];
-    q.a = t; q.b = 12; q.op = '×';
-    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct };
+    q.a = t; q.b = n; q.op = '×';
+    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n };
     q.hint = `Each number is ${t} more than the one before. Count on by ${t}.`;
     q.skillLabel = `Count by ${t}`;
     const payload = { values, blanks, look: 'arcs', tab: String(t), shape };

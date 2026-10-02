@@ -104,6 +104,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '8D-8O', owner: 'build lane data' }),
     Object.freeze({ keys: '8P-8Z', owner: 'build lane numtheory' }),
     Object.freeze({ keys: '5N-5Z', owner: 'lessons, support ladder and later waves' }),
+    Object.freeze({ keys: '2U-2Z', owner: 'wave 1 lane C: skip-count lines and the number grid' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -155,6 +156,11 @@ export const MULTI_KEYS = Object.freeze({
     ticks: '2E',         // nl_mult, nl_div: labels every step / every number
     shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
     // NEXT FREE IN BLOCK 2: 2G.
+    // Lane C sub-range 2U-2Z (wave 1): skip-count lines and the number grid.
+    fill: '2U',          // count_by_tables: how many numbers are printed at the start (two / one / half)
+    jumps: '2V',         // count_by_tables: the row runs to 12 or to 15 jumps
+    gaps: '2W',          // hundreds_chart_fill, number_chart_fill: which squares are empty (scatter / row / column / pattern)
+    grid: '2X',          // hundreds_chart_fill, number_chart_fill: the grid size (window / rows / whole)
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -314,6 +320,10 @@ export const VALUE_TOKENS = Object.freeze({
         // O6 appearance (lane AP3): "Numbers on the line" on + / − lines, drag-onto-the-line and read-the-line items
         some: 'M', ends: 'E' }),
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
+    // lane C (2U-2X)
+    fill: Object.freeze({ two: 'T', one: 'O', half: 'H' }),
+    gaps: Object.freeze({ scatter: 'S', row: 'R', column: 'C', pattern: 'P' }),
+    grid: Object.freeze({ window: 'W', rows: 'R', whole: 'F' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
     // block 7 (option-panel round 3)
@@ -372,7 +382,7 @@ export const SCALAR_ONLY = Object.freeze({
     // P9 step 8 (block 0)
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
-    missing: 'decimal', rule: 'bool',
+    missing: 'decimal', rule: 'bool', jumps: 'decimal',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
     // block 6 (O2 ladders)

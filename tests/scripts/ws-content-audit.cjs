@@ -886,11 +886,14 @@ function countByRules(items, F) {
         const p = it.cellP || {};
         if (it.cellT === 'count-row' && it.countBy) {
             const { step, values, blanks, pct } = it.countBy;
-            if (values.length !== 12 || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the 12 multiples of ${step}: ${values.join(', ')}`);
+            const fill = it.countBy.fill || 'one', nJ = it.countBy.jumps || 12;
+            if (![12, 15].includes(values.length) || values.length !== nJ || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the ${nJ} multiples of ${step}: ${values.join(', ')}`);
             if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
-            const k = pct >= 100 ? 11 : Math.max(1, Math.round(pct / 100 * 11));
-            if (blanks.length !== k) bad.row.push(`${pct}% blank should leave ${k} of 11 gaps, not ${blanks.length}`);
-            if (pct < 100 && blanks.length && blanks.every((b, i) => b === 12 - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
+            if (fill !== 'one' && blanks.includes(1)) bad.row.push(`the second number is blank under fill=${fill}`);
+            const pool = values.length - (fill === 'one' ? 1 : 2);
+            const k = fill === 'half' ? Math.min(pool, Math.floor(values.length / 2)) : (pct >= 100 ? pool : Math.max(1, Math.round(pct / 100 * pool)));
+            if (blanks.length !== k) bad.row.push(`${fill} / ${pct}% blank should leave ${k} of ${pool} gaps, not ${blanks.length}`);
+            if (pct < 100 && blanks.length && blanks.every((b, i) => b === values.length - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
             const key = keyOf(it);
             if (key.join(',') !== blanks.map(i => values[i]).join(',')) bad.row.push(`the key ${key.join(', ')} is not the row at its gaps`);
             if (JSON.stringify(p.values) !== JSON.stringify(values) || JSON.stringify(p.blanks) !== JSON.stringify(blanks)) bad.row.push('the drawn row is not the declared row');

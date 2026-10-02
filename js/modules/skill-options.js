@@ -1112,6 +1112,24 @@ Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
 // Read by js/modules/gen-counting.js (its `_kOpt()` reads) and drawn by the kit's counters /
 // compare templates. Defaults reproduce the stand-alone page (R2).
 const _k2CountTo = (values, dflt) => _opsBand(values, dflt, { label: 'Count to', help: 'The largest number on the page.' });
+/** Wave 1 lane C: the number-grid options (grid size, which squares are empty). Hoisted so P11_K2_OPTIONS can spread it. */
+function _gridOptions() {
+    return [
+        {
+            id: 'grid', label: 'Grid size', type: 'enum', default: 'window', group: 'layout',
+            values: [{ v: 'window', l: 'A small piece (3 rows of 5)' }, { v: 'rows', l: 'Three whole rows of ten' },
+                { v: 'whole', l: 'The whole chart (to "Numbers to")' }],
+            help: 'A small piece is cut from anywhere in the chart. Whole rows of ten show the down-ten pattern in full. The whole chart is one grid to a page.',
+        },
+        {
+            id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
+            values: [{ v: 'scatter', l: 'Scattered anywhere (default)' }, { v: 'row', l: 'A run along one row (count on by 1)' },
+                { v: 'column', l: 'A run down one column (count on by 10)' }, { v: 'pattern', l: 'Every other square in a row' }],
+            help: '"Empty boxes" says how many (in each row, on three rows or the whole chart). A run keeps at least one printed number at each end to count from. Every other square needs a row of at least four.',
+        },
+    ];
+}
+
 const P11_K2_OPTIONS = {
     'counting:count_objects': [
         _k2CountTo([5, 10, 20], 20),
@@ -1214,6 +1232,7 @@ const P11_K2_OPTIONS = {
             values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6, 7].map(n => ({ v: n, l: `${n} boxes` }))],
             help: 'How many numbers the pupil writes in each window.',
         },
+        ..._gridOptions(),
     ],
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
@@ -1287,6 +1306,20 @@ const _hopLine = (div) => [
 const CB_CHART_LINE_OPTIONS = {
     'multiplication:count_by_tables': [
         _cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'),
+        {
+            // Wave 1 lane C (owner, overdue): the first two numbers print so the pupil can SEE the step.
+            id: 'fill', label: 'Numbers printed to start', type: 'enum', default: 'two', group: 'support',
+            values: [{ v: 'two', l: 'The first two (shows the step)' }, { v: 'one', l: 'The first one only' },
+                { v: 'half', l: 'Half of them (50 % filled, the first two and others spread along the row)' }],
+            help: 'The first two numbers are printed so the pupil can see how much each jump adds; "Numbers left blank" then applies to the rest. '
+                + 'The first one only is the older, harder row. Half prints half the numbers (the first two always) spread along the row and ignores "Numbers left blank". '
+                + 'At least one number is always left to write.',
+        },
+        {
+            id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'layout',
+            values: [{ v: 12, l: '12 jumps (to 12 ×)' }, { v: 15, l: '15 jumps (to 15 ×; the row wraps to two lines)' }],
+            help: 'How many numbers the row holds: 12 (the table to × 12) or 15 (on to × 15).',
+        },
         _cbPercent(50),
         {
             id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
@@ -2904,6 +2937,7 @@ SKILL_OPTIONS['composing:number_chart_fill'] = [
         values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6].map(n => ({ v: n, l: `${n} boxes` }))],
         help: 'How many numbers the pupil writes in each window (3 rows of 4): at most two in a row, never side by side.',
     },
+    ..._gridOptions().slice(1),
 ];
 // ============================ end O6 · AP1 · K-2 picture kind ============================
 
