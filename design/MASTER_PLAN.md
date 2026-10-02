@@ -16,7 +16,7 @@ below. "Today" says what the code does now (checked 2026-10-02 on `claude/sweet-
 deployed tree for these files). **The owner orders the waves before work starts.**
 
 **Standing rules:**
-- An independent critic scores ≥ 8 before anything merges.
+- An independent critic scores ≥ 8 before anything merges. **Critic feedback must be actionable (owner 2026-10-02):** every defect names where (file:line or PNG + item), what is wrong (observed vs expected, measured), which criterion it costs, and the exact fix plus the check that proves it; every criterion below 10 says what would raise it to 10. No vague items.
 - Full gates, stamp, then deploy. **Check economy (owner 2026-10-02):** while building, a lane runs only targeted browser gates (`--skills` / `--category` for what it touched, or a ~20-skill cross-family sample for a global change) plus `ws-boot-smoke` and the non-browser unit gates; the full sweeps (`ws-screen-answer`, `ws-screen-slots`, `ws-share-options`, `ws-content-audit`, `ws-print-lint --source kit`) run once on the merged tree before each deploy. Nothing is skipped: every full gate still runs before anything ships.
 - At most 8 agents. Browser gates: **two at a time** (owner trial 2026-10-02; back to one if the machine is overloaded) via `/tmp/mq-browser-run.sh <cmd>`; stress/load tests run `--exclusive`; `echo 1 > /tmp/mq-browser-slots` reverts to one. Agents run on **Opus 5.5 at low effort** by default (owner, 2026-10-02, replacing Sonnet low); escalate to Opus medium at most, only for a persistent unsolved issue (see CLAUDE.md "Agents").
 - `design/STATUS.md` is updated after each wave.
