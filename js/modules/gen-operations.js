@@ -2085,7 +2085,7 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s']);
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s', 'multiply']);
 // Adding and subtracting tens / hundreds ("60 + 10 = [ ]") are mental facts read across, whatever
 // their digits: the kit's horizontal fact, never a column (lint AK-4 on the legacy cell, 2026-09-26).
 const _KIT_ACROSS_SKILLS = new Set(['add_sub_10s', 'add_sub_100s']);

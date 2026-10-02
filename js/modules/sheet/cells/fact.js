@@ -219,7 +219,7 @@ const ACROSS_TIGHT_GAP_EM = 0.18;
 /** The drawn height of a vertical fact (em): two operand rows, the rule, the answer zone. */
 const VERT_FACT_EM = 3.6;
 /** An across fact whose answer stays beside it is one line tall (em): the line, and room to write. */
-const BESIDE_FACT_EM = 2.5;
+const BESIDE_FACT_EM = 1.6;
 /** Advance of one Andika digit (em), for the width estimates below. */
 const DIGIT_EM = 0.56;
 /** A cell's content width at `cols` columns: the nominal width less the side pads and borders. */
@@ -312,7 +312,10 @@ register('fact', {
             // height whichever way it is drawn), the spare below the answer (PG-14). So the
             // same item measured across at 1 column and vertical at 5 is one height, not a
             // "collapse" (the host's reflow check), and the answer stays in the top half (CL-4).
-            const hold = ctx.mode === 'screen' ? '' : `min-height:${p.across === 'beside' ? BESIDE_FACT_EM : VERT_FACT_EM}em;`;
+            // `across: 'beside'` holds no spare height: the one line stands in the MIDDLE of its cell
+            // (margin:auto), so a row stretched to share the page splits its spare above and below
+            // (wave 1 lane D: the line pinned to the top of a cell half empty under it).
+            const hold = ctx.mode === 'screen' ? '' : p.across === 'beside' ? 'margin:auto 0;' : `min-height:${VERT_FACT_EM}em;`;
             if (acrossForm(p, ctx, pt) === 'below') {
                 // DN-22's "answer stacked below": the sentence on one line with tighter operator
                 // tracks, the same answer line under it, centred. Its width is the sentence

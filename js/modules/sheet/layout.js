@@ -745,8 +745,13 @@ export const measuredH = (it, cols) => {
  * shortest); problems of one height keep their order (a stable sort).
  */
 export function groupByHeight(items, cols) {
-    const hs = items.map((it) => measuredH(it, cols));
-    if (hs.some((h) => !h)) return items;
+    const hs0 = items.map((it) => measuredH(it, cols));
+    // A legacy cell carries no trusted height (measuredH 0): it is grouped as the tallest problem
+    // the section measured, so a mixed pool with one legacy cell still pairs its short problems
+    // with short ones (wave 1 lane D: a 22 mm ten frame beside a 60 mm chart window, H13).
+    const known = hs0.filter((h) => h > 0);
+    if (!known.length || known.length < items.length / 2) return items;
+    const hs = hs0.map((h) => h || Math.max(...known));
     const lo = Math.min(...hs), hi = Math.max(...hs);
     if (!(hi > lo * 1.6)) return items;
     // Height CLASSES, tallest class first; within a class the dealt order stands (critic
@@ -768,7 +773,8 @@ export function rowShape(items, cols, rows, cellH) {
     const w = [];
     const mins = [];
     for (let r = 0; r < rows; r++) {
-        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols));
+        // a legacy cell (no trusted height) keeps the layout's full row height (cellH)
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols) || (it && (it.legacy || it.template === 'legacy') ? cellH : 0));
         if (!hs.length || hs.some((h) => !h)) return null;
         w.push(Math.max(...hs));
         mins.push(Math.min(...hs));

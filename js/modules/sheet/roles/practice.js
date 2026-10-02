@@ -26,7 +26,7 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
+    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH,
 } from '../layout.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -259,6 +259,8 @@ export const SHEET_ENGINE_CSS = `
 /* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
+/* a practice grid (and one stretched to share its page) holds every problem in the middle of its cell */
+:is(.ws-page,.ws-sheet) .ws-grid.mq-spread>.ws-cell{justify-content:center}
 /* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
@@ -617,6 +619,34 @@ export function splitCellH(L, rowsUsed = 0) {
     return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
 }
 
+/** A centred cell's content may be stretched to this multiple before a band passes 30 % (H13). */
+export const SPREAD_CAP = 1.9;
+
+/**
+ * The rows of a lone grid that leaves more than a fifth of its page empty, stretched to share the
+ * page: each row as tall as its tallest problem x k, k the same for every row, no row past
+ * SPREAD_CAP x its shortest problem, the grid no taller than the page's grid less 1 mm (PG-12). null when
+ * the grid already fills four fifths of the page or nothing is measured.
+ */
+export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
+    if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.8 * availMm) return null;
+    const w = [], mins = [];
+    for (let r = 0; r < rows; r++) {
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols)).filter((h) => h > 0);
+        w.push(hs.length ? Math.max(...hs) : hMin || baseMm / rows);
+        mins.push(hs.length ? Math.min(...hs) : w[r]);
+    }
+    const S = w.reduce((a, b) => a + b, 0);
+    if (!(S > 0)) return null;
+    // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
+    // problem beside a tall one would otherwise sit in a band of a third of its cell)
+    const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
+    const H = w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r])));
+    const total = H.reduce((a, b) => a + b, 0);
+    if (total <= baseMm + 0.5) return null;
+    return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
+}
+
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
@@ -935,15 +965,25 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
             const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            // SPREAD (wave 1 lane D, 2026-10-02): a lone grid that leaves more than a fifth of its
+            // page under it (a count the teacher set, a page at its item ceiling) shares the page
+            // height among its rows instead - each row up to SPREAD_CAP x what it holds, every
+            // cell's content in its MIDDLE (so the spare splits above and below, never one band
+            // over 30 %, RUBRIC H13). Never gaps between rows (the owner's spare-height rule).
+            // (one-page sections only: a section over several pages keeps one cell height, PT-ENG-6)
+            const spread = !gap.gap && lone && (laidOut.chunksBySection[part.section] || []).length === 1 && baseMm && !noCapSec && !its.some((it) => it.anchor) && !L.blocks
+                ? spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin) : null;
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
                 rows: part.chunk.rows,
                 labels: labelStyle,
                 start,
-                cls: fillByFlex && !shape ? '' : 'fixed',
-                height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
-                rowsTpl: shape ? shape.rowsTpl : '',
+                // every practice cell holds its problem in the middle (mq-spread): a row taller than one
+                // of its problems splits the spare above and below it (H13), never one band under it
+                cls: spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread',
+                height: spread ? `${spread.heightMm}mm` : gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
+                rowsTpl: spread ? spread.rowsTpl : shape ? shape.rowsTpl : '',
                 rowGap: gap.gap || 0,
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
