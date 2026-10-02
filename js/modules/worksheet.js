@@ -971,8 +971,14 @@ let _wsLayoutTimers = [];
 function _wsScheduleLayout(grid) {
     _wsLayoutTimers.forEach(t => clearTimeout(t));
     layoutWorksheetGrid(grid);
+    // data-mq-laid-out is '0' while later passes are still due and '1' once the last has run: a
+    // card moves (columns re-fit) until then, so a driver must not tap by coordinates before it
+    grid.dataset.mqLaidOut = '0';
     // widgets and their stylesheets mount a moment later (dynamic import): lay out again
-    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => layoutWorksheetGrid(grid), ms));
+    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => {
+        layoutWorksheetGrid(grid);
+        if (ms === 900) grid.dataset.mqLaidOut = '1';
+    }, ms));
 }
 if (typeof window !== 'undefined') {
     let _wsResizeT = 0;

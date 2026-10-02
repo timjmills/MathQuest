@@ -422,7 +422,19 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3;
                 window.initWorksheet();
             }, c, k, hash(s + ':ws'));
-            await sleep(700);
+            // Wait for the real condition, not a fixed time: the app re-fits the worksheet's columns on
+            // timers (80 / 320 / 900 ms, later under load), and a card moves each time. Taps are made
+            // at coordinates, so they must start after the last pass and once every card holds still.
+            await page.waitForFunction(() => {
+                const g = document.getElementById('worksheetGrid');
+                return !!g && g.dataset.mqLaidOut === '1' && document.fonts.status === 'loaded';
+            }, { timeout: 30000 });
+            await page.waitForFunction(() => new Promise((res) => {
+                const snap = () => Array.from(document.querySelectorAll('#worksheetGrid .problem-card')).map(c => { const r = c.getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round).join(','); }).join(';');
+                let last = snap(), same = 0;
+                const tick = () => { const now = snap(); same = now === last ? same + 1 : 0; last = now; same >= 5 ? res(true) : requestAnimationFrame(tick); };
+                requestAnimationFrame(tick);
+            }), { timeout: 30000 });
             const n = await page.evaluate(() => window.state.worksheetQs.length);
             let err = '';
             for (let i = 0; i < n; i++) {
