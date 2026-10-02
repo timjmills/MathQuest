@@ -5,7 +5,7 @@
 // any step via Skip tour, the close ✕, the dark backdrop, or Escape.
 
 const STEPS = [
-    { sel: '.start-game-btn',        title: "Start your adventure!", body: "Tap this big orange button when you're ready to play." },
+    { sel: '.student-start-btn',      title: "Start your adventure!", body: "Tap this big orange button when you're ready to play." },
     { sel: '#quickSkillsGrid',       title: "Pick a skill",          body: "Tap a card to choose what to practice. You can select more than one!" },
     { sel: '.role-toggle-container', title: "Student or Teacher",    body: "Switch between modes here. Teachers see more options for setup and printing." },
     { sel: '#sfxToggle',             title: "Sound on or off",       body: "Turn sound effects on for celebrations, or off for quiet practice." }

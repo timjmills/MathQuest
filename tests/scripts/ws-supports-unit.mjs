@@ -187,7 +187,7 @@ ok('compat values', S.SUPPORT_IDS.every((x) => S.SUPPORT_IDS.every((y) => ['ok',
             ok(`${cat}:${sk.v} support values have tokens`, def.values.every((x) => x.v in union));
             ok(`${cat}:${sk.v} render ids are support ids`, def.render.every((v) => S.SUPPORT_IDS.includes(v)));
             const defs = SO.offeredOptionsFor(cat, sk.v);
-            const resting = defs.filter((d) => !(typeof d.appliesTo === 'function' && !d.appliesTo(SO.defaultOptions(cat, sk.v))));
+            const resting = SO.restingOptions(defs, SO.defaultOptions(cat, sk.v));
             const on = defs.filter((d) => !(typeof d.appliesTo === 'function' && !d.appliesTo(Object.assign(SO.defaultOptions(cat, sk.v), { support: [def.render[0]] }))));
             ok(`${cat}:${sk.v} panel ≤ 5 controls at rest`, resting.length <= 5, String(resting.length));
             ok(`${cat}:${sk.v} cover appears once a support is on`, on.some((d) => d.id === 'cover') && !resting.some((d) => d.id === 'cover'));

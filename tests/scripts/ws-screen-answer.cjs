@@ -8,6 +8,12 @@
 //   node tests/scripts/ws-screen-answer.cjs --hosts card,quiz
 //   node tests/scripts/ws-screen-answer.cjs --family pv           # P9 place value, rounding, estimation
 //
+//   node tests/scripts/ws-screen-answer.cjs --stress 10 [--hosts worksheet ...]
+//        starts one CPU burner per core, then runs this script N times in a row (every other flag is
+//        passed through) and prints `ws-screen-answer --stress: K/N passes`; exit 1 unless K = N.
+//        Run it as: /tmp/mq-browser-run.sh --exclusive node tests/scripts/ws-screen-answer.cjs --stress 10
+//   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
+//
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
 
@@ -374,7 +380,30 @@ async function liveGreen(page) {
 
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
-(async () => {
+// --stress N: one command that loads the CPU and repeats the whole run N times.
+if (has('stress')) {
+    const { spawn, spawnSync } = require('child_process');
+    const os = require('os');
+    const n = Math.max(1, parseInt(arg('stress', '10'), 10) || 10);
+    const passthru = []; const a = process.argv.slice(2);
+    for (let i = 0; i < a.length; i++) { if (a[i] === '--stress') { i++; continue; } passthru.push(a[i]); }
+    const burners = Array.from({ length: os.cpus().length }, () => spawn(process.execPath, ['-e', 'for(;;){}'], { stdio: 'ignore' }));
+    let passes = 0;
+    try {
+        for (let i = 1; i <= n; i++) {
+            const t = Date.now();
+            const r = spawnSync(process.execPath, [__filename, ...passthru], { encoding: 'utf8', maxBuffer: 64 << 20 });
+            const ok = r.status === 0 && /ws-screen-answer: OK/.test(r.stdout);
+            if (ok) passes++;
+            console.log(`stressed run ${i}/${n}: ${ok ? 'OK' : 'FAIL'} (${((Date.now() - t) / 1000).toFixed(1)} s, ${burners.length} CPU burners)`);
+            if (!ok) console.log((r.stdout || '').split('\n').filter(l => !/ ok( |$)/.test(l)).slice(-25).join('\n') + (r.stderr || ''));
+        }
+    } finally { burners.forEach(b => b.kill('SIGKILL')); }
+    console.log(`ws-screen-answer --stress: ${passes}/${n} passes`);
+    console.log(passes === n ? 'ws-screen-answer: OK' : 'ws-screen-answer: FAIL');
+    process.exit(passes === n ? 0 : 1);
+}
+else (async () => {
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;
     const fails = [];
@@ -422,7 +451,28 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3;
                 window.initWorksheet();
             }, c, k, hash(s + ':ws'));
-            await sleep(700);
+            // Wait for the real condition, not a fixed time: the app re-fits the worksheet's columns on
+            // timers (80 / 320 / 900 ms, later under load), and a card moves each time. Taps are made
+            // at coordinates, so they must start after the last pass and once every card holds still.
+            const WAIT = parseInt(arg('wait-timeout', '30000'), 10);
+            const waitFail = async (which, e) => {
+                const st = await page.evaluate(() => { const g = document.getElementById('worksheetGrid'); return `flag=${g ? g.dataset.mqLaidOut : 'no grid'}, fonts=${document.fonts.status}`; }).catch(() => 'page unreadable');
+                throw new Error(`${c}:${k} worksheet: ${which} not reached in ${WAIT >= 1000 ? WAIT / 1000 + ' s' : WAIT + ' ms'} (${st}) [${e.message}]`);
+            };
+            try {
+                await page.waitForFunction(() => {
+                    const g = document.getElementById('worksheetGrid');
+                    return !!g && g.dataset.mqLaidOut === '1' && document.fonts.status === 'loaded';
+                }, { timeout: WAIT });
+            } catch (e) { await waitFail('layout flag data-mq-laid-out=1 and fonts loaded', e); }
+            try {
+              await page.waitForFunction(() => new Promise((res) => {
+                const snap = () => Array.from(document.querySelectorAll('#worksheetGrid .problem-card')).map(c => { const r = c.getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round).join(','); }).join(';');
+                let last = snap(), same = 0;
+                const tick = () => { const now = snap(); same = now === last ? same + 1 : 0; last = now; same >= 5 ? res(true) : requestAnimationFrame(tick); };
+                requestAnimationFrame(tick);
+              }), { timeout: WAIT });
+            } catch (e) { await waitFail('5 stable card-position frames', e); }
             const n = await page.evaluate(() => window.state.worksheetQs.length);
             let err = '';
             for (let i = 0; i < n; i++) {

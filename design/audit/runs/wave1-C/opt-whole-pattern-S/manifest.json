@@ -1,0 +1,124 @@
+[
+  {
+    "skill": "composing:hundreds_chart_fill",
+    "category": "composing",
+    "skillId": "hundreds_chart_fill",
+    "label": "Hundreds Chart - Find the Missing Number (Visual)",
+    "grade": "1",
+    "dir": "composing__hundreds_chart_fill",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 1,
+          "perPage": 1,
+          "pages": 1,
+          "note": "Fits: 1 column x 1 rows, 1 per page, 1 page. Digits 16 pt. Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 1,
+              "perPage": 1,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 228,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+              "line": "Fits: 1 column x 1 rows, 1 per page, 1 page. Digits 16 pt. Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+              "cls": "short",
+              "digitPt": 16,
+              "hMin": 161.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 612640,
+        "title": "I Can find missing numbers on a hundreds chart",
+        "notes": [
+          "Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "1, 3, 5, 7, 9, 12, 14, 16, 18, 20, 21, 23, 25, 27, 29, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 52, 54, 56, 58, 60, 61, 63, 65, 67, 69, 72, 74, 76, 78, 80, 81, 83, 85, 87, 89, 92, 94, 96, 98, 100",
+            "measured": {
+              "1": {
+                "hMm": 161.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 161.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 161.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 161.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 161.1,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 94,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 147,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            1
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 65
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            1
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 115
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

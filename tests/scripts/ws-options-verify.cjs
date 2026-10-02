@@ -371,7 +371,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         const clashing = supDef.render.filter(v => !['boxsign', 'startarrow', 'steps', 'round-mark'].includes(v));
         return { support: [...keep, ...clashing.slice(0, 2)] };
     };
+    // BEHAVIOUR OPTIONS (Wave 1 lane A, 2026-10-02): `calculator` and `skipAfter` change what the
+    // pupil's screen offers (a calculator button, a Skip button), never the items. They are checked
+    // by their OWN behaviour test below (not "differs from the default"): generation and the printed
+    // page must be UNCHANGED, the value must round-trip a share code, and the screen gate must obey it.
+    const BEHAVIOUR = { calculator: [true], skipAfter: [0, 2, 20] };
     for (const def of defs) {
+        if (BEHAVIOUR[def.id]) { for (const v of BEHAVIOUR[def.id]) tries.push({ def, value: v, behaviour: true }); continue; }
         if (supDef && (def.id === 'cover' || def.id === 'mix')) {
             const base = supportBase(def.id);
             for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, base, renderOnly: true });
@@ -519,6 +525,82 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             r.checks.trip = JSON.stringify(back) === JSON.stringify(packed) ? 'ok' : 'fail';
             if (r.checks.trip === 'fail') fail('trip', `packed ${JSON.stringify(packed)} -> "${suffix}" -> ${JSON.stringify(back)}`);
         } catch (e) { r.checks.trip = 'fail'; fail('trip', String(e && e.message || e)); }
+
+        if (t.behaviour) {
+            // generation and print unchanged
+            const bi = gen(opts, APP_RANGE), bd = dfltAt(APP_RANGE);
+            if (!bi.length) fail('gen', 'no items');
+            else if (differs(bi, bd) === true) fail('gen', 'a behaviour option changed the generated items (it must not)');
+            r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
+            const bp = await sheet(opts, APP_RANGE), bpd = await sheet({}, APP_RANGE);
+            if (bp.error) fail('print', `buildSheet threw: ${bp.error}`);
+            else if (!bpd.error && bp.pupil !== bpd.pupil) fail('print', 'a behaviour option changed the printed page (it must not)');
+            r.checks.print = r.fails.some(f => f.startsWith('print:')) ? 'fail' : 'ok';
+            // screen behaviour: the value is put in the set's store, as a queue / link / Quick Start does
+            const sv = { category: st.category, skill: st.skill, range: st.range, skillOptions: st.skillOptions, gameMode: st.gameMode, currentQ: st.currentQ, att: st.currentQAttempts };
+            try {
+                W.clearSetOptions({ silent: true });
+                W.setSetOptions(categoryId, skillId, opts, { silent: true });
+                st.category = categoryId; st.skill = skillId; st.range = APP_RANGE; st.skillOptions = null; st.gameMode = 'practice';
+                const q = W.generateQuestion();
+                if (!q || !q.skillOptions || q.skillOptions[def.id] !== value) fail('screen/practice', `the question does not carry ${def.id}=${JSON.stringify(value)} from the store`);
+                else if (def.id === 'calculator') {
+                    if (W.calcAllowedFor(q) !== true) fail('screen/practice', 'calculator on, but the screen gate says no');
+                    const off = Object.assign({}, q, { skillOptions: { ...q.skillOptions, calculator: false } });
+                    if (W.calcAllowedFor(off) !== false) fail('screen/practice', 'calculator off, but the screen gate says yes');
+                } else {
+                    st.currentQ = q;
+                    const at = (k) => { st.currentQAttempts = k; return W.isSkipAvailable(); };
+                    if (value === 0) { if (at(0) || at(5) || at(99)) fail('screen/practice', 'skipAfter 0 must never show Skip'); }
+                    else if (at(value - 1) || !at(value) || !at(value + 3)) fail('screen/practice', `Skip must appear at exactly ${value} wrong tries`);
+                }
+                if (def.id === 'skipAfter') {
+                    // online worksheet: the per-card Skip obeys the same value, counted per card.
+                    try {
+                        st.gameMode = 'worksheet';
+                        W.initWorksheet();
+                        await new Promise(res => setTimeout(res, 600));
+                        const card = () => document.querySelector('#ws_card_0 .ws-skip-btn');
+                        const shown = () => { const b = card(); return !!b && getComputedStyle(b).display !== 'none'; };
+                        const wrong = (k) => {
+                            const q0 = st.worksheetQs[0], inp = document.getElementById('ws_input_0') || document.querySelector('#ws_card_0 input');
+                            if (!q0 || !inp) return false;
+                            const n = q0._mqSlots | 0;
+                            if (n > 1) {
+                                // a multi-slot card: the pupil erases the boxes and fills them again; every box feeds the
+                                // hidden card input (joined with ", ") and the card is graded the moment the LAST box is in,
+                                // so one round of entries is one wrong check (not one per box)
+                                const boxes = Array.from(document.querySelectorAll('#ws_card_0 input')).filter(e => e !== inp && !e.disabled && e.type !== 'hidden' && e.type !== 'checkbox');
+                                const fire = (b) => b.dispatchEvent(new Event('input', { bubbles: true }));
+                                const before = q0._wrongChecks || 0;
+                                if (boxes.length >= n) { boxes.forEach(b => { b.value = ''; fire(b); }); boxes.forEach((b, j) => { b.value = String(7770 + k + j); fire(b); }); }
+                                else inp.value = Array.from({ length: n }, (_, j) => String(7770 + k + j)).join(', ');
+                                if ((q0._wrongChecks || 0) === before) W.checkWorksheetAnswer(0);
+                                return true;
+                            }
+                            inp.value = String((Number(q0.ans) || 0) + 7777 + k); W.checkWorksheetAnswer(0); return true;
+                        };
+                        if (value === 0) { if (card()) fail('screen/worksheet', 'skipAfter 0 must render no per-card Skip'); }
+                        else if (!card()) fail('screen/worksheet', 'no per-card Skip button rendered');
+                        else {
+                            let ok = true; const seen = [];
+                            for (let k = 1; k <= value + 1 && ok; k++) { ok = wrong(k); if (ok) seen.push(shown()); }
+                            if (!ok) warn('screen/worksheet', 'card 0 has no plain input: worksheet per-card count not exercised');
+                            else if (seen.slice(0, value - 1).some(Boolean) || !seen[value - 1]) fail('screen/worksheet', `per-card Skip must appear at exactly ${value} wrong checks (saw ${JSON.stringify(seen)})`);
+                            const other = document.querySelector('#ws_card_1 .ws-skip-btn');
+                            if (ok && other && getComputedStyle(other).display !== 'none') fail('screen/worksheet', 'card 1 Skip showed from card 0 wrong checks');
+                        }
+                    } finally { try { W.showView('homeView'); } catch (_) {} st.gameMode = 'practice'; }
+                }
+            } catch (e) { fail('screen/practice', String(e && e.message || e)); }
+            finally {
+                W.clearSetOptions({ silent: true });
+                Object.assign(st, { category: sv.category, skill: sv.skill, range: sv.range, skillOptions: sv.skillOptions, gameMode: sv.gameMode, currentQ: sv.currentQ, currentQAttempts: sv.att });
+            }
+            r.checks.screen = r.fails.some(f => f.startsWith('screen')) ? 'fail' : 'ok';
+            results.push(r);
+            continue;
+        }
 
         // (a) generation at the app's Max Number, then at the big one when inert / refused
         // A Max Number / Decimal places value EQUAL to the app setting is, by definition, the same

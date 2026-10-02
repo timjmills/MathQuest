@@ -14,6 +14,12 @@ export function selectMode(mode) {
     }
 }
 
+// Student home (Wave 1 item 1.6): each "Start ..." button picks its mode and starts it directly.
+export function startMode(mode) {
+    selectMode(mode);
+    if (typeof window.startGame === 'function') window.startGame();
+}
+
 export function shouldShowNextButton() {
     return ["practice", "boss", "race"].includes(state.gameMode);
 }

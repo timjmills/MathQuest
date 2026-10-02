@@ -1,0 +1,166 @@
+{
+  "skill": "composing:hundreds_chart_fill",
+  "category": "composing",
+  "skillId": "hundreds_chart_fill",
+  "label": "Hundreds Chart - Find the Missing Number (Visual)",
+  "grade": "1",
+  "dir": "composing__hundreds_chart_fill",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 3,
+        "perPage": 3,
+        "pages": 1,
+        "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 3,
+            "perPage": 3,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 3 rows per page.",
+            "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 62.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 612640,
+      "title": "I Can find missing numbers on a hundreds chart",
+      "notes": [
+        "Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "32, 42, 44, 49, 54, 59",
+          "measured": {
+            "1": {
+              "hMm": 62.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 62.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "10, 12, 16, 18, 20, 22, 26, 28",
+          "measured": {
+            "1": {
+              "hMm": 62.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 62.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "44, 61, 66",
+          "measured": {
+            "1": {
+              "hMm": 62.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 62.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 62.1,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 119,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 139,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 90
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 107
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

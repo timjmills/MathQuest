@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MathQuest ("Maths Quest Pro") is a modular math practice web application targeting K-6 students. The app is split into 70 files: 1 HTML + 12 CSS + 57 JS (56 ES modules + 1 barrel module). The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
+MathQuest ("Maths Quest Pro") is a modular math practice web application targeting K-6 students. The app is split into 1 HTML + 23 CSS + 119 JS files (118 ES modules in `js/modules/` + the `js/globals.js` barrel) as of 2026-10-02, plus the `js/modules/sheet/` kit; the file list below names the original core modules only. The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
 
 ## Running the App
 
@@ -59,7 +59,7 @@ outrank any general design advice or skill:
 
 ```bash
 node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
-node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 604 codes / 35 categories today
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 608 codes / 35 categories on 2026-10-02
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)
@@ -502,20 +502,17 @@ Extensive SVG generation functions across 5 modules:
 - Never say "done" unless you have confirmed it works end to end
 - When creating or updating skills, ALWAYS research reference sites first (see "Researching Skills" section above)
 
-## Agents — model and effort (owner rule, 2026-10-02)
+## Agents — model and effort (owner rule, 2026-10-02, revised the same day)
 
-Every subagent (builders, fixers, critics, explorers) runs on **Sonnet 5.5 at LOW effort by default** (the owner sees Sonnet 5.5 listed in the program; the Agent tool alias is `sonnet`, which maps to the newest Sonnet available). Escalate only when a
-problem persists and the lower setting cannot solve it, one step at a time:
+- **Builders and fixers** run on **Sonnet 5.5 at MEDIUM effort** (profile `mq-sonnet-medium`, `model: "sonnet"`).
+- **Critics / auditors / reviewers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
+- Explorers and small one-off checks: Sonnet medium.
 
-1. Sonnet, low — the default for every agent.
-2. Sonnet, medium — only after a persistent, unsolved issue.
-3. Opus, low.
-4. Opus, medium — the ceiling. Never go higher.
+Escalate a builder only when a problem persists and its setting cannot solve it: Sonnet medium → Opus low → Opus
+medium (the ceiling; never higher). A critic may go to Opus medium at most.
 
 How to call them:
-- **Model:** pass `model: "sonnet"` (or `"opus"` when escalating) on every Agent call.
-- **Effort:** the Agent tool has no effort argument; effort comes from the agent definition's frontmatter
-  (`.claude/agents/*.md`, `effort: low|medium`). Use the low-effort definitions by default and the medium ones only
-  when escalating.
-- Profiles live in `.claude/agents/` (`mq-sonnet-low`, `mq-sonnet-medium`, `mq-opus-low`, `mq-opus-medium`). They load at session start; in a session started before they existed, use `general-purpose` with `model: "sonnet"` (verified 2026-10-02: reports Sonnet 5.5, claude-sonnet-5-5).
+- Pass `subagent_type` with the profile above and the matching `model` on every Agent call.
+- **Effort** comes from the profile's frontmatter (`.claude/agents/*.md`, `effort: low|medium`); the Agent tool has
+  no effort argument, and the agent cannot see its own effort setting.
 - Say in the agent's brief which step it is on and why, if it was escalated. Record escalations in `design/STATUS.md`.

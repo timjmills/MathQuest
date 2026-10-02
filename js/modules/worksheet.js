@@ -1,5 +1,6 @@
 import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
+import { skipAfterFor } from './skip-rule.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
@@ -968,19 +969,33 @@ export function layoutWorksheetGrid(grid) {
 }
 
 let _wsLayoutTimers = [];
+let _wsSchedPending = false;   // the first-render passes (80/320/900 ms) are still due
 function _wsScheduleLayout(grid) {
     _wsLayoutTimers.forEach(t => clearTimeout(t));
     layoutWorksheetGrid(grid);
+    if (!document.querySelector('.problem-card.mq-active-problem')) setActiveProblem(0);
+    // data-mq-laid-out is '0' while a scheduled layout pass is still due (first render, or a resize
+    // re-layout) and '1' after the last scheduled pass. A widget that mounts later can still move
+    // cards, so a driver also waits for the card rects to hold still before tapping by coordinates.
+    grid.dataset.mqLaidOut = '0';
     // widgets and their stylesheets mount a moment later (dynamic import): lay out again
-    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => layoutWorksheetGrid(grid), ms));
+    _wsSchedPending = true;
+    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => {
+        layoutWorksheetGrid(grid);
+        if (ms === 900) { _wsSchedPending = false; grid.dataset.mqLaidOut = '1'; }
+    }, ms));
 }
 if (typeof window !== 'undefined') {
     let _wsResizeT = 0;
     window.addEventListener('resize', () => {
         clearTimeout(_wsResizeT);
+        const g0 = document.getElementById('worksheetGrid');
+        const relayout = !!(g0 && g0.classList.contains('mq-wsfit') && g0.clientWidth);
+        if (relayout) g0.dataset.mqLaidOut = '0';   // a re-layout is pending
         _wsResizeT = setTimeout(() => {
             const g = document.getElementById('worksheetGrid');
             if (g && g.classList.contains('mq-wsfit') && g.clientWidth) layoutWorksheetGrid(g);
+            if (g && !_wsSchedPending) g.dataset.mqLaidOut = '1';
         }, 150);
     });
 }
@@ -1446,7 +1461,7 @@ function _wsRenderCard(grid, q, i) {
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
+    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" style="display:none" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -1528,6 +1543,9 @@ function _wsRenderCard(grid, q, i) {
                 if (row) row.style.display = 'none';
             }
         }
+        // a ten-column number chart keeps rows of ten at the host's digit size: its card takes the whole row
+        const _chartRow = cellEl.querySelector('.k2-chart tr');
+        if (_chartRow && _chartRow.children.length === 10) { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
         if (twin) {
             const inp = document.getElementById(`ws_input_${i}`);
             wireRingGroups(cellEl);
@@ -2174,9 +2192,29 @@ export function checkWorksheetExpandedAnswer(idx) {
 }
 
 // Advance to the next worksheet problem
+// Wave 1 item 1.2: the current problem (card + its answer box) is highlighted and pulses; the
+// highlight moves on as each problem is finished. Screen only (css/screen-cell.css).
+export function setActiveProblem(idx) {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll('.problem-card.mq-active-problem').forEach((el) => el.classList.remove('mq-active-problem'));
+    const card = idx == null ? null : document.getElementById(`ws_card_${idx}`);
+    if (card) card.classList.add('mq-active-problem');
+}
+
+// Clicking or tabbing into any problem makes it the current one.
+if (typeof document !== 'undefined' && !window.__mqActiveProblemBound) {
+    window.__mqActiveProblemBound = true;
+    document.addEventListener('focusin', (e) => {
+        const card = e.target && e.target.closest && e.target.closest('.problem-card[id^="ws_card_"]');
+        if (!card || card.classList.contains('mq-active-problem')) return;
+        setActiveProblem(Number(card.id.replace('ws_card_', '')));
+    });
+}
+
 export function advanceToNextProblem(currentIdx) {
     const nextIdx = currentIdx + 1;
-    if (nextIdx >= state.worksheetQs.length) return; // No more problems
+    if (nextIdx >= state.worksheetQs.length) { setActiveProblem(null); return; } // No more problems
+    setActiveProblem(nextIdx);
 
     const nextCard = document.getElementById(`ws_card_${nextIdx}`);
     if (!nextCard) return;
@@ -2212,8 +2250,22 @@ const worksheetBannerRecorded = new Set();
 // Track debounce timers for single-input wrong-answer delay (2 seconds)
 const worksheetWrongTimers = new Map();
 
+// Wave 1 item 1.3: this card's Skip button appears only after skipAfter wrong checks ON THAT CARD
+// (the skill's option, default 5; 0 = never).
+function wsNoteWrong(idx) {
+    const q = state.worksheetQs && state.worksheetQs[idx];
+    if (!q) return;
+    q._wrongChecks = (q._wrongChecks || 0) + 1;
+    const n = skipAfterFor(q);
+    if (n > 0 && q._wrongChecks >= n) {
+        const btn = document.querySelector(`#ws_card_${idx} .ws-skip-btn`);
+        if (btn) btn.style.display = '';
+    }
+}
+
 // Record a worksheet answer in the game stats banner (once per problem)
 function wsRecordAnswer(idx, isCorrect) {
+    if (!isCorrect) wsNoteWrong(idx);
     if (worksheetBannerRecorded.has(idx)) return;
     worksheetBannerRecorded.add(idx);
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
@@ -2249,6 +2301,7 @@ export function wsSkipCard(idx) {
     if (btn) btn.textContent = _wsTeacherLaunch() ? 'Undo skip' : '↩ Undo Skip';
     // Disable inputs (CSS pointer-events also blocks, but disable is belt+braces).
     card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+    advanceToNextProblem(idx);
 }
 
 export function checkWorksheetAnswer(idx) {

@@ -1,0 +1,318 @@
+{
+  "skill": "composing:hundreds_chart_fill",
+  "category": "composing",
+  "skillId": "hundreds_chart_fill",
+  "label": "Hundreds Chart - Find the Missing Number (Visual)",
+  "grade": "1",
+  "dir": "composing__hundreds_chart_fill",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 57,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 4 rows per page.",
+            "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 55.9,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 612640,
+      "title": "I Can find missing numbers on a hundreds chart",
+      "notes": [
+        "Tall problems: 4 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "What number goes in the empty box?",
+          "ans": "47",
+          "measured": {
+            "1": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "24, 25",
+          "measured": {
+            "1": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.9,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "47, 48",
+          "measured": {
+            "1": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.9,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "84, 85, 86",
+          "measured": {
+            "1": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "What number goes in the empty box?",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.9,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "48, 49",
+          "measured": {
+            "1": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.8,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "8, 9",
+          "measured": {
+            "1": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.9,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "96, 97, 98",
+          "measured": {
+            "1": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 55.9,
+              "fits": true
+            },
+            "5": {
+              "hMm": 55.9,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 155,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 174,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 126
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 142
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}
