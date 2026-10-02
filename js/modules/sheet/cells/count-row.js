@@ -77,7 +77,7 @@ function geom(p, ctx) {
     // compact (12 tables on one page): less chrome, never smaller digits. Critic round 4 (H): the page had
     // about 30 mm spare under row l, so the boxes take it - taller (+3 mm, the most Letter still holds on one page) and wider (the one-column cell's
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
-    const baseH = S(ctx).writeMm + (p.compact ? 3 : 2.5);
+    const baseH = S(ctx).writeMm + (p.compact ? 3.4 : 2.5);
     const live = p.compact ? COMPACT_LIVE_MM : LIVE_MM;
     const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
     let boxW = (look === 'arcs' ? PITCH[size] - gap : 14) + wide;
