@@ -501,3 +501,20 @@ Extensive SVG generation functions across 5 modules:
 - Do not skip steps or leave TODOs
 - Never say "done" unless you have confirmed it works end to end
 - When creating or updating skills, ALWAYS research reference sites first (see "Researching Skills" section above)
+
+## Agents — model and effort (owner rule, 2026-10-02)
+
+Every subagent (builders, fixers, critics, explorers) runs on **Sonnet at LOW effort by default**. Escalate only when a
+problem persists and the lower setting cannot solve it, one step at a time:
+
+1. Sonnet, low — the default for every agent.
+2. Sonnet, medium — only after a persistent, unsolved issue.
+3. Opus, low.
+4. Opus, medium — the ceiling. Never go higher.
+
+How to call them:
+- **Model:** pass `model: "sonnet"` (or `"opus"` when escalating) on every Agent call.
+- **Effort:** the Agent tool has no effort argument; effort comes from the agent definition's frontmatter
+  (`.claude/agents/*.md`, `effort: low|medium`). Use the low-effort definitions by default and the medium ones only
+  when escalating.
+- Say in the agent's brief which step it is on and why, if it was escalated. Record escalations in `design/STATUS.md`.
