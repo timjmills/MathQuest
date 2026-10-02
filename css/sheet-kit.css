@@ -314,3 +314,15 @@
    height, and a wrapped left-hand teacher line can never collide with it. */
 :is(.ws-page, .ws-sheet) .ws-foot > .ws-copy { position: absolute; left: 0; right: 0; top: 100%; margin-top: 1mm; text-align: center; font-size: 6.5pt; line-height: 1; font-weight: 400; }
 :is(.ws-page, .ws-sheet) .ws-foot > span:last-of-type { text-align: right; }
+
+/* ---------- WAVE 1 / 1.1: the answer line is a marked writing zone (additive) ----------
+   A bare rule reads as decoration. The line slot keeps its shape (SL-3, SL-8) and gains two black
+   end-ticks, 2.2 mm tall, drawn as solid borders (no gradients, INK-2) so the pupil sees where
+   the answer starts and stops. Ink only (INK-1). */
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label) { position: relative; }
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::before,
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::after {
+    content: ""; position: absolute; bottom: 0; width: 0; height: 2.2mm; border-left: var(--ws-hair) solid var(--ws-ink);
+}
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::before { left: 0; }
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::after { right: 0; }

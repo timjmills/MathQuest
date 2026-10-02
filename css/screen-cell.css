@@ -1308,3 +1308,24 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* ---------------------------------------------------------------- WAVE 1 / 1.1 (additive)
+   Screen answer lines: a typed line slot is a marked writing zone. Ink end-ticks (the same as
+   paper) plus a light wash of the sheet's single grey (#949494 at 14%), and a 2 px rule, so a
+   pupil sees where to write. Boxes already carry a full border. Static (key / trace) slots keep
+   the paper look; the focus ring is Lane A's. */
+html .mq-scell input.mq-slot:not(.mq-slot--box):not(.mq-slot--invisual-none),
+html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:not(.mq-slot--box),
+html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--box) {
+    background-color: rgba(148, 148, 148, 0.14) !important;
+    border-bottom-width: 2px !important;
+    background-image: linear-gradient(#000, #000), linear-gradient(#000, #000) !important;
+    background-repeat: no-repeat !important;
+    background-position: left bottom, right bottom !important;
+    background-size: 1px 10px, 1px 10px !important;
+}
+html .mq-scell input.mq-slot.mq-slot--box,
+html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot.mq-slot--box,
+html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot.mq-slot--box {
+    background-color: rgba(148, 148, 148, 0.14) !important;
+}

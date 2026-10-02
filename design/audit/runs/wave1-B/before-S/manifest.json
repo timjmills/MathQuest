@@ -1,0 +1,3558 @@
+[
+  {
+    "skill": "composing:base10_build",
+    "category": "composing",
+    "skillId": "base10_build",
+    "label": "Build a Number with Base-10 Blocks",
+    "grade": "1",
+    "dir": "composing__base10_build",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 3,
+          "perPage": 6,
+          "pages": 1,
+          "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 3,
+              "perPage": 6,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 76,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 61.3,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 364561,
+        "title": "I Can show a number with tens and ones",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 61 with base-10 blocks.",
+            "ans": "61",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 13 with base-10 blocks.",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 84 with base-10 blocks.",
+            "ans": "84",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 45 with base-10 blocks.",
+            "ans": "45",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 37 with base-10 blocks.",
+            "ans": "37",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "base10",
+            "fclass": "standard",
+            "text": "Build 20 with base-10 blocks.",
+            "ans": "20",
+            "measured": {
+              "1": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.3,
+                "fits": true
+              },
+              "3": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.3,
+                "fits": false
+              },
+              "5": {
+                "hMm": 61.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 107,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 110,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 50
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 50
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "base10-build",
+        "printFormat": "base10-build",
+        "text": "Build 93 with base-10 blocks.",
+        "ans": "93",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              11
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "base10-build",
+        "printFormat": "base10-build",
+        "text": "Build 34 with base-10 blocks.",
+        "ans": "34",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              11
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "base10-build",
+        "printFormat": "base10-build",
+        "text": "Build 41 with base-10 blocks.",
+        "ans": "41",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              11
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ],
+            [
+              "box-shadow",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              66
+            ],
+            [
+              "Nunito",
+              30
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              11
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "addition:add_20_regroup",
+    "category": "addition",
+    "skillId": "add_20_regroup",
+    "label": "Add within 20 (With Regrouping)",
+    "grade": "1",
+    "dir": "addition__add_20_regroup",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 3,
+          "perPage": 15,
+          "pages": 1,
+          "note": "Fits: 5 columns x 3 rows, 15 per page, 1 page. Digits 16 pt. Dense: 5 x 3, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 3,
+              "perPage": 15,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 71.05,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 5 x 3, cells sized to the problems.",
+              "line": "Fits: 5 columns x 3 rows, 15 per page, 1 page. Digits 16 pt. Dense: 5 x 3, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 49.7,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 582598,
+        "title": "I Can add within 20 (with regrouping)",
+        "notes": [
+          "Dense: 5 x 3, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "9 + 9 = ?",
+            "ans": "18",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "8 + 9 = ?",
+            "ans": "17",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "7 + 7 = ?",
+            "ans": "14",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "2 + 9 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "3 + 8 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "legacy",
+            "fclass": "standard",
+            "text": "6 + 7 = ?",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "3": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "4": {
+                "hMm": 49.7,
+                "fits": true
+              },
+              "5": {
+                "hMm": 49.7,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 61,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 76,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 38
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 50
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "4 + 8 = ?",
+        "ans": "12",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              9
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "4 + 8 = ?",
+        "ans": "12",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              9
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "4 + 8 = ?",
+        "ans": "12",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              9
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              24
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              26
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "box-shadow",
+              4
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              4
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "multiplication:mult_facts",
+    "category": "multiplication",
+    "skillId": "mult_facts",
+    "label": "Multiplication Facts (1-12)",
+    "grade": "3",
+    "dir": "multiplication__mult_facts",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 4,
+          "perPage": 20,
+          "pages": 1,
+          "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 4,
+              "perPage": 20,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 5 x 4, cells sized to the problems.",
+              "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 42.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 108947,
+        "title": "I Can multiply facts to 12",
+        "notes": [
+          "Dense: 5 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 × 6 = ?",
+            "ans": "18",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "10 × 12 = ?",
+            "ans": "120",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "6 × 12 = ?",
+            "ans": "72",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 × 5 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 × 9 = ?",
+            "ans": "81",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "5 × 6 = ?",
+            "ans": "30",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 60,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 69,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 41
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 54
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "mult-facts-vertical",
+        "text": "9 × 4 = ?",
+        "ans": "36",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "mult-facts-vertical",
+        "text": "5 × 4 = ?",
+        "ans": "20",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "mult-facts-vertical",
+        "text": "12 × 4 = ?",
+        "ans": "48",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              8
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ],
+            [
+              "box-shadow",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              29
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "division:div_remainders",
+    "category": "division",
+    "skillId": "div_remainders",
+    "label": "Division with Remainders (Visual)",
+    "grade": "4",
+    "dir": "division__div_remainders",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 4,
+          "perPage": 8,
+          "pages": 1,
+          "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Dense: 2 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 4,
+              "perPage": 8,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 2 x 4, cells sized to the problems.",
+              "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Dense: 2 x 4, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 42,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 960096,
+        "title": "I Can divide by 2–6 with remainders",
+        "notes": [
+          "Dense: 2 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 2. Write the quotient and the remainder.",
+            "ans": "4 R 1",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 4. Write the quotient and the remainder.",
+            "ans": "5 R 3",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 6. Write the quotient and the remainder.",
+            "ans": "2 R 4",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 6. Write the quotient and the remainder.",
+            "ans": "2 R 1",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 4. Write the quotient and the remainder.",
+            "ans": "2 R 3",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "remainder",
+            "fclass": "standard",
+            "text": "Ring groups of 6. Write the quotient and the remainder.",
+            "ans": "3 R 1",
+            "measured": {
+              "1": {
+                "hMm": 42,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42,
+                "fits": false
+              },
+              "4": {
+                "hMm": 42,
+                "fits": false
+              },
+              "5": {
+                "hMm": 42,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 84,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 99,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 50
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 62
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "text",
+        "printFormat": "div-remainders",
+        "text": "Ring groups of 5. Write the quotient and the remainder.",
+        "ans": "2 R 4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "text",
+        "printFormat": "div-remainders",
+        "text": "Ring groups of 5. Write the quotient and the remainder.",
+        "ans": "2 R 4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "text",
+        "printFormat": "div-remainders",
+        "text": "Ring groups of 5. Write the quotient and the remainder.",
+        "ans": "2 R 4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ],
+            [
+              "box-shadow",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              48
+            ],
+            [
+              "Nunito",
+              30
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "measurement:time_5min",
+    "category": "measurement",
+    "skillId": "time_5min",
+    "label": "Time to 5 Minutes",
+    "grade": "2",
+    "dir": "measurement__time_5min",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 4,
+          "rows": 3,
+          "perPage": 12,
+          "pages": 1,
+          "note": "Fits: 4 columns x 3 rows, 12 per page, 1 page. Digits 16 pt. Dense: 4 x 3, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 4,
+              "rows": 3,
+              "perPage": 12,
+              "pages": 1,
+              "cellW": 46.5,
+              "cellH": 76,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 4 x 3, cells sized to the problems.",
+              "line": "Fits: 4 columns x 3 rows, 12 per page, 1 page. Digits 16 pt. Dense: 4 x 3, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 54.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 61304,
+        "title": "I Can tell time to 5 minutes",
+        "notes": [
+          "Dense: 4 x 3, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "3:05",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "10:55",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "1:10",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "5:25",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "6:35",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "clock",
+            "fclass": "standard",
+            "text": "Write the time.",
+            "ans": "11:20",
+            "measured": {
+              "1": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 54.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 54,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 123,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 138,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 98
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 110
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "text",
+        "printFormat": "tm-clock",
+        "text": "Write the time.",
+        "ans": "3:05",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              15
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "text",
+        "printFormat": "tm-clock",
+        "text": "Write the time.",
+        "ans": "10:55",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              15
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "text",
+        "printFormat": "tm-clock",
+        "text": "Write the time.",
+        "ans": "1:10",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              15
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ],
+            [
+              "box-shadow",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              84
+            ],
+            [
+              "Nunito",
+              30
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              14
+            ],
+            [
+              "Nunito",
+              11
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "number_sense:nearest_100",
+    "category": "number_sense",
+    "skillId": "nearest_100",
+    "label": "Round to Nearest 100",
+    "grade": "3",
+    "dir": "number_sense__nearest_100",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 3,
+          "rows": 10,
+          "perPage": 30,
+          "pages": 1,
+          "note": "Fits: 3 columns x 10 rows, 30 per page, 1 page. Digits 16 pt. Dense: 3 x 10, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 3,
+              "rows": 10,
+              "perPage": 30,
+              "pages": 1,
+              "cellW": 62,
+              "cellH": 22,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 3 x 10, cells sized to the problems.",
+              "line": "Fits: 3 columns x 10 rows, 30 per page, 1 page. Digits 16 pt. Dense: 3 x 10, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 17,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 340895,
+        "title": "I Can round to the nearest 100",
+        "notes": [
+          "Dense: 3 x 10, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 692 to the nearest 100.",
+            "ans": "700",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 550 to the nearest 100.",
+            "ans": "600",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 695 to the nearest 100.",
+            "ans": "700",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 968 to the nearest 100.",
+            "ans": "1000",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 324 to the nearest 100.",
+            "ans": "300",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "pv",
+            "fclass": "standard",
+            "text": "Round 104 to the nearest 100.",
+            "ans": "100",
+            "measured": {
+              "1": {
+                "hMm": 17,
+                "fits": true
+              },
+              "2": {
+                "hMm": 17,
+                "fits": true
+              },
+              "3": {
+                "hMm": 17,
+                "fits": true
+              },
+              "4": {
+                "hMm": 17,
+                "fits": false
+              },
+              "5": {
+                "hMm": 17,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 90,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 99,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 62
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 68
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "pv-cell",
+        "text": "Round 505 to the nearest 100.",
+        "ans": "500",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "pv-cell",
+        "text": "Round 550 to the nearest 100.",
+        "ans": "600",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "pv-cell",
+        "text": "Round 505 to the nearest 100.",
+        "ans": "500",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(30, 136, 229)",
+              6
+            ],
+            [
+              "box-shadow",
+              6
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              48
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]
