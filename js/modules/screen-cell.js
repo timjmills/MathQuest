@@ -2631,6 +2631,15 @@ export function fitTwinRows(root) {
         // ten-column chart, whose squares are sized from the host's digits and which swipes inside
         // its own cell instead (TY-10, SP-11a / SP-12a; critic round 4 defect F)
         if (twin.querySelector('.k2-chart-ten')) return;
+        // Fit once per cell width. This pass re-runs on every DOM change (monoCell's afterInk), and
+        // typing changes the DOM (live marks, badges). Parts with a fixed pixel floor - the 44 px
+        // answer boxes - never shrink with --mq-k2, so their overflow never goes away and each
+        // re-run would ratchet the drawing smaller as the pupil types. Only a new cell width
+        // (rotation, resize) earns a new fit.
+        // (the key also counts the drawing's elements, so a widget that mounts late is still fitted)
+        const fitW = `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}`;
+        if (twin.dataset.mqFitW === fitW) return;
+        twin.dataset.mqFitW = fitW;
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
