@@ -315,14 +315,23 @@
 :is(.ws-page, .ws-sheet) .ws-foot > .ws-copy { position: absolute; left: 0; right: 0; top: 100%; margin-top: 1mm; text-align: center; font-size: 6.5pt; line-height: 1; font-weight: 400; }
 :is(.ws-page, .ws-sheet) .ws-foot > span:last-of-type { text-align: right; }
 
-/* ---------- WAVE 1 / 1.1: the answer line is a marked writing zone (additive) ----------
-   A bare rule reads as decoration. The line slot keeps its shape (SL-3, SL-8) and gains two black
-   end-ticks, 2.2 mm tall, drawn as solid borders (no gradients, INK-2) so the pupil sees where
-   the answer starts and stops. Ink only (INK-1). */
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label) { position: relative; }
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::before,
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::after {
-    content: ""; position: absolute; bottom: 0; width: 0; height: 2.2mm; border-left: var(--ws-hair) solid var(--ws-ink);
+/* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
+   vertical padding (row chrome), never its digits. Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
+
+/* ---------- WAVE 1 / 1.1: every answer slot is a full box (owner ruling 2026-10-02, additive) ----------
+   SL-3 changed: the slot after "=" is drawn as the same full black-outlined rounded box as every
+   other answer slot. The shape id stays data-ws-shape="line" (providers, key, lint unchanged); only
+   the drawing changes. Same width B(n) and height Hw as before, so geometry and pagination hold.
+   Ungraded write-ins (say-lines, data-ws-graded="0") are not answer slots and stay ruled lines. */
+:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]) {
+    border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); box-sizing: border-box; height: calc(var(--ws-hw) + 2 * var(--ws-hair));
 }
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::before { left: 0; }
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--label)::after { right: 0; }
+
+/* ---------- WAVE 1 / 1.1: the vertical fact's answer zone is a full box (owner ruling 2026-10-02, additive) ----------
+   The write row under the rule (data-ws-shape="open") is drawn as the same black-outlined rounded box.
+   It spans the stack's own tracks plus 0.1 em either side so three digits never touch the outline;
+   the tracks (and so the digit columns) do not move. The key writes its digits inside the same box. */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans {
+    box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
+    margin: 1mm -0.1em 0; padding: 0 calc(0.1em - var(--ws-hair)); }

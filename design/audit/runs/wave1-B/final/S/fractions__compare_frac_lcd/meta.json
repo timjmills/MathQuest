@@ -1,0 +1,599 @@
+{
+  "skill": "fractions:compare_frac_lcd",
+  "category": "fractions",
+  "skillId": "compare_frac_lcd",
+  "label": "Compare Fractions (LCD)",
+  "grade": "4",
+  "dir": "fractions__compare_frac_lcd",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 62.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 804338,
+      "title": "I Can compare fractions (LCD)",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Drag the fractions from greatest to least.",
+          "ans": "[\"t1\",\"t0\",\"t2\"]",
+          "measured": {
+            "1": {
+              "hMm": 53.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 66.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 92.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Drag the fractions from least to greatest.",
+          "ans": "[\"t0\",\"t2\",\"t1\"]",
+          "measured": {
+            "1": {
+              "hMm": 53.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 66.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 92.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Compare: 5/10 ___ 5/6  (Use >, <, or =)",
+          "ans": "<",
+          "measured": {
+            "1": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 68.4,
+              "fits": true
+            },
+            "4": {
+              "hMm": 79,
+              "fits": true
+            },
+            "5": {
+              "hMm": 96.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Compare: 3/5 ___ 4/8  (Use >, <, or =)",
+          "ans": ">",
+          "measured": {
+            "1": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 68.4,
+              "fits": true
+            },
+            "4": {
+              "hMm": 79,
+              "fits": true
+            },
+            "5": {
+              "hMm": 90.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Compare: 4/8 ___ 2/6  (Use >, <, or =)",
+          "ans": ">",
+          "measured": {
+            "1": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 68.4,
+              "fits": true
+            },
+            "4": {
+              "hMm": 79,
+              "fits": true
+            },
+            "5": {
+              "hMm": 90.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Compare: 1/2 ___ 2/4  (Use >, <, or =)",
+          "ans": "=",
+          "measured": {
+            "1": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 68.4,
+              "fits": true
+            },
+            "4": {
+              "hMm": 79,
+              "fits": true
+            },
+            "5": {
+              "hMm": 90.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 149,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 182,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 60
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 72
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "screen": {
+    "card-1280": {
+      "answerType": "dnd-generic",
+      "printFormat": "dnd-generic",
+      "text": "Drag the fractions from least to greatest.",
+      "ans": "t1,t0,t2",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            5
+          ],
+          [
+            "filter:grayscale(1) contrast(1.4)",
+            3
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            12
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-820": {
+      "answerType": "dnd-generic",
+      "printFormat": "dnd-generic",
+      "text": "Drag the fractions from least to greatest.",
+      "ans": "t1,t0,t2",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            5
+          ],
+          [
+            "filter:grayscale(1) contrast(1.4)",
+            3
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            12
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-390": {
+      "answerType": "dnd-generic",
+      "printFormat": "dnd-generic",
+      "text": "Drag the fractions from least to greatest.",
+      "ans": "t1,t0,t2",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            5
+          ],
+          [
+            "filter:grayscale(1) contrast(1.4)",
+            3
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            12
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "worksheet-1280": {
+      "cards": 6,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "borderTopColor:rgb(221, 214, 238)",
+            16
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            16
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            16
+          ],
+          [
+            "filter:grayscale(1) contrast(1.4)",
+            8
+          ],
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "borderTopColor:rgb(79, 75, 107)",
+            6
+          ],
+          [
+            "color:rgb(229, 114, 43)",
+            6
+          ],
+          [
+            "borderTopColor:rgb(255, 138, 61)",
+            6
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 251, 224)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            94
+          ],
+          [
+            "Nunito",
+            24
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "quiz-1280": {
+      "questions": 3,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "color:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            5
+          ],
+          [
+            "borderTopColor:rgb(244, 240, 251)",
+            3
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(124, 92, 230)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(220, 238, 238)",
+            2
+          ],
+          [
+            "box-shadow",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(124, 92, 230)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            11
+          ],
+          [
+            "Andika",
+            1
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    }
+  },
+  "consoleErrors": []
+}

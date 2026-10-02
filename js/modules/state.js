@@ -154,7 +154,6 @@ export const state = {
         numpadOnly: false,
         answerEliminator: false,
         scratchpadOpen: false,
-        calculatorEnabled: false,
         language: 'en',
     },
     lastMapResult: null,

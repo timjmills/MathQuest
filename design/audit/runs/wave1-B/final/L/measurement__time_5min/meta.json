@@ -1,0 +1,567 @@
+{
+  "skill": "measurement:time_5min",
+  "category": "measurement",
+  "skillId": "time_5min",
+  "label": "Time to 5 Minutes",
+  "grade": "2",
+  "dir": "measurement__time_5min",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 72.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 61304,
+      "title": "I Can tell time to 5 minutes",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "3:05",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "10:55",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "1:10",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "5:25",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "6:35",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "clock",
+          "fclass": "standard",
+          "text": "Write the time.",
+          "ans": "11:20",
+          "measured": {
+            "1": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 72.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 66,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 123,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 138,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 98
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 110
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "screen": {
+    "card-1280": {
+      "answerType": "text",
+      "printFormat": "tm-clock",
+      "text": "Write the time.",
+      "ans": "3:05",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            15
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-820": {
+      "answerType": "text",
+      "printFormat": "tm-clock",
+      "text": "Write the time.",
+      "ans": "10:55",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            15
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-390": {
+      "answerType": "text",
+      "printFormat": "tm-clock",
+      "text": "Write the time.",
+      "ans": "1:10",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            15
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "worksheet-1280": {
+      "cards": 6,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "borderTopColor:rgb(221, 214, 238)",
+            18
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            18
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            18
+          ],
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "borderTopColor:rgb(79, 75, 107)",
+            6
+          ],
+          [
+            "color:rgb(229, 114, 43)",
+            6
+          ],
+          [
+            "borderTopColor:rgb(255, 138, 61)",
+            6
+          ],
+          [
+            "backgroundColor:rgb(255, 251, 224)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            84
+          ],
+          [
+            "Nunito",
+            24
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "quiz-1280": {
+      "questions": 3,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "color:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            5
+          ],
+          [
+            "borderTopColor:rgb(244, 240, 251)",
+            3
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(124, 92, 230)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(220, 238, 238)",
+            2
+          ],
+          [
+            "box-shadow",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(124, 92, 230)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            14
+          ],
+          [
+            "Nunito",
+            11
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    }
+  },
+  "consoleErrors": []
+}

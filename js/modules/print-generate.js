@@ -4113,7 +4113,10 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
     html += cell(op, 'font-weight:700;') + B.padStart(T - 1, ' ').split('').map(ch => cell(ch)).join('');
     html += `<span class="rule" style="grid-column:1 / -1;height:1mm;border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`;
-    html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${o.answerMm || size.answerMm}mm;"></span>`;
+    // Owner ruling 2026-10-02 (SL-3): the open answer zone is a full black-outlined box, one box
+    // across the stack's tracks (same height as the old zone, so the cell geometry holds).
+    html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${o.answerMm || size.answerMm}mm;box-sizing:border-box;`
+        + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
         + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
@@ -4467,7 +4470,7 @@ function notationBlankDigits(problem, op) {
 }
 
 /**
- * The `line` slot of section 6: a 0.75 pt baseline rule, B(n) wide, with Hw of
+ * The `line` slot of section 6 (drawn as a full box since owner ruling 2026-10-02, SL-3): B(n) wide, Hw of
  * clear writing height above it. A ruled line means "write a number" (SL-3);
  * nothing else on the sheet may look like one.
  */
@@ -4478,7 +4481,7 @@ function wsAnswerLine(digits, shiftMm = 0) {
     return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
         + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
         + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
-        + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+        + `box-sizing:border-box;border:${STROKE.hair}pt solid ${INK.ink};border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
 }
 
 // TY-25: a horizontal equation keeps natural digit spacing, with a 1 em slot

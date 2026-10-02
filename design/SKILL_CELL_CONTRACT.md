@@ -452,7 +452,7 @@ export function blank(slot, ctx, key) {}   // returns HTML for one slot in the c
  */
 ```
 
-Slot shape tells the answer type: a line for a number, a box for a digit, a circle for a sign, a fraction
+Slot shape tells the answer type (the id `line` for a number is DRAWN as a full box since owner ruling 2026-10-02, SL-3): a line-id for a number, a box for a digit, a circle for a sign, a fraction
 stack, two boxes with a printed colon for a time, a number slot followed by its unit word, a check box for a
 decision.
 

@@ -16,9 +16,9 @@ below. "Today" says what the code does now (checked 2026-10-02 on `claude/sweet-
 deployed tree for these files). **The owner orders the waves before work starts.**
 
 **Standing rules:**
-- An independent critic scores ≥ 8 before anything merges.
-- Full gates, stamp, then deploy.
-- At most 8 agents, with browser gates one at a time. Agents run on Sonnet at low effort by default; escalate to Sonnet medium, then Opus low, then Opus medium at most, only for a persistent unsolved issue (see CLAUDE.md "Agents").
+- An independent critic scores ≥ 8 before anything merges. **Critic feedback must be actionable (owner 2026-10-02):** every defect names where (file:line or PNG + item), what is wrong (observed vs expected, measured), which criterion it costs, and the exact fix plus the check that proves it; every criterion below 10 says what would raise it to 10. No vague items.
+- Full gates, stamp, then deploy. **Check economy (owner 2026-10-02):** while building, a lane runs only targeted browser gates (`--skills` / `--category` for what it touched, or a ~20-skill cross-family sample for a global change) plus `ws-boot-smoke` and the non-browser unit gates; the full sweeps (`ws-screen-answer`, `ws-screen-slots`, `ws-share-options`, `ws-content-audit`, `ws-print-lint --source kit`) run once on the merged tree before each deploy. Nothing is skipped: every full gate still runs before anything ships.
+- At most 8 agents. Browser gates: **two at a time** (owner trial 2026-10-02; back to one if the machine is overloaded) via `/tmp/mq-browser-run.sh <cmd>`; stress/load tests run `--exclusive`; `echo 1 > /tmp/mq-browser-slots` reverts to one. Builders run on **Sonnet 5.5 medium**, critics on **Opus 5.5 low** (owner, 2026-10-02); escalate a builder to Opus low, then Opus medium at most, only for a persistent unsolved issue (see CLAUDE.md "Agents").
 - `design/STATUS.md` is updated after each wave.
 - The paused lane branches (`claude/sweet-newton-c8wrv1-wip-*`) are reused where their work fits.
 
@@ -38,6 +38,11 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Calculator | Per skill, teacher option, off by default |
 | Faded packets | A skill-worksheet option that fades supports after x problems |
 | WRM page | Teacher-facing only; from a small step or unit: print a worksheet, send a practice code, make a quiz |
+| Deploy | Each Wave 1 lane deploys (push to master) as soon as it passes critic ≥ 8 + full gates + stamp (owner 2026-10-02) |
+| Skip setting | Per skill, default 5 wrong tries; travels with the skill (skill option) |
+| money_count default | Mixed coins by default; "all the same coin" stays a teacher choice |
+| Practice map tile | Opens a **MAP strand picker**: each strand lists its MAP skills; from a strand or skill the teacher can print practice or send a practice link (MAP skills only) |
+| MAP representations | MAP keeps moving between two representations (picture → equation, model → number, graph → sentence, story → operation…). Build **more practice skills of this two-representation kind** (see 6.4) |
 
 ## Wave 1 — Correct the program
 
@@ -67,7 +72,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 | # | Item |
 |---|---|
-| 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. |
+| 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. **Practice map** opens the MAP strand picker (strands → their MAP skills → print practice / send practice link; MAP skills only). |
 | 3.2 | Gallery picker by default wherever skills are chosen: Big 3 / Medium 4 / Small 5 across plus a list view; search, Grade, Domain, Topic; select many at once. |
 | 3.3 | Sets auto-save in the browser until deleted; a Sets area lists every set for any paper, quiz or code. |
 | 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz. Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
@@ -133,6 +138,11 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 The emphasis throughout is moving between representations: picture → equation, equation → meaning, graph →
 sentence, model → number, story → operation, shape → property.
+
+**6.4 Two-representation skills (owner 2026-10-02):** audit every MAP strand for the representation pairs MAP tests
+(picture ↔ equation, model ↔ number, graph ↔ sentence, story ↔ operation, shape ↔ property, number line ↔ number,
+clock ↔ time words, array ↔ multiplication) and build a "match the two" form for each pair that has none, as options
+on existing skills where the content fits and new skills where it does not; each tagged and critic ≥ 8.
 
 **6.3 MAP practice set:** seven strands (Number & place value, Operations & algebra, Multiplication & division,
 Fractions & decimals, Measurement, Geometry, Data & graphing), picking from these skills. Today the MAP engine uses

@@ -29,6 +29,7 @@ import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
+import { normalizeOptions } from './skill-options.js';
 import { getProvider } from './sheet/index.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 
@@ -401,6 +402,11 @@ function sectionHTML(s, i) {
     <label class="tv-label" for="tvPages${i}">Pages</label>
     <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
   </div>`;
+    const onePage = onePageSection(s);
+    const colsField = onePage ? lockedSelect(`tvCols${i}`, 'Columns', '1') : `<label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select>`;
+    const pagesField = onePage && s.role !== 'more-practice' && s.role !== 'lesson' ? `
+  <div>${lockedSelect(`tvPages${i}`, 'Pages', '1')}<p class="tv-cap" style="margin-top:4px;">12 rows (× 1 to × 12, in order, 12 jumps each), one page and its key.</p></div>`
+        : onePage ? `${pagesPart}<p class="tv-cap" id="tvOnePageNote${i}">${ONE_PAGE_WHY} Each page: 12 rows (× 1 to × 12, in order, 12 jumps each) on one page, Small, one column.</p>` : pagesPart;
     const skills = s.skills.map((k, idx) => {
         const hit = findSkill(k.categoryId, k.skillId);
         const label = hit ? hit.label : k.skillId;
@@ -447,8 +453,8 @@ function sectionHTML(s, i) {
     ${s.types ? `<div class="tv-ptype-groups" id="tvTypes${i}" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>` : ''}
     ${whyNote}
   </div>
-  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div></div>${pagesPart}`
-        : `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>${pagesPart}</div>`}
+  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div>${colsField}</div></div>${pagesField}`
+        : `<div class="tv-fields-cols"><div>${colsField}</div>${pagesField}</div>`}
 </div>`;
 }
 
@@ -619,12 +625,24 @@ function openOptions(si, idx, anchor) {
     if (typeof window.openSkillOptionsPanel === 'function') {
         window.openSkillOptionsPanel(k.categoryId, k.skillId, anchor, {
             opts: k.opts || null,
-            onChange(next) { k.opts = next && typeof next === 'object' ? next : undefined; renderWhat(); scheduleBuild(); },
+            onChange(next) { k.opts = next && typeof next === 'object' ? next : undefined; renderWhat(); renderSetup(); scheduleBuild(); },
         });
         return;
     }
     s.optionsOpen = s.optionsOpen === String(idx) ? '' : String(idx);
     renderWhat();
+}
+
+/** True when the section prints "All 12 tables on one page" (count_by_tables onePage): print-sheet.js
+ *  normaliseRequest then forces size S, twelve rows, one page and one column (critic round 4, G). */
+function onePageSection(s) {
+    return !!(s && s.skills.some((k) => {
+        try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+    }));
+}
+const ONE_PAGE_WHY = 'Set by "All 12 tables on one page".';
+function lockedSelect(id, label, text) {
+    return `<label class="tv-label" for="${id}">${label}</label><select id="${id}" class="tv-select" disabled aria-describedby="${id}Why"><option selected>${text}</option></select><p class="tv-cap" id="${id}Why" style="margin-top:4px;">${ONE_PAGE_WHY}</p>`;
 }
 
 /* ================================================================= page setup */
@@ -644,7 +662,9 @@ function renderSetup() {
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
-    <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
+    <div><span class="tv-label">Size</span>${pr.sections.some(onePageSection)
+        ? `<div class="tv-seg" role="radiogroup" aria-label="Size" aria-describedby="tvSizeOnePage">${[['S', 'Small'], ['M', 'Medium'], ['L', 'Large']].map(([v, l]) => `<button type="button" role="radio" aria-checked="${v === 'S'}" aria-label="${l}" aria-disabled="true" tabindex="-1" disabled>${v}</button>`).join('')}</div><p class="tv-cap" id="tvSizeOnePage" style="margin-top:6px;">S (Small). ${ONE_PAGE_WHY} Twelve rows fit on one page only at Small.</p>`
+        : seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${!pr.sections.some(onePageSection) && pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
       <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>

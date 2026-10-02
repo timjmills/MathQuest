@@ -406,8 +406,27 @@ export const SKILL_OPTIONS = {
 // choice: Max Number lowered below the place's floor (a nearest-100 item needs three digits).
 //
 // GROUPS. Every control carries `group` — 'difficulty' (Harder / easier), 'support' (Support) or
-// 'layout' (Layout) — which the panel (skill-options-ui.js) uses to set the controls out under
+// 'layout' (Layout), plus 'play' (pupil play: calculator, skip — shown in a collapsed disclosure, never counted as at rest) — which the panel (skill-options-ui.js) uses to set the controls out under
 // those three headings, and a one-line `help` in plain teacher English.
+
+/**
+ * PUPIL-PLAY settings (calculator, skip) live in their own group, 'play'. The panel shows them
+ * inside one collapsed disclosure, so they are NOT controls "at rest": the teacher panel keeps its
+ * at-most-5 resting controls. `restingOptions` is the one place that says which controls those are;
+ * the panel (skill-options-ui.js) and ws-supports-unit both use it.
+ */
+export const PLAY_GROUP = 'play';
+export const isPlayOption = (def) => !!def && def.group === PLAY_GROUP;
+/** The controls the panel shows at rest: those that apply now and are not inside the collapsed play group. */
+export function restingOptions(defs, cur) {
+    return (defs || []).filter((d) => !isPlayOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
+}
+/** The play disclosure's summary line: "Calculator off · Skip after 5". */
+export function playSummary(defs, cur) {
+    return (defs || []).filter(isPlayOption)
+        .map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label))
+        .join(' · ');
+}
 
 /** Max Number's app default. At this value the Max Number setting counts as "not chosen". */
 export const APP_DEFAULT_RANGE = 100;
@@ -1112,6 +1131,24 @@ Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
 // Read by js/modules/gen-counting.js (its `_kOpt()` reads) and drawn by the kit's counters /
 // compare templates. Defaults reproduce the stand-alone page (R2).
 const _k2CountTo = (values, dflt) => _opsBand(values, dflt, { label: 'Count to', help: 'The largest number on the page.' });
+/** Wave 1 lane C: the number-grid options (grid size, which squares are empty). Hoisted so P11_K2_OPTIONS can spread it. */
+function _gridOptions() {
+    return [
+        {
+            id: 'grid', label: 'Grid size', type: 'enum', default: 'window', group: 'layout',
+            values: [{ v: 'window', l: 'A small piece (3 rows of 5)' }, { v: 'rows', l: 'Three whole rows of ten' },
+                { v: 'whole', l: 'The whole chart (to "Numbers to")' }],
+            help: 'A small piece is cut from anywhere in the chart. Whole rows of ten show the down-ten pattern in full. The whole chart is one grid to a page.',
+        },
+        {
+            id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
+            values: [{ v: 'scatter', l: 'Scattered anywhere (default)' }, { v: 'row', l: 'A run along one row (count on by 1)' },
+                { v: 'column', l: 'A run down one column (count on by 10)' }, { v: 'pattern', l: 'Every other square in a row' }],
+            help: '"Empty boxes" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four.',
+        },
+    ];
+}
+
 const P11_K2_OPTIONS = {
     'counting:count_objects': [
         _k2CountTo([5, 10, 20], 20),
@@ -1214,6 +1251,7 @@ const P11_K2_OPTIONS = {
             values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6, 7].map(n => ({ v: n, l: `${n} boxes` }))],
             help: 'How many numbers the pupil writes in each window.',
         },
+        ..._gridOptions(),
     ],
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
@@ -1284,14 +1322,40 @@ const _hopLine = (div) => [
         help: 'A number over each drawn hop (in the model and the key) so the pupil counts the hops. None is the fade.',
     },
 ];
+// Critic round 4 (G): "All 12 tables on one page" overrides these controls, so the panel shows the value it
+// forces, disabled, with the reason (skill-options-ui.js optionControlHTML reads `lockedBy`).
+const _onePageLock = (v) => (cur) => (cur && cur.onePage ? { v, why: 'Set by "All 12 tables on one page".' } : null);
 const CB_CHART_LINE_OPTIONS = {
     'multiplication:count_by_tables': [
-        _cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'),
+        { ..._cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'), lockedBy: _onePageLock(Array.from({ length: 12 }, (_, k) => k + 1)) },
+        {
+            // Wave 1 lane C (owner, overdue): the first two numbers print so the pupil can SEE the step.
+            id: 'fill', label: 'Numbers printed to start', type: 'enum', default: 'two', group: 'support',
+            values: [{ v: 'two', l: 'The first two (shows the step)' }, { v: 'one', l: 'The first one only' },
+                { v: 'half', l: 'Half of them (50 % filled, the first two and others spread along the row)' }],
+            help: 'The first two numbers are printed so the pupil can see how much each jump adds; "Numbers left blank" then applies to the rest. '
+                + 'The first one only is the older, harder row. Half prints half the numbers (the first two always) spread along the row and ignores "Numbers left blank". '
+                + 'At least one number is always left to write.',
+        },
+        {
+            id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'layout',
+            values: [{ v: 12, l: '12 jumps (to 12 ×)' }, { v: 15, l: '15 jumps (to 15 ×; the row wraps to two lines)' }],
+            help: 'How many numbers the row holds: 12 (the table to × 12) or 15 (on to × 15).',
+            lockedBy: _onePageLock(12),
+        },
+        {
+            // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
+            id: 'onePage', label: 'All 12 tables on one page', type: 'bool', default: false, group: 'layout',
+            help: 'Prints exactly twelve rows, the tables x 1 to x 12 in order, on ONE page (and its key on one page), at the smallest print size so all twelve fit. '
+                + 'The row is always 12 jumps long (15 jumps cannot fit, so "Line runs to" is ignored) and the ticked tables and "Order of the rows" are ignored. '
+                + 'The numbers printed to start and "Numbers left blank" still apply, up to every number after the starting ones left blank.',
+        },
         _cbPercent(50),
         {
             id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
             values: [{ v: 'inorder', l: 'In order (2, 3, 4 …)' }, { v: 'mixed', l: 'Mixed tables' }],
             help: 'In order runs the ticked tables smallest first down the page; mixed shuffles them.',
+            lockedBy: _onePageLock('inorder'),
         },
         _cbShape('box'),
     ],
@@ -2904,6 +2968,7 @@ SKILL_OPTIONS['composing:number_chart_fill'] = [
         values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6].map(n => ({ v: n, l: `${n} boxes` }))],
         help: 'How many numbers the pupil writes in each window (3 rows of 4): at most two in a row, never side by side.',
     },
+    ..._gridOptions().slice(1),
 ];
 // ============================ end O6 · AP1 · K-2 picture kind ============================
 
@@ -3245,7 +3310,22 @@ _ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) =
 // ============================ end O6 · appearance: operations, clocks, money (AP4) ============
 
 // Options every skill understands, whether or not it declares anything of its own.
-export const UNIVERSAL_OPTIONS = [levelOption()];
+// `calculator` (Wave 1 item 1.4): the pupil's calculator button, per skill, OFF by default. It
+// travels with the skill like any option; the old q.calculatorAllowed / CALCULATOR_SKILLS flags
+// no longer switch it on.
+export const calculatorOption = () => ({
+    id: 'calculator', label: 'Calculator', type: 'bool', default: false,
+    help: 'Show the pupil a calculator button on this skill. Off unless you turn it on.',
+    group: PLAY_GROUP, summary: (v) => (v ? 'Calculator on' : 'Calculator off'),
+});
+// `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
+// appears. Per skill, default 5; 0 turns Skip off for the skill.
+export const skipAfterOption = () => ({
+    id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
+    help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
+    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
+});
+export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
 // ---------------------------------------------------------------------------
 // MEASURED OPTIONS — every skill gets the settings its generator was seen to read
@@ -3407,6 +3487,13 @@ export function normalizeOptions(categoryId, skillId, opts) {
             const list = Array.isArray(v) ? v : (v === undefined || v === null ? null : [v]);
             if (list) out[def.id] = list.filter(x => legal.has(x));
         }
+    }
+    // A control another option overrides (`lockedBy`, count_by_tables "All 12 tables on one page")
+    // reads as the value that prints, so the sheet title, the summary and the page agree (round 4, G).
+    for (const def of defs) {
+        if (typeof def.lockedBy !== 'function') continue;
+        const lock = def.lockedBy(out);
+        if (lock) out[def.id] = Array.isArray(lock.v) ? lock.v.slice() : lock.v;
     }
     return out;
 }

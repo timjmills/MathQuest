@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { calcAllowedFor } from './skip-rule.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
 import {
@@ -1998,10 +1999,8 @@ function _renderQuestionImpl() {
     // PEMDAS/exponent/large-number problems). Placed before the early-return
     // branches so every answerType honours the flag.
     const _calcBtn = document.getElementById('calcBtn');
-    const _skillAllowsCalc = (typeof window !== 'undefined' && typeof window.skillAllowsCalculator === 'function')
-        ? !!window.skillAllowsCalculator(state.skill)
-        : false;
-    const _calcVisible = q.calculatorAllowed || _skillAllowsCalc;
+    // Wave 1 item 1.4: only the teacher's per-skill `calculator` option shows it (off by default).
+    const _calcVisible = calcAllowedFor(q);
     if (_calcBtn) _calcBtn.style.display = _calcVisible ? 'inline-block' : 'none';
     // If the current question doesn't permit a calculator, dismiss any open
     // panel left over from the previous question. We intentionally DO NOT

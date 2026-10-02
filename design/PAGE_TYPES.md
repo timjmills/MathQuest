@@ -784,7 +784,7 @@ One cell (label beside; when that does not fit, the equation drops below the lab
 |#12#|   2 7     +     [      ]    =     7 7           |  operands right-aligned in fixed tracks;
 +####+   A      1 em      B       1 em    C            |  operators, "=" and blanks align down each column
 +------------------------------------------------------+
- blank B: box inside an expression, baseline line after "=", circle Hw + 2 for a sign or comparison
+ blank B: box inside an expression, box after "=" (owner ruling 2026-10-02, SL-3), circle Hw + 2 for a sign or comparison
 ```
 
 Equation widths: class F ("7 x 3 = _") 3.16 em; F2 ("24 / 3 = _") 3.74 em; T (one 2-digit operand or more, "27 + [ ] = 77") 4.32 em; H (3-digit) 5.48 em; class comes from digit counts, not from the operation. Overhead OH: label beside 9 / 10 / 11, label above 4. Fit test: `eqW(pt) + B + OH <= cellW - 0.6`; at each ladder step try label-beside first, then label-above.

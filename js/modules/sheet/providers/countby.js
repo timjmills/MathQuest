@@ -89,18 +89,19 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
 }
 
 registerSkill('multiplication:count_by_tables', {
-    strings: strings({
-        iCan: 'I Can count by 1 to 12',
+    // The "I Can" line follows the row's length (12 or 15 jumps): derived from the item, never fixed.
+    strings: stringsBy((q) => ({
+        iCan: q && q.countBy && q.countBy.jumps === 15 ? 'I Can count by 1 to 12 (15 jumps)' : 'I Can count by 1 to 12',
         instructionKey: 'count-by-row',
         steps: [
             'Read the number in the box. That is the jump.',
             'Add the jump to a number to get the next one.',
             'Write each missing number in its box.',
-            'Check: the last number is 12 jumps.',
+            'Check: the last number is the last jump.',
         ],
         say: 'I count by __: __, __, __.',
         sayValues: (q) => { const d = countData(q); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
-    }),
+    })),
     misconceptions: ['skipped-multiple', 'counted-by-one', 'hundred-slip'],
     workedSteps: (q) => {
         const d = countData(q);

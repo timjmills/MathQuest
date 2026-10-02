@@ -97,8 +97,17 @@ function normaliseRequest(req = {}) {
             noCap: !!(s && s.noCap),
         }))
         .filter((s) => s.skills.length);
+    // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
+    // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
+    let onePage = false;
+    for (const sec of sections) {
+        const on = sec.skills.some((k) => {
+            try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+        });
+        if (on) { sec.count = 12; sec.pages = 1; sec.columns = 1; onePage = true; }
+    }
     return {
-        role, size, look, paper, seed, sections,
+        role, size: onePage ? 'S' : size, look, paper, seed, sections,
         form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
@@ -490,8 +499,10 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const at = html.indexOf(factRows[0]);
         const tracks = [...html.slice(0, at).matchAll(/grid-template-columns:\s*repeat\((\d+),/g)].map((m) => Number(m[1])).pop() || 3;
         if (digits.length > tracks) return null;
-        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
-        return html.replace(factRows[0], cells);
+        // The answer digits sit INSIDE the same box the pupil page draws (owner ruling 2026-10-02):
+        // the box is the zone itself, a grid of the stack's own tracks.
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);">${cells}</span>`);
     }
 
     // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
@@ -851,7 +862,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         visual: !!q.visual,
         footprint: fp,
         fclass: footprintClass(q, template, printSize),
-        cellCls: legacy ? 'mq-legacy' : '',
+        cellCls: (legacy ? 'mq-legacy' : '') + (q.cell && q.cell.payload && q.cell.payload.compact ? ' ws-cell-compact' : ''),
         key,
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
@@ -1180,7 +1191,7 @@ function spanGrades(sk) {
  * than the default is said too ("I Can add 6 (facts to 10)", "I Can add facts to 10").
  * factSetTitle() owns the set's name, so the header, the cell label and the key agree.
  */
-function optionTitle(sk, baseICan) {
+function optionTitleBase(sk, baseICan) {
     let set = '', bandDef = null, band;
     try {
         set = factSetTitle(sk.categoryId, sk.skillId, sk.opts || {});
@@ -1199,6 +1210,18 @@ function optionTitle(sk, baseICan) {
     const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}
+
+/** The page title for the chosen options; a count-by row of 15 jumps says so; the tables stay 1 to 12 (wave 1 lane C). */
+function optionTitle(sk, baseICan) {
+    const t = optionTitleBase(sk, baseICan);
+    try {
+        if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
+            const base = t || baseICan || '';
+            return /\(15 jumps\)/.test(base) ? base : `${base} (15 jumps)`;   // the tables stay 1 to 12; the row is 15 jumps long
+        }
+    } catch (e) { /* keep the base title */ }
+    return t;
 }
 
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
