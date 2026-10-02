@@ -294,14 +294,13 @@ register('stack', {
         // the scaffold level alone and the state only decides what ink goes in it. A Guided or
         // Model cell keeps its digit boxes in every state and the digits sit inside them; an
         // Independent cell keeps its open zone and the digits sit in it.
-        // Owner ruling 2026-10-02 (SL-3): every answer slot is a FULL box, so the open zone is
-        // drawn as the answer digit strip (same row height), and a printed answer / key fills the
-        // boxes instead of floating digits.
         let answer = p.answer || (level >= 2 ? 'boxes' : 'open');
         let boxInk = null;
-        if (answer === 'open') answer = 'boxes';
-        else if (answer === 'solid' || answer === 'traced') { boxInk = answer === 'traced' ? 'trace' : 'solid'; answer = 'boxes'; }
-        if (ctx.state !== 'blank') boxInk = ctx.state === 'traced' ? 'trace' : 'solid';
+        if (ctx.state !== 'blank') {
+            const ink = ctx.state === 'traced' ? 'trace' : 'solid';
+            if (answer === 'boxes') boxInk = ink;
+            else answer = ink === 'trace' ? 'traced' : 'solid';
+        }
         // SCC-T15 parity: a slot the pupil writes on paper is TYPED on screen. The printed
         // open answer zone becomes one digit input per track, in the same geometry (VA-11), the
         // carry boxes become ungraded inputs (VA-13) and the missing digit becomes an input too.
