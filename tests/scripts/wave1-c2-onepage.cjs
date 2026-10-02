@@ -47,6 +47,7 @@ const ROW_CASES = [
   { name: 'twelve rows, shuffled order', rows: [9, 3, 12, 5, 1, 8, 2, 11, 6, 4, 10, 7].map((n) => R(n)) },
   { name: 'twelve wide rows (cut)', rows: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 25000, 50000, 75000].map((n) => R(n, 'custom', 14000)) },
   { name: 'one row', rows: [R(25, 'custom', 100)] },
+  { name: 'wide row in the middle', rows: [R(3), R(7), R(25, 'zero'), R(100, 'custom', 2300), R(12, undefined, undefined, 'down'), R(1000, 'custom', 14000), R(5, 'custom', 3)] },
 ];
 async function rowsCheck() {
   const app = await open({ seed: 1 });

@@ -268,7 +268,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 125, 175, 225, 275",
+            "ans": "75, 125, 175, 200, 275",
             "measured": {
               "1": {
                 "hMm": 43.9,
@@ -1182,7 +1182,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 150, 200, 225, 300",
+            "ans": "75, 100, 125, 200, 250",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -1206,7 +1206,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 100, 125, 200, 250",
+            "ans": "100, 125, 200, 250, 300",
             "measured": {
               "1": {
                 "hMm": 43.7,

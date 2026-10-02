@@ -30,8 +30,9 @@ const CASES = {
   let fail = 0;
   for (const x of res) {
     // every LINE of six numbers (its numbers and gaps) on a page is different from every other line of its kind: zero repeats
-    const lineSigs = [[], []];
-    x.sigs.forEach((sg) => { const t = sg.split(' '); lineSigs[0].push(t.slice(0, 6).join(' ')); lineSigs[1].push(t.slice(6, 12).join(' ')); });
+    // (two lines of 6; the 15-number rows are three lines of 5)
+    const lineSigs = [[], [], []];
+    x.sigs.forEach((sg) => { const t = sg.split(' '); const per = t.length > 12 ? 5 : 6; for (let k = 0; k * per < t.length; k++) lineSigs[k].push(t.slice(k * per, (k + 1) * per).join(' ')); });
     const dupLines = lineSigs.map((ls, k) => ls.filter((s2, i) => ls.indexOf(s2) !== i).map((s2) => `line ${k + 1} "${s2}"`)).flat();
     const dup = x.sigs.filter((s, i) => x.sigs.indexOf(s) !== i);
     const pre = x.sigs.map((s) => s.split(' ').slice(0, 5).map((t) => (t === '_' ? '_' : 'n')).join(''));

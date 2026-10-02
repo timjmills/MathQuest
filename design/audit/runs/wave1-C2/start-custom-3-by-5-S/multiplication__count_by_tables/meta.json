@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 5. Write the missing numbers.",
-          "ans": "13, 23, 28, 33, 48",
+          "ans": "13, 18, 33, 38, 58",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -331,7 +331,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 5. Write the missing numbers.",
-          "ans": "13, 18, 33, 38, 58",
+          "ans": "13, 23, 28, 48, 58",
           "measured": {
             "1": {
               "hMm": 35.7,

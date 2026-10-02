@@ -275,7 +275,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 2. Write the missing numbers.",
-          "ans": "6, 12, 18, 20, 22",
+          "ans": "4, 12, 16, 18, 22",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 5. Write the missing numbers.",
-          "ans": "13, 23, 28, 33, 48",
+          "ans": "13, 18, 33, 38, 58",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -745,7 +745,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 1,000. Write the missing numbers.",
-          "ans": "9000, 7000, 6000, 5000, 3000",
+          "ans": "9000, 8000, 5000, 4000, 3000",
           "letter": "B",
           "measured": {
             "1": {
@@ -1040,7 +1040,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 2. Write the missing numbers.",
-          "ans": "6, 8, 14, 16, 18",
+          "ans": "4, 8, 10, 16, 22",
           "measured": {
             "1": {
               "hMm": 35.4,

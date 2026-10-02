@@ -105,11 +105,10 @@ function cbPage(q, ref = {}) {
     const froms = [...new Set(rows.map((r) => (r.start !== 'custom' ? null : r.dir === 'down' ? downStart(r, nn) : r.at)))];
     return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
 }
-// The steps in the order the rows are listed (and print): all of them up to six, else the first five and "other steps".
+// The steps in the order the rows are listed (and print), every one of them: the title never shortens to "and 5 more".
 const stepWords = (steps) => (!steps.length ? '1 to 12'
     : steps.length === 1 ? fmt(steps[0])
-        : steps.length <= 6 ? `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`
-            : `${steps.slice(0, 5).map(fmt).join(', ')} and other steps`);
+        : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`);
 
 registerSkill('multiplication:count_by_tables', {
     // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:

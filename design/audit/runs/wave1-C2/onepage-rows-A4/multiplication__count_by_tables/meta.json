@@ -9,36 +9,36 @@
     "independent": {
       "fits": {
         "cols": 1,
-        "rows": 5,
-        "perPage": 5,
-        "pages": 2,
-        "note": "Fits: 1 column x 5 rows, 5 per page, 2 pages. Digits 16 pt. Dense: 1 x 5, cells sized to the problems.",
+        "rows": 8,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
         "sections": [
           {
             "cols": 1,
-            "rows": 5,
-            "perPage": 5,
-            "pages": 2,
+            "rows": 8,
+            "perPage": 8,
+            "pages": 1,
             "cellW": 186,
-            "cellH": 45.6,
+            "cellH": 28.5,
             "requested": 1,
             "clamped": false,
-            "note": "Dense: 1 x 5, cells sized to the problems.",
-            "line": "Fits: 1 column x 5 rows, 5 per page, 2 pages. Digits 16 pt. Dense: 1 x 5, cells sized to the problems.",
+            "note": "Rows sized to the problems they hold.",
+            "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 44.7,
+            "hMin": 38.1,
             "anchorMm": 0,
             "blocks": null
           }
         ]
       },
-      "pageCount": 2,
-      "keyPageCount": 2,
+      "pageCount": 1,
+      "keyPageCount": 1,
       "seed": 244652,
-      "title": "I Can count on and back by 3, 7, 25, 100, 12 and other steps",
+      "title": "I Can count on and back by 3, 7, 25, 100, 12, 1,000 and 5",
       "notes": [
-        "Dense: 1 x 5, cells sized to the problems."
+        "Rows sized to the problems they hold."
       ],
       "gaps": [],
       "anchors": {
@@ -54,7 +54,7 @@
           "ans": "9, 12, 18, 21, 36",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -66,7 +66,7 @@
           "ans": "21, 28, 49, 70, 77",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -78,7 +78,7 @@
           "ans": "125, 150, 200, 225, 250",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -90,7 +90,7 @@
           "ans": "2700, 2800, 3000, 3100, 3300",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -102,7 +102,7 @@
           "ans": "108, 84, 60, 48, 12",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -114,7 +114,7 @@
           "ans": "18000, 20000, 21000, 22000, 25000",
           "measured": {
             "1": {
-              "hMm": 44.7,
+              "hMm": 38.1,
               "fits": true
             }
           }
@@ -126,7 +126,7 @@
           "ans": "13, 18, 23, 33, 48",
           "measured": {
             "1": {
-              "hMm": 29.2,
+              "hMm": 22.6,
               "fits": true
             }
           }
@@ -135,13 +135,7 @@
       "pages": [
         {
           "file": "independent-p1.png",
-          "words": 99,
-          "w_mm": 209.9,
-          "h_mm": 297
-        },
-        {
-          "file": "independent-p2.png",
-          "words": 56,
+          "words": 117,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -149,39 +143,31 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 127,
-          "w_mm": 209.9,
-          "h_mm": 297
-        },
-        {
-          "file": "independent-key-p2.png",
-          "words": 69,
+          "words": 155,
           "w_mm": 209.9,
           "h_mm": 297
         }
       ],
       "check": {
-        "pages": 2,
+        "pages": 1,
         "cells": [
-          5,
-          2
+          7
         ],
         "problems": [],
         "fonts": {
-          "Andika": 85
+          "Andika": 77
         },
         "fontsReady": true,
         "andika": true
       },
       "keyCheck": {
-        "pages": 2,
+        "pages": 1,
         "cells": [
-          5,
-          2
+          7
         ],
         "problems": [],
         "fonts": {
-          "Andika": 120
+          "Andika": 112
         },
         "fontsReady": true,
         "andika": true
