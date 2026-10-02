@@ -9,25 +9,25 @@
     "independent": {
       "fits": {
         "cols": 1,
-        "rows": 10,
-        "perPage": 10,
+        "rows": 4,
+        "perPage": 4,
         "pages": 2,
-        "note": "Fits: 1 column x 10 rows, 10 per page, 2 pages. Digits 16 pt. Rows sized to the problems they hold.",
+        "note": "Fits: 1 column x 4 rows, 4 per page, 2 pages. Digits 16 pt.",
         "sections": [
           {
             "cols": 1,
-            "rows": 10,
-            "perPage": 10,
+            "rows": 4,
+            "perPage": 4,
             "pages": 2,
             "cellW": 186,
-            "cellH": 21.04,
+            "cellH": 52.6,
             "requested": 1,
             "clamped": false,
-            "note": "Rows sized to the problems they hold.",
-            "line": "Fits: 1 column x 10 rows, 10 per page, 2 pages. Digits 16 pt. Rows sized to the problems they hold.",
+            "note": "",
+            "line": "Fits: 1 column x 4 rows, 4 per page, 2 pages. Digits 16 pt.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 32.9,
+            "hMin": 42.1,
             "anchorMm": 0,
             "blocks": null
           }
@@ -36,10 +36,8 @@
       "pageCount": 2,
       "keyPageCount": 2,
       "seed": 244652,
-      "title": "I Can count on and back by 3, 7 and 5 more",
-      "notes": [
-        "Rows sized to the problems they hold."
-      ],
+      "title": "I Can count on and back by 3, 7, 25, 100, 12 and other steps",
+      "notes": [],
       "gaps": [],
       "anchors": {
         "mode": "off",
@@ -54,7 +52,7 @@
           "ans": "9, 12, 18, 21, 36",
           "measured": {
             "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -66,7 +64,7 @@
           "ans": "21, 28, 49, 70, 77",
           "measured": {
             "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -78,7 +76,7 @@
           "ans": "125, 150, 200, 225, 250",
           "measured": {
             "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -90,7 +88,7 @@
           "ans": "2700, 2800, 3000, 3100, 3300",
           "measured": {
             "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -102,7 +100,7 @@
           "ans": "108, 84, 60, 48, 12",
           "measured": {
             "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -114,7 +112,7 @@
           "ans": "18000, 20000, 21000, 22000, 25000",
           "measured": {
             "1": {
-              "hMm": 32.9,
+              "hMm": 42.1,
               "fits": true
             }
           }
@@ -126,55 +124,7 @@
           "ans": "13, 18, 23, 33, 48",
           "measured": {
             "1": {
-              "hMm": 17.4,
-              "fits": true
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 3. Write the missing numbers.",
-          "ans": "9, 12, 15, 21, 30",
-          "measured": {
-            "1": {
-              "hMm": 17.4,
-              "fits": true
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 56, 63, 70",
-          "measured": {
-            "1": {
-              "hMm": 17.4,
-              "fits": true
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 75, 200, 225, 250",
-          "measured": {
-            "1": {
-              "hMm": 17.4,
-              "fits": true
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 100. Write the missing numbers.",
-          "ans": "2600, 2800, 3000, 3200, 3400",
-          "measured": {
-            "1": {
-              "hMm": 17.4,
+              "hMm": 26.6,
               "fits": true
             }
           }
@@ -183,13 +133,13 @@
       "pages": [
         {
           "file": "independent-p1.png",
-          "words": 141,
+          "words": 90,
           "w_mm": 215.9,
           "h_mm": 279.4
         },
         {
           "file": "independent-p2.png",
-          "words": 47,
+          "words": 65,
           "w_mm": 215.9,
           "h_mm": 279.4
         }
@@ -197,13 +147,13 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 194,
+          "words": 113,
           "w_mm": 215.9,
           "h_mm": 279.4
         },
         {
           "file": "independent-key-p2.png",
-          "words": 55,
+          "words": 83,
           "w_mm": 215.9,
           "h_mm": 279.4
         }
@@ -211,12 +161,12 @@
       "check": {
         "pages": 2,
         "cells": [
-          10,
-          1
+          4,
+          3
         ],
         "problems": [],
         "fonts": {
-          "Andika": 121
+          "Andika": 85
         },
         "fontsReady": true,
         "andika": true
@@ -224,12 +174,12 @@
       "keyCheck": {
         "pages": 2,
         "cells": [
-          10,
-          1
+          4,
+          3
         ],
         "problems": [],
         "fonts": {
-          "Andika": 176
+          "Andika": 120
         },
         "fontsReady": true,
         "andika": true

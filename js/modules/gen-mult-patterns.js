@@ -19,7 +19,7 @@ import { state } from './state.js';
 import { dealIndex, pageConstant } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
-import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePageRows } from './count-rows.js';
+import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePagePlan, getOnePageBody, NATURAL_MM, MIXED_PAD_MM } from './count-rows.js';
 import { k2Twin, renderCell } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
@@ -90,11 +90,12 @@ function _mulberry(seed) {
     return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 /** The k-th distinct set of gaps for a row on this page: a pure function of the page seed, the row key and k. */
-function listBlanks(deal, rowKey, k) {
+function listBlanks(deal, rowKey, k, rowKeyLen = 12) {
     const pageSeed = pageConstant('cbt-gaps', 1 << 30);
     const ck = `${pageSeed}|${rowKey}`;
     const c = _gapCache.get(ck) || { list: [], j: 0 };
-    const line1 = (b) => b.filter((i) => i < 6).join();   // the gaps of the first line: no two rows of a page open alike
+    const per = rowKeyLen > 12 ? 5 : 6;
+    const lines = (b) => [0, 1, 2].slice(0, rowKeyLen > 12 ? 3 : 2).map((l) => b.filter((i) => i >= l * per && i < (l + 1) * per).join());   // the gaps of each line: no two rows of a page share a line
     const saved = Math.random;
     try {
         while (c.list.length <= k && c.j < 600) {
@@ -102,7 +103,8 @@ function listBlanks(deal, rowKey, k) {
             c.j++;
             const b = deal(true);
             if (c.list.some((x) => x.join() === b.join())) continue;
-            if (c.list.some((x) => line1(x) === line1(b)) && c.j < 300) continue;
+            const lb = lines(b);
+            if (c.list.some((x) => lines(x).some((l, k) => l === lb[k])) && c.j < 500) continue;
             c.list.push(b);
         }
     } finally { Math.random = saved; }
@@ -121,10 +123,10 @@ export function genCountByTables(q) {
     let pageRows = normalizeRows(opt('rows'));
     if (!pageRows.length && ticks.length < 12) pageRows = ticks.map((n) => ({ step: n, start: 'step', dir: 'up' }));
     const plainSteps = pageRows.length && pageRows.every(isPlainRow) ? [...new Set(pageRows.map((r) => r.step))].sort((a, b) => a - b) : null;
-    if (plainSteps && plainSteps.length === 12) pageRows = [];          // every table: the usual page
-    let row;
+    if (plainSteps && plainSteps.length === 12 && !onePage) pageRows = [];          // every table: the usual page
+    let row, plan = null, planW = 1;
     if (onePage && pageRows.length) {
-        const list = onePageRows(pageRows); pageRows = list; row = list[idx % list.length];
+        plan = onePagePlan(pageRows); pageRows = plan.rows; row = plan.rows[idx % plan.rows.length]; planW = plan.weights[idx % plan.rows.length];
     } else if (!onePage && pageRows.length && !plainSteps) {
         row = opt('order') === 'mixed' && pageRows.length > 1 ? pageRows[dealIndex('cbt-row', pageRows.length)] : pageRows[idx % pageRows.length];
     } else {
@@ -191,7 +193,7 @@ export function genCountByTables(q) {
     // Printed pages with a chosen list only (a plain list's FIRST pass through its tables, and the usual tables page, print exactly as before).
     let blanks;
     if (Number.isFinite(state.itemIndex) && pageRows.length && (onePage || !plainSteps || plainSteps.length < 6)) {
-        blanks = listBlanks(deal, `${t}|${row.start}|${row.at}|${row.dir}|${len}|${fill}|${pct}`, idx);
+        blanks = listBlanks(deal, `${t}|${row.start}|${row.at}|${row.dir}|${len}|${fill}|${pct}`, idx, len);
     } else blanks = deal();
     const parts = blanks.map(i => values[i]);
     const shape = opt('shape') || 'box';
@@ -218,7 +220,17 @@ export function genCountByTables(q) {
     const tab = dirOpt === 'forward' ? fmt(t) : `${down ? '−' : '+'}${fmt(t)}`;
     const payload = { values, blanks, look: 'arcs', tab, shape };
     if (labels) { payload.times = timesMode; payload.labels = labels; }
-    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // the rows on one page: tighter chrome, digits at the S working size
+    if (onePage) {
+        payload.compact = true; q.countBy.onePage = true;
+        // chosen rows on one page: a short list spreads its rows over the page height (extra space above and below each row) instead of
+        // leaving the lower half empty; and when a two-line row is among them the one-line rows keep a little, so heights stay within 1.6x
+        if (plan) {
+            // the same air round every row (so one-line and two-line rows stay within 1.6x of each other and keep the teacher's order)
+            let pad = Math.min(13, Math.max(0, (getOnePageBody() * (plan.mixed ? 0.9 : 1) - NATURAL_MM * plan.units) / (2 * plan.rows.length)));
+            if (plan.mixed) pad = Math.max(pad, MIXED_PAD_MM);
+            if (pad > 0.05) payload.vpad = Math.round(pad * 10) / 10;
+        }
+    }   // the rows on one page: tighter chrome, digits at the S working size
     q.cell = { template: 'count-row', v: 1, payload };
     q.visual = k2Twin('count-row', payload);
     q.printFormat = 'count-row';

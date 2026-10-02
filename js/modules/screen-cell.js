@@ -927,7 +927,9 @@ function wireSwipeRows(cellEl) {
             const t = e.target;
             if (!t || !t.getBoundingClientRect) return;
             const r = t.getBoundingClientRect(), v = w.getBoundingClientRect();
-            if (r.left < v.left + 4) w.scrollLeft -= (v.left + 4 - r.left);
+            const tab = t.closest('.k2-countrow-line') && t.closest('.k2-countrow-line').firstElementChild;     // the pinned step tab stays on show
+            const pin = tab ? tab.getBoundingClientRect().width + 4 : 4;
+            if (r.left < v.left + pin) w.scrollLeft -= (v.left + pin - r.left);
             else if (r.right > v.right - 4) w.scrollLeft += (r.right - v.right + 4);
             upd();
         });

@@ -135,23 +135,45 @@ export function rowLines(row, signed = false, n = 12) {
     return pt >= FLOOR ? 1 : 2;
 }
 
+/** The page holds this many single-line rows (A4 and Letter alike: twelve compact lines fit both). */
 export const ONE_PAGE_LINES = 12;
+/** A row of two lines of six takes this many single-line rows of height (measured on the sheet). */
+export const TWO_LINE_UNITS = 2.5;
 /** The tables the one-page sheet prints when no rows are chosen. */
 export const ONE_PAGE_ITEMS = 12;
+/** Usable body height (mm) the one-page sheet's rows share, a little under the shorter paper's (Letter). */
+/** Height (mm) of one compact single-line row on the sheet, and the air a mixed page keeps round every row. */
+export const NATURAL_MM = 19.5;
+export const MIXED_PAD_MM = 2.2;
+export const ONE_PAGE_BODY_MM = 225;
+let _bodyMm = ONE_PAGE_BODY_MM;
+/** The sheet tells the generator the paper's body height (A4 225, Letter 207) so a short list's spread fits the page it prints on. */
+export function setOnePageBody(mm) { _bodyMm = Number(mm) > 0 ? Number(mm) : ONE_PAGE_BODY_MM; }
+export const getOnePageBody = () => _bodyMm;
 
-/** The rows the one-page sheet prints: the list in order, starting again until its twelve lines are full (at least one row). */
-export function onePageRows(rows) {
+/**
+ * "All rows on one page" with rows chosen: each chosen row ONCE, in the teacher's order, as many as fit one page. `rows` are the
+ * rows printed; `cut` the chosen rows that did not fit (the panel says so); `units` the page height they use (a one-line row is 1).
+ */
+export function onePagePlan(rows, bodyMm = _bodyMm) {
     const list = normalizeRows(rows);
-    if (!list.length) return [];
     const signed = list.some((r) => r.dir === 'down');          // the step tab carries a + / - sign when any row goes back
     const out = [];
     let used = 0;
-    for (let i = 0; i < 24; i++) {
-        const r = list[i % list.length];
-        const l = rowLines(r, signed);
-        if (out.length && used + l > ONE_PAGE_LINES) break;
-        out.push(r);
-        used += l;
+    for (const r of list) {
+        const w = rowLines(r, signed) === 1 ? 1 : TWO_LINE_UNITS;
+        if (out.length && used + w > ONE_PAGE_LINES + 1e-9) break;
+        out.push(Object.assign({}, r, { _w: w }));
+        used += w;
     }
-    return out;
+    // a page that mixes one-line and two-line rows keeps a little air round the one-line rows (heights within 1.6x, so nothing is regrouped
+    // and the order stays the teacher's): drop the last rows until the page, with that air, still fits its paper
+    const mixed = () => out.some((r) => r._w > 1) && out.some((r) => r._w === 1);
+    const hmm = () => out.reduce((a, r) => a + NATURAL_MM * r._w, 0) + (mixed() ? 2 * MIXED_PAD_MM * out.length : 0);
+    while (out.length > 1 && hmm() > Math.min(bodyMm, 207) + (mixed() ? 0 : 30)) out.pop();
+    used = out.reduce((a, r) => a + r._w, 0);
+    return { mixed: mixed(), rows: out.map((r) => { const c = { ...r }; delete c._w; return c; }), weights: out.map((r) => r._w), cut: list.length - out.length, units: used, of: list.length };
 }
+
+/** The rows the one-page sheet prints (see onePagePlan). */
+export function onePageRows(rows) { return onePagePlan(rows).rows; }

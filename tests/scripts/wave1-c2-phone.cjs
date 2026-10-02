@@ -58,6 +58,10 @@ const MEASURE = () => {
     else { const h = await page.evaluateHandle(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); return w ? (w.closest('[id^="ws_card_"]') || w.parentElement) : null; }); const el = h.asElement(); if (el) await el.screenshot({ path: `design/audit/runs/wave1-C2/phone-worksheet-${slug}.png` }); }
     const first = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const i = w && w.querySelector('input.mq-cellslot'); if (i) i.focus(); return !!i; });
     if (!first) { check(false, `${tag}: no boxes`); continue; }
+    // the step tab stays on show after the first box takes focus (it is pinned to the window's left edge)
+    await sleep(120);
+    const tabVis = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const t = w.querySelector('.k2-steptab'); if (!t) return true; const r = t.getBoundingClientRect(), v = w.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; });
+    check(tabVis, `${tag}: the step tab is still on show after the first box takes focus`);
     const n = await page.evaluate(() => [...[...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent).querySelectorAll('input.mq-cellslot')].length);   // the first card's boxes (the worksheet holds many cards)
     const seen = new Set();
     let bad = [];

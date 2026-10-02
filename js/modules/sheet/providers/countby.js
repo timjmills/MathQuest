@@ -19,6 +19,7 @@
 
 import { registerSkill } from '../contract.js';
 import { num, arr, obj, operands, chooseWrong, strings, step, clampSteps, fmt } from './util.js';
+import { downStart } from '../../count-rows.js';
 
 /** A `strings` member whose library key (and steps) depend on the item: `pick(q)` -> def. */
 function stringsBy(pick) {
@@ -100,13 +101,15 @@ function cbPage(q, ref = {}) {
     const steps = [...new Set(rows.map((r) => r.step))];
     const downs = rows.filter((r) => r.dir === 'down').length;
     const nn = ref && ref.opts && Number(ref.opts.jumps) === 15 ? 15 : 12;
-    // the start a row really prints: a back row too short for nn numbers is raised to the smallest start that gives them
-    const froms = [...new Set(rows.map((r) => (r.start !== 'custom' ? null : r.dir === 'down' && r.at < (nn - 1) * r.step ? (nn - 1) * r.step + (r.at % r.step) : r.at)))];
+    // the start a row really prints: a back row too short for nn numbers is raised (count-rows.js downStart)
+    const froms = [...new Set(rows.map((r) => (r.start !== 'custom' ? null : r.dir === 'down' ? downStart(r, nn) : r.at)))];
     return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
 }
+// The steps in the order the rows are listed (and print): all of them up to six, else the first five and "other steps".
 const stepWords = (steps) => (!steps.length ? '1 to 12'
-    : steps.length <= 4 ? (steps.length === 1 ? fmt(steps[0]) : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`)
-        : `${fmt(steps[0])}, ${fmt(steps[1])} and ${steps.length - 2} more`);
+    : steps.length === 1 ? fmt(steps[0])
+        : steps.length <= 6 ? `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`
+            : `${steps.slice(0, 5).map(fmt).join(', ')} and other steps`);
 
 registerSkill('multiplication:count_by_tables', {
     // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:

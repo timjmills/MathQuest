@@ -120,3 +120,61 @@ The wording is tight. It names the cell, the skill and the look, and says shrink
    **Fix:** confirm it does not happen in live play, and retake the screenshot.
 
 Arcs point right on the counting-back rows, as ruled. The compact sheet is untouched. TY-10a is accepted.
+
+---
+
+# Round 3 (Opus, low)
+
+Graded at **419d355** (the base was debc9c6). The working tree is clean.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 8 | Tab works at 390 on the card and the worksheet in all 8 cases, the cue shows, and the start dropdown reads "Number". |
+| C2 Educational value | 7 | Titles now name the start that prints. The new one-page "fill" repeats rows the teacher did not ask for twice, and puts them out of the list's order. |
+| C3 Spacing and layout | 7 | "All rows on one page" now prints **two pages on Letter**, with one orphan row on page 2 (and the same in the key). |
+| C4 Standard fidelity | 8 | Black and white, Andika, facsimile keys, arcs point right on back rows. The one-page sheet with no rows chosen is byte-identical to 4911898 (12 of 12). |
+
+## Runs (all from the tree, one at a time)
+
+- `wave1-c2-phone`: OK. Card and worksheet at 390, 4 cases each. A real `keyboard.press('Tab')` walk (only the first box is focused by script) reaches 5, 5, 7 and 5 boxes, each fully visible. Page scroll width is 0. The cue shows at the start, hides at the end, and never covers a box.
+- `wave1-c2-dupes`: OK, 7 cases × 4 roles × S/L. The probe allows one repeated first line per page and checks line 1 on page 1 only, which is lenient (see defect 4).
+- `wave1-c2-onepage` (`MQ_BASE_ROOT` set to a `git archive 4911898`): OK, 12 of 12 identical.
+- `wave1-c2-panel`: OK at 1280 and 390. Dropdown widths are 174/102/102/102, and the raised starts are explained.
+- `ws-content-audit --skill count_by_tables`: OK, 0 failing.
+- `ws-screen-answer --skills multiplication:count_by_tables`: OK (card, worksheet 3/3, quiz 3/3, live green).
+- `ws-print-lint --source kit --skills multiplication:count_by_tables --roles independent,more-practice,test,guided`: 0 findings at S and at L. The same holds with `--opts` set to a 5-row mixed list (with 100,000 from 1,000,000), to one-page with typed rows, and to times-each back by 7. That is 8 runs and 32 documents, all clean. The lint runs on A4 only, so it cannot catch defect 1.
+
+## Round-2 defects
+
+1. Titles name the printed start: **fixed**. back-from-30 S/L reads "I Can count back by 5 from 55", and the rows start at 55. `rowsSummary` (`count-rows.js`) and `cbPage` (`providers/countby.js`) now both raise the start. `cbPage` re-implements `downStart` inline instead of calling it, so the two can drift apart. Minor.
+2. Same values plus same blanks: **fixed** by the gate. On times-each-L test p1, b and d now differ. Items a and c still both open "7 14 21 [ ]", but their lines then differ. Accepted.
+3. Worksheet Tab at 390: **fixed**. Real keyboard, 4 of 4.
+4. Start dropdown at 390: **fixed**. It reads "Number" in `panel-open-390.png`.
+5. Glossary popover: the explanation is accepted. Focus lands on a glossary word, which opens its tip, so this is live behaviour and not a fault in the screenshot. The screenshots are now taken before the Tab walk, and `phone-*` show no popover.
+
+## The builder's unasked change (one-page sheet with rows chosen repeats the list to fill twelve lines)
+
+**Not sensible as built. Revert to "each chosen row once".** Reasons:
+- The option is called "All rows on one page". The teacher chose a list, and the label promises *that list*, on *one page*. Filling it repeats rows the teacher did not ask for twice. In `onepage-rows-A4`, +3, +7, +25 and +100 each appear twice. This also contradicts the one-page help text from round 2, which the owner saw.
+- It breaks the one-page promise itself. On Letter, `onepage-rows-Letter` and `onepage-rows-wide-Letter` now have `pageCount: 2` and `keyPageCount: 2`. Page 2 holds a single row (k, +100) under a full header. In round 2 these were 1 page. `onePageRows` counts twelve lines, but at size S a Letter page holds fewer once a two-line or wide row is present (fits: 10 and 8 per page).
+- If the owner wants a full sheet, the teacher can add rows. Fill could be a separate, explicit choice ("Repeat to fill the page"), off by default. Even then it must stop at what the page measurably holds, not at a fixed 12 lines.
+
+## Ranked defects (RUBRIC §6 form)
+
+1. **C3/C4, major. Where:** `onepage-rows-Letter` and `onepage-rows-wide-Letter`, independent p2 and key p2.
+   **What:** "All rows on one page" prints 2 pages, and page 2 holds one orphan row. This regressed with the fill-to-twelve change in `onePageRows` (`count-rows.js:142`).
+   **Fix:** print each chosen row once (see the judgement above). Whatever the rule, cap the rows at the count the paper actually fits (`fits.perPage` for that paper), never a fixed 12 lines. Add Letter cases with rows to `wave1-c2-onepage`, asserting `pageCount === 1`.
+2. **C2, major. Where:** `onepage-rows-A4` and `onepage-rows-Letter` p1.
+   **What:** rows repeat on a sheet the teacher built from a list, without being asked. The I Can reads "by 3, 7 and 5 more", but row a is +1,000. The printed order (1,000 first, then the repeats starting with +3 and not with the head of the list) does not match the order the title gives. "And 5 more" also tells the pupil nothing.
+   **Fix:** print each row once, in the teacher's order. Make the title follow the printed order, or fall back to a generic title ("count on and back") when there are more than 4 steps.
+3. **C1, minor. Where:** `phone-card-by-100-000-from-1-000-000-15-.png`.
+   **What:** once the first box takes focus, the row scrolls so the step tab "100,000" is off-screen. Only the chevron "〉" shows, so the pupil cannot see what they are counting by. The instruction line does state it.
+   **Fix:** on the first focus, keep `scrollLeft` at 0 when the box is already fully visible. Or pin the step tab, sticky on the left, as the cue is pinned.
+4. **C2, minor (gate).** **Where:** `tests/scripts/wave1-c2-dupes.cjs`.
+   **What:** it checks line-1 repeats on page 1 only, and tolerates one repeat per page.
+   **Fix:** check every page.
+5. **C4, minor. Where:** `providers/countby.js` `cbPage`.
+   **What:** it duplicates `downStart` inline.
+   **Fix:** import it from `count-rows.js`.

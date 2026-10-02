@@ -37,6 +37,33 @@ async function digest() {
   return dig;
 }
 
+
+// CHOSEN ROWS (owner 2026-10-02 round 3): each chosen row ONCE, in the teacher's order, as many as fit; always 1 pupil page + 1 key page
+// on A4 and Letter; when more rows are chosen than fit the sheet prints what fits (and the panel says how many).
+const R = (step, start, at, dir) => Object.assign({ step }, start ? { start } : {}, at !== undefined ? { at } : {}, dir ? { dir } : {});
+const ROW_CASES = [
+  { name: 'five rows', rows: [R(3), R(7), R(25, 'zero'), R(100, 'custom', 2300), R(12, undefined, undefined, 'down')] },
+  { name: 'wide rows first', rows: [R(100000, 'custom', 1000000), R(1000, 'custom', 14000), R(4), R(9), R(6), R(2), R(8), R(11)] },
+  { name: 'twelve rows, shuffled order', rows: [9, 3, 12, 5, 1, 8, 2, 11, 6, 4, 10, 7].map((n) => R(n)) },
+  { name: 'twelve wide rows (cut)', rows: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 25000, 50000, 75000].map((n) => R(n, 'custom', 14000)) },
+  { name: 'one row', rows: [R(25, 'custom', 100)] },
+];
+async function rowsCheck() {
+  const app = await open({ seed: 1 });
+  const res = await app.page.evaluate(async (ROW_CASES, PAPERS) => {
+    const out = [];
+    for (const paper of PAPERS) for (const c of ROW_CASES) {
+      const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: { onePage: true, rows: c.rows } }], count: 12, pages: 1, columns: 1 }], size: 'S', paper, seed: 4242, key: true });
+      const d = document.createElement('div'); d.innerHTML = r.pupilHtml;
+      const tabs = [...d.querySelectorAll('[data-ws-steptab]')].map((e) => Number(e.getAttribute('data-ws-steptab').replace(/[^0-9]/g, '')));
+      out.push({ paper, name: c.name, chosen: c.rows.map((x) => x.step), pages: r.pageCount, keyPages: r.keyPageCount, items: r.items.length, tabs });
+    }
+    return out;
+  }, ROW_CASES, PAPERS);
+  await app.close();
+  return res;
+}
+
 (async () => {
   if (process.argv.includes('--digest')) { console.log('DIGEST ' + JSON.stringify(await digest())); return; }
   const base = process.env.MQ_BASE_ROOT;
@@ -52,6 +79,14 @@ async function digest() {
     const one = now[k].pages === 1 && now[k].keyPages === 1 && now[k].items === 12;
     if (!same || !one) fail++;
     console.log(`${same && one ? 'ok  ' : 'FAIL'} ${k.padEnd(44)} ${same ? 'identical to base' : 'DIFFERS from base'}; ${now[k].pages} page + ${now[k].keyPages} key page, ${now[k].items} items`);
+  }
+  for (const x of await rowsCheck()) {
+    // printed order: the tabs read in the order the rows were chosen (the one-line rows keep their heights within 1.6x, so nothing is regrouped)
+    const want = x.chosen.slice(0, x.items);
+    const inOrder = JSON.stringify(x.tabs) === JSON.stringify(want);
+    const ok = x.pages === 1 && x.keyPages === 1 && x.items >= 1 && x.items <= x.chosen.length && inOrder && new Set(x.tabs).size === x.tabs.length;
+    if (!ok) fail++;
+    console.log(`${ok ? 'ok  ' : 'FAIL'} ${x.paper} | rows: ${x.name.padEnd(28)} ${x.items} of ${x.chosen.length} rows, ${x.pages} page + ${x.keyPages} key page, each once${inOrder ? ', in order' : ', ORDER WRONG ' + JSON.stringify(x.tabs)}`);
   }
   console.log(fail ? `wave1-c2-onepage: FAIL (${fail})` : 'wave1-c2-onepage: OK');
   process.exit(fail ? 1 : 0);

@@ -29,16 +29,16 @@ const CASES = {
   }, CASES);
   let fail = 0;
   for (const x of res) {
+    // every LINE of six numbers (its numbers and gaps) on a page is different from every other line of its kind: zero repeats
+    const lineSigs = [[], []];
+    x.sigs.forEach((sg) => { const t = sg.split(' '); lineSigs[0].push(t.slice(0, 6).join(' ')); lineSigs[1].push(t.slice(6, 12).join(' ')); });
+    const dupLines = lineSigs.map((ls, k) => ls.filter((s2, i) => ls.indexOf(s2) !== i).map((s2) => `line ${k + 1} "${s2}"`)).flat();
     const dup = x.sigs.filter((s, i) => x.sigs.indexOf(s) !== i);
-    // the first four numbers' printed / gap pattern may repeat, but not on every row of a page of 4 or more
     const pre = x.sigs.map((s) => s.split(' ').slice(0, 5).map((t) => (t === '_' ? '_' : 'n')).join(''));
     const allSamePrefix = x.sigs.length >= 4 && new Set(pre).size === 1;
-    // no two rows of one step open with the same first line (its numbers and gaps) while the page has fewer rows than line-1 patterns
-    const l1 = x.sigs.map((s) => s.split(' ').slice(0, 6).join(' '));
-    const dupLine1 = x.page === 1 && x.sigs.length <= 6 && (l1.length - new Set(l1).size) >= 2 && new Set(x.sigs.map((s) => s.split(' ').filter((t) => t !== '_').slice(0, 1).join())).size === 1;   // at most one repeated first line per page
-    const ok = !dup.length && !allSamePrefix && !dupLine1;
+    const ok = !dup.length && !allSamePrefix && !dupLines.length;
     if (!ok) fail++;
-    if (!ok || x.role === 'independent' && x.page === 1) console.log(`${ok ? 'ok  ' : 'FAIL'} ${x.name.padEnd(22)} ${x.role.padEnd(13)} ${x.size} p${x.page} ${x.sigs.length} rows${dup.length ? `; duplicate: ${dup[0]}` : ''}${allSamePrefix ? `; every row opens ${pre[0]}` : ''}${dupLine1 ? '; two rows share their first line' : ''}`);
+    if (!ok || x.role === 'independent' && x.page === 1) console.log(`${ok ? 'ok  ' : 'FAIL'} ${x.name.padEnd(22)} ${x.role.padEnd(13)} ${x.size} p${x.page} ${x.sigs.length} rows${dup.length ? `; duplicate: ${dup[0]}` : ''}${allSamePrefix ? `; every row opens ${pre[0]}` : ''}${dupLines.length ? `; repeated ${dupLines[0]}` : ''}`);
   }
   await app.close();
   console.log(fail ? `wave1-c2-dupes: FAIL (${fail})` : 'wave1-c2-dupes: OK');

@@ -31,7 +31,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { onePageRows, ONE_PAGE_ITEMS } from './count-rows.js';
+import { onePageRows, setOnePageBody, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -1250,7 +1250,14 @@ function skillMeta(sk, q) {
     }
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
-    if (sk.skillId === 'count_by_tables') { try { titleOpts = { opts: normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}) }; } catch (e) { titleOpts = {}; } }
+    if (sk.skillId === 'count_by_tables') {
+        try {
+            const no = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+            // the one-page sheet prints only the rows that fit: the title names those, in the order they print
+            if (no.onePage && no.rows && no.rows.length) no.rows = onePageRows(no.rows);
+            titleOpts = { opts: no };
+        } catch (e) { titleOpts = {}; }
+    }
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
@@ -1424,6 +1431,7 @@ function anchorSummary(mode, list, notes) {
  */
 export async function buildSheet(req = {}) {
     const n = normaliseRequest(req);
+    setOnePageBody(n.paper === 'Letter' ? 207 : 225);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();

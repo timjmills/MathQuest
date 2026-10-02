@@ -19,7 +19,7 @@
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
 import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary } from './skill-options.js';
-import { normalizeRows, downStart, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
+import { normalizeRows, downStart, onePagePlan, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
 import { state } from './state.js';
@@ -332,6 +332,7 @@ function _rowsControlHTML(def, rows, color, h, tip, cur) {
         + `<button type="button"${full ? ' disabled' : ''} onclick="${call('add', -1, 'this.previousElementSibling.value')}" style="min-height:40px;padding:0 12px;border:1px solid ${color};border-radius:7px;background:${color}22;color:var(--text);cursor:pointer;font-weight:700;">Add</button>`
         + (list.length ? `<button type="button" onclick="${call('clear', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text-dim);cursor:pointer;">Clear</button>` : '')
         + `</div>`
+        + (cur && cur.onePage && list.length && onePagePlan(list, 207).cut > 0 ? `<div class="sko-onepage-note" style="font-size:0.74rem;font-weight:600;margin-top:8px;color:var(--text);">${onePagePlan(list, 207).rows.length} of ${list.length} rows fit on one page (A4 or Letter).</div>` : '')
         + (list.length ? `<div class="sko-rows-list" style="margin-top:8px;">${rowsHtml}</div>`
             : `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;">None chosen: the page counts by the tables 2 to 12.</div>`)
         + `</div>`;

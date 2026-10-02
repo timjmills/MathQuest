@@ -208,7 +208,7 @@ function stepTab(ctx, g, text) {
         + `fill="#fff" stroke="${INK}" stroke-width="${n2(sw)}" stroke-linejoin="round"/>`
         + `<text x="${n2((w - 3) / 2 + 0.3)}" y="${n2(h / 2)}" dominant-baseline="central" text-anchor="middle" font-family="Andika, sans-serif" `
         + `font-weight="700" font-size="${n2(Math.min(g.pt * 1.05, 20) * 25.4 / 72)}" fill="${INK}">${esc(text)}</text>`;
-    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
+    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="${isTwin(ctx) ? 'position:sticky;left:0;z-index:2;background:#fff;' : ''}flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
         + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="count by ${esc(text)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
 }
 
@@ -291,7 +291,7 @@ register('count-row', {
             const turns = g.look === 'arcs' && g.tab && g.rows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span class="k2-steptab-in" style="${isTwin(ctx) ? 'position:sticky;left:0;z-index:2;background:#fff;' : ''}flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
@@ -312,11 +312,12 @@ register('count-row', {
                 + `<span>${esc(p.ruleBox.pre || 'Rule:')}</span>${rb}${p.ruleBox.post ? `<span>${esc(p.ruleBox.post)}</span>` : ''}</div>`;
         }
         const align = g.tab ? 'left' : 'center';
+        const vp = Number(p.vpad) > 0 ? Number(p.vpad) : 0;
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${isTwin(ctx) && g.look === 'arcs' ? '<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;">' : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
             + `${isTwin(ctx) && g.look === 'arcs' ? '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div>' : ''}${ruleFrame}`,
-            { style: `text-align:${align};` });
+            { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
     },
     answerKey(p) {
         const parts = keyParts(p);
@@ -331,7 +332,7 @@ register('count-row', {
         const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
-        return { wMm: Math.ceil(w), hMm: Math.ceil(h), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
+        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (Number(p.vpad) > 0 ? Number(p.vpad) : 0)), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));

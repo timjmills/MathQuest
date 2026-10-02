@@ -10,34 +10,34 @@
       "independent": {
         "fits": {
           "cols": 1,
-          "rows": 8,
-          "perPage": 8,
-          "pages": 2,
-          "note": "Fits: 1 column x 8 rows, 8 per page, 2 pages. Digits 16 pt. Rows sized to the problems they hold.",
+          "rows": 7,
+          "perPage": 7,
+          "pages": 1,
+          "note": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
           "sections": [
             {
               "cols": 1,
-              "rows": 8,
-              "perPage": 8,
-              "pages": 2,
+              "rows": 7,
+              "perPage": 7,
+              "pages": 1,
               "cellW": 186,
-              "cellH": 26.3,
+              "cellH": 30.057,
               "requested": 1,
               "clamped": false,
               "note": "Rows sized to the problems they hold.",
-              "line": "Fits: 1 column x 8 rows, 8 per page, 2 pages. Digits 16 pt. Rows sized to the problems they hold.",
+              "line": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
               "cls": "standard",
               "digitPt": 16,
-              "hMin": 32.9,
+              "hMin": 39.9,
               "anchorMm": 0,
               "blocks": null
             }
           ]
         },
-        "pageCount": 2,
-        "keyPageCount": 2,
+        "pageCount": 1,
+        "keyPageCount": 1,
         "seed": 244652,
-        "title": "I Can count by 100,000, 1,000 and 6 more",
+        "title": "I Can count by 100,000, 1,000, 4, 9, 6 and other steps",
         "notes": [
           "Rows sized to the problems they hold."
         ],
@@ -55,7 +55,7 @@
             "ans": "1200000, 1300000, 1600000, 1800000, 1900000",
             "measured": {
               "1": {
-                "hMm": 32.9,
+                "hMm": 39.9,
                 "fits": true
               }
             }
@@ -67,7 +67,7 @@
             "ans": "16000, 18000, 22000, 23000, 24000",
             "measured": {
               "1": {
-                "hMm": 32.9,
+                "hMm": 39.9,
                 "fits": true
               }
             }
@@ -79,7 +79,7 @@
             "ans": "16, 28, 36, 40, 48",
             "measured": {
               "1": {
-                "hMm": 17.4,
+                "hMm": 24.4,
                 "fits": true
               }
             }
@@ -91,7 +91,7 @@
             "ans": "27, 45, 54, 72, 108",
             "measured": {
               "1": {
-                "hMm": 17.4,
+                "hMm": 24.4,
                 "fits": true
               }
             }
@@ -103,7 +103,7 @@
             "ans": "24, 30, 36, 54, 66",
             "measured": {
               "1": {
-                "hMm": 17.4,
+                "hMm": 24.4,
                 "fits": true
               }
             }
@@ -115,7 +115,7 @@
             "ans": "6, 12, 16, 20, 22",
             "measured": {
               "1": {
-                "hMm": 17.4,
+                "hMm": 24.4,
                 "fits": true
               }
             }
@@ -127,31 +127,7 @@
             "ans": "32, 40, 56, 80, 96",
             "measured": {
               "1": {
-                "hMm": 17.4,
-                "fits": true
-              }
-            }
-          },
-          {
-            "template": "count-row",
-            "fclass": "standard",
-            "text": "Count by 11. Write the missing numbers.",
-            "ans": "44, 55, 77, 110, 132",
-            "measured": {
-              "1": {
-                "hMm": 17.4,
-                "fits": true
-              }
-            }
-          },
-          {
-            "template": "count-row",
-            "fclass": "standard",
-            "text": "Count by 100,000. Write the missing numbers.",
-            "ans": "1400000, 1500000, 1700000, 1800000, 1900000",
-            "measured": {
-              "1": {
-                "hMm": 32.9,
+                "hMm": 24.4,
                 "fits": true
               }
             }
@@ -160,13 +136,7 @@
         "pages": [
           {
             "file": "independent-p1.png",
-            "words": 121,
-            "w_mm": 215.9,
-            "h_mm": 279.4
-          },
-          {
-            "file": "independent-p2.png",
-            "words": 48,
+            "words": 115,
             "w_mm": 215.9,
             "h_mm": 279.4
           }
@@ -174,39 +144,31 @@
         "keyPages": [
           {
             "file": "independent-key-p1.png",
-            "words": 164,
-            "w_mm": 215.9,
-            "h_mm": 279.4
-          },
-          {
-            "file": "independent-key-p2.png",
-            "words": 56,
+            "words": 153,
             "w_mm": 215.9,
             "h_mm": 279.4
           }
         ],
         "check": {
-          "pages": 2,
+          "pages": 1,
           "cells": [
-            8,
-            1
+            7
           ],
           "problems": [],
           "fonts": {
-            "Andika": 103
+            "Andika": 77
           },
           "fontsReady": true,
           "andika": true
         },
         "keyCheck": {
-          "pages": 2,
+          "pages": 1,
           "cells": [
-            8,
-            1
+            7
           ],
           "problems": [],
           "fonts": {
-            "Andika": 148
+            "Andika": 112
           },
           "fontsReady": true,
           "andika": true
