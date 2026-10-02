@@ -392,7 +392,7 @@ export function nextMapItem() {
 
     // Universal Skip button — visible in MAP practice + simulation.
     const _skipBtn = document.getElementById('skipQuestionBtn');
-    if (_skipBtn) _skipBtn.style.display = 'inline-block';
+    if (_skipBtn) _skipBtn.style.display = 'none'; // shown after N wrong tries (skip-setting.js)
 
     // Refresh the navigator strip — current item just changed.
     renderMapNavBar();

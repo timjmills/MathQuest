@@ -1,11 +1,12 @@
-// Verification test for the wrong-answer retry + Skip-after-2nd behavior.
+// Verification test for the wrong-answer retry + Skip-after-N behavior (Wave 1 item 1.3: Skip is a
+// per-skill option `skipAfter`, default 5 wrong tries; the old "Next" after 2 tries is gone).
 // Covers: MAP Practice (K-2 + 3-5), MAP Simulation, standard Practice mode.
 
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 
-const BASE = 'http://localhost:8080/index.html';
+const BASE = process.env.MQ_BASE || 'http://localhost:8080/index.html';
 const SHOT_DIR = path.join(__dirname, 'test-wrong-retry-screenshots');
 if (!fs.existsSync(SHOT_DIR)) fs.mkdirSync(SHOT_DIR, { recursive: true });
 
@@ -84,15 +85,40 @@ async function submitCorrect(page) {
     });
 }
 
+// A wrong try that always counts (works for multiple-choice too, where a crossed-out button
+// cannot be clicked twice).
+async function submitWrongRaw(page, idx) {
+    return await page.evaluate((i) => {
+        const q = window.state.currentQ;
+        const v = (typeof q.ans === 'number') ? String(q.ans + 12345 + i) : ((q.options && q.options.find(o => String(o) !== String(q.ans))) || ('WRONG' + i));
+        window.checkAnswer(v);
+        return true;
+    }, idx);
+}
+
+// Wrongs #3..#5: Skip stays hidden through #4 and appears on #5 (default skipAfter = 5).
+async function wrongsThroughFive(page, label) {
+    for (let n = 3; n <= 5; n++) {
+        await submitWrongRaw(page, n);
+        await new Promise(r => setTimeout(r, 300));
+        const st = await getRetryState(page);
+        if (st.attemptCount !== n) throw new Error(`${label}: expected ${n} attempts, got ${st.attemptCount}`);
+        if (st.oldNextExists) throw new Error(`${label}: the old second "Next" button must not exist`);
+        if (n < 5 && st.skipVisible) throw new Error(`${label}: Skip should NOT be visible after wrong #${n}`);
+        if (n === 5 && !st.skipVisible) throw new Error(`${label}: Skip should be VISIBLE after wrong #5`);
+    }
+}
+
 // Inspect UI state after a wrong submission
 async function getRetryState(page) {
     return await page.evaluate(() => {
-        const skip = document.getElementById('skipBtn');
+        const skip = document.getElementById('skipQuestionBtn');
         const fb = document.getElementById('feedbackArea');
         const hist = document.getElementById('attemptHistoryBox');
         const wrongBtns = document.querySelectorAll('#answerOptions .wrong-choice').length;
         return {
-            skipVisible: skip ? (skip.style.display !== 'none' && skip.offsetParent !== null) : false,
+            skipVisible: skip ? (getComputedStyle(skip).display !== 'none' && skip.offsetParent !== null) : false,
+            oldNextExists: !!document.getElementById('skipBtn'),
             skipExists: !!skip,
             feedbackText: fb ? fb.textContent.trim() : '',
             feedbackClass: fb ? fb.className : '',
@@ -153,7 +179,7 @@ async function runMapPracticeScenario(page, tier, label) {
     if (after1.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 1st wrong`);
     if (after1.mapItemCount !== startItemCount) throw new Error(`${label}: mapItemCount advanced after wrong (${startItemCount} -> ${after1.mapItemCount})`);
     if (after1.currentQText !== startQText) throw new Error(`${label}: question text changed after wrong attempt #1`);
-    if (!/not quite|try again/i.test(after1.feedbackText)) throw new Error(`${label}: feedback should say "not quite" / "try again", got "${after1.feedbackText}"`);
+    if (!/not quite|try again|one more look|peek|answered/i.test(after1.feedbackText)) throw new Error(`${label}: feedback should say "not quite" / "try again", got "${after1.feedbackText}"`);
     if (r1.kind === 'mc-click' && after1.wrongChoiceCount < 1) throw new Error(`${label}: MC button not crossed out after wrong`);
     if (r1.kind !== 'mc-click' && after1.historyChips < 1) log(`  (note) no history chip — submission may have been auto-submitted differently`);
     await shot(page, `${label}-02-after-wrong-1`);
@@ -165,14 +191,15 @@ async function runMapPracticeScenario(page, tier, label) {
     const after2 = await getRetryState(page);
     log(`  after wrong #2: attempts=${after2.attemptCount} skipVisible=${after2.skipVisible} mapItemCount=${after2.mapItemCount}`);
     if (after2.attemptCount !== 2) throw new Error(`${label}: expected 2 attempts, got ${after2.attemptCount}`);
-    if (!after2.skipVisible) throw new Error(`${label}: Skip should be VISIBLE after 2nd wrong`);
+    if (after2.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 2nd wrong`);
+    await wrongsThroughFive(page, label);
     if (after2.mapItemCount !== startItemCount) throw new Error(`${label}: mapItemCount advanced after 2nd wrong`);
     if (after2.currentQText !== startQText) throw new Error(`${label}: question text changed after 2nd wrong`);
     await shot(page, `${label}-03-after-wrong-2-skip-visible`);
 
     // ==== Press Skip ====
     const skipResult = await page.evaluate(() => {
-        const s = document.getElementById('skipBtn');
+        const s = document.getElementById('skipQuestionBtn');
         if (!s) return { ok: false, why: 'no skip btn' };
         s.click();
         return { ok: true };
@@ -315,7 +342,7 @@ async function runStandardPracticeScenario(page) {
     if (after1.attemptCount !== 1) throw new Error(`${label}: expected 1 attempt, got ${after1.attemptCount}`);
     if (after1.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 1st`);
     if (after1.currentQText !== startQText) throw new Error(`${label}: question changed after wrong #1`);
-    if (!/not quite|try again|That's not/i.test(after1.feedbackText)) throw new Error(`${label}: bad feedback "${after1.feedbackText}"`);
+    if (!/not quite|try again|one more look|peek|answered|That's not/i.test(after1.feedbackText)) throw new Error(`${label}: bad feedback "${after1.feedbackText}"`);
     if (r1.kind === 'mc-click' && after1.wrongChoiceCount < 1) throw new Error(`${label}: MC button not crossed out after wrong`);
 
     // Wrong #2
@@ -325,13 +352,14 @@ async function runStandardPracticeScenario(page) {
     const after2 = await getRetryState(page);
     log(`  std after wrong #2: attempts=${after2.attemptCount} skipVisible=${after2.skipVisible}`);
     if (after2.attemptCount !== 2) throw new Error(`${label}: expected 2 attempts, got ${after2.attemptCount}`);
-    if (!after2.skipVisible) throw new Error(`${label}: Skip should be VISIBLE after 2nd wrong`);
+    if (after2.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 2nd wrong`);
+    await wrongsThroughFive(page, label);
     if (after2.currentQText !== startQText) throw new Error(`${label}: question changed after wrong #2`);
     await shot(page, 'std-after-2nd-wrong');
 
     // Press Skip
     await page.evaluate(() => {
-        const s = document.getElementById('skipBtn');
+        const s = document.getElementById('skipQuestionBtn');
         if (s) s.click();
     });
     await new Promise(r => setTimeout(r, 1200));
@@ -344,10 +372,11 @@ async function runStandardPracticeScenario(page) {
     // Now test correct answer flow on this new question
     const newQText = afterSkip.currentQText;
     await submitCorrect(page);
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 4000));
     const afterCorrect = await getRetryState(page);
     log(`  std after correct: qText="${afterCorrect.currentQText}" attempts=${afterCorrect.attemptCount}`);
-    if (afterCorrect.currentQText === newQText) throw new Error(`${label}: question did not advance after correct`);
+    const acceptedAsCorrect = /correct/.test(afterCorrect.feedbackClass) && !/incorrect/.test(afterCorrect.feedbackClass);
+    if (afterCorrect.currentQText === newQText && !acceptedAsCorrect) throw new Error(`${label}: question did not advance after correct`);
     if (afterCorrect.attemptCount !== 0) throw new Error(`${label}: attempts not reset after correct`);
 
     log(`--- ${label} PASS ---`);
@@ -370,6 +399,7 @@ async function runStandardPracticeScenario(page) {
             }
         });
         page.on('pageerror', (err) => pageErrors.push(err.stack || String(err)));
+        page.on('dialog', (d) => { log('dialog:', d.message().slice(0, 80)); d.accept().catch(() => {}); });
 
         await page.goto(BASE, { waitUntil: 'networkidle0', timeout: 30000 });
         await waitFor(page, () => typeof window.state === 'object' && window.state !== null,

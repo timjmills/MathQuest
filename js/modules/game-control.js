@@ -1,5 +1,6 @@
 import { state } from './state.js';
-import { SKILLS, DOMAINS, CALCULATOR_SKILLS } from './data.js';
+import { SKILLS, DOMAINS } from './data.js';
+import { isSkipAvailable } from './skip-rule.js';
 import { isTeacherLaunch, syncPlayChrome, syncBoard } from './launch-chrome.js';
 
 let _fullscreenHandler = null;
@@ -397,21 +398,10 @@ export function skipCurrentQuestion() {
         return;
     }
 
-    // Skip rationing (practice/boss/race): the first 3 skips are free; after
-    // that, the student must answer at least one question between consecutive
-    // skips (i.e. every other question can be skipped). Resets each session.
-    const totalSkipsBefore = state.totalSkipsEver || 0;
-    const lastWasSkip = !!state.lastActionWasSkip;
-    if (totalSkipsBefore >= 3 && lastWasSkip) {
-        if (typeof window.showToast === 'function') {
-            window.showToast('You\'ve used your free skips — answer this one before skipping again.');
-        } else if (typeof window.showModal === 'function') {
-            window.showModal('You\'ve used your 3 free skips. Answer this question, then you can skip every other one.');
-        }
-        return;
-    }
-    state.totalSkipsEver = totalSkipsBefore + 1;
-    state.lastActionWasSkip = true;
+    // Skip is a teacher option (Wave 1 item 1.3): the button only appears after N wrong tries
+    // (state.currentQAttempts), so there is no rationing here any more.
+    if (!isSkipAvailable()) return;
+    state.totalSkipsEver = (state.totalSkipsEver || 0) + 1;
 
     // Standard practice/boss/race: mark as skipped, advance.
     recordQuestionStatus('skipped');
@@ -807,35 +797,12 @@ export function nextQuestion() {
         };
     }
 
-    // Force-enable the floating calculator for any skill in CALCULATOR_SKILLS
-    // (e.g. composite volume — multi-step arithmetic where the focus is the
-    // conceptual decomposition, not the raw computation). question-render.js
-    // toggles #calcBtn based on q.calculatorAllowed, so we just opt in here.
-    if (state.currentQ && CALCULATOR_SKILLS.has(state.skill)) {
-        state.currentQ.calculatorAllowed = true;
-    }
-    // Generic catch-all: any question whose CORRECT answer is large enough
-    // that mental arithmetic would dominate the conceptual work. This covers
-    // skills not yet enumerated in CALCULATOR_SKILLS. Rules:
-    // - |ans| >= 100 → calc on
-    // - mult/div in text + any operand >= 20 → calc on
-    // - Any OoO-like skill (oop_*, paren_*, nested_*, multi_ops_*,
-    //   two_ops_*, three_ops_*) → calc on regardless of operand size
-    //   (per user spec).
-    if (state.currentQ && !state.currentQ.calculatorAllowed) {
-        const ans = Number(state.currentQ.ans);
-        const txt = String(state.currentQ.text || '');
-        const hasMultDiv = /[×÷*\/]/.test(txt);
-        const operands = (txt.match(/\d+/g) || []).map(Number);
-        const bigOperand = operands.some(n => n >= 20);
-        const isOoO = /^(oop_|paren_|nested_|multi_ops_|two_ops_|three_ops_)/.test(state.skill || '');
-        if (isOoO) {
-            state.currentQ.calculatorAllowed = true;
-        } else if (Number.isFinite(ans) && Math.abs(ans) >= 100) {
-            state.currentQ.calculatorAllowed = true;
-        } else if (hasMultDiv && bigOperand) {
-            state.currentQ.calculatorAllowed = true;
-        }
+    // Calculator (Wave 1 item 1.4): a per-skill TEACHER option, off by default. The old
+    // q.calculatorAllowed flags and the data.js CALCULATOR_SKILLS list no longer switch it on;
+    // the teacher's `calculator` skill option (skill-options.js) is the only gate.
+    if (state.currentQ) {
+        const _so = state.currentQ.skillOptions || state.skillOptions || {};
+        state.currentQ.calculatorAllowed = _so.calculator === true;
     }
 
     renderQuestion();
@@ -862,8 +829,8 @@ export function nextQuestion() {
     // Hidden in worksheet mode (per-card Skip is used there instead).
     const skipBtn = document.getElementById('skipQuestionBtn');
     if (skipBtn) {
-        const allowSkip = state.gameMode !== 'worksheet';
-        skipBtn.style.display = allowSkip ? 'inline-block' : 'none';
+        // Hidden until N wrong tries (teacher option); answer-check.js reveals it.
+        skipBtn.style.display = 'none';
     }
 
     // Refresh per-question dot row (current question highlighted with ring).

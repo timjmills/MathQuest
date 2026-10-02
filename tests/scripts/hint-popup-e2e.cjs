@@ -9,13 +9,13 @@
 
 const puppeteer = require('puppeteer');
 
-const URL = 'http://localhost:8765/';
+const URL = process.env.MQ_BASE || 'http://localhost:8765/';
 const failures = [];
 function fail(msg) { failures.push(msg); console.error('  ✗', msg); }
 function pass(msg) { console.log('  ✓', msg); }
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
   const page = await browser.newPage();
   page.on('pageerror', err => fail('Console pageerror: ' + err.message));
   page.on('console', msg => {

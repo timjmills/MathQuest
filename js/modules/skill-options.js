@@ -3245,7 +3245,20 @@ _ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) =
 // ============================ end O6 · appearance: operations, clocks, money (AP4) ============
 
 // Options every skill understands, whether or not it declares anything of its own.
-export const UNIVERSAL_OPTIONS = [levelOption()];
+// `calculator` (Wave 1 item 1.4): the pupil's calculator button, per skill, OFF by default. It
+// travels with the skill like any option; the old q.calculatorAllowed / CALCULATOR_SKILLS flags
+// no longer switch it on.
+export const calculatorOption = () => ({
+    id: 'calculator', label: 'Calculator', type: 'bool', default: false,
+    help: 'Show the pupil a calculator button on this skill. Off unless you turn it on.',
+});
+// `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
+// appears. Per skill, default 5; 0 turns Skip off for the skill.
+export const skipAfterOption = () => ({
+    id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
+    help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
+});
+export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
 // ---------------------------------------------------------------------------
 // MEASURED OPTIONS — every skill gets the settings its generator was seen to read

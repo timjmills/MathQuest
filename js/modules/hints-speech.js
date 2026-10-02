@@ -27,6 +27,9 @@ function _renderHintModal(titleHTML, bodyHTML) {
         'box-shadow:0 20px 60px rgba(0,0,0,0.35);border:2px solid var(--accent-orange,#ff9800);">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;">' +
                 '<h3 style="margin:0;color:var(--accent-orange,#ff9800);font-size:1.25rem;">' + titleHTML + '</h3>' +
+                '<button type="button" id="hintSpeakBtn" class="hint-speak-btn" aria-label="Read the hint aloud" title="Read the hint aloud" onclick="speakHint()" ' +
+                    'style="margin-left:auto;background:var(--bg-card);border:2px solid var(--accent-orange,#ff9800);font-size:1.3rem;line-height:1;cursor:pointer;' +
+                    'min-width:44px;min-height:44px;border-radius:10px;">🔊</button>' +
                 '<button type="button" aria-label="Close hint" onclick="closeHintPopup()" ' +
                     'style="background:none;border:none;font-size:1.7rem;line-height:1;cursor:pointer;' +
                     'color:var(--text-dim,#888);padding:4px 10px;border-radius:8px;">×</button>' +
@@ -62,6 +65,7 @@ export function closeHintPopup() {
     if (modal._hintKeyHandler) {
         document.removeEventListener('keydown', modal._hintKeyHandler);
     }
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (_) {}
     modal.remove();
 }
 
@@ -325,6 +329,19 @@ export function speakQuestion() {
             _safeSpeak(ou);
         });
     }
+}
+
+// Read the open hint aloud (the hint box's speaker button). An explicit click, so it works even
+// when the automatic read-aloud setting is off.
+export function speakHint() {
+    if (!("speechSynthesis" in window)) return;
+    const body = document.querySelector('#hintModal .hint-modal-body');
+    const text = body ? _toSpeakable(body.textContent || '') : '';
+    if (!text) return;
+    try { window.speechSynthesis.cancel(); } catch (_) {}
+    const utterance = new SpeechSynthesisUtterance(text);
+    applyVoice(utterance);
+    _safeSpeak(utterance);
 }
 
 // Speak an answer option on hover

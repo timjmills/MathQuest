@@ -1,5 +1,6 @@
 import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
+import { skipAfterFor } from './skip-rule.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
@@ -971,6 +972,7 @@ let _wsLayoutTimers = [];
 function _wsScheduleLayout(grid) {
     _wsLayoutTimers.forEach(t => clearTimeout(t));
     layoutWorksheetGrid(grid);
+    if (!document.querySelector('.problem-card.mq-active-problem')) setActiveProblem(0);
     // widgets and their stylesheets mount a moment later (dynamic import): lay out again
     _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => layoutWorksheetGrid(grid), ms));
 }
@@ -1446,7 +1448,7 @@ function _wsRenderCard(grid, q, i) {
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
+    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -2174,9 +2176,29 @@ export function checkWorksheetExpandedAnswer(idx) {
 }
 
 // Advance to the next worksheet problem
+// Wave 1 item 1.2: the current problem (card + its answer box) is highlighted and pulses; the
+// highlight moves on as each problem is finished. Screen only (css/screen-cell.css).
+export function setActiveProblem(idx) {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll('.problem-card.mq-active-problem').forEach((el) => el.classList.remove('mq-active-problem'));
+    const card = idx == null ? null : document.getElementById(`ws_card_${idx}`);
+    if (card) card.classList.add('mq-active-problem');
+}
+
+// Clicking or tabbing into any problem makes it the current one.
+if (typeof document !== 'undefined' && !window.__mqActiveProblemBound) {
+    window.__mqActiveProblemBound = true;
+    document.addEventListener('focusin', (e) => {
+        const card = e.target && e.target.closest && e.target.closest('.problem-card[id^="ws_card_"]');
+        if (!card || card.classList.contains('mq-active-problem')) return;
+        setActiveProblem(Number(card.id.replace('ws_card_', '')));
+    });
+}
+
 export function advanceToNextProblem(currentIdx) {
     const nextIdx = currentIdx + 1;
-    if (nextIdx >= state.worksheetQs.length) return; // No more problems
+    if (nextIdx >= state.worksheetQs.length) { setActiveProblem(null); return; } // No more problems
+    setActiveProblem(nextIdx);
 
     const nextCard = document.getElementById(`ws_card_${nextIdx}`);
     if (!nextCard) return;
@@ -2249,6 +2271,7 @@ export function wsSkipCard(idx) {
     if (btn) btn.textContent = _wsTeacherLaunch() ? 'Undo skip' : '↩ Undo Skip';
     // Disable inputs (CSS pointer-events also blocks, but disable is belt+braces).
     card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+    advanceToNextProblem(idx);
 }
 
 export function checkWorksheetAnswer(idx) {

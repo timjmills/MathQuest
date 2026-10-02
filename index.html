@@ -716,19 +716,19 @@
             <div class="section">
                 <div class="section-title">🎮 Choose Mode</div>
                 <div class="mode-cards">
-                    <div class="mode-card selected" data-mode="practice" onclick="selectMode('practice')">
+                    <div class="mode-card selected teacher-only" data-mode="practice" onclick="selectMode('practice')">
                         <span class="mode-icon">🎓</span>
                         <span class="mode-name">Practice</span>
                     </div>
-                    <div class="mode-card" data-mode="boss" onclick="selectMode('boss')">
+                    <div class="mode-card teacher-only" data-mode="boss" onclick="selectMode('boss')">
                         <span class="mode-icon">🐉</span>
                         <span class="mode-name">Boss Battle</span>
                     </div>
-                    <div class="mode-card" data-mode="race" onclick="selectMode('race')">
+                    <div class="mode-card teacher-only" data-mode="race" onclick="selectMode('race')">
                         <span class="mode-icon">🏎️</span>
                         <span class="mode-name">Car Race</span>
                     </div>
-                    <div class="mode-card" data-mode="worksheet" onclick="selectMode('worksheet')">
+                    <div class="mode-card teacher-only" data-mode="worksheet" onclick="selectMode('worksheet')">
                         <span class="mode-icon">📝</span>
                         <span class="mode-name">Worksheet</span>
                     </div>
@@ -823,8 +823,15 @@
                 </div>
             </div>
 
+            <div class="student-start-buttons student-only" id="studentStartButtons" role="group" aria-label="Start">
+                <button type="button" class="student-start-btn" data-mode="practice" onclick="startMode('practice')">🎓 Start practice</button>
+                <button type="button" class="student-start-btn" data-mode="boss" onclick="startMode('boss')">🐉 Start boss battle</button>
+                <button type="button" class="student-start-btn" data-mode="race" onclick="startMode('race')">🏎️ Start car race</button>
+                <button type="button" class="student-start-btn" data-mode="worksheet" onclick="startMode('worksheet')">📝 Start worksheet</button>
+            </div>
+
             <div class="start-buttons-container" style="text-align:center; margin-top:18px; display:flex; justify-content:center; gap:15px; flex-wrap:wrap;">
-                <button class="start-game-btn" onclick="startGame()" style="padding:18px 50px; font-size:1.25rem; font-weight:900; background:var(--mq-orange); color:white; border:2px solid var(--mq-orange-d); border-radius:18px; cursor:pointer; box-shadow:0 6px 0 0 var(--mq-orange-d); transition:transform 80ms ease, box-shadow 80ms ease; text-transform:uppercase; letter-spacing:0.04em;">
+                <button class="start-game-btn teacher-only" onclick="startGame()" style="padding:18px 50px; font-size:1.25rem; font-weight:900; background:var(--mq-orange); color:white; border:2px solid var(--mq-orange-d); border-radius:18px; cursor:pointer; box-shadow:0 6px 0 0 var(--mq-orange-d); transition:transform 80ms ease, box-shadow 80ms ease; text-transform:uppercase; letter-spacing:0.04em;">
                     🚀 Start Game
                 </button>
                 <button class="map-launch-btn map-launch-k2" onclick="openMapTest('k2')">📊 MAP K-2</button>
