@@ -114,7 +114,10 @@ register('chartwindow', {
             // the size a pupil writes in. The 3 x 5 keeps its markup (old pages are unchanged).
             const wide = !((p.rows || []).length === 3 && (p.cols || []).length === 5 && c.w === (CELL[sizeOf(ctx)] || CELL.L).w);
             const width = ten ? `width:min(100%,${L(ctx, part.length * c.w)});` : wide ? `width:${L(ctx, part.length * c.w)};` : '';
-            return `<table class="k2-chart" data-mq-join=", " style="border-collapse:collapse;margin:${isTwin(ctx) ? '0' : L(ctx, LETTER_CLEAR_MM)} auto 0;`
+            // a ten-column twin names its widest number's digits: a phone sizes its squares from it (css/screen-cell.css)
+            const tenCls = ten ? ' k2-chart-ten' : '';
+            const tenVar = ten ? `--mq-chd:${String(topOf(p)).length};` : '';
+            return `<table class="k2-chart${tenCls}" data-mq-join=", " style="${tenVar}border-collapse:collapse;margin:${isTwin(ctx) ? '0' : L(ctx, LETTER_CLEAR_MM)} auto 0;`
                 + `table-layout:fixed;${width}background:#fff;">${rows}</table>`;
         });
         return root(ctx, 'k2-chartwindow', tables[0]);

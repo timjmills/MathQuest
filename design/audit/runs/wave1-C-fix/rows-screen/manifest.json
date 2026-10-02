@@ -531,30 +531,8 @@
               8
             ]
           ],
-          "smallTargets": [
-            {
-              "tag": "input",
-              "cls": "mq-cellslot",
-              "w": 33,
-              "h": 42,
-              "text": ""
-            },
-            {
-              "tag": "input",
-              "cls": "mq-cellslot",
-              "w": 33,
-              "h": 42,
-              "text": ""
-            },
-            {
-              "tag": "input",
-              "cls": "mq-cellslot",
-              "w": 33,
-              "h": 42,
-              "text": ""
-            }
-          ],
-          "smallTargetCount": 3
+          "smallTargets": [],
+          "smallTargetCount": 0
         }
       },
       "worksheet-1280": {
