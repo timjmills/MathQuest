@@ -97,9 +97,7 @@
     "onePage": "2Y",
     "calculator": "6X",
     "skipAfter": "6Y",
-    "by": "1W",
-    "start": "1X",
-    "startAt": "1Y",
+    "rows": "1W",
     "times": "1Z"
   },
   "blocks": {
@@ -660,13 +658,7 @@
     "onePage": {},
     "calculator": {},
     "skipAfter": {},
-    "by": {},
-    "start": {
-      "step": "S",
-      "zero": "Z",
-      "custom": "C"
-    },
-    "startAt": {},
+    "rows": {},
     "times": {
       "none": "N",
       "each": "E",
@@ -705,8 +697,7 @@
     "onePage": "bool",
     "calculator": "bool",
     "skipAfter": "decimal",
-    "by": "decimal",
-    "startAt": "decimal"
+    "rows": "rows"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
@@ -722,6 +713,6 @@
     "5N-5Z": "lessons, support ladder and later waves",
     "2U-2Z": "wave 1 lane C: skip-count lines and the number grid",
     "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)",
-    "1W-1Z": "wave 1 lane C2: count_by_tables custom step, start, direction, multiplication labels"
+    "1W-1Z": "wave 1 lane C2: count_by_tables row list and multiplication labels"
   }
 }

@@ -217,7 +217,7 @@ const COUNTBY_MAKERS = {
         const values = Array.from({ length: 12 }, (_, i) => t * (down ? 12 - i : i + 1));
         const blanks = shuffle(r, Array.from({ length: 11 }, (_, i) => i + 1)).slice(0, int(r, 2, 10)).sort((a, b) => a - b);
         const k = blanks.map((i) => values[i]);
-        return { a: t, b: 12, op: '×', ans: k.join(', '), keyParts: k.map(String), countBy: { step: t, values, blanks, jumps: 12, dir: down ? 'down' : 'up', dirOpt: down ? 'back' : 'forward', start: 'step', by }, text: `${down ? 'Count back' : 'Count'} by ${t.toLocaleString('en-US')}. Write the missing numbers.` };
+        return { a: t, b: 12, op: '×', ans: k.join(', '), keyParts: k.map(String), countBy: { step: t, values, blanks, jumps: 12, dir: down ? 'down' : 'up', dirOpt: down ? 'back' : 'forward', start: 'step', page: { steps: [t], from: null, rows: 1 } }, text: `${down ? 'Count back' : 'Count'} by ${t.toLocaleString('en-US')}. Write the missing numbers.` };
     },
     'patterns:number_patterns_rule': (r) => {
         const kind = pick(r, ['add', 'sub', 'double', 'halve', 'times10', 'grow']);

@@ -31,6 +31,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { onePageRows } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -101,10 +102,17 @@ function normaliseRequest(req = {}) {
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
     let onePage = false;
     for (const sec of sections) {
+        let rowCount = 12;
         const on = sec.skills.some((k) => {
-            try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+            try {
+                if (k.skillId !== 'count_by_tables') return false;
+                const o = normalizeOptions(k.categoryId, k.skillId, k.opts || {});
+                // wave 1 C2: with rows chosen the sheet prints THOSE rows once each (as many as fit one page), else x 1 to x 12
+                if (o.onePage && o.rows && o.rows.length) rowCount = onePageRows(o.rows).length;
+                return !!o.onePage;
+            } catch (e) { return false; }
         });
-        if (on) { sec.count = 12; sec.pages = 1; sec.columns = 1; onePage = true; }
+        if (on) { sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true; }
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections,

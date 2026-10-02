@@ -1,4 +1,5 @@
 // skill-options.js — the options a skill carries with it.
+import { normalizeRows } from './count-rows.js';   // pure, imports nothing: node still loads this file bare
 //
 // Owner's rule (2026-09-19): options live ON THE SKILL, not on the page. A skill declares what
 // it can be configured with; the chosen values travel with it into ANY page role — lesson
@@ -21,12 +22,13 @@
 //   'int'     min, max, step          a number the teacher picks
 //   'enum'    values: [{v, l}]        one of a fixed list
 //   'bool'                            a tick-box
+//   'rows'                            (wave 1 C2) a list of count-by rows, edited by its own control (count-rows.js)
 //   'set'     values: [{v, l}]        any number of a fixed list: all, none, or a selection.
 //                                     None ticked means "no restriction", never an empty page.
 //
 // `appliesTo(opts)` (optional) hides an option that the current choices make meaningless.
 
-export const OPTION_TYPES = ['int', 'enum', 'bool', 'set'];
+export const OPTION_TYPES = ['int', 'enum', 'bool', 'set', 'rows'];
 
 // ---------------------------------------------------------------------------
 // FOLDED CONTROLS (option-panel round 3, 2026-09-25)
@@ -417,9 +419,12 @@ export const SKILL_OPTIONS = {
  */
 export const PLAY_GROUP = 'play';
 export const isPlayOption = (def) => !!def && def.group === PLAY_GROUP;
+/** Wave 1 lane C2: a second closed disclosure, "More", for the layout choices that would crowd the resting panel. */
+export const MORE_GROUP = 'more';
+export const isMoreOption = (def) => !!def && def.group === MORE_GROUP;
 /** The controls the panel shows at rest: those that apply now and are not inside the collapsed play group. */
 export function restingOptions(defs, cur) {
-    return (defs || []).filter((d) => !isPlayOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
+    return (defs || []).filter((d) => !isPlayOption(d) && !isMoreOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
 }
 /** The play disclosure's summary line: "Calculator off · Skip after 5". */
 export function playSummary(defs, cur) {
@@ -1322,12 +1327,27 @@ const _hopLine = (div) => [
         help: 'A number over each drawn hop (in the model and the key) so the pupil counts the hops. None is the fade.',
     },
 ];
-// Critic round 4 (G): "All 12 tables on one page" overrides these controls, so the panel shows the value it
+// Critic round 4 (G): "All rows on one page" overrides these controls, so the panel shows the value it
 // forces, disabled, with the reason (skill-options-ui.js optionControlHTML reads `lockedBy`).
-const _onePageLock = (v) => (cur) => (cur && cur.onePage ? { v, why: 'Set by "All 12 tables on one page".' } : null);
+const _onePageLock = (v) => (cur) => (cur && cur.onePage ? { v, why: 'Set by "All rows on one page".' } : null);
+// Wave 1 lane C2: the "More" disclosure. A panel keeps at most five controls at rest; the rest sit in one closed
+// disclosure (like Lane A's "Pupil play"), their current values in its summary line.
+const _moreSummary = (label) => (v) => `${label}: ${v}`;
 const CB_CHART_LINE_OPTIONS = {
     'multiplication:count_by_tables': [
-        { ..._cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'), lockedBy: _onePageLock(Array.from({ length: 12 }, (_, k) => k + 1)) },
+        {
+            // Wave 1 lane C2 (owner 2026-10-02): the teacher builds the page's rows. It REPLACES the old "Tables" tick list
+            // (the old `constant`, kept hidden so every old link still decodes, folded into this list below).
+            id: 'rows', label: 'Count-bys on the page', type: 'rows', default: [], group: 'difficulty',
+            helpShort: 'Tap tables 1 to 12 or type any step; each row has its own start and direction.',
+            help: 'Choose the rows the page deals: tap any of the tables 1 to 12, or type any other step (7, 15, 25, 250, 1,000 up to 100,000) and add it. '
+                + 'Each row has its own start (the step itself, 0, or a number you type: by 5 from 3 is 3, 8, 13 …) and its own direction (on, or back down towards 0, never below 0: 30 down by 5 is 30, 25 … 0, and a start too small to give even three numbers, such as 3 down by 100, is raised to give eight, keeping its ones). '
+                + 'The page deals your rows in order (or shuffled, under "More"), and starts the list again when the page has more rows than you chose. '
+                + 'Nothing chosen is the usual page: the tables 2 to 12 across the page. A row of big numbers gets wider boxes and wraps to more lines with a turn arrow. '
+                + 'On the one-page sheet, the rows you chose print once each, in order, as many as fit one page.',
+            summary: (v) => (Array.isArray(v) && v.length ? `${v.length} row${v.length === 1 ? '' : 's'}` : 'Tables 2 to 12'),
+        },
+        { ..._cbTables(1, 'Tables', 'Count by', 'Old control: the ticked tables now live in the list of rows.'), hidden: true },
         {
             // Wave 1 lane C (owner, overdue): the first two numbers print so the pupil can SEE the step.
             id: 'fill', label: 'Numbers printed to start', type: 'enum', default: 'two', group: 'support',
@@ -1337,70 +1357,43 @@ const CB_CHART_LINE_OPTIONS = {
                 + 'The first one only is the older, harder row. Half prints half the numbers (the first two always) spread along the row and ignores "Numbers left blank". '
                 + 'At least one number is always left to write.',
         },
-        {
-            id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'layout',
-            values: [{ v: 12, l: '12 jumps (to 12 ×)' }, { v: 15, l: '15 jumps (to 15 ×; the row wraps to two lines)' }],
-            help: 'How many numbers the row holds: 12 (the table to × 12) or 15 (on to × 15).',
-            lockedBy: _onePageLock(12),
-        },
-        {
-            // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
-            id: 'onePage', label: 'All 12 tables on one page', type: 'bool', default: false, group: 'layout',
-            help: 'Prints exactly twelve rows, the tables x 1 to x 12 in order, on ONE page (and its key on one page), at the smallest print size so all twelve fit. '
-                + 'The row is always 12 jumps long (15 jumps cannot fit, so "Line runs to" is ignored) and the ticked tables and "Order of the rows" are ignored. '
-                + 'The numbers printed to start and "Numbers left blank" still apply, up to every number after the starting ones left blank.',
-        },
         _cbPercent(50),
         {
-            id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
-            values: [{ v: 'inorder', l: 'In order (2, 3, 4 …)' }, { v: 'mixed', l: 'Mixed tables' }],
-            help: 'In order runs the ticked tables smallest first down the page; mixed shuffles them.',
-            lockedBy: _onePageLock('inorder'),
-        },
-        _cbShape('box'),
-        // Wave 1 lane C2 (owner 2026-10-02): custom step, start, direction, the multiplication fact, large numbers.
-        {
-            id: 'by', label: 'Count by (type a number)', type: 'int', default: 0, min: 0, max: 100000, step: 1, group: 'difficulty',
-            help: 'Type any step, such as 7, 15, 25, 50, 100, 250 or 1000, and every row counts by it (up to 100,000). 0 leaves the ticked tables in charge. '
-                + 'Every row then counts by the same number and only the gaps differ, so use it for a page on ONE step. '
-                + 'Big steps make wide numbers: the boxes grow to hold the widest number, and a row that no longer fits one line wraps to more lines with a turn arrow. '
-                + 'The ticked tables, "Order of the rows" and "All 12 tables on one page" are not used when a step is typed.',
-            lockedBy: (cur) => (cur && cur.onePage ? { v: 0, why: 'Set by "All 12 tables on one page" (rows count by 1 to 12).' } : null),
-            summary: (v) => (Number(v) ? `Count by ${Number(v).toLocaleString('en-US')}` : 'Count by the ticked tables'),
-        },
-        {
-            id: 'start', label: 'Row starts at', type: 'enum', default: 'step', group: 'difficulty',
-            values: [{ v: 'step', l: 'The step itself (3, 6, 9 …; going down, the end of the table)' },
-                { v: 'zero', l: '0 (0, 3, 6 …; going down, ending at 0)' },
-                { v: 'custom', l: 'A number I type (count by 5 from 3: 3, 8, 13 …)' }],
-            help: 'Where the row begins. The step itself is the times table as before (3, 6, 9 …). 0 begins on 0, so the row is one multiple shorter (12 numbers, ending at 11 ×); '
-                + 'going down it counts back to 0. A typed start can be any number up to 1,000,000 (by 100 from 2,300; by 1,000 from 14,000); '
-                + 'a start that is not a multiple of the step is not a times table, so the multiplication facts are not shown under it. '
-                + 'Counting down never goes below 0, so a short start gives a shorter row (30 down by 5 is 30, 25 … 0). A start so small that fewer than 5 numbers fit (3 down by 100) is raised to give 8, keeping its ones.',
-            lockedBy: _onePageLock('step'),
-        },
-        {
-            id: 'startAt', label: 'Start number', type: 'int', default: 0, min: 0, max: 1000000, step: 1, group: 'difficulty',
-            help: 'The number a row starts on when "Row starts at" is "A number I type" (up to 1,000,000). Counting up it is the first number; counting down it is the first number too, and the row runs down towards 0.',
-            appliesTo: (cur) => cur.start === 'custom',
-            lockedBy: _onePageLock(0),
-        },
-        {
-            id: 'dir', label: 'Direction', type: 'enum', default: 'forward', group: 'difficulty',
-            values: [{ v: 'forward', l: 'Counting on (up)' }, { v: 'back', l: 'Counting back (down)' },
-                { v: 'mixed', l: 'Mixed: some rows up, some down' }],
-            help: 'Counting on adds the step each jump; counting back takes it away, from the start down towards 0 (never below 0, so no negative numbers). '
-                + 'Mixed deals both on one page; the tab at the start of each row then shows + or − so the pupil knows which way to go.',
-        },
-        {
             id: 'times', label: 'Multiplication under each number', type: 'enum', default: 'none', group: 'support',
+            helpShort: 'A hint: 1 × 4, 2 × 4 … under the numbers. Fade it, and leave it off tests.',
             values: [{ v: 'none', l: 'None' }, { v: 'each', l: 'Under every number (1 × 4, 2 × 4, 3 × 4 …)' },
                 { v: 'given', l: 'Under the printed numbers only' }],
             help: 'A hint that links skip counting to multiplication: the jump number times the step is written under the number, the same on the pupil page and the key. '
-                + 'Fade it: under every number, then under the printed numbers only (the pupil works out the facts for the gaps), then None. It is a hint, so a test or a review page should leave it None. '
+                + 'It is a hint, so it fades: under every number, then under the printed numbers only (the pupil works out the facts for the gaps), then None. '
+                + 'Guided pages draw it in grey, and test and review pages leave it out. '
                 + 'It is shown only where every number is a multiple of the step (not for a typed start that is not), and not on the one-page sheet.',
             lockedBy: _onePageLock('none'),
         },
+        {
+            // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
+            id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
+            helpShort: 'Your rows (or the tables 1 to 12) once each on one sheet, as many as fit.',
+            help: 'Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order. '
+                + 'With rows chosen it is those rows once each, in order, as many as fit (a row of big numbers takes two or more lines, so fewer fit). '
+                + 'Every row is then 12 numbers long, and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
+        },
+        {
+            id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'more',
+            helpShort: 'How many numbers a row holds: 12 or 15.',
+            values: [{ v: 12, l: '12 numbers (to 12 ×)' }, { v: 15, l: '15 numbers (to 15 ×; the row wraps to two lines)' }],
+            help: 'How many numbers a row holds: 12 (the table to × 12) or 15 (on to × 15). A row that starts at 0 holds the same count, one multiple shorter at the top.',
+            lockedBy: _onePageLock(12),
+            summary: (v) => `${v} numbers`,
+        },
+        {
+            id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'more',
+            helpShort: 'Deal the rows as listed, or shuffled.',
+            values: [{ v: 'inorder', l: 'In order (as listed; the tables smallest first)' }, { v: 'mixed', l: 'Mixed' }],
+            help: 'In order deals your rows as you listed them (the tables 2 to 12 smallest first when none are chosen); mixed shuffles them, every row once before any repeats.',
+            lockedBy: _onePageLock('inorder'),
+            summary: (v) => (v === 'mixed' ? 'Mixed order' : 'In order'),
+        },
+        { ..._cbShape('box'), group: 'more', summary: (v) => ({ box: 'Boxes', circle: 'Circles', hex: 'Hexagons', mixed: 'Circles and hexagons' }[v] || v) },
     ],
     'patterns:number_patterns_rule': [
         {
@@ -1459,6 +1452,18 @@ const CB_CHART_LINE_OPTIONS = {
     ],
 };
 Object.assign(SKILL_OPTIONS, CB_CHART_LINE_OPTIONS);
+// Wave 1 lane C2: an old link's ticked tables (`constant`) become the list of rows (plain tables, in order), so the panel shows
+// them where the teacher now edits them. All twelve ticked is the default and stays an empty list.
+OPTION_FOLDS['multiplication:count_by_tables'] = (raw) => {
+    const next = { ...raw };
+    if (Array.isArray(next.constant)) {
+        const t = next.constant.map(Number).filter((n) => Number.isInteger(n) && n >= 1 && n <= 12);
+        const uniq = [...new Set(t)].sort((a, b) => a - b);
+        if (!(next.rows && next.rows.length) && uniq.length && uniq.length < 12) next.rows = uniq.map((n) => ({ step: n, start: 'step', dir: 'up' }));
+        delete next.constant;
+    }
+    return next;
+};
 // ======================= end count-by · chart · number line · patterns =======================
 
 // number_word_form: which way round (gen-algebraic.js wordFormWay() reads it; the codec has had
@@ -3505,6 +3510,7 @@ export function normalizeOptions(categoryId, skillId, opts) {
         if (!(def.id in opts)) continue;
         const v = opts[def.id];
         if (def.type === 'bool') { out[def.id] = !!v; continue; }
+        if (def.type === 'rows') { out[def.id] = normalizeRows(v); continue; }
         if (def.type === 'int') {
             const n = Number(v);
             if (Number.isFinite(n)) out[def.id] = Math.min(def.max ?? n, Math.max(def.min ?? n, Math.round(n)));
@@ -3665,6 +3671,7 @@ export function describeOptions(categoryId, skillId, opts) {
         if (!(def.id in packed)) continue;
         const v = packed[def.id];
         if (def.type === 'bool') { parts.push(v ? def.label : `No ${def.label.toLowerCase()}`); continue; }
+        if (def.type === 'rows') { parts.push(`${def.label}: ${typeof def.summary === 'function' ? def.summary(v) : (Array.isArray(v) ? v.length : 0)}`); continue; }
         if (def.type === 'set') {
             const all = (def.values || []);
             const labels = all.filter(x => v.includes(x.v)).map(x => x.l);

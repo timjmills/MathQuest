@@ -90,31 +90,29 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
     return w;
 }
 
-/** The way a count-by item runs: 'up' | 'down' | 'mixed' (the item's option), or the section's option when there is no item. */
-const cbDir = (q, ref = {}) => {
-    if (q && q.countBy && q.countBy.dirOpt) return q.countBy.dirOpt === 'forward' ? 'up' : q.countBy.dirOpt === 'back' ? 'down' : 'mixed';
-    const o = ref && ref.opts && ref.opts.dir;
-    return o === 'back' ? 'down' : o === 'mixed' ? 'mixed' : 'up';
-};
-/** The step a count-by page is about: typed (`by`), else 0 = the tables 1 to 12. */
-const cbBy = (q, ref = {}) => {
-    if (q && q.countBy) return q.countBy.by > 0 ? q.countBy.by : 0;
-    const b = ref && ref.opts && Number(ref.opts.by);
-    return Number.isFinite(b) && b > 0 ? b : 0;
-};
-const cbStart = (q, ref = {}) => {
-    if (q && q.countBy) return q.countBy.start === 'custom' ? q.countBy.startAt : null;
-    const o = ref && ref.opts;
-    return o && o.start === 'custom' && Number.isFinite(Number(o.startAt)) ? Number(o.startAt) : null;
-};
+/** What a count-by page is about, from the item (its page summary) or, with no item, the section's row list (canonical rows). */
+function cbPage(q, ref = {}) {
+    if (q && q.countBy) {
+        const c = q.countBy;
+        return { dir: c.dirOpt === 'back' ? 'down' : c.dirOpt === 'mixed' ? 'mixed' : 'up', steps: (c.page && c.page.steps) || [], from: c.page ? c.page.from : null };
+    }
+    const rows = ref && ref.opts && Array.isArray(ref.opts.rows) ? ref.opts.rows : [];
+    const steps = [...new Set(rows.map((r) => r.step))];
+    const downs = rows.filter((r) => r.dir === 'down').length;
+    const froms = [...new Set(rows.map((r) => (r.start === 'custom' ? r.at : null)))];
+    return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
+}
+const stepWords = (steps) => (!steps.length ? '1 to 12'
+    : steps.length <= 4 ? (steps.length === 1 ? fmt(steps[0]) : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`)
+        : `${fmt(steps[0])}, ${fmt(steps[1])} and ${steps.length - 2} more`);
 
 registerSkill('multiplication:count_by_tables', {
     // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:
     // derived from the item (or the section's options), never fixed.
     strings: stringsBy((q, ref = {}) => {
-        const dir = cbDir(q, ref), by = cbBy(q, ref), from = cbStart(q, ref);
+        const { dir, steps, from } = cbPage(q, ref);
         const verb = dir === 'down' ? 'count back by' : dir === 'mixed' ? 'count on and back by' : 'count by';
-        const what = by > 0 ? fmt(by) : '1 to 12';
+        const what = stepWords(steps);
         const jumps = (q && q.countBy && q.countBy.jumps === 15) || (!q && ref && ref.opts && Number(ref.opts.jumps) === 15) ? ' (15 jumps)' : '';
         const key = dir === 'down' ? 'count-back-row' : dir === 'mixed' ? 'count-sign-row' : 'count-by-row';
         return {

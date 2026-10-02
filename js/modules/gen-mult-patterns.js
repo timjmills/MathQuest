@@ -19,6 +19,7 @@ import { state } from './state.js';
 import { dealIndex } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
+import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePageRows } from './count-rows.js';
 import { k2Twin, renderCell } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
@@ -83,63 +84,61 @@ const pctCount = (pct, n) => (pct >= 100 ? n : Math.max(1, Math.min(n, Math.roun
 let _lastTable = null;
 
 export function genCountByTables(q) {
-    // Owner 2026-10-02: "All 12 tables on one page" deals x 1 to x 12 in order on a printed page (live play deals as usual).
+    // Owner 2026-10-02: "All rows on one page" deals the rows once each, in order, on a printed page (live play deals as usual).
     const onePage = !!opt('onePage') && Number.isFinite(state.itemIndex);
-    // Wave 1 lane C2: a step the teacher types replaces the ticked tables (never on the one-page sheet).
-    const by = onePage ? 0 : Math.max(0, Math.round(Number(opt('by')) || 0));
-    let tables = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
     const idx = itemAt();
-    // R3 (critic round 3): with every table ticked (untouched) a page of five rows was the 1s to
-    // the 5s in order, and counting by 1 is not practice. Untouched, the page deals 2 to 12 in a
-    // shuffled round, so any page samples across the tables its title names; a teacher who
-    // ticks tables keeps the order option.
-    const untouched = tables.length === 12;
-    if (untouched) tables = tables.filter((v) => v >= 2);
-    let t;
-    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
-    if (by > 0) {
-        t = by;
-    } else if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
-        // In order, every table ticked: the page walks up the tables, spread across 2 to 12
-        // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
-        if (_page <= tables.length) {
-            // one table from each stretch of the list, so the pages differ but always climb
-            const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
-            t = tables[randInt(lo, hi)];
-        } else t = tables[idx % tables.length];
-    // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
-    } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
-        // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
-        // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
-        // tables; page-deal.js shuffles each round from the page's own seeded rng.
-        t = tables[dealIndex('cbt-table', tables.length)];
-        if (!Number.isFinite(state.itemIndex) && t === _lastTable && tables.length > 1) t = tables[(tables.indexOf(t) + 1) % tables.length];
+    // Wave 1 lane C2: the page's ROW LIST (count-rows.js). The old ticked tables (a raw `constant` that a caller left
+    // un-folded) are the same thing as plain rows, so both end up here.
+    const ticks = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
+    let pageRows = normalizeRows(opt('rows'));
+    if (!pageRows.length && ticks.length < 12) pageRows = ticks.map((n) => ({ step: n, start: 'step', dir: 'up' }));
+    const plainSteps = pageRows.length && pageRows.every(isPlainRow) ? [...new Set(pageRows.map((r) => r.step))].sort((a, b) => a - b) : null;
+    if (plainSteps && plainSteps.length === 12) pageRows = [];          // every table: the usual page
+    let row;
+    if (onePage && pageRows.length) {
+        const list = onePageRows(pageRows); pageRows = list; row = list[idx % list.length];
+    } else if (!onePage && pageRows.length && !plainSteps) {
+        row = opt('order') === 'mixed' && pageRows.length > 1 ? pageRows[dealIndex('cbt-row', pageRows.length)] : pageRows[idx % pageRows.length];
     } else {
-        t = tables[idx % tables.length];
+        let tables = plainSteps ? plainSteps : ticks;
+        // R3 (critic round 3): with every table ticked (untouched) a page of five rows was the 1s to
+        // the 5s in order, and counting by 1 is not practice. Untouched, the page deals 2 to 12 in a
+        // shuffled round, so any page samples across the tables its title names; a teacher who
+        // ticks tables keeps the order option.
+        const untouched = !plainSteps;
+        if (untouched) tables = tables.filter((v) => v >= 2);
+        let t;
+        const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
+        if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
+            // In order, every table ticked: the page walks up the tables, spread across 2 to 12
+            // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
+            if (_page <= tables.length) {
+                // one table from each stretch of the list, so the pages differ but always climb
+                const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
+                t = tables[randInt(lo, hi)];
+            } else t = tables[idx % tables.length];
+        // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
+        } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
+            // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
+            // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
+            // tables; page-deal.js shuffles each round from the page's own seeded rng.
+            t = tables[dealIndex('cbt-table', tables.length)];
+            if (!Number.isFinite(state.itemIndex) && t === _lastTable && tables.length > 1) t = tables[(tables.indexOf(t) + 1) % tables.length];
+        } else {
+            t = tables[idx % tables.length];
+        }
+        // no rows chosen on the one-page sheet: x 1 to x 12 in order (the table is still dealt above, so the page's random draws are the same as before)
+        row = { step: onePage ? (idx % 12) + 1 : t, start: 'step', dir: 'up' };
     }
-    if (onePage) t = (idx % 12) + 1;
+    const t = row.step;
     _lastTable = t;
     // Wave 1 lane C: the row runs to 12 or 15 numbers; the first one, two or about half the numbers print.
     const n = !onePage && Number(opt('jumps')) === 15 ? 15 : 12;
-    // Wave 1 lane C2: where the row starts and which way it runs. Down never goes below 0 (no negatives).
-    const startMode = onePage ? 'step' : (opt('start') || 'step');
-    const dirOpt = opt('dir') || 'forward';
-    const down = dirOpt === 'back' || (dirOpt === 'mixed' && dealIndex('cbt-dir', 2) === 1);
-    const startAt = Math.max(0, Math.round(Number(opt('startAt')) || 0));
-    let values;
-    if (!down) {
-        const a0 = startMode === 'zero' ? 0 : startMode === 'custom' ? startAt : t;
-        values = Array.from({ length: n }, (_, i) => a0 + t * i);
-    } else if (startMode === 'custom') {
-        let top = startAt;
-        let m = Math.min(n, Math.floor(top / t) + 1);
-        if (m < 5) { top = 7 * t + (top % t); m = 8; }   // too short a run: lift the start, keeping its ones
-        values = Array.from({ length: m }, (_, i) => top - t * i);
-    } else {
-        // from the end of the table down: 12 x t ... 1 x t (start at the step) or (n-1) x t ... 0 (start at 0)
-        const hi = startMode === 'zero' ? n - 1 : n;
-        values = Array.from({ length: n }, (_, i) => t * (hi - i));
-    }
+    // Wave 1 lane C2: where the row starts and which way it runs (count-rows.js rowValues). Down never goes below 0.
+    const values = rowValues(row, n);
+    const down = row.dir === 'down';
+    const sum = rowsSummary(pageRows);
+    const dirOpt = sum.dir === 'up' ? 'forward' : sum.dir === 'down' ? 'back' : 'mixed';
     const len = values.length;
     const pct = Number(opt('missing')) || 50;
     const fill = opt('fill') || 'two';
@@ -169,15 +168,16 @@ export function genCountByTables(q) {
     q.selfAnswering = true;
     q.options = [];
     q.a = t; q.b = len; q.op = '×';
-    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n, dir: down ? 'down' : 'up', dirOpt, start: startMode,
-        startAt: startMode === 'custom' ? startAt : null, by, times: labels ? timesMode : 'none', labels: labels ? labels.slice() : null };
+    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n, dir: down ? 'down' : 'up', dirOpt, start: row.start,
+        startAt: row.start === 'custom' ? row.at : null, row: { ...row }, page: { steps: sum.steps.slice(), from: sum.from, rows: pageRows.length },
+        times: labels ? timesMode : 'none', labels: labels ? labels.slice() : null };
     q.hint = down ? `Each number is ${fmt(t)} less than the one before. Count back by ${fmt(t)}.` : `Each number is ${fmt(t)} more than the one before. Count on by ${fmt(t)}.`;
     q.skillLabel = `${down ? 'Count back' : 'Count'} by ${fmt(t)}`;
-    // The step tab shows the way when it can change (a page of back or mixed rows): "−7" back, "+7" on in a mixed page.
+    // The step tab shows the way when it can change (a page with rows going down): "−7" back, "+7" on in a mixed page.
     const tab = dirOpt === 'forward' ? fmt(t) : `${down ? '−' : '+'}${fmt(t)}`;
     const payload = { values, blanks, look: 'arcs', tab, shape };
     if (labels) { payload.times = timesMode; payload.labels = labels; }
-    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // twelve rows on one page: tighter chrome, digits at the S working size
+    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // the rows on one page: tighter chrome, digits at the S working size
     q.cell = { template: 'count-row', v: 1, payload };
     q.visual = k2Twin('count-row', payload);
     q.printFormat = 'count-row';

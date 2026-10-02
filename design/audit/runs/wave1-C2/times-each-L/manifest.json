@@ -12,20 +12,20 @@
           "cols": 1,
           "rows": 4,
           "perPage": 4,
-          "pages": 1,
-          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+          "pages": 2,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 2 pages. Digits 28 pt.",
           "sections": [
             {
               "cols": 1,
               "rows": 4,
               "perPage": 4,
-              "pages": 1,
+              "pages": 2,
               "cellW": 186,
               "cellH": 56.75,
               "requested": "auto",
               "clamped": false,
               "note": "",
-              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 2 pages. Digits 28 pt.",
               "cls": "standard",
               "digitPt": 28,
               "hMin": 54.3,
@@ -34,8 +34,8 @@
             }
           ]
         },
-        "pageCount": 1,
-        "keyPageCount": 1,
+        "pageCount": 2,
+        "keyPageCount": 2,
         "seed": 244652,
         "title": "I Can count by 7",
         "notes": [],
@@ -141,12 +141,42 @@
                 "fits": false
               }
             }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 49, 63, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
           }
         ],
         "pages": [
           {
             "file": "independent-p1.png",
-            "words": 225,
+            "words": 180,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p2.png",
+            "words": 129,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -154,7 +184,414 @@
         "keyPages": [
           {
             "file": "independent-key-p1.png",
-            "words": 248,
+            "words": 198,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p2.png",
+            "words": 142,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 2,
+          "cells": [
+            3,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 127
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 2,
+          "cells": [
+            3,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 152
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "guided": {
+        "fits": {
+          "cols": 1,
+          "rows": 2,
+          "pages": 2,
+          "note": "Fits: 1 columns x 2 rows (page 1 of 2), 5 guided cells.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 2,
+              "cellH": 85.23437499999997,
+              "line": "Fits: 1 columns x 2 rows (page 1 of 2), 5 guided cells."
+            },
+            {
+              "cols": 1,
+              "rows": 3,
+              "cellH": 61.489583333333336,
+              "line": "Fits: 1 columns x 3 rows (page 2 of 2), 5 guided cells."
+            }
+          ]
+        },
+        "pageCount": 2,
+        "keyPageCount": 2,
+        "seed": 972334,
+        "title": "I Can count by 7",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 56, 63, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "21, 42, 56, 70, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 70, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 49, 70, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "21, 42, 56, 70, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "guided-p1.png",
+            "words": 208,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "guided-p2.png",
+            "words": 214,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "guided-key-p1.png",
+            "words": 216,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "guided-key-p2.png",
+            "words": 232,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 2,
+          "cells": [
+            2,
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 153
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 2,
+          "cells": [
+            2,
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 173
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "test": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 1,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+          "sections": [
+            {
+              "role": "test",
+              "cls": "standard",
+              "requested": "auto",
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 1,
+              "count": 4,
+              "cellW": 186,
+              "innerW": 184.942,
+              "cellH": 56.75,
+              "hMin": 54.3,
+              "gridH": 227,
+              "gridHCont": 241,
+              "fill": true,
+              "packed": false,
+              "filled": false,
+              "ceiling": 12,
+              "clamped": false,
+              "reason": "",
+              "note": "",
+              "notes": [],
+              "digitPt": 28,
+              "trackMm": null,
+              "size": "L",
+              "look": "ican",
+              "availableWidthMm": 186,
+              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt."
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 657182,
+        "title": "Test A: counting by 7",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 63, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 70, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 56, 63, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 49, 70, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "test-p1.png",
+            "words": 81,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "test-key-p1.png",
+            "words": 104,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -166,7 +603,7 @@
           ],
           "problems": [],
           "fonts": {
-            "Andika": 98
+            "Andika": 50
           },
           "fontsReady": true,
           "andika": true
@@ -178,7 +615,227 @@
           ],
           "problems": [],
           "fonts": {
-            "Andika": 118
+            "Andika": 70
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "more-practice": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 2,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 56.75,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 54.3,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 2,
+        "keyPageCount": 2,
+        "seed": 720587,
+        "title": "I Can count by 7",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 56, 70, 84",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "21, 35, 56, 70, 84",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "21, 35, 56, 70, 77",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 70, 77",
+            "letter": "B",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 56, 70, 77",
+            "letter": "B",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "more-practice-p1.png",
+            "words": 180,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-p2.png",
+            "words": 135,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "more-practice-key-p1.png",
+            "words": 198,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-key-p2.png",
+            "words": 148,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 2,
+          "cells": [
+            3,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 133
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 2,
+          "cells": [
+            3,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 158
           },
           "fontsReady": true,
           "andika": true
