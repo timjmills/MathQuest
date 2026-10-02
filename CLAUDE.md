@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MathQuest ("Maths Quest Pro") is a modular math practice web application targeting K-6 students. The app is split into 70 files: 1 HTML + 12 CSS + 57 JS (56 ES modules + 1 barrel module). The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
+MathQuest ("Maths Quest Pro") is a modular math practice web application targeting K-6 students. The app is split into 1 HTML + 23 CSS + 119 JS files (118 ES modules in `js/modules/` + the `js/globals.js` barrel) as of 2026-10-02, plus the `js/modules/sheet/` kit; the file list below names the original core modules only. The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
 
 ## Running the App
 
@@ -59,7 +59,7 @@ outrank any general design advice or skill:
 
 ```bash
 node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
-node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 604 codes / 35 categories today
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 608 codes / 35 categories on 2026-10-02
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)

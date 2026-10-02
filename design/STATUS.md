@@ -106,4 +106,16 @@ To recreate a lane: `git worktree add .claude/worktrees/<lane> -b <local-name> o
 2. If the worktrees survive: resume each lane with "resumed after owner pause; your tree is WIP-committed; continue
    from the Next column", at most 8 agents, browser gates one at a time.
 3. Critic every lane before merge; merge + full gates + stamp (`ws-stamp-assets`) + deploy what passes.
-4. To build on resume (owner rulings of 2026-09-27): red answers on keys (a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
+4. To build on resume (owner rulings of 2026-09-27): reddish-orange answers on keys (MASTER_PLAN 4.4; a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
+
+## 7. Independent planning review (2026-10-02, Wave 1 start) — open items
+
+Fixed at once: key colour wording (INK-31, PT-KEY-1a, §6 here) now says reddish orange; CLAUDE.md file and code counts.
+Still open, for the owner or a later wave:
+- Teacher files: `teacher-shell/print/library/quiz-ui/sets/standards.js` and the `ws-teacher-*` gates are on this branch, while `sheet/papers.js` and `prerequisite-skills.js` exist only on `wip-teacher-ui`; a live-vs-branch table is needed before Wave 3.
+- One deploy-gate list: CLAUDE.md "Checks to run" omits `ws-screen-answer`, `ws-screen-slots`, `ws-share-options` and the `ws-teacher-*` gates.
+- Backlog items with no wave owner (BACKLOG.md top: div_remainders counters, nl_sub, add_5_pictures, money_compare panels, mixed_placevalue, round_nl_hundred_thousands, support ladder on worksheet/quiz hosts, expand double edge) → fold into Wave 5.
+- Owner questions not yet carried into MASTER_PLAN: what the "Practice map" tile opens; keep money_count's all-same-coin default?
+- The `effort:` field in `.claude/agents/*.md` cannot be seen by the agent itself; the model (Sonnet 5.5) was confirmed, the effort setting was not observable.
+- Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
+- 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.
