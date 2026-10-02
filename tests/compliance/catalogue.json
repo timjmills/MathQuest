@@ -48156,26 +48156,5 @@
    }
   }
  ],
- "consoleProblems": [
-  {
-   "type": "console.error",
-   "text": "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
-  },
-  {
-   "type": "console.error",
-   "text": "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
-  },
-  {
-   "type": "console.error",
-   "text": "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
-  },
-  {
-   "type": "console.error",
-   "text": "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
-  },
-  {
-   "type": "console.error",
-   "text": "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
-  }
- ]
+ "consoleProblems": []
 }
