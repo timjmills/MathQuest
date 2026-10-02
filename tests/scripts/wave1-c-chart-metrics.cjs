@@ -17,11 +17,18 @@
 const { open } = require('../lib/ws-harness.cjs');
 
 const SKILL = { categoryId: 'composing', skillId: 'hundreds_chart_fill' };
-const OPTS = { grid: 'whole', gaps: 'row' };
 const HOSTS = [
     ['card', 1280], ['card', 820], ['card', 390],
     ['worksheet', 1280], ['worksheet', 820], ['worksheet', 390],
     ['quiz', 1280],
+];
+// follow-up I (2026-10-02): the 3-row window (grid:'rows', two-digit numbers) on every host, gaps scatter and row.
+// Targets: squares >= 44 px wide, inputs >= 44 px wide, every printed number >= 4 px clear each side.
+const ALL_HOSTS = HOSTS.concat([['quiz', 820], ['quiz', 390]]);
+const CONFIGS = [
+    { name: 'whole/row', opts: { grid: 'whole', gaps: 'row' }, hosts: HOSTS, rows: false },
+    { name: 'rows/scatter', opts: { grid: 'rows', gaps: 'scatter' }, hosts: ALL_HOSTS, rows: true },
+    { name: 'rows/row', opts: { grid: 'rows', gaps: 'row' }, hosts: ALL_HOSTS, rows: true },
 ];
 
 function target(host, w) {
@@ -37,7 +44,8 @@ function target(host, w) {
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
     page.on('pageerror', (e) => errors.push(String(e)));
     let fail = 0;
-    for (const [host, W] of HOSTS) {
+    for (const CFG of CONFIGS) for (const [host, W] of CFG.hosts) {
+        const OPTS = CFG.opts;
         await page.setViewport({ width: W, height: 900, deviceScaleFactor: 1 });
         await new Promise((r) => setTimeout(r, 150));
         const r = await page.evaluate(async ({ host, SKILL, OPTS }) => {
@@ -80,23 +88,29 @@ function target(host, w) {
             if (!t) return { err: 'no ten-column chart' };
             const tds = [...t.querySelectorAll('td')];
             const rs = tds.map((d) => d.getBoundingClientRect());
-            const td100 = tds.find((d) => d.textContent.trim() === '100' && !d.querySelector('input'));
-            const printed = tds.find((d) => !d.querySelector('input') && d.textContent.trim());
+            const printedTds = tds.filter((d) => !d.querySelector('input') && d.textContent.trim());
+            const printed = printedTds[0];
             const fontEl = (printed && (printed.querySelector('span') || printed)) || tds[0];
             let clearL = null, clearR = null;
-            if (td100) {
-                const tn = [...td100.querySelectorAll('*'), td100].map((e) => [...e.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim() === '100')).find(Boolean);
+            for (const d of printedTds) {
+                const tn = [...d.querySelectorAll('*'), d].map((e) => [...e.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim()))
+                    .find(Boolean);
+                if (!tn) continue;
                 const rg = document.createRange(); rg.selectNodeContents(tn);
-                const tr = rg.getBoundingClientRect(), lr = td100.getBoundingClientRect();
-                clearL = +(tr.left - lr.left).toFixed(1); clearR = +(lr.right - tr.right).toFixed(1);
+                const tr = rg.getBoundingClientRect(), lr = d.getBoundingClientRect();
+                const l = +(tr.left - lr.left).toFixed(1), r2 = +(lr.right - tr.right).toFixed(1);
+                if (clearL === null || l < clearL) clearL = l;
+                if (clearR === null || r2 < clearR) clearR = r2;
             }
+            const ins = [...t.querySelectorAll('input')].map((i) => i.getBoundingClientRect());
+            const inputW = ins.length ? +Math.min(...ins.map((x) => x.width)).toFixed(1) : null;
             const wrap = t.closest('.k2-chartwindow') || t.parentElement;
             const hostBox = (t.closest('#questionCard, .problem-card, .qt-question-card') || root).getBoundingClientRect();
             return {
                 fontPx: parseFloat(getComputedStyle(fontEl).fontSize),
                 minW: +Math.min(...rs.map((x) => x.width)).toFixed(1),
                 minH: +Math.min(...rs.map((x) => x.height)).toFixed(1),
-                clearL, clearR,
+                clearL, clearR, inputW,
                 chartW: Math.round(t.getBoundingClientRect().width), hostW: Math.round(hostBox.width),
                 swipes: wrap.scrollWidth > wrap.clientWidth + 1,
                 wrapW: Math.round(wrap.clientWidth),
@@ -104,18 +118,20 @@ function target(host, w) {
                 pageHScroll: document.documentElement.scrollWidth - document.documentElement.clientWidth,
             };
         }, { host, SKILL, OPTS });
-        const tg = target(host, W);
+        const tg = Object.assign({}, target(host, W));
+        if (CFG.rows) { tg.squareW = 44; tg.inputW = 44; tg.clear = 4; }
         const miss = [];
         if (r.err) miss.push(r.err);
         else {
             if (r.fontPx < tg.font - 0.01) miss.push(`digits ${r.fontPx} < ${tg.font}`);
             if (tg.squareW && r.minW < tg.squareW) miss.push(`squares ${r.minW} < ${tg.squareW}`);
-            if (tg.clear && (r.clearL == null || r.clearL < tg.clear || r.clearR < tg.clear)) miss.push(`"100" clear ${r.clearL}/${r.clearR} < ${tg.clear}`);
+            if (tg.inputW && (r.inputW == null || r.inputW < tg.inputW)) miss.push(`input ${r.inputW} < ${tg.inputW}`);
+            if (tg.clear && (r.clearL == null || r.clearL < tg.clear || r.clearR < tg.clear)) miss.push(`printed number clear ${r.clearL}/${r.clearR} < ${tg.clear}`);
             if (W >= 1000 && r.swipes) miss.push('chart swipes at a desktop width (ten squares must fit)');
             if (r.pageHScroll > 0) miss.push(`page scrolls sideways ${r.pageHScroll}`);
         }
         if (miss.length) fail++;
-        console.log(`${miss.length ? 'FAIL' : 'ok  '} ${host.padEnd(9)} ${String(W).padStart(4)}  ${JSON.stringify(r)}${miss.length ? '  <- ' + miss.join('; ') : ''}`);
+        console.log(`${miss.length ? 'FAIL' : 'ok  '} ${CFG.name.padEnd(12)} ${host.padEnd(9)} ${String(W).padStart(4)}  ${JSON.stringify(r)}${miss.length ? '  <- ' + miss.join('; ') : ''}`);
     }
     if (errors.length) { fail++; console.log('console errors:', errors.slice(0, 5).join(' | ')); }
     await app.close();
