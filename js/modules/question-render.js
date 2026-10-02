@@ -1507,6 +1507,11 @@ function _applyScreenCell() {
             visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind) });
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
+            // A fact or equation drawn with one box per digit (ansBox 'digit') may come from a text-only
+            // item the legacy visual path never wired: give its digit boxes the same live per-box
+            // validation, which also hides #answerInputArea (idempotent).
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 0);
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 220);
         } else {
             visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>', supports: _supportsOf(q, kind) })
                 + (kind.kind === 'division' ? workRowsHTML(kind) : '');

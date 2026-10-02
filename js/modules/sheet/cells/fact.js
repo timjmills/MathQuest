@@ -11,7 +11,7 @@ import {
     opGlyph, FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_TRACKS, FACT_TRACK_EM,
     FACT_AUTO_COLS, EM_MM, SIZES, blankWidth,
 } from '../tokens.js';
-import { blank } from '../cell.js';
+import { blank, styledAnswerSlot } from '../cell.js';
 import { register, getCell } from '../registry.js';
 import { stepMarks, placeDigits, singleSlotState } from '../steps.js';
 import { touchNumbers, touchNumberHTML, touchOpts, touchDigit, installCueDrawer } from '../support-draw.js';
@@ -299,8 +299,9 @@ register('fact', {
             const A0 = touchNumberHTML(p.a, tn.a, to), B0 = touchNumberHTML(p.b, tn.b, to);
             // The key's value is written at the DIGIT size and weight, on the line, like the
             // pupil's own digits (AK-1) - never the small bold of a caption.
-            const slot = blank({ id: 'ans', kind: 'number', shape: 'line', digits: nd, graded: true, order: 0, maxLength: nd, inputmode: 'numeric', scopes: ['full', 'answer-only'] }, ctx, value)
+            const slot0 = blank({ id: 'ans', kind: 'number', shape: 'line', digits: nd, graded: true, order: 0, maxLength: nd, inputmode: 'numeric', scopes: ['full', 'answer-only'] }, ctx, value)
                 .replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
+            const slot = (ctx.mode !== 'screen' || ctx.static) ? styledAnswerSlot(slot0, p.ansBox, { n: nd, ctx, value }) : slot0;
             const o = (g, w) => `<span class="o"${w ? ` style="width:${w}em"` : ''}>${g}</span>`;
             // On paper an across fact keeps the vertical fact's height (VA-70: one fact cell
             // height whichever way it is drawn), the spare below the answer (PG-14). So the
@@ -342,6 +343,8 @@ register('fact', {
         const text = ink && shown !== undefined && shown !== null ? String(shown) : '';
         // INK-3 / LS-1: a trace digit is grey, or a dotted outline when photocopy-safe.
         const cls = ink === 'trace' ? (ctx.photocopySafe ? 'ws-factans ws-dotted' : 'ws-factans ws-trace') : 'ws-factans';
+        // The teacher's answer-box option (owner ruling 2026-10-02; automatic = one box for a fact).
+        const boxCls = p.ansBox === 'digit' ? ' ws-factans--digit' : p.ansBox === 'off' ? ' ws-factans--off' : '';
         // S5 step state (steps.js): one {ch, ink} per answer track, the newest grey (P-LC-9).
         const st = Array.isArray(ctx.stepTracks) ? ctx.stepTracks : null;
         const w = st ? st.length : Math.max(n, text.length);
@@ -349,7 +352,7 @@ register('fact', {
             ? st.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? (ctx.photocopySafe ? 'ws-dotted' : 'ws-trace') : ''}" data-ws-ink="${tk.ink}" style="text-align:center">${tk.ch}</span>` : '<span></span>')).join('')
             : [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');
         return item.html.replace('<span class="rule"></span>',
-            `<span class="rule"></span><span class="${cls}" data-ws-slot="ans" data-ws-shape="open"${ink ? ` data-ws-ink="${ink}"` : ''} `
+            `<span class="rule"></span><span class="${cls}${boxCls}" data-ws-slot="ans" data-ws-shape="open"${ink ? ` data-ws-ink="${ink}"` : ''} `
             + `style="grid-column:${w > n ? 1 : 2} / -1;font-weight:${ink === 'solid' ? 700 : 400};font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(${w}, ${FACT_TRACK_EM}em);justify-content:end;height:1.15em;line-height:1.15">${cells}</span>`);
     },
     answerKey(p) {

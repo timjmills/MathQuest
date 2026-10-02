@@ -9,7 +9,7 @@
 // Pure module (SCC-01).
 
 import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
-import { esc, line, box, circle, blank } from '../cell.js';
+import { esc, line, box, circle, blank, styledAnswerSlot } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, singleSlotState } from '../steps.js';
 import { touchNumbers, touchNumberHTML, touchOpts } from '../support-draw.js';
@@ -83,11 +83,18 @@ register('equation', {
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
         const digits = p.digits || String(unknownValue(Object.assign({}, p, { result }))).replace('-', '').length || 2;
         // SCC-T15: parity. The slot the pupil writes on paper is typed on screen, same shape.
-        const slotHtml = blank({
+        const slotHtml0 = blank({
             id: 'answer', kind: u === 'op' ? 'sign' : 'number', shape: slotShape(p),
             digits, graded: true, order: 0, inputmode: u === 'op' ? 'text' : 'numeric',
             scopes: ['full', 'answer-only'],
         }, ctx, ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })));
+        let slotHtml = slotHtml0;
+        // The teacher's answer-box option (owner ruling 2026-10-02; automatic = one box): on paper
+        // 'digit' draws one box per digit of the band (the key's digits right-aligned, one per box),
+        // 'off' the plain ruled line. Screen hosts draw their own slot (screen-cell.js).
+        const onPaper = ctx.mode !== 'screen' || ctx.static;
+        if (onPaper && u !== 'op') slotHtml = styledAnswerSlot(slotHtml0, p.ansBox, { n: digits, ctx,
+            value: ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })) });
         // P11: a ÷ sentence written the way the teacher ticked (`notation`): the dividend over the
         // divisor on a fraction bar, or the divisor outside a long-division bracket. The unknown
         // keeps its slot wherever it sits.

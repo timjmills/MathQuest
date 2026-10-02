@@ -417,9 +417,11 @@ export const SKILL_OPTIONS = {
  */
 export const PLAY_GROUP = 'play';
 export const isPlayOption = (def) => !!def && def.group === PLAY_GROUP;
+/** A control the panel keeps inside a closed disclosure (pupil play, answer boxes): never "at rest". */
+export const isClosedOption = (def) => !!def && (def.group === PLAY_GROUP || def.group === 'boxes');
 /** The controls the panel shows at rest: those that apply now and are not inside the collapsed play group. */
 export function restingOptions(defs, cur) {
-    return (defs || []).filter((d) => !isPlayOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
+    return (defs || []).filter((d) => !isClosedOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
 }
 /** The play disclosure's summary line: "Calculator off · Skip after 5". */
 export function playSummary(defs, cur) {
@@ -3327,6 +3329,34 @@ export const skipAfterOption = () => ({
 });
 export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
+// `ansBox` (Wave 1 lane B, owner ruling 2026-10-02): the answer-box style of a + − × ÷ skill, a
+// teacher option that travels with the skill into every page role, the key and the screen. null
+// (the default, not written into a share code) is automatic: column work (a stack) gets one box per
+// digit, a fact or an equation one box. Long division keeps its vinculum (SL-3 exception) whatever
+// the value. Shown inside its own closed disclosure, so it is never a control "at rest".
+export const ANSBOX_GROUP = 'boxes';
+// The skills whose items a kit template draws (measured, js/modules/skill-ansbox-skills.js, which
+// registers itself here like skill-options-derived.js): the option is OFFERED on these only.
+let ANSBOX_SKILLS = {};
+export function registerAnsBoxSkills(map) { ANSBOX_SKILLS = map || {}; }
+export const ANSBOX_CATEGORIES = new Set(['addition', 'subtraction', 'multiplication', 'division']);
+export const ansBoxOption = () => ({
+    id: 'ansBox', label: 'Answer boxes', type: 'enum', default: null, group: ANSBOX_GROUP,
+    values: [
+        { v: null, l: 'Automatic (columns: one box per digit; facts: one box)' },
+        { v: 'digit', l: 'One box per digit' },
+        { v: 'one', l: 'One box' },
+        { v: 'off', l: 'Off (no box: the plain answer space)' },
+    ],
+    help: 'How the answer place is drawn, on paper, on the key and on screen.',
+    summary: (v) => ({ digit: 'One box per digit', one: 'One box', off: 'No box' }[v] || 'Automatic'),
+});
+/** The answer-box style a cell draws: the chosen value, else the automatic one for its layout. */
+export function resolveAnsBox(value, layout) {
+    if (value === 'digit' || value === 'one' || value === 'off') return value;
+    return layout === 'stack' ? 'digit' : 'one';
+}
+
 // ---------------------------------------------------------------------------
 // MEASURED OPTIONS — every skill gets the settings its generator was seen to read
 // ---------------------------------------------------------------------------
@@ -3407,7 +3437,9 @@ export function optionsFor(categoryId, skillId) {
     const own = ownOptionsFor(categoryId, skillId);
     const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
     const ids = new Set(all.map(o => o.id));
-    return [...all, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
+    const uni = UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id));
+    if (ANSBOX_CATEGORIES.has(categoryId) && !ids.has('ansBox')) uni.push(ansBoxOption());
+    return [...all, ...uni];
 }
 
 /**
@@ -3429,6 +3461,9 @@ export function offeredOptionsFor(categoryId, skillId) {
         // A `hidden` option is a retired control folded into another one (OPTION_FOLDS below): it
         // stays in the model so an old share code still decodes, but the teacher never sees it.
         if (o.hidden) continue;
+        // The answer-box option is shown only where the skill's items are drawn by a kit template it
+        // restyles (skill-ansbox-skills.js, measured); elsewhere it stays in the model, unshown.
+        if (o.id === 'ansBox' && !ANSBOX_SKILLS[`${categoryId}:${skillId}`]) continue;
         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // A review's own "Support, for the whole review" sets every member's level already.

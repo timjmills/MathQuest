@@ -1442,10 +1442,34 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
    inside; the black outline is the cue. Compatible with Lane A2: a per-box live fill
    (.mq-live-ok / .mq-live-wrong) overrides background-color, a wrong box may switch to a dashed
    border. Focus / active highlight is Lane A's (above). */
-html .mq-scell input.mq-slot:not(.mq-slot--circle),
-html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:not(.mq-slot--circle),
-html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--circle) {
+/* Specificity 0 (:where): any Lane A2 rule (.mq-live-ok / .mq-live-wrong fill, dashed red wrong
+   border) written with !important at ANY specificity wins over this one without a war. */
+:where(html .mq-scell input.mq-slot:not(.mq-slot--circle)) {
     border-width: 1px !important; border-style: solid !important; border-color: #000 !important;
     border-radius: var(--mq-slot-r, 6px) !important;
     background-color: rgba(148, 148, 148, 0.14) !important;
 }
+
+/* WAVE 1 / 1.1 (additive, critic B D2): a `___` blank inside question text (.answer-blank-inline) is a
+   full box too, never a bottom rule alone. Place-value / static line slots inside a screen cell
+   (.ws-line, not the Say band) draw as the same box; an input adopted into one keeps the only box. */
+:where(.mq-scell .answer-blank-inline) {
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; display: inline-block; min-width: 2.4em; min-height: 1.2em; vertical-align: middle;
+}
+:where(.mq-scell .ws-line:not(.ws-line--say):not(:has(input))) {
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; box-sizing: border-box;
+}
+:where(.mq-scell .ws-line:has(> input.mq-slot)) { border: 0 !important; }
+
+/* WAVE 1 / 1.1: the + − × ÷ answer-box option on screen (owner ruling 2026-10-02, additive).
+   'one' on a column stack: the digit inputs read as ONE box (outer edges only: top, bottom, the
+   first box's left and the last box's right); 'off': no box, a ruled writing line under the inputs.
+   An equation's digit strip ('digit') sits inline after "=". Specificity stays low (:where) except
+   where an older !important rule must be beaten; Lane A2's .mq-live-ok / .mq-live-wrong fills keep winning. */
+:where(.mq-scell .ws-stack.mq-ans-one .ab > input.mq-digit) { border-left-color: transparent !important; border-right-color: transparent !important; }
+:where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="first"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-left-color: #000 !important; }
+:where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="last"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-right-color: #000 !important; }
+:where(.mq-scell .ws-stack.mq-ans-off .ab > input.mq-digit) { border-color: transparent !important; border-bottom-color: #000 !important; border-radius: 0 !important; }
+:where(.mq-scell .mq-ansoff input) { border-color: transparent !important; border-bottom: 2px solid #000 !important; border-radius: 0 !important; }
+.mq-kit .ws-stack.mq-eqdigits { display: inline-flex !important; vertical-align: middle; grid-template-columns: none; }
+.mq-kit .ws-stack.mq-eqdigits > .ab { width: auto; }

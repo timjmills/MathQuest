@@ -91,7 +91,33 @@ function DETECT(cellSel, hostSel, textSel) {
             if (m) paper.push((t.nodeValue || '').trim().slice(0, 50));
         }
     }
-    return { hostVisible, drawn: drawn.length, under, inputs: inputs.length, suspects, paper,
+    // Owner ruling 2026-10-02 (SL-3, Wave 1 Lane B): ONE full box per answer slot on screen.
+    // NESTED: a typed answer input that draws its own box inside a bordered ancestor of about its
+    // own size (a box inside a box; a table cell holding its input is the cell's own square, not
+    // counted). LINE: a typed answer input or drawn graded slot whose only border is the bottom one.
+    const sides = (el) => { const cs = getComputedStyle(el); return ['Top', 'Right', 'Bottom', 'Left'].map((k) => (cs[`border${k}Style`] === 'none' ? 0 : parseFloat(cs[`border${k}Width`]) || 0)); };
+    const boxed = (el) => sides(el).every((w) => w >= 0.5);
+    const answerInputs = inputs.concat(hostInput && vis(hostInput) ? [hostInput] : []);
+    let nested = 0, lines = 0;
+    for (const i of answerInputs) {
+        const ri = i.getBoundingClientRect();
+        if (boxed(i)) {
+            for (let el = i.parentElement; el && el !== cell && cell.contains(el); el = el.parentElement) {
+                if (/^(TD|TH)$/.test(el.tagName) || !boxed(el)) continue;
+                const r = el.getBoundingClientRect();
+                if (r.width <= ri.width * 2.5 && r.height <= ri.height * 2.5) { nested++; break; }
+            }
+        }
+        const sd = sides(i);
+        // a teacher's ansBox 'off' (the plain look) is a line on purpose
+        if (sd[2] >= 0.5 && !sd[0] && !sd[1] && !sd[3] && !i.closest('.mq-ansoff, .mq-ans-off')) lines++;
+    }
+    for (const el of cell.querySelectorAll('[data-ws-slot][data-ws-shape="line"]:not([data-ws-graded="0"]), .answer-blank-inline')) {
+        if (!vis(el) || inHost(el) || el.querySelector('input')) continue;
+        const sd = sides(el);
+        if (sd[2] >= 0.5 && !sd[0] && !sd[1] && !sd[3]) lines++;
+    }
+    return { hostVisible, drawn: drawn.length, under, inputs: inputs.length, suspects, paper, nested, lines,
         doubled: hostVisible && (drawn.length > 0 || inputs.length > 0 || under > 0),
         suspect: hostVisible && !(drawn.length > 0 || inputs.length > 0 || under > 0) && suspects > 0 };
 }
@@ -124,6 +150,7 @@ function DETECT(cellSel, hostSel, textSel) {
         const note = (host, r) => {
             checked++;
             if (r && r.paper && r.paper.length) paperVerbs.push(`${key.padEnd(44)} ${host.padEnd(10)} paper verb on screen: "${r.paper[0]}"`);
+            if (r && (r.nested || r.lines)) doubled.push(`${key.padEnd(44)} ${host.padEnd(10)} ${r.nested} box(es) inside a box, ${r.lines} answer slot(s) drawn as a line (SL-3)`);
             if (r && r.doubled) doubled.push(`${key.padEnd(44)} ${host.padEnd(10)} host field + ${r.drawn} drawn place(s), ${r.under} underscore blank(s), ${r.inputs} cell input(s)`);
             else if (r && r.suspect) suspects.push(`${key.padEnd(44)} ${host.padEnd(10)} host field + ${r.suspects} empty drawn box(es) (check by eye)`);
         };

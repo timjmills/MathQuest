@@ -28,7 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, resolveAnsBox } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
     withSupports, supportOpKey as opKey,
@@ -95,6 +95,34 @@ export function binaryParts(q) {
  *   division  US bracket division, quotient slot above the vinculum (VA-60, VA-61)
  */
 export function cellKindFor(q) {
+    return withAnsBox(q, _cellKindFor(q));
+}
+
+/**
+ * Owner ruling 2026-10-02: the + − × ÷ answer-box option on screen (`ansBox`; automatic = one box
+ * per digit for column work, one box for a fact or an equation). 'digit' on a fact or an equation
+ * becomes digit boxes: a vertical fact is drawn as the stack it is (no regroup row), an equation
+ * keeps its line and gets a digit strip after "=" (`layout: 'eq'`); both use the
+ * stack's digit inputs, so every host checks them, and marks them, box by box.
+ */
+function withAnsBox(q, k) {
+    if (!k || k.kind === 'division') return k;
+    const raw = q && (q.ansBox != null ? q.ansBox : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox
+        : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null);
+    const ab = resolveAnsBox(raw, k.kind === 'stack' ? 'stack' : 'other');
+    if (ab === 'digit' && (k.kind === 'fact' || k.kind === 'eq') && Number.isFinite(Number(k.a)) && Number.isFinite(Number(k.b))) {
+        const ansLen = String(k.ans != null ? k.ans : '').length;
+        const strip = Math.max(ansLen, Number(q && q.cell && q.cell.payload && q.cell.payload.digits) || 0, 1);
+        if (k.kind === 'fact') {
+            const T = Math.max(String(k.a).length, String(k.b).length, strip) + 1;
+            return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true };
+        }
+        return { ...k, kind: 'stack', layout: 'eq', strip, T: strip, regroup: false, ansBox: ab };
+    }
+    return { ...k, ansBox: ab };
+}
+
+function _cellKindFor(q) {
     const multi = multiAddParts(q);
     if (multi) return multi;
     const p = binaryParts(q);
@@ -365,7 +393,7 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
     }
     const label = operands.join(` ${spokenOp(k.op)} `);
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}${k.ansBox === 'one' ? ' mq-ans-one' : k.ansBox === 'off' ? ' mq-ans-off' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
@@ -385,6 +413,27 @@ function spokenOp(op) {
     return { '+': 'plus', '-': 'minus', '*': 'times', '/': 'divided by' }[op] || op;
 }
 
+/**
+ * An equation with one box per digit after "=" (ansBox 'digit'): the same digit inputs as a stack's
+ * answer strip (answerClass + mq-digit, read left to right by every checker, right-aligned like the
+ * key), inside a `.ws-stack` strip, so it auto-advances exactly like the existing digit boxes (SP-20).
+ */
+export function eqDigitsHTML(k, { idPrefix = '', answerClass = 'column-answer-input' } = {}) {
+    const strip = Math.max(1, Number(k.strip) || String(k.ans != null ? k.ans : '').length || 1);
+    const PL = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands'];
+    const seg = (i, n) => (n === 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid');
+    let cells = '';
+    for (let i = 0; i < strip; i++) {
+        const place = PL[strip - 1 - i] || `place ${strip - i}`;
+        cells += `<span class="ab" data-ws-seg="${seg(i, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${strip - 1 - i}" data-ws-slot="ans-${strip - 1 - i}" data-ws-shape="box"`
+            + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
+            + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}></span>`;
+    }
+    return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+        + `<span>${k.a}</span><span class="o">${opGlyph(k.op)}</span><span>${k.b}</span><span class="o">=</span>`
+        + `<span class="ws-stack mq-eqdigits" style="--t:${strip}" data-ws-slot="answer" data-ws-shape="open">${cells}</span></div></div>`;
+}
+
 /** The kit drawing for a kind, with the answer slot the host supplies. */
 export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input', supports = null } = {}) {
     if (!k) return '';
@@ -392,9 +441,12 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     // row and panes drawn round the problem by the same code as paper (support-draw.js).
     const kk = supports && supports.on && supports.on.length ? Object.assign({}, k, { supports }) : k;
     let html = '';
+    // ansBox 'off' (the plain look): the host's slot keeps a ruled writing line, no box.
+    if (k.ansBox === 'off' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansoff">${slotHtml}</span>`;
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);
+    else if (kk.kind === 'stack' && kk.layout === 'eq') html = eqDigitsHTML(kk, { idPrefix, answerClass });
     else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass });
     if (!html || kk === k) return html;
     const p = { a: k.a, b: k.b, op: k.op, operands: k.operands, supports: { ...supports, reserve: [] } };

@@ -106,6 +106,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '5N-5Z', owner: 'lessons, support ladder and later waves' }),
     Object.freeze({ keys: '6X-6Z', owner: 'Wave 1 lane A (pupil practice: calculator, skip)' }),
     Object.freeze({ keys: '2U-2Z', owner: 'wave 1 lane C: skip-count lines and the number grid' }),
+    Object.freeze({ keys: '6Q-6W', owner: 'wave 1 lane B: answer boxes (+ − × ÷)' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -203,6 +204,9 @@ export const MULTI_KEYS = Object.freeze({
     calculator: '6X',    // every skill: show the pupil a calculator button (default off)
     skipAfter: '6Y',     // every skill: wrong tries before Skip appears (default 5, 0 = off)
     // NEXT FREE IN 6X-6Z: 6Z.
+    // Wave 1 lane B (sub-range 6Q-6W): the answer-box style of + − × ÷ (owner ruling 2026-10-02).
+    ansBox: '6Q',        // + − × ÷: one box per digit / one box / off (null = automatic: column work per digit, facts one box)
+    // NEXT FREE IN 6Q-6W: 6R.
 
     // Block 7 — option-panel round 3 (design/audit/OPTIONS-CRITIC-R2.md §5 #7, #20)
     poolSize: '7A',      // mixed pools: every member one step easier / as set / harder
@@ -355,6 +359,8 @@ export const VALUE_TOKENS = Object.freeze({
     step: Object.freeze({ 45: 'X' }),
     power: Object.freeze({ 10: '1', 100: '2', 1000: '3' }),
     places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' }),
+    // wave 1 lane B (6Q): the answer-box style
+    ansBox: Object.freeze({ digit: 'D', one: 'O', off: 'N' }),
 });
 
 // Every member a numeric SET option takes on any skill, written as itself in base 36 (7 -> "7",

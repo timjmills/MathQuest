@@ -521,6 +521,15 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
     }
 
+    // 3a. (owner ruling 2026-10-02, SL-3) A legacy horizontal question's ONE stretching answer place
+    // (`flex:1;border-bottom:2px solid #000`), drawn as a box on kit pages (sheet-kit.css): the key
+    // writes the value INSIDE that box, never in an "Answer:" stamp under it.
+    const hpRe = /(<span style="flex:1;border-bottom:2px solid #(?:000|333);?")>(?:&nbsp;|\s)*<\/span>/g;
+    const hps = html.match(hpRe) || [];
+    if (hps.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        return html.replace(hpRe, (m, open) => `${open} data-ws-ink="${inkAttr}" class="ws-hp-ans"><b style="${INK_STYLE}">${escText(display)}</b></span>`);
+    }
+
     // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
     // ____ units", a question's own answer rule, a bar-graph answer rule) or the empty box between
     // two fractions: the value is written ON it (AK-1), so the key is a facsimile and Error

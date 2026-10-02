@@ -858,7 +858,7 @@ function answerBlock(ctx, p, shown, unitShown, vertical = false) {
     const uw = isTwin(ctx) ? 26 : vertical ? { S: 20, M: 22, L: 24 }[sizeOf(ctx)] : { S: 28, M: 32, L: 36 }[sizeOf(ctx)];
     const uInk = unitShown !== '' ? inkOf(ctx) : null;
     const unit = p.unit
-        ? `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" style="display:inline-flex;align-items:flex-end;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};min-height:${L(ctx, bx * 0.8)};border-bottom:${B(ctx, 1)} solid ${INK};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`
+        ? `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};min-height:${L(ctx, bx * 0.8)};border:${B(ctx, 1)} solid ${INK};border-radius:${L(ctx, 1)};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`
         : '';
     const bank = p.unit && p.bank && p.bank.length
         ? `<div class="mq-wwwords" aria-label="unit words" style="display:inline-flex;${vertical ? 'flex-direction:column;align-items:flex-start;' : 'align-items:center;'}gap:${L(ctx, vertical ? 0.4 : 1.6)};border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 0.8)} ${L(ctx, 1.8)};font-size:${P(ctx, zonePt(ctx) + 1)};line-height:1.2;">`
@@ -887,7 +887,7 @@ function unitBlock(ctx, p, unitShown, top = false) {
     const tp = textPt(ctx) + 2;
     const uw = isTwin(ctx) ? 26 : { S: 20, M: 22, L: 24 }[sizeOf(ctx)];
     const uInk = unitShown !== '' ? inkOf(ctx) : null;
-    const line = `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" aria-label="label" style="display:inline-flex;align-items:flex-end;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};height:${isTwin(ctx) ? `max(44px, ${L(ctx, bx)})` : L(ctx, bx)};border-bottom:${B(ctx, 1)} solid ${INK};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 0.6)};color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`;
+    const line = `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" aria-label="label" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};height:${isTwin(ctx) ? `max(44px, ${L(ctx, bx)})` : L(ctx, bx)};border:${B(ctx, 1)} solid ${INK};border-radius:${L(ctx, 1)};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 0.6)};color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`;
     const bank = p.bank && p.bank.length
         ? `<div class="mq-wwwords" aria-label="label words" style="display:inline-flex;flex-direction:${isTwin(ctx) ? 'row' : 'column'};align-items:flex-start;gap:${L(ctx, isTwin(ctx) ? 1.2 : 0.3)};border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 0.6)} ${L(ctx, 1.6)};font-size:${P(ctx, zonePt(ctx) + 1)};line-height:1.15;">`
             + p.bank.map((wd) => (isTwin(ctx)

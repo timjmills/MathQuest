@@ -324,33 +324,53 @@
    other answer slot. The shape id stays data-ws-shape="line" (providers, key, lint unchanged); only
    the drawing changes. Same width B(n) and height Hw as before, so geometry and pagination hold.
    Ungraded write-ins (say-lines, data-ws-graded="0") are not answer slots and stay ruled lines. */
-:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]) {
+:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]),
+:is(.ws-page, .ws-sheet) .ws-line[data-ws-graded="0"]:not(.ws-line--say) {
     border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); box-sizing: border-box; height: calc(var(--ws-hw) + 2 * var(--ws-hair));
 }
 
 /* ---------- WAVE 1 / 1.1: the vertical fact's answer zone is a full box (owner ruling 2026-10-02, additive) ----------
-   The write row under the rule (data-ws-shape="open") is drawn as the same black-outlined rounded box.
-   It spans the stack's own tracks plus 0.1 em either side so three digits never touch the outline;
-   the tracks (and so the digit columns) do not move. The key writes its digits inside the same box. */
-:is(.ws-page, .ws-sheet) .ws-fact .ws-factans {
-    box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
-    margin: 1mm -0.1em 0; padding: 0 calc(0.1em - var(--ws-hair)); }
-
-/* ---------- WAVE 1 / 1.1 (cont.): slot contents and the column stack's open zone (owner ruling 2026-10-02, additive) ----------
-   A key value sits centred inside the box. The stack's open answer row (.ansrow, same height
-   var(--ws-answer)) is one full box across the stack's tracks; the key's digits fill it on the same tracks. */
-:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]) { text-align: center; line-height: calc(var(--ws-hw) - 2 * var(--ws-hair)); }
-:is(.ws-page, .ws-sheet) .ws-stack .ansrow { box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); }
-:is(.ws-page, .ws-sheet) .ws-stack .ansrow--key > span { display: flex; align-items: center; justify-content: center; }
-/* The fact's answer box reaches 0.25 em past the digit tracks each side, so a two-digit key answer
-   ("10", "12") keeps clear white inside the outline at S; the tracks themselves do not move. */
-:is(.ws-page, .ws-sheet) .ws-fact .ws-factans { margin-left: -0.25em; margin-right: -0.25em; padding-left: calc(0.25em - var(--ws-hair)); padding-right: calc(0.25em - var(--ws-hair)); }
+   PAPER ONLY (:not(:has(input))): on screen the typed input is itself the one box, so the zone draws
+   nothing there (critic B D1: never a box inside a box). The box spans the whole rule (operator track
+   included, like the stack), right edge = rule end; the digits stay right-aligned to the ones with
+   0.16 em (>= 1.5 mm at L) clear inside the outline. The key writes its digits inside the same box. */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans:not(:has(input)) {
+    grid-column: 1 / -1 !important; box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
+    margin: 1mm 0 0; padding: 0 0.16em; }
 
 /* ---------- WAVE 1 / 1.1 (cont.): legacy-wrapped cells (owner ruling 2026-10-02, additive) ----------
    A legacy horizontal question ends in a stretching ruled answer place (`flex:1; border-bottom:2px`).
    Inside a kit page that place is drawn as the same full black box, at least 24 mm wide and Hw tall;
    when the question leaves too little room the box wraps to its own line instead of shrinking. */
 :is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem { flex-wrap: wrap; row-gap: 1mm; }
-:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem > span[style*="border-bottom:2px solid #000"] {
-    flex: 1 0 24mm !important; min-width: 24mm; box-sizing: border-box; min-height: var(--ws-hw, 8mm);
-    border: var(--ws-hair, 0.75pt) solid var(--ws-ink, #000) !important; border-radius: var(--ws-slot-r, 1.25mm); }
+/* critic B D9: one fixed width per size (SL-2: never the cell's width, never the answer's own size):
+   40 / 44 / 48 mm at S / M / L. The key writes the value centred inside (print-sheet.js 3a). */
+:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem > span:is([style*="border-bottom:2px solid #000"], [style*="border-bottom:2px solid #333"]) {
+    flex: 0 0 var(--ws-legacy-slot, 44mm) !important; width: var(--ws-legacy-slot, 44mm); box-sizing: border-box; min-height: var(--ws-hw, 8mm);
+    border: var(--ws-hair, 0.75pt) solid var(--ws-ink, #000) !important; border-radius: var(--ws-slot-r, 1.25mm);
+    display: inline-flex; align-items: center; justify-content: center; }
+.ws-S { --ws-legacy-slot: 40mm; } .ws-M { --ws-legacy-slot: 44mm; } .ws-L { --ws-legacy-slot: 48mm; }
+/* the value a key writes into a boxed number slot sits centred inside it (Say lines excluded) */
+:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--say) { text-align: center; line-height: calc(var(--ws-hw) - 2 * var(--ws-hair)); }
+
+/* ---------- WAVE 1 / 1.1: answer-box option (owner ruling 2026-10-02, additive) ----------
+   ansBox 'one' on a column stack: the open answer row is ONE box across the tracks; a key's digits
+   fill it on the same tracks. 'digit' is the stack's own answer strip; 'off' is the plain open row. */
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow--box { box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); }
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow--key { height: var(--ws-answer); }
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow--key > span { display: flex; align-items: center; justify-content: center; }
+/* the vertical fact: 'off' keeps the zone's geometry with no outline (the plain look); 'digit' draws one
+   box per answer track instead of the one box, the key's digits each in its own box. */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--off:not(:has(input)),
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) { border-color: transparent; }
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) > span {
+    box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
+    min-height: 1.15em; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+/* a small gap between the digit boxes so a key digit never touches an outline */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) { column-gap: 0.08em; padding: 0; }
+/* the equation: 'off' is the plain ruled line (no box); 'digit' one box per digit, Hw tall, B(1)-wide tracks */
+:is(.ws-page, .ws-sheet) .ws-line.ws-line--off { border: 0 !important; border-bottom: var(--ws-hair) solid var(--ws-ink) !important; border-radius: 0 !important; }
+:is(.ws-page, .ws-sheet) .ws-box.ws-box--off { border-color: transparent; border-bottom-color: var(--ws-ink); border-radius: 0; }
+:is(.ws-page, .ws-sheet) .ws-digitboxes { display: inline-flex; vertical-align: bottom; }
+:is(.ws-page, .ws-sheet) .ws-digitboxes .ws-box--digit { width: calc(var(--ws-hw) * 0.95); height: var(--ws-hw); box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; line-height: 1; }
+:is(.ws-page, .ws-sheet) .ws-digitboxes .ws-box--digit + .ws-box--digit { margin-left: calc(-1 * var(--ws-hair)); }

@@ -1,0 +1,2957 @@
+[
+  {
+    "skill": "addition:add_facts",
+    "category": "addition",
+    "skillId": "add_facts",
+    "label": "Addition Facts (within 20)",
+    "grade": "1",
+    "dir": "addition__add_facts",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 4,
+          "perPage": 20,
+          "pages": 1,
+          "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 4,
+              "perPage": 20,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 5 x 4, cells sized to the problems.",
+              "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 43.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 550978,
+        "title": "I Can add facts to 20",
+        "notes": [
+          "Dense: 5 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 3 = ?",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 7 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "4 + 3 = ?",
+            "ans": "7",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 3 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "5 + 6 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 5 = ?",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "8 + 5 = ?",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "10 + 1 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 8 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "7 + 5 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "4 + 8 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 9 = ?",
+            "ans": "18",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "6 + 3 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "7 + 3 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "8 + 8 = ?",
+            "ans": "16",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "5 + 9 = ?",
+            "ans": "14",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 9 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "1 + 9 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 4 = ?",
+            "ans": "7",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 2 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 43.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 116,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 139,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 95
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 130
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "add-facts-vertical",
+        "text": "4 + 7 = ?",
+        "ans": "11",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "add-facts-vertical",
+        "text": "4 + 4 = ?",
+        "ans": "8",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "add-facts-vertical",
+        "text": "4 + 9 = ?",
+        "ans": "13",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              19
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              24
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "box-shadow",
+              3
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              4
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "addition:add_100_regroup",
+    "category": "addition",
+    "skillId": "add_100_regroup",
+    "label": "Add within 100 (With Regrouping)",
+    "grade": "2",
+    "dir": "addition__add_100_regroup",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 4,
+          "perPage": 20,
+          "pages": 1,
+          "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 4,
+              "perPage": 20,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 56.5,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 5 x 4, cells sized to the problems.",
+              "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 40,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 569505,
+        "title": "I Can add within 100 (with regrouping)",
+        "notes": [
+          "Dense: 5 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "26 + 45 = ?",
+            "ans": "71",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "25 + 9 = ?",
+            "ans": "34",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "14 + 29 = ?",
+            "ans": "43",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "19 + 19 = ?",
+            "ans": "38",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "29 + 29 = ?",
+            "ans": "58",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "6 + 56 = ?",
+            "ans": "62",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "82 + 9 = ?",
+            "ans": "91",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "18 + 19 = ?",
+            "ans": "37",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "17 + 28 = ?",
+            "ans": "45",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "17 + 27 = ?",
+            "ans": "44",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "57 + 27 = ?",
+            "ans": "84",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "17 + 49 = ?",
+            "ans": "66",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "19 + 9 = ?",
+            "ans": "28",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "32 + 8 = ?",
+            "ans": "40",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "27 + 49 = ?",
+            "ans": "76",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "6 + 36 = ?",
+            "ans": "42",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "57 + 8 = ?",
+            "ans": "65",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "59 + 9 = ?",
+            "ans": "68",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "19 + 47 = ?",
+            "ans": "66",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "9 + 42 = ?",
+            "ans": "51",
+            "measured": {
+              "1": {
+                "hMm": 39,
+                "fits": true
+              },
+              "2": {
+                "hMm": 39,
+                "fits": true
+              },
+              "3": {
+                "hMm": 39,
+                "fits": true
+              },
+              "4": {
+                "hMm": 39,
+                "fits": true
+              },
+              "5": {
+                "hMm": 39,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 148,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 211,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 125
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 185
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "38 + 59 = ?",
+        "ans": "97",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              8
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "38 + 59 = ?",
+        "ans": "97",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              8
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "column-add",
+        "text": "38 + 59 = ?",
+        "ans": "97",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              8
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              25
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              33
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "box-shadow",
+              4
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              4
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "division:div_facts",
+    "category": "division",
+    "skillId": "div_facts",
+    "label": "Division Facts (1-12)",
+    "grade": "3",
+    "dir": "division__div_facts",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 4,
+          "perPage": 20,
+          "pages": 1,
+          "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Tall problems: 5 rows per page. Dense: 5 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 4,
+              "perPage": 20,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 5 rows per page. Dense: 5 x 4, cells sized to the problems.",
+              "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Tall problems: 5 rows per page. Dense: 5 x 4, cells sized to the problems.",
+              "cls": "short",
+              "digitPt": 16,
+              "hMin": 41.6,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 69559,
+        "title": "I Can divide using times facts",
+        "notes": [
+          "Tall problems: 5 rows per page. Dense: 5 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "108 ÷ 12 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": false
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "96 ÷ 8 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "8 ÷ 4 = ?",
+            "ans": "2",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "110 ÷ 11 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": false
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "21 ÷ 7 = ?",
+            "ans": "3",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "6 ÷ 3 = ?",
+            "ans": "2",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "80 ÷ 10 = ?",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": false
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "2 ÷ 2 = ?",
+            "ans": "1",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "10 ÷ 2 = ?",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "72 ÷ 9 = ?",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "15 ÷ 5 = ?",
+            "ans": "3",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "96 ÷ 12 = ?",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": false
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "72 ÷ 8 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "36 ÷ 4 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "55 ÷ 11 = ?",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": false
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "63 ÷ 7 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "30 ÷ 3 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "4 ÷ 4 = ?",
+            "ans": "1",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "12 ÷ 6 = ?",
+            "ans": "2",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "short",
+            "text": "24 ÷ 2 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "2": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "3": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "4": {
+                "hMm": 41.6,
+                "fits": true
+              },
+              "5": {
+                "hMm": 43.1,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 116,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 139,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 117
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 141
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "div-facts-horizontal",
+        "text": "36 ÷ 9 = ?",
+        "ans": "4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "div-facts-horizontal",
+        "text": "20 ÷ 5 = ?",
+        "ans": "4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "div-facts-horizontal",
+        "text": "48 ÷ 12 = ?",
+        "ans": "4",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              19
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              30
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "box-shadow",
+              3
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

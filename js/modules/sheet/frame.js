@@ -131,7 +131,7 @@ export function sayBand(frame, { size = DEFAULT_SIZE, digits = 2 } = {}) {
     const parts = String(frame).split('__');
     let inner = '';
     parts.forEach((part, i) => {
-        if (i) inner += `<span class="ws-line" style="--w:${w}mm" data-ws-slot="say-${i}" data-ws-shape="line" data-ws-graded="0"></span>`;
+        if (i) inner += `<span class="ws-line ws-line--say" style="--w:${w}mm" data-ws-slot="say-${i}" data-ws-shape="line" data-ws-graded="0"></span>`;
         if (part) inner += `<span>${esc(part)}</span>`;
     });
     return `<div class="ws-band ws-band--say" data-ws-band="say"><div class="ws-strip ws-strip--say">`

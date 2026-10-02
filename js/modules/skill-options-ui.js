@@ -18,7 +18,7 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, playSummary } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isClosedOption, playSummary } from './skill-options.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
 import { state } from './state.js';
@@ -96,8 +96,9 @@ function _liveDef(def) {
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     const all = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
-    const shown = all.filter(d => !isPlayOption(d));
+    const shown = all.filter(d => !isClosedOption(d));
     const play = all.filter(isPlayOption);
+    const boxes = all.filter(d => isClosedOption(d) && !isPlayOption(d));
     const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
     const hs = headingStyle || 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);margin:10px 0 0;';
     const heads = used.length > 1 || (used[0] && used[0].id !== 'difficulty');
@@ -111,8 +112,19 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
             + `<span aria-hidden="true">&#9662;</span><span>Pupil play</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(playSummary(play, cur))}</span></summary>`
             + play.map(row).join('') + '</details>'
         : '';
-    return groups + disclosure;
+    // Answer boxes (+ − × ÷, owner ruling 2026-10-02): its own closed disclosure, the current value in the summary.
+    const boxesSum = boxes.map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label)).join(' · ');
+    const boxDisclosure = boxes.length
+        ? `<details class="sko-group sko-boxes" data-sko-group="boxes"${_boxesOpen ? ' open' : ''} ontoggle="skoBoxesOpen(this.open)" style="margin-top:10px;">`
+            + `<summary class="sko-play-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
+            + `<span aria-hidden="true">&#9662;</span><span>Answer boxes</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(boxesSum)}</span></summary>`
+            + boxes.map(row).join('') + '</details>'
+        : '';
+    return groups + boxDisclosure + disclosure;
 }
+let _boxesOpen = false;
+/** Remembers whether the Answer boxes disclosure is open across a redraw. */
+export function skoBoxesOpen(open) { _boxesOpen = !!open; }
 let _playOpen = false;
 /** Remembers whether the Pupil play disclosure is open, so a redraw after a change keeps it open. */
 export function skoPlayOpen(open) { _playOpen = !!open; }
