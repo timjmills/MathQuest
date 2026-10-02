@@ -1308,3 +1308,7 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten (34.5 x 44 px cells, SP-10): its
+   writing inputs fill their square and never widen it. Additive. */
+html body .mq-scell .k2-chart [data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; min-height: 0 !important; box-sizing: border-box; }

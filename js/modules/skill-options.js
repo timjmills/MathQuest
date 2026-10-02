@@ -1125,7 +1125,7 @@ function _gridOptions() {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
             values: [{ v: 'scatter', l: 'Scattered anywhere (default)' }, { v: 'row', l: 'A run along one row (count on by 1)' },
                 { v: 'column', l: 'A run down one column (count on by 10)' }, { v: 'pattern', l: 'Every other square in a row' }],
-            help: '"Empty boxes" says how many (in each row, on three rows or the whole chart). A run keeps at least one printed number at each end to count from. Every other square needs a row of at least four.',
+            help: '"Empty boxes" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four.',
         },
     ];
 }

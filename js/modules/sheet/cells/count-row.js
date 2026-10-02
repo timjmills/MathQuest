@@ -148,6 +148,20 @@ function arcsSVG(ctx, g, k) {
         + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
+/**
+ * A row that wraps (15 jumps on paper) says so: a small elbow arrow leaves the end of a line and a
+ * short arrow enters the start of the next, so the last hop of a line has somewhere to land
+ * (critic, wave 1 C). Paper only: the screen twin's short rows stay as they are.
+ */
+function turnArrow(ctx, g, kind, w) {
+    const h = g.h, mid = h / 2, sw = n2(SW.hair);
+    const d = kind === 'out'
+        ? `M0.4 ${n2(mid)} H${n2(w - 2.2)} Q${n2(w - 0.8)} ${n2(mid)} ${n2(w - 0.8)} ${n2(mid + 1.6)} V${n2(h - 0.4)} M${n2(w - 2.1)} ${n2(h - 1.8)} L${n2(w - 0.8)} ${n2(h - 0.3)} L${n2(w + 0.5)} ${n2(h - 1.8)}`
+        : `M${n2(w - 7)} ${n2(mid)} H${n2(w - 0.4)} M${n2(w - 2.0)} ${n2(mid - 1.4)} L${n2(w - 0.4)} ${n2(mid)} L${n2(w - 2.0)} ${n2(mid + 1.4)}`;
+    return `<svg aria-hidden="true" viewBox="0 0 ${n2(w)} ${n2(h)}" style="display:block;width:${L(ctx, w)};height:${L(ctx, h)};overflow:visible;">`
+        + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
 register('count-row', {
     render(p, ctx) {
         const g = geom(p, ctx);
@@ -176,10 +190,13 @@ register('count-row', {
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
             const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) : '';
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span style="flex:none;width:${L(ctx, TAB_MM[g.size] + 2)};"></span>`) : '';
+            const turns = g.look === 'arcs' && g.tab && g.rows > 1 && !isTwin(ctx);
+            const tabW = TAB_MM[g.size] + 2;
+            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span style="flex:none;width:${L(ctx, tabW)};">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line" style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div style="display:flex;gap:${L(ctx, GAP_MM)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div></div>`);
+                + `<div style="display:flex;gap:${L(ctx, GAP_MM)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {

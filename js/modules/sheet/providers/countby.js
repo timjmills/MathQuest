@@ -91,7 +91,7 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
 registerSkill('multiplication:count_by_tables', {
     // The "I Can" line follows the row's length (12 or 15 jumps): derived from the item, never fixed.
     strings: stringsBy((q) => ({
-        iCan: q && q.countBy && q.countBy.jumps === 15 ? 'I Can count by 1 to 15' : 'I Can count by 1 to 12',
+        iCan: q && q.countBy && q.countBy.jumps === 15 ? 'I Can count by 1 to 12 (15 jumps)' : 'I Can count by 1 to 12',
         instructionKey: 'count-by-row',
         steps: [
             'Read the number in the box. That is the jump.',

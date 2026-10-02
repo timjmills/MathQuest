@@ -92,7 +92,7 @@ export function genCountByTables(q) {
     const untouched = tables.length === 12;
     if (untouched) tables = tables.filter((v) => v >= 2);
     let t;
-    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : 6;   // a page without a stated count: six rows
+    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
     if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
         // In order, every table ticked: the page walks up the tables, spread across 2 to 12
         // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
@@ -101,8 +101,7 @@ export function genCountByTables(q) {
             const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
             t = tables[randInt(lo, hi)];
         } else t = tables[idx % tables.length];
-    } else if (untouched && opt('order') !== 'mixed') {
-        t = tables[idx % tables.length];                // live play, in order: 2, 3, 4 ... 12, round again
+    // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
     } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
         // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
         // used to be shuffled from the round NUMBER alone, so every seed printed the same order of

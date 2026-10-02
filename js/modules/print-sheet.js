@@ -1201,12 +1201,13 @@ function optionTitleBase(sk, baseICan) {
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }
 
-/** The page title for the chosen options; a count-by row of 15 jumps names 15, not 12 (wave 1 lane C). */
+/** The page title for the chosen options; a count-by row of 15 jumps says so; the tables stay 1 to 12 (wave 1 lane C). */
 function optionTitle(sk, baseICan) {
     const t = optionTitleBase(sk, baseICan);
     try {
         if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
-            return (t || baseICan || '').replace(/\bto 12\b/, 'to 15');
+            const base = t || baseICan || '';
+            return /\(15 jumps\)/.test(base) ? base : `${base} (15 jumps)`;   // the tables stay 1 to 12; the row is 15 jumps long
         }
     } catch (e) { /* keep the base title */ }
     return t;

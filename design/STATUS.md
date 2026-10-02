@@ -3,6 +3,12 @@
 > **2026-10-02: the work order is now `design/MASTER_PLAN.md`** (8 waves in the owner's order; owner to confirm the order before work starts). Key answer colour changed to **reddish orange**.
 
 
+> **2026-10-02, Wave 1 lane C (count-by + number charts):** `multiplication:count_by_tables` now defaults to **fill = two**
+> (the first two numbers print). **An old count-by printout reprints with TWO numbers filled, not one, so a pre-lane share code
+> or saved set gives a row with one fewer blank (owner request).** A row of 15 jumps is titled "I Can count by 1 to 12 (15 jumps)";
+> the tables stay 1 to 12. The whole hundreds chart fills its page (17.5 x 19.5 mm squares at the L digit size, any S/M/L) and
+> stays rows of ten on a phone.
+
 Read this first when work resumes. It records what is live, what each work lane had done when it paused, what the
 independent critics last found, and the next step for each lane. Owner rulings are recorded in the design docs named
 below; this file only points to them.

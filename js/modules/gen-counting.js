@@ -60,20 +60,35 @@ function _kOpt(id) {
  * grid one in every row. Returns [] when it cannot place any (the caller falls back to scatter).
  */
 function _chartGaps({ R, C, grid, gaps, per, tiles, neighbours, rng }) {
-    const n = [1, 2, 3, 4, 5, 6, 7].includes(tiles) ? tiles : per;
+    const given = [1, 2, 3, 4, 5, 6, 7].includes(tiles);
+    const n = given ? tiles : per;
     const rowsWithGaps = grid === 'window' ? [rng(0, R - 1)] : Array.from({ length: R }, (_, i) => i);
     const out = new Set();
     if (gaps === 'row') {
-        const len = Math.max(1, Math.min(n, C - 2));
-        for (const r of rowsWithGaps) { const c0 = rng(0, C - len); for (let k = 0; k < len; k++) out.add(r * C + c0 + k); }
+        // A run along a row of at least two boxes (one box is scatter), kept one square in from each
+        // edge so a printed number stands on both sides of it: count on by 1 from the left one.
+        if (C < 4) return [];
+        const len = Math.max(2, Math.min(given ? n : Math.max(2, n), C - 2));
+        for (const r of rowsWithGaps) { const c0 = rng(1, C - len - 1); for (let k = 0; k < len; k++) out.add(r * C + c0 + k); }
     } else if (gaps === 'column') {
-        const len = Math.max(1, Math.min(n, Math.max(1, R - 1)));
+        // A run down a column, one square in from the top and the bottom: count on by 10 from above.
+        if (R < 3) return [];
+        const len = Math.max(1, Math.min(n, R - 2));
         const cols = grid === 'window' ? [rng(0, C - 1)] : shuffle(Array.from({ length: C }, (_, i) => i)).slice(0, Math.min(4, C)).sort((x, y) => x - y).filter((c, i, a) => i === 0 || c - a[i - 1] > 1);
-        for (const c of cols) { const r0 = rng(0, R - len); for (let k = 0; k < len; k++) out.add((r0 + k) * C + c); }
+        for (const c of cols) { const r0 = rng(1, R - len - 1); for (let k = 0; k < len; k++) out.add((r0 + k) * C + c); }
     } else if (gaps === 'pattern') {
+        // Every other square of a row. A window takes one row; the whole chart takes a seeded set of
+        // rows (4 to 7 of the 10, never the same set twice on a page of items), each alternating from
+        // its own start, so two charts rarely match.
         const offset = rng(0, 1);
-        rowsWithGaps.forEach((r, i) => {
-            const o = grid === 'window' ? offset : (offset + i) % 2;
+        let rowSet = rowsWithGaps;
+        if (grid !== 'window') {
+            const k = Math.min(R, rng(Math.min(4, R), Math.min(7, R)));
+            rowSet = shuffle(rowsWithGaps.slice()).slice(0, k).sort((a, b) => a - b);
+        }
+        const flip = grid === 'window' ? 0 : rng(0, 1);   // checkerboard (rows alternate) or stripes (every row the same)
+        rowSet.forEach((r, i) => {
+            const o = grid === 'window' ? offset : flip ? (offset + i) % 2 : offset;
             for (let c = o; c < C; c += 2) out.add(r * C + c);
         });
     } else {
@@ -87,7 +102,8 @@ function _chartGaps({ R, C, grid, gaps, per, tiles, neighbours, rng }) {
     }
     const set = out;
     // Every gap keeps a printed neighbour; a column of the grid keeps a printed number.
-    for (const i of set) if (!neighbours(i).some(j => !set.has(j))) return [];
+    // (A run's own ends are printed by construction, so only pattern and scatter need the check.)
+    if (gaps !== 'row' && gaps !== 'column') for (const i of set) if (!neighbours(i).some(j => !set.has(j))) return [];
     return Array.from(set);
 }
 
