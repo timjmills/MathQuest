@@ -276,3 +276,48 @@ The paper side is fixed. The screen twin's new slot overlay (chartwindow.js:191)
 ## What raises each criterion
 - **C1 and C4 (6 → 9):** fix F, then re-measure at 1280 from the DOM after the fit pass.
 - **C3:** fix G.
+
+# Round 5 (critic, Opus low, head 43086c7)
+
+**Verdict: PASS.** C1 8 · C2 9 · C3 8 · C4 8.
+
+## Gates and probes run
+- `wave1-c-chart-metrics.cjs` (the builder's script): OK on all 7 hosts.
+- My own probe (scratchpad copy of the script, with quiz 820 and 390 added and cue, data-mq-end and input metrics read):
+  - Tested whole/pattern, whole/row, rows/row and rows/pattern.
+  - Whole chart: card and quiz at 1280 and 820 have 48 px digits and 93.5 × 67.2 squares. "100" has 4.3–4.8 px clear. 1280 does not swipe. 820 swipes and the cue shows.
+  - Phone: card and quiz have 40 px digits. The worksheet has 29 px digits and 60.5 px squares on every host.
+  - Page scroll-x is 0 and body scroll-x is 0 on every host and window. There were no console errors.
+  - The "100 clear null" misses in my probe are not defects: those windows hold no printed "100".
+- Rows window (3 × 10, two-digit numbers):
+  - Card and quiz: 48 px digits, 65.7 × 67.2 squares, input 64 × 65. No swipe at 820 or 1280.
+  - **Worksheet: 29 px digits in 43.6 px wide squares, input 42 × 54** (defect I).
+- `ws-screen-answer` on the 5 skills (hundreds_chart_fill, number_chart_fill, count_by_tables, base10_build, add_facts): OK. Card, worksheet 3/3, quiz 3/3 and live green all passed. The widened card is scoped by `:has(.k2-chart-ten)`, so it does not reach other skills.
+- Viewed:
+  - all of onepage-12, including the three G shots
+  - rows-screen and whole-pattern-screen
+  - L/ and S/ for all three skills: every page type, pupil and key (contact sheets, plus full-size reads of the key pages)
+
+## Round-4 defects
+- **F: fixed.** The 48 px card and quiz digits and the 29 px worksheet digits are measured after the fit pass. whole-pattern card-1280 shows a full-width chart, and "100" sits clear in its square.
+- **SP-12a wording is acceptable.** It is dated, limited to 10-column charts, names its widths (960 and 990), states the 48 px honest target and the reason for it, gives the tablet fallback to SP-11a, and names the gate script. **The implementation matches it.**
+- **G: fixed.**
+  - Columns and pages are disabled and show "Set by …", and the 12-rows note is shown.
+  - Size is locked to S in page setup (code read; that state is not shown in any of the shots).
+  - In the options panel, Tables reads "All twelve", disabled. Jumps and order are locked too.
+  - `normalizeOptions` applies the locks, so the sheet title "I Can count by 1 to 12" and "12 problems on 1 page" agree with the page.
+  - Minor: the disabled selects look almost like enabled ones (only a dashed border and opacity 0.85).
+- **H: acceptable.**
+  - Boxes are about 12.7 × 9 mm. The 16 pt key digits "108" and "144" keep about 1–1.5 mm clear on each side, and the pupil has about 4 mm per handwritten digit.
+  - This is tight for SPED handwriting. It is acceptable only because the page is opt-in, and the owner asked for all 12 tables on one page. Width cannot grow: 13 items already share the full 178 mm.
+  - About 15 mm still sits unused below row l on A4. +1 mm box height (`writeMm + 4`) is the only cheap gain left, and only if Letter still fits on one page.
+
+## Ranked defects (round 5), none blocking
+### I. On the online worksheet, the rows window's squares are sized for two digits (C1, C4).
+- **Where:** `css/screen-cell.css`, `--mq-chw: calc(var(--mq-chd)*0.58*var(--mq-chfs) + 10px)`.
+- **What it does:** with two digits it gives 43.6 px squares and a 42 px input at 29 px. That is under the 44 px target. The digits also nearly touch the borders on the 1280 card and worksheet (rows-screen card-1280 and worksheet-1280), and the 437 px chart floats in an 1100 px card.
+- **Fix:** `--mq-chw: max(44px, calc(var(--mq-chd,3)*0.58*var(--mq-chfs) + 0.5*var(--mq-chfs)))`. That gives 48 px worksheet squares and 79.7 px card squares. Re-run the metrics script with `grid:'rows'` added to HOSTS.
+### J. The disabled controls are hard to tell from enabled ones (C3).
+- **Fix:** add a grey fill (`background: var(--surface-2)` or the dim token) to `.sko-locked select` and `.tv-select:disabled`, and `cursor: not-allowed`.
+### K. The one-page print has about 15 mm unused on A4 (C1, minor).
+- **Fix:** raise `baseH` to `writeMm + 4` in `count-row.js` when `p.compact`. Keep it only if the Letter set still paginates to 1 + 1 page.
