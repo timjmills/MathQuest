@@ -10,25 +10,25 @@
       "independent": {
         "fits": {
           "cols": 1,
-          "rows": 8,
-          "perPage": 8,
+          "rows": 7,
+          "perPage": 7,
           "pages": 1,
-          "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+          "note": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
           "sections": [
             {
               "cols": 1,
-              "rows": 8,
-              "perPage": 8,
+              "rows": 7,
+              "perPage": 7,
               "pages": 1,
               "cellW": 186,
-              "cellH": 26.3,
+              "cellH": 30.057,
               "requested": 1,
               "clamped": false,
               "note": "Rows sized to the problems they hold.",
-              "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+              "line": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
               "cls": "standard",
               "digitPt": 16,
-              "hMin": 37.3,
+              "hMin": 38.9,
               "anchorMm": 0,
               "blocks": null
             }
@@ -55,7 +55,7 @@
             "ans": "9, 12, 18, 21, 36",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }
@@ -67,7 +67,7 @@
             "ans": "21, 28, 49, 70, 77",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }
@@ -79,7 +79,7 @@
             "ans": "125, 150, 200, 225, 250",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }
@@ -91,7 +91,7 @@
             "ans": "2700, 2800, 3000, 3100, 3300",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }
@@ -103,7 +103,7 @@
             "ans": "108, 84, 60, 48, 12",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }
@@ -115,7 +115,7 @@
             "ans": "18000, 20000, 21000, 22000, 25000",
             "measured": {
               "1": {
-                "hMm": 37.3,
+                "hMm": 38.9,
                 "fits": true
               }
             }
@@ -127,7 +127,7 @@
             "ans": "13, 18, 23, 33, 48",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 23.4,
                 "fits": true
               }
             }

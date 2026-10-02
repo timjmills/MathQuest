@@ -115,7 +115,7 @@ function geom(p, ctx) {
         const ptFit = Math.min(digitPt(ctx), 18, (fitPitch - gap - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4);
         if (chars <= 3 ? fitPitch - gap >= MIN_BOX[size] : ptFit >= FLOOR_PT) {
             const w = fitPitch - gap;
-            return { size, n, look, shape, w, h: baseH, pitch: w + gap, gap, tab, tabBody, perRow: n, rows: 1, arcH: 3, pt: ptFit, hasLbl, lblH, lblPt };
+            return { size, n, look, shape, w, h: baseH, pitch: w + gap, gap, tab, tabBody, perRow: n, rows: 1, arcH: 3, pt: ptFit, hasLbl, lblH, lblPt, compact: true };
         }
     }
     if (look === 'arcs') return arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab, baseH, live, lblPt, lblChars, hasLbl, lblH });
@@ -166,7 +166,7 @@ function arcsGeom(p, ctx, c) {
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
-    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : 3.8, pt, hasLbl, lblH: lblHh, lblPt };
+    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : 3.8, pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -200,6 +200,13 @@ const shownAt = (p, i) => {
     return v === undefined || v === null || v === '' ? undefined : v;
 };
 
+/**
+ * The step tab's type: the row's digit size, and on the one-page sheet never below TAB_FLOOR_PT (critic C2 r4: "+100" printed at
+ * 9 pt beside "+3" at 17 pt; the step is the cue the pupil reads first). geom() already sizes the tab for the size's full digit.
+ */
+const TAB_FLOOR_PT = 14;
+const tabPt = (g) => { const pt = Math.min(g.pt * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
+
 /** The step tab: a bold number in a pentagon pointing into the row ("7>"). */
 function stepTab(ctx, g, text) {
     const w = g.tabBody, h = g.h;
@@ -207,8 +214,8 @@ function stepTab(ctx, g, text) {
     const body = `<polygon points="${n2(sw)},${n2(sw)} ${n2(w - 3.2)},${n2(sw)} ${n2(w - sw)},${n2(h / 2)} ${n2(w - 3.2)},${n2(h - sw)} ${n2(sw)},${n2(h - sw)}" `
         + `fill="#fff" stroke="${INK}" stroke-width="${n2(sw)}" stroke-linejoin="round"/>`
         + `<text x="${n2((w - 3) / 2 + 0.3)}" y="${n2(h / 2)}" dominant-baseline="central" text-anchor="middle" font-family="Andika, sans-serif" `
-        + `font-weight="700" font-size="${n2(Math.min(g.pt * 1.05, 20) * 25.4 / 72)}" fill="${INK}">${esc(text)}</text>`;
-    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="${isTwin(ctx) ? 'position:sticky;left:0;z-index:2;background:#fff;' : ''}flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
+        + `font-weight="700" font-size="${n2(tabPt(g) * 25.4 / 72)}" fill="${INK}">${esc(text)}</text>`;
+    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
         + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="count by ${esc(text)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
 }
 
@@ -285,16 +292,21 @@ register('count-row', {
             }
         }
         const rowsHtml = [];
+        const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab;
+        const tabsCol = [];
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
             const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) : '';
             const turns = g.look === 'arcs' && g.tab && g.rows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span class="k2-steptab-in" style="${isTwin(ctx) ? 'position:sticky;left:0;z-index:2;background:#fff;' : ''}flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            // screen twin (critic C2 r4): the step tab and the arrow column sit OUTSIDE the swiping row, in a fixed column beside it,
+            // so no number or box can ever slide under them; wireSwipeRows (screen-cell.js) keeps each entry level with its line
+            if (swipeTabs) { tabsCol.push(`<div data-mq-tabfor="${r}" style="display:flex;align-items:flex-end;${r ? `margin-top:${L(ctx, 2.5)};` : ''}">${tabCol}</div>`); }
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
-                + `${tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
+                + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
                 + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;gap:${L(ctx, g.gap)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
@@ -314,9 +326,10 @@ register('count-row', {
         const align = g.tab ? 'left' : 'center';
         const vp = Number(p.vpad) > 0 ? Number(p.vpad) : 0;
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
-            `${caption}${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${g.tab ? `scroll-padding-left:${L(ctx, g.tab + 3)};` : ''}">` : ''}`
+            `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
+            + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div>' : ''}${ruleFrame}`,
+            + `${isTwin(ctx) && g.look === 'arcs' ? '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
     },
     answerKey(p) {

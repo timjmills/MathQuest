@@ -56,12 +56,33 @@ const MEASURE = () => {
     const slug = name.replace(/[^a-z0-9]+/gi, '-');
     if (host === 'card') { await (await page.$('#questionCard')).screenshot({ path: `design/audit/runs/wave1-C2/phone-card-${slug}.png` }); }
     else { const h = await page.evaluateHandle(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); return w ? (w.closest('[id^="ws_card_"]') || w.parentElement) : null; }); const el = h.asElement(); if (el) await el.screenshot({ path: `design/audit/runs/wave1-C2/phone-worksheet-${slug}.png` }); }
+    // critic C2 r4: the step tab sits in its own column BESIDE the swiping row: nothing (no number, no box) is ever under it or cut by
+    // the row's left edge, each tab entry is level with its line, and the card opens at scrollLeft 0. Checked after load and after each Tab.
+    const TABCHK = () => {
+      const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent);
+      const col = w && w.previousElementSibling && w.previousElementSibling.matches('[data-mq-tabcol]') ? w.previousElementSibling : null;
+      if (!w) return { ok: false, why: 'no swipe row' };
+      if (!col) return { ok: false, why: 'no step-tab column beside the row' };
+      const c = col.getBoundingClientRect(), v = w.getBoundingClientRect();
+      const tab = col.querySelector('.k2-steptab');
+      const tr = tab && tab.getBoundingClientRect();
+      if (!tr || tr.left < -1 || tr.right > window.innerWidth + 1) return { ok: false, why: 'step tab not on screen' };
+      if (c.right > v.left + 1) return { ok: false, why: `tab column (${Math.round(c.right)}) overlaps the row (${Math.round(v.left)})` };
+      const lines = [...w.querySelectorAll('.k2-countrow-line')];
+      for (const t of col.querySelectorAll('[data-mq-tabfor]')) { const ln = lines[+t.getAttribute('data-mq-tabfor')]; const a = t.getBoundingClientRect(), b = ln.getBoundingClientRect(); if (Math.abs(a.bottom - b.bottom) > 2) return { ok: false, why: `tab entry ${t.getAttribute('data-mq-tabfor')} not level with its line (${Math.round(a.bottom)} vs ${Math.round(b.bottom)})` }; }
+      const cut = [...w.querySelectorAll('input.mq-cellslot, .k2-given')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.left < v.left - 1 && r.right > v.left + 1);
+      if (cut.length) return { ok: false, why: `${cut.length} number(s)/box(es) cut at the row's left edge` };
+      const f = w.querySelector('input.mq-cellslot'), fr = f.getBoundingClientRect();
+      const firstNeedsScroll = fr.right - v.left + w.scrollLeft > w.clientWidth - 2;   // the first box is not fully visible at scrollLeft 0
+      return { ok: true, scrollLeft: firstNeedsScroll ? 0 : w.scrollLeft };
+    };
+    const t0 = await page.evaluate(TABCHK);
+    check(t0.ok && (host !== 'card' || t0.scrollLeft === 0), `${tag}: after load the step tab is beside the row, nothing under it${host === 'card' ? ', scrollLeft 0' : ''}${t0.ok ? (host === 'card' && t0.scrollLeft ? ` (scrollLeft ${t0.scrollLeft})` : '') : ' (' + t0.why + ')'}`);
     const first = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const i = w && w.querySelector('input.mq-cellslot'); if (i) i.focus(); return !!i; });
     if (!first) { check(false, `${tag}: no boxes`); continue; }
-    // the step tab stays on show after the first box takes focus (it is pinned to the window's left edge)
     await sleep(120);
-    const tabVis = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const t = w.querySelector('.k2-steptab'); if (!t) return true; const r = t.getBoundingClientRect(), v = w.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; });
-    check(tabVis, `${tag}: the step tab is still on show after the first box takes focus`);
+    const t1 = await page.evaluate(TABCHK);
+    check(t1.ok, `${tag}: the first box focused, the step tab is still on show and nothing is under it${t1.ok ? '' : ' (' + t1.why + ')'}`);
     const n = await page.evaluate(() => [...[...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent).querySelectorAll('input.mq-cellslot')].length);   // the first card's boxes (the worksheet holds many cards)
     const seen = new Set();
     let bad = [];
@@ -90,6 +111,9 @@ const MEASURE = () => {
       if (st.idx >= 0) seen.add(st.idx);
       if (!st.ok) bad.push(`box ${st.idx}: ${st.why}`);
       await page.keyboard.press('Tab');
+      await sleep(60);
+      const tk = await page.evaluate(TABCHK);
+      if (!tk.ok && k < n - 1) bad.push(`after Tab ${k + 1}: ${tk.why}`);
     }
     check(!bad.length && seen.size === n, `${tag}: Tab reached ${seen.size}/${n} boxes, each fully visible${bad.length ? ' (' + bad.slice(0, 3).join('; ') + ')' : ''}`);
     const m = await page.evaluate((src) => (new Function('return (' + src + ')'))()(), MEASURE.toString());

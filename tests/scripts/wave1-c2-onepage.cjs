@@ -47,17 +47,30 @@ const ROW_CASES = [
   { name: 'twelve rows, shuffled order', rows: [9, 3, 12, 5, 1, 8, 2, 11, 6, 4, 10, 7].map((n) => R(n)) },
   { name: 'twelve wide rows (cut)', rows: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 25000, 50000, 75000].map((n) => R(n, 'custom', 14000)) },
   { name: 'one row', rows: [R(25, 'custom', 100)] },
+  { name: 'seven rows by 1,000s (cut)', rows: [1000, 2000, 3000, 4000, 5000, 6000, 7000].map((n) => R(n, 'custom', 14000)) },
+  { name: 'wide and plain mixed (cut)', rows: [R(100000, 'custom', 1000000), R(3), R(1000, 'custom', 14000), R(7), R(2000, 'custom', 14000), R(9), R(3000, 'custom', 14000), R(11), R(4000, 'custom', 14000), R(6), R(5000, 'custom', 14000), R(8)] },
   { name: 'wide row in the middle', rows: [R(3), R(7), R(25, 'zero'), R(100, 'custom', 2300), R(12, undefined, undefined, 'down'), R(1000, 'custom', 14000), R(5, 'custom', 3)] },
 ];
 async function rowsCheck() {
   const app = await open({ seed: 1 });
   const res = await app.page.evaluate(async (ROW_CASES, PAPERS) => {
+    const cr = await import('./js/modules/count-rows.js');
+    const ui = document.createElement('div');
     const out = [];
+    const build = (rows, paper) => window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: { onePage: true, rows } }], count: 12, pages: 1, columns: 1 }], size: 'S', paper, seed: 4242, key: true });
     for (const paper of PAPERS) for (const c of ROW_CASES) {
-      const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: { onePage: true, rows: c.rows } }], count: 12, pages: 1, columns: 1 }], size: 'S', paper, seed: 4242, key: true });
+      const r = await build(c.rows, paper);
       const d = document.createElement('div'); d.innerHTML = r.pupilHtml;
       const tabs = [...d.querySelectorAll('[data-ws-steptab]')].map((e) => Number(e.getAttribute('data-ws-steptab').replace(/[^0-9]/g, '')));
-      out.push({ paper, name: c.name, chosen: c.rows.map((x) => x.step), pages: r.pageCount, keyPages: r.keyPageCount, items: r.items.length, tabs });
+      // the step tab's type size on the page (critic C2 r4: never below 14 pt on the one-page sheet)
+      const tabPts = [...d.querySelectorAll('[data-ws-steptab] text')].map((t) => Number(t.getAttribute('font-size')) * 72 / 25.4);
+      // TIGHT: with the cap lifted, the printed rows plus the next chosen row make a second page
+      let tight = null;
+      if (r.items.length < c.rows.length) {
+        cr.setOnePageBodyOverride(10000);
+        try { const r2 = await build(c.rows.slice(0, r.items.length + 1), paper); tight = r2.pageCount; } finally { cr.setOnePageBodyOverride(0); }
+      }
+      out.push({ paper, name: c.name, chosen: c.rows.map((x) => x.step), pages: r.pageCount, keyPages: r.keyPageCount, items: r.items.length, tabs, tight, panel: cr.onePagePlan(c.rows, paper).rows.length, minTab: Math.min(...tabPts) });
     }
     return out;
   }, ROW_CASES, PAPERS);
@@ -85,9 +98,11 @@ async function rowsCheck() {
     // printed order: the tabs read in the order the rows were chosen (the one-line rows keep their heights within 1.6x, so nothing is regrouped)
     const want = x.chosen.slice(0, x.items);
     const inOrder = JSON.stringify(x.tabs) === JSON.stringify(want);
-    const ok = x.pages === 1 && x.keyPages === 1 && x.items >= 1 && x.items <= x.chosen.length && inOrder && new Set(x.tabs).size === x.tabs.length;
+    const tightOk = x.tight === null || x.tight === 2;
+    const ok = x.pages === 1 && x.keyPages === 1 && x.items >= 1 && x.items <= x.chosen.length && inOrder && new Set(x.tabs).size === x.tabs.length && tightOk && x.panel === x.items && x.minTab >= 14 - 0.05;
     if (!ok) fail++;
-    console.log(`${ok ? 'ok  ' : 'FAIL'} ${x.paper} | rows: ${x.name.padEnd(28)} ${x.items} of ${x.chosen.length} rows, ${x.pages} page + ${x.keyPages} key page, each once${inOrder ? ', in order' : ', ORDER WRONG ' + JSON.stringify(x.tabs)}`);
+    console.log(`${ok ? 'ok  ' : 'FAIL'} ${x.paper} | rows: ${x.name.padEnd(28)} ${x.items} of ${x.chosen.length} rows, ${x.pages} page + ${x.keyPages} key page, each once${inOrder ? ', in order' : ', ORDER WRONG ' + JSON.stringify(x.tabs)}`
+      + `${x.tight === null ? '' : x.tight === 2 ? '; tight: one more row makes 2 pages' : `; NOT TIGHT: one more row still ${x.tight} page`}; panel says ${x.panel}${x.panel === x.items ? '' : ' (WRONG)'}; tab text >= ${x.minTab.toFixed(1)} pt`);
   }
   console.log(fail ? `wave1-c2-onepage: FAIL (${fail})` : 'wave1-c2-onepage: OK');
   process.exit(fail ? 1 : 0);

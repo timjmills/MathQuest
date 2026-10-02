@@ -1345,7 +1345,32 @@ function wireSwipeRows(cellEl) {
         if (w.dataset.mqSwipe === '1') return;
         w.dataset.mqSwipe = '1';
         // the cue (SP-11a, extended to count-by rows 2026-10-02) hides at the end of the row, or when the row fits
-        const upd = () => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        // the step-tab column beside the row: each entry as tall as its line (the boxes keep a 44 px floor on screen)
+        const col = w.previousElementSibling && w.previousElementSibling.matches('[data-mq-tabcol]') ? w.previousElementSibling : null;
+        const level = () => {
+            if (!col) return;
+            const lines = w.querySelectorAll('.k2-countrow-line');
+            col.querySelectorAll('[data-mq-tabfor]').forEach((t) => {
+                const ln = lines[Number(t.getAttribute('data-mq-tabfor'))];
+                if (!ln) return;
+                t.style.height = `${ln.getBoundingClientRect().height}px`;
+                t.style.marginTop = getComputedStyle(ln).marginTop;
+            });
+        };
+        // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
+        const body = w.querySelector('.k2-countrow-body');
+        const padEnd = () => {
+            if (!body || !col) return;
+            body.style.paddingRight = '0px';
+            const cw = w.clientWidth, max0 = w.scrollWidth - cw;
+            if (max0 <= 0) return;
+            const v = w.getBoundingClientRect(), sl = w.scrollLeft;
+            const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
+            const xs = line ? [...line.children].map((e) => e.getBoundingClientRect().left - v.left + sl - 2).filter((x) => x >= max0 - 0.5) : [];
+            if (xs.length) body.style.paddingRight = `${Math.max(0, Math.min(...xs) - max0)}px`;
+        };
+        padEnd(); window.addEventListener('resize', padEnd);
+        const upd = () => { level(); w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
         // a box that takes focus scrolls fully into view, clear of the pinned cue
@@ -1353,11 +1378,24 @@ function wireSwipeRows(cellEl) {
             const t = e.target;
             if (!t || !t.getBoundingClientRect) return;
             const r = t.getBoundingClientRect(), v = w.getBoundingClientRect();
-            const tab = t.closest('.k2-countrow-line') && t.closest('.k2-countrow-line').firstElementChild;     // the pinned step tab stays on show
-            const pin = tab ? tab.getBoundingClientRect().width + 4 : 4;
-            if (r.left < v.left + pin) w.scrollLeft -= (v.left + pin - r.left);
-            else if (r.right > v.right - 4) w.scrollLeft += (r.right - v.right + 4);
-            upd();
+            // (the step tab sits beside the row, outside it, so nothing scrolls under it). The row stops on a COLUMN start (the
+            // lines' columns line up), the nearest one to where it is that shows the whole box, so no number is ever cut at the
+            // row's left edge; the browser's own focus scroll is undone first (the card opens at scrollLeft 0).
+            const snap = () => {
+                const v2 = w.getBoundingClientRect(), r2 = t.getBoundingClientRect(), sl = w.scrollLeft, cw = w.clientWidth;
+                const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
+                const xs = [0, ...(line ? [...line.children].map((e) => e.getBoundingClientRect().left - v2.left + sl - 2) : [])];
+                const bl = r2.left - v2.left + sl, br = r2.right - v2.left + sl;
+                const ok = xs.filter((x) => x <= bl + 0.5 && br - x <= cw - 2);
+                if (!ok.length) { if (r2.left < v2.left + 4) w.scrollLeft -= (v2.left + 4 - r2.left); else if (r2.right > v2.right - 4) w.scrollLeft += (r2.right - v2.right + 4); }
+                else w.scrollLeft = first && ok[0] === 0 ? 0 : Math.max(0, ok.reduce((a, x) => (Math.abs(x - sl) < Math.abs(a - sl) ? x : a)));
+                upd();
+            };
+            const first = w.dataset.mqFocused !== '1';      // the first focus (the card's auto-focus) keeps the row at its start when the box shows there
+            w.dataset.mqFocused = '1';
+            snap();
+            requestAnimationFrame(snap);
+            setTimeout(() => { if (document.activeElement === t) snap(); }, 150);    // after the cell's late fit (fitTwinRows) moves the boxes
         });
         upd(); setTimeout(upd, 300); setTimeout(upd, 1000);
     });

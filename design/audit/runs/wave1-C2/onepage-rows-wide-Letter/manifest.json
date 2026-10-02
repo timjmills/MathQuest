@@ -10,25 +10,25 @@
       "independent": {
         "fits": {
           "cols": 1,
-          "rows": 7,
-          "perPage": 7,
+          "rows": 8,
+          "perPage": 8,
           "pages": 1,
-          "note": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+          "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
           "sections": [
             {
               "cols": 1,
-              "rows": 7,
-              "perPage": 7,
+              "rows": 8,
+              "perPage": 8,
               "pages": 1,
               "cellW": 186,
-              "cellH": 30.057,
+              "cellH": 26.3,
               "requested": 1,
               "clamped": false,
               "note": "Rows sized to the problems they hold.",
-              "line": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+              "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
               "cls": "standard",
               "digitPt": 16,
-              "hMin": 37.3,
+              "hMin": 36.5,
               "anchorMm": 0,
               "blocks": null
             }
@@ -37,7 +37,7 @@
         "pageCount": 1,
         "keyPageCount": 1,
         "seed": 244652,
-        "title": "I Can count by 100,000, 1,000, 4, 9, 6 and 2",
+        "title": "I Can count by 100,000, 1,000, 4, 9, 6, 2, 8 and 11",
         "notes": [
           "Rows sized to the problems they hold."
         ],
@@ -55,7 +55,7 @@
             "ans": "1200000, 1300000, 1600000, 1800000, 1900000",
             "measured": {
               "1": {
-                "hMm": 37.3,
+                "hMm": 36.5,
                 "fits": true
               }
             }
@@ -67,7 +67,7 @@
             "ans": "16000, 18000, 22000, 23000, 24000",
             "measured": {
               "1": {
-                "hMm": 37.3,
+                "hMm": 36.5,
                 "fits": true
               }
             }
@@ -79,7 +79,7 @@
             "ans": "16, 28, 36, 40, 48",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 21,
                 "fits": true
               }
             }
@@ -91,7 +91,7 @@
             "ans": "27, 45, 54, 72, 108",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 21,
                 "fits": true
               }
             }
@@ -103,7 +103,7 @@
             "ans": "24, 30, 36, 54, 66",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 21,
                 "fits": true
               }
             }
@@ -115,7 +115,31 @@
             "ans": "6, 12, 16, 20, 22",
             "measured": {
               "1": {
-                "hMm": 21.8,
+                "hMm": 21,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 8. Write the missing numbers.",
+            "ans": "32, 40, 56, 80, 96",
+            "measured": {
+              "1": {
+                "hMm": 21,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 11. Write the missing numbers.",
+            "ans": "44, 55, 77, 110, 132",
+            "measured": {
+              "1": {
+                "hMm": 21,
                 "fits": true
               }
             }
@@ -124,7 +148,7 @@
         "pages": [
           {
             "file": "independent-p1.png",
-            "words": 105,
+            "words": 125,
             "w_mm": 215.9,
             "h_mm": 279.4
           }
@@ -132,7 +156,7 @@
         "keyPages": [
           {
             "file": "independent-key-p1.png",
-            "words": 138,
+            "words": 168,
             "w_mm": 215.9,
             "h_mm": 279.4
           }
@@ -140,11 +164,11 @@
         "check": {
           "pages": 1,
           "cells": [
-            6
+            8
           ],
           "problems": [],
           "fonts": {
-            "Andika": 68
+            "Andika": 86
           },
           "fontsReady": true,
           "andika": true
@@ -152,11 +176,11 @@
         "keyCheck": {
           "pages": 1,
           "cells": [
-            6
+            8
           ],
           "problems": [],
           "fonts": {
-            "Andika": 98
+            "Andika": 126
           },
           "fontsReady": true,
           "andika": true

@@ -1344,7 +1344,7 @@ const CB_CHART_LINE_OPTIONS = {
                 + 'Each row has its own start (the step itself, 0, or a number you type: by 5 from 3 is 3, 8, 13 …) and its own direction (on, or back down towards 0, never below 0). Every row holds the full 12 numbers, in two lines of 6, so a back row whose start is too small is raised to the smallest start that works, keeping its ones digit (12 down by 5 starts at 57), and the panel says so beside the row). '
                 + 'The page deals your rows in order (or shuffled, under "More"), and starts the list again when the page has more rows than you chose. '
                 + 'Nothing chosen is the usual page: the tables 2 to 12 across the page. Every row is two lines of 6 numbers across the full width; big numbers get smaller digits (never below 9 pt) rather than fewer per line. '
-                + 'On the one-page sheet, the rows you chose print once each, in your order, as many as fit (the compact one-line sheet; the panel says how many fit). A short list spreads its rows over the page.',
+                + 'On the one-page sheet, the rows you chose print once each, in your order, as many as fit (the compact one-line sheet; the panel says how many fit). A short list keeps extra space round each row.',
             summary: (v) => (Array.isArray(v) && v.length ? `${v.length} row${v.length === 1 ? '' : 's'}` : 'Tables 2 to 12'),
         },
         { ..._cbTables(1, 'Tables', 'Count by', 'Old control: the ticked tables now live in the list of rows.'), hidden: true },
@@ -1374,7 +1374,7 @@ const CB_CHART_LINE_OPTIONS = {
             id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
             helpShort: 'Your rows (or the tables 1 to 12) once each on one compact sheet, as many as fit.',
             help: 'Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
-                + 'With rows chosen it is those rows, in order, as many as fit one page (twelve lines; a row of very wide numbers takes two lines of six, so fewer fit; the panel says how many). '
+                + 'With rows chosen it is those rows, in order, as many as the paper holds (a row of very wide numbers takes two lines of six, so fewer fit; the panel says how many on Letter and on A4). '
                 + 'Every row is then one line of 12 numbers (the other pages use two lines of six), and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
         },
         {

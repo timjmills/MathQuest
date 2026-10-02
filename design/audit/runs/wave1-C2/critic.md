@@ -178,3 +178,74 @@ Graded at **419d355** (the base was debc9c6). The working tree is clean.
 5. **C4, minor. Where:** `providers/countby.js` `cbPage`.
    **What:** it duplicates `downStart` inline.
    **Fix:** import it from `count-rows.js`.
+
+# Round 4 (Opus, medium)
+
+Graded at **7bd1ecf** (WIP 6619966 plus the finishing commit, on 419d355). The working tree is clean.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 7 | The pinned step tab now **covers** the row on the 390 practice card when it opens: it reads "1,000 ⟩00 16,000", and the first box of lines 2 and 3 is half hidden. |
+| C2 Educational value | 8 | Rows print once each, in the teacher's order. Titles name what prints, with no "and 5 more". The step is always in view. |
+| C3 Spacing and layout | 7 | The one-page sheet drops chosen rows that would fit. 7 wide rows print 4, with about 50 mm blank at the foot of both A4 and Letter. A 2-row list leaves two-thirds of the page empty, though the help says "spreads". |
+| C4 Standard fidelity | 8 | Black and white, Andika, TY-10a floor, facsimile keys. The default one-page sheet is byte-identical to 4911898 **and** to the current sweet-newton tip (12 of 12 each). |
+
+## Runs (all from the tree, one at a time)
+
+- `wave1-c2-onepage` against `git archive 4911898`: OK. It is also OK against `git archive claude/sweet-newton-c8wrv1` (96df11b), 12 of 12 identical. The 12 new chosen-row cases (6 lists × A4/Letter) are each 1 page + 1 key page, each row once, in order.
+- `wave1-c2-dupes`: OK. It now checks every line on every page, which closes round-3 defect 4.
+- `wave1-c2-phone`: OK, 32 PASS. It does **not** check what the pinned column covers (see defect 1).
+- `ws-content-audit --skill count_by_tables`: OK, 0 failing. `ws-screen-answer --skills multiplication:count_by_tables`: OK.
+- `ws-layout-unit`: OK, 535 assertions.
+- `ws-print-lint --source kit` on count_by_tables, add_20_regroup and count_objects × independent, more-practice, test and guided: 12 documents, 0 findings. One-page with a 7-row mixed list (A4 and Letter): 0 findings.
+- **(a) groupByHeight:** this is a byte comparison against `git archive 4911898`, which is the merge base. I built 25 sheets, pupil and key HTML plus page count: add_20_regroup, skip_count_line and count_objects × independent, more-practice, test and guided × S/L, plus a one-page count_by section mixed with add_20_regroup. **25 of 25 are identical.** The bypass fires only when *every* item is a one-page count-by item, so mixed sections and every other skill keep the regrouping. Accepted.
+- **Dry-run merge onto claude/sweet-newton-c8wrv1** (`git merge-tree`): **no conflicts**. count-row.js and screen-cell.css merge cleanly. On the merged tree, boot-smoke, ws-screen-answer for count_by, wave1-c2-phone (32 PASS) and ws-code-snapshot (608 codes, nothing moved) are all OK. `ws-stamp-assets --check` FAILS (stale). Whoever merges must re-stamp.
+- Probes of my own, in the scratchpad: `sticky.cjs` lists the numbers and boxes under the pinned column after load. `ws-grade-render --opts` renders a 7-row all-wide list on A4 and Letter, and a 2-row list on A4.
+
+## Round-3 defects
+
+1. Letter one-page with rows ran to 2 pages: **fixed**. Every chosen-row case is now 1 + 1 on both papers, and the gate asserts it. A new problem is that the cap is too low (defect 2).
+2. Repeats and out-of-order rows: **fixed**. Each row prints once, in the teacher's order, and the I Can names every printed step in that order.
+3. Step tab scrolled off on the phone: the tab is now pinned, but the pin **covers content** (defect 1). Not fixed as a whole.
+4. Dupes gate on page 1 only: **fixed**. It checks every line on every page.
+5. `cbPage` duplicating `downStart`: **fixed** (imported).
+
+## Judgements on the extra changes
+
+- **(a)** Accepted. The proof is above.
+- **(b) One Letter limit for both papers.** Not acceptable as built. The real fault is the height model, not the shared limit. `TWO_LINE_UNITS = 2.5` treats a two-line row as 48.8 mm, but it measures 35.9–40.5 mm. `MIXED_PAD_MM` reserves 4.4 mm a row to keep heights within 1.6×, but the `groupByHeight` bypass has already made that reserve unnecessary. Both errors cut rows the paper holds (defect 2). One shared limit is reasonable for the panel message only if it equals the true Letter capacity.
+- **(c) vpad spread.** The spread looks intentional and the digits stay at working size, which is good. It is capped at 13 mm, so a 1–3 row list does not spread: `short2-A4` (25 from 100, then 4) fills the top third and leaves the rest blank. That is honest, but the help text says "A short list spreads its rows over the page". Fix the wording, not the page.
+- **(d) Pinned tab plus scroll-padding.** The idea is right, but the result is wrong on the practice card (defect 1). The worksheet opens at scrollLeft 0, so the problem there only shows mid-swipe.
+- **(e) No note on the sheet about rows left off.** This is acceptable on the pupil page, because a note there would be noise for the pupil. The panel note ("N of M rows fit…") is the right place. That note must be true, though, and today it understates the count (defect 2). Optionally, the key footer could name the rows left off ("Not printed: by 8, by 11"). That is not scored.
+
+## Ranked defects (RUBRIC §6 form)
+
+1. **C1, major (−2). Where:** practice card at 390 on load: `phone-card-by-1-000-from-14-000.png`, `phone-card-by-100-000-from-1-000-000-15-.png`, `phone-card-times-each-back.png`, and `large-by-100000-from-1000000-15-L/.../card-390.png`.
+   **What:** the first box auto-focuses and the row scrolls 42 px (1,000 from 14,000), 106 px (100,000) or 12 px (back by 12). The opaque sticky column then covers the start of every line:
+   - The probe found 14,000 under the tab, with 15,000 showing as "00".
+   - 1,000,000 is fully hidden and 1,100,000 shows as ",100,000".
+   - On line 2 and line 3, the first item sits under the white `.k2-steptab-in` column, and on the card **an answer box is half covered** (box 96–163 px under a pin ending at 136 px, and 152–229 px under 164 px).
+   - The pupil's first view shows a broken number and a partial box.
+
+   **Fix:** in `count-row.js`, take the step tab (and the line-2 and line-3 arrow column) **out of** the `[data-mq-swiperow]` scroller, as a fixed left column beside it. Then nothing can slide under it, and `scroll-padding-left` and the pin offset in `wireSwipeRows` (`screen-cell.js:929`) go away. If the sticky approach stays: make only line 1's tab sticky, keep `.k2-steptab-in` non-sticky, and in `wireSwipeRows` reset `scrollLeft = 0` after the initial auto-focus when the focused box is fully visible clear of the tab.
+   **Check:** add to `wave1-c2-phone` "after load, no number text or input in any line has `left < pin.right`, and the swipe row's `scrollLeft === 0` on the card", for all 4 cases.
+2. **C3, major (−2); C2 −1 in the panel's honesty. Where:** `count-rows.js` `onePagePlan` (`TWO_LINE_UNITS`, `MIXED_PAD_MM`, the `Math.min(bodyMm, 207) + (mixed ? 0 : 30)` limit). Evidence: a render of 7 rows (by 1,000 … 7,000 from 14,000).
+   **What:** A4 prints 4 rows, each 45.6 mm, and leaves about 50 mm blank above the footer. Letter prints 4 rows, each 42.1 mm, and leaves about 47 mm blank. A 5th row (measured 40.5 / 35.9 mm) fits on both papers. In the gate case "wide rows first", 6 of 8 print, but natural heights (2 × 37.5 + 6 × 22 = 207 mm) fit an A4 body of about 227 mm. The panel tells the teacher "4 of 7 rows fit", which is false.
+   **Fix:** cap the plan by **measured** height rather than units. In `buildSheet`, the bridge already measures cells (`measured.hMm`). Add rows in order while Σ hMm + the row gaps ≤ the body height for that paper (`bodyHeightMm(paper) − instructionMm`). Drop `MIXED_PAD_MM`, since the `groupByHeight` bypass makes it redundant. The panel can then quote the Letter capacity computed the same way, or say "N fit on Letter, M on A4".
+   **Check:** in `wave1-c2-onepage`, for each case, assert `pageCount === 1` **and** that building with the next chosen row added gives `pageCount === 2` (the cap is tight). Assert the panel's N equals the printed count on Letter.
+3. **C3, minor (−1). Where:** `skill-options.js:1355` help text, and `short2-A4`.
+   **What:** "A short list spreads its rows over the page." A 1–3 row list fills only the top third, because the pad is capped at 13 mm (`gen-mult-patterns.js` `pad = Math.min(13, …)`).
+   **Fix:** reword it to "A short list keeps extra space round each row".
+   **Check:** read the panel help.
+4. **C4, minor (−1). Where:** `onepage-rows-A4` and `onepage-rows-wide-*`, rows d and a.
+   **What:** on the one-line sheet the step-tab text shrinks with the digits (`stepTab`: `Math.min(g.pt * 1.05, 20)`). "+100" and "100,000" print at about 9 pt beside "+3" and "+25" at about 17 pt. The step is the one cue the pupil reads first.
+   **Fix:** in `count-row.js` `stepTab`, floor the tab text at the S working size (about 14 pt) and widen the tab as needed. Use `w` from the text width rather than the digit pt.
+   **Check:** in a render of `onepage-rows-A4`, every tab's text is ≥ 14 pt.
+
+**To reach 10:**
+- C1: no content ever sits under a pinned column, and the card opens at scrollLeft 0.
+- C2: the panel's fit count is exact.
+- C3: the cap is tight to measured height on each paper, and short lists match the help.
+- C4: step-tab text has a size floor.

@@ -19,7 +19,7 @@ import { state } from './state.js';
 import { dealIndex, pageConstant } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
-import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePagePlan, getOnePageBody, NATURAL_MM, MIXED_PAD_MM } from './count-rows.js';
+import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePagePlan } from './count-rows.js';
 import { k2Twin, renderCell } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
@@ -124,9 +124,9 @@ export function genCountByTables(q) {
     if (!pageRows.length && ticks.length < 12) pageRows = ticks.map((n) => ({ step: n, start: 'step', dir: 'up' }));
     const plainSteps = pageRows.length && pageRows.every(isPlainRow) ? [...new Set(pageRows.map((r) => r.step))].sort((a, b) => a - b) : null;
     if (plainSteps && plainSteps.length === 12 && !onePage) pageRows = [];          // every table: the usual page
-    let row, plan = null, planW = 1;
+    let row, plan = null;
     if (onePage && pageRows.length) {
-        plan = onePagePlan(pageRows); pageRows = plan.rows; row = plan.rows[idx % plan.rows.length]; planW = plan.weights[idx % plan.rows.length];
+        plan = onePagePlan(pageRows); pageRows = plan.rows; row = plan.rows[idx % plan.rows.length];
     } else if (!onePage && pageRows.length && !plainSteps) {
         row = opt('order') === 'mixed' && pageRows.length > 1 ? pageRows[dealIndex('cbt-row', pageRows.length)] : pageRows[idx % pageRows.length];
     } else {
@@ -226,8 +226,9 @@ export function genCountByTables(q) {
         // leaving the lower half empty; and when a two-line row is among them the one-line rows keep a little, so heights stay within 1.6x
         if (plan) {
             // the same air round every row (so one-line and two-line rows stay within 1.6x of each other and keep the teacher's order)
-            let pad = Math.min(13, Math.max(0, (getOnePageBody() * (plan.mixed ? 0.9 : 1) - NATURAL_MM * plan.units) / (2 * plan.rows.length)));
-            if (plan.mixed) pad = Math.max(pad, MIXED_PAD_MM);
+            // the paper's spare height, shared out as air above and below every row (at most 13 mm a side: a short list keeps extra
+            // space round each row, it is not stretched down the page)
+            const pad = Math.min(plan.mixed ? 3 : 13, Math.max(0, plan.spare - 6) / (2 * plan.rows.length));   // 6 mm kept back: the layout's row rounding; a mixed page keeps its two heights over 1.6x apart, so each row stays its own height   // 6 mm kept back: the layout's row rounding
             if (pad > 0.05) payload.vpad = Math.round(pad * 10) / 10;
         }
     }   // the rows on one page: tighter chrome, digits at the S working size

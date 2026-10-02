@@ -135,44 +135,46 @@ export function rowLines(row, signed = false, n = 12) {
     return pt >= FLOOR ? 1 : 2;
 }
 
-/** The page holds this many single-line rows (A4 and Letter alike: twelve compact lines fit both). */
-export const ONE_PAGE_LINES = 12;
-/** A row of two lines of six takes this many single-line rows of height (measured on the sheet). */
-export const TWO_LINE_UNITS = 2.5;
 /** The tables the one-page sheet prints when no rows are chosen. */
 export const ONE_PAGE_ITEMS = 12;
-/** Usable body height (mm) the one-page sheet's rows share, a little under the shorter paper's (Letter). */
-/** Height (mm) of one compact single-line row on the sheet, and the air a mixed page keeps round every row. */
-export const NATURAL_MM = 19.5;
-export const MIXED_PAD_MM = 2.2;
-export const ONE_PAGE_BODY_MM = 225;
-let _bodyMm = ONE_PAGE_BODY_MM;
-/** The sheet tells the generator the paper's body height (A4 225, Letter 207) so a short list's spread fits the page it prints on. */
-export function setOnePageBody(mm) { _bodyMm = Number(mm) > 0 ? Number(mm) : ONE_PAGE_BODY_MM; }
-export const getOnePageBody = () => _bodyMm;
+/**
+ * Critic C2 round 4: the cap is the MEASURED height of the rows against the paper's body, per paper. A row's cell measures
+ * ROW_MM[lines] on the one-page sheet at S (its boxed cell, label and arcs, the row rule included); the paper's body is the
+ * height those cells share under the header and the instruction. Both are measured on the sheet (wave1-c2-onepage asserts the
+ * cap is tight: the next chosen row would make a second page, on A4 and on Letter).
+ */
+export const ROW_MM = { 1: 17.1, 2: 33.2 };
+export const ONE_PAGE_BODY = { A4: 226, Letter: 208 };
+export const MIX_ROW_MM = 0.6;
+let _paper = 'A4';
+/** The sheet tells the generator which paper it prints on (the bridge, before it deals the rows). */
+export function setOnePagePaper(paper) { _paper = /letter/i.test(String(paper || '')) ? 'Letter' : 'A4'; }
+export const getOnePagePaper = () => _paper;
+let _bodyOverride = 0;
+/** TEST ONLY (wave1-c2-onepage proves the cap is tight): lift the body height so the next chosen row is dealt too. 0 restores it. */
+export function setOnePageBodyOverride(mm) { _bodyOverride = Number(mm) > 0 ? Number(mm) : 0; }
 
 /**
- * "All rows on one page" with rows chosen: each chosen row ONCE, in the teacher's order, as many as fit one page. `rows` are the
- * rows printed; `cut` the chosen rows that did not fit (the panel says so); `units` the page height they use (a one-line row is 1).
+ * "All rows on one page" with rows chosen: each chosen row ONCE, in the teacher's order, as many as the paper holds. `rows` are
+ * the rows printed, `heights` their natural cell heights (mm), `spare` the body height left over, `cut` the chosen rows left off.
  */
-export function onePagePlan(rows, bodyMm = _bodyMm) {
+export function onePagePlan(rows, paper = _paper) {
     const list = normalizeRows(rows);
+    const body = _bodyOverride || ONE_PAGE_BODY[paper === 'Letter' ? 'Letter' : 'A4'];
     const signed = list.some((r) => r.dir === 'down');          // the step tab carries a + / - sign when any row goes back
-    const out = [];
-    let used = 0;
+    const out = [], heights = [];
+    // a page that mixes one-line and two-line rows is laid out row by row ("rows sized to the problems they hold"), which adds
+    // MIX_ROW_MM to every row; a page of one kind is a plain grid
+    const total = (hs) => hs.reduce((a, h) => a + h, 0) + (new Set(hs).size > 1 ? MIX_ROW_MM * hs.length : 0);
     for (const r of list) {
-        const w = rowLines(r, signed) === 1 ? 1 : TWO_LINE_UNITS;
-        if (out.length && used + w > ONE_PAGE_LINES + 1e-9) break;
-        out.push(Object.assign({}, r, { _w: w }));
-        used += w;
+        const h = ROW_MM[rowLines(r, signed) === 1 ? 1 : 2];
+        if (out.length && total([...heights, h]) > body + 1e-9) break;
+        out.push(r); heights.push(h);
     }
-    // a page that mixes one-line and two-line rows keeps a little air round the one-line rows (heights within 1.6x, so nothing is regrouped
-    // and the order stays the teacher's): drop the last rows until the page, with that air, still fits its paper
-    const mixed = () => out.some((r) => r._w > 1) && out.some((r) => r._w === 1);
-    const hmm = () => out.reduce((a, r) => a + NATURAL_MM * r._w, 0) + (mixed() ? 2 * MIXED_PAD_MM * out.length : 0);
-    while (out.length > 1 && hmm() > Math.min(bodyMm, 207) + (mixed() ? 0 : 30)) out.pop();
-    used = out.reduce((a, r) => a + r._w, 0);
-    return { mixed: mixed(), rows: out.map((r) => { const c = { ...r }; delete c._w; return c; }), weights: out.map((r) => r._w), cut: list.length - out.length, units: used, of: list.length };
+    const used = total(heights);
+    const mixed = new Set(heights).size > 1;
+    const real = ONE_PAGE_BODY[paper === 'Letter' ? 'Letter' : 'A4'];
+    return { rows: out, heights, mixed, spare: Math.max(0, real - used), cut: list.length - out.length, of: list.length };
 }
 
 /** The rows the one-page sheet prints (see onePagePlan). */

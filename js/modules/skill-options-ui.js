@@ -332,7 +332,11 @@ function _rowsControlHTML(def, rows, color, h, tip, cur) {
         + `<button type="button"${full ? ' disabled' : ''} onclick="${call('add', -1, 'this.previousElementSibling.value')}" style="min-height:40px;padding:0 12px;border:1px solid ${color};border-radius:7px;background:${color}22;color:var(--text);cursor:pointer;font-weight:700;">Add</button>`
         + (list.length ? `<button type="button" onclick="${call('clear', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text-dim);cursor:pointer;">Clear</button>` : '')
         + `</div>`
-        + (cur && cur.onePage && list.length && onePagePlan(list, 207).cut > 0 ? `<div class="sko-onepage-note" style="font-size:0.74rem;font-weight:600;margin-top:8px;color:var(--text);">${onePagePlan(list, 207).rows.length} of ${list.length} rows fit on one Letter or A4 page; the rest do not print.</div>` : '')
+        + (cur && cur.onePage && list.length && (onePagePlan(list, 'Letter').cut > 0 || onePagePlan(list, 'A4').cut > 0) ? (() => {
+            const nL = onePagePlan(list, 'Letter').rows.length, nA = onePagePlan(list, 'A4').rows.length;
+            const msg = nL === nA ? `${nL} of ${list.length} rows fit on one page (Letter or A4)` : `${nL} of ${list.length} rows fit on one Letter page, ${nA} on A4`;
+            return `<div class="sko-onepage-note" style="font-size:0.74rem;font-weight:600;margin-top:8px;color:var(--text);">${msg}; the rest do not print.</div>`;
+        })() : '')
         + (list.length ? `<div class="sko-rows-list" style="margin-top:8px;">${rowsHtml}</div>`
             : `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;">None chosen: the page counts by the tables 2 to 12.</div>`)
         + `</div>`;

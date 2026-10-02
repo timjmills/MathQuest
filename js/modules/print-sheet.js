@@ -31,7 +31,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { onePageRows, setOnePageBody, ONE_PAGE_ITEMS } from './count-rows.js';
+import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -107,7 +107,7 @@ function normaliseRequest(req = {}) {
             try {
                 if (k.skillId !== 'count_by_tables') return false;
                 const o = normalizeOptions(k.categoryId, k.skillId, k.opts || {});
-                // wave 1 C2: with rows chosen the sheet prints THOSE rows in order, starting the list again until its twelve lines are full, else x 1 to x 12
+                // wave 1 C2: with rows chosen the sheet prints THOSE rows once each, in order, as many as the paper holds, else x 1 to x 12
                 if (o.onePage && o.rows && o.rows.length) rowCount = onePageRows(o.rows).length;
                 return !!o.onePage;
             } catch (e) { return false; }
@@ -1430,8 +1430,8 @@ function anchorSummary(mode, list, notes) {
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
 export async function buildSheet(req = {}) {
+    setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
-    setOnePageBody(n.paper === 'Letter' ? 207 : 225);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();
