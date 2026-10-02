@@ -1,0 +1,400 @@
+{
+  "skill": "multiplication:count_by_tables",
+  "category": "multiplication",
+  "skillId": "count_by_tables",
+  "label": "Count by 1–12",
+  "grade": "3",
+  "dir": "multiplication__count_by_tables",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 6,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 6,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 38,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 1 x 6, cells sized to the problems.",
+            "line": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 35.7,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 244652,
+      "title": "I Can count by 1,000 from 14,000",
+      "notes": [
+        "Dense: 1 x 6, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 20000, 23000, 24000",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 20000, 22000, 24000",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 21000, 22000, 25000",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 18000, 21000, 23000, 24000",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 83,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 50
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 70
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "test": {
+      "fits": {
+        "cols": 1,
+        "rows": 6,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+        "sections": [
+          {
+            "role": "test",
+            "cls": "standard",
+            "requested": "auto",
+            "cols": 1,
+            "rows": 6,
+            "perPage": 6,
+            "pages": 1,
+            "count": 4,
+            "cellW": 186,
+            "innerW": 184.942,
+            "cellH": 38,
+            "hMin": 35.4,
+            "gridH": 228,
+            "gridHCont": 242,
+            "fill": true,
+            "packed": false,
+            "filled": false,
+            "ceiling": 20,
+            "clamped": false,
+            "reason": "",
+            "note": "Dense: 1 x 6, cells sized to the problems.",
+            "notes": [
+              "Dense: 1 x 6, cells sized to the problems."
+            ],
+            "digitPt": 16,
+            "trackMm": null,
+            "size": "S",
+            "look": "ican",
+            "availableWidthMm": 186,
+            "line": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 657182,
+      "title": "Test A: counting by 1,000 from 14,000",
+      "notes": [
+        "Dense: 1 x 6, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 20000, 22000, 25000",
+          "measured": {
+            "1": {
+              "hMm": 35.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 20000, 23000, 25000",
+          "measured": {
+            "1": {
+              "hMm": 35.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 19000, 21000, 22000, 24000",
+          "measured": {
+            "1": {
+              "hMm": 35.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 1,000. Write the missing numbers.",
+          "ans": "17000, 18000, 20000, 23000, 25000",
+          "measured": {
+            "1": {
+              "hMm": 35.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "3": {
+              "hMm": 35.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "test-p1.png",
+          "words": 83,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "test-key-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 50
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 70
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

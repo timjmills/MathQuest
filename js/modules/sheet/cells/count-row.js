@@ -33,13 +33,21 @@
 //   rule?: 'Rule: count on by 5.'     a printed rule caption (the rule is given)
 //   ruleBox?: {pre: 'Rule: add', post: 'each time', value: '5'}   the pupil writes the rule
 //   shown?: {index: value}            Error analysis: a value printed in the finished row
+//   times?: 'each'|'given', labels?: ['1 × 4', ...]   (wave 1 C2) the multiplication fact under each number
+//                                     (every number, or only the printed ones). A HINT: drawn black at
+//                                     levels 1 and 3, grey at level 2 (Guided), and dropped at level 0
+//                                     (Test, pre-skill check, review: PEDAGOGY P-7 "hints off on tests").
 // }
+//
+// WIDE NUMBERS (wave 1 C2). A box is as wide as the widest number ("1,200,000"), content never
+// shrinks; a row that no longer fits one line wraps to even lines (a turn arrow leaves and enters
+// each line). The step tab widens with its text ("−25,000").
 //
 // Pure module (SCC-01).
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, textPt, sizeOf, inkOf, isTwin, S, SW, n2 } from './k2kit.js';
+import { L, P, B, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2 } from './k2kit.js';
 import { tile, tileSize, shapeAt } from './shapes.js';
 
 /** The widest box pitch of an 'arcs' row (mm), and the narrowest box a size may print. */
@@ -57,6 +65,13 @@ const TWIN_ROW = 4;
 
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
+const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
+/** The multiplication label drawn under number `i`, or '' (none): a hint, so never at level 0. */
+function labelAt(p, ctx, i) {
+    if (!Array.isArray(p.labels) || !p.times || p.times === 'none' || p.look === 'train' || lvlOf(ctx) < 1) return '';
+    if (p.times === 'given' && (p.blanks || []).map(Number).includes(i)) return '';
+    return String(p.labels[i] === undefined ? '' : p.labels[i]);
+}
 
 /**
  * The geometry of one render: box size, pitch, how many numbers stand in a row. An 'arcs' row
@@ -72,14 +87,24 @@ function geom(p, ctx) {
     // "1,000" needs a wider box; R3 (critic round 3): on a pattern track so does a 3-digit number
     // (152, 227), which filled a 14 mm tile edge to edge in the key's bold. A count-by row keeps
     // one box width for every table, so the rows of a page line up.
-    const wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
-    const tab = look === 'arcs' && p.tab ? TAB_MM[size] + 2 : 0;
+    let wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
+    const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
+    // The step tab grows with its text ("−25,000"): the pentagon's point and padding plus the digits at the tab's own size.
+    const tabPtEst = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64) * 1.05, 20);
+    const tabBody = look === 'arcs' && p.tab ? Math.max(TAB_MM[size], String(p.tab).length * 0.6 * tabPtEst * PT_MM + 7) : 0;
+    const tab = tabBody ? tabBody + 2 : 0;
+    // The multiplication label ("12 × 25") is at least as wide as its text: the box widens so neighbouring labels never touch.
+    const lblPt = Math.max(8, zonePt(ctx));
+    let lblChars = 0;
+    for (let i = 0; i < n; i++) lblChars = Math.max(lblChars, labelAt(p, ctx, i).length);
+    const hasLbl = lblChars > 0;
+    const lblH = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : 0;
+    if (hasLbl) wide = Math.max(wide, lblChars * 0.6 * lblPt * PT_MM + 0.8 - gap - (look === 'arcs' ? PITCH[size] - gap : 14));
     // compact (12 tables on one page): less chrome, never smaller digits. Critic round 4 (H): the page had
     // about 30 mm spare under row l, so the boxes take it - taller (+3 mm, the most Letter still holds on one page) and wider (the one-column cell's
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
     const baseH = S(ctx).writeMm + (p.compact ? 3.4 : 2.5);
     const live = p.compact ? COMPACT_LIVE_MM : LIVE_MM;
-    const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
     let boxW = (look === 'arcs' ? PITCH[size] - gap : 14) + wide;
     let perRow = n;
     if (look === 'arcs') {
@@ -96,7 +121,7 @@ function geom(p, ctx) {
     const arcH = look === 'arcs' ? (p.compact ? 3 : 3.8) : 0;
     // the compact page prints its digits at the size's working size (16 pt at S, TY-10), not the 0.64 of it
     const pt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
-    return { size, n, look, shape, w: sz.w, h: sz.h, pitch, gap, tab, perRow, rows, arcH, pt };
+    return { size, n, look, shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH, pt, hasLbl, lblH, lblPt };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -132,13 +157,13 @@ const shownAt = (p, i) => {
 
 /** The step tab: a bold number in a pentagon pointing into the row ("7>"). */
 function stepTab(ctx, g, text) {
-    const w = TAB_MM[g.size], h = g.h;
+    const w = g.tabBody, h = g.h;
     const sw = SW.heavy;
     const body = `<polygon points="${n2(sw)},${n2(sw)} ${n2(w - 3.2)},${n2(sw)} ${n2(w - sw)},${n2(h / 2)} ${n2(w - 3.2)},${n2(h - sw)} ${n2(sw)},${n2(h - sw)}" `
         + `fill="#fff" stroke="${INK}" stroke-width="${n2(sw)}" stroke-linejoin="round"/>`
         + `<text x="${n2((w - 3) / 2 + 0.3)}" y="${n2(h / 2)}" dominant-baseline="central" text-anchor="middle" font-family="Andika, sans-serif" `
         + `font-weight="700" font-size="${n2(Math.min(g.pt * 1.05, 20) * 25.4 / 72)}" fill="${INK}">${esc(text)}</text>`;
-    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};">`
+    return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
         + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="count by ${esc(text)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
 }
 
@@ -178,6 +203,8 @@ register('count-row', {
         const shown = shownValues(p, ctx);
         const ink = inkOf(ctx);
         const plainGiven = g.look === 'arcs' && g.shape === 'box';
+        // the widest written answer, in digits (no separators): the screen box takes that many (a count by 25,000 writes 6 digits).
+        const keyDigits = Math.max(4, ...blanks.map((i) => String(values[i]).replace(/\D/g, '').length));
         const cells = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -192,16 +219,26 @@ register('count-row', {
             }
             const val = over !== undefined ? String(over) : shown[k];
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
-            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined });
+            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits });
         });
+        if (g.hasLbl) {
+            const lblInk = lvlOf(ctx) === 2 ? GREY : INK;
+            for (let i = 0; i < cells.length; i++) {
+                const t = labelAt(p, ctx, i);
+                cells[i] = `<span style="flex:none;display:flex;flex-direction:column;align-items:center;width:${L(ctx, g.w)};">${cells[i]}`
+                    + `<span class="k2-timeslbl"${t ? ` data-ws-times="${esc(t)}"` : ''} style="display:flex;justify-content:center;width:100%;height:${L(ctx, g.lblH - 0.5)};margin-top:${L(ctx, isTwin(ctx) ? 2.6 : 0.5)};`
+                    + `white-space:nowrap;font-size:${P(ctx, g.lblPt)};font-weight:400;line-height:1.2;color:${lblInk};">${esc(t)}</span></span>`;
+            }
+        }
         const rowsHtml = [];
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
             const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) : '';
             const turns = g.look === 'arcs' && g.tab && g.rows > 1 && !isTwin(ctx);
-            const tabW = TAB_MM[g.size] + 2;
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span style="flex:none;width:${L(ctx, tabW)};">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
-            const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
+            const tabW = g.tab;
+            const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
+            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line" style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
                 + `<div style="display:flex;gap:${L(ctx, g.gap)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
@@ -235,7 +272,7 @@ register('count-row', {
     footprint(p, ctx) {
         const g = geom(p, ctx || {});
         const w = g.tab + g.perRow * g.pitch - g.gap + 4;
-        const h = g.rows * (g.arcH + g.h) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
+        const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
         return { wMm: Math.ceil(w), hMm: Math.ceil(h), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };

@@ -183,7 +183,7 @@ export function optionControlHTML(def, cur, color, h) {
         </label>${extra}`;
     }
     if (def.type === 'int') {
-        return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
+        return `<label${tip} style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
             <span style="flex:1;">${escHTML(def.label)}</span>
             <input type="number" value="${escHTML(v)}"${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
                 style="width:80px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"

@@ -1,0 +1,180 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 3,
+          "perPage": 3,
+          "pages": 1,
+          "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 16 pt. Tall problems: 3 rows per page.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 3,
+              "perPage": 3,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 76,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 3 rows per page.",
+              "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 16 pt. Tall problems: 3 rows per page.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 66.5,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 244652,
+        "title": "I Can count by 100,000 from 1,000,000 (15 jumps)",
+        "notes": [
+          "Tall problems: 3 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1500000, 1600000, 1900000, 2000000, 2300000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 66.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "3": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "4": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "5": {
+                "hMm": 66.5,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1500000, 1600000, 1800000, 2000000, 2200000, 2300000",
+            "measured": {
+              "1": {
+                "hMm": 66.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "3": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "4": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "5": {
+                "hMm": 66.5,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1500000, 1700000, 1800000, 2100000, 2200000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 66.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "3": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "4": {
+                "hMm": 66.5,
+                "fits": false
+              },
+              "5": {
+                "hMm": 66.5,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 79,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 103,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 44
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 65
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

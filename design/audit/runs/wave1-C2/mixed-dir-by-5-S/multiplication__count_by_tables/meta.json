@@ -1,0 +1,262 @@
+{
+  "skill": "multiplication:count_by_tables",
+  "category": "multiplication",
+  "skillId": "count_by_tables",
+  "label": "Count by 1–12",
+  "grade": "3",
+  "dir": "multiplication__count_by_tables",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 11,
+        "perPage": 11,
+        "pages": 1,
+        "note": "Fits: 1 column x 11 rows, 11 per page, 1 page. Digits 16 pt. Dense: 1 x 11, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 11,
+            "perPage": 11,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 20.727,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 1 x 11, cells sized to the problems.",
+            "line": "Fits: 1 column x 11 rows, 11 per page, 1 page. Digits 16 pt. Dense: 1 x 11, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 20.3,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 244652,
+      "title": "I Can count on and back by 5",
+      "notes": [
+        "Dense: 1 x 11, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 5. Write the missing numbers.",
+          "ans": "45, 35, 30, 20, 10",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 30, 35, 45, 55",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 30, 40, 45, 60",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 5. Write the missing numbers.",
+          "ans": "45, 40, 25, 15, 10",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 5. Write the missing numbers.",
+          "ans": "45, 40, 30, 20, 5",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 30, 35, 45, 60",
+          "measured": {
+            "1": {
+              "hMm": 20.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 20.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 20.3,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 139,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 68
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 98
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

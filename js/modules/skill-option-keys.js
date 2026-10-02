@@ -106,6 +106,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '5N-5Z', owner: 'lessons, support ladder and later waves' }),
     Object.freeze({ keys: '6X-6Z', owner: 'Wave 1 lane A (pupil practice: calculator, skip)' }),
     Object.freeze({ keys: '2U-2Z', owner: 'wave 1 lane C: skip-count lines and the number grid' }),
+    Object.freeze({ keys: '1W-1Z', owner: 'wave 1 lane C2: count_by_tables custom step, start, direction, multiplication labels' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -163,6 +164,11 @@ export const MULTI_KEYS = Object.freeze({
     gaps: '2W',          // hundreds_chart_fill, number_chart_fill: which squares are empty (scatter / row / column / pattern)
     grid: '2X',          // hundreds_chart_fill, number_chart_fill: the grid size (window / rows / whole)
     onePage: '2Y',       // count_by_tables: all twelve tables, x 1 to x 12, on one page
+    // Wave 1 lane C2 (sub-range 1W-1Z, count_by_tables). `dir` (I) is reused: forward / back / mixed.
+    by: '1W',            // count_by_tables: count by this typed number instead of the ticked tables (0 = the tables)
+    start: '1X',         // count_by_tables: the row starts at the step / at 0 / at a number the teacher types
+    startAt: '1Y',       // count_by_tables: the typed start (read when `start` is custom)
+    times: '1Z',         // count_by_tables: the multiplication fact under each number (none / every number / printed ones)
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -328,6 +334,9 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // lane C (2U-2X)
     fill: Object.freeze({ two: 'T', one: 'O', half: 'H' }),
+    // lane C2 (1X, 1Z)
+    start: Object.freeze({ step: 'S', zero: 'Z', custom: 'C' }),
+    times: Object.freeze({ none: 'N', each: 'E', given: 'G' }),
     gaps: Object.freeze({ scatter: 'S', row: 'R', column: 'C', pattern: 'P' }),
     grid: Object.freeze({ window: 'W', rows: 'R', whole: 'F' }),
     // block 3 (2026-09-25)
@@ -389,6 +398,8 @@ export const SCALAR_ONLY = Object.freeze({
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
     missing: 'decimal', rule: 'bool', jumps: 'decimal', onePage: 'bool',
+    // lane C2 (1W-1Z): the typed step and start
+    by: 'decimal', startAt: 'decimal',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
     // block 6 (O2 ladders)

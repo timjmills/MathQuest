@@ -40,7 +40,7 @@ function countData(q) {
     const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
     const keys = listOf(q).map(num);
     const blanks = keys.map((k) => values.indexOf(k)).filter((i) => i > 0);
-    return { step: t, values, blanks };
+    return { step: t, values, blanks, dir: 'up' };
 }
 
 /** Worked steps of a row with gaps: jump by the step to each missing number (slots blank0 ..). */
@@ -64,6 +64,7 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
     const c = [];
     if (!blanks.length) return null;
     // skipped a multiple: wrote the NEXT number at the first gap and carried on from there
+    const sgn = stepN < 0 ? -1 : 1;
     const skip = blanks.map((i, k) => (k === 0 ? values[i] + stepN : values[i]));
     c.push({ value: joinLike(q, [...skip, ...tail]), misconception: 'skipped-multiple', slot: 'b0', slots: { b0: String(skip[0]) },
         explain: `Skipped a number: wrote ${fmt(skip[0])}, not ${fmt(values[blanks[0]])}.` });
@@ -71,44 +72,83 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
     const i1 = blanks.find((i) => i > 0 && !blanks.includes(i - 1));
     if (i1 !== undefined && stepN !== 1) {
         const k = blanks.indexOf(i1);
-        const v = blanks.map((i) => values[i]); v[k] = values[i1 - 1] + 1;
+        const v = blanks.map((i) => values[i]); v[k] = values[i1 - 1] + sgn;
         c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'counted-by-one', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
-            explain: `Counted on by 1 after ${fmt(values[i1 - 1])}, not by ${fmt(stepN)}.` });
+            explain: `Counted ${sgn < 0 ? 'back' : 'on'} by 1 after ${fmt(values[i1 - 1])}, not by ${fmt(Math.abs(stepN))}.` });
     }
     // a place-value slip where the count crosses a hundred (96, 108 written as 98)
-    const i2 = blanks.find((i) => i > 0 && Math.floor(values[i] / 100) > Math.floor(values[i - 1] / 100) && values[i] - 10 > values[i - 1]);
+    const i2 = blanks.find((i) => i > 0 && Math.abs(values[i] - values[i - 1]) > 10 && Math.abs(values[i] - values[i - 1]) < 100
+        && Math.floor(values[i] / 100) !== Math.floor(values[i - 1] / 100) && values[i] - 10 * sgn !== values[i - 1]);
     if (i2 !== undefined) {
         const k = blanks.indexOf(i2);
-        const v = blanks.map((i) => values[i]); v[k] = values[i2] - 10;
-        c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'hundred-slip', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
-            explain: `Crossed the hundred and lost a ten: wrote ${fmt(v[k])}, not ${fmt(values[i2])}.` });
+        const v = blanks.map((i) => values[i]); v[k] = values[i2] - 10 * sgn;
+        if (v[k] >= 0) c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'hundred-slip', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
+            explain: `Crossed the hundred and ${sgn < 0 ? 'gained' : 'lost'} a ten: wrote ${fmt(v[k])}, not ${fmt(values[i2])}.` });
     }
     const w = chooseWrong(q, c);
     if (w && key.length) w.display = String(Array.isArray(w.value) ? w.value.join(', ') : w.value);
     return w;
 }
 
+/** The way a count-by item runs: 'up' | 'down' | 'mixed' (the item's option), or the section's option when there is no item. */
+const cbDir = (q, ref = {}) => {
+    if (q && q.countBy && q.countBy.dirOpt) return q.countBy.dirOpt === 'forward' ? 'up' : q.countBy.dirOpt === 'back' ? 'down' : 'mixed';
+    const o = ref && ref.opts && ref.opts.dir;
+    return o === 'back' ? 'down' : o === 'mixed' ? 'mixed' : 'up';
+};
+/** The step a count-by page is about: typed (`by`), else 0 = the tables 1 to 12. */
+const cbBy = (q, ref = {}) => {
+    if (q && q.countBy) return q.countBy.by > 0 ? q.countBy.by : 0;
+    const b = ref && ref.opts && Number(ref.opts.by);
+    return Number.isFinite(b) && b > 0 ? b : 0;
+};
+const cbStart = (q, ref = {}) => {
+    if (q && q.countBy) return q.countBy.start === 'custom' ? q.countBy.startAt : null;
+    const o = ref && ref.opts;
+    return o && o.start === 'custom' && Number.isFinite(Number(o.startAt)) ? Number(o.startAt) : null;
+};
+
 registerSkill('multiplication:count_by_tables', {
-    // The "I Can" line follows the row's length (12 or 15 jumps): derived from the item, never fixed.
-    strings: stringsBy((q) => ({
-        iCan: q && q.countBy && q.countBy.jumps === 15 ? 'I Can count by 1 to 12 (15 jumps)' : 'I Can count by 1 to 12',
-        instructionKey: 'count-by-row',
-        steps: [
-            'Read the number in the box. That is the jump.',
-            'Add the jump to a number to get the next one.',
-            'Write each missing number in its box.',
-            'Check: the last number is the last jump.',
-        ],
-        say: 'I count by __: __, __, __.',
-        sayValues: (q) => { const d = countData(q); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
-    })),
+    // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:
+    // derived from the item (or the section's options), never fixed.
+    strings: stringsBy((q, ref = {}) => {
+        const dir = cbDir(q, ref), by = cbBy(q, ref), from = cbStart(q, ref);
+        const verb = dir === 'down' ? 'count back by' : dir === 'mixed' ? 'count on and back by' : 'count by';
+        const what = by > 0 ? fmt(by) : '1 to 12';
+        const jumps = (q && q.countBy && q.countBy.jumps === 15) || (!q && ref && ref.opts && Number(ref.opts.jumps) === 15) ? ' (15 jumps)' : '';
+        const key = dir === 'down' ? 'count-back-row' : dir === 'mixed' ? 'count-sign-row' : 'count-by-row';
+        return {
+            iCan: `I Can ${verb} ${what}${from !== null ? ` from ${fmt(from)}` : ''}${jumps}`,
+            instructionKey: key,
+            steps: dir === 'up' ? [
+                'Read the number in the box. That is the jump.',
+                'Add the jump to a number to get the next one.',
+                'Write each missing number in its box.',
+                'Check: the last number is the last jump.',
+            ] : dir === 'down' ? [
+                'Read the number in the box. That is the jump.',
+                'Take the jump away from a number to get the next one.',
+                'Write each missing number in its box.',
+                'Check: each number is smaller than the one before.',
+            ] : [
+                'Read the sign in the box. + means count on. − means count back.',
+                'Add or take away the jump to get the next number.',
+                'Write each missing number in its box.',
+                'Check: the numbers go the way the sign says.',
+            ],
+            say: dir === 'down' ? 'I count back by __: __, __, __.' : 'I count by __: __, __, __.',
+            sayValues: (item) => { const d = countData(item); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
+        };
+    }),
     misconceptions: ['skipped-multiple', 'counted-by-one', 'hundred-slip'],
     workedSteps: (q) => {
         const d = countData(q);
         if (!d) return [];
-        return rowSteps(d.values, d.blanks, `Count by ${d.step}: each jump adds ${d.step}.`, () => `+ ${d.step}`);
+        const down = d.dir === 'down';
+        const sign = down ? '\u2212' : '+';
+        return rowSteps(d.values, d.blanks, `Count ${down ? 'back ' : ''}by ${fmt(d.step)}: each jump ${down ? 'takes away' : 'adds'} ${fmt(d.step)}.`, () => `${sign} ${fmt(d.step)}`);
     },
-    wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.step) : null; },
+    wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.dir === 'down' ? -d.step : d.step) : null; },
 });
 
 /* ===================================================================== number patterns */

@@ -1,0 +1,707 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 3,
+          "perPage": 3,
+          "pages": 2,
+          "note": "Fits: 1 column x 3 rows, 3 per page, 2 pages. Digits 28 pt. Tall problems: 3 rows per page.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 3,
+              "perPage": 3,
+              "pages": 2,
+              "cellW": 186,
+              "cellH": 75.667,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 3 rows per page.",
+              "line": "Fits: 1 column x 3 rows, 3 per page, 2 pages. Digits 28 pt. Tall problems: 3 rows per page.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 63.3,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 2,
+        "keyPageCount": 2,
+        "seed": 244652,
+        "title": "I Can count by 1,000 from 14,000",
+        "notes": [
+          "Tall problems: 3 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 20000, 23000, 24000",
+            "measured": {
+              "1": {
+                "hMm": 63.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 20000, 22000, 24000",
+            "measured": {
+              "1": {
+                "hMm": 63.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 21000, 22000, 25000",
+            "measured": {
+              "1": {
+                "hMm": 63.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 18000, 21000, 23000, 24000",
+            "measured": {
+              "1": {
+                "hMm": 63.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 65,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p2.png",
+            "words": 57,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 78,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p2.png",
+            "words": 70,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 2,
+          "cells": [
+            2,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 58
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 2,
+          "cells": [
+            2,
+            2
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 78
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "test": {
+        "fits": {
+          "cols": 1,
+          "rows": 3,
+          "perPage": 3,
+          "pages": 1,
+          "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+          "sections": [
+            {
+              "role": "test",
+              "cls": "standard",
+              "requested": "auto",
+              "cols": 1,
+              "rows": 3,
+              "perPage": 3,
+              "pages": 1,
+              "count": 3,
+              "cellW": 186,
+              "innerW": 184.942,
+              "cellH": 75.667,
+              "hMin": 63,
+              "gridH": 227,
+              "gridHCont": 241,
+              "fill": true,
+              "packed": false,
+              "filled": false,
+              "ceiling": 12,
+              "clamped": false,
+              "reason": "",
+              "note": "Tall problems: 3 rows per page.",
+              "notes": [
+                "Tall problems: 3 rows per page."
+              ],
+              "digitPt": 28,
+              "trackMm": null,
+              "size": "L",
+              "look": "ican",
+              "availableWidthMm": 186,
+              "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page."
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 657182,
+        "title": "Test A: counting by 1,000 from 14,000",
+        "notes": [
+          "Tall problems: 3 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 20000, 22000, 25000",
+            "measured": {
+              "1": {
+                "hMm": 63,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 20000, 23000, 25000",
+            "measured": {
+              "1": {
+                "hMm": 63,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 1,000. Write the missing numbers.",
+            "ans": "17000, 19000, 21000, 22000, 24000",
+            "measured": {
+              "1": {
+                "hMm": 63,
+                "fits": true
+              },
+              "2": {
+                "hMm": 63,
+                "fits": false
+              },
+              "3": {
+                "hMm": 63,
+                "fits": false
+              },
+              "4": {
+                "hMm": 63,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "test-p1.png",
+            "words": 74,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "test-key-p1.png",
+            "words": 92,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 41
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 56
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 1,000. Write the missing numbers.",
+        "ans": "17000, 18000, 21000, 23000, 25000",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              10
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 1,000. Write the missing numbers.",
+        "ans": "17000, 18000, 21000, 23000, 25000",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              10
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 1,000. Write the missing numbers.",
+        "ans": "17000, 18000, 21000, 23000, 25000",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              10
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              54
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              9
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

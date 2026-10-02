@@ -594,6 +594,9 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
         // A pv item's identity is its description plus what it prints: a sort prints the same
         // sentence every time and its whole variation is the tiles.
         if (pv) fp = `${text}|${printText}|${JSON.stringify(q.pv || null)}|${JSON.stringify(q.tiles || null)}|${JSON.stringify(q.numbers || null)}|${String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')}`;
+        // A count-by row (wave 1 C2): the row is the same step on every row of a typed-step page, so the pupil's
+        // gaps (the key) are what makes two rows different: they are part of the item's identity.
+        if (q.countBy && q.cell && q.cell.template === 'count-row') fp += `|${q.ans}|${(q.countBy.values || [])[0]}|${q.countBy.dir || ''}`;
         const item = {
             a: q.a, b: q.b, op: q.op, ans: q.ans, fp,
             fmt: q.printFormat || '(none)', type: q.answerType || '(none)',
@@ -913,15 +916,55 @@ function countByRules(items, F) {
         const p = it.cellP || {};
         if (it.cellT === 'count-row' && it.countBy) {
             const { step, values, blanks, pct } = it.countBy;
+            const o = it.opts || {};
             const fill = it.countBy.fill || 'one', nJ = it.countBy.jumps || 12;
-            if (![12, 15].includes(values.length) || values.length !== nJ || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the ${nJ} multiples of ${step}: ${values.join(', ')}`);
-            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
+            // Wave 1 C2: the row is the step's multiples run in the declared direction from the declared start, never below 0.
+            const dir = it.countBy.dir || 'up', startMode = it.countBy.start || 'step';
+            const by = o.by || 0, dirOpt = o.dir || 'forward', timesOpt = o.times || 'none', onePageOn = !!o.onePage;
+            const startAt = Number(o.startAt) || 0;
+            const fm = (n) => Number(n).toLocaleString('en-US');
+            if (!values.every((v, i) => Number.isInteger(v) && v >= 0 && (i === 0 || v - values[i - 1] === (dir === 'down' ? -step : step)))) bad.row.push(`not a count ${dir === 'down' ? 'back' : 'on'} by ${step} (no negatives): ${values.join(', ')}`);
+            if (by > 0 && !onePageOn && step !== by) bad.row.push(`"count by ${by}" but the row counts by ${step}`);
+            if (by === 0 && Array.isArray(o.constant) && o.constant.length && !onePageOn && !o.constant.includes(step)) bad.row.push(`counts by ${step}, not a ticked table {${o.constant}}`);
+            if (by === 0 && !onePageOn && !(step >= 1 && step <= 12)) bad.row.push(`a table row counts by ${step}`);
+            if (dirOpt === 'forward' && dir !== 'up') bad.row.push('"counting on" but the row counts back');
+            if (dirOpt === 'back' && dir !== 'down') bad.row.push('"counting back" but the row counts on');
+            const sm = onePageOn ? 'step' : startMode;
+            if (sm !== (onePageOn ? 'step' : (o.start || 'step'))) bad.row.push(`start option ${o.start} but the row's start is ${startMode}`);
+            if (dir === 'up') {
+                const first = sm === 'zero' ? 0 : sm === 'custom' ? startAt : step;
+                if (values[0] !== first) bad.row.push(`counting on from ${sm} should start at ${first}, not ${values[0]}`);
+                if (values.length !== nJ) bad.row.push(`a row of ${values.length} numbers, not ${nJ}`);
+            } else {
+                if (sm === 'step' && (values[0] !== nJ * step || values.length !== nJ)) bad.row.push(`counting back from the end of the table should run ${nJ * step} .. ${step}, not ${values[0]} .. ${values[values.length - 1]}`);
+                if (sm === 'zero' && (values[0] !== (nJ - 1) * step || values[values.length - 1] !== 0 || values.length !== nJ)) bad.row.push(`counting back to 0 should end on 0 after ${nJ} numbers, not ${values[values.length - 1]} after ${values.length}`);
+                if (sm === 'custom') {
+                    const fits = Math.min(nJ, Math.floor(startAt / step) + 1);
+                    const want = fits < 5 ? { top: 7 * step + (startAt % step), len: 8 } : { top: startAt, len: fits };
+                    if (values[0] !== want.top || values.length !== want.len) bad.row.push(`counting back from ${startAt} by ${step} should be ${want.len} numbers from ${want.top}, not ${values.length} from ${values[0]}`);
+                    if (startAt % step !== values[values.length - 1] % step) bad.row.push('the ones of the typed start were lost');
+                }
+            }
+            if (values.length < 5) bad.row.push(`a row of only ${values.length} numbers`);
+            // The tab says the way when the direction can change; the multiplication labels are the facts of the row, or absent.
+            const tab = String(it.cellP && it.cellP.tab);
+            const wantTab = dirOpt === 'forward' ? fm(step) : `${dir === 'down' ? '\u2212' : '+'}${fm(step)}`;
+            if (tab !== wantTab) bad.row.push(`the step tab reads "${tab}", not "${wantTab}"`);
+            const labels = it.countBy.labels, isTable = values.every(v => v % step === 0);
+            if (timesOpt === 'none' || onePageOn || !isTable) {
+                if (labels || (it.cellP && it.cellP.labels)) bad.row.push(`multiplication labels shown (times=${timesOpt}, onePage=${onePageOn}, table=${isTable})`);
+            } else {
+                if (!Array.isArray(labels) || labels.length !== values.length || labels.some((l, i) => l !== `${fm(values[i] / step)} \u00d7 ${fm(step)}`)) bad.row.push(`the multiplication labels are not the facts of ${values.join(', ')}: ${labels && labels.slice(0, 3)}`);
+                if (!it.cellP || it.cellP.times !== timesOpt || JSON.stringify(it.cellP.labels) !== JSON.stringify(labels)) bad.row.push('the drawn labels are not the declared labels');
+            }
             // ONE PAGE (owner 2026-10-02): rows are x 1 .. x 12 in order, twelve jumps long whatever "jumps" says.
-            if (it.opts && it.opts.onePage) {
+            if (onePageOn) {
                 const at = live.filter(x => x.cellT === 'count-row' && x.countBy).indexOf(it);
                 if (step !== (at % 12) + 1) bad.row.push(`one page: row ${at + 1} counts by ${step}, not ${(at % 12) + 1}`);
                 if (values.length !== 12) bad.row.push(`one page: a row of ${values.length} jumps (must be 12)`);
+                if (startMode !== 'step') bad.row.push(`one page: the row starts "${startMode}", not at the step`);
             }
+            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
             if (fill !== 'one' && blanks.includes(1)) bad.row.push(`the second number is blank under fill=${fill}`);
             const pool = values.length - (fill === 'one' ? 1 : 2);
             const k = fill === 'half' ? Math.min(pool, Math.floor(values.length / 2)) : (pct >= 100 ? pool : Math.max(1, Math.round(pct / 100 * pool)));
@@ -990,6 +1033,14 @@ function countByRules(items, F) {
             else if (h.response === 'missing' && !sentence.includes(Number(it.ans))) bad.hop.push(`the missing number ${it.ans} is not in ${sentence.join(', ')}`);
         }
     }
+    // Wave 1 C2: a "mixed" page deals both ways (L10: from the seeded draw, not alternately) and a typed step is dealt as typed.
+    const cbRows = live.filter(x => x.cellT === 'count-row' && x.countBy);
+    if (cbRows.length >= 10 && cbRows.every(x => x.opts && x.opts.dir === 'mixed')) {
+        const ups = cbRows.filter(x => x.countBy.dir === 'up').length;
+        if (!ups || ups === cbRows.length) bad.row.push(`a mixed page deals only ${ups ? 'counting on' : 'counting back'} in ${cbRows.length} rows`);
+        const seq = cbRows.map(x => (x.countBy.dir === 'up' ? 'u' : 'd')).join('');
+        if (/^(ud)+u?$|^(du)+d?$/.test(seq)) bad.row.push(`a mixed page alternates up, down, up, down (${seq.slice(0, 12)}): deal it from the seeded draw`);
+    }
     if (bad.row.length) F('count-row', `${bad.row.length} count-by rows are wrong: ${show(bad.row)}`);
     if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);
     if (bad.grid.length) F('mult-grid', `${bad.grid.length} charts are keyed wrongly: ${show(bad.grid)}`);
@@ -1015,7 +1066,17 @@ function bondRules(items, F) {
 /** Option values sampled besides the defaults, per skill (the count-by row and the number charts). */
 const OPTION_SWEEPS = {
     'multiplication:count_by_tables': [{ fill: 'one' }, { fill: 'half' }, { jumps: 15 }, { jumps: 15, fill: 'half' }, { order: 'mixed' },
-        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 }],
+        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 },
+        // Wave 1 lane C2: a typed step (small to large), the start, the direction, the multiplication labels, and the ways they meet.
+        { by: 7 }, { by: 15 }, { by: 25 }, { by: 50 }, { by: 100 }, { by: 250 }, { by: 1000 }, { by: 25000 }, { by: 100000 }, { by: 7, jumps: 15 }, { by: 1000, jumps: 15 },
+        { start: 'zero' }, { start: 'zero', dir: 'back' }, { dir: 'back' }, { dir: 'mixed' }, { dir: 'back', jumps: 15 }, { dir: 'mixed', constant: [7, 8, 9] },
+        { start: 'custom', startAt: 3, by: 5 }, { start: 'custom', startAt: 2300, by: 100 }, { start: 'custom', startAt: 14000, by: 1000 },
+        { start: 'custom', startAt: 1000000, by: 100000 }, { start: 'custom', startAt: 1000000, by: 100000, dir: 'back', jumps: 15 },
+        { start: 'custom', startAt: 14000, by: 1000, dir: 'back' }, { start: 'custom', startAt: 30, by: 5, dir: 'back' }, { start: 'custom', startAt: 3, by: 100, dir: 'back' },
+        { start: 'custom', startAt: 0, by: 7, dir: 'back' }, { start: 'custom', startAt: 3, by: 5, dir: 'mixed' }, { start: 'custom', startAt: 99, by: 4, fill: 'half' },
+        { times: 'each' }, { times: 'given' }, { times: 'each', by: 25, start: 'zero' }, { times: 'each', by: 1000, dir: 'back' }, { times: 'given', start: 'custom', startAt: 200, by: 50 },
+        { times: 'each', start: 'custom', startAt: 3, by: 5 }, { times: 'each', jumps: 15, by: 12 }, { times: 'each', dir: 'mixed', by: 100000 },
+        { onePage: true, times: 'each' }, { onePage: true, dir: 'back' }, { onePage: true, by: 7, start: 'zero' }, { onePage: true, start: 'custom', startAt: 5, by: 9 }],
     'composing:hundreds_chart_fill': [
         { grid: 'rows' }, { grid: 'whole' }, { grid: 'whole', gaps: 'pattern' }, { grid: 'whole', gaps: 'row' }, { grid: 'whole', gaps: 'column' },
         { gaps: 'row' }, { gaps: 'column' }, { gaps: 'pattern' }, { grid: 'rows', gaps: 'row' }, { grid: 'rows', gaps: 'column' }, { gaps: 'row', tiles: 3 },

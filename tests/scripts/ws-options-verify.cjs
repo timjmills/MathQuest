@@ -221,7 +221,42 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             }
             return [bad.length ? [`answer is not ${v} away: ${bad.slice(0, 2).join(' | ')}`] : [], []];
         },
+        // Wave 1 lane C2: count_by_tables. On the generator and the screen the item's own countBy record is read;
+        // on a printed sheet only the item's sentence ("Count back by 1,000.") is, so the checks that need the row are not applied there.
+        by(v, items) {
+            const steps = items.map(q => (q.countBy ? q.countBy.step : (/by ([\d,]+)\./.exec(qText(q)) || [])[1] && Number(/by ([\d,]+)\./.exec(qText(q))[1].replace(/,/g, '')))).filter(Number.isFinite);
+            const bad = steps.filter(x => x !== v);
+            return [bad.length ? [`"count by ${v}" but ${bad.length} row(s) count by ${[...new Set(bad)]}`] : [], []];
+        },
+        start(v, items) {
+            const cb = items.map(q => q.countBy).filter(Boolean);
+            if (!cb.length) return [[], []];
+            const bad = cb.filter(c => (v === 'zero' ? !c.values.includes(0) : v === 'step' ? c.values.includes(0) : false));
+            return [bad.length ? [`start "${v}" but ${bad.length} row(s) ${v === 'zero' ? 'never reach 0' : 'contain 0'}`] : [], []];
+        },
+        startAt(v, items) {
+            const cb = items.map(q => q.countBy).filter(c => c && c.start === 'custom');
+            if (!cb.length) return [[], []];
+            const bad = cb.filter(c => (c.dir === 'down' ? c.values[0] < v : c.values[0] !== v));
+            return [bad.length ? [`typed start ${v} but ${bad.length} row(s) start at ${bad[0].values[0]}`] : [], []];
+        },
+        times(v, items) {
+            const cb = items.map(q => q.countBy).filter(Boolean);
+            if (!cb.length) return [[], []];
+            const bad = cb.filter(c => (v === 'none' ? !!c.labels : (!c.labels || c.times !== v)));
+            return [bad.length ? [`times "${v}" but ${bad.length} row(s) have ${v === 'none' ? 'labels' : 'no labels'}`] : [], []];
+        },
         dir(v, items) {
+            const cbRows = items.map(q => q.countBy).filter(Boolean);
+            const cbText = cbRows.length ? [] : items.map(q => qText(q)).filter(t => /^Count (back )?by /.test(t));
+            if (cbRows.length || cbText.length) {
+                const downs = cbRows.length ? cbRows.filter(c => c.dir === 'down').length : cbText.filter(t => /^Count back/.test(t)).length;
+                const n = cbRows.length || cbText.length;
+                if (v === 'forward' && downs) return [[`"counting on" but ${downs} row(s) count back`], []];
+                if (v === 'back' && downs !== n) return [[`"counting back" but ${n - downs} row(s) count on`], []];
+                if (v === 'mixed' && (!downs || downs === n) && n >= 8) return [[`"mixed" but every row counts ${downs ? 'back' : 'on'}`], []];
+                return [[], []];
+            }
             const words = items.map(q => qText(q).toLowerCase());
             const more = words.filter(s => /\bmore\b/.test(s)).length, less = words.filter(s => /\bless\b/.test(s)).length;
             if (!more && !less) return [[], []];
@@ -384,7 +419,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             continue;
         }
         if (def.type === 'bool') { tries.push({ def, value: !def.default }); continue; }
-        if (def.type === 'int') { tries.push({ def, value: def.min }, { def, value: def.max }); continue; }
+        if (def.type === 'int') {
+            // Wave 1 C2: count_by_tables' typed step and start have the default as their minimum (0 = the tables / no start),
+            // so the ends of the range are not the values to try: real teacher values are, a start with "A number I type" on.
+            const INT_TRIES = { by: [7, 250, 100000], startAt: [3, 2300, 1000000] };
+            if (INT_TRIES[def.id]) { for (const v of INT_TRIES[def.id]) tries.push({ def, value: v, base: def.id === 'startAt' ? { start: 'custom', by: 5 } : undefined }); continue; }
+            tries.push({ def, value: def.min }, { def, value: def.max }); continue;
+        }
         if (def.type === 'enum') { for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l }); continue; }
         if (def.type === 'set') {
             const all = def.values.map(x => x.v);

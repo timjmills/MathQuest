@@ -1358,6 +1358,49 @@ const CB_CHART_LINE_OPTIONS = {
             lockedBy: _onePageLock('inorder'),
         },
         _cbShape('box'),
+        // Wave 1 lane C2 (owner 2026-10-02): custom step, start, direction, the multiplication fact, large numbers.
+        {
+            id: 'by', label: 'Count by (type a number)', type: 'int', default: 0, min: 0, max: 100000, step: 1, group: 'difficulty',
+            help: 'Type any step, such as 7, 15, 25, 50, 100, 250 or 1000, and every row counts by it (up to 100,000). 0 leaves the ticked tables in charge. '
+                + 'Every row then counts by the same number and only the gaps differ, so use it for a page on ONE step. '
+                + 'Big steps make wide numbers: the boxes grow to hold the widest number, and a row that no longer fits one line wraps to more lines with a turn arrow. '
+                + 'The ticked tables, "Order of the rows" and "All 12 tables on one page" are not used when a step is typed.',
+            lockedBy: (cur) => (cur && cur.onePage ? { v: 0, why: 'Set by "All 12 tables on one page" (rows count by 1 to 12).' } : null),
+            summary: (v) => (Number(v) ? `Count by ${Number(v).toLocaleString('en-US')}` : 'Count by the ticked tables'),
+        },
+        {
+            id: 'start', label: 'Row starts at', type: 'enum', default: 'step', group: 'difficulty',
+            values: [{ v: 'step', l: 'The step itself (3, 6, 9 …; going down, the end of the table)' },
+                { v: 'zero', l: '0 (0, 3, 6 …; going down, ending at 0)' },
+                { v: 'custom', l: 'A number I type (count by 5 from 3: 3, 8, 13 …)' }],
+            help: 'Where the row begins. The step itself is the times table as before (3, 6, 9 …). 0 begins on 0, so the row is one multiple shorter (12 numbers, ending at 11 ×); '
+                + 'going down it counts back to 0. A typed start can be any number up to 1,000,000 (by 100 from 2,300; by 1,000 from 14,000); '
+                + 'a start that is not a multiple of the step is not a times table, so the multiplication facts are not shown under it. '
+                + 'Counting down never goes below 0, so a short start gives a shorter row (30 down by 5 is 30, 25 … 0). A start so small that fewer than 5 numbers fit (3 down by 100) is raised to give 8, keeping its ones.',
+            lockedBy: _onePageLock('step'),
+        },
+        {
+            id: 'startAt', label: 'Start number', type: 'int', default: 0, min: 0, max: 1000000, step: 1, group: 'difficulty',
+            help: 'The number a row starts on when "Row starts at" is "A number I type" (up to 1,000,000). Counting up it is the first number; counting down it is the first number too, and the row runs down towards 0.',
+            appliesTo: (cur) => cur.start === 'custom',
+            lockedBy: _onePageLock(0),
+        },
+        {
+            id: 'dir', label: 'Direction', type: 'enum', default: 'forward', group: 'difficulty',
+            values: [{ v: 'forward', l: 'Counting on (up)' }, { v: 'back', l: 'Counting back (down)' },
+                { v: 'mixed', l: 'Mixed: some rows up, some down' }],
+            help: 'Counting on adds the step each jump; counting back takes it away, from the start down towards 0 (never below 0, so no negative numbers). '
+                + 'Mixed deals both on one page; the tab at the start of each row then shows + or − so the pupil knows which way to go.',
+        },
+        {
+            id: 'times', label: 'Multiplication under each number', type: 'enum', default: 'none', group: 'support',
+            values: [{ v: 'none', l: 'None' }, { v: 'each', l: 'Under every number (1 × 4, 2 × 4, 3 × 4 …)' },
+                { v: 'given', l: 'Under the printed numbers only' }],
+            help: 'A hint that links skip counting to multiplication: the jump number times the step is written under the number, the same on the pupil page and the key. '
+                + 'Fade it: under every number, then under the printed numbers only (the pupil works out the facts for the gaps), then None. It is a hint, so a test or a review page should leave it None. '
+                + 'It is shown only where every number is a multiple of the step (not for a typed start that is not), and not on the one-page sheet.',
+            lockedBy: _onePageLock('none'),
+        },
     ],
     'patterns:number_patterns_rule': [
         {

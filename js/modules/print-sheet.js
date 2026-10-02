@@ -1238,7 +1238,10 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
-    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
+    // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
+    let titleOpts = {};
+    if (sk.skillId === 'count_by_tables') { try { titleOpts = { opts: normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}) }; } catch (e) { titleOpts = {}; } }
+    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
     return meta;

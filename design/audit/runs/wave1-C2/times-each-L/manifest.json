@@ -1,0 +1,521 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 1,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 56.75,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 54.3,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 244652,
+        "title": "I Can count by 7",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 70, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 49, 63, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 42, 56, 63, 84",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 56, 70, 77",
+            "measured": {
+              "1": {
+                "hMm": 54.3,
+                "fits": true
+              },
+              "2": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "3": {
+                "hMm": 54.3,
+                "fits": false
+              },
+              "4": {
+                "hMm": 54.3,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 225,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 248,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 98
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 118
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 7. Write the missing numbers.",
+        "ans": "28, 35, 56, 70, 84",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              22
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 7. Write the missing numbers.",
+        "ans": "28, 35, 56, 70, 84",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              22
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "text",
+        "printFormat": "count-row",
+        "text": "Count by 7. Write the missing numbers.",
+        "ans": "28, 35, 56, 70, 84",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              22
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              126
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              5
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              3
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "box-shadow",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(124, 92, 230)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              21
+            ],
+            [
+              "Nunito",
+              11
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]
