@@ -27,7 +27,7 @@
     <!-- Teacher view (approved 2026-09-24): sidebar shell + teacher screens. Loaded last. -->
     <link rel="stylesheet" href="css/teacher.css?v=067a1d288b">
     <link rel="stylesheet" href="css/teacher-library.css?v=9babb86288">
-    <link rel="stylesheet" href="css/screen-cell.css?v=de84289200">
+    <link rel="stylesheet" href="css/screen-cell.css?v=0fecfec838">
     <link rel="stylesheet" href="css/time-money.css?v=e0656f9c9e">
     <link rel="stylesheet" href="css/play-teacher.css?v=95feac5f95">
     <link rel="stylesheet" href="css/teacher-quiz.css?v=3df23b723f">
@@ -715,6 +715,7 @@
 
             <div class="section">
                 <div class="section-title">🎮 Choose Mode</div>
+                <p class="student-only" id="studentStartSkill" style="text-align:center; margin:0 0 12px; font-size:1.15rem; font-weight:900;">Your skill: <span id="studentStartSkillName"></span></p>
                 <div class="mode-cards">
                     <div class="mode-card selected teacher-only" data-mode="practice" onclick="selectMode('practice')">
                         <span class="mode-icon">🎓</span>
@@ -737,12 +738,11 @@
                         <span class="mode-name">Print Worksheet</span>
                     </div>
                     <div class="student-start-wrap student-only">
-                    <p class="student-only" id="studentStartSkill" style="text-align:center; margin:0 0 4px; font-size:1.15rem; font-weight:900;">Your skill: <span id="studentStartSkillName"></span></p>
                     <div class="student-start-buttons" id="studentStartButtons" role="group" aria-label="Start">
-                        <button type="button" class="student-start-btn" data-mode="practice" onclick="startMode('practice')">🎓 Start practice</button>
-                        <button type="button" class="student-start-btn" data-mode="boss" onclick="startMode('boss')">🐉 Start boss battle</button>
-                        <button type="button" class="student-start-btn" data-mode="race" onclick="startMode('race')">🏎️ Start car race</button>
-                        <button type="button" class="student-start-btn" data-mode="worksheet" onclick="startMode('worksheet')">📝 Start worksheet</button>
+                        <button type="button" class="student-start-btn" data-mode="practice" onclick="startMode('practice')"><span class="mode-icon" aria-hidden="true">🎓</span><span class="mode-name">Start practice</span></button>
+                        <button type="button" class="student-start-btn" data-mode="boss" onclick="startMode('boss')"><span class="mode-icon" aria-hidden="true">🐉</span><span class="mode-name">Start boss battle</span></button>
+                        <button type="button" class="student-start-btn" data-mode="race" onclick="startMode('race')"><span class="mode-icon" aria-hidden="true">🏎️</span><span class="mode-name">Start car race</span></button>
+                        <button type="button" class="student-start-btn" data-mode="worksheet" onclick="startMode('worksheet')"><span class="mode-icon" aria-hidden="true">📝</span><span class="mode-name">Start worksheet</span></button>
                     </div>
                     </div>
 

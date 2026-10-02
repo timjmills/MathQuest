@@ -47,6 +47,21 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
     check(new Set(lay.cols.map((c) => c.border)).size === 4 && new Set(lay.cols.map((c) => c.bg)).size === 4, `[${w}] each Start button has its own colour`);
     for (const c of lay.cols) check(c.border === c.cardBorder && (c.m === 'practice' || c.bg === c.cardBg), `[${w}] ${c.m} button matches its mode-card colour (${c.border})`);
     check(lay.minH >= 44 && lay.minW >= 44, `[${w}] Start buttons >= 44 px (${Math.round(lay.minW)}x${Math.round(lay.minH)})`);
+    const shape = await page.evaluate(() => {
+      const pg = document.getElementById('mqHomeMascot'); const pc = getComputedStyle(pg); const pr = pg.getBoundingClientRect();
+      return { peng: { r: pc.borderTopLeftRadius, bw: pc.borderTopWidth, h: pr.height, top: pr.top },
+        btns: Array.from(document.querySelectorAll('.student-start-btn')).map((b) => { const c = getComputedStyle(b); const r = b.getBoundingClientRect(); const i = b.querySelector('.mode-icon').getBoundingClientRect(); const n = b.querySelector('.mode-name').getBoundingClientRect();
+          return { r: c.borderTopLeftRadius, bw: c.borderTopWidth, h: r.height, top: Math.round(r.top), iconAbove: i.bottom <= n.top + 1 }; }) };
+    });
+    check(shape.btns.every((b) => b.r === shape.peng.r && b.bw === shape.peng.bw), `[${w}] Start cards share the penguin card radius/border (${shape.peng.r}, ${shape.peng.bw})`);
+    check(shape.btns.every((b) => b.iconAbove), `[${w}] each Start card has its icon above its name`);
+    if (w === 1280) {
+      check(new Set(shape.btns.map((b) => b.top)).size === 1, `[${w}] four Start cards in one row`);
+      check(shape.btns.every((b) => Math.abs(b.h - shape.peng.h) <= 6), `[${w}] Start cards as tall as the penguin card (${shape.btns.map((b) => Math.round(b.h))} vs ${Math.round(shape.peng.h)})`);
+    } else {
+      check(new Set(shape.btns.map((b) => b.top)).size === 2, `[${w}] Start cards in a 2x2 grid`);
+      check(shape.btns.every((b) => b.h >= 120), `[${w}] Start cards are tall tiles (${shape.btns.map((b) => Math.round(b.h))})`);
+    }
     check(lay.mapTop >= lay.secBottom, `[${w}] MAP buttons below Choose Mode (${Math.round(lay.mapTop)} >= ${Math.round(lay.secBottom)})`);
     check(!home.startGame && home.cards === 0, `[${w}] old Start Game and mode cards hidden for students`);
     check(home.map === 3, `[${w}] MAP buttons still shown (${home.map})`);
