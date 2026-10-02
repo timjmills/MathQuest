@@ -98,3 +98,34 @@ What each criterion needs to reach 10:
 - C3 7 -> 10: D2's comment, D3, and D4's reworded comment.
 - C4 8 -> 10: D3 (measured numbers reproducible), plus a recorded run of the stressed loop of at least 10 in
   design/audit/runs/wave1-E/ (command and output), matching the ">= 10 consecutive stressed passes" in MASTER_PLAN 1.9.
+
+## Round 2 (Opus low, independent critic, head 7205e19) - PASS
+
+Scores: C1 9, C2 9, C3 9, C4 9.
+
+Reproduced on 7205e19: `ws-load-check` OK (5 submits, score 0 -> 5; worksheet Score 3/3; session history 1 -> 2; 2 play
+requests, both local Andika, 0 external). `--self-test` OK (fetch probe FAIL/exit 1, hang probe FAIL/exit 1, clean OK).
+`ws-screen-answer --skills composing:base10_build,composing:ten_frame_build` OK (card, worksheet 3/3, quiz 3/3, live green).
+`ws-boot-smoke` OK. Stress not re-run (builder log stress-ws-screen-answer.log, 10/10 under 4 burners, accepted).
+
+Defect status: D1 fixed (page.on('request') with phase at start; hang probe proves an unfinished request fails). D2 fixed
+(submitAnswer, checkAllWorksheet, endGame, each asserted). D3 fixed (`--slow-cdn`, `--root`, `--ready-only`; doc cites the
+command, 2.55 -> 1.80 claim withdrawn). D4 fixed for the stated cases (resize sets '0', then '1'; re-init clears timers and
+re-arms `_wsSchedPending`). D5 fixed (message names skill, wait, flag and font status). No assertion weakened: the two
+screen-answer waits keep their conditions, only wrapped. MQ_ROOT: unset -> old path, only ws-load-check sets it.
+
+Remaining defects (ranked, none blocking):
+R1. js/modules/worksheet.js resize handler vs the 900 ms timer. WHAT: a resize at ~850 ms sets the flag '0'; the 900 ms
+timer then sets '1' while the resize relayout (due ~1000 ms) is still pending. Expected '0' until that pass runs. C2 -1
+(trap only; the stable-frame wait still covers drivers). FIX: track `_wsResizePending`; the 900 ms timer sets '1' only if
+it is false, and the resize timeout sets '1' only if `!_wsSchedPending`. CHECK: init a worksheet, dispatch resize at 850 ms,
+read the flag at 920 ms ('0') and 1100 ms ('1').
+R2. tests/scripts/ws-load-check.cjs fetch probe hits the real fonts.gstatic.com (network-dependent self-test; offline the
+request still starts, so it still fails correctly, but it makes a real outbound call). C1 -1. FIX: in the request handler,
+`r.respond({status:204})` for URLs containing `probe-fetch`. CHECK: --self-test still OK with the network off.
+R3. LOAD_CHECK.md slow-CDN numbers are from the builder only; I did not re-run --slow-cdn (kept short per brief). C3/C4 -1
+until a second party reproduces. FIX: none needed in code; next critic with time runs `--slow-cdn 8000` once on each tree.
+R4. --stress log was recorded on "9fb3af7+uncommitted", not on the committed 7205e19. C4 -1. FIX: re-run the one stress
+command on 7205e19 and replace the header line.
+
+To 10: C1 R2; C2 R1; C3 R3; C4 R3 + R4.
