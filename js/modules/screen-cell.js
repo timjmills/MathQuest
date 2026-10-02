@@ -112,7 +112,11 @@ function withAnsBox(q, k) {
     const ab = resolveAnsBox(raw, k.kind === 'stack' ? 'stack' : 'other');
     if (ab === 'digit' && (k.kind === 'fact' || k.kind === 'eq') && Number.isFinite(Number(k.a)) && Number.isFinite(Number(k.b))) {
         const ansLen = String(k.ans != null ? k.ans : '').length;
-        const strip = Math.max(ansLen, Number(q && q.cell && q.cell.payload && q.cell.payload.digits) || 0, 1);
+        // the band's width (SL-2): the kit payload's digits, else the legacy band rule (as printed)
+        const A0 = String(k.a), B0 = String(k.b), d0 = Math.max(A0.length, B0.length);
+        const band = Number(q && q.cell && q.cell.payload && q.cell.payload.digits)
+            || (k.op === '+' ? d0 + 1 : k.op === '*' ? A0.length + B0.length : k.op === '/' ? Math.max(1, A0.length - B0.length + 1) : d0);
+        const strip = Math.max(ansLen, band, 1);
         if (k.kind === 'fact') {
             const T = Math.max(String(k.a).length, String(k.b).length, strip) + 1;
             return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true, ltr: true };
@@ -122,7 +126,13 @@ function withAnsBox(q, k) {
     // A column stack's strip is the BAND's width on every item (SL-2, critic B r2 #4): the kit
     // payload's ansDigits when the generator gives one (add_100_regroup: always 3), never the answer's.
     if (k.kind === 'stack' && !k.strip) {
-        const ad = Number(q && q.cell && q.cell.payload && q.cell.payload.ansDigits) || 0;
+        // without one (a legacy column): the same band rule as the printed legacy strip
+        // (print-generate.js wsStackHTML): a sum one place past the widest operand, a 1-digit product
+        // both lengths, a difference the widest operand.
+        const ops = (Array.isArray(k.operands) && k.operands.length >= 2 ? k.operands : [k.a, k.b]).map((x) => String(x));
+        const dw = Math.max(...ops.map((x) => x.length));
+        const legacyBand = ops.length === 2 && !(q && q.cell) ? (k.op === '+' ? dw + 1 : k.op === '*' ? ops[0].length + ops[1].length : dw) : 0;
+        const ad = Number(q && q.cell && q.cell.payload && q.cell.payload.ansDigits) || legacyBand;
         if (ad > 0) {
             const ansLen = String(k.ans != null ? k.ans : '').length;
             const strip = Math.max(ad, ansLen);

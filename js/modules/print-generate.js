@@ -4121,8 +4121,11 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     const zoneH = o.answerMm || size.answerMm;
     if (ab === 'digit') {
         // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
-        const n = T - 1;
-        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:2 / -1;height:${zoneH}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+        // the band's width on every item (SL-2): a sum can carry one place past the widest operand,
+        // a 1-digit product two; the strip may then reach under the operator's track
+        const d = Math.max(A.length, B.length);
+        const n = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
+        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneH}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
             + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     } else if (ab === 'off') {

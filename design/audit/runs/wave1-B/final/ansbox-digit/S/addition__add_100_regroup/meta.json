@@ -661,7 +661,7 @@
         "colours": [
           [
             "box-shadow",
-            8
+            10
           ],
           [
             "color:rgb(43, 40, 64)",
@@ -732,7 +732,7 @@
         "colours": [
           [
             "box-shadow",
-            8
+            10
           ],
           [
             "color:rgb(43, 40, 64)",
@@ -803,7 +803,7 @@
         "colours": [
           [
             "box-shadow",
-            8
+            10
           ],
           [
             "color:rgb(43, 40, 64)",
@@ -871,7 +871,7 @@
         "colours": [
           [
             "box-shadow",
-            25
+            37
           ],
           [
             "borderTopColor:rgb(221, 214, 238)",
@@ -930,12 +930,12 @@
             11
           ],
           [
-            "color:rgb(139, 135, 159)",
-            5
+            "box-shadow",
+            6
           ],
           [
-            "box-shadow",
-            4
+            "color:rgb(139, 135, 159)",
+            5
           ],
           [
             "borderTopColor:rgb(244, 240, 251)",
