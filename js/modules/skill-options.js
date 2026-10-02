@@ -3340,17 +3340,22 @@ export const ANSBOX_GROUP = 'boxes';
 let ANSBOX_SKILLS = {};
 export function registerAnsBoxSkills(map) { ANSBOX_SKILLS = map || {}; }
 export const ANSBOX_CATEGORIES = new Set(['addition', 'subtraction', 'multiplication', 'division']);
-export const ansBoxOption = () => ({
-    id: 'ansBox', label: 'Answer boxes', type: 'enum', default: null, group: ANSBOX_GROUP,
-    values: [
-        { v: null, l: 'Automatic (columns: one box per digit; facts: one box)' },
-        { v: 'digit', l: 'One box per digit' },
-        { v: 'one', l: 'One box' },
-        { v: 'off', l: 'Off (no box: the plain answer space)' },
-    ],
-    help: 'How the answer place is drawn, on paper, on the key and on screen.',
-    summary: (v) => ({ digit: 'One box per digit', one: 'One box', off: 'No box' }[v] || 'Automatic'),
-});
+export const ansBoxOption = (layout = '') => {
+    const col = /stack/.test(layout), fact = /fact|equation|eq/.test(layout);
+    const auto = col && fact ? 'Automatic: one box per digit in column sums, one box for facts'
+        : col ? 'Automatic: one box per digit (column work)' : 'Automatic: one box';
+    return {
+        id: 'ansBox', label: 'Answer boxes', type: 'enum', default: null, group: ANSBOX_GROUP,
+        values: [
+            { v: null, l: auto },
+            { v: 'digit', l: 'One box per digit' },
+            { v: 'one', l: 'One box' },
+            { v: 'off', l: 'Off (no box: the plain answer space)' },
+        ],
+        help: 'How the answer place is drawn on paper, on the key and on screen. Word problems keep their own answer places, so they do not offer this.',
+        summary: (v) => ({ digit: 'One box per digit', one: 'One box', off: 'No box' }[v] || auto),
+    };
+};
 /** The answer-box style a cell draws: the chosen value, else the automatic one for its layout. */
 export function resolveAnsBox(value, layout) {
     if (value === 'digit' || value === 'one' || value === 'off') return value;
@@ -3438,7 +3443,7 @@ export function optionsFor(categoryId, skillId) {
     const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
     const ids = new Set(all.map(o => o.id));
     const uni = UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id));
-    if (ANSBOX_CATEGORIES.has(categoryId) && !ids.has('ansBox')) uni.push(ansBoxOption());
+    if (ANSBOX_CATEGORIES.has(categoryId) && !ids.has('ansBox')) uni.push(ansBoxOption(ANSBOX_SKILLS[`${categoryId}:${skillId}`] || ''));
     return [...all, ...uni];
 }
 

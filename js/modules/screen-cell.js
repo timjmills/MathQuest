@@ -115,9 +115,19 @@ function withAnsBox(q, k) {
         const strip = Math.max(ansLen, Number(q && q.cell && q.cell.payload && q.cell.payload.digits) || 0, 1);
         if (k.kind === 'fact') {
             const T = Math.max(String(k.a).length, String(k.b).length, strip) + 1;
-            return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true };
+            return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true, ltr: true };
         }
-        return { ...k, kind: 'stack', layout: 'eq', strip, T: strip, regroup: false, ansBox: ab };
+        return { ...k, kind: 'stack', layout: 'eq', strip, T: strip, regroup: false, ansBox: ab, ltr: true };
+    }
+    // A column stack's strip is the BAND's width on every item (SL-2, critic B r2 #4): the kit
+    // payload's ansDigits when the generator gives one (add_100_regroup: always 3), never the answer's.
+    if (k.kind === 'stack' && !k.strip) {
+        const ad = Number(q && q.cell && q.cell.payload && q.cell.payload.ansDigits) || 0;
+        if (ad > 0) {
+            const ansLen = String(k.ans != null ? k.ans : '').length;
+            const strip = Math.max(ad, ansLen);
+            return { ...k, strip, T: Math.max(k.T || 0, strip + 1), ansBox: ab };
+        }
     }
     return { ...k, ansBox: ab };
 }
@@ -393,7 +403,7 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
     }
     const label = operands.join(` ${spokenOp(k.op)} `);
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}${k.ansBox === 'one' ? ' mq-ans-one' : k.ansBox === 'off' ? ' mq-ans-off' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}${k.ansBox === 'one' ? ' mq-ans-one' : k.ansBox === 'off' ? ' mq-ans-off' : ''}"${k.ltr ? ' data-mq-ltr="1"' : ''} style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
@@ -431,7 +441,7 @@ export function eqDigitsHTML(k, { idPrefix = '', answerClass = 'column-answer-in
     }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${k.a}</span><span class="o">${opGlyph(k.op)}</span><span>${k.b}</span><span class="o">=</span>`
-        + `<span class="ws-stack mq-eqdigits" style="--t:${strip}" data-ws-slot="answer" data-ws-shape="open">${cells}</span></div></div>`;
+        + `<span class="ws-stack mq-eqdigits" data-mq-ltr="1" style="--t:${strip}" data-ws-slot="answer" data-ws-shape="open">${cells}</span></div></div>`;
 }
 
 /** The kit drawing for a kind, with the answer slot the host supplies. */
@@ -517,6 +527,12 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
             inp.addEventListener('input', () => {
                 const v = (inp.value || '').replace(/[^0-9]/g, '');
                 if (v !== inp.value) inp.value = v;
+                if (stk.hasAttribute('data-mq-ltr')) {
+                    // a fact or an equation in digit boxes (ansBox 'digit'): typed in reading order,
+                    // left to right (critic B r2 #1); only column work enters ones first (SP-20)
+                    if (v.length >= 1 && i < boxes.length - 1) { boxes[i + 1].focus(); try { boxes[i + 1].select(); } catch (e) { /* not selectable */ } }
+                    return;
+                }
                 if (v.length >= 1 && i > 0) {
                     const left = boxes[i - 1];
                     left.focus();
@@ -524,7 +540,9 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
                 }
             });
             inp.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !(inp.value || '') && i < boxes.length - 1) {
+                if (e.key === 'Backspace' && !(inp.value || '') && stk.hasAttribute('data-mq-ltr')) {
+                    if (i > 0) { e.preventDefault(); boxes[i - 1].focus(); }
+                } else if (e.key === 'Backspace' && !(inp.value || '') && i < boxes.length - 1) {
                     e.preventDefault();
                     boxes[i + 1].focus();
                 } else if (e.key === 'ArrowLeft' && i > 0) {
@@ -555,7 +573,7 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
             });
         });
         if (autofocus) {
-            const ones = boxes[boxes.length - 1];
+            const ones = stk.hasAttribute('data-mq-ltr') ? boxes[0] : boxes[boxes.length - 1];
             try { ones.focus({ preventScroll: true }); } catch (e) { ones.focus(); }
         }
     });
@@ -1099,7 +1117,11 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
     const stk = root.querySelector('.ws-stack');
     if (stk && kind && kind.kind === 'stack') {
         const ex = stackExpectations(kind);
-        stk.querySelectorAll('input.mq-digit').forEach((inp) => {
+        if (stk.hasAttribute('data-mq-ltr')) {
+            // a fact / equation in digit boxes is written left to right: box i holds the i-th digit
+            const a = String(kind.ans != null ? kind.ans : '').replace(/[^0-9]/g, '');
+            stk.querySelectorAll('input.mq-digit').forEach((inp, i) => { if (a[i] !== undefined && _liveBind(inp, a[i])) n++; });
+        } else stk.querySelectorAll('input.mq-digit').forEach((inp) => {
             const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('ans-', ''));
             if (Number.isFinite(col) && ex.ans[col] !== undefined && _liveBind(inp, ex.ans[col])) n++;
         });

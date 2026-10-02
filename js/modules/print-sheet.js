@@ -488,6 +488,23 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         }
     }
 
+    // 1b. (ansBox 'digit', owner ruling 2026-10-02) ONE strip of digit boxes - a column's write row
+    // (`ws-fact-write--digit`) or an equation's (`ws-slot--digits`): the key writes each digit in its
+    // own box, right-aligned to the ones.
+    const digitStrips = html.match(/<span class="(?:ws-fact-write ws-fact-write--digit|ws-slot ws-slot--digits)"[^>]*>(?:<i [^>]*><\/i>)+<\/span>/g) || [];
+    if (digitStrips.length === 1 && /^\d+$/.test(digits)) {
+        const boxes = digitStrips[0].match(/<i [^>]*><\/i>/g) || [];
+        if (digits.length <= boxes.length) {
+            const pad = boxes.length - digits.length;
+            let k = 0;
+            const filled = digitStrips[0].replace(/<i ([^>]*)><\/i>/g, (m, attrs) => {
+                const d = k >= pad ? digits[k - pad] : ''; k++;
+                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${d}</b></i>` : m;
+            });
+            return html.replace(digitStrips[0], filled);
+        }
+    }
+
     // 2. A vertical fact's open write row: three tracks under the rule, digits right-aligned.
     const factRows = html.match(/<span class="ws-fact-write" style="([^"]*)"><\/span>/g) || [];
     if (factRows.length === 1 && /^\d+$/.test(digits)) {

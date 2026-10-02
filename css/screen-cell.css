@@ -1541,12 +1541,6 @@ html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--
    first box's left and the last box's right); 'off': no box, a ruled writing line under the inputs.
    An equation's digit strip ('digit') sits inline after "=". Specificity stays low (:where) except
    where an older !important rule must be beaten; Lane A2's .mq-live-ok / .mq-live-wrong fills keep winning. */
-:where(.mq-scell .ws-stack.mq-ans-one .ab > input.mq-digit) { border-left-color: transparent !important; border-right-color: transparent !important; }
-:where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="first"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-left-color: #000 !important; }
-:where(.mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="last"] > input.mq-digit, .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg="only"] > input.mq-digit) { border-right-color: #000 !important; }
-:where(.mq-scell .ws-stack.mq-ans-off .ab > input.mq-digit) { border-color: transparent !important; border-bottom-color: #000 !important; border-radius: 0 !important; }
-html .mq-scell .mq-ansoff input.mq-slot { border-color: transparent !important; border-bottom-color: #000 !important; }
-html body .mq-scell.mq-scell .mq-ansoff.mq-ansoff.mq-ansoff.mq-ansoff input.mq-slot.mq-slot { border-width: 0 0 2px !important; border-radius: 0 !important; }
 .mq-kit .ws-stack.mq-eqdigits { display: inline-flex !important; vertical-align: middle; grid-template-columns: none; }
 .mq-kit .ws-stack.mq-eqdigits > .ab { width: auto; }
 /* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
@@ -1613,3 +1607,16 @@ html body .mq-scell.mq-scell .mq-ansoff.mq-ansoff.mq-ansoff.mq-ansoff input.mq-s
 html body .mq-scell.mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
     border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
 }
+
+/* WAVE 1 / 1.1 r2 (critic B r2 #2, #6): the stack's digit boxes are DRAWN by inset box-shadows
+   (the strip rule above), so the answer-box option restyles those shadows. 'one': top and bottom on
+   every box, the left edge on the first and the right on the last (one outline, no inner seams);
+   'off': no edge at all, only the light grey wash (paper's plain open zone). Specificity (0,6,2)
+   stays below Lane A2's right / wrong marks, so their green and dashed red still win. */
+html .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg] > input.mq-digit {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="only"]) > input.mq-digit {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit { box-shadow: none !important; }
+/* a fact / equation with 'off': the host input keeps only the grey wash (no box, no line), as paper's blank zone */
+html .mq-scell .mq-ansoff input.mq-slot { border-color: transparent !important; }

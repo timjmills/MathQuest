@@ -118,7 +118,7 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
         ? `<details class="sko-group sko-boxes" data-sko-group="boxes"${_boxesOpen ? ' open' : ''} ontoggle="skoBoxesOpen(this.open)" style="margin-top:10px;">`
             + `<summary class="sko-play-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
             + `<span aria-hidden="true">&#9662;</span><span>Answer boxes</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(boxesSum)}</span></summary>`
-            + boxes.map(row).join('') + '</details>'
+            + boxes.map((d) => row({ ...d, label: 'Draw the answer as' })).join('') + '</details>'
         : '';
     return groups + boxDisclosure + disclosure;
 }

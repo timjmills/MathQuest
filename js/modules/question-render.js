@@ -900,9 +900,10 @@ export function wireBoxValidation(visualAidEl, q) {
         if (N === 1) {
             slots.push({ el: colInputs[0], expect: ansStr, norm: numNorm });
         } else if (ansStr.length <= N) {
-            const pad = N - ansStr.length;
+            // a fact / equation in digit boxes (data-mq-ltr) is written left to right: digits first
+            const pad = colInputs[0].closest('[data-mq-ltr]') ? 0 : N - ansStr.length;
             for (let i = 0; i < N; i++) {
-                const ch = i < pad ? '' : ansStr.charAt(i - pad);
+                const ch = i < pad ? '' : (ansStr.charAt(i - pad) || '');
                 slots.push({ el: colInputs[i], expect: ch, norm: numNorm });
             }
         } else {

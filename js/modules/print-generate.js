@@ -12,6 +12,7 @@ import { generateQuestion } from './generate-question.js';
 import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
+import { resolveAnsBox } from './skill-options.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
 // (see "THE STRANGLER HOOK" below). `sheet/index.js` imports nothing outside
 // `sheet/`, so this direction stays acyclic: print-generate.js -> sheet/**, never
@@ -4115,8 +4116,22 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     html += `<span class="rule" style="grid-column:1 / -1;height:1mm;border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`;
     // Owner ruling 2026-10-02 (SL-3): the open answer zone is a full black-outlined box, one box
     // across the stack's tracks (same height as the old zone, so the cell geometry holds).
-    html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${o.answerMm || size.answerMm}mm;box-sizing:border-box;`
-        + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+    // ansBox (owner ruling 2026-10-02): column work defaults to one box per digit, a fact to one box.
+    const ab = resolveAnsBox(_ANSBOX, o.cls === 'ws-fact' ? 'other' : 'stack');
+    const zoneH = o.answerMm || size.answerMm;
+    if (ab === 'digit') {
+        // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
+        const n = T - 1;
+        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:2 / -1;height:${zoneH}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+            + '</span>';
+    } else if (ab === 'off') {
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;"></span>`;
+    } else {
+        // the open answer zone is ONE full black-outlined box across the stack's tracks
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;box-sizing:border-box;`
+            + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+    }
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
         + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
@@ -4478,6 +4493,20 @@ const wsBlankMm = (digits) =>
     blankWidth(digits, WS_SIZE, Math.max(0, Math.floor((digits - 1) / 3)));
 
 function wsAnswerLine(digits, shiftMm = 0) {
+    const ab = resolveAnsBox(_ANSBOX, 'other');
+    if (ab === 'digit') {
+        // one box per digit (owner ruling 2026-10-02): a joined strip the key fills digit by digit
+        const n = Math.max(1, digits);
+        const w = (wsWriteMm() * 0.95).toFixed(2);
+        return `<span class="ws-slot ws-slot--digits" data-ws-shape="box" style="display:inline-flex;vertical-align:bottom;`
+            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `">`
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:${w}mm;height:${wsWriteMm()}mm;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+            + '</span>';
+    }
+    if (ab === 'off') {
+        return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+    }
     return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
         + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
         + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
@@ -5175,8 +5204,15 @@ function problemHeadHTML(index, skillLabel, showSkillLabels, isCompact) {
  * cell, the answer-key facsimile — reaches the legacy branches through this one function, so
  * this is the one place the ink rule has to live for markup the generators still colour.
  */
+// The + − × ÷ answer-box option (owner ruling 2026-10-02, `ansBox`) of the problem being formatted:
+// the legacy stack / fact / equation slots below read it, so a legacy-printed skill honours the
+// teacher's choice exactly as the kit does (one box per digit / one box / off).
+let _ANSBOX = null;
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
-    return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels));
+    const prev = _ANSBOX;
+    _ANSBOX = problem && problem.ansBox != null ? problem.ansBox : null;
+    try { return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels)); }
+    finally { _ANSBOX = prev; }
 }
 
 function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {

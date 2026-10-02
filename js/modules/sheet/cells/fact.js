@@ -347,7 +347,10 @@ register('fact', {
         const boxCls = p.ansBox === 'digit' ? ' ws-factans--digit' : p.ansBox === 'off' ? ' ws-factans--off' : '';
         // S5 step state (steps.js): one {ch, ink} per answer track, the newest grey (P-LC-9).
         const st = Array.isArray(ctx.stepTracks) ? ctx.stepTracks : null;
-        const w = st ? st.length : Math.max(n, text.length);
+        // One box per digit: the BAND's digit count on every item of the section (SL-2), never the
+        // dividend's tracks (critic B r2 #5: 108 ÷ 12 drew 3 boxes beside 2).
+        const band = p.ansBox === 'digit' && Number(p.digits) > 0 ? Number(p.digits) : n;
+        const w = st ? st.length : Math.max(band, text.length);
         const cells = st
             ? st.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? (ctx.photocopySafe ? 'ws-dotted' : 'ws-trace') : ''}" data-ws-ink="${tk.ink}" style="text-align:center">${tk.ch}</span>` : '<span></span>')).join('')
             : [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');

@@ -715,7 +715,7 @@ table; multiples of the divisor.
 | 4 | format | Read Division in a Bracket | format | The same fact in both notations; match, then copy. |
 | 5 | bridging | Divide on a Number Line | representation | 0-20 line; hop by d to the total; count the hops. |
 | 6 | decide | Circle the Multiples of 5 | responseScope | Near misses included (24, 51). Warm-up for ÷ 5. |
-| 7 | procedure | Divide by 5 (tally box) | responseScope: full | Count by 5 to the total; one tally per count; write the tally count on the answer line. |
+| 7 | procedure | Divide by 5 (tally box) | responseScope: full | Count by 5 to the total; one tally per count; write the tally count in the answer box (SL-3 as changed 2026-10-02). |
 | 8 | case | Divide 0, Divide a Number by Itself, Divide by 1 | range | `0 ÷ 5`, `5 ÷ 5`, `7 ÷ 1`. |
 | 9 | range | Divide by 2, 10, then 3, 4, 6, then 7, 8, 9, then 11, 12 (one per step) | range | Same order as L-6 (P-FL-18); 5, 0 and 1 are steps 7 and 8. Review every two steps; both notations. Divide by 11 and by 12 are dropped when the fact range is limited to 10 (P-FL-19). |
 | 10 | concept | Build a Fact Family (multiply and divide) | representation | Three numbers, four facts. The optional think box belongs from here on. |

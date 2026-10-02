@@ -366,8 +366,9 @@
 :is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) > span {
     box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
     min-height: 1.15em; align-self: stretch; display: flex; align-items: center; justify-content: center; }
-/* a small gap between the digit boxes so a key digit never touches an outline */
-:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) { column-gap: 0.08em; padding: 0; }
+/* the digit boxes share their seams, as a column stack's answer strip does (paper = screen, critic B r2 #6) */
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) { padding: 0; }
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--digit:not(:has(input)) > span + span { margin-left: calc(-1 * var(--ws-hair)); }
 /* the equation: 'off' is the plain ruled line (no box); 'digit' one box per digit, Hw tall, B(1)-wide tracks */
 :is(.ws-page, .ws-sheet) .ws-line.ws-line--off { border: 0 !important; border-bottom: var(--ws-hair) solid var(--ws-ink) !important; border-radius: 0 !important; }
 :is(.ws-page, .ws-sheet) .ws-box.ws-box--off { border-color: transparent; border-bottom-color: var(--ws-ink); border-radius: 0; }

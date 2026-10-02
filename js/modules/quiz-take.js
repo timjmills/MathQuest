@@ -471,8 +471,8 @@ function _mountQuizCell(flatIdx) {
         // restore a saved answer, right-aligned across the tracks
         const saved = String(hidden.value || '').replace(/[^0-9]/g, '');
         if (saved) {
-            const pad = boxes.length - saved.length;
-            boxes.forEach((b, i) => { b.value = i >= pad ? saved.charAt(i - pad) : ''; });
+            const pad = boxes[0].closest('[data-mq-ltr]') ? 0 : boxes.length - saved.length;
+            boxes.forEach((b, i) => { b.value = i >= pad ? (saved.charAt(i - pad) || '') : ''; });
         }
         const compose = () => boxes.map(b => (b.value || '').trim()).join('');
         boxes.forEach(b => {

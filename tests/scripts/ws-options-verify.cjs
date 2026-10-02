@@ -376,6 +376,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // by their OWN behaviour test below (not "differs from the default"): generation and the printed
     // page must be UNCHANGED, the value must round-trip a share code, and the screen gate must obey it.
     const BEHAVIOUR = { calculator: [true], skipAfter: [0, 2, 20] };
+    const abSig = {};   // ansBox value -> how the card draws its answer place (computed edges)
     for (const def of defs) {
         if (BEHAVIOUR[def.id]) { for (const v of BEHAVIOUR[def.id]) tries.push({ def, value: v, behaviour: true }); continue; }
         // ANSWER BOXES (Wave 1 lane B, owner ruling 2026-10-02): `ansBox` restyles the answer place
@@ -569,6 +570,14 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                         if (value === 'digit' && !has('input.mq-digit')) fail('screen/practice', 'ansBox digit: the card has no digit boxes');
                         if (value === 'off' && !has('.mq-ansoff, .mq-ans-off')) fail('screen/practice', 'ansBox off: the card still boxes the answer');
                         if (value === 'one' && (has('.mq-ansoff, .mq-ans-off') || (kind.kind === 'stack' && !has('.mq-ans-one')))) fail('screen/practice', 'ansBox one: the card does not draw one box');
+                        // the three values must LOOK different: the computed edges of the answer places
+                        abSig[value] = Array.from(card.querySelectorAll('input')).filter(e => e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'))
+                            .map(e => { const cs = getComputedStyle(e); return [cs.borderTopWidth, cs.borderTopStyle, cs.borderLeftWidth, cs.borderBottomWidth, cs.boxShadow].join(' '); }).join('|');
+                        if (value === 'off' && abSig.digit !== undefined && abSig.one !== undefined) {
+                            const kindName = kind.kind;
+                            if (abSig.off === abSig.one || abSig.off === abSig.digit || (kindName === 'stack' && abSig.one === abSig.digit))
+                                fail('screen/practice', `ansBox: the card draws the same answer place for two values (${['digit', 'one', 'off'].filter(v => Object.values(abSig).filter(x => x === abSig[v]).length > 1).join(' = ')})`);
+                        }
                     }
                 }
             } catch (e) { fail('screen/practice', String(e && e.message || e)); }
