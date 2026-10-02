@@ -1309,6 +1309,13 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
 
-/* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten (34.5 x 44 px cells, SP-10): its
-   writing inputs fill their square and never widen it. Additive. */
+/* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten at SP-10's 34.5 x 44 px or more:
+   its writing slots and inputs fill their square and never widen it (the generic 44 px floor on a
+   [data-mq-cell] would push each slot into its neighbour), and on a phone the chart takes the card's
+   full width (it spans the grid's two 12 px gutters). Additive. */
+html body .mq-scell .k2-chart [data-mq-cell] { min-width: 0 !important; min-height: 0 !important; }
 html body .mq-scell .k2-chart [data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; min-height: 0 !important; box-sizing: border-box; }
+@media (max-width: 480px) {
+    #gameView #questionCard.mq-card #questionPaper > #visualAid:has(.k2-chart) { grid-column: 1 / -1 !important; }
+    #gameView #questionCard.mq-card:has(.k2-chart) { padding-left: 6px; padding-right: 6px; }
+}

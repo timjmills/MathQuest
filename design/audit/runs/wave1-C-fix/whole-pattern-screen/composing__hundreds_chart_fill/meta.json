@@ -112,6 +112,114 @@
         "fontsReady": true,
         "andika": true
       }
+    },
+    "more-practice": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "perPage": 1,
+        "pages": 1,
+        "note": "Fits: 1 column x 1 rows, 1 per page, 1 page. Digits 28 pt. Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "perPage": 1,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 227,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+            "line": "Fits: 1 column x 1 rows, 1 per page, 1 page. Digits 28 pt. Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 205.8,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 976103,
+      "title": "I Can find missing numbers on a hundreds chart",
+      "notes": [
+        "Tall problems: 1 row per page. Very tall problems: fewer than 3 rows fit."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "chartwindow",
+          "fclass": "short",
+          "text": "Write the missing numbers in the empty boxes.",
+          "ans": "2, 4, 6, 8, 10, 11, 13, 15, 17, 19, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 62, 64, 66, 68, 70, 71, 73, 75, 77, 79, 92, 94, 96, 98, 100",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 205.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 205.8,
+              "fits": false
+            },
+            "3": {
+              "hMm": 205.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 205.8,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "more-practice-p1.png",
+          "words": 109,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "more-practice-key-p1.png",
+          "words": 147,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          1
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          1
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 115
+        },
+        "fontsReady": true,
+        "andika": true
+      }
     }
   },
   "screen": {
@@ -324,8 +432,149 @@
             8
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 33,
+            "h": 42,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 30
       }
     },
     "worksheet-1280": {
@@ -376,8 +625,149 @@
             30
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 28,
+            "h": 80,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 135
       }
     },
     "quiz-1280": {

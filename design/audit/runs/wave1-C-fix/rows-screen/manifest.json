@@ -161,6 +161,164 @@
           "fontsReady": true,
           "andika": true
         }
+      },
+      "more-practice": {
+        "fits": {
+          "cols": 1,
+          "rows": 3,
+          "perPage": 3,
+          "pages": 1,
+          "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 3,
+              "perPage": 3,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 75.667,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 3 rows per page.",
+              "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+              "cls": "short",
+              "digitPt": 28,
+              "hMin": 61.8,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 976103,
+        "title": "I Can find missing numbers on a hundreds chart",
+        "notes": [
+          "Tall problems: 3 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "41, 44, 46, 50",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 61.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "45, 48",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 61.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "21, 26, 29",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 61.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 61.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 61.8,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "more-practice-p1.png",
+            "words": 127,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "more-practice-key-p1.png",
+            "words": 139,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 98
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 107
+          },
+          "fontsReady": true,
+          "andika": true
+        }
       }
     },
     "screen": {
@@ -373,8 +531,30 @@
               8
             ]
           ],
-          "smallTargets": [],
-          "smallTargetCount": 0
+          "smallTargets": [
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 33,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 33,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 33,
+              "h": 42,
+              "text": ""
+            }
+          ],
+          "smallTargetCount": 3
         }
       },
       "worksheet-1280": {
@@ -425,8 +605,128 @@
               30
             ]
           ],
-          "smallTargets": [],
-          "smallTargetCount": 0
+          "smallTargets": [
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 29,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "mq-cellslot",
+              "w": 28,
+              "h": 69,
+              "text": ""
+            }
+          ],
+          "smallTargetCount": 17
         }
       },
       "quiz-1280": {

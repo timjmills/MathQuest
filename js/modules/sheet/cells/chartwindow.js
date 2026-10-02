@@ -85,7 +85,7 @@ register('chartwindow', {
                     const k = blanks.indexOf(n);
                     const base = ten
                         ? `box-sizing:border-box;width:10%;height:max(44px,min(${L(ctx, c.h)},11vw));padding:0;position:relative;text-align:center;vertical-align:middle;`
-                            + `font-size:min(${P(ctx, pt)},4.6vw);font-weight:400;line-height:1;`
+                            + `font-size:min(${P(ctx, pt)},4.6vw,${L(ctx, 5.2)});font-weight:400;line-height:1;`
                         : `box-sizing:border-box;width:${L(ctx, c.w)};height:${L(ctx, c.h)};padding:0;position:relative;text-align:center;vertical-align:middle;`
                             + `font-size:${P(ctx, pt)};font-weight:400;line-height:1;`;
                     if (k < 0) {
@@ -97,13 +97,11 @@ register('chartwindow', {
                         const v = shown[k];
                         const ink = v !== '' ? inkOf(ctx) : null;
                         const hook = isTwin(ctx) ? ' data-mq-cell="1"' : '';
-                        // The writing place is heavier by an inset line, not a wider border, so every
-                        // square has the same box and the numbers beside it never shift (critic, wave 1 C).
-                        // (the heavier line is an overlay border above the slot, so the screen's input never hides it)
-                        tds += `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};">`
+                        // The writing place is the square's own heavier border (no overlay layer to spill
+                        // into a neighbour); its text is filled like every number, so rows keep one baseline.
+                        tds += `<td style="${base}border:${isWhole(p) && !isTwin(ctx) ? B(ctx, 0.75) : B(ctx, 1.5)} solid ${INK};">`
                             + `<span data-ws-slot="b${k}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook} style="${FILL}`
-                            + `font-weight:700;color:${ink === 'trace' ? GREY : INK};">${esc(fmt(v))}</span>`
-                            + `<span aria-hidden="true" style="${FILL}pointer-events:none;box-sizing:border-box;border:${isTwin(ctx) ? B(ctx, 1.5) : B(ctx, 0.75)} solid ${INK};"></span></td>`;
+                            + `font-weight:700;color:${ink === 'trace' ? GREY : INK};">${esc(fmt(v))}</span></td>`;
                     }
                 }
                 rows += `<tr>${tds}</tr>`;
