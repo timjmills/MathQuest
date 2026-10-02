@@ -1344,3 +1344,17 @@ html body #questionCard .mq-scell .k2-chart td, html body .qt-question-card .mq-
     html body #questionCard .mq-scell .k2-chart.k2-chart-ten, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten { --mq-chfs: 40px; }
     html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten td, html body .mq-scell .k2-chart.k2-chart-ten td { width: var(--mq-chw) !important; font-size: var(--mq-chfs) !important; height: max(56px, calc(var(--mq-chfs) * 1.4)) !important; }
 }
+
+/* Swipe cue of the phone's ten-column chart (owner ruling 2026-10-02): a big arrow and words under the chart,
+   pinned to the visible edge of the cell while it scrolls, hidden at the end. Screen only; never over a square. */
+.k2-swipe-cue { display: none; }
+@media (max-width: 480px) {
+    .mq-scell .k2-swipe-cue {
+        display: block; position: sticky; left: 0; width: 100%; box-sizing: border-box; text-align: center;
+        padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
+        border-top: 2px solid #000; font-family: "Andika", sans-serif;
+    }
+    .mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
+    .mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
+}
+@media print { .k2-swipe-cue { display: none !important; } }

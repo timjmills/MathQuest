@@ -120,7 +120,9 @@ register('chartwindow', {
             return `<table class="k2-chart${tenCls}" data-mq-join=", " style="${tenVar}border-collapse:collapse;margin:${isTwin(ctx) ? '0' : L(ctx, LETTER_CLEAR_MM)} auto 0;`
                 + `table-layout:fixed;${width}background:#fff;">${rows}</table>`;
         });
-        return root(ctx, 'k2-chartwindow', tables[0]);
+        // a phone's ten-column chart swipes sideways inside its cell: a cue under it says so (screen only, shown by css/screen-cell.css)
+        const cue = ten ? '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more squares</b></span>' : '';
+        return root(ctx, 'k2-chartwindow', tables[0] + cue);
     },
     answerKey(p) {
         const parts = (p.blanks || []).map(String);

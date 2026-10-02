@@ -283,15 +283,156 @@
         "fonts": [
           [
             "Andika",
-            67
+            70
           ],
           [
             "Nunito",
             8
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 35
       }
     },
     "card-820": {
@@ -354,15 +495,156 @@
         "fonts": [
           [
             "Andika",
-            72
+            75
           ],
           [
             "Nunito",
             8
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 30
       }
     },
     "card-390": {
@@ -425,7 +707,7 @@
         "fonts": [
           [
             "Andika",
-            72
+            75
           ],
           [
             "Nunito",
@@ -477,15 +759,156 @@
         "fonts": [
           [
             "Andika",
-            471
+            489
           ],
           [
             "Nunito",
             30
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 135
       }
     },
     "quiz-1280": {
@@ -541,15 +964,156 @@
         "fonts": [
           [
             "Andika",
-            81
+            84
           ],
           [
             "Nunito",
             11
           ]
         ],
-        "smallTargets": [],
-        "smallTargetCount": 0
+        "smallTargets": [
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          },
+          {
+            "tag": "input",
+            "cls": "mq-cellslot",
+            "w": 40,
+            "h": 45,
+            "text": ""
+          }
+        ],
+        "smallTargetCount": 20
       }
     }
   },
