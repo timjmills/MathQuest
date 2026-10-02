@@ -15,7 +15,7 @@ function fail(msg) { failures.push(msg); console.error('  ✗', msg); }
 function pass(msg) { console.log('  ✓', msg); }
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+  const browser = await puppeteer.launch({ headless: 'new', executablePath: require('../lib/ws-harness.cjs').chromePath(), args: ['--no-sandbox'] });
   const page = await browser.newPage();
   page.on('pageerror', err => fail('Console pageerror: ' + err.message));
   page.on('console', msg => {

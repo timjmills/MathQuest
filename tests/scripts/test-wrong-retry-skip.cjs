@@ -6,7 +6,8 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 
-const BASE = process.env.MQ_BASE || 'http://localhost:8080/index.html';
+const { startServer, chromePath } = require('../lib/ws-harness.cjs');
+let BASE = process.env.MQ_BASE || null; // when unset, main() starts its own static server
 const SHOT_DIR = path.join(__dirname, 'test-wrong-retry-screenshots');
 if (!fs.existsSync(SHOT_DIR)) fs.mkdirSync(SHOT_DIR, { recursive: true });
 
@@ -192,6 +193,13 @@ async function runMapPracticeScenario(page, tier, label) {
     log(`  after wrong #2: attempts=${after2.attemptCount} skipVisible=${after2.skipVisible} mapItemCount=${after2.mapItemCount}`);
     if (after2.attemptCount !== 2) throw new Error(`${label}: expected 2 attempts, got ${after2.attemptCount}`);
     if (after2.skipVisible) throw new Error(`${label}: Skip should NOT be visible after 2nd wrong`);
+    // A click on the hidden Skip button after 2 tries must not skip anything (R2-1).
+    await page.evaluate(() => document.getElementById('skipQuestionBtn').click());
+    await new Promise(r => setTimeout(r, 500));
+    const afterHidden = await getRetryState(page);
+    if (afterHidden.mapItemCount !== startItemCount || afterHidden.currentQText !== startQText || afterHidden.attemptCount !== 2) throw new Error(`${label}: a click on the hidden Skip button after 2 tries changed the item`);
+    log('  hidden Skip click after 2 tries: item unchanged');
+    // Wrongs #3..#5: hidden after each of the first 4, shown after the 5th.
     await wrongsThroughFive(page, label);
     if (after2.mapItemCount !== startItemCount) throw new Error(`${label}: mapItemCount advanced after 2nd wrong`);
     if (after2.currentQText !== startQText) throw new Error(`${label}: question text changed after 2nd wrong`);
@@ -387,7 +395,8 @@ async function runStandardPracticeScenario(page) {
     let exitCode = 0;
     try {
         log('launching puppeteer...');
-        browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+        if (!BASE) { const srv = await startServer(); BASE = srv.base + '/index.html'; }
+        browser = await puppeteer.launch({ headless: 'new', executablePath: chromePath(), args: ['--no-sandbox'] });
         const page = await browser.newPage();
         await page.setViewport({ width: 1280, height: 900 });
 

@@ -47,6 +47,7 @@ export function updateCategoryOptions() {
 
 // Update breadcrumb navigation display
 export function updateBreadcrumb() {
+    updateStartSkillName();
     const domainSelect = document.getElementById("domainSelect");
     const categorySelect = document.getElementById("categorySelect");
     const skillSelect = document.getElementById("skillSelect");
@@ -90,6 +91,22 @@ export function updateBreadcrumb() {
         let skillName = selectedOption.text.replace(/^[\u2460-\u2466\u24C2]\s*/, '');
         breadcrumbSkill.textContent = skillName;
     }
+}
+
+// Student home: name the chosen skill above the Start buttons (the queue if there is one,
+// otherwise the skill the dropdown holds, which is what Start plays).
+export function updateStartSkillName() {
+    const el = document.getElementById('studentStartSkillName');
+    if (!el) return;
+    const clean = (t) => String(t || '').replace(/^[\u2460-\u2466\u24C2🟢🟡🟠🔴🎲]+\s*/u, '').trim();
+    const q = Array.isArray(window.skillQueue) ? window.skillQueue : [];
+    if (q.length) {
+        el.textContent = clean(q[0].skillLabel || q[0].label) + (q.length > 1 ? ` + ${q.length - 1} more` : '');
+        return;
+    }
+    const sel = document.getElementById('skillSelect');
+    const opt = sel && sel.options[sel.selectedIndex];
+    el.textContent = opt ? clean(opt.text) : '';
 }
 
 export function updateSkillOptions() {

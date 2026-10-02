@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { updateStartSkillName } from './category-dropdowns.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
 import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
 
@@ -243,6 +244,7 @@ export const UnifiedSkills = {
         const count = document.getElementById('skillQueueCount');
 
         if (count) count.textContent = this.count;
+        updateStartSkillName();
 
         if (!container || !list) return;
 

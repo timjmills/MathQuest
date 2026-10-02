@@ -554,6 +554,31 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                     if (value === 0) { if (at(0) || at(5) || at(99)) fail('screen/practice', 'skipAfter 0 must never show Skip'); }
                     else if (at(value - 1) || !at(value) || !at(value + 3)) fail('screen/practice', `Skip must appear at exactly ${value} wrong tries`);
                 }
+                if (def.id === 'skipAfter') {
+                    // online worksheet: the per-card Skip obeys the same value, counted per card.
+                    try {
+                        st.gameMode = 'worksheet';
+                        W.initWorksheet();
+                        await new Promise(res => setTimeout(res, 600));
+                        const card = () => document.querySelector('#ws_card_0 .ws-skip-btn');
+                        const shown = () => { const b = card(); return !!b && getComputedStyle(b).display !== 'none'; };
+                        const wrong = (k) => {
+                            const q0 = st.worksheetQs[0], inp = document.getElementById('ws_input_0') || document.querySelector('#ws_card_0 input');
+                            if (!q0 || !inp) return false;
+                            inp.value = String((Number(q0.ans) || 0) + 7777 + k); W.checkWorksheetAnswer(0); return true;
+                        };
+                        if (value === 0) { if (card()) fail('screen/worksheet', 'skipAfter 0 must render no per-card Skip'); }
+                        else if (!card()) fail('screen/worksheet', 'no per-card Skip button rendered');
+                        else {
+                            let ok = true; const seen = [];
+                            for (let k = 1; k <= value + 1 && ok; k++) { ok = wrong(k); if (ok) seen.push(shown()); }
+                            if (!ok) warn('screen/worksheet', 'card 0 has no plain input: worksheet per-card count not exercised');
+                            else if (seen.slice(0, value - 1).some(Boolean) || !seen[value - 1]) fail('screen/worksheet', `per-card Skip must appear at exactly ${value} wrong checks (saw ${JSON.stringify(seen)})`);
+                            const other = document.querySelector('#ws_card_1 .ws-skip-btn');
+                            if (ok && other && getComputedStyle(other).display !== 'none') fail('screen/worksheet', 'card 1 Skip showed from card 0 wrong checks');
+                        }
+                    } finally { try { W.showView('homeView'); } catch (_) {} st.gameMode = 'practice'; }
+                }
             } catch (e) { fail('screen/practice', String(e && e.message || e)); }
             finally {
                 W.clearSetOptions({ silent: true });

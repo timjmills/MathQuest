@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { recordPracticeLog } from './storage.js';
 import { skillAllowsCalculator } from './data.js';
-import { updateSkipButton } from './skip-rule.js';
+import { updateSkipButton, isSkipAvailable } from './skip-rule.js';
 import {
     isMapTestMode,
     isFirstAttempt,
@@ -441,6 +441,8 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noH
 // Standard Practice: mark wrong, advance via nextQuestion (forces past the
 //   "must be correct to advance" guard by setting lastAnswerCorrect = true).
 export function skipCurrentItem() {
+    // A click on a hidden Skip button (or a stray call) must not skip before skipAfter wrong tries.
+    if (!isSkipAvailable()) return;
     // Always reset attempt UI so the next question starts fresh
     state.hasAnswered = true;
     if (state.mapMode === true && state.mapSessionMode === 'practice') {

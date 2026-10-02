@@ -141,10 +141,6 @@ export function recordQuestionStatus(status, opts) {
         entry.wasWrong = true;
     }
     state.questionHistory[idx] = entry;
-    // Reset the "last action was a skip" flag once a real answer (correct or
-    // incorrect) is recorded so the alternating-skip rule advances properly.
-    if (status === 'correct' || status === 'incorrect') {
-    }
     // Skipped count: increment ONLY on first-time skip (not re-skip via review).
     if (status === 'skipped' && !wasSkipped) {
         state.skippedCount = (state.skippedCount || 0) + 1;
@@ -391,6 +387,7 @@ export function skipCurrentQuestion() {
     // MAP mode (practice OR simulation): hand off to the MAP skip path which
     // records as skipped without mutating RIT/streak.
     if (state.mapMode === true) {
+        if (!isSkipAvailable()) return;   // a click on the hidden button must not skip
         if (typeof window.skipMapItem === 'function') {
             window.skipMapItem();
         }

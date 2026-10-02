@@ -32,6 +32,8 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
     check(botBtn <= 900, `[${w}] all four Start buttons within the first screen (top ${topBtn}, bottom ${botBtn})`);
     check(!home.startGame && home.cards === 0, `[${w}] old Start Game and mode cards hidden for students`);
     check(home.map === 3, `[${w}] MAP buttons still shown (${home.map})`);
+    const startName = await page.evaluate(() => (document.getElementById('studentStartSkillName') || {}).textContent || '');
+    check(startName.length > 2, `[${w}] student home names the chosen skill beside Start ("${startName}")`);
     await page.screenshot({ path: path.join(OUT, `student-home-${w}.png`) });
 
     // practice: pick a skill, start practice via the button
@@ -69,6 +71,12 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
     console.log('practice', JSON.stringify(info));
     check(/mq-active-pulse/.test(info.boxAnim || ''), `[${w}] practice answer box pulses (${info.boxAnim} ${info.boxBg})`);
     check(info.calc === false, `[${w}] calculator hidden by default`);
+    await page.evaluate(() => {
+      document.querySelectorAll('.toast-notification, .toast, #toast, [class*="toast"]').forEach((t) => { t.style.display = 'none'; });
+      document.querySelectorAll('body *').forEach((e) => { const r = e.getBoundingClientRect(); if (getComputedStyle(e).position === 'fixed' && r.top > innerHeight - 120 && r.left > 300 && r.right < innerWidth - 300) e.style.display = 'none'; });
+      const ae = document.activeElement; if (ae && ae.scrollIntoView) ae.scrollIntoView({ block: 'center' });
+    });
+    await sleep(300);
     await page.screenshot({ path: path.join(OUT, `practice-card-pulse-${w}.png`) });
     // reduced motion: steady
     await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);

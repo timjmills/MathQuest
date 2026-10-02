@@ -346,9 +346,10 @@
         <div class="view active" id="homeView">
             <div style="text-align:center; margin-bottom:28px;">
                 <h1 style="font-size:clamp(2rem,6vw,3rem); font-weight:900; margin-bottom:10px; letter-spacing:-0.02em; background:linear-gradient(135deg, var(--mq-purple) 0%, var(--mq-orange) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Start Your Adventure!</h1>
-                <p style="color:var(--mq-muted); font-size:1.05rem; font-weight:700;">Customize your challenge below</p>
+                <p style="color:var(--mq-muted); font-size:1.05rem; font-weight:700;">Pick a skill below, or start now</p>
             </div>
 
+            <p class="student-only" id="studentStartSkill" style="text-align:center; margin:0 0 4px; font-size:1.15rem; font-weight:900;">Your skill: <span id="studentStartSkillName"></span></p>
             <div class="student-start-buttons student-only" id="studentStartButtons" role="group" aria-label="Start">
                 <button type="button" class="student-start-btn" data-mode="practice" onclick="startMode('practice')">🎓 Start practice</button>
                 <button type="button" class="student-start-btn" data-mode="boss" onclick="startMode('boss')">🐉 Start boss battle</button>
