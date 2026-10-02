@@ -504,16 +504,15 @@ Extensive SVG generation functions across 5 modules:
 
 ## Agents — model and effort (owner rule, 2026-10-02, revised the same day)
 
-Every subagent (builders, fixers, critics, explorers) runs on **Opus 5.5 at LOW effort by default** (owner, 2026-10-02:
-"change the agents to opus 5.5 low"; this replaces the earlier Sonnet-low default). Escalate only when a problem
-persists and low effort cannot solve it:
+- **Builders and fixers** run on **Sonnet 5.5 at MEDIUM effort** (profile `mq-sonnet-medium`, `model: "sonnet"`).
+- **Critics / auditors / reviewers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
+- Explorers and small one-off checks: Sonnet medium.
 
-1. Opus, low — the default for every agent (profile `mq-opus-low`).
-2. Opus, medium — only after a persistent, unsolved issue (profile `mq-opus-medium`). The ceiling; never go higher.
+Escalate a builder only when a problem persists and its setting cannot solve it: Sonnet medium → Opus low → Opus
+medium (the ceiling; never higher). A critic may go to Opus medium at most.
 
 How to call them:
-- **Model:** pass `model: "opus"` on every Agent call, with `subagent_type: "mq-opus-low"` (or `"mq-opus-medium"` when escalating).
-- **Effort:** the Agent tool has no effort argument; effort comes from the agent definition's frontmatter
-  (`.claude/agents/*.md`, `effort: low|medium`). The agent cannot see its own effort setting, so it cannot confirm it.
-- The `mq-sonnet-*` profiles stay in `.claude/agents/` but are no longer used by default.
+- Pass `subagent_type` with the profile above and the matching `model` on every Agent call.
+- **Effort** comes from the profile's frontmatter (`.claude/agents/*.md`, `effort: low|medium`); the Agent tool has
+  no effort argument, and the agent cannot see its own effort setting.
 - Say in the agent's brief which step it is on and why, if it was escalated. Record escalations in `design/STATUS.md`.
