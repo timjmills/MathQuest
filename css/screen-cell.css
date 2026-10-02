@@ -1436,3 +1436,16 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 .mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .k2-swipe-cue { display: none !important; } }
+
+/* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
+   place of the mode cards, each in its original mode-card colour (ui-components.css .mode-card:nth-child). */
+.mode-cards > .student-start-wrap { grid-column: 1 / -1; }
+.student-start-wrap #studentStartSkill { text-align: center; margin: 0 0 10px; font-size: 1.15rem; font-weight: 900; }
+.mode-cards .student-start-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 0; }
+.mode-cards .student-start-btn { max-width: none; min-height: 72px; color: var(--mq-ink, #1a1a1a); border-width: 2px; border-style: solid; }
+.mode-cards .student-start-btn[data-mode="practice"] { background: linear-gradient(180deg, #FFFFFF 0%, #B5D8FF 100%); border-color: #5A9DEE; box-shadow: 0 4px 0 0 #5A9DEE; }
+.mode-cards .student-start-btn[data-mode="boss"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-add) 100%); border-color: var(--mq-op-add-d); box-shadow: 0 4px 0 0 var(--mq-op-add-d); }
+.mode-cards .student-start-btn[data-mode="race"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-sub) 100%); border-color: var(--mq-op-sub-d); box-shadow: 0 4px 0 0 var(--mq-op-sub-d); }
+.mode-cards .student-start-btn[data-mode="worksheet"] { background: linear-gradient(180deg, #FFFFFF 0%, var(--mq-op-div) 100%); border-color: var(--mq-op-div-d); box-shadow: 0 4px 0 0 var(--mq-op-div-d); }
+.mode-cards .student-start-btn:active { transform: translateY(3px); box-shadow: none; }
+@media (max-width: 480px) { .mode-cards .student-start-btn { min-height: 64px; font-size: 1.05rem; padding: 10px 8px; } }

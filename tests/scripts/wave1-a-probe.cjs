@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { open } = require('../lib/ws-harness.cjs');
-const OUT = path.resolve(__dirname, '..', '..', 'design', 'audit', 'runs', 'wave1-A');
+const OUT = path.resolve(__dirname, '..', '..', 'design', 'audit', 'runs', 'wave1-A-fix');
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
@@ -27,14 +27,37 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       };
     });
     check(home.btns.length === 4 && home.btns.every((b) => b.v), `[${w}] four student start buttons visible ${JSON.stringify(home.btns.map((b) => b.t))}`);
-    const topBtn = await page.evaluate(() => Math.round(document.querySelector('.student-start-btn').getBoundingClientRect().top));
-    const botBtn = await page.evaluate(() => { const bs = Array.from(document.querySelectorAll('.student-start-btn')); return Math.round(Math.max(...bs.map((b) => b.getBoundingClientRect().bottom))); });
-    check(botBtn <= 900, `[${w}] all four Start buttons within the first screen (top ${topBtn}, bottom ${botBtn})`);
+    const lay = await page.evaluate(() => {
+      const sec = Array.from(document.querySelectorAll('#homeView .section')).find((x) => /choose\s*mode/i.test((x.querySelector('.section-title') || {}).textContent || ''));
+      const bs = Array.from(document.querySelectorAll('.student-start-btn'));
+      const card = (m) => document.querySelector(`.mode-card[data-mode="${m}"]`);
+      const sr = sec.getBoundingClientRect();
+      const maps = Array.from(document.querySelectorAll('.map-launch-btn'));
+      return {
+        inside: bs.every((b) => sec.contains(b)), skillInside: sec.contains(document.getElementById('studentStartSkill')),
+        cols: bs.map((b) => { const c = getComputedStyle(b); const k = getComputedStyle(card(b.dataset.mode)); return { m: b.dataset.mode, bg: c.backgroundImage, border: c.borderTopColor, cardBorder: k.borderTopColor, cardBg: k.backgroundImage }; }),
+        minH: Math.min(...bs.map((b) => b.getBoundingClientRect().height)), minW: Math.min(...bs.map((b) => b.getBoundingClientRect().width)),
+        secBottom: sr.bottom, mapTop: Math.min(...maps.map((m) => m.getBoundingClientRect().top)),
+        btnTop: Math.min(...bs.map((b) => b.getBoundingClientRect().top)), btnBottom: Math.max(...bs.map((b) => b.getBoundingClientRect().bottom)),
+        secTop: sr.top,
+      };
+    });
+    check(lay.inside && lay.skillInside, `[${w}] four Start buttons and "Your skill" inside the Choose Mode box`);
+    check(lay.btnTop >= lay.secTop && lay.btnBottom <= lay.secBottom && lay.btnBottom - lay.btnTop > 100, `[${w}] Choose Mode box is filled by the buttons (${Math.round(lay.btnTop - lay.secTop)}..${Math.round(lay.btnBottom - lay.secTop)} of ${Math.round(lay.secBottom - lay.secTop)})`);
+    check(new Set(lay.cols.map((c) => c.border)).size === 4 && new Set(lay.cols.map((c) => c.bg)).size === 4, `[${w}] each Start button has its own colour`);
+    for (const c of lay.cols) check(c.border === c.cardBorder && (c.m === 'practice' || c.bg === c.cardBg), `[${w}] ${c.m} button matches its mode-card colour (${c.border})`);
+    check(lay.minH >= 44 && lay.minW >= 44, `[${w}] Start buttons >= 44 px (${Math.round(lay.minW)}x${Math.round(lay.minH)})`);
+    check(lay.mapTop >= lay.secBottom, `[${w}] MAP buttons below Choose Mode (${Math.round(lay.mapTop)} >= ${Math.round(lay.secBottom)})`);
     check(!home.startGame && home.cards === 0, `[${w}] old Start Game and mode cards hidden for students`);
     check(home.map === 3, `[${w}] MAP buttons still shown (${home.map})`);
     const startName = await page.evaluate(() => (document.getElementById('studentStartSkillName') || {}).textContent || '');
     check(startName.length > 2, `[${w}] student home names the chosen skill beside Start ("${startName}")`);
-    await page.screenshot({ path: path.join(OUT, `student-home-${w}.png`) });
+    await page.screenshot({ path: path.join(OUT, `student-home-${w}.png`), fullPage: true });
+    if (w === 1280) { await page.evaluate(() => { document.body.classList.remove('student-mode'); document.body.classList.add('teacher-mode'); }); await sleep(300);
+      const t = await page.evaluate(() => ({ cards: Array.from(document.querySelectorAll('.mode-card')).filter((c) => getComputedStyle(c).display !== 'none').length, start: getComputedStyle(document.querySelector('.start-game-btn')).display !== 'none', stud: Array.from(document.querySelectorAll('.student-start-btn')).filter((b) => b.getBoundingClientRect().width > 0).length }));
+      check(t.cards === 5 && t.start && t.stud === 0, `[teacher] five mode cards + Start Game, no student buttons ${JSON.stringify(t)}`);
+      await page.screenshot({ path: path.join(OUT, 'teacher-home-1280.png'), fullPage: true });
+      await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); }); await sleep(200); }
 
     // practice: pick a skill, start practice via the button
     await page.evaluate(() => {
