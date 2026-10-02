@@ -2636,7 +2636,8 @@ export function fitTwinRows(root) {
         // answer boxes - never shrink with --mq-k2, so their overflow never goes away and each
         // re-run would ratchet the drawing smaller as the pupil types. Only a new cell width
         // (rotation, resize) earns a new fit.
-        const fitW = String(Math.round(box.width));
+        // (the key also counts the drawing's elements, so a widget that mounts late is still fitted)
+        const fitW = `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}`;
         if (twin.dataset.mqFitW === fitW) return;
         twin.dataset.mqFitW = fitW;
         const tw = twin.scrollWidth;
