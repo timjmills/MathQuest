@@ -122,3 +122,144 @@ two nested boxes, and some screen slots are still lines, which goes against the 
 - Hundred-chart squares and count-by boxes (Lanes C/C2): the same 0.75 pt black rounded box style. No double borders on paper. The hundreds-chart key bolds the answer square, which is consistent.
 - Lane A2 compatibility: the screen rule sets `background-color` and `border-style` with `!important` at specificity `html .mq-scell input.mq-slot:not(...)` (0,2,2). An A2 per-box fill or dashed border must match that specificity and also use `!important`, or it will lose. The comment claims ".mq-live-ok overrides background-color", which is only true if A2 writes `html .mq-scell input.mq-slot.mq-live-ok {… !important}`. Record that requirement in A2's brief.
 - Additive CSS: yes. Old saved quiz HTML is unaffected, apart from the rules that intentionally re-skin `.ws-line` slots.
+
+---
+
+# Round 2
+
+Critic: independent, Opus 5.5, medium effort. I did not build this lane. Fresh run after a container restart.
+Tree head `755cffc` (round-2 work `757e5d6` + live merge `b97c21b` + final fixes). Date 2026-10-02.
+The evidence was restored with `git checkout -- design/audit/runs` before and after the gates. Only this file changed.
+
+## Verdict: FAIL
+
+| Criterion | Score | Why it is not 8 |
+|---|---|---|
+| C1 Ease of use | 6 | With "One box per digit" on a fact or an equation, entry starts in the ones box and moves left. A pupil who types "12" gets "21", and both boxes turn red (R2-D1). |
+| C2 Educational value | 7 | Because of R2-D1, a pupil who knows the fact is told they are wrong. Keys are now right everywhere in the lane. |
+| C3 Spacing and layout | 8 | Round-1 D8 and D9 are fixed. Minor: per-digit box counts change within one division section (R2-D5). |
+| C4 Standard fidelity | 6 | On screen, "One box" and "Off" do nothing for column stacks, so paper and screen differ (R2-D2). The legacy column and fact skills print one box against the column ruling, and they get no option (R2-D3). |
+
+The default ("Automatic") is close to passing on every host. The option, which is the new work in this round, does not pass yet.
+
+## Gates (from the tree, one at a time via `/tmp/mq-browser-run.sh`)
+
+| Gate | Result |
+|---|---|
+| `ws-screen-slots --skills add_facts,add_100_regroup,mult_facts,div_facts,place_value_disks` | OK: 20 host renders, 0 doubled. **The new checks are real.** I ran the same script against `git archive 4c9a22e` (round-1 head). It FAILs with 9 findings: "1 box inside a box" on add_facts and mult_facts (card, worksheet and quiz), and "1 answer slot drawn as a line" on place_value_disks (all 3 hosts). Those are exactly round-1 D1 and D2. |
+| `ws-options-verify --skill add_100_regroup` | OK, 12/12, including ansBox digit, one and off. The two `level` warnings ("answers not found in key text") also appear at 4c9a22e, so they were there before. **Gap:** the gate passes ansBox one/off even though the screen ignores them (R2-D2). |
+| `wave1-a2-perbox` | OK, 0 FAIL. Green fill with a tick, red dashed edge with a cross, neutral when empty. The live PNGs confirm this on stacks, digit facts and equations. |
+| `ws-print-lint --source kit` (add_facts, add_100_regroup, length_metric) | OK, 0 findings. The length_metric AK-4 finding that existed before this lane has cleared. |
+| `ws-code-snapshot` | OK: 608 codes, nothing moved, 1869 option round trips. The default `ansBox: null` writes no suffix (`optionSuffix` = ""), so old share codes are unchanged. `digit` encodes as `~_6QD`. |
+| `ws-ansbox-measure --check`, `ws-boot-smoke`, `ws-stamp-assets --check`, module `--check` on 5 changed files | all OK |
+| Dry-run merge onto `claude/sweet-newton-c8wrv1` (`50dbfa6`) | `50dbfa6` is an ancestor of HEAD, so this is a fast-forward. `git merge-tree` reports **0 conflicts**. |
+
+## Round-1 defects
+
+| ID | Status | Evidence |
+|---|---|---|
+| D1 nested box on screen | FIXED | final/S/addition__add_facts card-390, worksheet and quiz show one box. The gate now catches it. |
+| D2 place-value / inline slot as a line | FIXED | place_value_disks worksheet-1280 and card-390 show one full box. |
+| D3 paper ≠ screen stack | MOSTLY FIXED | Both now use one box per digit (owner ruling). They still differ in box count: paper has 3 boxes for add_100_regroup, screen has 2 (3 only when the answer is 100). See R2-D4. |
+| D4 legacy key outside the box | FIXED | length_metric key S and L: 700, 11,000 … are inside the boxes. No "Answer:" line. |
+| D5 standards still say "line" | MOSTLY FIXED | SL-3, SL-8, PT-TOK-1, P-SC-6, PT-FPR-7, the ASCII sketch and the screen table are all reworded. Some spots remain (R2-D8). |
+| D6 graded=0 write places stay lines | FIXED | The Say band is now `ws-line--say`. The error-analysis "correct answer", the lesson opener and the word-problem unit label are boxes (roles/*, L add_word_problems). |
+| D7 long-division vinculum | FIXED | Recorded as a dated exception in VA-61, PT-LDV-1 and SL-3. |
+| D8 fact box vs rule | FIXED | The box spans the whole rule and its right edge equals the rule's end at S and L. Keys "120" and "18" sit clear inside. |
+| D9 legacy box stretched to cell | FIXED | Fixed width per size: 40 mm at S, 48 mm at L, the same across the page. |
+| D10 stale L evidence | FIXED | L length_metric shows boxes. |
+
+## The answer-box option, judged
+
+- **Panel.** The panel shows a closed "Answer boxes · Automatic" disclosure between the support group and Pupil play. It is clear enough, but the summary says only "Automatic", not what Automatic draws for this skill (R2-D7).
+- **Which skills get it.** There are 48 skills, measured as "items drawn by the kit stack, fact or equation template". That measurement is honest, but the result is not the right list for a teacher (R2-D3):
+  - These skills get no option: add_10/20_*, sub_10/20_*, sub_facts, multiply, divide, mult_zeros, sub_across_zeros, mixed_add_sub, mixed_mult_div and equal_sign. All of them are + − × ÷ column or fact work.
+  - "Add within 50" has the option and "Add within 20" does not.
+  - Hiding it on word problems is acceptable, because their digit-box grid is the representation itself.
+- **Each value on paper and on the key.**
+  - digit: correct, with digits inside the boxes.
+  - one: correct, with the key inside the one box.
+  - off: plain open zone, and the key prints plain digits.
+  - **"Off" on paper** leaves no line under a vertical fact or a stack. Only the sum rule and white space remain. The standard allows this ("the open zone under a sum rule"), and it reads as the traditional writing place, so it is acceptable.
+- **Each value on screen.**
+  - digit: works on facts and equations, with an inline strip after "=".
+  - off on facts and equations: works, drawn as a grey zone with a line.
+  - **one and off on stacks: no effect.** card-390, worksheet and quiz under final/ansbox-one and ansbox-off look the same as digit.
+- **Per-digit auto-advance.** On stacks it is right: ones first, then leftward, as column work is taught. On facts and equations it is wrong (R2-D1).
+- **Old share codes.** Unchanged (see gates).
+
+## Defects, ranked (RUBRIC §6 form)
+
+```json
+{
+  "lane": "wave1-B",
+  "round": 2,
+  "pass": false,
+  "scores": { "C1": 6, "C2": 7, "C3": 8, "C4": 6 },
+  "caps": [],
+  "defects": [
+    { "id": "R2-D1", "criterion": "C1", "severity": "critical",
+      "where": "screen-cell.js withAnsBox -> eqDigitsHTML / fact->stack (ansBox 'digit' on add_facts, subtract, mult_facts, div_facts); card and worksheet",
+      "what": "A fact or equation drawn one box per digit uses the stack's column entry: focus starts in the ones box (data-slot ans-0) and advances LEFT. A pupil reading '144 ÷ 12 = [ ][ ]' types 1 then 2 and gets '21'. Both boxes turn red with crosses (probe: add_facts ans 15 -> boxes '5','1' both mq-live-wrong; div_facts ans 12 -> '2','1' both wrong). A pupil who knows the fact is told it is wrong. Column work is taught ones first; a remembered fact or an answer after '=' is written left to right.",
+      "fix": "For layout 'eq' and fromFact strips, focus the leftmost box and advance rightward, and right-align on Check (or accept either fill order when the boxes form the answer read left to right). Keep ones-first only for real column stacks.",
+      "check": "Type '12' into a fresh div_facts digit item and '15' into add_facts digit: both boxes turn green. Add this as a wave1-a2-perbox scenario." },
+
+    { "id": "R2-D2", "criterion": "C4", "severity": "major",
+      "where": "css/screen-cell.css :where(.mq-scell .ws-stack.mq-ans-one/.mq-ans-off .ab > input.mq-digit); final/ansbox-one/*/addition__add_100_regroup card-390/worksheet/quiz, final/ansbox-off/* same",
+      "what": "'One box' and 'Off' never reach the screen for column stacks. The stack gets class mq-ans-one / mq-ans-off (probe), but the rules restyle the digit INPUT's border. The computed border of both the input and its .ab parent is 0px, so the visible box is drawn by another mechanism, and the stack still shows two separate boxes. On paper the same setting draws one box or no box, so paper and screen differ in every host for 34 stack skills. ws-options-verify passes these values, so the gate does not see the screen.",
+      "fix": "Restyle the element that actually draws the digit box (find it in the computed styles: box-shadow, outline or a pseudo-element), or draw 'one' as a bordered strip wrapper with borderless inputs and 'off' as a ruled line under borderless inputs. Extend ws-options-verify's screen leg to compare the drawn outline geometry for each ansBox value.",
+      "check": "card-390, worksheet and quiz for add_100_regroup show one outline at 'one' and no outline plus a line at 'off'. ws-options-verify fails on 755cffc and passes after the fix." },
+
+    { "id": "R2-D3", "criterion": "C4", "severity": "major",
+      "where": "js/modules/skill-ansbox-skills.js (48 skills); legacy column/fact skills add_10_*/add_20_*, sub_10_*/sub_20_*, sub_facts, multiply, divide, mult_zeros, sub_across_zeros, mixed_add_sub, mixed_mult_div, equal_sign",
+      "what": "These + − × ÷ skills are column or fact work. They print through the legacy wrapper as ONE box under the rule (scratch render, add_20_regroup and sub_facts S; sub_facts also shows a near-double rule), while their screen twin draws one box per digit plus a regroup box. This breaks the column ruling ('one box per digit, paper and screen the same'). They also get no Answer-boxes option, so a teacher sees the control on 'Add within 50' and not on 'Add within 20'.",
+      "fix": "Either migrate these skills' items to q.cell stack/fact (the §10.1 path), or make the legacy column print draw the per-digit strip and offer the option on them too. Until then, list them in STATUS as known exceptions.",
+      "check": "add_20_regroup and sub_facts print per-digit boxes matching their card. offeredOptionsFor offers ansBox on every + − × ÷ column or fact skill." },
+
+    { "id": "R2-D4", "criterion": "C4", "severity": "minor",
+      "where": "screen stack strip (add_100_regroup): card/quiz 2 boxes, paper 3",
+      "what": "The screen answer strip follows the operands, and grows to the answer's length only when the answer is longer (probe: ans 100 -> 3 boxes, otherwise 2). Paper uses the band (3 boxes always). So the screen gives away that an answer has 3 digits, and its box count differs from paper. This was probably there before the lane, but it falls under the column ruling.",
+      "fix": "Size the screen strip from the same band as paper (the skill's 'within N' answer bound).",
+      "check": "add_100_regroup card shows 3 boxes for every item, as on paper." },
+
+    { "id": "R2-D5", "criterion": "C3", "severity": "minor",
+      "where": "final/ansbox-digit/S/division__div_facts/independent-p1 and key items a, d",
+      "what": "In one section, 108÷12 and 110÷11 draw 3 digit boxes and every other item draws 2. Quotients are at most 12, so the strip follows the dividend's tracks, not the band. This breaks SL-2 (one width per section), and the screen draws 2.",
+      "fix": "In styledAnswerSlot / factans--digit, take n from the section band, not from the item's track count.",
+      "check": "Every div_facts digit cell has 2 boxes." },
+
+    { "id": "R2-D6", "criterion": "C4", "severity": "minor",
+      "where": "final/ansbox-off/S/addition__add_facts and div_facts: independent-p1 vs card/worksheet/quiz; ansbox-digit facts paper vs screen",
+      "what": "Small differences between paper and screen. With 'off', paper leaves a blank zone under the rule, while screen draws a grey zone with a black bottom line, so there are two rules on screen. With 'digit', paper boxes have a gap between them, while screen boxes share a seam (and the focused box's 2 px edge makes the seam look heavy).",
+      "fix": "Pick one drawing for each: either a line on paper 'off' too, or no line on screen; and the same gap (or none) on both.",
+      "check": "The off and digit renders match by eye between independent-p1 and card-390." },
+
+    { "id": "R2-D7", "criterion": "C1", "severity": "minor",
+      "where": "skill-options-ui.js boxes disclosure (scratch panel-open.png)",
+      "what": "The summary reads 'Answer boxes · Automatic', which does not say what this skill will draw. The open disclosure repeats the label 'Answer boxes', and the select gives the generic 'Automatic (columns: one box per digit; facts: one box)' even on a column-only skill.",
+      "fix": "Summary 'Automatic (one box per digit)' or '(one box)', resolved by this skill's layout from ANSBOX_SKILLS. Drop the inner duplicate label.",
+      "check": "The summary for add_100_regroup reads 'Automatic (one box per digit)', and for add_facts 'Automatic (one box)'." },
+
+    { "id": "R2-D8", "criterion": "C4", "severity": "minor",
+      "where": "design/PROBLEM_TYPES.md:547 (RM-01 'Black answer line'), :584 ('Black line' response row); PEDAGOGY_STANDARD.md:718 ('answer line'); PAGE_TYPES.md PT-TOK-3 ('square corners = … answer boxes', against SL-11 rounded)",
+      "what": "The standards still contain wording that says answers go on lines (and one line about square answer-box corners).",
+      "fix": "Reword them to 'answer box (SL-3 as changed 2026-10-02)'. In PT-TOK-3, move answer boxes to the rounded list per SL-11.",
+      "check": "grep 'answer line|Black line' over the design docs returns only the Say band and the vinculum." }
+  ],
+  "to_raise_to_10": {
+    "C1": "Left-to-right entry for fact and equation digit strips (R2-D1); a panel summary that says what Automatic draws (R2-D7).",
+    "C2": "No right answer ever marked red (R2-D1).",
+    "C3": "One digit-strip width per section (R2-D5).",
+    "C4": "'One' and 'Off' honoured on screen (R2-D2); legacy column and fact skills per digit plus the option (R2-D3); screen strip from the band (R2-D4); paper and screen alike for off and digit (R2-D6); docs (R2-D8)."
+  },
+  "summary": "Round-1 defects are fixed and the default passes on every host. The new answer-box option fails: 'one' and 'off' do nothing on screen for stacks, per-digit facts and equations reverse a pupil's left-to-right typing, and about 25 legacy + − × ÷ skills get neither per-digit boxes nor the option."
+}
+```
+
+## Outside this lane (log for the owning families)
+
+- add_word_problems lesson key p2 (final/roles): the Steps box says "Circle +. Add. Write 34 and 51 … 34 + 51 = 85 … 85 marbles" next to a guided item that is 54 − 11 pencils. The worked steps do not match the problem. This is a critical C2 defect in the lessons family.
+- add_word_problems lesson p4 item e uses half a page and leaves the right cell empty.
+- place_value_disks card-390: the H/T/O chart overflows the cell, and the O column is clipped.
+- add_fractions_like key items e and f print raw ids `Answer: ["opt4"]` (as noted in round 1).
+- div_facts prints as a vertical fact on paper but shows as a horizontal equation on screen.
