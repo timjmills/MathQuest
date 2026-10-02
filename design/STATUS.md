@@ -120,3 +120,15 @@ Still open, for the owner or a later wave:
 - The `effort:` field in `.claude/agents/*.md` cannot be seen by the agent itself; the model (Sonnet 5.5) was confirmed, the effort setting was not observable.
 - Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
 - 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.
+
+## 8. Container fix: browser gates and the proxy CA (2026-10-02)
+
+Browser gates failed with `net::ERR_CERT_AUTHORITY_INVALID` on every CDN (fonts, jsDelivr, cdnjs): Chromium's NSS store
+`/root/.pki/nssdb` was empty, so it did not trust the cloud container's proxy CA. This is environment, not app code. Fix
+(rerun in any new container before browser gates; never disable TLS checks instead):
+
+    apt-get install -y libnss3-tools
+    mkdir -p /tmp/cabits && cd /tmp/cabits && awk '/BEGIN CERT/{n++} {print > ("c" n ".pem")}' /root/.ccr/ca-bundle.crt
+    for f in c*.pem; do s=$(openssl x509 -in $f -noout -subject); case "$s" in *Anthropic*) certutil -d sql:/root/.pki/nssdb -A -t "C,," -n "$(echo "$s" | sed 's/.*CN = //; s/,.*//')" -i $f;; esac; done
+
+Gate failures and load numbers measured before this fix (~12:30 UTC) are not trustworthy and are being rerun.
