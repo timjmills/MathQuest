@@ -1474,3 +1474,14 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
     .mode-cards .student-start-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .mode-cards .student-start-btn { min-height: 140px; height: auto; padding: 16px 10px 18px; }
 }
+
+/* ---- WAVE 1 fix 3 (critic 2026-10-02): dark theme keeps dark ink on the pastel tiles and the penguin
+   bubble; a visible focus ring; icons line up per row on a phone; the skill line wraps evenly. */
+.dark .mode-cards .student-start-btn, .dark-theme .mode-cards .student-start-btn { color: #2B2840; }
+.dark #mqHomeMascot .mq-mascot-bubble, .dark-theme #mqHomeMascot .mq-mascot-bubble { background: #fff; color: #2B2840; }
+.mode-cards .student-start-btn:focus-visible { outline: 3px solid #5E3FCC; outline-offset: 3px; }
+#studentStartSkill { text-wrap: balance; }
+@media (max-width: 780px) {
+    .mode-cards .student-start-btn { justify-content: flex-start; }
+    .mode-cards .student-start-btn .mode-name { min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
+}
