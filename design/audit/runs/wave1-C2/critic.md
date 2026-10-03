@@ -249,3 +249,71 @@ Graded at **7bd1ecf** (WIP 6619966 plus the finishing commit, on 419d355). The w
 - C2: the panel's fit count is exact.
 - C3: the cap is tight to measured height on each paper, and short lists match the help.
 - C4: step-tab text has a size floor.
+
+# Round 5 (Opus, medium)
+
+Graded at **409d746** (round-4 fixes on top of the merge 7897b36 of sweet-newton 50dbfa6). Only the builder's own changes, 7897b36..409d746, were reviewed. The working tree is clean: evidence that the gates re-shot was restored with `git checkout -- design/audit/runs`.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 7 | The tab column now sits beside the scroller, so nothing slides under it. But on the 390 practice card, the first auto-focus still scrolls the row past its own start in 3 of 4 cases. The pupil opens "by 1,000 from 14,000" and sees "1,000 › 16,000 [ ]", and "by 100,000 from 1,000,000" opens as "100,000 › [ ] 1,300,000", with no given number before the first box. The gate's scrollLeft-0 check is masked, so it passes. |
+| C2 Educational value | 8 | Rows print once each, in order. Titles name exactly what prints ("…1,000 … 6,000 from 14,000" when the 7th row is cut). The panel count equals the printed count on A4 and Letter. |
+| C3 Spacing and layout | 9 | The one-page cap is now tight on both papers. 7 rows by 1,000 print 6, filling the page to the footer, and so does the 12-row mixed list (8 print). Nothing is clipped and there is no big blank. A short list keeps air round each row, as the help now says. |
+| C4 Standard fidelity | 8 | Black and white, Andika, TY-10a 9 pt floor. Step-tab text is ≥ 14 pt on every one-page case (the gate asserts it). The default one-page sheet is byte-identical to 4911898 and to live 50dbfa6 (12 of 12 each). |
+
+## Runs (one at a time, from the tree)
+
+- `wave1-c2-phone`: OK, 40 PASS. See defect 1 for why the card's "scrollLeft 0" PASS is not real.
+- `wave1-c2-onepage` with MQ_BASE_ROOT = `git archive 4911898`: OK. With MQ_BASE_ROOT = `git archive claude/sweet-newton-c8wrv1` (50dbfa6): the 12 default/blank cases are identical. The chosen-row cases are all 1 + 1 pages, each row once and in order. The 3 cut cases are tight (one more row makes 2 pages). Panel N equals printed N, and tab text is ≥ 14 pt.
+- `wave1-c2-panel`: OK, 28 PASS. `ws-screen-answer --skills multiplication:count_by_tables`: OK. `ws-content-audit --skill count_by_tables`: OK, 0 failing.
+- `node --input-type=module --check` on the 7 modified modules: OK. `ws-stamp-assets --check`: OK.
+- **Dry-run merge onto claude/sweet-newton-c8wrv1** (local and origin, both 50dbfa6): the live tip is already an ancestor of 409d746, so the merge is a **fast-forward. No conflicts.**
+- My own probes (scratchpad, `c5-phone.cjs`, `c5-roles.cjs`):
+  - **Phone, 390, card and worksheet × 4 cases**, checked after load, after programmatic `scrollLeft` = 37 and = half, after focus, after 3 real Tab presses and after 3 real Shift+Tab presses. In every state the tab column's right edge equals the row's left edge, and each tab entry is level with its line (0 px). That part of round-4 defect 1 is fixed.
+  - **Renders**, `ws-grade-render --opts` on A4 and Letter: 7 rows by 1,000 from 14,000, and the 12-row wide/plain mixed list. Each is 1 page, full to the footer, with nothing clipped.
+  - **Roles:** independent, more-practice and test × ican/daily × A4/Letter × 4 lists all give 1 + 1 pages with the same count, so the constant ROW_MM model holds across roles and looks.
+
+## Round-4 defects
+
+1. **Opaque tab covering content** (sticky tab): **fixed**. The tab is a separate column (`[data-mq-tabcol]`), level with its lines, and nothing is ever under it. The row lands on column starts on focus, and the end of the row pads so its last column lands on a start too. Two problems remain: **the card's first view** (defect 1 below) and **no snapping on a finger swipe** (defect 3).
+2. **One-page cap**: **fixed**. ROW_MM {1: 17.1, 2: 33.2} with a body of A4 226 / Letter 208 is calibrated rather than measured live, but the gate proves it tight on every cut case and both papers. The panel uses the same function, so its count is exact.
+3. **Help text**: **fixed** ("A short list keeps extra space round each row").
+4. **Tab ≥ 14 pt**: **fixed** on the one-page sheet (`tabPt`, `TAB_FLOOR_PT = 14`, asserted by the gate). "+100" is now 14 pt beside "+3" at 16.8 pt.
+
+## Judgement: `setOnePageBodyOverride` (count-rows.js)
+
+**Acceptable.** It is not on `window` (globals.js does not import it), and no UI path calls it. A user could reach it only with a devtools `import()`. The gate resets it in `finally`, and `spare` (the vpad) always uses the real body, so a leaked override could not distort the air round rows, only the count. Optional tidy-up: let `onePagePlan` take a `bodyMm` argument for the test instead of module state. This is not scored.
+
+## Ranked defects (RUBRIC §6 form)
+
+1. **C1, major (−2). Where:** `screen-cell.js:1391` (`wireSwipeRows` → `snap`) and the gate `wave1-c2-phone.cjs:76-77`. Evidence: the builder's own `phone-card-by-100-000-from-1-000-000-15-.png` and `phone-card-by-1-000-from-14-000.png`, and probe `c5-phone.cjs`.
+   **What:** the card auto-focuses the first box. When that box is not fully visible at scrollLeft 0, `snap` picks the column start **nearest the browser's own focus scroll** rather than the leftmost one that shows the box. Measured on load:
+   - default tables: sl 0 → 1 column, so "6" is hidden.
+   - 1,000 from 14,000: sl 161, so 14,000 and 15,000 are hidden.
+   - 100,000 from 1,000,000: sl 182, so both given numbers before the first box are hidden. A leftmost valid start (sl 90) exists and shows "1,100,000 [ ] 1,300,000".
+   - The worksheet does the same when a pupil taps the first box of the 100,000 row: sl 182, line 1 shows "[ ] [ ] [ ]" with no given at all.
+
+   Two things make this worse:
+   - The fixed "→" turn arrows in the tab column now point at whichever column is shown ("→ 1,700,000" when line 2 starts at 1,500,000).
+   - The step tab "100,000 ›" points straight into the first box. That invites the exact error a custom start exists to teach against: counting from the step, so 200,000 instead of 1,200,000.
+
+   Nothing tells the pupil that numbers lie to the left; the cue says only "Swipe → for more boxes". The gate passes because `scrollLeft: firstNeedsScroll ? 0 : w.scrollLeft` reports 0 whenever the first box needs a scroll. That masks exactly the case it was written to catch.
+   **Fix:**
+   - In `snap`, on the first focus (and on any focus whose box needs a scroll from 0), use `Math.min(...ok)`: the leftmost column start that shows the whole box, so the most preceding numbers stay in view. Keep "nearest" only for later Tab moves within a line.
+   - While `scrollLeft > 0`, show a left-edge cue (a "‹" fade, or "Swipe back ← to the start") and hide the in-arrows of lines 2+ (or give the tab column a "…" marker), so the column never claims a continuation it does not show.
+   - Fix the gate to report the real scrollLeft and assert it equals the leftmost valid column start.
+
+   **Check:** in `wave1-c2-phone`, after load on the card, assert that `scrollLeft === min(column starts x such that the first box is fully visible)`, and that at least one given number precedes the focused box in line 1 whenever one exists in the row. Run this for all 4 cases, and again on the worksheet after `focus()` of the first box.
+2. **C1, minor (−1). Where:** `count-row.js` swipe row (`[data-mq-swiperow]`) and `css/screen-cell.css`.
+   **What:** focus snaps to column starts, but a finger swipe or programmatic scroll does not. After `scrollLeft = 37`, every line shows a number cut at the row's left edge ("<cut>14,000", "<cut>1,000,000"). The tab no longer covers it, but a cut 7-digit number is still a misread risk.
+   **Fix:** add `scroll-snap-type: x proximity` to the swipe row and `scroll-snap-align: start` to each line's column items (CSS additive, in `screen-cell.css` under `.mq-scell [data-mq-swiperow]`). The end padding already makes the last start reachable.
+   **Check:** probe a programmatic `scrollLeft = 37` followed by `scrollend`. No `.k2-given` or `input` has `left < row.left - 1`.
+3. **Nit, not scored.** In `gen-mult-patterns.js:231`, the trailing comment is duplicated ("// 6 mm kept back … // 6 mm kept back …").
+4. **Observation, not scored and outside this lane's diff.** The guided role ignores "All rows on one page". A 2-row list with onePage gives 7 items over 2 + 2 pages, and the panel's "N fit on one page" does not apply there. Confirm whether guided is meant to honour onePage. If it is not, the option help should say "Independent, More practice and Test pages".
+
+**To reach 10:**
+- C1: the card opens with the row's start in view (or the leftmost possible column), says when content lies to the left, and snaps on swipe.
+- C2: no first view that hides the start the teacher chose.
+- C4: the test-only hook becomes a parameter.

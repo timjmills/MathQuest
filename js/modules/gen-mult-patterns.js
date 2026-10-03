@@ -228,7 +228,7 @@ export function genCountByTables(q) {
             // the same air round every row (so one-line and two-line rows stay within 1.6x of each other and keep the teacher's order)
             // the paper's spare height, shared out as air above and below every row (at most 13 mm a side: a short list keeps extra
             // space round each row, it is not stretched down the page)
-            const pad = Math.min(plan.mixed ? 3 : 13, Math.max(0, plan.spare - 6) / (2 * plan.rows.length));   // 6 mm kept back: the layout's row rounding; a mixed page keeps its two heights over 1.6x apart, so each row stays its own height   // 6 mm kept back: the layout's row rounding
+            const pad = Math.min(plan.mixed ? 3 : 13, Math.max(0, plan.spare - 6) / (2 * plan.rows.length));   // 6 mm kept back: the layout's row rounding; a mixed page keeps its two heights over 1.6x apart, so each row stays its own height
             if (pad > 0.05) payload.vpad = Math.round(pad * 10) / 10;
         }
     }   // the rows on one page: tighter chrome, digits at the S working size

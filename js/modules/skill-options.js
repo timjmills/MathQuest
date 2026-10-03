@@ -1372,8 +1372,8 @@ const CB_CHART_LINE_OPTIONS = {
         {
             // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
             id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
-            helpShort: 'Your rows (or the tables 1 to 12) once each on one compact sheet, as many as fit.',
-            help: 'Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
+            helpShort: 'Independent, More practice and Test pages: your rows (or the tables 1 to 12) once each on one compact sheet, as many as fit.',
+            help: 'Independent, More practice and Test pages (the other page types keep their own layout). Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
                 + 'With rows chosen it is those rows, in order, as many as the paper holds (a row of very wide numbers takes two lines of six, so fewer fit; the panel says how many on Letter and on A4). '
                 + 'Every row is then one line of 12 numbers (the other pages use two lines of six), and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
         },

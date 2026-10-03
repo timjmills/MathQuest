@@ -1366,11 +1366,11 @@ function wireSwipeRows(cellEl) {
             if (max0 <= 0) return;
             const v = w.getBoundingClientRect(), sl = w.scrollLeft;
             const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
-            const xs = line ? [...line.children].map((e) => e.getBoundingClientRect().left - v.left + sl - 2).filter((x) => x >= max0 - 0.5) : [];
+            const xs = line ? [...line.children].map((e) => e.getBoundingClientRect().left - v.left + sl).filter((x) => x >= max0 - 0.5) : [];
             if (xs.length) body.style.paddingRight = `${Math.max(0, Math.min(...xs) - max0)}px`;
         };
         padEnd(); window.addEventListener('resize', padEnd);
-        const upd = () => { level(); w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        const upd = () => { level(); w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
         // a box that takes focus scrolls fully into view, clear of the pinned cue
@@ -1384,11 +1384,11 @@ function wireSwipeRows(cellEl) {
             const snap = () => {
                 const v2 = w.getBoundingClientRect(), r2 = t.getBoundingClientRect(), sl = w.scrollLeft, cw = w.clientWidth;
                 const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
-                const xs = [0, ...(line ? [...line.children].map((e) => e.getBoundingClientRect().left - v2.left + sl - 2) : [])];
+                const xs = [0, ...(line ? [...line.children].map((e) => e.getBoundingClientRect().left - v2.left + sl) : [])];
                 const bl = r2.left - v2.left + sl, br = r2.right - v2.left + sl;
                 const ok = xs.filter((x) => x <= bl + 0.5 && br - x <= cw - 2);
                 if (!ok.length) { if (r2.left < v2.left + 4) w.scrollLeft -= (v2.left + 4 - r2.left); else if (r2.right > v2.right - 4) w.scrollLeft += (r2.right - v2.right + 4); }
-                else w.scrollLeft = first && ok[0] === 0 ? 0 : Math.max(0, ok.reduce((a, x) => (Math.abs(x - sl) < Math.abs(a - sl) ? x : a)));
+                else w.scrollLeft = Math.max(0, first ? Math.min(...ok) : ok.reduce((a, x) => (Math.abs(x - sl) < Math.abs(a - sl) ? x : a)));   // the first focus: the LEFTMOST start that shows the box (critic C2 r5)
                 upd();
             };
             const first = w.dataset.mqFocused !== '1';      // the first focus (the card's auto-focus) keeps the row at its start when the box shows there

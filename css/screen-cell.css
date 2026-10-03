@@ -1515,6 +1515,19 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 .mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .k2-swipe-cue { display: none !important; } }
+/* count-by rows (critic C2 r5): the row snaps to a column start, so no number is cut at its left edge; scrolled away from the
+   start, a "back" cue shows under the row and the line-2/3 in-arrows beside it hide (they would claim a start the row does not show) */
+.mq-scell [data-mq-swiperow] { scroll-snap-type: x mandatory; }
+.mq-scell [data-mq-swiperow] .k2-countrow-line [data-mq-wrapped] > * { scroll-snap-align: start; }
+.k2-swipe-back { display: none; }
+.mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-back {
+    display: block; position: sticky; left: 0; width: 100%; box-sizing: border-box; text-align: center;
+    padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
+    border-top: 2px solid #000; font-family: "Andika", sans-serif;
+}
+.mq-scell .k2-swipe-back i { font-style: normal; font-size: 34px; vertical-align: middle; }
+.mq-scell .k2-countrow-frame:has(> [data-mq-swiperow][data-mq-scrolled]) .k2-steptab-in svg { visibility: hidden; }
+@media print { .k2-swipe-back { display: none !important; } }
 
 /* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
    place of the mode cards, each in its original mode-card colour (ui-components.css .mode-card:nth-child). */
