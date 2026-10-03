@@ -496,8 +496,8 @@ else (async () => {
                     fails.push(`${s} worksheet: ${res} [${per}]`);
                 }
             }
-            // the score pop-up covers the page; a pupil closes it before the next task
-            await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });
+            // the score pop-up and a level/badge celebration (OK button) cover the page; a pupil closes them before the next task
+            await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); document.querySelectorAll('.mq-celebration-modal').forEach(m => { const ok = m.querySelector('button'); if (ok) ok.click(); else m.remove(); }); });
         }
         if (HOSTS.includes('quiz')) {
             await page.evaluate((c, k, seed, opts) => {

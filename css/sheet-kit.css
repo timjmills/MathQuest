@@ -318,3 +318,20 @@
 /* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
    vertical padding (row chrome), never its digits. Additive. */
 :is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
+
+/* "Check ALL" option list (legacy printFormat 'multi-select') inside a kit page: it reads the
+   page size like the kit cells (text, fraction size, check box section 6) instead of the legacy
+   11pt / 14px. Additive: the legacy print path and saved quizzes keep their own rules. */
+.ws-S { --ws-checkbox: 5mm; }
+.ws-M { --ws-checkbox: 6mm; }
+.ws-L { --ws-checkbox: 7mm; }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .ms-prompt { font-size: var(--ws-text); }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list {
+    display: flex; flex-wrap: wrap; gap: 3mm 6mm; font-size: var(--ws-frac); font-family: inherit; color: var(--ws-ink);
+}
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt { gap: 2mm; white-space: nowrap; }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt::before {
+    width: var(--ws-checkbox); height: var(--ws-checkbox); box-sizing: border-box;
+    border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
+    font-size: calc(var(--ws-checkbox) * 0.9);
+}
