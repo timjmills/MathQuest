@@ -333,7 +333,7 @@ register('count-row', {
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back to the start</b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
+            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
     },
     answerKey(p) {

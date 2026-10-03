@@ -389,3 +389,43 @@ Cue heights: the back cue is 83 px (2 lines) and the forward cue 59–83 px. The
 - C2: the first thing the pupil reads is the start the teacher chose, then the step.
 - C3: the cues are one line and ≤ half the row's height.
 - C4: the owner settles defect 4.
+
+# Round 7 (Opus, medium)
+
+Graded at **f756b7a** (round-6 fixes on 45d509b). Diff reviewed: 45d509b..f756b7a (`screen-cell.js` `wireSwipeRows` mode/snap, `count-row.js` twin gap cap + one cue strip, `screen-cell.css` additive rules, gate). Re-shot evidence restored with `git checkout -- design/audit/runs`; probes ran from the scratchpad.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 7 | The six named cases now open at scrollLeft 0 with the start and first box in a 322 px window (verified). But fix (iv) and its gate check were not done: with **Missing 20 %** the first box lands in column 6 in 7 of 12 default-table cards, and the card opens at scrollLeft 172 (163 for 14,000), so "6, 12" (or "14,000, 15,000") are hidden behind "Back to the start". That is the round-6 defect on the more-scaffolded option weaker pupils get. On the 1280 quiz, 1,000,000 ×15 now shows a false "Swipe ➜ for more boxes" when every number is visible. |
+| C2 Educational value | 8 | Start-first on all default and named cases; rows, order, titles unchanged. The line-turn arrows (↴) are cut off on the 1280 quiz. |
+| C3 Spacing and layout | 8 | The phone card is clean: tab above line 1, whole-column window, one cue line in the common case. The gap is 24.6 px on phone hosts and 25.3 / 26.9 px on 1280 / 820 cards, which reads well (arcs are drawn on the pitch). Two layout faults remain: the quiz window cuts the exit arrows, and the cues wrap to 2 lines (57 px) at 390 when both show. |
+| C4 Standard fidelity | 8 | Print is untouched (`isTwin` guard): `wave1-c2-onepage` is byte-identical to 4911898 on 12 of 12, and `wave1-c2-sizes` is OK. B&W, Andika, TY-10a, two lines of six. |
+
+## Gates run (one at a time)
+- `wave1-c2-phone`: **OK** (all PASS, both hosts, 6 cases).
+- `wave1-c2-onepage` (MQ_BASE_ROOT = scratch checkout of 4911898): **OK**. 12/12 defaults identical; rows cases fit on 1 + 1 key, tight.
+- `wave1-c2-sizes`: **OK** (S/M/L, independent + test, lines 6+6 / 5+5+5, digit floors held).
+- `ws-screen-answer --skills multiplication:count_by_tables`: **OK** (card, worksheet 3/3, quiz 3/3, live green).
+- `ws-stamp-assets --check`: OK. `node --input-type=module --check`: both changed modules OK.
+- Dry-run merge onto `claude/sweet-newton-c8wrv1` (origin = 50dbfa6): ancestor of f756b7a, **fast-forward, no conflicts**.
+
+## Worksheet at 390 (my probe, 6 cases)
+- At load nothing is focused (`document.activeElement` = BODY). Every row rests at 0 with the start visible. The window is 237 px (3 columns) for 1–2-digit rows, 236 px for 14,000 and 268 px for 1,000,000.
+- A tap can reach only a visible box, and the row does not move (verified: tap → focus in the row, scrollLeft 0).
+- Only **keyboard Tab** into a card whose first box is in column 4+ scrolls the row: default seed card 2 goes to scrollLeft 86 and hides the start. The gate's "focus() first box" runs show the same: default 86, by 7 from 3 86, by 25 259.
+- Judgment: acceptable for touch, and minor for keyboard. The same rule as the card fix below closes it, so it is folded into defect 1 and not scored separately.
+
+## Desktop
+- The 1280 card (by 25, 1,000,000 ×15) is clean. 1,000,000 ×15 switches to tab-above at 1280, which is reasonable because the row then fits whole.
+- The committed `large-by-100000…/worksheet-1280.png` and `card-1280.png` show two stray "→" in-arrows floating under the tab, about 90 px of dead space. A fresh `ws-grade-render` of the same case does not draw them, so the evidence is stale (it was rendered before the last CSS edits). Re-shoot it.
+
+## Ranked defects (RUBRIC §6 form)
+1. **C1, major (−2). Where:** `js/modules/screen-cell.js` `wireSwipeRows` → `snap` (the `!ok.length && firstFlag` branch). The fallback fires only when *no* position shows the box. **What:** with Missing 20 % (also 90 % first only, or any seed whose first blank is in column 5+), the auto-focused first box is in column 6. The card then opens at scrollLeft 172 and the start is hidden (probe: 7 of 12 default-table cards, 3 of 12 "by 1,000 from 14,000" cards). Keyboard Tab on the worksheet does the same. **Fix:** on the first focus, if the box is not fully inside the window at scrollLeft 0, keep scrollLeft 0 and do **not** focus a hidden box. Typing into an invisible box is worse than no focus. On the card, skip the auto-focus (or `focus({preventScroll:true})` plus `blur` on the first keystroke, so the pupil is never typing blind), and leave the forward cue on. The pupil swipes and taps. Later Tabs keep the nearest-start rule. **Check:** add the cases `missing: 20` (seeded so the first box is in column 6) and `missing: 90, fill: 'one'` to `wave1-c2-phone` (card and worksheet). Assert scrollLeft 0 at load and after the first Tab into the card, the first `.k2-given` fully inside the window, and `document.activeElement` not a box outside the window.
+2. **C1/C3, minor (−1). Where:** `screen-cell.js` `mode()` (`win = n·pitch − gap + 3`) and the cue rules in `css/screen-cell.css` (`[data-mq-end]` comes from scrollWidth). **What:** on the 1280 quiz, 1,000,000 ×15 shows all 15 numbers in a 562 px window. The two ↴ exit arrows lie beyond it (scrollWidth 676), so the row scrolls and "Swipe ➜ for more boxes" shows, though no box or number is hidden, and the turn arrows that join the lines are cut. In 45d509b this case showed whole, with no cue. **Fix:** when `n ≥ perRow` (every column fits), do not narrow the window. Use the full width, so the exit arrows are inside and nothing scrolls. Also drive the forward cue from "a `.k2-given`/input lies beyond the right edge", not from scrollWidth. **Check:** quiz 1280 1,000,000 ×15: `scrollWidth ≤ clientWidth + 1`, cue hidden, every ↴ inside the window. Add this to `wave1-c2-phone` or a desktop twin of it.
+3. **Evidence, not scored.** Re-run `ws-grade-render` for `large-by-100000-from-1000000-15-L` (and the rest of the wave1-C2 render dirs) after the last CSS edits. The committed 1280 card and worksheet PNGs show stray in-arrows that the current code does not draw.
+4. **Nit, not scored.** At 390, when both cues show, the strip wraps to 2 lines (57 px, within the ≤ 60 px gate). "⟵ Back" alone would keep it to one line.
+5. **Carried, owner observation (C4):** count-row screen boxes 44 px and digits 22 px against the C1 48 px input / 40 px card digit; one rule should govern.
+
+**To reach 10:** no first view ever hides the start and no box takes focus off-screen (1); no cue claims boxes that are not there, and the turn arrows always show when the row fits (2); evidence matches the code (3).

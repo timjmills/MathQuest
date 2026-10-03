@@ -1613,3 +1613,6 @@ html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-sw
    inside .problem-card (specificity 0,7,0); the worksheet's own nowrap rule matches only while the tile's style attribute reads
    "display:flex", which the active-box highlight rewrites, and the 44 px input then sat 2 px low in its tile. This beats both. */
 html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-tile.k2-tile.k2-tile { flex-wrap: nowrap !important; }
+/* count-by rows (critic C2 r7): when both cues show, the back cue says only "Back", so the strip stays one line at 390 */
+html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
+html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
