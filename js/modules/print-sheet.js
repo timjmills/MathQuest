@@ -1163,7 +1163,18 @@ function measureTitleLines(text, size) {
 /* ==================================================================== the one entry point */
 
 async function fontsReady() {
-    try { if (typeof document !== 'undefined' && document.fonts) await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]); } catch (e) { /* print anyway */ }
+    // document.fonts.ready only waits for faces ALREADY loading: on a page's first print the
+    // Andika faces the measurement host uses had not been requested yet, so the first sheet was
+    // measured in the fallback font and dealt a different count than every later sheet with the
+    // same seed (critic 2026-10-03: the lint sweep and a single-skill run disagreed). The faces
+    // are requested explicitly before anything is measured.
+    try {
+        if (typeof document !== 'undefined' && document.fonts) {
+            const faces = ['400 28px Andika', '700 28px Andika', 'italic 400 28px Andika', 'italic 700 28px Andika'];
+            const load = Promise.all(faces.map((f) => (document.fonts.load ? document.fonts.load(f, '0123456789') : null)).filter(Boolean)).catch(() => {});
+            await Promise.race([load.then(() => document.fonts.ready), new Promise((r) => setTimeout(r, 3000))]);
+        }
+    } catch (e) { /* print anyway */ }
 }
 
 /** The column counts a section's layout may choose, so each gets measured. */
@@ -1751,20 +1762,35 @@ async function buildSheetOnce(req = {}) {
                     items = more;
                 }
                 // whole rows: a pool page never leaves a bordered empty cell after its last problem
-                // (critic 2026-10-03, counting_all S: 7 problems in 2 columns). The row is filled
-                // when the page still holds it, else the lone problem goes.
+                // (critic 2026-10-03: counting_all S, 7 problems in 2 columns; mixed_multiplication L,
+                // a lone area model beside an empty cell). Only the problems that share the column
+                // grid count (a full-width problem has its own row). The row is filled when the page
+                // still holds it (up to four more problems are tried); else buildSheet deals the page
+                // again from a derived seed (dropping the problem would leave a strip, PAGEFILL).
                 try {
-                    const Lr = layoutOf(n.role, sec, withTwins(si, items), n, lctx);
-                    const cols = Math.max(1, Number(Lr && Lr.cols) || 1);
-                    const rem = items.length % cols;
-                    if (cols > 1 && rem && !(Lr && Lr.splitWide)) {
-                        const full = finalRun(sec, si, base, items.length + cols - rem, probe);
-                        sec.floor = floorWith(si, full);
-                        const capF = capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, full), n, lctx)) * pagesWanted;
-                        const ceilF = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
-                        if (capF >= full.length && full.length % cols === 0 && full.length <= ceilF * pagesWanted) items = full;
-                        else if (items.length - rem > 0) { items = finalRun(sec, si, base, items.length - rem, probe); sec.floor = floorWith(si, items); }
-                        else sec.floor = floorWith(si, items);
+                    const ceilF = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
+                    const holeOf = (its) => {
+                        const Lr = layoutOf(n.role, sec, withTwins(si, its), n, lctx);
+                        const cols = Math.max(1, Number(Lr && Lr.cols) || 1);
+                        // column work (stack / fact) in a group of two or more stands in its own grid
+                        // (practice.js fineSplit), so only the other column problems share this one
+                        const narrow = its.filter((it) => !oneColumnOnly(it, n));
+                        const isFine = (it) => it.template === 'stack' || it.template === 'fact';
+                        const fineN = narrow.filter(isFine).length;
+                        const narrowN = fineN >= 2 && fineN < narrow.length ? narrow.length - fineN : narrow.length;
+                        return { cols, rem: cols > 1 ? narrowN % cols : 0, cap: capFromL(sec, si, Lr) * pagesWanted };
+                    };
+                    let h = holeOf(items);
+                    if (h.rem) {
+                        let done = false;
+                        for (let add = 1; add <= 4 && !done; add++) {
+                            const more = finalRun(sec, si, base, items.length + add, probe);
+                            sec.floor = floorWith(si, more);
+                            const hm = holeOf(more);
+                            if (hm.cap < more.length || more.length > ceilF * pagesWanted) break;
+                            if (!hm.rem) { items = more; done = true; }
+                        }
+                        sec.floor = floorWith(si, items);
                     }
                 } catch (e) { /* keep the count */ }
             }
@@ -2439,10 +2465,28 @@ export async function buildSheet(req = {}) {
             // standard problems at S / M / L): the fill never adds past it
             const sz = String(req.size || 'M').toUpperCase();
             const ceil = () => ({ S: 30, M: 20, L: 12 })[sz] || 12;
+            // A count that leaves a bordered empty run after the last problem (grid.js blankRun) is
+            // a hole on the page (critic 2026-10-03: mixed_multiplication L, a lone area model
+            // beside an empty cell): the largest count without one is kept, stepping back one
+            // problem when the counts tried all leave one.
+            const hole = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+            const tried = [r];
             for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
                 const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
                 if (!(more.pageCount <= wanted) || more.items.length <= best.items.length) break;
                 best = more;
+                tried.push(more);
+            }
+            if (!hole(best) || req._noReseat) return best;
+            const whole = tried.filter((x) => !hole(x) && x.items.length >= best.items.length).sort((a, b) => b.items.length - a.items.length)[0];
+            if (whole) return whole;
+            // Dropping the lone problem leaves a strip under the rows (PAGEFILL), so the page is
+            // dealt again from a derived seed (seed + k x 7919, reproducible: the same request
+            // always lands on the same deal) until one fills its rows with as many problems.
+            const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+            for (let k = 1; k <= 4; k++) {
+                const alt = await buildSheet(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
+                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length) return alt;
             }
             return best;
         }

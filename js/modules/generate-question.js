@@ -1013,6 +1013,12 @@ function generateResolvedQuestion() {
     }
 
     if (poolMember) q.poolMember = poolMember;
+    // A pool page prints one generic instruction ("Solve."): a parity sort dealt there carries its
+    // own task line in the cell (parity.js `caption`), or the pupil has a row of numbers and no
+    // question (critic 2026-10-03, counting_all S).
+    if (q.poolMember && q.cell && q.cell.template === 'parity' && q.cell.payload && q.cell.payload.task === 'sort' && !q.cell.payload.caption) {
+        q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { caption: true }) });
+    }
     else if (mixedWordSkill) q.poolMember = wordMember;
     if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
