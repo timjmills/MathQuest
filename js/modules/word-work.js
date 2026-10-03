@@ -100,11 +100,7 @@ export function applyWordWork(q) {
     } catch (e) { payload = null; }
     if (!payload) return q;
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
-    const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');
-    // A retold story has new names and nouns: the generator's hint ("Zoe has more, so add ...")
-    // would name a child who is not in it. The hint is rebuilt from the item's own work.
-    if (retold) q.hint = workHint(payload);
     q.cell = { template: WW_TEMPLATE, v: 1, payload };
     try { q.visual = wordWorkTwin(renderCell, payload); } catch (e) { /* keep the old visual */ }
     q.answerType = 'number';
@@ -118,16 +114,4 @@ export function applyWordWork(q) {
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;
-}
-
-/** A hint built from a word-work payload alone (no names): the sign and the number sentence. */
-export function workHint(p) {
-    const G = { '+': '+', '-': '−', '*': '×', '/': '÷' };
-    const V = { '+': 'add', '-': 'subtract', '*': 'multiply', '/': 'divide' };
-    const lines = (p && p.steps || []).map((st, i) => {
-        const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
-        const v = V[st.op] || 'work it out';
-        return `${pre}${pre ? v : v.charAt(0).toUpperCase() + v.slice(1)}: ${st.top} ${G[st.op] || st.op} ${st.bottom} = ?`;
-    });
-    return lines.join(' ');
 }

@@ -588,8 +588,8 @@ export const SKILLS = {
         { v: "add_sub_10s", l: "Add & Subtract by 10s" },
         { v: "add_sub_100s", l: "Add & Subtract by 100s" },
         { v: "add", l: "Basic Addition" },
-        { v: "add_word_problems", l: "Addition Word Problems", desc: "Some stories are \"how many more\" problems, solved by subtracting." },
-        { v: "add_word_problems_plain", l: "Addition Word Problems (No Pictures)", desc: "Some stories are \"how many more\" problems, solved by subtracting." },
+        { v: "add_word_problems", l: "Addition Word Problems" },
+        { v: "add_word_problems_plain", l: "Addition Word Problems (No Pictures)" },
         { v: "add_sub_fact_family", l: "Addition Fact Families" },
         // Merged 2026-09-20 (owner ruling 5): one skill, Support level chooses how many
         // numbers of the family are blank. The two tombstones keep their positions and their

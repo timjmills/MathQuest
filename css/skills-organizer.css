@@ -654,10 +654,3 @@
     .so-action-btn .so-action-icon { font-size: 0.9rem; }
     .so-back-btn { padding: 4px 12px; font-size: 0.8rem; }
 }
-
-/* A skill's teacher note (data.js desc) under its name in the preview. Additive. */
-.so-hover-popup .so-popup-desc {
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    margin: -4px 0 10px;
-}

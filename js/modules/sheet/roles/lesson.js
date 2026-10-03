@@ -252,15 +252,9 @@ export function pickWeDo(items, example, data, n) {
     const rest = items.filter((it) => sigOf(it) !== ex);
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     const same = rest.filter((it) => (!re || re.test(workedStepsOf(it).map((s) => s.text).join(' '))) && digitsOfOps(it) === shape);
-    // The Steps beside the cells are the example's steps: a Guided cell first works the SAME
-    // steps (the same sign, the same story type) - never "Circle +. Add." beside a take-away story.
-    const kind = kindOf(example);
-    const opKind = opKindOf(example);
-    const sameKind = kind ? rest.filter((it) => kindOf(it) === kind).concat(rest.filter((it) => kindOf(it) !== kind && opKindOf(it) === opKind)) : [];
     // The lesson's preferred kind of number first (never an end case like 99 as the first try).
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
-    const order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
-        ...liked, ...same, ...rest])];
+    const order = liked.concat(same.filter((it) => !liked.includes(it)), rest.filter((it) => !same.includes(it)));
     // Lessons r1: a Guided set is varied - no two with the same answer, at most one "make 10"
     // (a fact whose answer is the band's top), and the big number on both sides where the pool
     // has it (the chart models both).
@@ -525,35 +519,13 @@ function stateDrawing(it, steps, groups, k, c) {
  * lesson data IS worked step n (the data is written that way); a skill without lesson data takes
  * the provider's words and the icon of their first verb.
  */
-/** An item's worked steps with their numbers masked: two items of one kind work the same steps. */
-export const kindOf = (it) => workedStepsOf(it).map((s) => String(s.text || '').replace(/^(Write the answer)\b.*$/, '$1').replace(/\d[\d,.]*/g, '#')).join('|');
-/** The same, with the story's key words dropped too: the same sign(s) and the same moves. */
-const opKindOf = (it) => workedStepsOf(it).map((s) => generalStep(s.text)).filter((t) => !/^Look at the key words/.test(t)).join('|').replace(/\d[\d,.]*/g, '#');
-
-/**
- * A worked step said for ANY problem of the kind (the Steps beside the Guided cells and the
- * practice pages' strip): the example's own numbers, key words and answer stay on the chart; a
- * Steps list beside another problem never reads "Write 34 and 51" next to 54 and 11.
- */
-export function generalStep(text) {
-    const t = String(text || '');
-    const pre = (t.match(/^Step \d+: /) || [''])[0];
-    const body = t.slice(pre.length);
-    if (/^Look at the key words?\b/i.test(body)) return `${pre}Look at the key words.`;
-    if (!/\d/.test(body)) return t;
-    if (/^Write .* in the boxes\.?$/i.test(body)) return `${pre}Write the numbers in the boxes.`;
-    if (/^Write the answer\b/i.test(body)) return `${pre}Write the answer and its label word.`;
-    if (/^[\d,.\s]+[-+×÷−*/][\d,.\s]+=\s*[\d,.]+(\s*R\s*\d+)?\.?$/.test(body)) return `${pre}Work it out.`;
-    return t;
-}
-
-export function namedSteps(steps, data, { general = false } = {}) {
+export function namedSteps(steps, data) {
     const own = data && Array.isArray(data.steps) && data.steps.length === steps.length ? data.steps : null;
     // The provider's words in the lesson's own terms (`words`: [{from, to}] regex rewrites).
     const rules = data && Array.isArray(data.words) ? data.words : [];
     const say = (t) => rules.reduce((w, r) => w.replace(new RegExp(r.from), r.to), String(t || ''));
     return steps.map((s, i) => ({
-        name: own ? own[i].text : general ? generalStep(s.text) : s.text,
+        name: own ? own[i].text : s.text,
         icon: own ? (own[i].icon || iconForText(own[i].text)) : iconForText(s.text),
         words: own ? say(s.text) : '',
         // Lessons r3: a rule the step needs for another case ("0 tens? Leave it empty.").
@@ -744,7 +716,7 @@ export function secondItems(example2) {
  * does not load the lesson stylesheet).
  */
 export function stripHtml(data, steps, size = 'L') {
-    const named = namedSteps(steps, data, { general: true });
+    const named = namedSteps(steps, data);
     if (!named.length) return '';
     return `<div class="mq-lstrip" data-mq-lesson-strip><b class="mq-lstrip-l">Steps:</b><ol>${named.map((s, i) => `<li>${stepMarker(i + 1)}${stepIcon(s.icon, size)}<span>${esc(s.name)}</span></li>`).join('')}</ol></div>`;
 }
@@ -862,7 +834,7 @@ export function vocabItem(vocab, seed) {
 
 /** The lesson's Steps zone beside the Guided cells: the chart's numerals, icons and step names. */
 function weDoStepsHtml(data, steps, size) {
-    const named = namedSteps(steps, data, { general: true });
+    const named = namedSteps(steps, data);
     const chant = data && data.chant ? `<p class="mq-lchant">${esc(data.chant)}</p>` : '';
     return `<div class="mq-lstepszone"><ol class="mq-lsteps">${named.map((s, i) => `<li>${stepMarker(i + 1)}${stepIcon(s.icon, size)}<span>${esc(s.name)}</span></li>`).join('')}</ol>${chant}</div>`;
 }
