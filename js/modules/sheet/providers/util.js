@@ -163,10 +163,13 @@ export function strings(def) {
         if (q && typeof def.instructionVars === 'function') {
             try { instruction = instructionFor(key, def.instructionVars(q) || {}); } catch (e) { /* keep template */ }
         }
+        // RM-08: a choose-all item (printFormat 'multi-select') is ringed, whatever the skill's
+        // own line: its section prints the library's circle-all line once (critic fractions-key D3)
+        const circleAll = !!(q && q.printFormat === 'multi-select' && !q.printText);
         const out = {
             iCan: def.iCan,
-            instruction,
-            instructionKey: key,
+            instruction: circleAll ? INSTRUCTION_LIBRARY['default-circle-all'] : instruction,
+            instructionKey: circleAll ? 'default-circle-all' : key,
             steps: def.steps.slice(),
             say: def.say,
             oralFrame: def.say,

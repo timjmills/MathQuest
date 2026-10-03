@@ -335,3 +335,15 @@
     border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
     font-size: calc(var(--ws-checkbox) * 0.9);
 }
+
+/* RM-08 circle-all on a kit page (critic fractions-key D3): options are words / numbers to ring,
+   no check box; at least 8 mm between options and room for the ring. The key rings the right
+   ones (print-sheet.js legacyKeyFill 3c) with a 0.75 pt line in the key's ink. */
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt::before { display: none !important; content: none !important; }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list { gap: 3mm 8mm; }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt {
+    box-sizing: border-box; min-height: calc(var(--ws-hw) + 4mm); padding: 1mm 2.5mm;
+    border: var(--ws-hair) solid transparent; border-radius: 999px; justify-content: center;
+}
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt[data-ws-circled] { border-color: var(--ws-ink); }
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt[data-ws-circled][data-ws-ink="trace"] { border-color: #949494; }

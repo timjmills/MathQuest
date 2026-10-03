@@ -500,26 +500,38 @@ else (async () => {
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); document.querySelectorAll('.mq-celebration-modal').forEach(m => { const ok = m.querySelector('button'); if (ok) ok.click(); else m.remove(); }); });
         }
         if (HOSTS.includes('quiz')) {
-            await page.evaluate((c, k, seed, opts) => {
+            const nQuiz = await page.evaluate((c, k, seed, opts) => {
                 const questions = [];
                 for (let i = 0; i < 3; i++) {
                     const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i, ...(opts ? { opts } : {}) });
                     questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
+                }
+                // a skill that can deal a choose-all item ("Circle ALL ...") gets one on the quiz
+                // too (critic fractions-key D2: the quiz drew none of its options)
+                if (!questions.some(x => x.questionData.answerType === 'multi-select-check')) {
+                    for (let t = 1; t <= 200; t++) {
+                        const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + 1000 + t, itemIndex: 3, ...(opts ? { opts } : {}) });
+                        if (q && q.answerType === 'multi-select-check' && Array.isArray(q.options)) {
+                            questions.push({ id: 3, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
+                            break;
+                        }
+                    }
                 }
                 const test = { id: null, name: 'Answer', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
                     settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
                 window.handleQuizURL(window.compressTestForURL(test));
                 const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
                 window.startQuizTest();
+                return questions.length;
             }, c, k, hash(s + ':quizans'), OPTS);
             await sleep(500);
             let err = '';
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < nQuiz; i++) {
                 const r = await run(page, '#quizTakeView .qt-cell', { host: 'quiz' });
                 if (r.error) { err = `Q${i + 1}: ${r.error}`; break; }
                 await page.keyboard.press('Tab');
                 await sleep(250);
-                if (i < 2) { await page.evaluate(() => window.navigateQuizQuestion(1)); await sleep(350); }
+                if (i < nQuiz - 1) { await page.evaluate(() => window.navigateQuizQuestion(1)); await sleep(350); }
             }
             if (err) { line.push(`quiz ERR ${err}`); fails.push(`${s} quiz: ${err}`); }
             else {

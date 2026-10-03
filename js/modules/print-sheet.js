@@ -405,6 +405,46 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     const inkAttr = ink === 'trace' ? 'trace' : 'solid';
     const raw = key && key.value !== undefined && key.value !== null && typeof key.value !== 'object' ? String(key.value) : '';
     const display = key && key.display !== undefined ? String(key.display) : raw;
+
+    // 3c. A choose-all option list (printFormat 'multi-select', RM-08 circle-all): the key rings
+    // every option the answer names by id, as the pupil rings it (AK-1, AK-2). It runs before the
+    // value checks: a picture option has no label, so its key has no display text (D6). A list
+    // whose paper task is another one (`printText` / `printAnswer`: "Circle the even numbers.
+    // Cross out the odd numbers.") is not keyed from the screen target: its stamp says the paper
+    // task (D1).
+    const optSpans = html.match(/<span class="opt">/g) || [];
+    // The odd/even sort ("Circle the even numbers. Cross out the odd numbers.", gen-algebraic.js
+    // oddEvenSortKey): its key is the paper task, read from `printAnswer` - every number to
+    // circle ringed, every number to cross out crossed, in the pupil's own list (D1).
+    const sortKey = q && q.printFormat === 'multi-select' && typeof q.printAnswer === 'string'
+        ? /^\s*Circle:\s*(.*?);\s*Cross out:\s*(.*)$/.exec(q.printAnswer) : null;
+    if (sortKey && Array.isArray(q.options) && optSpans.length === q.options.length) {
+        const list = (t) => t.split(',').map((x) => x.trim()).filter((x) => x && x !== '(none)');
+        const ring = list(sortKey[1]), cross = list(sortKey[2]);
+        let k = 0;
+        return html.replace(/<span class="opt">/g, () => {
+            const o = q.options[k++] || {};
+            const lbl = String(o.label == null ? '' : o.label).replace(/<[^>]*>/g, '').trim();
+            if (ring.includes(lbl)) return `<span class="opt" data-ws-circled="1" data-ws-ink="${inkAttr}">`;
+            if (cross.includes(lbl)) {
+                const col = inkAttr === 'trace' ? '#949494' : '#000';
+                return `<span class="opt" data-ws-crossed="1" data-ws-ink="${inkAttr}" style="position:relative;">`
+                    + `<svg aria-hidden="true" viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;">`
+                    + `<line x1="1" y1="9" x2="9" y2="1" stroke="${col}" stroke-width="0.75pt" vector-effect="non-scaling-stroke"/></svg>`;
+            }
+            return '<span class="opt">';
+        });
+    }
+    if (q && q.printFormat === 'multi-select' && !q.printText && !q.printAnswer && Array.isArray(q.options) && optSpans.length === q.options.length) {
+        let ids = q.ans;
+        if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { ids = null; } }
+        if (ids != null && !Array.isArray(ids)) ids = [ids];
+        const on = Array.isArray(ids) ? q.options.map((o) => !!o && ids.map(String).includes(String(o.id))) : [];
+        if (on.some(Boolean)) {
+            let k = 0;
+            return html.replace(/<span class="opt">/g, () => (on[k++] ? `<span class="opt" data-ws-circled="1" data-ws-ink="${inkAttr}">` : '<span class="opt">'));
+        }
+    }
     if (!raw && !display) return null;
     const digits = raw.replace(/,/g, '').trim();
 
@@ -544,20 +584,6 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const fm = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
         const val = fm ? `<span class="mq-frac" style="font-size:1em;"><span>${fm[1]}</span><span>${fm[2]}</span></span>` : escText(display);
         return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
-    }
-
-    // 3c. A "Circle ALL" option list (printFormat 'multi-select'): the key ticks the box of every
-    // option the answer names by id, in the pupil's own boxes (AK-1, AK-2).
-    const optSpans = html.match(/<span class="opt">/g) || [];
-    if (q && q.printFormat === 'multi-select' && Array.isArray(q.options) && optSpans.length === q.options.length) {
-        let ids = q.ans;
-        if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { ids = null; } }
-        if (ids != null && !Array.isArray(ids)) ids = [ids];
-        const on = Array.isArray(ids) ? q.options.map((o) => !!o && ids.map(String).includes(String(o.id))) : [];
-        if (on.some(Boolean)) {
-            let k = 0;
-            return html.replace(/<span class="opt">/g, () => (on[k++] ? `<span class="opt" data-ws-ticked="1" data-ws-ink="${inkAttr}">` : '<span class="opt">'));
-        }
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -1682,14 +1708,25 @@ export async function buildSheet(req = {}) {
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
-            for (let pass = 0; pass < 3; pass++) {
+            for (let pass = 0; pass < 4; pass++) {
                 items = finalRun(sec, si, base, want, probe);
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
                 sec.floor = floorWith(si, probe.items.concat(items));
                 if (sec.count) break;
                 const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
-                if (again >= want) break;
+                // The count may also GROW: the probe guessed the share of full-width problems,
+                // and a run dealt with fewer of them leaves rows of the page empty (critic
+                // fractions-key D9: 31 % of a page blank under a split section).
+                if (again === want) break;
                 want = again;
+            }
+            if (!sec.count && shared[si] === null) {
+                // never more than the page holds: a run grown on the last pass is checked again
+                const cap = Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                if (cap < items.length) {
+                    items = finalRun(sec, si, base, cap, probe);
+                    sec.floor = floorWith(si, probe.items.concat(items));
+                }
             }
             hostItems = hostItems.concat(items);
         });

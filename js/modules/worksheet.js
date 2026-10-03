@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
-import { shuffle, normalizeText } from './utils.js';
+import { shuffle, normalizeText, stackSlashFractions } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
@@ -356,7 +356,9 @@ function mountWorksheetMsc(q, idx, host) {
             _wsMscDispatcherInstalled = true;
         }
         host.dataset.mscIdx = String(idx);
-        mod.renderMultiSelectCheck(q, host);
+        // the options only, in the cell, checked by CHECK ALL like every other card (critic
+        // fractions-key D10): no Submit or counter inside the paper cell
+        mod.renderMultiSelectCheck(q, host, { embedded: true });
     }).catch(err => console.error('Failed to load multi-select-check widget for worksheet:', err));
 }
 
@@ -1354,7 +1356,9 @@ function _wsRenderCard(grid, q, i) {
         const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
             ? `<div class="ws-msc-visual">${q.visual}</div>`
             : '';
-        const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
+        // screen verb (Tap, never Click) and fractions stacked (TY-7)
+        const mscText = q.text ? stackSlashFractions(String(q.text).replace(/\bClick\b/g, 'Tap').replace(/\bclick\b/g, 'tap')) : '';
+        const textHtml = mscText ? `<div class="question-line">${mscText}</div>` : '';
         questionDisplay = `${visualHtml}${textHtml}<div class="ws-msc-host" id="wsMscHost_${i}" data-msc-idx="${i}"></div>`;
     } else if (isClockSet) {
         // Render the clock-set widget into a per-card host. The widget is
@@ -2829,8 +2833,24 @@ export function checkAllWorksheet() {
             // ungraded cards (student never clicked Submit) reveal the correct
             // set via flash classes and append a "no answer" note. Graded
             // cards return their stored verdict.
-            const stored = worksheetMscState.get(idx);
+            let stored = worksheetMscState.get(idx);
             const host = document.getElementById(`wsMscHost_${idx}`);
+            // an embedded list (no Submit in the cell): CHECK ALL grades what the pupil ringed
+            if (host && host.dataset.mscEmbedded === '1' && !(stored && stored.submitted)) {
+                const sel = Array.from(host.querySelectorAll('.msc-opt.selected')).map(el => el.dataset.id);
+                if (sel.length) {
+                    const want = new Set((q.ans || []).map(String));
+                    const ok = sel.length === want.size && sel.every(id => want.has(String(id)));
+                    host.querySelectorAll('.msc-opt').forEach(el => {
+                        const on = sel.includes(el.dataset.id), right = want.has(String(el.dataset.id));
+                        el.classList.remove('correct-flash', 'wrong-flash');
+                        if (on && right) el.classList.add('correct-flash');
+                        else if (on !== right) el.classList.add('wrong-flash');
+                    });
+                    stored = { submitted: true, isCorrect: ok, selectedIds: sel };
+                    worksheetMscState.set(idx, stored);
+                }
+            }
             if (stored && stored.submitted) {
                 isCorrect = !!stored.isCorrect;
             } else {

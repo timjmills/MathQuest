@@ -318,7 +318,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
                 // default), never the sum (RP-1); the pupil writes the sum in the boxes after "=".
-                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: sumNum > den && sumNum % den !== 0 });
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: true });  // D4 (owner 2026-10-03): one slot shape for every item; 1 or 5/5 both accepted
                 return;
 
             } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
@@ -338,7 +338,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 let opts = items.map((it, i) => ({
                     id: 'opt' + i,
-                    label: `${it.a}/${den} - ${it.b}/${den}`,
+                    label: `${it.a}/${den} \u2212 ${it.b}/${den}`,
                     correct: it.diff < 0.5 - 1e-9
                 }));
                 // Force at least one correct option
@@ -346,10 +346,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const aF = rng(1, Math.floor(den / 2));
                     const bF = aF > 1 ? rng(1, aF - 1) : 0;
                     if (aF > bF) {
-                        opts[0] = { id: 'opt0', label: `${aF}/${den} - ${bF || 0}/${den}`, correct: (aF - (bF || 0)) / den < 0.5 - 1e-9 };
+                        opts[0] = { id: 'opt0', label: `${aF}/${den} \u2212 ${bF || 0}/${den}`, correct: (aF - (bF || 0)) / den < 0.5 - 1e-9 };
                     }
                     if (!opts[0].correct) {
-                        opts[0] = { id: 'opt0', label: `2/${den} - 1/${den}`, correct: true };
+                        opts[0] = { id: 'opt0', label: `2/${den} \u2212 1/${den}`, correct: true };
                     }
                 }
                 opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
@@ -377,7 +377,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
                 // default), never the difference (RP-1); the pupil writes it in the boxes after "=".
-                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['−'], _fModelPick() || 'bar', { mixed: diffNum > den && diffNum % den !== 0 });
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['−'], _fModelPick() || 'bar', { mixed: diffNum >= den });
                 return;
 
             } else if (fracSkill === "add_mixed_like" && Math.random() < 0.25) {
@@ -989,7 +989,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 {
                     const _mk = _fModelPick() || 'bar';
                     _fSentenceKit(q, [{ n: n1, d: d1 }, { n: n2, d: d2 }], ['+'], _mk,
-                        { mixed: sumNum > lcd && sumNum % lcd !== 0, wholeMm: _mk === 'line' ? 40 : 26 });
+                        { mixed: true, wholeMm: _mk === 'line' ? 40 : 26 });
                 }
                 return;
 

@@ -5692,7 +5692,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const optCount = (problem.options || []).length;
         const cols = optCount <= 9 ? ' cols-3' : '';
         const rawText = problem.text || '';
-        const promptText = rawText.replace(/\b(?:Click|Circle) ALL\b/gi, 'Check the box beside ALL');
+        // a fraction in the prompt is stacked too (TY-7); the verb stays the legacy "Circle ALL"
+        // (a kit page prints the library line once per section and keeps only the criterion here)
+        const promptText = rawText.replace(/\b(?:Click|Circle) ALL\b/g, 'Circle all')
+            .replace(/(^|[^<\w])(\d+)\/(\d+)\b/g, '$1<span class="mq-frac" style="font-size:1em;"><span>$2</span><span>$3</span></span>');
         // A generator that draws the figure the options refer to sets `printStem` (identify_angles:
         // "Tick every obtuse angle in this shape", its corners lettered).
         const stem = _msStem(problem) || (problem.printStem && problem.visual ? printVisualWrap(problem.visual) : '');

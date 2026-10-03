@@ -4,7 +4,7 @@
 import { state } from './state.js';
 import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
-import { shuffle } from './utils.js';
+import { shuffle, stackSlashFractions, answerLabelOf } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
 import {
@@ -360,7 +360,14 @@ function renderQuizQuestion(qItem, flatIdx) {
 
     let instrHtml = '';
     let cellBody;
-    if (kind && kind.kind === 'stack') {
+    if (qd.answerType === 'multi-select-check' && Array.isArray(qd.options) && qd.options.length) {
+        // A choose-all list (critic fractions-key D2): the options drawn in the cell, tapped to
+        // ring; the chosen ids (option order) go to a hidden #qtAnswerInput like every other cell.
+        const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
+        const prompt = String(qd.text || '').replace(/\bClick\b/g, 'Tap').replace(/\bclick\b/g, 'tap');
+        cellBody = `<div class="qt-msc-host" data-qt-msc="1"></div>${hidden}`;
+        instrHtml = stackSlashFractions(escHtml(prompt));
+    } else if (kind && kind.kind === 'stack') {
         // Digit boxes (right-to-left entry, SP-20) feed a hidden #qtAnswerInput, which every
         // save path of this module already reads.
         const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
@@ -390,7 +397,7 @@ function renderQuizQuestion(qItem, flatIdx) {
         </div>
         <div class="mq-qtpaper mq-scell">
             ${instrHtml ? `<div class="mq-instr">${instrHtml}</div>` : ''}
-            <div class="ws-cell mq-scell mq-mono qt-cell" data-ws-cell="${kind ? kind.kind : 'legacy'}" data-flat-idx="${flatIdx}">${cellBody}</div>
+            <div class="ws-cell mq-scell mq-mono qt-cell" data-ws-cell="${cellBody.startsWith('<div class="qt-msc-host"') ? 'msc' : kind ? kind.kind : 'legacy'}" data-flat-idx="${flatIdx}">${cellBody}</div>
         </div>
         ${feedbackHtml}
     `;
@@ -401,6 +408,23 @@ function renderQuizQuestion(qItem, flatIdx) {
 function _mountQuizCell(flatIdx) {
     const cellEl = document.querySelector('#quizTakeView .qt-cell');
     if (!cellEl) return;
+    if (cellEl.dataset.wsCell === 'msc') {
+        // a choose-all list: tap to ring; the ids (option order) are the answer (D2)
+        const host = cellEl.querySelector('.qt-msc-host');
+        const hidden = document.getElementById('qtAnswerInput');
+        const qd = state.quizAllQuestions[flatIdx].question.questionData;
+        const saved = String((hidden && hidden.value) || '').split(',').map(s => s.trim()).filter(Boolean);
+        import('./widgets/multi-select-check.js').then(mod => {
+            if (!host || !host.isConnected) return;
+            mod.renderMultiSelectCheck(qd, host, {
+                embedded: true,
+                selected: saved,
+                onChange: (ids) => { const v = ids.join(','); if (hidden) hidden.value = v; recordAnswer(flatIdx, v); },
+            });
+        }).catch(err => console.error('Failed to load multi-select-check widget for the quiz:', err));
+        monoCell(cellEl);
+        return;
+    }
     if (cellEl.dataset.wsCell === 'legacy') {
         hideScreenOnlyCaptions(cellEl);
         const textEl = cellEl.querySelector(':scope > .qt-question-text');
@@ -537,7 +561,22 @@ function recordAnswer(flatIdx, studentAnswer) {
     const aNorm = String(qd.ans).trim().toLowerCase();
     const slotVerdict = slotAnswerMatches(studentAnswer, qd);
 
-    if (typeof slotVerdict === 'boolean') {
+    const fracParse = (t) => {
+        const m = /^\s*(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)\s*$/.exec(t) || /^\s*(\d+)\s*$/.exec(t);
+        if (!m) return null;
+        if (m.length === 2) return { n: Number(m[1]), d: 1 };
+        return Number(m[3]) ? { n: Number(m[1] || 0) * Number(m[3]) + Number(m[2]), d: Number(m[3]) } : null;
+    };
+    if (qd.answerType === 'multi-select-check' && Array.isArray(qd.ans)) {
+        // a choose-all list: the same set of options, in any order
+        const got = String(studentAnswer).split(',').map(s => s.trim()).filter(Boolean);
+        const want = new Set(qd.ans.map(String));
+        correct = got.length === want.size && got.every(id => want.has(id));
+    } else if (qd.cell && qd.cell.template === 'frac-model' && /\//.test(String(studentAnswer)) && fracParse(String(studentAnswer)) && fracParse(String(qd.ans))) {
+        // a fraction sentence (owner 2026-10-03, D4): 5/5 is as right as 1, 6/4 as 1 1/2
+        const u = fracParse(String(studentAnswer)), a = fracParse(String(qd.ans));
+        correct = u.n * a.d === a.n * u.d;
+    } else if (typeof slotVerdict === 'boolean') {
         correct = slotVerdict;
     } else if (Array.isArray(qd.acceptedAnswers) && qd.acceptedAnswers.some(a => String(a).trim().toLowerCase() === sNorm)) {
         correct = true;
@@ -800,7 +839,7 @@ function showQuizResults() {
                     : '<span class="incorrect-icon">&#10007;</span>';
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
-                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(String(q.questionData.ans))}</span>`;
+                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(answerLabelOf(q.questionData, q.questionData.ans))}</span>`;
                 }
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}
@@ -819,7 +858,7 @@ function showQuizResults() {
                     : '<span class="incorrect-icon">&#10007;</span>';
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
-                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(String(q.questionData.ans))}</span>`;
+                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(answerLabelOf(q.questionData, q.questionData.ans))}</span>`;
                 }
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}

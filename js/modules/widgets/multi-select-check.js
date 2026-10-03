@@ -8,11 +8,16 @@
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
+import { stackSlashFractions } from '../utils.js';
+
 function _largeTargets() {
     try {
         return !!(window.state && window.state.mapFeatures && window.state.mapFeatures.largeTargets);
     } catch (e) { return false; }
 }
+
+// a fraction is written stacked over its bar, never with a slash (TY-7)
+const stackFractions = stackSlashFractions;
 
 function _renderInner(opt) {
     if (opt.svg) {
@@ -22,18 +27,23 @@ function _renderInner(opt) {
         const safeLabel = opt.label ? `<span class="msc-label">${opt.label}</span>` : '';
         return `<img class="msc-image" src="${opt.image}" alt="${opt.label || ''}">${safeLabel}`;
     }
-    return `<span class="msc-label">${opt.label != null ? opt.label : ''}</span>`;
+    return `<span class="msc-label">${opt.label != null ? stackFractions(opt.label) : ''}</span>`;
 }
 
-export function renderMultiSelectCheck(q, container) {
+export function renderMultiSelectCheck(q, container, { embedded = false, onChange = null, selected = null } = {}) {
     if (!container || !q || !Array.isArray(q.options)) return;
     const large = _largeTargets();
     const optClass = large ? 'msc-opt large' : 'msc-opt';
     // TAP TO RING (P9 RN-10, "Circle every number that rounds to N"): the paper item is a row of
     // printed numbers the pupil rings, so the screen twin draws the same black numerals and a tap
     // draws the ring round the number — no check box (parity, RM-P-01; place-value-rounding.md §13.6).
-    const ring = !!q.circleAll;
+    // A printed choose-all list (printFormat 'multi-select', RM-08) is drawn the same way.
+    const ring = !!q.circleAll || q.printFormat === 'multi-select';
     const total = q.options.length;
+    // `embedded` (the online worksheet and the quiz): the options only, inside the cell, as on
+    // paper; the host's own check flow reads the selection (`onChange(ids)`, option order), and
+    // no Submit button or counter is drawn in the cell (critic fractions-key D2, D10).
+    if (embedded) container.dataset.mscEmbedded = '1';
 
     const optsHtml = q.options.map(opt => {
         const id = opt.id;
@@ -43,15 +53,17 @@ export function renderMultiSelectCheck(q, container) {
         </button>`;
     }).join('');
 
-    container.innerHTML = `
+    const gridHtml = `<div class="msc-grid${ring ? ' msc-ring' : ''}" role="group" aria-label="${ring ? 'Tap every answer to ring it' : 'Select all that apply'}">${optsHtml}</div>`;
+    container.innerHTML = embedded ? gridHtml : `
         <div class="msc-counter" aria-live="polite">0 of ${total} selected</div>
-        <div class="msc-grid${ring ? ' msc-ring' : ''}" role="group" aria-label="${ring ? 'Tap every number to ring it' : 'Select all that apply'}">${optsHtml}</div>
+        ${gridHtml}
         <button type="button" class="msc-submit primary-btn" disabled>Submit</button>
     `;
 
     const grid = container.querySelector('.msc-grid');
-    const counter = container.querySelector('.msc-counter');
-    const submit = container.querySelector('.msc-submit');
+    // embedded: stand-ins, so the shared code below needs no branches
+    const counter = container.querySelector('.msc-counter') || { textContent: '' };
+    const submit = container.querySelector('.msc-submit') || { disabled: false, addEventListener() {} };
     const minCorrect = (typeof q.minCorrect === 'number' && q.minCorrect > 0) ? q.minCorrect : 1;
 
     function getSelected() {
@@ -76,7 +88,12 @@ export function renderMultiSelectCheck(q, container) {
         const isOn = btn.classList.toggle('selected');
         btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         refresh();
+        if (typeof onChange === 'function') { try { onChange(getSelected()); } catch (err) { console.error(err); } }
     });
+    // a saved selection (a quiz question visited again)
+    if (Array.isArray(selected)) {
+        grid.querySelectorAll('.msc-opt').forEach(el => { if (selected.includes(el.dataset.id)) { el.classList.add('selected'); el.setAttribute('aria-pressed', 'true'); } });
+    }
 
     function lockWidget() {
         submit.disabled = true;

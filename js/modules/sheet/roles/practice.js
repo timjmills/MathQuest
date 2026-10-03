@@ -654,7 +654,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
-    return { layouts, chunksBySection, pages };
+    return { layouts, chunksBySection, pages, bodyMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }), instrMm: instr };
 }
 
 /** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
@@ -709,6 +709,11 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * printed again on the same page). Not with step-by-step anchors (their bands are keyed by
  * section).
  */
+/** A choose-all cell's prompt without its verb: "Circle all sums that equal 1." -> "Sums that equal 1." */
+export function circleAllCriterion(html) {
+    return String(html).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Select|Tap|Check|Choose)\s+(?:ALL|all)\s+(?:of\s+)?(?:the\s+)?([a-z])/, (m, open, c) => `${open}${c.toUpperCase()}`);
+}
+
 export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM } = {}) {
     const { size, look, paper } = norm;
     const sections = [];
@@ -747,6 +752,7 @@ export function itemInstructionKey(it) {
     // The provider's key for THIS question first: the host stamps a mixed pool's items with the
     // pool's one key, which is exactly the line that does not fit each kind.
     const q = it.q || {};
+    if (q.printFormat === 'multi-select' && !q.printText) return 'default-circle-all';
     try {
         const p = getProvider(q.categoryId || '', q.skillId || '');
         // Only a skill's own strings (the default adapter's key is a placeholder).
@@ -818,7 +824,10 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         // they decide, and different kinds share the neutral line.
         const ownKeys = pupil.map(itemInstructionKey);
         const mixedKinds = new Set(ownKeys.filter(Boolean)).size > 1;
-        const keys = sec.instructionKey ? [sec.instructionKey] : mixedKinds ? ownKeys : hostKeys;
+        // A group whose items all say one line of their own (a split-off row of choose-all
+        // items, whose line is "Circle all the correct answers.") prints that line.
+        const uniformOwn = ownKeys.length && ownKeys[0] && ownKeys.every((k) => k === ownKeys[0]) && ownKeys[0] === 'default-circle-all';
+        const keys = sec.instructionKey ? [sec.instructionKey] : (mixedKinds || uniformOwn) ? ownKeys : hostKeys;
         let key = sec.instructionKey ? sectionInstructionKey(keys) : neutralForKinds(sectionInstructionKey(keys), pupil);
         let text;
         ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
@@ -844,6 +853,28 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         // the host took its height off the section's gridH.
         if (input.stepStrip) sections.push({ kind: 'html', html: input.stepStrip });
         const lone = pg.parts.length === 1;
+        // RUBRIC H13 / PAGEFILL (critic fractions-key D9): a page that holds a split section (its
+        // narrow grid and the full-width rows under it) sizes each part's rows to what they hold,
+        // which can leave a third of the page empty. The spare height is shared out over the
+        // rows of every part, so the cells grow (content never shrinks) and the page is full.
+        let extraPerRow = 0;
+        if (!input.anchors && pg.parts.length > 1 && pg.parts.some((pp) => (norm.sections[pp.section] || {}).splitOf !== undefined)) {
+            const bodyMm = pg.cont ? laidOut.bodyContMm : laidOut.bodyMm;
+            let used = 0, rowsAll = 0;
+            pg.parts.forEach((pp, k) => {
+                const Lp = layouts[pp.section];
+                used += pp.chunk.rows * Lp.cellH;
+                rowsAll += pp.chunk.rows;
+                const s2 = norm.sections[pp.section] || {};
+                const prev = pg.parts[k - 1];
+                const sharesLine = s2.splitOf !== undefined && prev && prev.section === s2.splitOf
+                    && instr[s2.splitOf] && instr[s2.splitOf].key === instr[pp.section].key;
+                if (!sharesLine) used += laidOut.instrMm;
+            });
+            if (input.stepStrip) used = Infinity;            // a lesson strip's height is not known here
+            const spare = bodyMm - used - 4;
+            if (rowsAll && spare > 0.05 * bodyMm) extraPerRow = Math.floor((spare / rowsAll) * 100) / 100;
+        }
         for (const part of pg.parts) {
             const L = layouts[part.section];
             const its = sheetItems[part.section].slice(part.chunk.from, part.chunk.from + part.chunk.count);
@@ -857,7 +888,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // instruction (splitWide): the line is not printed twice.
             const sec = norm.sections[part.section] || {};
             const prevPart = pg.parts[pg.parts.indexOf(part) - 1];
-            const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf;
+            const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf
+                && instr[sec.splitOf] && instr[sec.splitOf].key === instr[part.section].key;
             if (!shares) sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
             if (L.blocks && part.chunk.blocks) {
                 // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
@@ -884,7 +916,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : extraPerRow ? { heightMm: Math.round(part.chunk.rows * (L.cellH + extraPerRow) * 1000) / 1000, rowsTpl: '' }
+                    : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
@@ -900,7 +933,17 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 rowsTpl: shape ? shape.rowsTpl : '',
                 rowGap: gap.gap || 0,
-                items: its.map((it) => planItem(it, level, L.cols)),
+                items: its.map((it) => {
+                    const pi = planItem(it, level, L.cols);
+                    // RM-08: under the section line "Circle all the correct answers." a choose-all
+                    // cell keeps only its criterion ("Sums that equal 1."), never a second verb
+                    // (P-LG-2, P-LG-5); under any other line it keeps its own "Circle all ...".
+                    if (instr[part.section].key === 'default-circle-all' && typeof pi.render === 'function') {
+                        const draw = pi.render;
+                        pi.render = (c) => circleAllCriterion(draw(c));
+                    }
+                    return pi;
+                }),
             });
         }
         return { header: pg.cont ? cont : first, sections };

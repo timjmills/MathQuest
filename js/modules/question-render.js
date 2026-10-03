@@ -3376,6 +3376,16 @@ function _renderQuestionImpl() {
         })();
         host.innerHTML = "";
 
+        // the prompt's fractions stacked over their bar, never slashed (TY-7)
+        const mscText = document.getElementById("questionText");
+        if (mscText && !mscText.querySelector('*') && !/[<>&]/.test(mscText.textContent || '')) {
+            // the screen verb is Tap, never Click
+            const said = String(mscText.textContent || '').replace(/\bClick\b/g, 'Tap').replace(/\bclick\b/g, 'tap');
+            if (said !== mscText.textContent) mscText.textContent = said;
+            if (/\d\/\d/.test(said)) {
+                import('./utils.js').then(u => { if (mscText.isConnected) mscText.innerHTML = u.stackSlashFractions(said); }).catch(() => {});
+            }
+        }
         import('./widgets/multi-select-check.js').then(mod => {
             resetRetryState();
             mod.renderMultiSelectCheck(q, host);

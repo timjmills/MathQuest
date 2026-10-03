@@ -177,7 +177,9 @@ export function optionLabelsOf(p, value) {
     if (!Array.isArray(ids)) ids = [ids];
     ids = ids.map(String);
     if (!ids.length || !ids.every((id) => opts.some((o) => String(o.id) === id))) return null;
-    return opts.filter((o) => ids.includes(String(o.id))).map((o) => stripTags(String(o.label != null ? o.label : o.id)).trim());
+    // a picture option has no label: it is named by its letter (A, B, ...), never by its id
+    return opts.map((o, i) => ({ o, i })).filter(({ o }) => ids.includes(String(o.id)))
+        .map(({ o, i }) => stripTags(String(o.label != null ? o.label : '')).trim() || String.fromCharCode(65 + i));
 }
 
 function stamp(key, ctx) {
@@ -237,8 +239,11 @@ const LEGACY_TEMPLATE = register('legacy', {
         const value = p && p.ans !== undefined ? p.ans : '';
         // SCC-A7: a simple value stamps itself; anything else is stamped with the legacy hint.
         let display;
-        const picked = optionLabelsOf(p, value);
-        if (picked) {
+        const picked = p && (p.printText || p.printAnswer) ? null : optionLabelsOf(p, value);
+        if (p && p.printAnswer && typeof p.printAnswer === 'string') {
+            // the paper task's own answer ("Circle: 4, 8; Cross out: 3, 9"), never the screen target
+            display = p.printAnswer;
+        } else if (picked) {
             // A choice item stores option ids ("opt3") in `ans`; the key prints what they SAY.
             display = picked.join('; ');
         } else if (value !== null && typeof value === 'object') {

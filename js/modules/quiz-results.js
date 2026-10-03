@@ -3,7 +3,7 @@
 
 import { SKILLS } from './data.js';
 import { compressTestForURL, loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
-import { shuffle } from './utils.js';
+import { shuffle, answerLabelOf } from './utils.js';
 import { icon, cleanLabel, copyText, fmtDay } from './teacher-ui.js';
 import { note, backHTML, goQuizzes } from './teacher-quiz-ui.js';
 
@@ -267,8 +267,8 @@ export async function showStudentQuizDetail(resultId, testId) {
         return `<tr>
           <td data-label="Question">Q${i + 1}</td>
           <td data-label="Skill"><span class="tv-cell-title tvq-plain" title="${label}">${label}</span></td>
-          <td data-label="Pupil's answer">${a ? escHtml(String(a.studentAnswer || '–')) : '–'}</td>
-          <td data-label="Right answer">${escHtml(String(q.questionData.ans))}</td>
+          <td data-label="Pupil's answer">${a ? escHtml(answerLabelOf(q.questionData, a.studentAnswer) || '–') : '–'}</td>
+          <td data-label="Right answer">${escHtml(answerLabelOf(q.questionData, q.questionData.ans))}</td>
           <td data-label="Result">${tag}</td>
         </tr>`;
     };
@@ -494,7 +494,7 @@ export function printQuizTest(quiz, options = {}) {
         for (let i = 0; i < allQs.length; i++) {
             const q = allQs[i].question;
             const qd = q.questionData;
-            let ansDisplay = String(qd.ans);
+            let ansDisplay = answerLabelOf(qd, qd.ans);
             html += `<div class="ak-item">
                 <span class="ak-num">Q${i + 1}</span>
                 <span class="ak-ans">${escHtml(ansDisplay)}</span>

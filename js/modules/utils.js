@@ -89,3 +89,34 @@ export function pickNoun(category) {
     const list = WORD_PROBLEM_NOUNS[cat];
     return list[Math.floor(Math.random() * list.length)];
 }
+
+
+/**
+ * A fraction is written stacked over its bar, never with a slash (TY-7): every "a/b" in a plain
+ * screen string becomes a small inline stack (inline styles, so any host draws it).
+ */
+export function stackSlashFractions(text) {
+    const s = String(text == null ? '' : text);
+    if (/</.test(s)) return s;
+    return s.replace(/\b(\d+)\/(\d+)\b/g, '<span class="msc-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:0.8em;margin:0 0.08em;">'
+        + '<span>$1</span><span style="border-top:2px solid currentColor;align-self:stretch;text-align:center;">$2</span></span>');
+}
+
+/**
+ * What an answer SAYS: a choice item stores option ids ("opt3", or a list of them) in `ans` or in
+ * a pupil's answer; this gives their labels, in option order, joined by "; " (a picture option
+ * with no label is named by its letter). Anything else comes back as its own text.
+ */
+export function answerLabelOf(q, value) {
+    const opts = q && Array.isArray(q.options) ? q.options.filter((o) => o && typeof o === 'object' && o.id != null) : [];
+    let ids = value;
+    if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { /* text */ } }
+    if (typeof ids === 'string' && /^opt\d+(\s*,\s*opt\d+)*$/.test(ids.trim())) ids = ids.split(',').map((t) => t.trim());
+    const list = Array.isArray(ids) ? ids.map(String) : [String(ids)];
+    if (opts.length && list.length && list.every((id) => opts.some((o) => String(o.id) === id))) {
+        return opts.map((o, i) => ({ o, i })).filter(({ o }) => list.includes(String(o.id)))
+            .map(({ o, i }) => String(o.label == null ? '' : o.label).replace(/<[^>]*>/g, '').trim() || String.fromCharCode(65 + i))
+            .join('; ');
+    }
+    return Array.isArray(value) ? value.join(', ') : String(value == null ? '' : value);
+}

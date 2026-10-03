@@ -258,7 +258,11 @@ const GLYPH = { '+': '+', '-': '−', '−': '−', 'x': '×', '×': '×', '/': 
 function answerValues(p, ctx) {
     const a = p.answer || {};
     const whole = !Number(a.n) && Number(a.w) > 0;
-    const key = { n: whole ? '' : a.n, d: whole ? '' : a.d, w: a.w || '', sign: a.sign, letter: a.letter, shade: a.shade, part: a.part };
+    // D4 (owner 2026-10-03): in a mixed number's three boxes the key writes the simplest form
+    // and a dash in each box it leaves unused, so no box of the key is blank.
+    const wnd = (p.terms || []).some((x) => x.frac === 'wnd');
+    const DASH = '\u2013';
+    const key = { n: whole ? (wnd ? DASH : '') : a.n, d: whole ? (wnd ? DASH : '') : a.d, w: a.w || (wnd ? DASH : ''), sign: a.sign, letter: a.letter, shade: a.shade, part: a.part };
     if (ctx.state === 'blank') return {};
     if (ctx.state === 'wrong') {
         const w = ctx.wrong || {};
@@ -593,9 +597,10 @@ register('frac-model', {
         const slots = {};
         // a whole-number answer in a mixed number's boxes: the whole box only (never "0/1")
         const part = t.frac !== 'wnd' || Number(a.n) > 0;
-        if (/n/.test(t.frac)) slots.n = { value: part ? String(a.n) : '', graded: part };
-        if (/d/.test(t.frac)) slots.d = { value: part ? String(a.d) : '', graded: part };
-        if (t.frac === 'wnd' || t.frac === 'w') slots.w = { value: a.w ? String(a.w) : '', graded: !!a.w || t.frac === 'w' };
+        const unused = t.frac === 'wnd' ? '\u2013' : '';
+        if (/n/.test(t.frac)) slots.n = { value: part ? String(a.n) : unused, graded: part };
+        if (/d/.test(t.frac)) slots.d = { value: part ? String(a.d) : unused, graded: part };
+        if (t.frac === 'wnd' || t.frac === 'w') slots.w = { value: a.w ? String(a.w) : unused, graded: !!a.w || t.frac === 'w' };
         const display = t.frac === 'n' ? String(a.n) : t.frac === 'd' ? String(a.d) : t.frac === 'w' ? String(a.w || 0)
             : `${a.w ? `${a.w} ` : ''}${Number(a.n) ? `${a.n}/${a.d}` : ''}`.trim() || String(a.w || 0);
         return { value: t.frac === 'n' ? Number(a.n) : t.frac === 'd' ? Number(a.d) : t.frac === 'w' ? Number(a.w || 0) : display, display, slots };

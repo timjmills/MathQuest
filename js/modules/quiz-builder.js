@@ -11,7 +11,7 @@
 
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
-import { shuffle } from './utils.js';
+import { shuffle, answerLabelOf } from './utils.js';
 import { saveTest, loadTest, listTests, deleteTest, exportTestJSON, importTestJSON, compressTestForURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { icon, cleanLabel, levelText, copyText } from './teacher-ui.js';
 import { mountSample, mountQuestion } from './teacher-preview.js';
@@ -690,13 +690,15 @@ function renderPreview(q, categoryId, skillId) {
     if (q.options && q.options.length > 0) {
         html += `<div class="qb-preview-options">`;
         for (const opt of q.options) {
-            const isCorrect = String(opt) === String(q.ans);
-            html += `<span class="qb-preview-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+            // a choose-all option is an object {id, label}: its label, correct when the answer names its id
+            const isObj = opt && typeof opt === 'object';
+            const isCorrect = isObj ? (Array.isArray(q.ans) ? q.ans.map(String).includes(String(opt.id)) : String(opt.id) === String(q.ans)) : String(opt) === String(q.ans);
+            html += `<span class="qb-preview-option${isCorrect ? ' correct' : ''}">${isObj ? escHtml(String(opt.label == null ? '' : opt.label).replace(/<[^>]*>/g, '')) : opt}</span>`;
         }
         html += `</div>`;
     }
 
-    html += `<div class="qb-preview-answer">Answer: ${q.ans}</div>`;
+    html += `<div class="qb-preview-answer">Answer: ${escHtml(answerLabelOf(q, q.ans))}</div>`;
 
     if (q.hint) {
         html += `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:4px;">Hint: ${q.hint}</div>`;
@@ -1135,7 +1137,7 @@ function qbRenderQuestionCardTeacher(q, sectionIdx, localIdx, globalIdx) {
   <div class="qb-q-skill">${escHtml(label)}</div>
   <div class="tvp-frame tvq-qframe" data-qb-cell="${sectionIdx}:${localIdx}"></div>
   <div class="tvq-qfoot">
-    <span class="tv-cap tvq-ans">Answer: <strong>${escHtml(String(q.questionData.ans))}</strong></span>
+    <span class="tv-cap tvq-ans">Answer: <strong>${escHtml(answerLabelOf(q.questionData, q.questionData.ans))}</strong></span>
     <div class="qb-q-actions">
       <button type="button" class="tv-icon-btn" title="New question" aria-label="New question for Q${n}" onclick="regenerateQuizQuestion(${sectionIdx}, ${localIdx})">${icon('reset', 18)}</button>
       <button type="button" class="tv-icon-btn" title="Duplicate" aria-label="Duplicate Q${n}" onclick="duplicateQuizQuestion(${sectionIdx}, ${localIdx})">${icon('copy', 18)}</button>
@@ -1175,12 +1177,14 @@ function qbRenderQuestionCard(q, sectionIdx, localIdx, globalIdx) {
     if (q.questionData.options && q.questionData.options.length > 0) {
         html += `<div class="qb-q-options">`;
         for (const opt of q.questionData.options) {
-            const isCorrect = String(opt) === String(q.questionData.ans);
-            html += `<span class="qb-q-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+            // a choose-all option is an object {id, label}: its label, correct when the answer names its id
+            const isObj = opt && typeof opt === 'object';
+            const isCorrect = isObj ? (Array.isArray(q.questionData.ans) ? q.questionData.ans.map(String).includes(String(opt.id)) : String(opt.id) === String(q.questionData.ans)) : String(opt) === String(q.questionData.ans);
+            html += `<span class="qb-q-option${isCorrect ? ' correct' : ''}">${isObj ? escHtml(String(opt.label == null ? '' : opt.label).replace(/<[^>]*>/g, '')) : opt}</span>`;
         }
         html += `</div>`;
     }
-    html += `<div class="qb-q-answer">Answer: ${q.questionData.ans}</div>`;
+    html += `<div class="qb-q-answer">Answer: ${escHtml(answerLabelOf(q.questionData, q.questionData.ans))}</div>`;
     html += `</div>`;
 
     // Actions row
