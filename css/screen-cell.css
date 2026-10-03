@@ -1616,3 +1616,7 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 /* count-by rows (critic C2 r7): when both cues show, the back cue says only "Back", so the strip stays one line at 390 */
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
+
+/* Touch numerals floor (WORKSHEET_DESIGN_STANDARD SF-34, 2026-10-03): a grid cell holding touch
+   numerals draws its digits at 40 px, never the 29 px grid size. Additive. */
+.mq-scell.mq-grid-cell:has(.ws-tn) { --mq-digit: 40px; }

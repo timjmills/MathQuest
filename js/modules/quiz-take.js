@@ -499,6 +499,9 @@ function _mountQuizCell(flatIdx) {
         // feedback is the practice card's and the online worksheet's.
         // the item's support ladder so far (support-ladder.js)
         try { drawLadder(cellEl, qd2, { kind: kind2, categoryId: qd2.categoryId, skillId: qd2.skillId || state.quizAllQuestions[flatIdx].question.skillId }); } catch (e) { /* optional */ }
+        // the message names the rung actually drawn (a touch rung the cell could not draw is dropped)
+        const fbEl = document.querySelector('#quizTakeView .qt-feedback.mq-ladder-feedback');
+        if (fbEl) { const m = ladderMessage(qd2); if (m) fbEl.textContent = m; }
     }
     monoCell(cellEl);
     // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)

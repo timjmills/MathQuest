@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Touch numerals specimen</title>
+<link rel="stylesheet" href="../../../../css/fonts/andika.css">
+<style>
+  body { margin: 0; padding: 16px 24px; background: #fff; color: #000; font-family: "Andika", sans-serif; font-feature-settings: "cv04" 1; font-variant-numeric: lining-nums tabular-nums; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p { font-size: 13px; margin: 0 0 12px; max-width: 1100px; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid #000; padding: 4px 6px; text-align: center; vertical-align: middle; }
+  th { font-size: 12px; font-weight: 700; text-align: left; white-space: nowrap; }
+  .d { line-height: 1.15; }
+  .pair { display: inline-flex; gap: 0.12em; align-items: baseline; }
+  .pair > span:first-child { color: #000; }
+  .reg .ws-tn { color: #e00000 !important; -webkit-text-fill-color: #e00000 !important; }
+  .base { background: linear-gradient(#000, #000) 0 var(--b) / 100% 1px no-repeat; }
+</style>
+</head>
+<body>
+<h1>Touch numerals 0–9: plain beside touch, at every size the app uses</h1>
+<p>Each pair: the plain Andika digit, then the touch numeral that replaces it. Rows "trace": the faded-hint variant (marks in the one grey; photocopy: dashed outline). Sizes below 24 pt / 40 px are not drawn: a cell with touch dots is raised to at least that size. Only operands carry marks, never the answer or a sign.</p>
+<div id="out"></div>
+<script type="module">
+import { touchNumeralHTML, TOUCH_NUMERAL_SIZES } from '../../../../js/modules/sheet/touchdots.js';
+const rows = [];
+const cell = (inner, size) => `<td class="d" style="font-size:${size}">${inner}</td>`;
+const digits = [...'0123456789'];
+for (const s of TOUCH_NUMERAL_SIZES) {
+  const size = `${s.v}${s.unit}`;
+  const o = { em: s.v, unit: s.unit };
+  rows.push(`<tr><th>${s.id}<br>${size}</th>${digits.map((d) => cell(`<span class="pair"><span>${d}</span>${touchNumeralHTML(d, o)}</span>`, size)).join('')}</tr>`);
+  if (s.id === 'paper-L' || s.id === 'screen-card') {
+    rows.push(`<tr><th>${s.id} trace</th>${digits.map((d) => cell(`<span class="pair"><span>${d}</span>${touchNumeralHTML(d, { ...o, ink: 'trace' })}</span>`, size)).join('')}</tr>`);
+    rows.push(`<tr><th>${s.id} trace<br>photocopy</th>${digits.map((d) => cell(`<span class="pair"><span>${d}</span>${touchNumeralHTML(d, { ...o, ink: 'trace', photocopy: true })}</span>`, size)).join('')}</tr>`);
+  }
+}
+rows.push(`<tr><th>marks on the<br>plain digit<br>96px</th>${digits.map((d) => cell(touchNumeralHTML(d, { em: 96, unit: 'px' }), '96px')).join('')}</tr>`);
+const T = (n) => touchNumeralHTML(n, { em: 28 });
+rows.push(`<tr><th>in a fact<br>28pt</th><td colspan="10" class="d" style="font-size:28pt;text-align:left">8 + ${T(5)} = <span style="font-size:11pt">(count on)</span> &nbsp; ${T(8)} + ${T(5)} = <span style="font-size:11pt">(count all)</span> &nbsp; 17 − ${T(9)} = <span style="font-size:11pt">(count back)</span></td></tr>`);
+document.getElementById('out').innerHTML = `<table>${rows.join('')}</table>`;
+await document.fonts.ready;
+document.body.setAttribute('data-ready', '1');
+</script>
+</body>
+</html>

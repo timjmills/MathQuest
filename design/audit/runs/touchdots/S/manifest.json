@@ -1,0 +1,264 @@
+[
+  {
+    "skill": "addition:add_column_multi",
+    "category": "addition",
+    "skillId": "add_column_multi",
+    "label": "Add Three or Four Numbers in Columns",
+    "grade": "2",
+    "dir": "addition__add_column_multi",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 3,
+          "rows": 2,
+          "perPage": 6,
+          "pages": 1,
+          "note": "Fits: 3 columns x 2 rows, 6 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page. Dense: 3 x 2, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 3,
+              "rows": 2,
+              "perPage": 6,
+              "pages": 1,
+              "cellW": 62,
+              "cellH": 114,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 2 rows per page. Dense: 3 x 2, cells sized to the problems.",
+              "line": "Fits: 3 columns x 2 rows, 6 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page. Dense: 3 x 2, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 79,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 588999,
+        "title": "I Can add three or four numbers in columns",
+        "notes": [
+          "Tall problems: 2 rows per page. Dense: 3 x 2, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "57 + 54 + 60 + 65 = ?",
+            "ans": "236",
+            "measured": {
+              "1": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "3": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "4": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "5": {
+                "hMm": 77.5,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "53 + 91 + 28 = ?",
+            "ans": "172",
+            "measured": {
+              "1": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 66.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "82 + 18 + 87 + 63 = ?",
+            "ans": "250",
+            "measured": {
+              "1": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "3": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "4": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "5": {
+                "hMm": 77.5,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "17 + 84 + 77 + 21 = ?",
+            "ans": "199",
+            "measured": {
+              "1": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "2": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "3": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "4": {
+                "hMm": 77.5,
+                "fits": true
+              },
+              "5": {
+                "hMm": 77.5,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "40 + 50 + 47 = ?",
+            "ans": "137",
+            "measured": {
+              "1": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 66.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "stack",
+            "fclass": "standard",
+            "text": "75 + 35 + 31 = ?",
+            "ans": "141",
+            "measured": {
+              "1": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 66.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 66.1,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 93,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 125,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 68
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 97
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

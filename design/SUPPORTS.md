@@ -175,20 +175,28 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
 | `TOUCH_DOTS`, `TOUCH_DOTS_BOLD` | `{0..9: [{x, y, double}]}` in counting order |
 | `touchDots(d, weight)` | the table for a weight |
 | `touchDotCount(d)`, `touchDotOrder(d)` | counts (doubles 2) and the per-touch order `{mark, say, second}` |
-| `TOUCH_DOT_BASELINE_EM`, `TOUCH_DOT_TOP_EM` | 0.41 / −0.31 em from the line-box centre |
-| `TOUCH_DOT_SIZES`, `TOUCH_DOT_DEFAULT` | S / M / L, default M |
+| `TOUCH_DOT_BASELINE_EM`, `TOUCH_DOT_TOP_EM` | 0.415 / −0.31 em from the line-box centre |
+| `TOUCH_NUMERAL_SIZES` | the digit-size tokens: paper S / M / L (16 / 22 / 28 pt), screen grid 29 px, phone card 40 px, card 48 px, desktop 56 px |
+| `TOUCH_DOT_SIZES`, `TOUCH_DOT_FLOOR_MM`, `TOUCH_DOT_FLOOR_PX` | the mark proportions (em) and the legibility floors (paper mm, screen px) |
 | `TOUCH_DOT_MIN`, `touchDotsFits(size, unit)` | 24 pt / 40 px |
-| `touchDotGeometry(opts)` | radii in em after the photocopy floors |
-| `touchDotsSVG(d, {em, unit, weight, ink, photocopy, size, halo, ring = 'open', counted, tappable})` | the overlay: absolute SVG, 1 × 1.15 em in CSS em, centred on the host span, no layout |
-| `touchDotsMarks(d, opts)` | the marks alone (em coordinates) for an SVG host (clock, coin) |
-| `touchDotsDigitHTML(ch, opts)` | a span's inner HTML: digit + overlay |
+| `touchDotGeometry(opts)` | radii in em after the floors |
+| `touchNumeralSVG(d, {em, unit, weight, ink: 'solid'\|'trace', photocopy, counted, tappable})` | **the touch numeral**: the Andika glyph path (`touch-glyphs.js`) plus its marks, absolute SVG centred on the host, sized in CSS em |
+| `touchNumeralHTML(ch, opts)` | the digit as a touch numeral: a span holding the real digit as transparent text (its exact width, baseline and text) and the numeral SVG over it. `touchDotsSVG` / `touchDotsDigitHTML` are aliases kept for old callers |
+| `touchDotsMarks(d, opts)` | the marks alone (1/1000 em, centre origin) |
 | `touchDotNearest(d, x, y, counted)` | the mark a tap counts |
 | `touchTallySVG(n, opts)` | the ÷ tally row |
 
-Host: the digit span takes `class="ws-td"` (`position: relative`, additive rule in
-`css/sheet-kit.css`) and the overlay as its last child. Paper `fact()` / `stack()` spans and the
-screen `factHTML()` / `stackHTML()` spans are one span per digit, so no template change is needed
-to host it (S3 wires it).
+**Replace, never overlay (owner report 2026-10-03).** The earlier overlay laid marks over the font's
+digit and drifted off it on screen (three dots clumped left of a 5). A touched digit is now drawn
+as a whole touch numeral: the glyph is generated once from the app's own Andika
+(`python3 tests/scripts/ws-touch-glyphs.py css/fonts/Andika-Regular.woff2 css/fonts/Andika-Bold.woff2
+js/modules/sheet/touch-glyphs.js`, open 4), normalised to the em box, with every touch point snapped to
+the stroke centre; the SVG scales per size. `support-draw.js` `touchDigit` / `touchNumberHTML`
+emit it for the fact, stack and equation templates on paper (pupil and key) and on every screen host.
+Only a single-digit number is ever a touch numeral in a fact or sentence (`touchNumbers`); a stack
+dots its digits column by column. The support ladder's touch rung swaps the numerals in on the
+card live, and is dropped (with its message) when the cell could not draw them.
+Specimen: `node tests/scripts/ws-touchdots-specimen.cjs` → `design/audit/runs/touchdots/specimen.png`.
 
 ### S1.10 Tools and gate
 

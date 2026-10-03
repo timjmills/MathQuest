@@ -613,6 +613,15 @@ export function drawLadder(root, q, ctx = {}) {
     if (ww.length) wwSupports(root, q, ww);
     sup.filter((r) => r.how === 'pane').forEach((r) => parts.push(paneHTML(r)));
     if (s.worked) parts.push(workedHTML(q, ctx));
+    // The touch-dot rung (owner report 2026-10-03): its message may only stand when the touch
+    // numerals really are on the card. A cell that could not draw them drops that rung, and the
+    // next rung (and its message) takes its place at once.
+    const e = _entries.get(q);
+    const cur = e && e.n >= 1 && e.n <= e.rungs.length ? e.rungs[e.n - 1] : null;
+    if (cur && TOUCH_IDS.includes(cur.id) && !root.querySelector('[data-ws-touch], [data-ws-tally]')) {
+        e.rungs.splice(e.n - 1, 1);
+        return drawLadder(root, q, ctx.message ? Object.assign({}, ctx, { message: messageFor(e) }) : ctx);
+    }
     const body = parts.filter(Boolean).join('');
     if (!body) return;
     const box = document.createElement('div');
@@ -803,7 +812,8 @@ export function practiceLadderWrong(q, userAns) {
     if (fb) {
         fb.style.display = 'block';
         fb.className = 'feedback-area mq-ladder-feedback';
-        fb.textContent = r.message;
+        // the message of the rung actually drawn (a touch rung the cell could not draw was dropped)
+        fb.textContent = ladderMessage(q) || r.message;
     }
     return r;
 }
