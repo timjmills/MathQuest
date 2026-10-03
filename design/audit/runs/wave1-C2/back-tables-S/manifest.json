@@ -1,0 +1,688 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 6,
+          "perPage": 6,
+          "pages": 2,
+          "note": "Fits: 1 column x 6 rows, 6 per page, 2 pages. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 6,
+              "perPage": 6,
+              "pages": 2,
+              "cellW": 186,
+              "cellH": 38,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 1 x 6, cells sized to the problems.",
+              "line": "Fits: 1 column x 6 rows, 6 per page, 2 pages. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 35.7,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 2,
+        "keyPageCount": 2,
+        "seed": 244652,
+        "title": "I Can count back by 3, 7 and 12",
+        "notes": [
+          "Dense: 1 x 6, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "30, 27, 18, 15, 9",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "63, 56, 49, 14, 7",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "96, 84, 48, 36, 24",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "27, 18, 12, 9, 6",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "70, 56, 28, 14, 7",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "108, 72, 60, 36, 24",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "24, 18, 12, 6, 3",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "56, 42, 21, 14, 7",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "120, 96, 84, 72, 24",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "24, 21, 15, 12, 3",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "70, 63, 49, 28, 21",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "108, 96, 84, 60, 12",
+            "measured": {
+              "1": {
+                "hMm": 35.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.7,
+                "fits": false
+              },
+              "5": {
+                "hMm": 35.7,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 104,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p2.png",
+            "words": 94,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 137,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p2.png",
+            "words": 127,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 2,
+          "cells": [
+            6,
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 130
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 2,
+          "cells": [
+            6,
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 190
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "test": {
+        "fits": {
+          "cols": 1,
+          "rows": 6,
+          "perPage": 6,
+          "pages": 1,
+          "note": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems.",
+          "sections": [
+            {
+              "role": "test",
+              "cls": "standard",
+              "requested": "auto",
+              "cols": 1,
+              "rows": 6,
+              "perPage": 6,
+              "pages": 1,
+              "count": 6,
+              "cellW": 186,
+              "innerW": 184.942,
+              "cellH": 38,
+              "hMin": 35.4,
+              "gridH": 228,
+              "gridHCont": 242,
+              "fill": true,
+              "packed": false,
+              "filled": false,
+              "ceiling": 20,
+              "clamped": false,
+              "reason": "",
+              "note": "Dense: 1 x 6, cells sized to the problems.",
+              "notes": [
+                "Dense: 1 x 6, cells sized to the problems."
+              ],
+              "digitPt": 16,
+              "trackMm": null,
+              "size": "S",
+              "look": "ican",
+              "availableWidthMm": 186,
+              "line": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 16 pt. Dense: 1 x 6, cells sized to the problems."
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 657182,
+        "title": "Test A: counting back by 3, 7 and 12",
+        "notes": [
+          "Dense: 1 x 6, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "27, 24, 9, 6, 3",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "70, 56, 42, 35, 21",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "120, 96, 72, 24, 12",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 3. Write the missing numbers.",
+            "ans": "24, 21, 18, 12, 3",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 7. Write the missing numbers.",
+            "ans": "70, 49, 28, 21, 7",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count back by 12. Write the missing numbers.",
+            "ans": "96, 84, 72, 36, 12",
+            "measured": {
+              "1": {
+                "hMm": 35.4,
+                "fits": true
+              },
+              "2": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "3": {
+                "hMm": 35.4,
+                "fits": false
+              },
+              "4": {
+                "hMm": 35.4,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "test-p1.png",
+            "words": 104,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "test-key-p1.png",
+            "words": 137,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 68
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            6
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 98
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

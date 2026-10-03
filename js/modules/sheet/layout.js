@@ -754,6 +754,8 @@ export function groupByHeight(items, cols) {
     const hs = hs0.map((h) => h || Math.max(...known));
     const lo = Math.min(...hs), hi = Math.max(...hs);
     if (!(hi > lo * 1.6)) return items;
+    // Wave 1 C2: a one-page count-by sheet is the teacher's row list, printed in the teacher's order (its title names that order).
+    if (items.every((it) => it && it.q && it.q.countBy && it.q.countBy.onePage)) return items;
     // Height CLASSES, tallest class first; within a class the dealt order stands (critic
     // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
     // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.

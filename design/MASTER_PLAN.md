@@ -36,7 +36,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Atomised Lesson V20 | The owner supplies it when the lesson wave starts |
 | Skip | A teacher option; appears only after N wrong tries (default 5) |
 | Calculator | Per skill, teacher option, off by default |
-| Faded packets | A skill-worksheet option that fades supports after x problems |
+| Faded supports | A skill-worksheet option that fades supports all → mixed → none, in three modes: **Faded problems** (every N problems, e.g. 3), **Faded page** (across one page), **Faded packet** (across 2, 3, 4, 5 … pages) (owner 2026-10-03) |
 | WRM page | Teacher-facing only; from a small step or unit: print a worksheet, send a practice code, make a quiz |
 | Deploy | Each Wave 1 lane deploys (push to master) as soon as it passes critic ≥ 8 + full gates + stamp (owner 2026-10-02) |
 | Skip setting | Per skill, default 5 wrong tries; travels with the skill (skill option) |
@@ -75,14 +75,14 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. **Practice map** opens the MAP strand picker (strands → their MAP skills → print practice / send practice link; MAP skills only). |
 | 3.2 | Gallery picker by default wherever skills are chosen: Big 3 / Medium 4 / Small 5 across plus a list view; search, Grade, Domain, Topic; select many at once. |
 | 3.3 | Sets auto-save in the browser until deleted; a Sets area lists every set for any paper, quiz or code. |
-| 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz. Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
+| 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz — for the step's own skills **or its pre-skills** (owner list: "students can practise the pre-skills or the actual skill for the chosen lesson"). Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
 | 3.5 | Critic teacher-r1 at 1280 / 820 / 390, every action clicked. |
 
 ## Wave 4 — Three worksheets: skill, mixed, quiz
 
 | # | Item | Today |
 |---|---|---|
-| 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **faded packet** (supports fade after x problems, all → mixed → none, over 3 / 4 / 5 pages) | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
+| 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **Fade supports** (all → mixed → none), three named modes (owner 2026-10-03): **Faded problems** — a support is removed every N problems (e.g. every 3); **Faded page** — the fade runs across one page; **Faded packet** — the fade runs across 2, 3, 4, 5 … pages | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
 | 4.2 | Mixed worksheet: per-skill weights (equal by default) and "Mix in prerequisite skills" (all listed, none ticked) | built on the teacher-UI branch, not live |
 | 4.3 | Quiz worksheet: mixed with points (each / by type / per question), built from CCSS / EE / WRM step or unit, standards breakdown on the key | built on the teacher-UI branch, not live |
 | 4.4 | Answer key: at the end **or** after each page; **short** (answer list) **or** mirror layout; answers in **reddish orange** | one on/off switch; keys always after all pages; mirror only; black (`--ws-ink`) |
@@ -94,7 +94,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | # | Item |
 |---|---|
 | 5.1 | Resume the paused lanes from their backup branches: place value, figures, geometry, K-2, operations, fractions, worked examples. Order by WRM, early units first; each goes fix → critic ≥ 8 → merge. |
-| 5.2 | Steps and Number line as support options on every skill where they fit (the decimal-worksheet picture: a steps box plus a number line). Today both exist in `SUPPORT_LABELS` ("Step checklist", "Number line 0 to 20") but only some skills offer them, and the line is 0–20 only. |
+| 5.2 | Steps and Number line as support options on every skill where they fit (the decimal-worksheet picture: a steps box plus a number line). Today both exist in `SUPPORT_LABELS` ("Step checklist", "Number line 0 to 20") but only some skills offer them, and the line is 0–20 only. **Custom number line at the top of the page (owner 2026-10-03):** a support option on every skill where a number line helps (add/sub, counting, skip counting, rounding, fractions, decimals, integers, measurement): a reference line printed once at the top of the page (and above the card on screen), with the teacher setting start, end, step (whole, fraction or decimal ticks), which ticks are labelled, and optional jump arrows; sensible defaults come from the skill's own range. |
 | 5.3 | Same skill with and without supports: add a skill twice with different supports and weight them, or show a different support each wrong try. Today the support ladder (`support-ladder.js`) already varies supports by wrong try; adding a skill twice with different supports is missing. |
 | 5.4 | Remaining families: measurement, data, algebra, number theory. |
 
@@ -131,7 +131,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Minutes → hours (90 min = 1.5 h = 1 ½ h) | partial (hours → minutes only) | add the reverse, with decimal and mixed hours |
 | Line / dot plots | exists `line_plot*` | re-grade |
 | Adding decimals | exists `add_decimal` | re-grade |
-| Two-step change problems (add-add, add-sub, sub-add, sub-sub) | exists `multi_step_word` | re-grade |
+| Two-step change problems: start → more/less → more/less again → final (add-add, add-sub, sub-add, sub-sub) | exists `multi_step_word` | re-grade, and add a teacher option choosing which of the four change patterns (default all four, equally) |
 | Ordering times / a time between two times | exists `order_clocks_*`, `elapsed_*` | re-grade |
 | Equal groups total | exists | re-grade |
 | Meaning of a coordinate point in context | missing | new skill |

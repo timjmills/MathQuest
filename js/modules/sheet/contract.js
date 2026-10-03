@@ -175,6 +175,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'table-make': 'Write your own In numbers. Use the rule for Out.',
     // Added 2026-09-25 with count by 1-12, number patterns, the chart tasks and x / ÷ on a line.
     'count-by-row': 'Count by the number in the box. Write the missing numbers.',
+    // Wave 1 lane C2: count back, and a page that mixes counting on and back (the sign in the box says which).
+    'count-back-row': 'Count back by the number in the box. Write the missing numbers.',
+    'count-sign-row': 'Count on (+) or back (\u2212). Write the missing numbers.',
     'pattern-rule': 'Use the rule. Write the missing numbers.',
     'pattern-find-rule': 'Find the rule. Write the missing numbers and the rule.',
     'chart-fill-all': 'Fill in the whole multiplication chart.',
