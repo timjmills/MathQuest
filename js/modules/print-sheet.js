@@ -2104,7 +2104,17 @@ async function buildLesson(n, metaOf) {
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = lessonFor(sk.categoryId, sk.skillId);
-    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 4, { sameOps: true });
+    // A skill whose earlier steps are no warm-up (a two-step story's category lists tape diagrams
+    // before it) names its own: two-step change stories are add / subtract chains, so they warm
+    // up on one add fact and one subtract fact (coordinator ruling 2026-10-03).
+    const WARM_FOR = {
+        'algebra:multi_step_word': ['addition:add_facts', 'subtraction:sub_facts'],
+        'algebra:multi_step_word_plain': ['addition:add_facts', 'subtraction:sub_facts'],
+    };
+    const own = WARM_FOR[`${sk.categoryId}:${sk.skillId}`];
+    const warmSkills = data ? data.skills.map(skillRef)
+        : own ? own.map((k) => ({ categoryId: k.split(':')[0], skillId: k.split(':')[1] }))
+        : earlierSkills(sk, 4, { sameOps: true });
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
     // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.

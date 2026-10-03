@@ -1105,7 +1105,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         // The panels take the body left over (by flex: the header's real height is only known to
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
-        const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
+        const fill = !!opts.lay || lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
         if (perRow) {
             // The rows share the room in proportion to their own panels.
@@ -1369,9 +1369,10 @@ export function plan(input = {}) {
             // The chart continues on a second page: the panels in order, a row of two per page,
             // the Say band under the last (PT-ANC: whole panels, the example at full size).
             const half = Math.ceil(st.length / 2);
-            const lay1 = { cols: 2, rows: 1, variant: 'col' };
-            const a = chartPage(input, ctx, data, example, st.slice(0, half), draws.slice(0, half), [], null, [], null, { lay: lay1, say: false });
-            chart = chartPage(input, ctx, data, example, st.slice(half), draws.slice(half), [], tail, [], tailP, { lay: lay1 });
+            // One panel a row, full width, the rows sharing the page (never a half-empty sheet).
+            const lay1 = { cols: 1, rows: 0, variant: 'col' };
+            const a = chartPage(input, ctx, data, example, st.slice(0, half), draws.slice(0, half), [], null, [], null, { lay: Object.assign({}, lay1, { rows: half }), say: false });
+            chart = chartPage(input, ctx, data, example, st.slice(half), draws.slice(half), [], tail, [], tailP, { lay: Object.assign({}, lay1, { rows: st.length - half }) });
             out.push({ header: a.header, sections: a.sections });
         }
         zoom = chart.zoom;
