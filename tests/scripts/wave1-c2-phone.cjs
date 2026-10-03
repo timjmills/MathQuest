@@ -112,10 +112,40 @@ const MEASURE = () => {
       return { inRow: !!box, first: a === w.querySelector('input.mq-cellslot'), hiddenFocus: !!box && (box.left < v.left - 1 || box.right > v.right + 1) }; };
     const f0 = await page.evaluate(F0);
     const named = !!opts.$firstCol;
-    check(t0.ok && t0.scrollLeft === 0 && t0.startShown && (named || host !== 'card' || t0.boxShown) && !f0.hiddenFocus, `${tag}: at load the row rests at 0 (scrollLeft ${t0.scrollLeft}) with the first given number${t0.startShown ? '' : ' NOT'} fully in the ${t0.win} px window, the first box${t0.boxShown ? '' : ' NOT'} fully in it, focus ${f0.inRow ? (f0.hiddenFocus ? 'ON A HIDDEN BOX' : 'on a box in view') : 'not in the row'}, nothing cut at either edge${t0.ok ? '' : ' (' + t0.why + ')'}`);
+    check(t0.ok && t0.scrollLeft === 0 && t0.startShown && !f0.hiddenFocus, `${tag}: at load the row rests at 0 (scrollLeft ${t0.scrollLeft}) with the first given number${t0.startShown ? '' : ' NOT'} fully in the ${t0.win} px window, the first box${t0.boxShown ? '' : ' NOT'} fully in it, focus ${f0.inRow ? (f0.hiddenFocus ? 'ON A HIDDEN BOX' : 'on a box in view') : 'not in the row'}, nothing cut at either edge${t0.ok ? '' : ' (' + t0.why + ')'}`);
     if (host === 'card') check(t0.boxShown ? f0.first : !f0.inRow, `${tag}: the card's auto-focus ${t0.boxShown ? (f0.first ? 'is on the first box (it shows at the start)' : 'is NOT on the first box though it shows') : (f0.inRow ? 'went INTO A HIDDEN BOX' : 'is withheld: the first box does not show at the start, so nothing is typed blind')}`);
     if (named) check(!t0.boxShown && !f0.inRow, `${tag}: the seeded first box (column ${opts.$firstCol + 1}) lies past the window at load (shown: ${t0.boxShown}) and holds no focus`);
     check(t0.ok, `${tag}: after load the step tab is clear of the row, nothing under it${t0.ok ? '' : ' (' + t0.why + ')'}`);
+    // owner 2026-10-03 (TY-10b): on a phone the row's digits are about 29 px, the boxes scaled with them (>= 48 px touch targets);
+    // critic C2 r8 (a): the window shows as many WHOLE columns as fit in the cell's inner box
+    const sz = await page.evaluate(() => {
+      const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent);
+      const g = w.querySelector('.k2-given'), i = w.querySelector('input.mq-cellslot'), ir = i.getBoundingClientRect(), v = w.getBoundingClientRect();
+      const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children];
+      const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect(), pitch = b.left - a.left, gap = pitch - a.width;
+      const cell = w.closest('.mq-scell'), cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
+      const room = cr.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+      const shown = its.filter((e) => { const r = e.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; }).length;
+      return { fs: parseFloat(getComputedStyle(g).fontSize), bfs: parseFloat(getComputedStyle(i).fontSize), bw: ir.width, bh: ir.height, shown, fit: Math.min(its.length, Math.max(1, Math.floor((room + gap + 0.5) / pitch))), room: Math.round(room), swipes: w.scrollWidth > w.clientWidth + 1 };
+    });
+    // a number too wide for six boxes shrinks under TY-10a (floor 9 pt), so the 29 px rule is checked on rows that keep their size
+    const big = !/1,000|100,000/.test(name);
+    if (big) check(sz.fs >= 28 && sz.fs <= 31 && Math.abs(sz.bfs - sz.fs) < 0.5 && Math.min(sz.bw, sz.bh) >= 48 && sz.bw / sz.fs > 2.4 && sz.bw / sz.fs < 2.9, `${tag}: digits ${sz.fs.toFixed(1)} px (about 29), box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 48, width:digit ${(sz.bw / sz.fs).toFixed(2)}, 2.6 before the change)`);
+    else check(Math.min(sz.bw, sz.bh) >= 44, `${tag}: a wide number row (TY-10a): digits ${sz.fs.toFixed(1)} px, box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 44)`);
+    const cueFit = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cue');
+      if (!c || getComputedStyle(c).display === 'none') return { ok: true, why: 'no forward cue (the row fits)' };
+      const v = w.getBoundingClientRect(), r = c.getBoundingClientRect(), fs = parseFloat(getComputedStyle(c).fontSize);
+      return { ok: c.scrollWidth <= c.clientWidth + 1 && r.right <= v.right + 1 && r.left >= v.left - 1 && r.height < 2.2 * fs && fs >= 14, why: `${Math.round(r.width)} px in a ${Math.round(v.width)} px window, ${fs} px type, ${Math.round(r.height)} px high` }; });
+    check(cueFit.ok, `${tag}: the forward cue is whole, on one line, inside the window (${cueFit.why})`);
+    check(!sz.swipes || sz.shown === sz.fit, `${tag}: the window shows ${sz.shown} whole columns; ${sz.fit} fit in the cell's ${sz.room} px inner box`);
+    // critic C2 r8 (b): focus held back -> the first digit key typed with nothing focused goes to the first box, shown whole, as Tab does
+    if (host === 'card' && !t0.boxShown && !f0.inRow) {   // (at 29 px digits a default row may hold its first box past the start too)
+      await page.keyboard.press('5'); await sleep(300);
+      const dk = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const i = w.querySelector('input.mq-cellslot'), v = w.getBoundingClientRect(), r = i.getBoundingClientRect();
+        const out = { focused: document.activeElement === i, value: i.value, shown: r.left >= v.left - 1 && r.right <= v.right + 1 }; i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); i.blur(); w.scrollLeft = 0; return out; });
+      await sleep(300);
+      check(dk.focused && dk.value === '5' && dk.shown, `${tag}: with focus held back, typing 5 moves to the first box (focused ${dk.focused}, value "${dk.value}", fully shown ${dk.shown})`);
+    }
     // a programmatic scroll settles on a column start (scroll-snap): no number or box is cut at the row's left edge
     await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children]; w.scrollLeft = Math.round((its[1].getBoundingClientRect().left - its[0].getBoundingClientRect().left) * 0.7); });
     await sleep(700);
