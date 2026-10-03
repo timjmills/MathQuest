@@ -86,10 +86,15 @@ export const measureCols = () => [1, 2, 3, 4];
 
 const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));
 
+const WARM_MAX_MM = 70;
+
 /** How many cells each prerequisite gets in its share of the width. */
 function warmShape(pools, input) {
     const ctx = ctxOf(input);
-    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length);
+    // A Warm-up is a quick look back: a prerequisite whose problem is taller than WARM_MAX_MM even
+    // across the whole width (a pair of arrays, a story with a work box) would take the sheet's
+    // page by itself and push the lesson past it, so it is left out.
+    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length && hAt(pools[id].slice(0, 3), 1) <= WARM_MAX_MM);
     const out = {};
     // A cell in a half of the width is as wide as a cell of a 4-column page: the measurement at 4
     // columns says whether it fits there (a template's own column cap is for a whole page of it).
@@ -499,6 +504,23 @@ const isRound = (it) => {
     return !!(c && c.template === 'pv' && c.payload && c.payload.kind === 'round' && Number.isFinite(Number(c.payload.n)));
 };
 
+/** `html` without its first <div class="cls ..."> element (nested divs balanced). */
+function dropDiv(html, cls, nth = 0) {
+    const h = String(html || '');
+    const open = new RegExp(`<div class="${cls}[" ]`, 'g');
+    let at = -1;
+    for (let i = 0, m = open.exec(h); m; m = open.exec(h), i++) if (i === nth) { at = m.index; break; }
+    if (at < 0) return h;
+    const re = /<div\b|<\/div>/g;
+    re.lastIndex = at;
+    let depth = 0;
+    for (let m = re.exec(h); m; m = re.exec(h)) {
+        depth += m[0] === '</div>' ? -1 : 1;
+        if (depth === 0) return h.slice(0, at) + h.slice(re.lastIndex);
+    }
+    return h;
+}
+
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
 function stateDrawing(it, steps, groups, k, c) {
     const merged = groups.map((g) => ({ marks: g.marks }));
@@ -541,6 +563,9 @@ export function generalStep(text) {
     const body = t.slice(pre.length);
     if (/^Look at the key words?\b/i.test(body)) return `${pre}Look at the key words.`;
     if (!/\d/.test(body)) return t;
+    // "Step 1: Circle +. 17 + 27 = 44." -> "Step 1: Circle +. Work it out."
+    const circ = body.match(/^(Circle \S+\.) [\d,.\s]+[-+×÷−*/][\d,.\s]+=\s*[\d,.]+(\s*R\s*\d+)?\.?$/);
+    if (circ) return `${pre}${circ[1]} Work it out.`;
     if (/^Write .* in the boxes\.?$/i.test(body)) return `${pre}Write the numbers in the boxes.`;
     if (/^Write the answer\b/i.test(body)) return `${pre}Write the answer and its label word.`;
     if (/^[\d,.\s]+[-+×÷−*/][\d,.\s]+=\s*[\d,.]+(\s*R\s*\d+)?\.?$/.test(body)) return `${pre}Work it out.`;
@@ -580,7 +605,31 @@ export function stateItems(example, data) {
     const groups = stateGroups(steps);
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length);
-    const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
+    const draw0 = (k, c) => stateDrawing(example, steps, groups, k, c);
+    // A story's panels after the first show the WORK only: the story is read in panel 1, and four
+    // copies of it pushed the chart past the page (two-step stories most of all).
+    const story = !!(example && example.q && example.q.cell && example.q.cell.template === 'word-work');
+    const drawCls = (k) => (story && k > 0 ? 'mq-cdraw mq-cdraw-work' : 'mq-cdraw');
+    // Cut in the HTML (not by CSS alone) so the host measures the panel as it prints.
+    // A two-step story's panels show the step they work: the reading panel the story alone, a
+    // "Step n" panel that step's column work alone, the last panel all of it (two stacks in
+    // every panel ran the chart past the page).
+    const nSteps = story ? ((example.q.cell.payload && example.q.cell.payload.steps) || []).length : 0;
+    const stepOf = (k) => {
+        const m = groups[k].steps.map((i) => steps[i].text).join(' ').match(/Step (\d+):/g) || [];
+        return m.length === 1 ? Number(m[0].replace(/\D/g, '')) : m.length ? -1 : 0;
+    };
+    const workOnly = (k, html) => {
+        if (nSteps < 2 || k === groups.length - 1) return html;
+        const n = stepOf(k);
+        if (n < 0) return html;
+        let h = html;
+        for (let j = nSteps; j >= 1; j--) if (j !== n) h = dropDiv(h, 'mq-wwstep', j - 1);
+        return h;
+    };
+    // (The page's full-width floor of a two-step cell is no floor for a chart panel.)
+    const fitPanel = (h) => (story ? h.replace(/(<div class="mq-ww"[^>]*?)min-width:[^;"]+;/, '$1') : h);
+    const drawing = (k, c) => fitPanel(workOnly(k, story && k > 0 ? dropDiv(draw0(k, c), 'mq-wwstory') : draw0(k, c)));
     // Lessons r1: a closing step that draws nothing ("Check: add back") is not squeezed into the
     // last panel: it gets a line of its own under the panels, its words beside its name.
     const marked = (i) => ((steps[i] && steps[i].marks) || []).length > 0;
@@ -613,7 +662,7 @@ export function stateItems(example, data) {
             // Lessons r3: a panel whose step counts on draws the hops beside its words (the side
             // column has the room; under the fact they would push the panels past the page).
             const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
-            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
+            const draw = `<div class="${drawCls(k)}" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
@@ -621,7 +670,7 @@ export function stateItems(example, data) {
     }));
     const draws = groups.map((g, k) => Object.assign({}, base, {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
-        render: (c) => `<div class="mq-cdraw">${drawing(k, c)}</div>`,
+        render: (c) => `<div class="${drawCls(k)}">${drawing(k, c)}</div>`,
     }));
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
@@ -970,7 +1019,10 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const panelW = lay.variant === 'row' ? 186 * 0.42 : 186 / cols - 8;
         return panelW / boundW;
     });
-    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
+    // A story's drawing is laid out at its own width (story, signs, columns, label words): it is
+    // never zoomed past 1, where it would run out of its panel's sides.
+    const storyChart = !!(example && example.q && example.q.cell && example.q.cell.template === 'word-work');
+    const zMax = storyChart ? 1 : Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
     const H = (z) => Math.max(...states.map((st, k) => base[k] + (z - 1) * dH[k]));
     // The largest zoom in [lo, hi] at which `total(z)` fits `room`; 0 when not even `lo` does.
     const solve = (total, room, lo, hi) => {
@@ -1009,7 +1061,17 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const zc = solve((q) => sum(rowsAt(q)), availAll, 0.8, 1);
         if (zc) { mode = 'grid3'; z = zc; }
     }
-    if (mode === 'one') z = solve((q) => lay.rows * H(q), avail, 1, zMax) || 1;
+    // Panels too tall even at zoom 1 (a word story: the story and its stack in every panel) take
+    // the drawing down rather than leave the sheet: never below 0.75, where the chart's L type
+    // (15 pt text, 28 pt digits) is still at least the S type (11 pt, 16 pt: the content floor).
+    // Each row as tall as its OWN panels (a first panel of three step heads sets only its row).
+    const rowsOne = (q) => Array.from({ length: lay.rows }, (_, r) => Math.max(...states.slice(r * cols, r * cols + cols).map((st) => base[states.indexOf(st)] + (q - 1) * dH[states.indexOf(st)])));
+    let perRow = false;
+    if (mode === 'one') {
+        z = solve((q) => lay.rows * H(q), avail, 1, zMax);
+        if (!z && cols === 2 && lay.rows > 1) { z = solve((q) => sum(rowsOne(q)), avail, 0.75, zMax); perRow = !!z; }
+        if (!z) z = solve((q) => lay.rows * H(q), avail, 0.75, 1) || 0.75;
+    }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -1034,7 +1096,14 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         // spreads).
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
-        sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
+        if (perRow) {
+            // The rows share the room in proportion to their own panels.
+            const hr = rowsOne(z);
+            const k = room / sum(hr);
+            grid.rowsTpl = hr.map((h) => `${Math.round(h * k * 10) / 10}fr`).join(' ');
+            rowH = room / lay.rows;
+        }
+        sections.push(fill || perRow ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
         if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
@@ -1208,7 +1277,9 @@ export function plan(input = {}) {
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h, { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h, grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+    // The Guided strip sits in two thirds of the width beside the Steps: its label and instruction
+    // wrap to two lines ("Guided / Practice:"), so the band counts the second line.
+    } else if (weDo.length) groups.push(band(m.strip + m.instr * 0.75 + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);

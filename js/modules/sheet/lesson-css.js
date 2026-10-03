@@ -46,6 +46,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-chead>b{font-weight:700}
 :is(.ws-page,.ws-sheet) .mq-cdraw{display:flex;justify-content:center;align-items:flex-start}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cdraw{flex:none;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cdraw-work .mq-wwstory{display:none}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-ctailcell{justify-content:center;align-items:stretch;padding:2mm 4mm}
 :is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
 :is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
