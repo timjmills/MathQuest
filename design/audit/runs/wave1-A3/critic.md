@@ -117,3 +117,66 @@ The log has **no `pointerdown` on a red box and no programmatic `input` event**,
 - **C2:** fix 7, so every numeric answer form marks its wrong digits. A one-line Say frame under a wrong box would also help ("The tens digit is wrong."), shown and spoken.
 - **C3:** draw the missing-digit box as a single dashed slot rather than nested inside the box's own dashed edge, so it is not a dashed box inside a dashed box (`card-add_facts_2digit-missing-390.png`).
 - **C4:** fixes 4 and 5, and blink the digit only (fix 6), so AX-9's "cells never animate" is broken only by the owner-ruled digit blink.
+
+---
+
+# Round 2
+
+Graded fix a9e1535 (on merge c4e0a9f). Critic: Opus, medium effort, independent. No code edited.
+
+## Verdict: PASS
+
+| Host | Width | C1 Ease | C2 Teach | C3 Space | C4 Fidelity |
+|---|---|---|---|---|---|
+| Practice card | 1280 | 9 | 8 | 9 | 9 |
+| Practice card | 390 | 9 | 8 | 9 | 9 |
+| Online worksheet | 1280 | 9 | 8 | 9 | 9 |
+| Online worksheet | 390 | 9 | 8 | 9 | 9 |
+| Quiz | 1280 / 390 | unaffected: 0 marks, a tap keeps the answer (gate lines PASS) | | | |
+
+No cap applies.
+
+## Runs (this tree)
+
+- `wave1-a3-wrongdigits`: **OK**, 256 PASS. It includes the new ghost, auto-advance and shapes checks, and the quiz lines.
+- `wave1-a2-perbox`: **OK**, 644 PASS.
+- `test-wrong-retry-skip`: **OVERALL: PASS**, so XP, skip-after-N and the ladder are unchanged.
+- `ws-screen-answer --skills addition:add_100_regroup` (instrumented copy): **10/10** at card ok, worksheet 3/3, quiz 3/3. The round-1 rate was 1 failure in 8.
+- `node --input-type=module --check` passes on all three changed modules. There were no console errors in any probe.
+- Probes P1 to P6 were rerun at 1280 and 390, and I viewed every new PNG.
+
+## Each round-1 defect, verified
+
+| # | Round-1 defect | Round-2 evidence | Status |
+|---|---|---|---|
+| 1 | Red digit on the selection blue, 1.26:1 | `::selection` is `rgba(0,0,0,0.12)`. On `p1-card-try3-1280.png` the selection pixel is (224,213,140): red on it is **4.38:1** and black is 14.1:1. The stack's auto-select into a red box (`p6-card-stack-select-390.png`) reads clearly, with the same grey. | fixed |
+| 2 | Ghost "14" over an empty box, a Backspace/Check trap | P1 try 4 and P5: `value ""`, no mirror, not red, ink black. Typing "11" turns it green. The mirror also removes itself when its value changes (200 ms watch). | fixed |
+| 3 | Tab through a red box erased it | P2 card count-by: after Tab-Tab, box 1 is still "99" and red, and selected (`sel:true`). A tap still clears it (gate). | fixed |
+| 4 | Wrong digit shown by colour alone | `.mq-wd-bad` has a 3 px underline at both widths on the card (add_facts, count_by_tables) and the worksheet (area model, the missing digit) (`png/r2-sheet.png`). It outlasts the blink and is present under reduced motion (gate). | fixed |
+| 5 | Standards contradicted the feature | P-ON-11, SP-32 and AX-9 now carry the 2026-10-03 ruling. | fixed |
+| 6 | A one-digit box faded as a whole | P6: the input's `opacity` stays 1 across 10 samples, and only `-webkit-text-fill-color` moves (#B3261E to 0.2 alpha). The dashed edge holds. | fixed |
+| 7 | Fractions, decimals and signs got no marks | `wrongDigitPattern` passes 12 cases (gate, shapes). **But** see R2-1: the one live fraction host still draws nothing. | partly fixed |
+| race | Worksheet auto-advance stole focus | `wsScheduleAdvance` cancels on pointerdown and Tab. Gate advance lines PASS, and there were 10/10 instrumented runs. A keyboard pupil who just keeps typing still gets the auto-advance, which is the intended behaviour. | fixed |
+
+The overlay is unchanged: P4 offset `[0,0,0,0]` in all 22 cases, `[0,0,0]` in all 26 after a resize, and the digit runs are centred within 1 px.
+
+## Defects (minor, none blocks the pass)
+
+1. **R2-1 · C2 minor (it keeps C2 at 8 rather than 9). The mixed/improper fraction boxes still get no digit marks.**
+   - Where: `screen-cell.js`, in `_bindOwnBoxes`, the `dualFractionAnswers` branch. It binds with `_liveBindFn`, which sets `LIVE_EXPECT` to `['']`. `_markWrongDigits(el, LIVE_EXPECT.get(el))` then has no answer to compare.
+   - Measured: P6, `fractions:mixed_improper_visual`, want `14/4`, typed `14/5`. The box goes red (cross), but there is no mirror (`mirror: null`) at 1280 and 390.
+   - Fix: keep the expected text beside the judge. Add a `LIVE_WANT` WeakMap filled in that branch with `[want]`. In `_liveSet` and `markBoxSubmitted`, pass `LIVE_WANT.get(el) || LIVE_EXPECT.get(el)` to `_markWrongDigits`.
+   - Proof: rerun P6. The fraction case shows the mirror pattern `..|.b`. Add a `mixed_improper_visual` scenario to `wave1-a3-wrongdigits`.
+2. **R2-2 · C4 nit (no points). The promised 3 px bar under a one-digit box does not render.**
+   - Where: `css/screen-cell.css`, `input.mq-live-wrong.mq-wrong-digit` `box-shadow: inset 0 -3px 0 …`.
+   - Measured: P6 reads `box-shadow: none` on the stack's red tens box at both widths. It is overridden, for example by the `.mq-cellslot.mq-live-wrong { box-shadow: none !important }` rule at line 1419 and by the stack digit rules.
+   - Not a pupil defect: in a one-digit box, the box is the digit, and its corner cross is a non-colour cue.
+   - Fix: delete the dead declaration (and its comment), or raise its specificity above line 1419.
+   - Proof: computed `boxShadow` either matches the rule or the rule is gone.
+
+## What would raise each criterion to 10
+
+- **C1 (9):** a visible caret in a red, mirrored box while it has focus. Today it is `caret-color: transparent` app-wide (SP-22 allows this because the focus ring shows), but a keyboard pupil retyping into a kept, selected entry would see where the typing goes.
+- **C2 (8):** R2-1. Also a short spoken or shown line naming the wrong place ("The tens digit is wrong."), so the feedback teaches the place value, not only marks it.
+- **C3 (9):** draw a missing digit as a single dashed slot, not a dashed box inside the box's own dashed edge (`p4-worksheet-add_facts-missing-390-card.png`).
+- **C4 (9):** R2-2, so every claimed cue is real.
