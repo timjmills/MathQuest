@@ -520,3 +520,106 @@ There is a **second, latent hole.** The box search starts at the `[data-ws-ink]`
   "summary": "Every round-3 defect is fixed on real renders: worksheet LTR focus, one value rule, no gaps, right-align, the stack Off wash, the legacy key digits inside their boxes, and the docs. It still fails C4: the quiz drops ansBox for every legacy skill, because QUIZ_CELL_FIELDS does not carry it (digit draws one box, off draws a black box). The new L-KEY check missed sub_facts because querySelector's descendant combinator matches an ancestor outside the box; ':scope' closes it, and it flags round 3's sub_facts key 20 times."
 }
 ```
+
+---
+
+# Round 5
+
+Critic: independent, Opus 5.5, medium effort. Tree head `e7a99aa` (merge `434c339`). Date 2026-10-03.
+
+Everything ran on scratch copies, so nothing in the tree changed except this file:
+- `head` is `git archive e7a99aa`.
+- `base` is `434c339^2` (b684322), main as the lane last merged it.
+- `merged` is a trial merge of main `5ebc2de` (A3 + its follow-up) into `e7a99aa`.
+
+Probes and PNGs are in the session scratchpad (`lane-b-r5/`). I viewed every PNG cited.
+
+## Verdict: FAIL
+
+| Criterion | Score | Why (one line; details in the defects) |
+|---|---|---|
+| C1 Ease of use | **5** | **H6:** add_three at *digit*, 390, quiz: the second digit box runs past the paper (and the viewport), so a tap at its centre misses (R5-D3). A right answer in a digit strip on the practice card freezes the card: the boxes lock, with no message, no score and no next item until Check (R5-D1). |
+| C2 Educational value | **5** | The digit strip marks the box last left, not the wrong digit. "25" for 15 turns the **right** ones digit red and leaves the wrong tens digit plain. A wrong 1-digit answer is never marked (R5-D2). After the merge, A3's red, blinking, underlined digit never appears in a strip. The missing-digit skills draw the **given** sum in answer boxes (R5-D4). |
+| C3 Spacing and layout | **6** | add_sub_100s at S: the answer box runs 3 mm through the cell's bottom rule (120 L-OVERFLOW, base 0) (R5-D5). Missing-digit keys at S: 127 to 139 L-KEY (base 6 to 14), digits touching the box edges (R5-D4). add_three at 390 overflows its frame (R5-D3). |
+| C4 Standard fidelity | **6** | One slot shape per section is broken twice. missing_add_sub / missing_mult_div at *digit* mix a digit strip and a single box (R5-D6), and given digits wear the answer-box shape (R5-D4). The lane does not merge cleanly with main (R5-D7). |
+
+## Gates
+
+| Gate | Tree | Result |
+|---|---|---|
+| `wave1-b-ansbox-entry` | head / merged | OK (57 items) / OK (57 items). Its advance leg counts the `transitionToNextQuestion` call as an advance, with synthetic input; see R5-D1. |
+| `wave1-a2-perbox` | head / merged | OK, 644 PASS / OK, 644 PASS |
+| `wave1-a3-wrongdigits` | merged | OK, 268 PASS. It has no digit-strip scenario, so R5-D2 is not seen. |
+| `ws-screen-answer` (default list) | head | OK. It presses Check on the card, so R5-D1 is not seen. |
+| `ws-screen-answer` (add_facts, add_100_regroup, sub_facts, divide, div_facts, multiply, add_three, missing_mult_div, missing_add_sub) | merged | OK, 9/9 on card, worksheet and quiz. |
+| `ws-screen-answer` add_100_regroup, instrumented, ×6 | head | 6/6 at 3/3. |
+| `ws-print-lint --self-test` | head | OK, 48 assertions. Both R4-D2 mutations ("legacy fact zone", "per-digit key across its seam") fire. |
+| `ws-print-lint --source kit`, the 74 ansBox skills, independent + more-practice, S/L × default/digit/off | head | S: 598 / 592 / 257 findings; L: 68 / 62 / 70. Measured against base with this tree's lint: every L-size finding and the mixed_* L-DENSITY / L-FONT are pre-existing (identical counts). **Lane regressions at S:** see R5-D4 and R5-D5. |
+| Hosts: 9 skills × {auto, digit, one, off} × {card, worksheet, quiz} × {390, 1280} | head | 216 renders, scrollWidth always equals the viewport, 0 console errors. The exception is R5-D3. |
+
+## Round-4 defects
+
+| ID | Status | Evidence |
+|---|---|---|
+| R4-D1 quiz drops ansBox | **FIXED** | Quiz at 390 and 1280: divide, sub_facts and multiply at *digit* draw a 2-input LTR strip. At *one* and *off* they draw 1 input, with no black edge at *off*. The gate's quiz leg stores '5' and '11'. |
+| R4-D2 lint holes | **FIXED** | `:scope` guard, walk from the glyph, transparent borders ignored. Both self-test mutations fire. With it, base sub_facts was already shown to fail in round 4. |
+| R4-D3 scope | **PARTLY** | add_three and missing_mult_div offer the option on paper and screen, and the missing_mult_div keys (S/L, *digit* / *one*) are clean, with every key digit inside its box. New defects in what was built: R5-D3 and R5-D6. |
+| R4-D4 leading zeros | **PARTLY** | `07` → `_7` green, `008` → `__8`, `00` → `_0`; right-align matches the key. "Auto-advance like a plain 7" is **not** true: no right entry auto-advances at *digit* (R5-D1). |
+| Builder gap: "Off" at S/L not re-run | Checked | divide, sub_facts, multiply, add_facts and add_100_regroup at *off*, S and L, pupil and key: a plain rule, with key digits on the rule and clear of it. missing_mult_div S *off* and add_three L *off* are fine. |
+| Builder gap: missing_mult_div keys predate the slot width | Checked | Re-rendered at S/L *digit* and L *one*: 3-box strips, digits right-aligned and clear. |
+
+## Defects (RUBRIC §6)
+
+```json
+{
+  "lane": "wave1-B",
+  "round": 5,
+  "pass": false,
+  "scores": { "C1": 5, "C2": 5, "C3": 6, "C4": 6 },
+  "caps": ["H6 (C1 ≤ 5): add_three digit, quiz 390"],
+  "defects": [
+    { "id": "R5-D1", "criterion": "C1", "severity": "major",
+      "where": "js/modules/question-render.js:830 wireBoxValidation (collects every .column-answer-input, which includes the digit strip's boxes) and its tryAdvance at :1111 (disables the inputs, then calls transitionToNextQuestion; only fraction input goes through submitAnswer)",
+      "what": "Card, ansBox digit, add_facts / div_facts / multiply, 390 (adv3.cjs, adv5.cjs). The pupil types the right answer (1 or 2 digits, with or without a leading zero, with or without leaving the box). At 1000 ms the boxes are disabled, with no message and score 0. At 4.5 s the question is unchanged. Only Check scores it. At auto and one the same entries score at 300 ms ('Correct!') and the next item appears by 4.5 s. A pupil sees a right answer lock with no response. The lane gate passes because it counts the transitionToNextQuestion call (window.__mqAdv) as 'advanced', with synthetic input.",
+      "fix": "Leave the strip to the card's own checker: skip inputs inside [data-mq-ltr] in wireBoxValidation (as the 'one' box is skipped), or route that tryAdvance through window.submitAnswer() (the hasFi branch) so score, message, XP and advance happen exactly as at auto. In wave1-b-ansbox-entry, type with page.keyboard and require st.score to rise, not the call.",
+      "check": "adv5.cjs: the digit rows equal the auto rows. Score 1 and feedback correct by 1000 ms, next question by 4.5 s, XP awarded once, inputs not disabled before the verdict." },
+    { "id": "R5-D2", "criterion": "C2", "severity": "major",
+      "where": "js/modules/screen-cell.js wireLiveCorrect, the data-mq-ltr branch: every strip box is bound with _liveBindFn(inp, judge, group) to one WHOLE-VALUE judge, so LIVE_EXPECT is [''] and the red goes on whichever box is judged as final",
+      "what": "adv2.cjs, head and merged alike, card at 390. Typed '25' for 15 (also divide 20 for 10, sub_facts 24 for 14): the ones box (a right digit) is red with a cross, and the tens box (the wrong digit) is plain, both live and after Check. div_facts '3' for 2 in a 2-box strip: never red, not on leaving (the right-align re-judges it as unfinished) and not after Check. On the merged tree, A3's mq-wrong-digit class, blink and underline never reach a strip box (ab3.cjs: 'W' never set). This contradicts A2 (each box judged on its own) and A3 (only the wrong digits, by place value), and it teaches the wrong place.",
+      "fix": "Keep the value rule for green and neutral, but when the strip is complete and its value is wrong (on leaving the strip, or on Check), mark per box by place value: right-align the answer's digits into the strip's T boxes. A box whose digit differs gets mq-live-wrong; an empty box where the answer has a digit is missing (A3's mq-wd-empty); right digits stay unmarked. Give each box its expected digit for A3 (main's LIVE_WANT map, added by 5ebc2de for judge-bound boxes) so the merged tree blinks and underlines exactly the wrong digit.",
+      "check": "adv2.cjs E: '25' for 15 gives a red tens box, ones not red. D: the '3' for 2 box is red after leaving and after Check. Add a strip scenario to wave1-a3-wrongdigits on the merged tree: the mq-wrong-digit class is on the wrong place only." },
+    { "id": "R5-D3", "criterion": "C1 (H6) / C3", "severity": "critical",
+      "where": "js/modules/screen-cell.js, the 'add-three' twin: renderCell at resolveCtx({mode:'print', size:'L'}) then _screenSizes, with no fit to the host width",
+      "what": "add_three, ansBox digit, 390 (a3fit.cjs, 4 seeds). Quiz: the second digit box ends 17 to 41 px past the paper frame on 4/4 seeds; on seed 7 it runs 11 px past the viewport and elementFromPoint at its centre misses it (quiz-add_three-digit-390.png shows only one box). Card: the second box is 24 px past the cell frame on 1 seed and flush with it on 3. At auto, one and off every box is 19 to 31 px inside, and 820 / 1280 are fine. The digit drawing is also visibly larger than the auto drawing at the same width.",
+      "fix": "Draw the twin at the host's own fit (the scale the auto path uses), or wrap '= [ ][ ]' under the counters when the sentence does not fit, so the strip never crosses the frame.",
+      "check": "a3fit.cjs: every box has 'over' ≤ 0 and 'hit yes' at 390 / 820 / 1280 for the 4 seeds, on card and quiz." },
+    { "id": "R5-D4", "criterion": "C2 / C3", "severity": "major",
+      "where": "the stack answer row under ansBox styling for addition:add_missing_digit, subtraction:sub_missing_digit, multiplication:mult_missing_digit (ANSBOX_SKILLS 'stack')",
+      "what": "In a missing-digit item the sum or difference is GIVEN. On the lane's pupil page (S, default) it is printed inside digit answer boxes, the same shape as the empty box for the missing digit (paper2-head/add_missing_digit-S-auto-independent-pupil.png). Base prints it as plain digits (paper2-base key). The key then prints the given digits edge to edge in those boxes: L-KEY at S is 139 / 127 / 135 on head against 27 / 26 / 9 on base. The slot shape no longer tells the pupil where to answer (RUBRIC C1). Verified on paper (S pupil and key). The screen hosts for these three skills were not probed this round: the probe was stopped while waiting for a browser slot.",
+      "fix": "Apply the answer-box styling only to answer places that are blank for the pupil. A given digit stays a plain printed digit on paper and screen. Or take the three missing-digit skills out of ANSBOX_SKILLS, since their answer place is the missing digit, not the answer row.",
+      "check": "S pupil page: the sums are unboxed. ws-print-lint --source kit --skills addition:add_missing_digit,subtraction:sub_missing_digit,multiplication:mult_missing_digit --size S: L-KEY at or below base." },
+    { "id": "R5-D5", "criterion": "C3", "severity": "major",
+      "where": "js/modules/print-generate.js, the legacy missing-number branch: atEnd → wsAnswerLine(band), band = max(answer digits, 2)",
+      "what": "addition:add_sub_100s at S (every ansBox value, independent and more-practice): the '= ?' answer box wraps onto its own line and runs 3 mm through the cell's bottom rule, so its lower edge is lost (c-add_sub_100s-S-auto-independent-pupil.png). 60 + 60 L-OVERFLOW findings; base has 0, with the old inline line '= ? ____'.",
+      "fix": "Keep the slot inline at S (size the band box to the S metrics), or grow the legacy cell to hold the wrapped slot. The cell must contain its slot.",
+      "check": "ws-print-lint --source kit --skills addition:add_sub_100s --size S (and L): 0 L-OVERFLOW." },
+    { "id": "R5-D6", "criterion": "C4", "severity": "minor",
+      "where": "SL-3 scope rule as built for subtraction:missing_add_sub and division:missing_mult_div at ansBox digit",
+      "what": "One section mixes two slot shapes. 'a ○ b = [ ][ ]' (a digit strip) sits next to '[ ] ○ b = c' (one box) on the same S page (p-d3a.png, p-d3b.png). A pupil reads the single box as a one-digit place although it holds 2-digit answers ('[13] + 5 = 18'). RUBRIC C1 asks for one slot shape per section.",
+      "fix": "At digit, draw every missing-number box of these skills as a digit strip of the skill's band. Or do not offer 'digit' on them (keep one / off) and say so in SL-3.",
+      "check": "An S digit page of each skill shows one slot shape; offeredOptionsFor reflects the choice." },
+    { "id": "R5-D7", "criterion": "C4 (process)", "severity": "minor",
+      "where": "merging main (5ebc2de, A3 + follow-up) into e7a99aa",
+      "what": "Conflicts in js/modules/answer-check.js and js/modules/worksheet.js (both import lists), index.html (asset stamps) and 4 A2 evidence PNGs. Resolved as the import union plus a re-stamp, the merged tree passes A3 (268), the entry gate (57), A2 (644) and ws-screen-answer 9/9, but A3 does not reach the strips (R5-D2).",
+      "fix": "Merge main into the lane: take both import lists, re-run ws-stamp-assets, then fix R5-D2 on the merged code.",
+      "check": "git merge main is clean on the lane; wave1-a3-wrongdigits with a strip scenario passes." }
+  ],
+  "to_raise_to_10": {
+    "C1": "R5-D1 and R5-D3: every right entry scores and advances the same way at every ansBox value, and every box fits at 390.",
+    "C2": "R5-D2 and R5-D4: the wrong digit is the one marked, at every value, and A3's blink and underline reach strip boxes. Given digits never look like answer places.",
+    "C3": "R5-D5 and the R5-D4 key fit at S, with the lint at or below base on all 74 skills.",
+    "C4": "R5-D6, one slot shape per section, and a clean merge with main (R5-D7)."
+  },
+  "summary": "R4-D1 (quiz) and R4-D2 (lint) are fixed, and Off at S/L and the missing_mult_div keys are clean. Round 5 fails on new defects. A right answer in a digit strip locks the card with no score until Check, and the strip marks the box last left, so '25' for 15 marks the right digit red. add_three's strip overflows the paper at 390. The missing-digit skills box their given sums. add_sub_100s's new slot overflows its cell at S."
+}
+```

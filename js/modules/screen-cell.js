@@ -1090,13 +1090,88 @@ function _wireClear() {
     window.addEventListener('resize', () => Array.from(MIRRORS.keys()).forEach(_mirrorPlace));
 }
 /**
+ * A fact / equation in digit boxes (ansBox 'digit', data-mq-ltr), critic B r5 D2. GREEN and NEUTRAL
+ * follow the strip's VALUE (ltrStripValue: "07" is 7, a gap is never green, a correct prefix is
+ * neutral). RED is judged per box BY PLACE VALUE, the A3 rule (wrongDigitPattern): the answer's
+ * digits are right-aligned into the strip's boxes; a box whose digit differs is the wrong digit
+ * (mq-live-wrong + A3's mq-wrong-digit blink and underline), an empty box where the answer has a digit
+ * is a missing digit (mq-wd-empty), a right digit stays unmarked. Red is shown when the strip is
+ * complete: every box filled, the pupil leaves the strip (after the right-align), or Check.
+ */
+const STRIPS = new WeakMap();          // the strip -> { group: its digit inputs, want: the answer's digits }
+function _stripExpect(group, want) {
+    const pad = group.length - want.length;
+    return group.map((_, i) => (i >= pad ? want[i - pad] : ''));
+}
+function _stripUnmark(e) { _liveSet(e, false, false); e.classList.remove('mq-wrong-digit', 'mq-wd-empty'); }
+/** Judge one strip. `final`: the pupil left it or pressed Check. Returns 'right' | 'wrong' | 'open'. */
+export function judgeLtrStrip(stk, final = false) {
+    const s = stk && STRIPS.get(stk);
+    if (!s) return 'open';
+    const { group, want } = s;
+    if (_inQuiz(stk)) return 'open';
+    const r = ltrStripValue(group);
+    const digit = (e) => String(e.value || '').replace(/[^0-9]/g, '');
+    if (!r.gap && r.text !== '' && r.value === want) {
+        group.forEach((e) => { e.classList.remove('mq-wrong-digit', 'mq-wd-empty'); _liveSet(e, digit(e) !== '', false); });
+        return 'right';
+    }
+    group.forEach((e) => { if (e.classList.contains('mq-live-correct')) _liveSet(e, false, false); });
+    if (r.text === '' && !r.gap) return 'open';
+    const full = group.every((e) => digit(e) !== '');
+    if (!final && !full) return 'open';                       // still being written: no new red
+    const exp = _stripExpect(group, want);
+    group.forEach((e, i) => {
+        const v = digit(e);
+        if (v === exp[i]) { if (e.classList.contains('mq-live-wrong')) _stripUnmark(e); return; }
+        if (exp[i]) LIVE_WANT.set(e, [exp[i]]); else LIVE_WANT.delete(e);
+        _liveSet(e, false, true);                              // red + its corner mark (A2)
+        if (v === '') e.classList.add('mq-wrong-digit', 'mq-wd-empty');   // a missing digit (A3)
+        else e.classList.add('mq-wrong-digit');                // the wrong digit blinks (A3)
+    });
+    return 'wrong';
+}
+/** Bind a strip to its answer (idempotent; a redraw re-binds the new inputs). Returns the boxes bound. */
+export function bindLtrStrip(stk, ans) {
+    const group = Array.from(stk.querySelectorAll('input.mq-digit'));
+    if (!group.length) return 0;
+    const want = String(ans == null ? '' : ans).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    STRIPS.set(stk, { group, want });
+    group.forEach((e) => {
+        LIVE_FN.delete(e);
+        LIVE_EXPECT.set(e, ['']);                              // bound (markBoxSubmitted, unwire)
+        if (e.dataset.mqLive === '1') return;
+        e.dataset.mqLive = '1';
+        // editing a box clears its own red (A2); the strip is then judged again as unfinished
+        e.addEventListener('input', () => { if (e.classList.contains('mq-live-wrong') || e.classList.contains('mq-wd-empty')) _stripUnmark(e); judgeLtrStrip(stk, false); });
+        e.addEventListener('change', () => judgeLtrStrip(stk, false));
+    });
+    if (stk.dataset.mqStripJudge !== '1') {
+        stk.dataset.mqStripJudge = '1';
+        stk.addEventListener('focusout', (ev) => {
+            if (ev.relatedTarget && stk.contains(ev.relatedTarget)) return;
+            if (_toControl(ev)) return;                          // Check / Hint judge it themselves
+            stk.dataset.mqLeft = '1';                            // complete: a host's own check may judge it
+            rightAlignLtrStrip(stk);
+            judgeLtrStrip(stk, true);
+        });
+        stk.addEventListener('focusin', () => { delete stk.dataset.mqLeft; });
+    }
+    judgeLtrStrip(stk, false);
+    return group.length;
+}
+
+/**
  * The item was judged wrong at Check: the digit boxes the pupil left empty are missing digits, so
- * they are marked too (an answer digit box only; a regroup box may rightly stay empty).
+ * they are marked too (an answer digit box only; a regroup box may rightly stay empty). A digit
+ * strip (data-mq-ltr) is judged by place value as a whole (judgeLtrStrip).
  */
 export function markMissingDigits(root) {
     if (!root || _inQuiz(root)) return 0;
     let n = 0;
+    root.querySelectorAll('[data-mq-ltr]').forEach((stk) => { if (STRIPS.has(stk) && judgeLtrStrip(stk, true) === 'wrong') n++; });
     root.querySelectorAll('input.mq-digit, input.mq-cellslot:not(.mq-cellslot-host), input.ib-cell').forEach((el) => {
+        if (el.closest('[data-mq-ltr]') && STRIPS.has(el.closest('[data-mq-ltr]'))) return;
         if (el.classList.contains('mq-carry') || LIVE_FN.has(el) || String(el.value || '').trim() !== '') return;
         const want = LIVE_EXPECT.get(el);
         if (!want || !want.some((w) => w !== '') || !el.offsetWidth) return;
@@ -1417,17 +1492,7 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
             // judged by the VALUE the boxes hold together (empty boxes ignored: "_9" and "9_" are 9);
             // a value still on its way to the answer stays neutral
             const a = String(kind.ans != null ? kind.ans : '').replace(/[^0-9]/g, '');
-            const group = Array.from(stk.querySelectorAll('input.mq-digit'));
-            const want = a.replace(/^0+(?=\d)/, '');
-            const judge = (v) => {
-                if (!String(v || '').trim()) return null;
-                const r = ltrStripValue(group);
-                if (r.gap) return null;                                   // never green with a gap (D4)
-                if (r.value === want) return true;                         // by value: "07" is 7 (D3)
-                if (r.zerosOnly && want !== '0') return null;              // a leading zero on its way
-                return r.value.length < want.length && want.startsWith(r.value) ? null : false;
-            };
-            group.forEach((inp) => { if (_liveBindFn(inp, judge, group)) n++; });
+            n += bindLtrStrip(stk, a);
         } else stk.querySelectorAll('input.mq-digit').forEach((inp) => {
             const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('ans-', ''));
             if (Number.isFinite(col) && ex.ans[col] !== undefined && _liveBind(inp, ex.ans[col])) n++;

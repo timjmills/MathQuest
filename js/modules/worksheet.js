@@ -13,7 +13,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks, ltrStripValue,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks, ltrStripValue, judgeLtrStrip,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -1852,6 +1852,12 @@ export function checkWorksheetAnswerFromColumns(idx) {
         if (!r.gap && r.zerosOnly && want !== '0' && filledCount < columnInputs.length) return;
         enteredValue = r.text;
         isCorrect = !r.gap && r.value === want;
+        // critic B r5 D2: a wrong strip is judged when it is COMPLETE (every box filled, or the pupil
+        // left it), and then by place value, box by box (judgeLtrStrip): only the wrong digits go red
+        if (!isCorrect) {
+            if (filledCount < columnInputs.length && ltrStrip.dataset.mqLeft !== '1') return;
+            judgeLtrStrip(ltrStrip, true);
+        }
     }
 
     if (isCorrect) {
@@ -1882,7 +1888,8 @@ export function checkWorksheetAnswerFromColumns(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        columnInputs.forEach(input => {
+        // a digit strip is marked digit by digit (judgeLtrStrip above), never every box
+        if (!ltrStrip) columnInputs.forEach(input => {
             input.style.borderColor = "var(--incorrect)";
             input.style.background = "rgba(239,71,111,0.15)";
         });
