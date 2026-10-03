@@ -109,11 +109,16 @@ async function tag(page, host, s) {
 const wrongOf = (e) => { const d = e.replace(/[0-9]$/, (m) => String((Number(m) + 1) % 10)); return d === e ? e + '9' : d; };
 
 async function typeInto(page, i, text) {
-  await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); el.focus(); el.select && el.select(); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }, i);
+  // the pupil TAPS the box (a pointerdown first): a count-by row that swipes refuses a program focus on a box hidden at its start
+  // (wave 1 C2, critic r7), so a bare el.focus() would type nowhere
+  await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); el.select && el.select(); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }, i);
   await page.keyboard.type(text, { delay: 15 });
 }
 
 async function info(page, i) {
+  // a box scrolled out of its swipe row's window (a count-by row, wave 1 C2) rightly hides its badge: swipe it into view first
+  await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); const w = el.closest('[data-mq-swiperow]');
+    if (w) { const v = w.getBoundingClientRect(), r = el.getBoundingClientRect(); if (r.left < v.left) w.scrollLeft -= v.left - r.left + 4; else if (r.right > v.right) w.scrollLeft += r.right - v.right + 4; } }, i);
   await sleep(150);                       // the badge follows its box on the next animation frames
   return page.evaluate((i) => {
     const el = document.querySelector(`[data-t="${i}"]`);
@@ -210,7 +215,7 @@ async function run(w) {
         const tries = await page.evaluate((host) => host === 'card' ? (window.state.currentQAttempts || 0) : 0, host);
         check(tries === wrongTries0, `${tag0} red box added no wrong try (${wrongTries0} -> ${tries})`);
         if (s.shot) { await page.evaluate((host) => { (host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0')).scrollIntoView({ block: 'center' }); }, host); await sleep(150); await shot(page, host, s, w, 'red'); }
-        await page.evaluate(() => { const el = document.querySelector('[data-t="0"]'); el.focus(); }); await page.keyboard.press('Backspace');
+        await page.evaluate(() => { const el = document.querySelector('[data-t="0"]'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); }); await page.keyboard.press('Backspace');
         r = await info(page, 0);
         check(!r.bad && !r.ok, `${tag0} editing the red box clears its red (${JSON.stringify({ bad: r.bad, val: r.val })})`);
         await typeInto(page, 0, t.exp[0]);
@@ -260,7 +265,7 @@ async function run(w) {
       if (s.shot) { await page.evaluate((host) => { (host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0')).scrollIntoView({ block: 'center' }); }, host); await sleep(150); await shot(page, host, s, w, 'green-red-empty'); }
       if (t.n > 1) {
         // edit the red box: Backspace clears its red; filling it right turns it green
-        await page.evaluate(() => { document.querySelector('[data-t="1"]').focus(); });
+        await page.evaluate(() => { const e1 = document.querySelector('[data-t="1"]'); e1.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); e1.focus(); });
         await page.keyboard.press('Backspace');
         let e1 = await info(page, 1);
         const full = t.exp[1].length;
@@ -288,7 +293,7 @@ async function run(w) {
         check(!r.bad && !r.ok, `${tag0} the box stays neutral (${JSON.stringify({ bad: r.bad, val: r.val })})`);
         await page.evaluate(() => { if (window.closeHintPopup) window.closeHintPopup(); });
         // leaving for nothing else (the page) does judge it
-        await page.evaluate(() => { const el = document.querySelector('[data-t="0"]'); el.focus(); }); await sleep(800);
+        await page.evaluate(() => { const el = document.querySelector('[data-t="0"]'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); }); await sleep(800);
         await blurAll(page); await sleep(100);
         const r2 = await info(page, 0);
         check(r2.bad, `${tag0} leaving the item to nothing else does judge it (${r2.bad})`);
