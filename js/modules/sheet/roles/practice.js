@@ -910,7 +910,13 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
         }
-        return { header: pg.cont ? cont : first, sections };
+        // Wave 5.2: a page none of whose sections asked for the number line prints without it
+        // (its height stays reserved, so every page keeps one geometry).
+        let head = pg.cont ? cont : first;
+        if (head.refBand && Array.isArray(input.refSections) && !pg.parts.some((pt) => input.refSections.includes(pt.section))) {
+            head = Object.assign({}, head, { refBand: `<div class="ws-refline-gap" style="flex:none;height:${Number(head.refBandMm)}mm"></div>` });
+        }
+        return { header: head, sections };
     });
 
     const fits = layouts.map((L, si) => ({

@@ -127,6 +127,7 @@ Still open, for the owner or a later wave:
 - Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
 - 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.
 - Decimals family (found by the Wave 5.2 number-line lane, 2026-10-03): `ws-print-lint --source kit --skills decimals:add_decimal` fails L-KEY AK-4 ("key page 2 has 12 answer slots, pupil page 1 has 0") at S and L. It fails identically on the base commit b684322 with the number line off, so it predates 5.2: the pupil page's decimal answer slots carry no slot hook the lint counts. Open for the decimals lane.
+- Number line at the top of the page (5.2), after critic nl-r1: later steps. (1) The elapsed-time skills (`measurement:elapsed_*`) want a time line labelled in hours and minutes; the line counts in plain numbers today, so they are not offered it yet. (2) D9: the band is now tighter (about 3 mm less), but where a section's cells have no slack it still costs a row; the layout's rows are already the cells' minimum footprints (`floor((G - 1) / hMin)`), so the rest needs a per-skill cell-height review, not a band change. (3) The lesson packet's own build path places the line on its practice parts only through the roles it calls.
 
 ## 8. Container fix: browser gates and the proxy CA (2026-10-02)
 

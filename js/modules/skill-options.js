@@ -87,7 +87,7 @@ export const constantOption = (max, label, titleVerb) => ({
 // a whole sheet; on its own a skill carries them into a link.
 export const SUPPORT_LABELS = Object.freeze({
     touch: 'Touch dots: count on', touchall: 'Touch dots: count all',
-    tile: 'Dot tiles (one dot for each)', frame: 'Ten frames', line: 'Number line 0 to 20',
+    tile: 'Dot tiles (one dot for each)', frame: 'Ten frames', line: 'Number line in each problem (0 to 20)',
     skip: 'Skip-count strip (3, 6, 9 …)', array: 'Dot array', think: 'Think box (4 × __ = 28)',
     boxsign: 'The sign in a box, named', startarrow: 'Start arrow over the ones column',
     steps: 'Step checklist',
@@ -3465,23 +3465,54 @@ const _NL_SKILLS = {
     // add / subtract up to 1,000 (facts, within 10 … 1,000, adding on, counting back, word problems)
     addition: /^(add_facts|add_sub_10s|add_sub_100s|add|add_word_problems(_plain)?|add_three|comparison_word|add_5_pictures|add_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|add_wp_(10|20|50|100|1k)(_plain)?|nl_add|number_line_add|mixed_addition)$/,
     subtraction: /^(sub_facts|subtract|sub_word_problems(_plain)?|missing_add_sub|sub_5_pictures|unknown_start_wp|sub_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|sub_wp_(10|20|50|100|1k)(_plain)?|nl_sub|number_line_sub|mixed_add_sub|mixed_subtraction)$/,
+    // × / ÷ on a number line: jumps of the factor
+    multiplication: /^(nl_mult|count_by_tables)$/,
+    division: /^(nl_div)$/,
     counting: /^(count_sequence|number_seq_fill|mixed_counting)$/,
     composing: /^(fraction_number_line|whole_as_fraction)$/,
-    patterns: /^(seq_2|seq_5|seq_10|count_by_fill|skip_count_line|count_by_step_up|count_by_step_down)$/,
+    patterns: /^(seq_2|seq_5|seq_10|count_by_fill|skip_count_line|count_by_step_up|count_by_step_down|number_patterns_rule)$/,
     placevalue: /^(more_less_10|more_less_100)$/,
-    number_sense: /^(rounding_visual|nearest_(10|100|1000)|round_sort_(10|100|1000|tenths|hundredths)|between_tens|place_on_number_line|make_a_ten)$/,
+    // rounding of WHOLE numbers (the decimal rounding skills draw their own local line, so a
+    // page-wide one cannot show the place: critic nl-r1 D5)
+    number_sense: /^(rounding_visual|nearest_(10|100|1000)|round_sort_(10|100|1000)|between_tens|place_on_number_line|make_a_ten|round_nl_(thousands|ten_thousands|hundred_thousands)|estimate_sum|estimate_diff)$/,
     fractions: /^(equivalent|equiv_frac_nv|compare|improper_mixed|mixed_improper_visual|order_fractions|order_frac_numline|benchmark_fractions|compare_frac_lcd|graph_fractions|round_fractions|fraction_nl_drag|mixed_nl_drag)$/,
-    decimals: /^(add_decimal|sub_decimal|compare_decimal|compare_thousandths|round_decimals|round_thousandths|order_decimals|decimal_nl_drag|mixed_decimals)$/,
-    integers: /^(number_line_int|compare_int|add_int|sub_int|order_negatives|integer_nl_drag|mixed_integers|abs_value|opposite_numbers)$/,
-    measurement: /^(temperature|reading_ruler|reading_ruler_hard)$/,
+    // jumps of a unit fraction: the CCSS 4.NF.3 model for adding and decomposing fractions
+    fraction_operations: /^(add_fractions_like|sub_fractions_like|add_mixed_like|sub_mixed_like|decompose_fractions|mult_frac_whole|add_frac_like_nv|sub_frac_like_nv|add_mixed_like_nv|sub_mixed_like_nv|decompose_frac_nv|mult_frac_whole_nv)$/,
+    decimals: /^(add_decimal|sub_decimal|order_decimals|decimal_nl_drag)$/,
+    conversions: /^(f_to_d|d_to_f|order_fdp)$/,
+    integers: /^(number_line_int|compare_int|add_int|sub_int|order_negatives|integer_nl_drag|mixed_integers|abs_value|opposite_numbers|ordering_rationals)$/,
+    // a thermometer scale; the ruler skills are a ruler already, and the elapsed-time line (hours
+    // and minutes) is a later step (design/STATUS.md)
+    measurement: /^(temperature)$/,
 };
+/**
+ * What a skill itself says about its line (critic nl-r1 D3-D5): `skip` = a skip-count / sequence
+ * skill (count in its own step; label only the ends, so the line is never the answer list);
+ * `step` = the count it steps in, when the name says it; `within` = the "within N" / "to N" its
+ * name declares (the line's default end); `fraction` / `decimal` = the kind of line it needs.
+ */
+export function numberLineSkillHints(categoryId, skillId) {
+    const id = String(skillId);
+    const out = { skip: false, step: 0, within: 0, fraction: numberLineIsFraction(categoryId, skillId), decimal: categoryId === 'decimals' || /^(f_to_d|d_to_f|order_fdp)$/.test(id) };
+    if (/^(seq_\d+|count_by_|skip_count|count_sequence|number_seq_fill|number_patterns_rule)/.test(id)) out.skip = true;
+    const m = /^seq_(\d+)$/.exec(id);
+    if (m) out.step = Number(m[1]);
+    const w = /_(\d+k?|1m)(?:_|$)/.exec(id.replace(/^(add|sub)_wp_/, '$1_'));
+    if (w && /^(add|sub)_/.test(id)) out.within = w[1] === '1k' ? 1000 : w[1] === '1m' ? 1000000 : Number(w[1]);
+    if (/^(add|sub)_facts$/.test(id)) out.within = 20;
+    if (/_10s$/.test(id)) out.within = 100;
+    if (/_100s$/.test(id)) out.within = 1000;
+    if (/^more_less_10$/.test(id)) out.within = 100;
+    if (/^more_less_100$/.test(id)) out.within = 1000;
+    return out;
+}
 /** Does a number line at the top of the page help this skill? (judgement per family; see above) */
 export function numberLineFits(categoryId, skillId) {
     const re = _NL_SKILLS[categoryId];
     return !!(re && re.test(String(skillId)));
 }
 /** A fraction skill's line counts in fractions even when every number on the page is whole. */
-export const numberLineIsFraction = (categoryId, skillId) => categoryId === 'fractions' || /fraction/.test(String(skillId));
+export const numberLineIsFraction = (categoryId, skillId) => categoryId === 'fractions' || categoryId === 'fraction_operations' || /fraction|frac/.test(String(skillId));
 const _nlOn = (o) => !!(o && o.nlOn);
 const _nlNum = (v) => (v === null || v === undefined ? 'Auto' : String(v).replace('-', '−'));
 const _NL_STEP_LABELS = {
@@ -3495,9 +3526,9 @@ const _nlEnd = (id, label, help) => ({
 });
 /** The seven number-line controls (one disclosure). `skill` names the skill for the panel's coverage check. */
 export const numberLineOptions = (categoryId, skillId) => [
-    { id: 'nlOn', label: 'Number line at the top of the page', type: 'bool', default: false, group: NLINE_GROUP,
+    { id: 'nlOn', label: 'Show the number line', type: 'bool', default: false, group: NLINE_GROUP,
         nlSkill: { categoryId, skillId },
-        help: 'One reference number line under the title, above the problems, on the page, its key and the screen.',
+        help: 'One number line for the whole page, under the title, on the page, its key and the screen. ("Number line in each problem" under Support draws a small one inside every problem.)',
         summary: (v) => (v ? 'On' : 'Off') },
     _nlEnd('nlFrom', 'Starts at', 'The first number on the line. Leave it empty (Auto) to start from the page\'s smallest number.'),
     _nlEnd('nlTo', 'Ends at', 'The last number on the line. Leave it empty (Auto) to end at the page\'s biggest number.'),
@@ -3516,10 +3547,19 @@ export const numberLineOptions = (categoryId, skillId) => [
         help: 'Arcs over the line from tick to tick, to show counting on in jumps. Off by default.' },
 ];
 /** The disclosure's summary line: "Off" or "On · 0 to 20 · step Auto". */
-export function numberLineSummary(cur = {}) {
+export function numberLineSummary(cur = {}, spec = null) {
     if (!_nlOn(cur)) return 'Off';
-    const st = cur.nlStep && cur.nlStep !== 'auto' ? (_NL_STEP_LABELS[cur.nlStep] || cur.nlStep) : 'Auto';
-    return `On · ${_nlNum(cur.nlFrom)} to ${_nlNum(cur.nlTo)} · step ${st}`;
+    // The RESOLVED line when the app can work it out ("On · 0 to 20 · steps of 1 (from the page)").
+    if (spec && Number.isFinite(spec.from) && Number.isFinite(spec.to) && spec.step) {
+        const f = (v) => String(Math.round(v * 1000) / 1000).replace('-', '−');
+        const s = spec.step.kind === 'frac' ? (_NL_STEP_LABELS[`1/${spec.step.den}`] || `1/${spec.step.den}`).toLowerCase()
+            : spec.step.kind === 'dec' ? String(spec.step.num / spec.step.den) : String(spec.step.num);
+        const auto = (cur.nlFrom === null || cur.nlFrom === undefined) && (cur.nlTo === null || cur.nlTo === undefined) && (!cur.nlStep || cur.nlStep === 'auto');
+        return `On · ${f(spec.from)} to ${f(spec.to)} · steps of ${s}${auto ? ' (from the skill)' : ''}`;
+    }
+    const st = cur.nlStep && cur.nlStep !== 'auto' ? (_NL_STEP_LABELS[cur.nlStep] || cur.nlStep) : 'from the skill';
+    const ends = (cur.nlFrom === null || cur.nlFrom === undefined) && (cur.nlTo === null || cur.nlTo === undefined) ? 'range from the skill' : `${_nlNum(cur.nlFrom)} to ${_nlNum(cur.nlTo)}`;
+    return `On · ${ends} · steps ${st}`;
 }
 
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */

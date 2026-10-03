@@ -125,14 +125,18 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     // Wave 5.2: the number line at the top of the page - seven settings behind one closed disclosure,
     // its state in the summary, and a warning when the teacher's own range misses the page's numbers.
     const nlDef = nline.find(d => d.id === 'nlOn');
-    let nlWarn = '';
+    let nlWarn = '', nlSummary = numberLineSummary(cur);
     if (nlDef && cur.nlOn && typeof _nlCoverCheck === 'function' && nlDef.nlSkill) {
-        try { nlWarn = _nlCoverCheck(nlDef.nlSkill.categoryId, nlDef.nlSkill.skillId, cur) || ''; } catch (e) { nlWarn = ''; }
+        try {
+            const info = _nlCoverCheck(nlDef.nlSkill.categoryId, nlDef.nlSkill.skillId, cur) || {};
+            nlWarn = typeof info === 'string' ? info : (info.warn || '');
+            if (info.summary) nlSummary = info.summary;
+        } catch (e) { nlWarn = ''; }
     }
     const nlBox = nline.length
         ? `<details class="sko-group sko-nline" data-sko-group="nline"${_nlOpen ? ' open' : ''} ontoggle="skoNlineOpen(this.open)" style="margin-top:10px;">`
             + `<summary class="sko-nline-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
-            + `<span aria-hidden="true">&#9662;</span><span>Number line</span><span class="sko-nline-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(numberLineSummary(cur))}</span></summary>`
+            + `<span aria-hidden="true">&#9662;</span><span>Number line at the top of the page</span><span class="sko-nline-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(nlSummary)}</span></summary>`
             + (nlWarn ? `<div class="sko-nline-warn" role="alert" data-sko-warn="nline" style="margin:4px 0;padding:6px 8px;border:1px solid #b45309;border-radius:6px;font-size:0.75rem;color:var(--text);">&#9888; ${escHTML(nlWarn)}</div>` : '')
             + nline.map(row).join('') + '</details>'
         : '';

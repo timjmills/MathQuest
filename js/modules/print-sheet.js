@@ -23,7 +23,8 @@
 // app's print branches.
 
 import { generateQuestionFor } from './generate-question.js';
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, numberLineIsFraction } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
@@ -1445,18 +1446,24 @@ const NO_HINT_ROLES = new Set(['test', 'pre-skill-check', 'fact-probe']);
  * capacity of every section is decided once and a pupil never meets two different scales.
  */
 function drawNumberLine(nline, items, size, header) {
-    const nums = items.flatMap((it) => nlLineNumbers(it.q));
-    let spec = nlResolveLine(nline.opts, nums, { fraction: nline.fraction });
+    // The skill's own line (one per skill and options, every role alike: critic nl-r1 D6), widened
+    // only by the page's items; several skills share one merged line (D8).
+    let spec = mergedLine(nline.reqs, items.map((it) => it.q));
     let band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
     if (band.natural > nline.hMm + 0.05) {
-        spec = nlResolveLine(Object.assign({}, nline.opts, { nlStep: stepName(nline.spec0.step) }), nums, { fraction: nline.fraction });
+        spec = mergedLine(nline.reqs.map((r) => Object.assign({}, r, { opts: Object.assign({}, r.opts, { nlStep: stepName(nline.spec0.step) }) })), items.map((it) => it.q));
         band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
     }
     header.refBand = band.html;
-    return { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes, warn: spec.warn };
+    return { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes.concat(spec.notes || []), warn: spec.warn };
 }
+/**
+ * Wave 5.2: the skills of a sheet that ask for the number line (skill-options.js numberLineFits,
+ * ticked on), the sections they hold, and the band reserved for their ONE merged line before any
+ * capacity is worked out. null when none asks.
+ */
 function numberLineRequest(n) {
-    let first = null;
+    const reqs = [];
     const sections = new Set();
     const keys = new Set();
     n.sections.forEach((sec, si) => {
@@ -1465,23 +1472,16 @@ function numberLineRequest(n) {
             const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
             if (!o.nlOn) continue;
             sections.add(si);
-            keys.add(`${sk.categoryId}:${sk.skillId}`);
-            if (!first) first = { sk, opts: o, fraction: numberLineIsFraction(sk.categoryId, sk.skillId) };
+            const k = `${sk.categoryId}:${sk.skillId}`;
+            if (!keys.has(k)) reqs.push({ categoryId: sk.categoryId, skillId: sk.skillId, opts: sk.opts || {} });
+            keys.add(k);
         }
     });
-    return first ? Object.assign(first, { sections, keys }) : null;
-}
-/** The numbers a seeded sample of the skill uses (the band's height is decided from it). */
-function numberLineSample(nline, seed, count = 16) {
-    const out = [];
-    const base = (Number(seed) >>> 0) || 1;
-    for (let i = 0; i < count; i++) {
-        try {
-            const q = generateQuestionFor({ category: nline.sk.categoryId, skill: nline.sk.skillId, opts: nline.sk.opts, seed: (base + i) >>> 0, itemIndex: i });
-            out.push(...nlLineNumbers(q));
-        } catch (e) { /* a failed sample item adds nothing */ }
-    }
-    return out;
+    if (!reqs.length) return null;
+    const spec0 = mergedLine(reqs, []);
+    if (!spec0) return null;
+    const band0 = refLineHTML(spec0, { size: n.size, widthMm: LIVE_W_MM });
+    return { reqs, sections, keys, spec0, hMm: band0.hMm, html: band0.html };
 }
 
 export async function buildSheet(req = {}) {
@@ -1542,11 +1542,8 @@ export async function buildSheet(req = {}) {
     // last page); the line itself is drawn from the page's real items once they exist.
     const nline = numberLineRequest(n);
     if (nline) {
-        nline.spec0 = nlResolveLine(nline.opts, numberLineSample(nline, n.seed), { fraction: nline.fraction });
-        const band0 = refLineHTML(nline.spec0, { size: n.size, widthMm: LIVE_W_MM });
-        nline.hMm = band0.hMm;
-        header.refBandMm = layoutHeader.refBandMm = band0.hMm;
-        header.refBand = band0.html;
+        header.refBandMm = layoutHeader.refBandMm = nline.hMm;
+        header.refBand = nline.html;
     }
     // A lesson's step reminder strip sits above the grid on every page: the grid is that much
     // shorter (the strip's height comes off the body, never off a cell).
@@ -1826,17 +1823,8 @@ export async function buildSheet(req = {}) {
     // Wave 5.2: draw the line from the page's own numbers, in the band reserved above.
     let numberLine = null;
     if (nline) {
-        const nums = hostItems.filter((it) => nline.sections.has(Number(it.section) || 0)).flatMap((it) => nlLineNumbers(it.q));
-        let spec = nlResolveLine(nline.opts, nums, { fraction: nline.fraction });
-        let band = refLineHTML(spec, { size: n.size, widthMm: LIVE_W_MM, hMm: nline.hMm });
-        if (band.natural > nline.hMm + 0.05) {
-            // The sample counted in another kind of step (taller labels): keep its step so the band fits.
-            spec = nlResolveLine(Object.assign({}, nline.opts, { nlStep: stepName(nline.spec0.step) }), nums, { fraction: nline.fraction });
-            band = refLineHTML(spec, { size: n.size, widthMm: LIVE_W_MM, hMm: nline.hMm });
-        }
-        header.refBand = band.html;
-        if (spec.warn) notes.push(spec.warn);
-        numberLine = { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes, warn: spec.warn };
+        numberLine = drawNumberLine(nline, hostItems.filter((it) => nline.sections.has(Number(it.section) || 0)), n.size, header);
+        if (numberLine.warn) notes.push(numberLine.warn);
     }
     const input = {
         items: hostItems,
@@ -1851,6 +1839,8 @@ export async function buildSheet(req = {}) {
         lesson: n.lesson,
         tabId: n.tabId || '',
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
+        // Wave 5.2: only the pages holding a section that asked for the line print it (D8).
+        refSections: nline ? [...nline.sections] : null,
     };
     const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
     const out = renderPlan(plan, { key: n.key });
@@ -1994,11 +1984,8 @@ async function buildRoleSheet(n, metaOf) {
     // (PEDAGOGY P-SC-5: a teacher option, `req.testHints`); every other role carries it.
     const nline = NO_HINT_ROLES.has(n.role) && !n.testHints ? null : numberLineRequest(n);
     if (nline) {
-        nline.spec0 = nlResolveLine(nline.opts, numberLineSample(nline, n.seed), { fraction: nline.fraction });
-        const band0 = refLineHTML(nline.spec0, { size: n.size, widthMm: LIVE_W_MM });
-        nline.hMm = band0.hMm;
-        header.refBandMm = band0.hMm;
-        header.refBand = band0.html;
+        header.refBandMm = nline.hMm;
+        header.refBand = nline.html;
     }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
     const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];

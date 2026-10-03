@@ -97,7 +97,7 @@ export {
 // Wave 5.2: the reference number line at the top of the page (sheet/refline.js).
 export {
     NL_STEP_VALUES, NL_LABEL_VALUES, NL_MINOR_VALUES, NL_FRAC_DENS, parseStep as nlParseStep, stepName as nlStepName, numbersInText as nlNumbersInText,
-    lineNumbers as nlLineNumbers, defaultLine as nlDefaultLine, lineCovers as nlLineCovers, resolveLine as nlResolveLine,
+    lineNumbers as nlLineNumbers, sequenceStep as nlSequenceStep, defaultLine as nlDefaultLine, lineCovers as nlLineCovers, resolveLine as nlResolveLine,
     refLineGeom, refLineHTML,
 } from './refline.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.

@@ -1,40 +1,36 @@
-// refline-screen.js — Wave 5.2: the number line at the top of the page, ON SCREEN.  (2026-10-03)
+// refline-screen.js — Wave 5.2: the number line at the top of the page: ONE resolver for print and
+// screen, and the screen hosts.  (2026-10-03; critic nl-r1 D1, D2, D3, D6, D8)
 //
-// The same drawing as paper (sheet/refline.js), placed ONCE above the practice card and once above
-// the online worksheet, in the black-and-white paper look. It is a support option of the skill
-// (skill-options.js numberLineOptions): it shows only when the skill's options tick it on. The quiz
-// draws no supports (quiz-take.js renders its cells without them), so it shows none there.
+// THE LINE OF A SKILL. `skillLine(categoryId, skillId, opts)` resolves the Auto line ONCE per skill
+// and options, from what the skill declares (its "within N", its count step, its option band) and a
+// FIXED seeded sample of its items, never from the page or the card in hand. Every host uses it:
+// every print role, the practice card and the online worksheet, so one skill gets one scale
+// everywhere. The items actually on a page or a card only WIDEN it (they never narrow it).
 //
-// The line covers every number the screen uses: the online worksheet's own items; for live
-// practice (one item at a time) a seeded sample of the skill with its options, cached, plus the
-// item on the card.
+// A PAGE OF SEVERAL SKILLS. `mergedLine(requests, items)` merges the skills that asked for the line:
+// the union of their ranges (their own teacher ranges included), the finest step any of them needs
+// (fractions before decimals before wholes), and a note when one line cannot serve them all.
 //
-// Layer 4 (imports generate-question.js, skill-options.js and the kit).
+// THE SCREEN. The same drawing as paper (sheet/refline.js), placed once above the practice card and
+// once above the online worksheet, in the black-and-white paper look. The quiz draws no supports, so
+// it shows none there. The options come from where the app keeps them: the set's per-skill options
+// (skill-option-store), the session's, then the ones each generated item carries.
+//
+// Layer 4 (imports generate-question.js, skill-options.js, the option store and the kit).
 
 import { generateQuestionFor } from './generate-question.js';
-import { normalizeOptions, numberLineFits, numberLineIsFraction } from './skill-options.js';
+import { normalizeOptions, numberLineFits, numberLineSkillHints, numberLineSummary } from './skill-options.js';
+import { getSetOptions } from './skill-option-store.js';
 import { setNumberLineCoverCheck } from './skill-options-ui.js';
-import { nlResolveLine, nlLineNumbers, refLineHTML } from './sheet/index.js';
+import { nlResolveLine, nlLineNumbers, nlSequenceStep, nlStepName, refLineHTML } from './sheet/index.js';
 
 const PX_PER_MM = 3.4;     // the screen twin's scale (k2kit.js --mq-k2)
-const SAMPLE = 16;
-const _cache = new Map();
-
-/** The numbers a seeded sample of the skill (with these options) uses. Cached. */
-export function sampleNumbers(categoryId, skillId, opts) {
-    const key = `${categoryId}:${skillId}:${JSON.stringify(opts || {})}`;
-    if (_cache.has(key)) return _cache.get(key);
-    const out = [];
-    for (let i = 0; i < SAMPLE; i++) {
-        try { out.push(...nlLineNumbers(generateQuestionFor({ category: categoryId, skill: skillId, opts, seed: 9001 + i, itemIndex: i }))); } catch (e) { /* skip */ }
-    }
-    if (_cache.size > 60) _cache.clear();
-    _cache.set(key, out);
-    return out;
-}
+const SAMPLE = 40;
+const SAMPLE_SEED = 7001;  // fixed: the line never depends on the page's seed
+const _basis = new Map();
 
 /** The skill's options normalised, or null when the line is not on for it. */
-function lineOpts(categoryId, skillId, opts) {
+export function lineOpts(categoryId, skillId, opts) {
     if (!categoryId || !skillId || !numberLineFits(categoryId, skillId)) return null;
     let o = null;
     try { o = normalizeOptions(categoryId, skillId, opts || {}); } catch (e) { o = null; }
@@ -42,15 +38,88 @@ function lineOpts(categoryId, skillId, opts) {
 }
 
 /**
- * The band's HTML for a screen host `widthPx` wide, or '' when the skill does not carry the line.
- * `items`: the generated questions the line must cover (the worksheet); otherwise a sample.
+ * What the line of one skill rests on: its hints (declared range, count step, kind) and the
+ * numbers of a fixed seeded sample. Cached per skill and options.
  */
-export function screenRefLineHTML(categoryId, skillId, opts, { items = null, extra = [], widthPx = 600 } = {}) {
+export function skillLineBasis(categoryId, skillId, opts) {
+    const key = `${categoryId}:${skillId}:${JSON.stringify(opts || {})}`;
+    if (_basis.has(key)) return _basis.get(key);
+    const hints = Object.assign({}, numberLineSkillHints(categoryId, skillId));
+    let o = {};
+    try { o = normalizeOptions(categoryId, skillId, opts || {}); } catch (e) { o = {}; }
+    // An option that bounds the answers ("Facts to 20", a band, the Max Number) is the declared end.
+    for (const k of ['band', 'range']) if (Number(o[k]) > 0) { hints.within = Number(o[k]); break; }
+    const qs = [];
+    for (let i = 0; i < SAMPLE; i++) {
+        try { const q = generateQuestionFor({ category: categoryId, skill: skillId, opts, seed: SAMPLE_SEED + i * 7919, itemIndex: i }); if (q) qs.push(q); } catch (e) { /* skip */ }
+    }
+    if (hints.skip && !hints.step) hints.step = nlSequenceStep(qs);
+    const out = { hints, nums: qs.flatMap((q) => nlLineNumbers(q)) };
+    if (_basis.size > 80) _basis.clear();
+    _basis.set(key, out);
+    return out;
+}
+
+/** One skill's line: its basis, widened by the items in hand. */
+export function skillLine(categoryId, skillId, opts, items = []) {
     const o = lineOpts(categoryId, skillId, opts);
-    if (!o) return '';
-    const nums = (Array.isArray(items) && items.length ? items.flatMap((q) => nlLineNumbers(q)) : sampleNumbers(categoryId, skillId, opts))
-        .concat((extra || []).flatMap((q) => nlLineNumbers(q)));
-    const spec = nlResolveLine(o, nums, { fraction: numberLineIsFraction(categoryId, skillId) });
+    if (!o) return null;
+    const b = skillLineBasis(categoryId, skillId, opts);
+    return nlResolveLine(o, b.nums.concat(items.flatMap((q) => nlLineNumbers(q))), b.hints);
+}
+
+/**
+ * The ONE line of a page or screen shared by several skills (critic nl-r1 D8). `requests` =
+ * [{categoryId, skillId, opts}] of the skills that asked for it; `items` = the generated items it
+ * must cover. Returns the resolved spec (with `warn` / `notes`) or null.
+ */
+export function mergedLine(requests, items = []) {
+    const reqs = (requests || []).map((r) => ({ ...r, o: lineOpts(r.categoryId, r.skillId, r.opts) })).filter((r) => r.o);
+    if (!reqs.length) return null;
+    if (reqs.length === 1) return skillLine(reqs[0].categoryId, reqs[0].skillId, reqs[0].opts, items);
+    const bases = reqs.map((r) => skillLineBasis(r.categoryId, r.skillId, r.opts));
+    const one = reqs.map((r, k) => nlResolveLine(r.o, bases[k].nums, bases[k].hints));
+    const hints = {
+        fraction: bases.some((b) => b.hints.fraction),
+        decimal: bases.some((b) => b.hints.decimal),
+        within: Math.max(0, ...bases.map((b) => Number(b.hints.within) || 0)),
+        skip: bases.every((b) => b.hints.skip) && new Set(bases.map((b) => b.hints.step)).size === 1,
+        step: bases[0].hints.step,
+    };
+    // The teacher ranges merge: the union of every skill's own Start / End.
+    const froms = reqs.map((r) => r.o.nlFrom).filter((v) => v !== null && v !== undefined);
+    const tos = reqs.map((r) => r.o.nlTo).filter((v) => v !== null && v !== undefined);
+    const o = Object.assign({}, reqs[0].o, {
+        nlFrom: froms.length === reqs.length ? Math.min(...froms) : null,
+        nlTo: tos.length === reqs.length ? Math.max(...tos) : null,
+        // The finest step any skill needs: a fraction step before a decimal one before a whole one.
+        nlStep: (one.find((s) => s.step.kind === 'frac') || one.find((s) => s.step.kind === 'dec') || null)
+            ? nlStepName((one.find((s) => s.step.kind === 'frac') || one.find((s) => s.step.kind === 'dec')).step) : reqs[0].o.nlStep,
+    });
+    const nums = one.flatMap((s) => [{ v: s.from, den: 1 }, { v: s.to, den: 1 }]).concat(bases.flatMap((b) => b.nums), items.flatMap((q) => nlLineNumbers(q)));
+    const spec = nlResolveLine(o, nums, hints);
+    const kinds = new Set(one.map((s) => s.step.kind));
+    const spans = one.map((s) => Math.max(1, s.to - s.from));
+    if (kinds.size > 1 || Math.max(...spans) / Math.min(...spans) > 10) {
+        const note = 'The sections of this page count on different scales; one number line serves them all, so some ticks are finer or coarser than a section needs. Print the sections on their own pages for a line each.';
+        spec.notes = (spec.notes || []).concat(note);
+        spec.warn = [spec.warn, note].filter(Boolean).join(' ');
+    }
+    return spec;
+}
+
+/** Where the app keeps a skill's options: the set's per-skill store, else the session's, else the item's. */
+export function optionsInUse(categoryId, skillId, fallback = null, q = null) {
+    let o = null;
+    try { const s = getSetOptions(categoryId, skillId); if (s && Object.keys(s).length) o = s; } catch (e) { o = null; }
+    if (!o && fallback && Object.keys(fallback).length) o = fallback;
+    if (!o && q && q.skillOptions && Object.keys(q.skillOptions).length) o = q.skillOptions;
+    return o || {};
+}
+
+/** The band's HTML for a screen host `widthPx` wide, or ''. */
+function bandHTML(spec, widthPx) {
+    if (!spec) return '';
     const w = Math.max(80, Math.floor((Math.max(240, widthPx) - 24) / PX_PER_MM));
     return refLineHTML(spec, { size: 'L', twin: true, widthMm: w, pxPerMm: PX_PER_MM }).html;
 }
@@ -72,37 +141,48 @@ export function mountRefLine(anchor, id, html) {
     return el;
 }
 
-/** Live practice: the line above the practice card for the item `q` on it. */
+/** Live practice: the skill's line above the practice card (the item on it only widens it). */
 export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = null } = {}) {
     if (typeof document === 'undefined') return;
     const card = document.getElementById('questionCard');
     if (!card) return;
     const cat = (q && q.categoryId) || categoryId;
     const sk = (q && (q.requestedSkillId || q.skillId)) || skillId;
-    const o = (opts && Object.keys(opts).length ? opts : null) || (q && q.skillOptions) || {};
+    const o = optionsInUse(cat, sk, opts, q);
     let html = '';
-    // The sample sets the line for the session; the item on the card is always on it too.
-    try { html = screenRefLineHTML(cat, sk, o, { extra: q ? [q] : [], widthPx: card.clientWidth || 600 }); } catch (e) { html = ''; }
+    try { html = bandHTML(skillLine(cat, sk, o, q ? [q] : []), card.clientWidth || 600); } catch (e) { html = ''; }
     const el = mountRefLine(card, 'mqRefLine', html);
     if (el) el.style.width = `${card.offsetWidth || card.clientWidth}px`;
 }
 
-/** The online worksheet: the line above the grid, covering every item of the sheet. */
+/** The online worksheet: one line above the grid, for every skill on the sheet that asked for it. */
 export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opts = null } = {}) {
     if (typeof document === 'undefined') return;
     const grid = document.getElementById('worksheetGrid');
     if (!grid) return;
+    const qs = Array.isArray(items) ? items.filter(Boolean) : [];
+    // The skills on the sheet, each with the options the app holds for it (critic nl-r1 D1: a
+    // panel edit lives in the set's store, not in state.skillOptions).
+    const seen = new Map();
+    for (const q of qs) {
+        const cat = q.categoryId || categoryId, sk = q.requestedSkillId || q.skillId || skillId;
+        const k = `${cat}:${sk}`;
+        if (!seen.has(k)) seen.set(k, { categoryId: cat, skillId: sk, opts: optionsInUse(cat, sk, qs.length && seen.size === 0 ? opts : null, q) });
+    }
+    if (!seen.size && categoryId && skillId) seen.set(`${categoryId}:${skillId}`, { categoryId, skillId, opts: optionsInUse(categoryId, skillId, opts) });
     let html = '';
-    try { html = screenRefLineHTML(categoryId, skillId, opts, { items, widthPx: grid.clientWidth || 600 }); } catch (e) { html = ''; }
+    try { html = bandHTML(mergedLine([...seen.values()], qs), grid.clientWidth || 600); } catch (e) { html = ''; }
     mountRefLine(grid, 'mqWsRefLine', html);
 }
 
-/** The option panel's warning: the teacher's own Start / End miss numbers the skill uses. */
+/** The option panel: the warning, and the resolved line for the summary. */
 export function numberLineCoverWarning(categoryId, skillId, opts) {
-    const o = lineOpts(categoryId, skillId, opts);
-    if (!o) return '';
-    if ((o.nlFrom === null || o.nlFrom === undefined) && (o.nlTo === null || o.nlTo === undefined)) return '';
-    const spec = nlResolveLine(o, sampleNumbers(categoryId, skillId, opts), { fraction: numberLineIsFraction(categoryId, skillId) });
-    return spec.warn || '';
+    const spec = skillLine(categoryId, skillId, opts);
+    return spec ? (spec.warn || '') : '';
 }
-setNumberLineCoverCheck(numberLineCoverWarning);
+function numberLinePanelInfo(categoryId, skillId, opts) {
+    const spec = skillLine(categoryId, skillId, opts);
+    if (!spec) return { warn: '', summary: numberLineSummary(opts || {}) };
+    return { warn: spec.warn || '', summary: numberLineSummary(opts || {}, spec) };
+}
+setNumberLineCoverCheck(numberLinePanelInfo);

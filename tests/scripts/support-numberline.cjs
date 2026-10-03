@@ -167,6 +167,91 @@ const SAMPLES = [
             if (want) check(r.nl && r.nl.covers, `${role}: the line does not cover the page (${JSON.stringify(r.nl)})`);
             log(`  ${role}: ${want ? 'line ' + (r.nl ? r.nl.from + ' to ' + r.nl.to : '?') : 'no line (check page)'}, ${r.pages.length} pages`);
         }
+        // REAL FLOW (critic nl-r1 D1): the option set the way the panel sets it (the set's store,
+        // and a skill code carrying ~0R1), then the online worksheet built by initWorksheet.
+        const flow = await page.evaluate(async () => {
+            const W = window;
+            const st = (await import('./js/modules/state.js')).state;
+            const out = {};
+            for (const via of ['store', 'code']) {
+                W.clearSetOptions && W.clearSetOptions();
+                if (via === 'store') W.setSetOptions('addition', 'add_facts', { nlOn: true });
+                else {
+                    const parts = W.parseSkillCodeParts(W.SKILL_CODES['addition:add_facts'] + '~_0R1');
+                    W.setSetOptions('addition', 'add_facts', parts[0].opts);
+                }
+                st.category = 'addition'; st.skill = 'add_facts'; st.skillOptions = null; st.problemCount = 6; st.gameMode = 'worksheet';
+                W.initWorksheet();
+                await new Promise((r) => setTimeout(r, 200));
+                const el = document.getElementById('mqWsRefLine');
+                const lab = el ? el.querySelector('svg').getAttribute('aria-label') : '';
+                out[via] = { on: !!el, label: lab, items: st.worksheetQs.length };
+            }
+            W.clearSetOptions && W.clearSetOptions();
+            st.skillOptions = null; W.initWorksheet();
+            await new Promise((r) => setTimeout(r, 100));
+            out.off = !document.getElementById('mqWsRefLine');
+            W.showView('homeView');
+            return out;
+        });
+        check(flow.store.on && /0 to 20/.test(flow.store.label), `real-flow worksheet (set options): ${JSON.stringify(flow.store)}`);
+        check(flow.code.on, `real-flow worksheet (skill code ~0R1): ${JSON.stringify(flow.code)}`);
+        check(flow.off, 'real-flow worksheet: the line stays after the option is cleared');
+        log(`  real-flow worksheet: ${flow.store.label}`);
+
+        // AUTO DEFAULTS (critic nl-r1 D2-D6): the skill decides its line, one line per skill everywhere.
+        const auto = await page.evaluate(async () => {
+            const m = await import('./js/modules/refline-screen.js');
+            const L = (c, k, o = {}) => { const s = m.skillLine(c, k, Object.assign({ nlOn: true }, o)); return s ? { from: s.from, to: s.to, step: s.step, labels: s.labels, warn: s.warn, covers: s.covers } : null; };
+            return {
+                seq2: L('patterns', 'seq_2'), seq5: L('patterns', 'seq_5'),
+                wp20: L('addition', 'add_wp_20'), wp50: L('addition', 'add_wp_50'),
+                k1r: L('addition', 'add_1k_regroup'), k1n: L('addition', 'add_1k_no_regroup'), facts: L('addition', 'add_facts'),
+                rs1000: L('number_sense', 'round_sort_1000'), neg: L('integers', 'order_negatives'),
+                ofn: L('fractions', 'order_frac_numline'), ofr: L('fractions', 'order_fractions'),
+                dec: L('decimals', 'add_decimal'), fop: L('fraction_operations', 'add_fractions_like'),
+                roundDec: !!m.skillLine('decimals', 'round_decimals', { nlOn: true }),
+            };
+        });
+        const a = auto;
+        check(a.seq2 && a.seq2.step.num === 2 && a.seq2.labels === 'ends', `seq_2 Auto: ${JSON.stringify(a.seq2)}`);
+        check(a.seq5 && a.seq5.step.num === 5 && a.seq5.labels === 'ends', `seq_5 Auto: ${JSON.stringify(a.seq5)}`);
+        check(a.wp20 && a.wp20.from === 0 && a.wp20.to === 20, `add_wp_20 Auto: ${JSON.stringify(a.wp20)}`);
+        check(a.wp50 && a.wp50.to === 50, `add_wp_50 Auto: ${JSON.stringify(a.wp50)}`);
+        check(a.k1r && a.k1n && a.k1r.to === 1000 && a.k1n.to === 1000, `add_1k Auto: ${JSON.stringify([a.k1r, a.k1n])}`);
+        check(a.facts && a.facts.to === 20, `add_facts Auto: ${JSON.stringify(a.facts)}`);
+        check(a.rs1000 && a.rs1000.to >= 1000 && a.rs1000.covers, `round_sort_1000 Auto: ${JSON.stringify(a.rs1000)}`);
+        check(a.neg && a.neg.from >= -1000 && a.neg.to <= 1000 && a.neg.from < 0, `order_negatives Auto: ${JSON.stringify(a.neg)}`);
+        check(a.ofn && a.ofn.step.kind === 'frac', `order_frac_numline Auto: ${JSON.stringify(a.ofn)}`);
+        check(a.ofr && a.ofr.step.kind === 'frac', `order_fractions Auto: ${JSON.stringify(a.ofr)}`);
+        check(a.dec && a.dec.step.kind === 'whole', `add_decimal Auto: ${JSON.stringify(a.dec)}`);
+        check(a.fop && a.fop.step.kind === 'frac', `add_fractions_like Auto: ${JSON.stringify(a.fop)}`);
+        check(!a.roundDec, 'round_decimals still offers the line');
+        log(`  auto: seq_2 ${a.seq2 && a.seq2.from}..${a.seq2 && a.seq2.to} by 2 (ends), add_wp_20 0..${a.wp20 && a.wp20.to}, round_sort_1000 ${a.rs1000 && a.rs1000.from}..${a.rs1000 && a.rs1000.to}, order_negatives ${a.neg && a.neg.from}..${a.neg && a.neg.to}, order_fractions 1/${a.ofr && a.ofr.step.den}`);
+
+        // ONE range per skill across roles (D6), and the mixed page (D8)
+        const one = await page.evaluate(async () => {
+            const out = {};
+            for (const role of ['independent', 'guided', 'review', 'mixed-practice', 'stretch', 'reason-it']) {
+                try {
+                    const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true } }] }], size: 'L', key: false, seed: 31 });
+                    out[role] = r.numberLine ? `${r.numberLine.from}..${r.numberLine.to}/${r.numberLine.step}` : 'none';
+                } catch (e) { out[role] = 'n/a'; }
+            }
+            const mix = await window.buildSheet({ role: 'independent', sections: [
+                { skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true } }], count: 6 },
+                { skills: [{ categoryId: 'fractions', skillId: 'order_fractions', opts: { nlOn: true } }], count: 4 }], size: 'M', key: false, seed: 5 });
+            const ranges = await window.buildSheet({ role: 'independent', sections: [
+                { skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true, nlFrom: 0, nlTo: 10 } }], count: 6 },
+                { skills: [{ categoryId: 'integers', skillId: 'add_int', opts: { nlOn: true, nlFrom: -20, nlTo: 20 } }], count: 6 }], size: 'M', key: false, seed: 5 });
+            return { roles: out, mix: mix.numberLine, mixNote: mix.fits.note, ranges: ranges.numberLine };
+        });
+        const vals = [...new Set(Object.values(one.roles).filter((v) => v !== 'n/a'))];
+        check(vals.length === 1, `add_facts gets different lines on different roles: ${JSON.stringify(one.roles)}`);
+        check(one.mix && one.mix.step.includes('/'), `mixed add_facts + order_fractions: no fraction step (${JSON.stringify(one.mix)})`);
+        check(one.ranges && one.ranges.from === -20 && one.ranges.to === 20, `the teacher ranges do not merge: ${JSON.stringify(one.ranges)}`);
+        log(`  roles: ${JSON.stringify(one.roles)}; mixed: ${one.mix && one.mix.from}..${one.mix && one.mix.to} by ${one.mix && one.mix.step}`);
+
         // a teacher range that misses the page warns
         const warn = await page.evaluate(async () => {
             const out = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true, nlFrom: 0, nlTo: 5 } }] }], size: 'M', key: false, seed: 7 });
@@ -262,7 +347,8 @@ async function shots(h) {
             }
             await page.evaluate(async ({ smp }) => {
                 const st = (await import('./js/modules/state.js')).state;
-                st.category = smp.cat; st.skill = smp.skill; st.skillOptions = smp.opts; st.problemCount = 6; st.gameMode = 'worksheet';
+                window.setSetOptions(smp.cat, smp.skill, smp.opts);
+                st.category = smp.cat; st.skill = smp.skill; st.skillOptions = null; st.problemCount = 6; st.gameMode = 'worksheet';
                 window.initWorksheet();
             }, { smp });
             await waitFor(page, () => { const g = document.getElementById('worksheetGrid'); return !!(g && g.dataset.mqLaidOut === '1' && g.children.length && document.querySelector('#mqWsRefLine svg')); }, 20000, 'worksheet laid out');

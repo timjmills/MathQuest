@@ -463,6 +463,7 @@ their touch floors, so M is only a little smaller than L.
 
 | Id | Draws | Grades | Ops (accepts) | Sample | L (w×h) | M (w×h) | Class |
 |---|---|---|---|---|---|---|---|
+| `refline` | ONE reference number line for the whole page (not a pane: a band under the header, RP-55): start, end, step (whole, fraction, decimal), which ticks are labelled, small ticks, hop arrows; Auto from the skill's declared range and a fixed sample of its items, widened by the page | K–6 | the skills `numberLineFits` names (skill-options.js) | add_facts 0–20 | 186×14 | 186×13.5 | hint H3 |
 | `objects` | outline objects in rows of 5; − crosses out; × equal groups in rings | PK–2 | n ≤ 20; + a,b ≤ 10; − a ≤ 20; × a ≤ 5, b ≤ 6 | 4 + 3 cars | 58×42 | 54×39 | hint H1 |
 | `tenframe` | 1–2 ten frames: first number solid, second hollow (shows make-ten); − crosses out | K–2 | n ≤ 20; +/− within 20 | 7 + 5 | 56×60 | 51×55 | hint H1 |
 | `dice` | dot tiles: dice 1–6, two rows of five 7–10 | PK–1 | n 1–10; + a,b ≤ 10; − a ≤ 10 | 4 + 3 | 65×41 | 63×39 | hint H1 |

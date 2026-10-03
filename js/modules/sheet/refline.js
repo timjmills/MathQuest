@@ -72,76 +72,132 @@ export function numbersInText(s) {
         // A minus sign is a sign only when it is not the operator between two numbers ("7 - 2").
         const before = t.slice(0, m.index + m[1].length).trimEnd();
         const signed = m[2] && !/[\d)]$/.test(before);
-        const raw = (signed ? '-' : '') + m[3] + (m[4] || '');
-        const v = cleanNum(raw);
-        if (Number.isFinite(v)) out.push({ v, den: 1, places: placesOf(raw) });
+        // "1,250" is one number; "44,90,100" or "-55,-52,18" is a LIST (critic nl-r1 D2): a group
+        // touching another comma is read part by part.
+        const start = m.index + m[1].length;
+        const listy = m[3].includes(',') && (t[start - 1] === ',' || t[re.lastIndex] === ',' || /,\s*[-−]/.test(t));
+        const parts = listy ? m[3].split(',') : [m[3]];
+        parts.forEach((part, k) => {
+            const raw = (signed && k === 0 ? '-' : '') + part + (k === parts.length - 1 ? (m[4] || '') : '');
+            const v = cleanNum(raw);
+            if (Number.isFinite(v)) out.push({ v, den: 1, places: placesOf(raw) });
+        });
     }
     return out;
 }
 
-const PAYLOAD_KEYS = ['a', 'b', 'c', 'operands', 'terms', 'numbers', 'values', 'start', 'target', 'value', 'whole'];
-function payloadNumbers(p, out, depth = 0) {
-    if (!p || typeof p !== 'object' || depth > 3) return;
-    if (Array.isArray(p)) { p.forEach((x) => (typeof x === 'number' ? out.push({ v: x, den: 1, places: placesOf(x) }) : payloadNumbers(x, out, depth + 1))); return; }
+// Keys that hold drawing geometry or bookkeeping, never a number the pupil works with.
+const SKIP_KEY = /(mm|Mm|Px|px)$|^(n|digits|count|cols|rows|w|h|width|height|size|pitch|ticks|tickCount|parts|seed|index|i|id|level|x|y|places|tracks|v|version|weight|tries|itemIndex|kind|template|answerType|interactiveType|printFormat|skillLabel|skillId|categoryId|requestedSkillId|grade|label|letter|letters|hint|hints|visual|solution|steps|workedSteps|explanation|skillOptions|strings|instruction|sentence|svg|html|text|ans|answer|cell)$/;
+// Keys that hold numbers the pupil works with (an item's own drawing range, tick lists and
+// denominator menus are left out: they are geometry, not the problem).
+const PICK_KEY = /^(a|b|c|operands|terms|numbers|values|start|target|value|whole|cards|tiles|bins|items|choices|nums|list|sequence|given|addends|parts?Values|dragItems|sortItems|points)$/;
+function walkNumbers(p, out, depth = 0) {
+    if (p === null || p === undefined || depth > 4) return;
+    if (typeof p === 'number') { if (Number.isFinite(p)) out.push({ v: p, den: 1, places: placesOf(p) }); return; }
+    if (typeof p === 'string') { if (/^\s*[-−]?\d/.test(p) && p.length < 60) out.push(...listNumbers(p)); return; }
+    if (Array.isArray(p)) { p.forEach((x) => walkNumbers(x, out, depth + 1)); return; }
+    if (typeof p !== 'object') return;
     if (Number.isFinite(Number(p.n)) && Number(p.d) > 0 && typeof p.n !== 'object') {
         const w = Number(p.w || p.whole || 0);
         out.push({ v: w + Number(p.n) / Number(p.d), den: Number(p.d), places: 0 });
         return;
     }
-    for (const k of PAYLOAD_KEYS) {
-        const v = p[k];
-        if (typeof v === 'number' && Number.isFinite(v)) out.push({ v, den: 1, places: placesOf(v) });
-        else if (typeof v === 'string' && /^[-−]?\d/.test(v)) out.push(...numbersInText(v));
-        else if (v && typeof v === 'object') payloadNumbers(v, out, depth + 1);
-    }
+    for (const [k, v] of Object.entries(p)) if (!SKIP_KEY.test(k) && PICK_KEY.test(k)) walkNumbers(v, out, depth + 1);
+}
+/** An answer or a card: a single value, or a list split on its commas ("-55,-52,18"). */
+function listNumbers(s) {
+    const t = String(s);
+    if (/^[\s\d.,/−-]+$/.test(t) && t.includes(',') && !/^\s*\d{1,3}(,\d{3})+(\.\d+)?\s*$/.test(t)) return t.split(',').flatMap((x) => numbersInText(x));
+    return numbersInText(t);
 }
 
-/** Every number one generated item uses: its text, its answer and its cell payload. */
+/**
+ * Every number one generated item uses: its text, its answer (a list split on its commas), its
+ * cell payload and whatever else it carries (drag cards, tiles, bins, choices), so a skill whose
+ * numbers live on cards is read too (critic nl-r1 D2).
+ */
 export function lineNumbers(q) {
     if (!q || typeof q !== 'object') return [];
     const out = numbersInText(q.text);
     const a = q.ans;
-    if (typeof a === 'number' && Number.isFinite(a)) out.push({ v: a, den: 1, places: placesOf(a) });
-    else if (typeof a === 'string') out.push(...numbersInText(a));
-    if (q.cell && q.cell.payload) payloadNumbers(q.cell.payload, out);
+    if (Array.isArray(a)) a.forEach((x) => walkNumbers(x, out));
+    else if (typeof a === 'number' && Number.isFinite(a)) out.push({ v: a, den: 1, places: placesOf(a) });
+    else if (typeof a === 'string') out.push(...listNumbers(a));
+    if (q.cell && q.cell.payload) walkNumbers(q.cell.payload, out);
+    for (const [k, v] of Object.entries(q)) if (!SKIP_KEY.test(k) && PICK_KEY.test(k) && v && typeof v === 'object') walkNumbers(v, out);
     return out.filter((x) => Number.isFinite(x.v) && Math.abs(x.v) < 1e7);
+}
+
+/** The usual step of a run of numbers (a count-by sequence): the commonest gap, or 0. */
+export function sequenceStep(qs = []) {
+    const tally = new Map();
+    for (const q of qs) {
+        const v = numbersInText(q && q.text).map((x) => x.v).filter(Number.isInteger);
+        for (let i = 1; i < v.length; i++) { const d = Math.abs(v[i] - v[i - 1]); if (d > 0) tally.set(d, (tally.get(d) || 0) + 1); }
+    }
+    let best = 0, n = 0;
+    for (const [d, c] of tally) if (c > n || (c === n && d < best)) { best = d; n = c; }
+    return n >= 2 ? best : 0;
 }
 
 /* ------------------------------------------------------------------ the line's spec */
 
+const FRAC_NAMES = { 2: 'halves', 3: 'thirds', 4: 'quarters', 5: 'fifths', 6: 'sixths', 7: 'sevenths', 8: 'eighths', 9: 'ninths', 10: 'tenths', 12: 'twelfths', 100: 'hundredths' };
+
 /**
- * The default line for a page's numbers: it always covers every one of them. Fractions give a
- * fraction step (their common denominator when it is one of the offered ones), decimals 0.1 or
- * 0.01, whole numbers a step of 1 up to a span of 20 and a "nice" step above.
+ * The default line for a skill (critic nl-r1 D3-D5). `hints` is what the skill says about itself
+ * (skill-options.js numberLineSkillHints, plus the app's `within` from its options and the count
+ * step of its sequences): the ends come from the skill's declared range ("within 20" ends at 20)
+ * and widen to its numbers; a skip-count skill counts in its own step; fractions count in the
+ * page's common denominator, or in halves with a note when no one offered step serves them all;
+ * decimals get a whole-number line with tenth minor ticks.
  */
-export function defaultLine(nums = [], { fraction = false } = {}) {
+export function defaultLine(nums = [], hints = {}) {
+    const notes = [];
     const vals = nums.map((x) => x.v).filter(Number.isFinite);
-    let lo = Math.min(0, ...vals), hi = Math.max(...vals, 0);
-    if (!vals.length) { lo = 0; hi = 20; }
+    const within = Number(hints.within) > 0 ? Number(hints.within) : 0;
+    if (!vals.length && !within) return { from: 0, to: 10, step: { num: 1, den: 1, kind: 'whole' }, unknown: true, notes };
+    let lo = Math.min(0, ...vals), hi = Math.max(0, within, ...vals);
     const fracDens = nums.filter((x) => x.den > 1 && Math.abs(x.v - Math.round(x.v)) > EPS).map((x) => x.den);
     const allDens = nums.filter((x) => x.den > 1).map((x) => x.den);
     const places = Math.max(0, ...nums.map((x) => x.places || 0));
-    let step;
-    if (fracDens.length || (fraction && allDens.length)) {
-        const L = (fracDens.length ? fracDens : allDens).reduce(lcm, 1);
-        const den = NL_FRAC_DENS.includes(L) ? L : Math.max(...(fracDens.length ? fracDens : allDens).filter((d) => NL_FRAC_DENS.includes(d)), 2);
+    let step, minor = 0;
+    if (fracDens.length || (hints.fraction && allDens.length)) {
+        const dens = [...new Set(fracDens.length ? fracDens : allDens)];
+        const L = dens.reduce(lcm, 1);
+        let den = L;
+        if (!NL_FRAC_DENS.includes(L)) {
+            den = 2;
+            notes.push(`This page uses ${dens.sort((a, b) => a - b).map((d) => FRAC_NAMES[d] || `${d}ths`).join(', ')}: one line cannot show them all, so it marks halves.`);
+        }
         step = { num: 1, den, kind: 'frac' };
-        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi), lo + 1);
-    } else if (places >= 1) {
-        step = { num: 1, den: places >= 2 ? 100 : 10, kind: 'dec' };
-        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi), lo + 1);
+        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
+    } else if (places >= 1 || hints.decimal) {
+        // Decimals: a whole-number line, tenths as small ticks (a long line of hundredths cannot be read).
+        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
+        const span = hi - lo;
+        const s = span <= 20 ? 1 : (NICE.find((k) => span / k <= 20) || 100000);
+        step = { num: s, den: 1, kind: 'whole' };
+        if (s === 1) minor = 10;
+        lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s;
+    } else if (hints.skip && Number(hints.step) > 0) {
+        const s = Number(hints.step);
+        step = { num: s, den: 1, kind: 'whole' };
+        lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s;
+        if (hi <= lo) hi = lo + 10 * s;
     } else {
         const span = Math.max(1, hi - lo);
         const s = span <= 20 ? 1 : (NICE.find((k) => span / k <= 20) || 100000);
         step = { num: s, den: 1, kind: 'whole' };
-        // Round the ends out to a friendly number: fives on a line of ones (0 to 20, not 0 to 17),
-        // two steps on a longer one (0 to 100 by 5, not 0 to 95).
+        // Round the ends out to a friendly number: fives on a line of ones, two steps on a longer
+        // one; a skill's declared end ("within 50") is kept exactly.
         const r = s === 1 ? 5 : 2 * s;
-        lo = Math.floor(lo / r) * r; hi = Math.ceil(hi / r) * r;
+        lo = Math.floor(lo / r) * r;
+        hi = within && hi <= within ? within : Math.ceil(hi / r) * r;
         if (s === 1 && hi - lo < 10 && lo >= 0) hi = lo + 10;
         if (hi <= lo) hi = lo + 10 * s;
     }
-    return { from: lo, to: hi, step };
+    return { from: lo, to: hi, step, minor, notes };
 }
 
 /** True when every number lies on the line's span. */
@@ -155,8 +211,8 @@ export function lineCovers(spec, nums = []) {
  * page's numbers. Unset values come from the numbers. Returns the spec plus `covers`/`missing`,
  * and a `warn` line for the panel when the teacher's own range misses some of them.
  */
-export function resolveLine(opts = {}, nums = [], { fraction = false } = {}) {
-    const d = defaultLine(nums, { fraction });
+export function resolveLine(opts = {}, nums = [], hints = {}) {
+    const d = defaultLine(nums, hints);
     const own = parseStep(opts.nlStep);
     const hasFrom = opts.nlFrom !== null && opts.nlFrom !== undefined && opts.nlFrom !== '' && Number.isFinite(Number(opts.nlFrom));
     const hasTo = opts.nlTo !== null && opts.nlTo !== undefined && opts.nlTo !== '' && Number.isFinite(Number(opts.nlTo));
@@ -171,17 +227,22 @@ export function resolveLine(opts = {}, nums = [], { fraction = false } = {}) {
     let to = hasTo ? Number(opts.nlTo) : (own ? Math.ceil(d.to / sv - EPS) * sv : d.to);
     if (to < from) [from, to] = [to, from];
     if (to - from < sv - EPS) to = from + sv;
-    const spec = {
-        from, to, step,
-        labels: NL_LABEL_VALUES.includes(String(opts.nlLabels)) ? String(opts.nlLabels) : 'auto',
-        minor: NL_MINOR_VALUES.includes(String(opts.nlMinor)) ? String(opts.nlMinor) : 'auto',
-        hops: !!opts.nlHops,
-    };
+    let labels = NL_LABEL_VALUES.includes(String(opts.nlLabels)) ? String(opts.nlLabels) : 'auto';
+    // A skip-count line labels only its ends: every tick labelled would be the answer list.
+    if (labels === 'auto' && hints.skip) labels = 'ends';
+    let minor = NL_MINOR_VALUES.includes(String(opts.nlMinor)) ? String(opts.nlMinor) : 'auto';
+    if (minor === 'auto' && !own && d.minor) minor = String(d.minor);
+    const spec = { from, to, step, labels, minor, hops: !!opts.nlHops, autoFrom: !hasFrom, autoTo: !hasTo, notes: d.notes.slice() };
     const cov = lineCovers(spec, nums);
     const fmt = (v) => String(Math.round(v * 1000) / 1000).replace('-', '−');
-    spec.covers = cov.ok;
+    spec.covers = cov.ok && !d.unknown;
+    spec.unknown = !!d.unknown;
     spec.missing = cov.missing;
-    spec.warn = cov.ok ? '' : `The number line runs ${fmt(from)} to ${fmt(to)}, but the page uses ${cov.missing.slice(0, 4).map(fmt).join(', ')}${cov.missing.length > 4 ? ' …' : ''}. Widen it or leave Start and End on Auto.`;
+    const list = cov.missing.slice(0, 4).map(fmt).join(', ') + (cov.missing.length > 4 ? ' and more' : '');
+    spec.warn = d.unknown && !(hasFrom && hasTo) ? 'This skill\'s numbers could not be read: set Start and End for its number line.'
+        : cov.ok ? '' : `The number line runs ${fmt(from)} to ${fmt(to)}, but the page uses ${list}. Widen it or leave Start and End on Auto.`;
+    if (own) spec.notes = [];
+    if (spec.notes.length && !spec.warn) spec.warn = spec.notes.join(' ');
     return spec;
 }
 
@@ -197,7 +258,8 @@ function labelOf(i, step) {
     if (step.kind === 'dec') {
         const places = String(step.den).length - 1;
         const v = (i * step.num) / step.den;
-        return { whole: (Number.isInteger(v) ? String(v) : v.toFixed(places)).replace('-', '−') };
+        // One format on the whole line: 0, 0.5, 1, 1.5 (never 0.50 beside 1).
+        return { whole: String(Number(v.toFixed(places))).replace('-', '−') };
     }
     const v = i * step.num;
     return { whole: (Math.abs(v) >= 10000 ? v.toLocaleString('en-US') : String(v)).replace('-', '−') };
@@ -219,28 +281,37 @@ export function refLineGeom(c, spec, widthMm) {
     const W = Math.max(60, widthMm);
     const pad = 6;
     const usable = W - 2 * pad;
-    const n = i1 - i0;
-    const pitch = usable / n;
     const pt = c.S.zonePt;
     const frac = step.kind === 'frac';
-    // Ticks: every step while they stand 1.5 mm apart, else every 2nd, 5th, 10th ... (on round numbers).
-    const tickEvery = NICE.find((k) => k * pitch >= 1.5) || NICE[NICE.length - 1];
-    if (tickEvery > 1) notes.push(`ticks every ${tickEvery} steps (the range is long)`);
-    // Labels: never smaller type; a wider interval instead.
-    let maxW = 0;
-    for (let i = i0; i <= i1; i += Math.max(1, Math.ceil(n / 400))) maxW = Math.max(maxW, labelWidth(labelOf(i, step), pt));
-    maxW = Math.max(maxW, labelWidth(labelOf(i0, step), pt), labelWidth(labelOf(i1, step), pt));
+    // The intervals ticks and labels may take: on a fraction line the divisors of the denominator
+    // and then whole multiples, so every whole is a tick and a label (critic nl-r1 D4); else 1, 2, 5, 10 ...
+    const GRID = frac
+        ? [...new Set([...Array.from({ length: step.den }, (_, k) => k + 1).filter((k) => step.den % k === 0), ...NICE.map((k) => k * step.den)])].sort((a, b) => a - b)
+        : NICE;
     const gapMm = 1.5;
-    const fitEvery = NICE.find((k) => k % tickEvery === 0 && k * pitch >= maxW + gapMm) || NICE[NICE.length - 1];
     const want = spec.labels;
-    let labelEvery = 0;
-    if (want === 'all') labelEvery = tickEvery;
-    else if (want === '2' || want === '5' || want === '10') labelEvery = Number(want) * tickEvery;
-    else if (want === 'auto') labelEvery = fitEvery;
-    if (labelEvery && labelEvery < fitEvery) {
-        notes.push(`labels every ${fitEvery} steps so the numbers do not crowd`);
-        labelEvery = NICE.find((k) => k >= fitEvery && k % labelEvery === 0) || fitEvery;
+    let n, pitch, tickEvery, maxW, fitEvery, labelEvery;
+    // Auto ends land on the label grid, so every label gap is the same (critic nl-r1 D10).
+    for (let pass = 0; pass < 3; pass++) {
+        n = i1 - i0;
+        pitch = usable / n;
+        tickEvery = GRID.find((k) => k * pitch >= 1.5) || GRID[GRID.length - 1];
+        maxW = 0;
+        for (let i = i0; i <= i1; i += Math.max(1, Math.ceil(n / 400))) maxW = Math.max(maxW, labelWidth(labelOf(i, step), pt));
+        maxW = Math.max(maxW, labelWidth(labelOf(i0, step), pt), labelWidth(labelOf(i1, step), pt));
+        fitEvery = GRID.find((k) => k % tickEvery === 0 && k * pitch >= maxW + gapMm) || GRID[GRID.length - 1];
+        labelEvery = 0;
+        if (want === 'all') labelEvery = tickEvery;
+        else if (want === '2' || want === '5' || want === '10') labelEvery = Number(want) * tickEvery;
+        else if (want === 'auto') labelEvery = fitEvery;
+        if (labelEvery && labelEvery < fitEvery) labelEvery = GRID.find((k) => k >= fitEvery && k % labelEvery === 0) || fitEvery;
+        const g = labelEvery || tickEvery;
+        const j0 = spec.autoFrom ? Math.floor(i0 / g) * g : i0, j1 = spec.autoTo ? Math.ceil(i1 / g) * g : i1;
+        if (j0 === i0 && j1 === i1) break;
+        i0 = j0; i1 = j1;
     }
+    if (tickEvery > 1 && !frac) notes.push(`ticks every ${tickEvery} steps (the range is long)`);
+    if (labelEvery && want !== 'auto' && labelEvery !== (want === 'all' ? tickEvery : Number(want) * tickEvery)) notes.push(`labels every ${labelEvery} steps so the numbers do not crowd`);
     const hopEvery = spec.hops ? (n / tickEvery <= 40 ? tickEvery : (labelEvery || fitEvery)) : 0;
     // Minor ticks between two drawn ticks.
     let minor = spec.minor === 'auto' ? 0 : Number(spec.minor) || 0;
@@ -250,11 +321,12 @@ export function refLineGeom(c, spec, widthMm) {
     if (minor && (pitch * tickEvery) / minor < 1.2) { notes.push('no small ticks: they would touch'); minor = 0; }
 
     const hopH = hopEvery ? 7 : 0;
-    const axisY = 3.2 + hopH;
-    const labTop = axisY + 2.5 + 1.6;
-    const H = labTop + (frac ? mm(pt) * 2.25 : mm(pt) * 1.05) + 1;
+    // A tight band (critic nl-r1 D9): the strokes and type keep their sizes, only the air goes.
+    const axisY = 2.8 + hopH;
+    const labTop = axisY + 2.5 + 1.0;
+    const H = labTop + (frac ? mm(pt) * 2.2 : mm(pt) * 1.0) + 0.4;
     const x = (i) => pad + (i - i0) * pitch;
-    const oneEnd = spec.from === 0 && step.kind === 'whole';
+    const oneEnd = i0 === 0 && step.kind === 'whole';
     let body = `<line x1="${n2(oneEnd ? pad : 1)}" y1="${n2(axisY)}" x2="${n2(W - 1)}" y2="${n2(axisY)}" ${st(c, SW.heavy)}/>`;
     if (!oneEnd) body += arrowHead(c, 0, axisY, -1);
     body += arrowHead(c, W, axisY, 1);
@@ -310,11 +382,11 @@ export function refLineHTML(spec, { size = 'M', widthMm = 186, twin = false, pxP
     const width = twin ? `${Math.round(vw * pxPerMm)}px` : `${n2(vw)}mm`;
     const svg = `<svg class="ws-refline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="${-M} ${-M} ${n2(vw)} ${n2(vh)}" role="img" aria-label="${esc(g.label)}" `
         + `style="display:block;width:${width};height:auto;max-width:100%;overflow:visible;">${g.body}</svg>`;
-    const natural = Math.ceil((vh + 2.5) * 10) / 10;
+    const natural = Math.ceil((vh + 1.0) * 10) / 10;
     // A host that reserved the band already (print-sheet.js) keeps its height: the page was laid out with it.
     const hMm = fixedH > 0 ? Math.max(fixedH, 0) : natural;
     const html = `<div class="ws-refline" data-ws-support="refline" data-ws-band="refline" data-ws-answer-free="1" data-ws-scaffold="hint" `
-        + `style="flex:none;${twin ? '' : `height:${hMm}mm;`}box-sizing:border-box;padding-top:1.5mm;display:flex;justify-content:center;color:#000;background:#fff;font-family:'Andika',sans-serif;line-height:1;">${svg}</div>`;
+        + `style="flex:none;${twin ? '' : `height:${hMm}mm;`}box-sizing:border-box;padding-top:0.5mm;display:flex;justify-content:center;color:#000;background:#fff;font-family:'Andika',sans-serif;line-height:1;">${svg}</div>`;
     return { html, hMm, natural, notes: g.notes, geom: { tickEvery: g.tickEvery, labelEvery: g.labelEvery } };
 }
 

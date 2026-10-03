@@ -107,6 +107,7 @@ Header, first page (every field is a teacher check box, PT-FRM-3):
 | Pre-skill check | `Check A`, `Check B` | Today's Number | range and version, `to 120 - B` |
 | Blank template | `Template` | Answer key | `Answer Key` replaces the id |
 
+- **PT-FRM-11.** The number-line band (WORKSHEET_DESIGN_STANDARD RP-55): when a skill on the sheet turns on "Number line at the top of the page", a band sits between the header rule and the first instruction on EVERY page and every key page of the sheet, continuation pages included. Its height is taken off the body before rows are computed (`headerHeightMm` adds `refBandMm`), so no cell is split and the last page is rebalanced as usual. Roles: Independent, More Practice, Opener, Scripted Model, Guided, Error analysis, Review, Word problems, Fact rows, Mixed practice, True or False, Reason it, Stretch and the lesson packet carry it; Test, Pre-skill check and the Fact probe carry it only with the dialog's "Hints on tests" on (P-SC-5). A sheet of several skills prints ONE merged line (the union of their ranges, the finest step any needs, a note when the scales differ); a page none of whose sections asked for it keeps the reserved height blank.
 - **PT-FRM-10.** When header fields are switched off, the freed height is added to the body and rows are recomputed with the same formulas. Content never grows in size because of it; only row counts or answer space change.
 
 ### 1.2 Tokens used in this file's arithmetic
