@@ -296,6 +296,43 @@ async function advance(page, w) {
   check(r2.v2 === a2[2] && r2.v1 === '', `${t0} finish card 1, tap card 3 within 750 ms: the digits land in card 3 (${JSON.stringify(r2)})`);
 }
 
+// follow-up: mixed + improper boxes are bound by a judge; their digits are still marked; a focused red box shows its caret
+async function mixed(page, w) {
+  for (const host of ['card', 'worksheet']) {
+    const t0 = `[${w} ${host} mixed_improper_visual]`;
+    await boot(page);
+    await setup(page, host, { c: 'fractions', k: 'mixed_improper_visual' });
+    const t = await page.evaluate((host) => {
+      const q = host === 'card' ? window.state.currentQ : window.state.worksheetQs[0];
+      const root = host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0');
+      document.querySelectorAll('[data-t]').forEach((e) => e.removeAttribute('data-t'));
+      const els = ['#mixedInput', '#improperInput'].map((s) => root.querySelector(s)).filter((e) => e && e.offsetWidth);
+      els.forEach((e, i) => e.setAttribute('data-t', String(i)));
+      return { n: els.length, d: q.dualFractionAnswers };
+    }, host);
+    if (t.n < 2 || !t.d) { check(false, `${t0} has its two boxes (${t.n})`); continue; }
+    const imp = String(t.d.improper);                       // e.g. 7/3: numerator wrong
+    const [num, den] = imp.split('/');
+    const bad = num.slice(0, -1) + flip(num.slice(-1)) + '/' + den;
+    await typeInto(page, 1, bad); await blurAll(page); await sleep(250);
+    const r = await info(page, 1);
+    const want = '.'.repeat(num.length - 1) + 'b.' + '.'.repeat(den.length);   // info() prints the "/" as "."
+    check(r.bad && r.digits === want, `${t0} improper ${bad} for ${imp}: only the wrong numerator digit is red (${r.digits} want ${want})`);
+    const mx = String(t.d.mixed);
+    const m = /^(\d+)\s+(\d+)\/(\d+)$/.exec(mx);
+    if (m) {
+      const badM = flip(m[1].slice(-1)) + ' ' + m[2] + '/' + m[3];
+      await typeInto(page, 0, badM); await blurAll(page); await sleep(250);
+      const r0 = await info(page, 0);
+      check(r0.bad && /^b/.test(r0.digits || '') && !/b/.test((r0.digits || '').slice(1)), `${t0} mixed ${badM} for ${mx}: only the whole-number digit is red (${r0.digits})`);
+    }
+    await page.evaluate(() => document.querySelector('[data-t="1"]').focus());
+    const caret = await page.evaluate(() => getComputedStyle(document.querySelector('[data-t="1"]')).caretColor);
+    check(caret === 'rgb(0, 0, 0)', `${t0} a focused red box shows its text cursor (${caret})`);
+    if (host === 'card') await shot(page, host, 'mixed_improper-wrong', w);
+  }
+}
+
 async function quiz(page, w) {
   for (const [c, k] of [['addition', 'add_facts'], ['multiplication', 'count_by_tables']]) {
     await boot(page);
@@ -335,6 +372,7 @@ async function run(w) {
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
   await quiz(page, w);
   await ghost(page, w);
+  await mixed(page, w);
   await advance(page, w);
   if (w === 1280) await shapes(page);
   const errs = problems.filter((p) => !/favicon/.test(p.text));

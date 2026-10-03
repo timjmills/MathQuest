@@ -1625,9 +1625,10 @@ html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit {
     color: var(--mq-box-bad) !important; -webkit-text-fill-color: var(--mq-box-bad);
     /* the DIGIT blinks (its fill colour), never the box: the dashed edge holds still (critic r1) */
     animation: mqWdBlinkInk 1.2s ease-in-out 3 !important;   /* beats .mq-scell * { animation: none } */
-    /* a second cue under the digit besides colour: a 3 px bar along the box's foot */
-    box-shadow: inset 0 -3px 0 var(--mq-box-bad) !important;
 }
+/* a red box the pupil is in shows its text cursor (a digit slot's caret is otherwise hidden) */
+html body .mq-scell.mq-scell.mq-scell input.mq-live-wrong.mq-live-wrong:focus,
+html body input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: #000 !important; }
 @keyframes mqWdBlinkInk { 0%, 100% { -webkit-text-fill-color: var(--mq-box-bad); } 50% { -webkit-text-fill-color: rgba(179, 38, 30, 0.2); } }
 /* a kept wrong entry is selected after a wrong try: no browser blue under the red digit (1.26:1) */
 html body input.mq-live-wrong::selection { background: rgba(0, 0, 0, 0.12); color: var(--mq-box-bad); -webkit-text-fill-color: var(--mq-box-bad); }

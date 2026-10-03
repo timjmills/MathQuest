@@ -758,6 +758,8 @@ function _badgeTrack(el) {
  * empty mq-wd-miss box, the right digits stay black. The input's own text goes clear under the mirror,
  * so typing is untouched (the mirror goes on the next keystroke or the tap that empties the box). */
 const MIRRORS = new Map();
+// the expected value of a box bound by a judge (mixed / improper fractions): its digits can still be compared
+const LIVE_WANT = new WeakMap();
 const _inQuiz = (el) => !!(el && el.closest && el.closest('#quizTakeView'));
 function _mirrorDrop(el) {
     const m = MIRRORS.get(el);
@@ -942,7 +944,7 @@ function _liveSet(el, ok, bad) {
     el.classList.toggle('mq-live-wrong', bad);
     if (ok || bad) _badgeTrack(el);
     el.classList.remove('mq-wd-empty');
-    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
+    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_WANT.get(el) || LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
     if (bad) {
         el.setAttribute('aria-invalid', 'true');
         // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
@@ -999,9 +1001,10 @@ function _liveBind(el, expected, { single = false, numeric = false } = {}) {
  * the other boxes the verdict depends on (a rule table's Out box depends on its In box): when one
  * of them changes, the rest are judged again - a box the pupil has left is judged as final.
  */
-function _liveBindFn(el, fn, group = []) {
+function _liveBindFn(el, fn, group = [], want = null) {
     if (!el || typeof fn !== 'function') return false;
     LIVE_FN.set(el, fn);
+    if (want != null && want !== '') LIVE_WANT.set(el, [String(want)]); else LIVE_WANT.delete(el);
     LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
@@ -1035,7 +1038,7 @@ export function markBoxSubmitted(el, ok) {
     el.classList.toggle('mq-live-correct', !!ok);
     el.classList.toggle('mq-live-wrong', !ok);
     _badgeTrack(el);
-    if (!ok) { _wireClear(); const w = LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
+    if (!ok) { _wireClear(); const w = LIVE_WANT.get(el) || LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
     else _mirrorDrop(el);
     if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     if (el.dataset.mqSubmitMark !== '1') {
@@ -1180,7 +1183,7 @@ function _bindOwnBoxes(root, q) {
     if (q && q.dualFractionAnswers) {
         [['#mixedInput', q.dualFractionAnswers.mixed], ['#improperInput', q.dualFractionAnswers.improper]].forEach(([sel, want]) => {
             const el = root.querySelector(sel);
-            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want))) n++;
+            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want), [], want)) n++;
         });
     }
     // ordering boxes: the n-th item of the answer (text, else the same number)
@@ -1189,7 +1192,7 @@ function _bindOwnBoxes(root, q) {
         root.querySelectorAll('input.order-input-box, input.ws-order-input').forEach((el) => {
             const want = parts[Number(el.getAttribute('data-order-idx'))];
             if (want !== undefined && el.dataset.mqLive !== '1') {
-                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); })) n++;
+                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); }, [], want)) n++;
             }
         });
     }
