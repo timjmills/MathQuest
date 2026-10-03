@@ -1528,6 +1528,27 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 .mq-scell .k2-swipe-back i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-scell .k2-countrow-frame:has(> [data-mq-swiperow][data-mq-scrolled]) .k2-steptab-in svg { visibility: hidden; }
 @media print { .k2-swipe-back { display: none !important; } }
+/* count-by rows on a phone (critic C2 r6): when the row swipes, the step tab sits ONCE above line 1 (the side column goes), so the
+   window is the cell's full width; and both cues share ONE strip under the row (back on the left, forward on the right) */
+.mq-scell .k2-countrow-frame[data-mq-swipes] { flex-direction: column; }
+.mq-scell .k2-countrow-frame[data-mq-swipes] [data-mq-tabfor]:not([data-mq-tabfor="0"]) { display: none !important; }
+.mq-scell .k2-countrow-frame[data-mq-swipes] [data-mq-tabfor="0"] { height: auto !important; margin: 0 0 4px 0 !important; }
+.mq-scell [data-mq-swiperow] .k2-swipe-cues {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 10px;
+    position: sticky; left: 0; width: 100%; box-sizing: border-box; padding: 3px 4px; margin-top: 4px;
+    border-top: 2px solid #000; background: #fff; color: #000; font-family: "Andika", sans-serif; font-size: 17px; line-height: 24px;
+}
+.mq-scell [data-mq-swiperow][data-mq-end]:not([data-mq-scrolled]) .k2-swipe-cues { display: none; }
+html body .mq-scell [data-mq-swiperow] .k2-swipe-cues > .k2-swipe-cue,
+html body .mq-scell [data-mq-swiperow] .k2-swipe-cues > .k2-swipe-back {
+    position: static; width: auto; padding: 0; margin: 0; border: 0; font-size: 17px; line-height: 24px; white-space: nowrap;
+}
+html body .mq-scell [data-mq-swiperow] .k2-swipe-cues > .k2-swipe-back { margin-right: auto; }
+html body .mq-scell [data-mq-swiperow] .k2-swipe-cues i { font-size: 24px; line-height: 20px; }
+html body .mq-scell [data-mq-swiperow]:not([data-mq-scrolled]) .k2-swipe-cues > .k2-swipe-back { display: none; }
+html body .mq-scell [data-mq-swiperow][data-mq-end] .k2-swipe-cues > .k2-swipe-cue { display: none; }
+html body .mq-scell [data-mq-swiperow]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue { display: inline-block; }
+html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-swipe-back { display: inline-block; }
 
 /* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
    place of the mode cards, each in its original mode-card colour (ui-components.css .mode-card:nth-child). */
@@ -1588,3 +1609,7 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
 /* ---- Start cards: dark-theme focus ring reaches 3:1 against the dark section (critic R2-D1). */
 .dark .mode-cards .student-start-btn:focus-visible,
 .dark-theme .mode-cards .student-start-btn:focus-visible { outline-color: #B5A5F4; }
+/* count-by rows (critic C2 r6): a box's tile never wraps. On the online worksheet ui-components.css wraps every inline flex
+   inside .problem-card (specificity 0,7,0); the worksheet's own nowrap rule matches only while the tile's style attribute reads
+   "display:flex", which the active-box highlight rewrites, and the 44 px input then sat 2 px low in its tile. This beats both. */
+html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-tile.k2-tile.k2-tile { flex-wrap: nowrap !important; }

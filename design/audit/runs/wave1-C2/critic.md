@@ -317,3 +317,75 @@ Graded at **409d746** (round-4 fixes on top of the merge 7897b36 of sweet-newton
 - C1: the card opens with the row's start in view (or the leftmost possible column), says when content lies to the left, and snaps on swipe.
 - C2: no first view that hides the start the teacher chose.
 - C4: the test-only hook becomes a parameter.
+
+# Round 6 (Opus, medium)
+
+Graded at **45d509b**, the round-5 fixes on top of 409d746. Only the builder's diff, 409d746..45d509b, was reviewed. The gates' re-shot evidence was restored with `git checkout -- design/audit/runs`. My probes ran from the scratchpad and wrote nothing into the tree.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 7 | The 390 practice card still opens with the start of the row out of view in 4 of 6 cases measured. Default ×6 opens at scrollLeft 89, so "6" is hidden. By 7 from 3 opens at 89, so "3" is hidden. By 1,000 from 14,000 opens at 163, so 14,000 **and** 15,000 are hidden. By 100,000 from 1,000,000 opens at 92, so 1,000,000 is hidden. The pupil meets the step tab "1,000 ›" pointing into 16,000 and has to swipe back before seeing where the count starts. |
+| C2 Educational value | 8 | A given number now precedes the first box on every opening (the leftmost-start rule works). Rows print once each, in order, and titles name what prints. The start the teacher chose is still not the first thing the pupil sees. |
+| C3 Spacing and layout | 8 | Print is unchanged and tight (9 in round 5). On the phone card the two cues stack to 142–166 px against 128 px for the two lines of boxes. The back cue wraps to 2 lines (83 px) in a 192–267 px window. |
+| C4 Standard fidelity | 8 | Black and white, Andika, TY-10a floor, step tab ≥ 14 pt. The default one-page sheet is byte-identical to 4911898 (12 of 12 on A4 and Letter, `wave1-c2-onepage` OK). |
+
+## Gates run (one at a time)
+
+- `wave1-c2-phone`: **OK**, 56 PASS. The card's scrollLeft equals "want" in every case (89/163/92/0). The gate now asserts the real value, as round 5 asked. It proves the rule is applied, not that the opening is good.
+- `wave1-c2-onepage` (MQ_BASE_ROOT = 4911898): **OK**. The defaults are identical to base, and every rows case fits on 1 page plus 1 key page, tight.
+- `ws-screen-answer --skills multiplication:count_by_tables`: **OK** (card, worksheet 3/3, quiz 3/3, live green).
+- `ws-stamp-assets --check`: OK. `node --input-type=module --check` passes on all 4 changed modules.
+- Dry-run merge onto `claude/sweet-newton-c8wrv1` (50dbfa6): 50dbfa6 is an ancestor of 45d509b, so it is a **fast-forward with no conflicts**.
+
+## Round-5 items
+
+1. **Leftmost valid start:** **fixed as specified** (`screen-cell.js` snap: `first ? Math.min(...ok)`). The measurement shows the rule's limit. With the step-tab column beside the row, the window is only 267 / 220 / 192 px (tab 55 / 102 / 130 px wide). The leftmost start that shows the first box is therefore 1–2 columns in. See defect 1.
+2. **Gate asserts the real scrollLeft:** **fixed**. It compares against the leftmost valid start, with ±2 px tolerance. One part is vacuous: the "after scrollLeft = 37 … the back cue shows" check returns true when the row settles at 0, and it settled at 0 in all 8 runs. The back cue is really tested only at 130. This is not scored.
+3. **Mandatory snap:** **accepted.** The snap points are every column start (81–92 px) under a 192–322 px window. 0 is a snap point (line 1 child 0 sits at x = 0). The end padding makes the last start reachable. Measured settles: 37 → 0, 130 → 89 / 163 / 92 / 172, with nothing cut. On a finger it behaves like a carousel. A drag of less than half a column springs back, which a pupil with weak motor control may feel as "sticky". The alternative is worse: `proximity` lets the row rest mid-column with a 7-digit number cut at the left edge (the round-4 defect). Keep `mandatory`.
+4. **Help text:** **fixed and verified.** buildSheet with onePage prints 12 rows on 1 page plus 1 key page for independent, more-practice and test. Guided (7 rows) and review (8 rows) keep their own layout, as the help now says.
+
+## Measured: the 390 card at load (probe `c6-phone.cjs`)
+
+| Case | Tab col | Window | Pitch / item | 1st box (col) | Right edge of 1st box | Opens at | Hidden givens |
+|---|---|---|---|---|---|---|---|
+| default ×6 | 55 | 267 | 89 / 62 | 4th | 329 | 89 | 6 |
+| by 7 from 3 | 55 | 267 | 89 / 62 | 4th | 329 | 89 | 3 |
+| by 1,000 from 14,000 | 102 | 220 | 81 / 71 | 4th | 315 | 163 | 14,000, 15,000 |
+| by 100,000 from 1,000,000 (15) | 130 | 192 | 92 / 81 | 3rd | 265 | 92 | 1,000,000 |
+| times each, back | 74 | 248 | 86 / 62 | 3rd | 234 | 0 | none |
+| by 25 | 55 | 267 | 89 / 62 | 3rd | 240 | 0 | none |
+
+Cue heights: the back cue is 83 px (2 lines) and the forward cue 59–83 px. The two lines of boxes are 128 px (196 px for the 15-number row). Digits are 22.2 px (14.7 px for 7-digit numbers) and boxes 58–77 × 44 px.
+
+## The alternatives, measured
+
+- **(a) Fit the start and the first box at scrollLeft 0 by shrinking, with the tab kept beside the row:** rejected. 1,000,000 needs 265 px in a 192 px window, about 0.72× the digits (14.7 → 10.6 px ≈ 8 pt), which is under the TY-10a 9 pt floor. 14,000 needs 315 in 220, 0.70×.
+- **(b) 3 lines of 4 on phones:** rejected. TY-10a ("every count-by row is exactly two lines of six") and the SP-11a extension ("two lines of six" on the phone) are written for the screen too, not only for pages, so this needs a new owner ruling. It also does not fit the wide rows: 4 × 92 − 10 = 358 px > 322 for 1,000,000.
+- **(c) No auto-focus, row at 0:** not enough on its own. The start shows, but the first box is 0 % visible (default, by 7, 14,000) or 8 % visible (1,000,000), and "16,000" is cut at the right edge (163–234 against a 220 window). Use it only as the fallback in the fix below.
+- **(d) Smaller cues:** needed, but they are a consequence of the narrow window (see defect 2).
+- **(e) Recommended: on the phone, put the step tab ABOVE line 1, not in a side column.** I probed this live by setting `flex-direction: column` on `.k2-countrow-frame`, keeping only tab entry 0, with scrollLeft 0 and nothing focused. The window becomes **322 px** in every case. The first box right edges are then 315 for 14,000 (fits), 265 for 1,000,000 (fits), 234 for times-back (fits), 240 for by 25 (fits), and 329 for default and by 7 (**7 px short**). The forward cue drops to one line, 55 px. The card is 23–48 px shorter in the 4 cases that opened scrolled (mostly because the back cue goes); the 2 that opened at 0 grow 59–64 px for the tab line. Nothing shrinks, and the rows stay two lines of six.
+
+## Ranked defects (RUBRIC §6 form)
+
+1. **C1, major (−2). Where:** `js/modules/sheet/cells/count-row.js:295–330` (`swipeTabs`: the tab column `[data-mq-tabcol]` beside `[data-mq-swiperow]`) and `js/modules/screen-cell.js` `wireSwipeRows` → `snap`. The evidence is `phone-card-default-tables.png`, `phone-card-by-1-000-from-14-000.png` and `phone-card-by-100-000-from-1-000-000-15-.png`, plus the table above.
+   **What:** the card opens 1–2 columns into the row, so the start of the count (the teacher's chosen start in 3 of the cases) is off-screen behind a "⟵ Swipe back to the start" cue. A SPED pupil has to see where counting begins without first swiping away from the box that has focus. Expected: scrollLeft 0, with the first given number and the first box both fully visible.
+   **Fix:**
+   - (i) When the cell is a phone twin that swipes (`swipeTabs`), render the step tab once, above line 1. It sits left-aligned in its own block before `[data-mq-swiperow]`, outside the scroller, and nothing sits under it. Drop the side tab column and the line-2+ tab entries; the in-arrow of lines 2+ may stay at the start of each line inside the row. Paper and wider hosts are unchanged. This frees 55–130 px, making the window 322 px at 390.
+   - (ii) On that phone layout, cap the gap so the first four columns fit: `gap ≤ (window − 2 − 4·item) / 3`, which is ≤ 24 px for 1–2-digit rows (now 27.6 px, pitch 89 → 86). Boxes stay 58 × 44, digits unchanged. Redraw the arcs on the new pitch (they are drawn from `g.pitch`, so pass the phone pitch into the geometry; do not restyle the flex gap afterwards).
+   - (iii) Make the window a whole number of columns, `floor((window + gap) / pitch) · pitch − gap`, so no number is cut at the right edge at load either. Today 1,000,000 cuts 3 items at the right at 322, so its window becomes 265 px.
+   - (iv) In `snap`, on the first focus: if no valid start ≤ 0 shows the box (for example when the teacher prints 4+ numbers to start), **leave scrollLeft at 0** and do not move the row. Focus with `{ preventScroll: true }` and let the forward cue show. The next Tab or tap snaps as now. The start beats the box on the first view.
+   **Check:** extend `wave1-c2-phone` for the card. At load assert `scrollLeft === 0` for all 4 cases plus "by 7 from 3". Assert that the first `.k2-given` (the start) is fully inside the window, that the first box is fully inside it for the 4 named cases, and that no `.k2-given` or `input` crosses the window's right edge (`r.left < v.right && r.right > v.right + 1`). Assert the tab does not overlap the row. Assert that a row with 4 numbers printed to start opens at 0 with focus unmoved.
+2. **C3, minor (−1). Where:** `css/screen-cell.css` `.k2-swipe-back` / `.k2-swipe-cue`, and the cue markup in `count-row.js:332`.
+   **What:** the back cue (83 px, 2 lines) and the forward cue (59–83 px) stack to 142–166 px, more than the 128 px of the two lines they serve.
+   **Fix:** with fix 1 the window is 322 px and the forward cue is one line (55 px measured). Shorten the back cue to "⟵ Back to the start" and put both cues in one strip when the row is mid-way (back on the left, "Swipe ➜ for more boxes" on the right, wrapping only if needed). Target: the visible cue height is ≤ 60 px and ≤ 0.5 × `.k2-countrow-body` height at 390.
+   **Check:** in `wave1-c2-phone`, after `scrollLeft = 130`, assert that the summed visible cue height is ≤ 60 px and ≤ 0.5 × body height.
+3. **Gate nit, not scored.** In `wave1-c2-phone.cjs` the "scrollLeft = 37 … the back cue shows" message passes vacuously when the row settles at 0. Say "settles at 0 (back cue hidden)", or assert the cue hidden at 0 and shown at > 0.
+4. **Observation for the owner, not scored.** RUBRIC C1 asks for screen digit inputs ≥ 48 px tall. The SP-11a extension sets count-row boxes at ≥ 44 px, and they render at 44. The card's count-row digits are 22 px against the 40 px practice-card digit size (WDS table), and TY-10a / SP-11a are silent on the screen digit size of count rows. One of the two rules should say which governs.
+
+**To reach 10:**
+- C1: the card opens at scrollLeft 0 with the start and the first box in view (fix 1), and no number is cut at either edge.
+- C2: the first thing the pupil reads is the start the teacher chose, then the step.
+- C3: the cues are one line and ≤ half the row's height.
+- C4: the owner settles defect 4.

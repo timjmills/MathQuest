@@ -1347,29 +1347,51 @@ function wireSwipeRows(cellEl) {
         // the cue (SP-11a, extended to count-by rows 2026-10-02) hides at the end of the row, or when the row fits
         // the step-tab column beside the row: each entry as tall as its line (the boxes keep a 44 px floor on screen)
         const col = w.previousElementSibling && w.previousElementSibling.matches('[data-mq-tabcol]') ? w.previousElementSibling : null;
+        const frame = col ? w.parentElement : null;
         const level = () => {
             if (!col) return;
             const lines = w.querySelectorAll('.k2-countrow-line');
+            const swipes = frame && frame.hasAttribute('data-mq-swipes');
             col.querySelectorAll('[data-mq-tabfor]').forEach((t) => {
                 const ln = lines[Number(t.getAttribute('data-mq-tabfor'))];
                 if (!ln) return;
-                t.style.height = `${ln.getBoundingClientRect().height}px`;
-                t.style.marginTop = getComputedStyle(ln).marginTop;
+                t.style.height = swipes ? '' : `${ln.getBoundingClientRect().height}px`;
+                t.style.marginTop = swipes ? '' : getComputedStyle(ln).marginTop;
             });
         };
         // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
         const body = w.querySelector('.k2-countrow-body');
+        const items = () => { const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]'); return ln ? [...ln.children] : []; };
         const padEnd = () => {
             if (!body || !col) return;
             body.style.paddingRight = '0px';
             const cw = w.clientWidth, max0 = w.scrollWidth - cw;
             if (max0 <= 0) return;
             const v = w.getBoundingClientRect(), sl = w.scrollLeft;
-            const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
-            const xs = line ? [...line.children].map((e) => e.getBoundingClientRect().left - v.left + sl).filter((x) => x >= max0 - 0.5) : [];
+            const xs = items().map((e) => e.getBoundingClientRect().left - v.left + sl).filter((x) => x >= max0 - 0.5);
             if (xs.length) body.style.paddingRight = `${Math.max(0, Math.min(...xs) - max0)}px`;
         };
-        padEnd(); window.addEventListener('resize', padEnd);
+        // critic C2 r6: when the row is wider than the cell, the step tab goes ABOVE line 1 (the window takes the cell's full width)
+        // and the window is a whole number of columns wide, so no number is cut at its right edge either
+        let firstSnap = null, firstFlag = false;
+        const mode = () => {
+            if (!frame || !body) return;
+            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; w.style.maxWidth = ''; body.style.paddingRight = '0px';
+            const its = items();
+            const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
+            if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
+            frame.setAttribute('data-mq-swipes', '');
+            level();
+            const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
+            const pitch = b.left - a.left, gap = pitch - a.width;
+            const avail = frame.getBoundingClientRect().width;
+            const n = Math.max(1, Math.floor((avail + gap + 0.5) / pitch));
+            const win = Math.min(avail, n * pitch - gap + 3);
+            w.style.width = `${win}px`; w.style.maxWidth = '100%';
+            padEnd();
+        };
+        mode();
+        window.addEventListener('resize', mode);
         const upd = () => { level(); w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
@@ -1386,18 +1408,26 @@ function wireSwipeRows(cellEl) {
                 const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
                 const xs = [0, ...(line ? [...line.children].map((e) => e.getBoundingClientRect().left - v2.left + sl) : [])];
                 const bl = r2.left - v2.left + sl, br = r2.right - v2.left + sl;
-                const ok = xs.filter((x) => x <= bl + 0.5 && br - x <= cw - 2);
-                if (!ok.length) { if (r2.left < v2.left + 4) w.scrollLeft -= (v2.left + 4 - r2.left); else if (r2.right > v2.right - 4) w.scrollLeft += (r2.right - v2.right + 4); }
-                else w.scrollLeft = Math.max(0, first ? Math.min(...ok) : ok.reduce((a, x) => (Math.abs(x - sl) < Math.abs(a - sl) ? x : a)));   // the first focus: the LEFTMOST start that shows the box (critic C2 r5)
+                const ok = xs.filter((x) => x <= bl + 0.5 && br - x <= cw + 0.5);
+                if (!ok.length && firstFlag) w.scrollLeft = 0;      // no position shows the box: the row stays at its start (the start beats the box)
+                else if (!ok.length) { if (r2.left < v2.left + 4) w.scrollLeft -= (v2.left + 4 - r2.left); else if (r2.right > v2.right - 4) w.scrollLeft += (r2.right - v2.right + 4); }
+                else w.scrollLeft = Math.max(0, firstFlag ? Math.min(...ok) : ok.reduce((a, x) => (Math.abs(x - sl) < Math.abs(a - sl) ? x : a)));   // the first focus: the LEFTMOST start that shows the box (critic C2 r5)
                 upd();
             };
             const first = w.dataset.mqFocused !== '1';      // the first focus (the card's auto-focus) keeps the row at its start when the box shows there
+            if (!first) w.dataset.mqMoved = '1';
             w.dataset.mqFocused = '1';
+            if (first) firstSnap = () => { if (document.activeElement === t && w.dataset.mqMoved !== '1') { mode(); snapAs(true); } };
+            const snapAs = (f) => { const keep = first; try { firstFlag = f; snap(); } finally { firstFlag = keep; } };
+            firstFlag = first;
+            if (first) mode();
             snap();
             requestAnimationFrame(snap);
             setTimeout(() => { if (document.activeElement === t) snap(); }, 150);    // after the cell's late fit (fitTwinRows) moves the boxes
         });
-        upd(); setTimeout(upd, 300); setTimeout(upd, 1000);
+        // after the cell's late fit (fonts, fitTwinRows): lay the row out again and, while the pupil has not moved on, re-rest it
+        const late = () => { if (firstSnap) firstSnap(); else if (!w.scrollLeft) mode(); upd(); };
+        upd(); setTimeout(late, 300); setTimeout(late, 1000);
     });
 }
 

@@ -62,6 +62,7 @@ const COMPACT_LIVE_MM = 178;  // the one-page sheet's single full-width column (
 const COMPACT_GAP_MM = 1;      // and a tighter gap, so the box takes the width (3-digit keys keep clear space)
 /** Most boxes in one row of the screen twin: four (and the step tab) fit a 390 px phone at >= 44 px a box. */
 const TWIN_ROW = 4;
+const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by columns (~24 px at the card's 3.4 px/mm)
 
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
@@ -160,13 +161,16 @@ function arcsGeom(p, ctx, c) {
     let boxW = maxW >= boxMin ? Math.min(maxW, Math.max(boxMin, boxCap)) : maxW;
     const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
     if (sz.w > pitch - 1) { sz.w = pitch - 1; }
-    const gap = pitch - sz.w;
+    // the screen twin (critic C2 r6): the gap between columns is capped at TWIN_GAP_MM (about 24 px on a phone card), so four
+    // columns fit the 322 px phone window; the arcs are drawn from this pitch, never restyled afterwards
+    let gap = pitch - sz.w;
+    if (isTwin(ctx) && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     // digits: today's size, shrunk only as far as the widest number needs, never below the floor
     const pt = Math.max(FLOOR_PT, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
-    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : 3.8, pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact };
+    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + gap, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : 3.8, pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -329,7 +333,7 @@ register('count-row', {
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<span class="k2-swipe-back" aria-hidden="true"><i>&#10229;</i> <b>Swipe back to the start</b></span><span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
+            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back to the start</b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
     },
     answerKey(p) {

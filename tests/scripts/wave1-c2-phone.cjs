@@ -11,6 +11,8 @@ const CASES = {
   'by 1,000 from 14,000': { rows: [R(1000, 'custom', 14000)] },
   'by 100,000 from 1,000,000 (15)': { rows: [R(100000, 'custom', 1000000)], jumps: 15 },
   'times each, back': { rows: [R(12, undefined, undefined, 'down')], times: 'each' },
+  'by 7 from 3': { rows: [R(7, 'custom', 3)] },
+  'by 25': { rows: [R(25)] },
 };
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
@@ -67,11 +69,18 @@ const MEASURE = () => {
       const tab = col.querySelector('.k2-steptab');
       const tr = tab && tab.getBoundingClientRect();
       if (!tr || tr.left < -1 || tr.right > window.innerWidth + 1) return { ok: false, why: 'step tab not on screen' };
-      if (c.right > v.left + 1) return { ok: false, why: `tab column (${Math.round(c.right)}) overlaps the row (${Math.round(v.left)})` };
+      // critic C2 r6: when the row swipes the tab sits ABOVE line 1; either way it never overlaps the row's window
+      const swipes = col.parentElement.hasAttribute('data-mq-swipes');
+      if (!(tr.bottom <= v.top + 1 || tr.top >= v.bottom - 1 || tr.right <= v.left + 1 || tr.left >= v.right - 1)) return { ok: false, why: 'the step tab overlaps the row' };
       const lines = [...w.querySelectorAll('.k2-countrow-line')];
-      for (const t of col.querySelectorAll('[data-mq-tabfor]')) { const ln = lines[+t.getAttribute('data-mq-tabfor')]; const a = t.getBoundingClientRect(), b = ln.getBoundingClientRect(); if (Math.abs(a.bottom - b.bottom) > 2) return { ok: false, why: `tab entry ${t.getAttribute('data-mq-tabfor')} not level with its line (${Math.round(a.bottom)} vs ${Math.round(b.bottom)})` }; }
+      for (const t of (swipes ? [] : col.querySelectorAll('[data-mq-tabfor]'))) { const ln = lines[+t.getAttribute('data-mq-tabfor')]; const a = t.getBoundingClientRect(), b = ln.getBoundingClientRect(); if (Math.abs(a.bottom - b.bottom) > 2) return { ok: false, why: `tab entry ${t.getAttribute('data-mq-tabfor')} not level with its line (${Math.round(a.bottom)} vs ${Math.round(b.bottom)})` }; }
       const cut = [...w.querySelectorAll('input.mq-cellslot, .k2-given')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.left < v.left - 1 && r.right > v.left + 1);
       if (cut.length) return { ok: false, why: `${cut.length} number(s)/box(es) cut at the row's left edge` };
+      const cutR = [...w.querySelectorAll('input.mq-cellslot, .k2-given')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.left < v.right - 1 && r.right > v.right + 1);
+      if (cutR.length) return { ok: false, why: `${cutR.length} number(s)/box(es) cut at the row's right edge` };
+      const inWin = (r) => r.left >= v.left - 1 && r.right <= v.right + 1;
+      const g0 = w.querySelector('.k2-given'), b0 = w.querySelector('input.mq-cellslot');
+      const startShown = !!g0 && inWin(g0.getBoundingClientRect()), boxShown = !!b0 && inWin(b0.getBoundingClientRect());
       // the leftmost column start (or 0) at which the first box is fully visible: where the row must rest when that box has focus
       const f = w.querySelector('input.mq-cellslot'), fr = f.getBoundingClientRect(), sl = w.scrollLeft, cw = w.clientWidth;
       const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
@@ -79,21 +88,24 @@ const MEASURE = () => {
       const bl = fr.left - v.left + sl, br = fr.right - v.left + sl;
       const okx = xs.filter((x) => x <= bl + 0.5 && br - x <= cw - 2);
       const want = Math.min(Math.max(0, Math.min(...okx)), w.scrollWidth - cw);
-      return { ok: true, scrollLeft: sl, want };
+      return { ok: true, scrollLeft: sl, want, startShown, boxShown, win: Math.round(v.width), swipes };
     };
     const t0 = await page.evaluate(TABCHK);
     const at = (t) => t.ok && Math.abs(t.scrollLeft - t.want) <= 2;
+    if (host === 'card') check(t0.ok && t0.scrollLeft === 0 && t0.startShown && t0.boxShown, `${tag}: at load the row rests at 0 (scrollLeft ${t0.scrollLeft}) with the first given number${t0.startShown ? '' : ' NOT'} and the first box${t0.boxShown ? '' : ' NOT'} fully in the ${t0.win} px window, nothing cut at either edge${t0.ok ? '' : ' (' + t0.why + ')'}`);
     check(t0.ok && (host !== 'card' || at(t0)), `${tag}: after load the step tab is beside the row, nothing under it${host === 'card' ? `, the row rests at the leftmost start that shows the first box (scrollLeft ${t0.scrollLeft}, want ${Math.round(t0.want)})` : ''}${t0.ok ? '' : ' (' + t0.why + ')'}`);
     // a programmatic scroll settles on a column start (scroll-snap): no number or box is cut at the row's left edge
-    await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); w.scrollLeft = 37; });
+    await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children]; w.scrollLeft = Math.round((its[1].getBoundingClientRect().left - its[0].getBoundingClientRect().left) * 0.7); });
     await sleep(700);
     const tS = await page.evaluate(TABCHK);
     const backCue = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const b = w.querySelector('.k2-swipe-back'); return w.scrollLeft > 1 ? !!b && getComputedStyle(b).display !== 'none' : true; });
-    check(tS.ok && backCue, `${tag}: after scrollLeft = 37 the row settles on a column start (scrollLeft ${tS.scrollLeft}), nothing cut, the back cue shows${tS.ok ? '' : ' (' + tS.why + ')'}`);
+    check(tS.ok && tS.scrollLeft > 0 && backCue, `${tag}: after a scroll of 0.7 column the row settles on the next column start (scrollLeft ${tS.scrollLeft}), nothing cut, the back cue shows${tS.ok ? '' : ' (' + tS.why + ')'}`);
     await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); w.scrollLeft = 130; });
     await sleep(700);
     const tM = await page.evaluate(TABCHK);
     const backCue2 = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const b = w.querySelector('.k2-swipe-back'); return w.scrollLeft > 1 ? !!b && getComputedStyle(b).display !== 'none' : true; });
+    const strip = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cues'); const b = w.querySelector('.k2-countrow-body'); return { h: c && getComputedStyle(c).display !== 'none' ? c.getBoundingClientRect().height : 0, body: b.getBoundingClientRect().height, back: getComputedStyle(w.querySelector('.k2-swipe-back')).display !== 'none', fwd: getComputedStyle(w.querySelector('.k2-swipe-cue')).display !== 'none' }; });
+    check(strip.h > 0 && strip.h <= 60 && strip.h <= 0.5 * strip.body, `${tag}: mid-row, the cues share one strip ${Math.round(strip.h)} px high (<= 60 and <= half the ${Math.round(strip.body)} px row; back ${strip.back ? 'shown' : 'hidden'}, forward ${strip.fwd ? 'shown' : 'hidden'})`);
     check(tM.ok && backCue2, `${tag}: after scrollLeft = 130 the row settles on a column start (scrollLeft ${tM.scrollLeft}), nothing cut, the back cue shows${tM.ok ? '' : ' (' + tM.why + ')'}`);
     await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); w.style.scrollSnapType = 'none'; w.scrollLeft = 0; w.style.scrollSnapType = ''; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); delete w.dataset.mqFocused; });
     await sleep(200);
@@ -101,6 +113,7 @@ const MEASURE = () => {
     if (!first) { check(false, `${tag}: no boxes`); continue; }
     await sleep(250);
     const t1 = await page.evaluate(TABCHK);
+    if (host === 'card') check(t1.ok && t1.scrollLeft === 0 && t1.startShown && t1.boxShown, `${tag}: the first box focused, the row at 0 (scrollLeft ${t1.scrollLeft}), the start and the first box fully in the ${t1.win} px window${t1.ok ? '' : ' (' + t1.why + ')'}`);
     check(at(t1), `${tag}: the first box focused, the row rests at the leftmost start that shows it (scrollLeft ${t1.scrollLeft}, want ${Math.round(t1.want || 0)}), the step tab on show, nothing under it${t1.ok ? '' : ' (' + t1.why + ')'}`);
     const n = await page.evaluate(() => [...[...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent).querySelectorAll('input.mq-cellslot')].length);   // the first card's boxes (the worksheet holds many cards)
     const seen = new Set();
