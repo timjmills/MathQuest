@@ -96,7 +96,8 @@
     "grid": "2X",
     "onePage": "2Y",
     "calculator": "6X",
-    "skipAfter": "6Y"
+    "skipAfter": "6Y",
+    "divForm": "5N"
   },
   "blocks": {
     "0": {
@@ -655,7 +656,14 @@
     },
     "onePage": {},
     "calculator": {},
-    "skipAfter": {}
+    "skipAfter": {},
+    "divForm": {
+      "standard": "S",
+      "long": "L",
+      "fraction": "F",
+      "vertical": "V",
+      "mix": "M"
+    }
   },
   "scalarOnly": {
     "range": "decimal",

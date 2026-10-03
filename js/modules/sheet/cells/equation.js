@@ -126,8 +126,10 @@ register('equation', {
         const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
         const wMm = chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         return {
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction',
-            factLike: false, maxCols: 4, stretchCap: STRETCH_CAP.equation,
+            // `fact` (div_facts' Fraction form): a one-line fact cell, packed like the other
+            // fact forms of its page instead of measured as a visual.
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
+            factLike: !!p.fact, maxCols: 4, stretchCap: STRETCH_CAP.equation,
         };
     },
     inputs(p, ctx) {

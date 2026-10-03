@@ -336,6 +336,9 @@ function footprintClass(q, template, size) {
     // A horizontal fact ("24 ÷ 6 = ___") is one line with one short answer (critic round 2, H5:
     // six division facts filled a page, every cell 80% empty).
     if (isAcrossFact(q, template)) return 'short';
+    // div_facts' Long-division and Fraction forms (payload `fact`): a recalled fact with one
+    // short answer, no work rows - packed with the page's other fact forms, never as long work.
+    if ((template === 'division' || template === 'equation') && q.cell && q.cell.payload && q.cell.payload.fact) return 'short';
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -844,7 +847,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
         } catch (e) { cellPrompt = null; }
     }
-    if (isAcrossFact(q, template)) {
+    // div_facts' fact forms (Long division and Fraction, and Mix's across form, payload `fact`)
+    // are measured exactly like the across fact, so a Mix page packs all three in one grid.
+    if (isAcrossFact(q, template) || ((template === 'division' || template === 'equation') && q.cell && q.cell.payload && q.cell.payload.fact)) {
         // Its static footprint is the VERTICAL fact's cell height plus a stack's pads (50 mm at
         // L), for one line about 17 mm tall: the measurement is the truth for this one.
         fp = Object.assign({}, fp, { measure: true, hMm: null, tracks: undefined, factLike: false });

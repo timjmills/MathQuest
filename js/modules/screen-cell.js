@@ -124,7 +124,12 @@ export function cellKindFor(q) {
             return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
         }
     }
+    // div_facts' Fraction form: the kit equation template's fraction drawing, its slot typed.
+    if (cellT === 'equation' && pay.notation === 'fraction' && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', frac: true, ...p };
     if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
+    // div_facts' Vertical form (divForm): a 12s-table dividend has three digits (144 ÷ 12); the
+    // paper draws it on the fact template, so the screen does too.
+    if (cellT === 'fact' && pay.notation === 'vertical' && p.op === '/' && A.length <= 3 && B.length <= 2 && ANS.length <= 2) return { kind: 'fact', ...p };
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
@@ -243,6 +248,14 @@ export function equationHTML(k, slotHtml) {
     // S2: touch dots on the given numbers (k.supports, screenSupportsFor).
     const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
     const to = touchOpts(40, 'px');
+    // div_facts' Fraction form (divForm): the dividend over the divisor on a bar, = [slot] - the
+    // kit equation template's fraction drawing, same markup as paper (cells/equation.js).
+    if (k.frac) {
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+            + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+            + `<span style="border-bottom:0.75pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
+            + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`
         + `<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;

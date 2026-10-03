@@ -944,6 +944,23 @@ const _opsUnknown = (dflt = 'answer', { answer = 'The answer (8 + 7 = __)', firs
 const _opsAddCue = (withTile = true, sub = false) => supportsOptions(
     ['touch', 'touchall', ...(withTile ? ['tile'] : []), 'frame', 'line', 'boxsign'],
     { labels: sub ? { touch: 'Touch dots: count back (on the number taken away)' } : { touch: 'Touch dots: count on (on the smaller number)' } });
+// How a division FACT is written (owner, 2026-10-03). One choice for the page, the same kit cell on
+// paper (every size, pupil page and key) and on every screen host. Mix deals exactly one third
+// each of Standard, Long division and Fraction down the page (blocks of three, shuffled by seed);
+// Vertical is chosen on purpose only, for the 5-10 column fact-drill layouts. It replaces the
+// ÷ `notation` set on div_facts: a link that still carries `notation` is read by the generator.
+export const divFormOption = () => ({
+    id: 'divForm', label: 'How it is written', type: 'enum', default: 'standard',
+    values: [
+        { v: 'standard', l: 'Standard  (12 ÷ 3 = __)' },
+        { v: 'long', l: 'Long division  (3 with the bracket round 12, answer above)' },
+        { v: 'fraction', l: 'Fraction  (12 over 3 = __)' },
+        { v: 'vertical', l: 'Vertical  (12 above ÷ 3, a rule, the answer below)' },
+        { v: 'mix', l: 'Mix  (one third each: standard, long division, fraction)' },
+    ],
+    help: 'One way for the whole page, or Mix for a third of each of the first three. Vertical suits '
+        + 'the 5 to 10 column fact rows, where the facts are stacked so the ones digits line up.',
+});
 const _opsMulCue = (div = false) => supportsOptions(
     ['touch', 'skip', 'array', ...(div ? ['think'] : []), 'boxsign'],
     { labels: { touch: div ? 'Touch dots: a row to touch while counting by' : 'Touch dots: count by (on one factor)',
@@ -982,7 +999,7 @@ const P11_OPS_OPTIONS = {
         c.values = c.values.map(x => (x.v === 0 ? { v: 0, l: '0 (zero shared: 0 ÷ n)' } : x));
         c.zeroTitle = 'Zero divided by a number';
         return c;
-    })(), notationOption('/'), _opsTableBand(), ..._opsMulCue(true)],
+    })(), divFormOption(), _opsTableBand(), ..._opsMulCue(true)],
 
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.

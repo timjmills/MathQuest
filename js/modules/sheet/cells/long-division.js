@@ -28,7 +28,9 @@ import { INK, stripPos } from '../tokens.js';
 import { stepMarks, WHOLE_SLOTS } from '../steps.js';
 
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
-const rowsOf = (p) => (Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
+// A division FACT (`fact: true`, div_facts' long-division form): the bracket and the quotient
+// boxes only - a fact is recalled, not worked, so no work rows.
+const rowsOf = (p) => (p.fact ? 0 : Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
 
 /** The steps of the standard algorithm: where each quotient digit sits and what is written. */
 export function divisionSteps(dividend, divisor) {
@@ -180,7 +182,7 @@ register('division', {
         return {
             wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
-            measure: true, factLike: false, maxCols: 2, tracks: n + dv + 1,
+            measure: !p.fact, factLike: !!p.fact, maxCols: p.fact ? 4 : 2, tracks: n + dv + 1,
         };
     },
     inputs(p) {

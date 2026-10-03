@@ -121,8 +121,11 @@ const LADDER_PTS = [28, 24, 20, 18, 16];
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
 
 /** A division fact prints ACROSS ("24 ÷ 6 = ___", PT-FRW-6/7): vertical division is not a fact form. */
-const isAcross = (items) => items.some((it) => opOf(it.q || {}) === 'divide'
-    || /horiz/.test(String((((it.q || {}).cell || {}).payload || {}).notation || '')));
+// A division fact the teacher asked for Vertical (div_facts `divForm`) is stacked in the vertical
+// rows (up to 10 columns), like + - x; every other division fact prints across.
+const notationOfItem = (it) => String((((it.q || {}).cell || {}).payload || {}).notation || '');
+const isAcross = (items) => items.some((it) => (opOf(it.q || {}) === 'divide' && notationOfItem(it) !== 'vertical')
+    || /horiz/.test(notationOfItem(it)));
 
 /** Digit tracks of the widest fact in the section (operands and answer, TY-22, at least 2). */
 const tracksOf = (items) => Math.max(2, ...items.map((it) => {
@@ -186,7 +189,19 @@ export function factRowsLayout(items, input) {
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     if (big && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
-    const pt = verticalPt(cols, n, ctx.look);
+    // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the
+    // page drops columns until the ladder's own digit size fits, rather than shrink the digits
+    // (PG-20: content never shrinks to fit).
+    const askedCols = cols;
+    const divide = items.some((it) => opOf(it.q || {}) === 'divide');
+    // The drawn width: a 3-track division fact's divisor is shorter than its dividend, so the
+    // operator takes the tight track (cells/fact.js factOpTrackEm): n + 1 tracks of 0.72 em, inside
+    // the cell's side pads (about 4 mm).
+    const tightDiv = divide && n >= 3;
+    const fitsAt = (c) => { const pt = factDigitPt(c); return (n + 1) * FACT_TRACK_EM * (EM_MM[pt] || (pt / 72) * 25.4) <= cellWidthMm(c, LIVE_W_MM, ctx.look).inner - 4.5; };
+    while (tightDiv && cols > 5 && !fitsAt(cols)) cols--;
+    if (cols < askedCols) note = [note, `${n}-digit numbers: ${cols} columns so the digits keep their size.`].filter(Boolean).join(' ');
+    const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols) : verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
     const rows = cap.rows;

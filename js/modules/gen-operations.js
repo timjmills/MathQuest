@@ -165,6 +165,51 @@ function _factTrivialSlot() {
     return ((at % 10) + 10) % 10 === 7;
 }
 
+/**
+ * div_facts' form for this item (`divForm`). Mix deals exactly one third each of standard, long
+ * division and fraction: the page is cut into blocks of three, each block a seeded shuffle of the
+ * three, so a 6- or 9-item page is 2/2/2 or 3/3/3 and the remainder of any other count falls
+ * where the seed puts it. The block orders are drawn at the skill's first kept item (itemIndex 0)
+ * and held for its page, so a retried item and another skill's page reset do not move them.
+ */
+const DIV_FORMS = ['standard', 'long', 'fraction', 'vertical', 'mix'];
+const DIV_MIX = ['standard', 'long', 'fraction'];
+let _divMixPerms = new Map();
+let _divMixCursor = 0;
+function _divFactMixOn() {
+    const o = state.skillOptions || {};
+    if (o.divForm === 'mix') return true;
+    if (DIV_FORMS.includes(o.divForm)) return false;
+    let n = o.notation;
+    if (typeof n === 'string') n = [n];
+    return Array.isArray(n) && n.filter((v) => ['across', 'bracket', 'fraction'].includes(v)).length > 1;
+}
+function _divFactForm() {
+    const o = state.skillOptions || {};
+    let f = o.divForm;
+    if (!DIV_FORMS.includes(f)) {
+        // An old link: the ÷ notation set (across / bracket / fraction; several ticked = mixed).
+        let n = o.notation;
+        if (typeof n === 'string') n = [n];
+        const map = { across: 'standard', bracket: 'long', fraction: 'fraction' };
+        const ok = Array.isArray(n) ? n.map((v) => map[v]).filter(Boolean) : [];
+        f = ok.length === 1 ? ok[0] : ok.length > 1 ? 'mix' : 'standard';
+    }
+    if (f !== 'mix') return f;
+    let at;
+    if (Number.isFinite(state.itemIndex)) {
+        at = state.itemIndex;
+        if (at === 0) _divMixPerms = new Map();
+    } else at = _divMixCursor++;
+    const block = Math.floor(at / 3);
+    if (!_divMixPerms.has(block)) {
+        const p = [0, 1, 2];
+        for (let i = 2; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+        _divMixPerms.set(block, p);
+    }
+    return DIV_MIX[_divMixPerms.get(block)[at % 3]];
+}
+
 function notationFor(op) {
     const natural = (op === '÷' || op === '/') ? 'across' : 'stacked';
     if (_notationItemCache && _notationItemCache[op] !== undefined) return _notationItemCache[op];
@@ -7008,35 +7053,44 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = '';
                     }
                 } else if (op === '\u00f7') {
-                    // The three division notations are three ladder steps, not a per-item
-                    // shuffle (catalogue mult-div-integers.md, DV-A4). The teacher picks one.
-                    const _divNot = notationFor('\u00f7');
-                    const roll = _divNot === 'bracket' ? 'long' : (_divNot === 'fraction' ? 'fraction' : 'horiz');
-                    q.notation = _divNot;
-                    q._variant = roll;
+                    // HOW IT IS WRITTEN (`divForm`, owner 2026-10-03): one kit cell per form, the
+                    // same on paper and on every screen host. A link from before the option still
+                    // carries the ÷ `notation` set; it is read when `divForm` is not set.
+                    const form = _divFactForm();
+                    q.divForm = form;
+                    // In Mix every form is a one-line fact cell drawn at the page's ONE digit size
+                    // (the equation / division templates read ctx.metrics), so the three forms keep
+                    // one cell size and one row height and interleave on the page.
+                    const inMix = _divFactMixOn();
                     q.skillLabel = 'Div Facts';
-                    // Clear any Long Division visual from operator-specific code above
                     q.visual = '';
-                    if (roll === 'horiz') {
-                        q.printFormat = 'div-facts-horizontal';
-                    } else if (roll === 'fraction') {
-                        q.printFormat = 'div-facts-fraction';
-                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
-                            <div style="display:inline-flex;flex-direction:column;align-items:center;">
-                                <span style="padding:0 15px;">${a}</span>
-                                <span style="border-top:3px solid var(--text-bright);padding:4px 15px;">${b}</span>
-                            </div>
-                            <span style="margin-left:12px;vertical-align:middle;">= ?</span>
-                        </div>`;
-                    } else {
+                    q.answerType = 'number';
+                    const A = Number(a), B = Number(b), Q = A / B;
+                    if (form === 'long') {
+                        const payload = { dividend: A, divisor: B, quotient: Q, workRows: 0, fact: true };
+                        q.notation = 'bracket'; q._variant = 'long';
                         q.printFormat = 'div-facts-long';
-                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
-                            <div style="display:inline-flex;align-items:flex-end;gap:4px;">
-                                <span style="color:var(--accent-orange);padding-bottom:8px;">${b}</span>
-                                <div style="border-top:3px solid var(--text-bright);border-left:3px solid var(--text-bright);padding:8px 20px 8px 15px;border-top-left-radius:8px;">${a}</div>
-                            </div>
-                            <div style="margin-top:8px;font-size:1rem;color:var(--text-dim);">${a} \u00f7 ${b} = ?</div>
-                        </div>`;
+                        q.cell = { template: 'division', v: 1, payload };
+                        q.visual = _kitTwin('division', payload, { join: '' });
+                    } else if (form === 'fraction') {
+                        const payload = { a: A, b: B, op: '/', result: Q, notation: 'fraction', digits: String(Q).length, fact: true };
+                        q.notation = 'fraction'; q._variant = 'fraction';
+                        q.printFormat = 'div-facts-fraction';
+                        q.cell = { template: 'equation', v: 1, payload };
+                        q.visual = _kitTwin('equation', payload);
+                    } else if (form === 'vertical') {
+                        const payload = { a: A, b: B, op: '/', notation: 'vertical', digits: Math.max(2, String(Q).length) };
+                        q.notation = 'stacked'; q._variant = 'vertical';
+                        q.printFormat = 'div-facts-vertical';
+                        q.cell = { template: 'fact', v: 1, payload };
+                    } else if (inMix) {
+                        q.notation = 'across'; q._variant = 'horiz';
+                        q.printFormat = 'div-facts-horizontal';
+                        q.cell = { template: 'equation', v: 1, payload: { a: A, b: B, op: '/', result: Q, digits: String(Q).length, fact: true } };
+                    } else {
+                        q.notation = 'across'; q._variant = 'horiz';
+                        q.printFormat = 'div-facts-horizontal';
+                        q.cell = { template: 'fact', v: 1, payload: { a: A, b: B, op: '/', notation: 'horiz', digits: _bandDigits('div_facts', '\u00f7', range) } };
                     }
                 }
 
