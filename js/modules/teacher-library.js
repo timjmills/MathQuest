@@ -18,6 +18,7 @@
 // grid as it scrolls into view, and the List | Thumbnails choice is the same per-device choice the
 // Send screen uses (skillView / setSkillView / viewToggleHTML).
 
+import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import { optionsFor } from './skill-options.js';
@@ -151,13 +152,14 @@ function matches(s) {
     if (lib.level && s.level !== lib.level) return false;
     if (lib.domain && s.domainId !== lib.domain) return false;
     if (lib.stdHits) return lib.stdHits.has(`${s.categoryId}:${s.skillId}`);
-    const words = lib.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (!words.length) return true;
-    const hay = `${s.label} ${s.categoryName} ${s.domainName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
-    return words.every((w) => hay.includes(w));
+    return true;
 }
 
-function shown() { return skillCatalogue().filter(matches); }
+// The words are matched by the shared thesaurus search (skill-finder.js), best match first.
+function shown() {
+    const list = skillCatalogue().filter(matches);
+    return lib.stdHits ? list : rankByQuery(list, lib.query);
+}
 
 function keyOf(s) { return `${s.categoryId}|${s.skillId}`; }
 

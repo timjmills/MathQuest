@@ -9,6 +9,7 @@
 // of the teacher previews (teacher-preview.js), and the preview column stays visible at tablet
 // widths (it is the only way to add questions). Skills are buttons, so the keyboard reaches them.
 
+import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
 import { shuffle } from './utils.js';
@@ -539,6 +540,7 @@ export function qbFilterGrade(grade) {
 
 export function qbSearchInput(value) {
     qb.searchText = (value || '').toLowerCase().trim();
+    qb.searchHits = skillSearchScores(qb.searchText);   // shared thesaurus search (skill-finder.js)
     qbApplyFilters();
 }
 
@@ -558,8 +560,8 @@ function qbApplyFilters() {
             if (!qb.activeGrades.has(String(card.dataset.qbGrade))) show = false;
         }
         if (show && qb.searchText) {
-            const label = card.dataset.qbLabel || '';
-            if (!label.includes(qb.searchText)) show = false;
+            const hits = qb.searchHits || (qb.searchHits = skillSearchScores(qb.searchText));
+            if (!hits || !hits.has(`${card.dataset.qbCat}:${card.dataset.qbSkill}`)) show = false;
         }
 
         card.style.display = show ? '' : 'none';

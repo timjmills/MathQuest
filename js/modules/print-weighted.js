@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
+import { searchSkillIndex } from './skill-search.js';
 
 window.weightedItems = [];
 
@@ -660,14 +661,11 @@ export function handlePrintSkillSearch(query) {
         return;
     }
     
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
     
     // Find matches - all terms must match
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    });
+    const matches = index;
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.9rem;">No skills found. Try different keywords.</div>';

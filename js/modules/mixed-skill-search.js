@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS } from './data.js';
+import { searchSkillIndex } from './skill-search.js';
 
 export let mixedSkillSearchMouseDown = false;
 export let keepMixedSkillSearchOpen = false;
@@ -266,13 +267,10 @@ export function handleMixedSkillSearch(query) {
         return;
     }
     
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
     
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    }).slice(0, 12);
+    const matches = index.slice(0, 12);
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:#666;text-align:center;font-size:0.85rem;">No skills found.</div>';

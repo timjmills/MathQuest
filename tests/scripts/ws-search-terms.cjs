@@ -1,0 +1,311 @@
+// ws-search-terms — GATE for the skill search (owner request 2026-10-03: "list all the ways someone
+// could search for it and make sure they are tagged with all of them").
+//   node tests/scripts/ws-search-terms.cjs            gate: exits non-zero on failure
+//   node tests/scripts/ws-search-terms.cjs --dump     per-skill term counts and concepts, family by family
+//   node tests/scripts/ws-search-terms.cjs --q "take away"   show the top 10 for one query
+// Node only: imports js/modules/skill-finder.js (the code every search box calls) with the standards
+// and WRM terms loaded.
+//   (a) every live skill has >= 5 distinct search terms beyond its label
+//   (b) every query in QUERIES has its listed skills in the top 5
+//   (c) no query in QUERIES returns zero results
+const path = require('path');
+const { pathToFileURL } = require('url');
+
+const MOD = (f) => pathToFileURL(path.join(__dirname, '../../js/modules', f)).href;
+
+// [query, [skills that MUST be in the top 5, as 'category:skill']]
+const QUERIES = [
+    // the owner's case
+    ['skip counting', ['multiplication:count_by_tables']],
+    ['skip count', ['multiplication:count_by_tables']],
+    ['skip countin', ['multiplication:count_by_tables']],
+    ['skipcounting', ['multiplication:count_by_tables']],
+    ['count by', ['multiplication:count_by_tables']],
+    ['counting in 3s', ['multiplication:count_by_tables']],
+    ['count by 1-12', ['multiplication:count_by_tables']],
+    ['count by 2s', ['patterns:seq_2']],
+    ['counting in 5s', ['patterns:seq_5']],
+    ['count in tens', ['patterns:seq_10']],
+    ['times tables', ['multiplication:mult_facts', 'multiplication:count_by_tables']],
+    ['timestables', ['multiplication:mult_facts']],
+    ['times table', ['multiplication:mult_facts']],
+    ['multiplication tables', ['multiplication:mult_facts']],
+    ['multiplication square', ['multiplication:mult_chart']],
+    // addition
+    ['plus', ['addition:add_facts']],
+    ['+', ['addition:add_facts']],
+    ['add', ['addition:add_facts']],
+    ['adding', ['addition:add_facts']],
+    ['addition', ['addition:add_facts']],
+    ['additon', ['addition:add_facts']],
+    ['addition facts', ['addition:add_facts']],
+    ['sum', ['addition:add_facts']],
+    ['altogether', ['addition:add_5_pictures']],
+    ['carrying', ['addition:add_100_regroup']],
+    ['carry', ['addition:add_100_regroup']],
+    ['regrouping addition', ['addition:add_100_regroup']],
+    ['2 digit addition', ['addition:add_100_no_regroup']],
+    ['two digit addition', ['addition:add_100_regroup']],
+    ['3 digit addition', ['addition:add_1k_mixed']],
+    ['add within 20', ['addition:add_20_mixed']],
+    ['addition within 100', ['addition:add_100_mixed']],
+    ['add within 1000', ['addition:add_1k_mixed']],
+    ['addition no regrouping', ['addition:add_20_no_regroup']],
+    ['column addition', ['addition:add_column_multi']],
+    ['add three numbers', ['addition:add_three']],
+    ['addition word problems', ['addition:add_word_problems']],
+    ['adding story problems', ['addition:add_word_problems']],
+    ['bridging ten', ['addition:add_10_regroup']],
+    ['missing addend', ['addition:cloze_addition']],
+    // subtraction
+    ['take away', ['subtraction:sub_facts']],
+    ['takeaway', ['subtraction:sub_facts']],
+    ['minus', ['subtraction:sub_facts']],
+    ['-', ['subtraction:sub_facts']],
+    ['subtract', ['subtraction:sub_facts']],
+    ['subtration', ['subtraction:sub_facts']],
+    ['substraction', ['subtraction:sub_facts']],
+    ['subtraction facts', ['subtraction:sub_facts']],
+    ['borrowing', ['subtraction:sub_100_regroup']],
+    ['borrow', ['subtraction:sub_100_regroup']],
+    ['exchanging subtraction', ['subtraction:sub_20_regroup']],
+    ['subtract within 20', ['subtraction:sub_20_mixed']],
+    ['subtract within 100', ['subtraction:sub_100_mixed']],
+    ['2 digit subtraction', ['subtraction:sub_100_no_regroup']],
+    ['subtract across zeros', ['subtraction:sub_across_zeros']],
+    ['subtraction word problems', ['subtraction:sub_word_problems']],
+    ['difference', ['subtraction:sub_facts']],
+    ['how many more', ['addition:comparison_word']],
+    ['add and subtract', ['subtraction:mixed_add_sub']],
+    // multiplication & division
+    ['times', ['multiplication:mult_facts']],
+    ['multiply', ['multiplication:mult_facts']],
+    ['multipication', ['multiplication:mult_facts']],
+    ['multiplcation', ['multiplication:mult_facts']],
+    ['x', ['multiplication:mult_facts']],
+    ['lots of', ['multiplication:multiply']],
+    ['groups of', ['multiplication:arrays_groups']],
+    ['arrays', ['multiplication:arrays_groups']],
+    ['repeated addition', ['multiplication:repeated_add_to_mult']],
+    ['area model multiplication', ['multiplication:area_model_mult']],
+    ['grid method', ['multiplication:area_model_mult']],
+    ['multiply by 10', ['multiplication:mult_zeros']],
+    ['divide', ['division:div_facts']],
+    ['division', ['division:div_facts']],
+    ['divison', ['division:div_facts']],
+    ['divided by', ['division:div_facts']],
+    ['÷', ['division:div_facts']],
+    ['sharing', ['division:share_into_groups']],
+    ['share equally', ['division:share_into_groups']],
+    ['remainders', ['division:div_remainders']],
+    ['long division', ['division:long_div_2digit']],
+    ['bus stop', ['division:box_division_easy']],
+    ['fact families', ['addition:add_sub_fact_family']],
+    ['multiplication fact family', ['multiplication:mult_div_fact_family']],
+    ['inverse', ['subtraction:sub_check_by_adding']],
+    ['four operations', ['number_ops_mixed:mixed']],
+    // early number
+    ['number bonds', ['composing:number_bonds']],
+    ['bonds to 10', ['composing:make_ten']],
+    ['make 10', ['composing:make_ten']],
+    ['part whole', ['composing:number_bonds']],
+    ['ten frame', ['composing:ten_frame_build']],
+    ['teen numbers', ['composing:teen_compose']],
+    ['counting objects', ['counting:count_objects']],
+    ['how many', ['counting:count_objects']],
+    ['one more one less', ['placevalue:more_less_10']],
+    ['number after', ['counting:count_sequence']],
+    ['odd and even', ['composing:odd_even']],
+    ['even numbers', ['composing:odd_even']],
+    ['hundred square', ['composing:hundreds_chart_fill']],
+    ['100 square', ['composing:hundreds_chart_fill']],
+    ['hundreds chart', ['composing:hundreds_chart_fill']],
+    ['number grid', ['composing:hundreds_chart_fill']],
+    ['more or fewer', ['comparing:compare_groups']],
+    ['base ten blocks', ['composing:base10_build']],
+    ['dienes', ['composing:base10_build']],
+    ['number line', ['addition:nl_add']],
+    ['number words', ['composing:number_word_form']],
+    // place value & number sense
+    ['place value', ['placevalue:place_value_disks']],
+    ['tens and ones', ['placevalue:identify']],
+    ['value of a digit', ['placevalue:value']],
+    ['expanded form', ['placevalue:expand']],
+    ['standard form', ['placevalue:combine']],
+    ['compare numbers', ['placevalue:compare']],
+    ['greater than less than', ['placevalue:compare']],
+    ['order numbers', ['placevalue:order_least_to_greatest']],
+    ['rounding', ['number_sense:nearest_10']],
+    ['round to nearest 10', ['number_sense:nearest_10']],
+    ['round to the nearest hundred', ['number_sense:nearest_100']],
+    ['estimate', ['number_sense:estimate_sum']],
+    ['doubles', ['number_sense:doubles_near_doubles']],
+    ['halving', ['patterns:halve']],
+    ['doubling', ['patterns:double']],
+    // fractions, decimals, percents
+    ['fractions', ['fractions:identify']],
+    ['fracions', ['fractions:identify']],
+    ['half', ['shapes_early:partition_shapes']],
+    ['halves and quarters', ['shapes_early:partition_shapes']],
+    ['equivalent fractions', ['fractions:equivalent']],
+    ['simplify fractions', ['fractions:simplify']],
+    ['lowest terms', ['fractions:simplify']],
+    ['improper fractions', ['fractions:improper_mixed']],
+    ['mixed numbers', ['fractions:improper_mixed']],
+    ['add fractions', ['fraction_operations:add_fractions_like']],
+    ['adding fractions', ['fraction_operations:add_fractions_like']],
+    ['subtract fractions', ['fraction_operations:sub_fractions_like']],
+    ['multiply fractions', ['fraction_operations:mult_frac_frac']],
+    ['compare fractions', ['fractions:compare']],
+    ['fractions on a number line', ['composing:fraction_number_line']],
+    ['fraction of a set', ['fractions:fraction_of_set']],
+    ['decimals', ['decimals:add_decimal']],
+    ['adding decimals', ['decimals:add_decimal']],
+    ['decimels', ['decimals:add_decimal']],
+    ['tenths', ['number_sense:round_sort_tenths']],
+    ['percent', ['conversions:percent_visual']],
+    ['percentage', ['conversions:percent_visual']],
+    ['%', ['conversions:percent_visual']],
+    ['ratio', ['conversions:ratio_intro']],
+    ['negative numbers', ['integers:number_line_int']],
+    ['integers', ['integers:add_int']],
+    // time & money & measures
+    ['telling time', ['measurement:time_hour']],
+    ['tell the time', ['measurement:time_hour']],
+    ["o'clock", ['measurement:time_hour']],
+    ['oclock', ['measurement:time_hour']],
+    ['half past', ['measurement:time_half_hour']],
+    ['quarter past', ['measurement:time_quarter']],
+    ['quarter to', ['measurement:time_quarter']],
+    ['clock', ['measurement:time_hour']],
+    ['elapsed time', ['measurement:elapsed_30min']],
+    ['am pm', ['measurement:time_sense']],
+    ['money', ['measurement:money_count']],
+    ['coins', ['measurement:money_count']],
+    ['cents', ['measurement:money_count']],
+    ['pence', ['measurement:money_count']],
+    ['change', ['measurement:money_change']],
+    ['measuring length', ['measurement:reading_ruler']],
+    ['ruler', ['measurement:reading_ruler']],
+    ['centimetres', ['measurement:length_metric']],
+    ['weight', ['measurement:heavier_lighter_visual']],
+    ['mass', ['measurement:mass_volume_liquid']],
+    ['capacity', ['measurement:capacity']],
+    ['temperature', ['measurement:temperature']],
+    ['unit conversions', ['measurement:unit_conversions']],
+    // geometry
+    ['shapes', ['shapes_early:name_2d_shapes']],
+    ['2d shapes', ['shapes_early:name_2d_shapes']],
+    ['3d shapes', ['shapes_early:name_3d_shapes']],
+    ['3-D shapes', ['shapes_early:name_3d_shapes']],
+    ['faces edges vertices', ['shapes_early:count_edges_faces_vertices']],
+    ['perimeter', ['area_perimeter:perimeter']],
+    ['perimiter', ['area_perimeter:perimeter']],
+    ['area', ['area_perimeter:area']],
+    ['volume', ['area_perimeter:volume']],
+    ['angles', ['angles_lines:identify_angles']],
+    ['right angle', ['angles_lines:identify_angles']],
+    ['protractor', ['angles_lines:measure_angles']],
+    ['parallel lines', ['angles_lines:identify_lines']],
+    ['symmetry', ['angles_lines:symmetry']],
+    ['line of symmetry', ['angles_lines:symmetry']],
+    ['quadrilaterals', ['shapes_classify:classify_quads']],
+    ['triangles', ['shapes_classify:classify_triangles']],
+    ['coordinates', ['coordinates:coordinate_q1']],
+    ['reflection', ['coordinates:geo_reflect']],
+    ['nets', ['shapes_classify:net_identify']],
+    // data
+    ['pictogram', ['graphs:pictograph']],
+    ['pictograph', ['graphs:pictograph']],
+    ['picture graph', ['graphs:pictograph']],
+    ['bar chart', ['graphs:bar_graph']],
+    ['bar graph', ['graphs:bar_graph']],
+    ['tally', ['graphs:tally_chart']],
+    ['tally chart', ['graphs:tally_chart']],
+    ['line plot', ['graphs:line_plot']],
+    ['dot plot', ['graphs:line_plot']],
+    ['pie chart', ['graphs:pie_chart']],
+    ['average', ['data_analysis:mean']],
+    ['mean median mode', ['data_analysis:mean']],
+    ['probability', ['probability:probability_basic']],
+    ['chance', ['probability:probability_basic']],
+    // algebra
+    ['patterns', ['patterns:number_pattern']],
+    ['bar model', ['algebra:tape_diagram']],
+    ['tape diagram', ['algebra:tape_diagram']],
+    ['order of operations', ['order_of_operations:oop_easy']],
+    ['bodmas', ['order_of_operations:oop_easy']],
+    ['pemdas', ['order_of_operations:oop_easy']],
+    ['solve for x', ['algebra:solve_unknown']],
+    ['equations', ['algebra:solve_eq_addsub']],
+    ['balance equations', ['algebra:balance_addsub']],
+    ['equal sign', ['addition:equal_sign']],
+    ['factors', ['number_theory:factors_identify']],
+    ['prime numbers', ['number_theory:prime_composite']],
+    ['multiples', ['number_theory:multiples']],
+    ['lcm', ['number_theory:lcm']],
+    ['hcf', ['number_theory:gcf_easy']],
+    ['exponents', ['order_of_operations:exponents_simple']],
+    ['vocabulary', ['vocabulary:vocab_grade_K']],
+    // curriculum codes and grades
+    ['2.NBT.2', ['patterns:seq_2']],
+    ['2.nbt.a.2', ['patterns:seq_2']],
+    ['3.OA.7', ['multiplication:mult_facts']],
+    ['K.CC.5', ['counting:count_objects']],
+    ['EE.3.OA.8', ['multiplication:count_by_tables']],
+    ['year 2 fractions', ['fractions:identify']],
+    ['grade 1 fractions', ['shapes_early:partition_shapes']],
+    ['grade 3 multiplication', ['multiplication:mult_facts']],
+    ['kindergarten counting', ['counting:count_objects']],
+    ['y3 times tables', ['multiplication:count_by_tables']],
+    ['2nd grade addition', ['addition:add_50_no_regroup']],
+];
+
+(async () => {
+    globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+    const log = console.log;
+    console.log = () => {};
+    const finder = await import(MOD('skill-finder.js'));
+    const st = await import(MOD('search-terms.js'));
+    await finder.warmSkillSearch();
+    console.log = log;
+    const args = process.argv.slice(2);
+    const top = (q, n) => finder.findSkills(q).slice(0, n);
+
+    if (args[0] === '--q') {
+        for (const h of top(args[1], 10)) console.log(`${h.score.toFixed(1).padStart(6)}  ${h.key}  ${h.label}`);
+        return;
+    }
+    const entries = finder.skillSearchEntries();
+    const counts = entries.map((e) => ({ e, n: st.termCount(st.termsFor(e)), c: st.conceptsFor(e.categoryId, e.skillId, e.label) }));
+    if (args[0] === '--dump') {
+        let fam = '';
+        for (const { e, n, c } of counts) {
+            if (e.categoryId !== fam) { fam = e.categoryId; console.log(`\n## ${fam}`); }
+            console.log(`${String(n).padStart(4)}  ${e.skillId.padEnd(28)} ${c.join(', ')}`);
+        }
+        return;
+    }
+    const failures = [];
+    // (a)
+    for (const { e, n } of counts) if (n < 5) failures.push(`(a) ${e.key} has only ${n} search terms beyond its label`);
+    const ns = counts.map((x) => x.n).sort((a, b) => a - b);
+    // (b) + (c)
+    let passed = 0;
+    for (const [q, must] of QUERIES) {
+        const all = finder.findSkills(q);
+        if (!all.length) { failures.push(`(c) "${q}" returns no results`); continue; }
+        const keys = all.slice(0, 5).map((h) => h.key);
+        const miss = must.filter((k) => !keys.includes(k));
+        if (miss.length) failures.push(`(b) "${q}": ${miss.join(', ')} not in top 5 (got ${keys.join(', ')})`);
+        else passed++;
+    }
+    if (QUERIES.length < 150) failures.push(`query table has ${QUERIES.length} queries, needs >= 150`);
+    console.log(`ws-search-terms: ${entries.length} skills, terms per skill min ${ns[0]} / median ${ns[Math.floor(ns.length / 2)]} / max ${ns[ns.length - 1]}; ${passed}/${QUERIES.length} queries pass`);
+    if (failures.length) {
+        for (const f of failures) console.log('  ' + f);
+        console.log('ws-search-terms: FAIL');
+        process.exit(1);
+    }
+    console.log('ws-search-terms: OK');
+})().catch((e) => { console.error(e); console.log('ws-search-terms: FAIL'); process.exit(1); });

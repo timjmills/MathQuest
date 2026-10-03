@@ -18,6 +18,7 @@
 // options (skill-options.js optionsFor) is shown. Chosen values live on the queue item as
 // `item.opts`; the share code carries them once skill-codes.js encodes `opts`.
 
+import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import {
@@ -291,14 +292,12 @@ function wire() {
 function matches(s, q) {
     if (ui.levels.length && !ui.levels.includes(s.level) && s.level !== 'M') return false;
     if (ui.levels.length && s.level === 'M') return false;
-    if (!q) return true;
-    const hay = `${s.label} ${s.categoryName} ${s.domainName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
-    return q.split(/\s+/).every((w) => hay.includes(w));
+    return true;
 }
 
+// The words are matched by the shared thesaurus search (skill-finder.js), best match first.
 function shownSkills() {
-    const q = ui.query.toLowerCase();
-    return skillCatalogue().filter((s) => matches(s, q));
+    return rankByQuery(skillCatalogue().filter((s) => matches(s)), ui.query);
 }
 
 function renderBrowser() {
@@ -321,13 +320,20 @@ function renderBrowser() {
     }
     if (ui.view === 'thumbs') { renderThumbs(box, shown, inSet); return; }
     let html = '';
-    for (const [domainId, domain] of Object.entries(DOMAINS)) {
+    // While searching, the best match leads: domains and categories follow the rank of their best skill.
+    const firstAt = new Map();
+    shown.forEach((s, i) => { if (!firstAt.has(s.domainId)) firstAt.set(s.domainId, i); if (!firstAt.has(s.categoryId)) firstAt.set(s.categoryId, i); });
+    const byRank = (id) => (searching && firstAt.has(id) ? firstAt.get(id) : Infinity);
+    const domainList = Object.entries(DOMAINS);
+    if (searching) domainList.sort((a, b) => byRank(a[0]) - byRank(b[0]));
+    for (const [domainId, domain] of domainList) {
         const dSkills = shown.filter((s) => s.domainId === domainId);
         if (!dSkills.length) continue;
         const dOpen = searching || !!ui.open[domainId];
         html += `<button type="button" class="tv-tree-btn" data-toggle="${domainId}" aria-expanded="${dOpen}">${icon('chevR', 16, ' class="tv-chev"')}<span>${esc(domain.name)}</span><span class="tv-tree-count">${dSkills.length}</span></button>`;
         if (!dOpen) continue;
-        for (const cat of domain.categories) {
+        const cats = searching ? domain.categories.slice().sort((a, b) => byRank(a.id) - byRank(b.id)) : domain.categories;
+        for (const cat of cats) {
             const cSkills = dSkills.filter((s) => s.categoryId === cat.id);
             if (!cSkills.length) continue;
             const key = `${domainId}/${cat.id}`;

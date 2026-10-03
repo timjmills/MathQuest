@@ -1,6 +1,7 @@
 // skills-organizer.js - Full-screen skill browsing, preview, and queue management
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
+import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
@@ -229,6 +230,7 @@ export function soFilterGrade(grade) {
 
 export function soSearchInput(value) {
     so.searchText = (value || '').toLowerCase().trim();
+    so.searchHits = skillSearchScores(so.searchText);   // shared thesaurus search (skill-finder.js)
     soApplyFilters();
 }
 
@@ -262,8 +264,8 @@ export function soApplyFilters() {
 
         // Search filter
         if (show && so.searchText) {
-            const label = card.dataset.soLabel || '';
-            if (!label.includes(so.searchText)) {
+            const hits = so.searchHits || (so.searchHits = skillSearchScores(so.searchText));
+            if (!hits || !hits.has(`${card.dataset.soCat}:${card.dataset.soSkill}`)) {
                 show = false;
             }
         }

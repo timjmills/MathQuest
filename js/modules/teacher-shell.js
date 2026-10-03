@@ -20,6 +20,7 @@
 //   - `?board=1` in the URL (the "Open board view in new window" link) hides the teacher
 //     shell entirely for that window (`body.tv-board`).
 
+import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { listTests, loadTest, deleteTest, exportTestJSON, importTestJSON, compressTestForURL } from './quiz-storage.js';
 import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelectedVoiceURI } from './voice-picker.js';
@@ -475,10 +476,7 @@ function renderRunOneResults(el) {
     const words = run.oneQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
     box.hidden = !words.length;
     if (!words.length) return;
-    const hits = skillCatalogue().filter((s) => {
-        const hay = `${s.label} ${s.categoryName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
-        return words.every((w) => hay.includes(w));
-    }).slice(0, 30);
+    const hits = rankByQuery(skillCatalogue(), run.oneQuery).slice(0, 30);
     box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-run-one="${esc(s.categoryId + '|' + s.skillId)}"${tvpAttrs(s.categoryId, s.skillId)}><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
         : '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>';
 }
