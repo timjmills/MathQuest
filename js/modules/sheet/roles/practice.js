@@ -567,6 +567,12 @@ export function sheetHeaders(input, words, score) {
     };
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const cont = { name: on('name'), date: false, score: false, title: '', tab: contTab };
+    // Wave 5.2: the reference number line rides under the header of every page (the layout took
+    // its height off the body: sheetLayout's refBandMm).
+    if (h.refBand && Number(h.refBandMm) > 0) {
+        first.refBand = cont.refBand = String(h.refBand);
+        first.refBandMm = cont.refBandMm = Number(h.refBandMm);
+    }
     return { first, cont };
 }
 
@@ -686,6 +692,7 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
         tab: input.header && input.header.tab === false ? false : words.tabLines,
         title: input.header && input.header.title === false ? '' : words.title,
         titleLines,
+        refBandMm: (input.header && Number(input.header.refBandMm)) || 0,
     };
     const W = Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM;
     const anchors = input.anchors || null;

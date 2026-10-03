@@ -178,12 +178,14 @@ export function paperOf(paper) {
  * @param {{cont?: boolean}} [opts]  `cont`: a continuation page (HD-20), always 12 mm
  */
 export function headerHeightMm(header = {}, { cont = false } = {}) {
-    if (cont) return CONT_HEADER_MM;
+    // Wave 5.2: a reference number line under the header (sheet/refline.js) on EVERY page.
+    const band = Math.max(0, Number(header && header.refBandMm) || 0);
+    if (cont) return CONT_HEADER_MM + band;
     const h = HEADER_PARTS_MM;
     const hasTab = Array.isArray(header.tab) ? header.tab.length > 0 : !!header.tab;
     const hasTitle = !!header.title;
     const lines = Math.max(1, Number(header.titleLines) || 1);
-    return (hasTab ? h.rowTab : h.rowNoTab) + (hasTitle ? h.title + h.titleWrap * (lines - 1) : 0) + h.rule;
+    return (hasTab ? h.rowTab : h.rowNoTab) + (hasTitle ? h.title + h.titleWrap * (lines - 1) : 0) + h.rule + band;
 }
 
 /** PG-2 / HD-12: body = live height - header - footer block. */

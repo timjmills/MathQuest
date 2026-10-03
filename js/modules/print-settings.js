@@ -334,7 +334,7 @@ export function setPrintSkillOption(sIdx, skIdx, optId, raw) {
         if (!def) return;
         if (def.type === 'bool') { next[optId] = !!raw; return; }
         if (def.type === 'rows') { next[optId] = normalizeRows(raw); return; }
-        if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
+        if (def.type === 'int') { if (def.nullable && (raw === '' || raw === null)) { next[optId] = null; return; } const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
         if (def.type === 'enum') {
             const hit = (def.values || [])[Number(raw)];
             if (hit) next[optId] = hit.v;

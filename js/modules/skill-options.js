@@ -424,7 +424,7 @@ export const MORE_GROUP = 'more';
 export const isMoreOption = (def) => !!def && def.group === MORE_GROUP;
 /** The controls the panel shows at rest: those that apply now and are not inside the collapsed play group. */
 export function restingOptions(defs, cur) {
-    return (defs || []).filter((d) => !isPlayOption(d) && !isMoreOption(d) && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
+    return (defs || []).filter((d) => !isPlayOption(d) && !isMoreOption(d) && d.group !== 'nline' && !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
 }
 /** The play disclosure's summary line: "Calculator off · Skip after 5". */
 export function playSummary(defs, cur) {
@@ -3450,10 +3450,83 @@ function _measuredOptions(categoryId, skillId, own) {
     return out;
 }
 
+// ---------------------------------------------------------------------------
+// WAVE 5.2 · THE NUMBER LINE AT THE TOP OF THE PAGE  (owner, 2026-10-03)
+// ---------------------------------------------------------------------------
+// A support option on the skills where a number line helps: ONE reference line under the header,
+// above the cells, on every page and its key, and above the practice card and the online
+// worksheet (sheet/refline.js draws it; print-sheet.js and refline-screen.js place it). The
+// quiz draws no supports, so it shows none there. All seven controls sit in ONE closed disclosure,
+// "Number line" (group 'nline'), so they never count among the resting controls. Start and End
+// left on Auto come from the page's own numbers, so the line covers every one of them.
+export const NLINE_GROUP = 'nline';
+export const isNumberLineOption = (def) => !!def && def.group === NLINE_GROUP;
+const _NL_SKILLS = {
+    // add / subtract up to 1,000 (facts, within 10 … 1,000, adding on, counting back, word problems)
+    addition: /^(add_facts|add_sub_10s|add_sub_100s|add|add_word_problems(_plain)?|add_three|comparison_word|add_5_pictures|add_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|add_wp_(10|20|50|100|1k)(_plain)?|nl_add|number_line_add|mixed_addition)$/,
+    subtraction: /^(sub_facts|subtract|sub_word_problems(_plain)?|missing_add_sub|sub_5_pictures|unknown_start_wp|sub_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|sub_wp_(10|20|50|100|1k)(_plain)?|nl_sub|number_line_sub|mixed_add_sub|mixed_subtraction)$/,
+    counting: /^(count_sequence|number_seq_fill|mixed_counting)$/,
+    composing: /^(fraction_number_line|whole_as_fraction)$/,
+    patterns: /^(seq_2|seq_5|seq_10|count_by_fill|skip_count_line|count_by_step_up|count_by_step_down)$/,
+    placevalue: /^(more_less_10|more_less_100)$/,
+    number_sense: /^(rounding_visual|nearest_(10|100|1000)|round_sort_(10|100|1000|tenths|hundredths)|between_tens|place_on_number_line|make_a_ten)$/,
+    fractions: /^(equivalent|equiv_frac_nv|compare|improper_mixed|mixed_improper_visual|order_fractions|order_frac_numline|benchmark_fractions|compare_frac_lcd|graph_fractions|round_fractions|fraction_nl_drag|mixed_nl_drag)$/,
+    decimals: /^(add_decimal|sub_decimal|compare_decimal|compare_thousandths|round_decimals|round_thousandths|order_decimals|decimal_nl_drag|mixed_decimals)$/,
+    integers: /^(number_line_int|compare_int|add_int|sub_int|order_negatives|integer_nl_drag|mixed_integers|abs_value|opposite_numbers)$/,
+    measurement: /^(temperature|reading_ruler|reading_ruler_hard)$/,
+};
+/** Does a number line at the top of the page help this skill? (judgement per family; see above) */
+export function numberLineFits(categoryId, skillId) {
+    const re = _NL_SKILLS[categoryId];
+    return !!(re && re.test(String(skillId)));
+}
+/** A fraction skill's line counts in fractions even when every number on the page is whole. */
+export const numberLineIsFraction = (categoryId, skillId) => categoryId === 'fractions' || /fraction/.test(String(skillId));
+const _nlOn = (o) => !!(o && o.nlOn);
+const _nlNum = (v) => (v === null || v === undefined ? 'Auto' : String(v).replace('-', '−'));
+const _NL_STEP_LABELS = {
+    auto: 'Auto (from the page)', 1: '1', 2: '2', 5: '5', 10: '10', 20: '20', 25: '25', 50: '50', 100: '100', 1000: '1,000',
+    '1/2': 'Halves', '1/3': 'Thirds', '1/4': 'Quarters', '1/5': 'Fifths', '1/6': 'Sixths', '1/8': 'Eighths',
+    '1/10': 'Tenths (fractions)', '1/12': 'Twelfths', '0.1': '0.1 (decimal tenths)', '0.01': '0.01 (decimal hundredths)',
+};
+const _nlEnd = (id, label, help) => ({
+    id, label, type: 'int', default: null, nullable: true, signed: true, places: 2, min: -1000000, max: 1000000, step: 'any',
+    group: NLINE_GROUP, appliesTo: _nlOn, help, placeholder: 'Auto',
+});
+/** The seven number-line controls (one disclosure). `skill` names the skill for the panel's coverage check. */
+export const numberLineOptions = (categoryId, skillId) => [
+    { id: 'nlOn', label: 'Number line at the top of the page', type: 'bool', default: false, group: NLINE_GROUP,
+        nlSkill: { categoryId, skillId },
+        help: 'One reference number line under the title, above the problems, on the page, its key and the screen.',
+        summary: (v) => (v ? 'On' : 'Off') },
+    _nlEnd('nlFrom', 'Starts at', 'The first number on the line. Leave it empty (Auto) to start from the page\'s smallest number.'),
+    _nlEnd('nlTo', 'Ends at', 'The last number on the line. Leave it empty (Auto) to end at the page\'s biggest number.'),
+    { id: 'nlStep', label: 'Step between ticks', type: 'enum', default: 'auto', group: NLINE_GROUP, appliesTo: _nlOn,
+        values: Object.entries(_NL_STEP_LABELS).map(([v, l]) => ({ v: String(v), l })),
+        help: 'Whole numbers, fractions or decimals. Auto counts in the step the page\'s numbers need.' },
+    { id: 'nlLabels', label: 'Numbers under the ticks', type: 'enum', default: 'auto', group: NLINE_GROUP, appliesTo: _nlOn,
+        values: [{ v: 'auto', l: 'Auto (as many as fit)' }, { v: 'all', l: 'Every tick' }, { v: '2', l: 'Every 2nd tick' },
+            { v: '5', l: 'Every 5th tick' }, { v: '10', l: 'Every 10th tick' }, { v: 'ends', l: 'The two ends only' }, { v: 'none', l: 'None' }],
+        help: 'Which ticks carry a number. Numbers never shrink: on a long line they are spaced out instead.' },
+    { id: 'nlMinor', label: 'Small ticks between', type: 'enum', default: 'auto', group: NLINE_GROUP, appliesTo: _nlOn,
+        values: [{ v: 'auto', l: 'Auto' }, { v: '0', l: 'None' }, { v: '2', l: 'Halves of a step' }, { v: '4', l: 'Quarters of a step' },
+            { v: '5', l: 'Fifths of a step' }, { v: '10', l: 'Tenths of a step' }],
+        help: 'Unlabelled small ticks that split each step, for counting on inside a step.' },
+    { id: 'nlHops', label: 'Hop arrows over each step', type: 'bool', default: false, group: NLINE_GROUP, appliesTo: _nlOn,
+        help: 'Arcs over the line from tick to tick, to show counting on in jumps. Off by default.' },
+];
+/** The disclosure's summary line: "Off" or "On · 0 to 20 · step Auto". */
+export function numberLineSummary(cur = {}) {
+    if (!_nlOn(cur)) return 'Off';
+    const st = cur.nlStep && cur.nlStep !== 'auto' ? (_NL_STEP_LABELS[cur.nlStep] || cur.nlStep) : 'Auto';
+    return `On · ${_nlNum(cur.nlFrom)} to ${_nlNum(cur.nlTo)} · step ${st}`;
+}
+
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
-    const own = ownOptionsFor(categoryId, skillId);
-    const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
+    const own0 = ownOptionsFor(categoryId, skillId);
+    const own = numberLineFits(categoryId, skillId) && !own0.some(o => o.id === 'nlOn') ? [...own0, ...numberLineOptions(categoryId, skillId)] : own0;
+    const all = [...own, ..._measuredOptions(categoryId, skillId, own0)];
     const ids = new Set(all.map(o => o.id));
     return [...all, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
 }
@@ -3512,8 +3585,11 @@ export function normalizeOptions(categoryId, skillId, opts) {
         if (def.type === 'bool') { out[def.id] = !!v; continue; }
         if (def.type === 'rows') { out[def.id] = normalizeRows(v); continue; }
         if (def.type === 'int') {
+            // A `nullable` int (the number line's Start / End) reads empty as null: Auto.
+            if (def.nullable && (v === null || v === '' || v === undefined)) { out[def.id] = null; continue; }
             const n = Number(v);
-            if (Number.isFinite(n)) out[def.id] = Math.min(def.max ?? n, Math.max(def.min ?? n, Math.round(n)));
+            const k = 10 ** (Number(def.places) || 0);
+            if (Number.isFinite(n)) out[def.id] = Math.min(def.max ?? n, Math.max(def.min ?? n, Math.round(n * k) / k));
             continue;
         }
         if (def.type === 'enum') {

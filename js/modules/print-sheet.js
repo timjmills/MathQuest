@@ -23,11 +23,11 @@
 // app's print branches.
 
 import { generateQuestionFor } from './generate-question.js';
-import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, numberLineIsFraction } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
@@ -1429,6 +1429,38 @@ function anchorSummary(mode, list, notes) {
  * @param {string[]} [req.letters]           More Practice: which letters (default from the count)
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
+/**
+ * Wave 5.2: the number line a sheet asks for - the first skill on it that offers the line
+ * (skill-options.js numberLineFits) with it ticked on. null when none does. `sections` = the
+ * sections whose numbers the line must cover (every section of a skill that asked for it).
+ */
+function numberLineRequest(n) {
+    let first = null;
+    const sections = new Set();
+    n.sections.forEach((sec, si) => {
+        for (const sk of sec.skills) {
+            if (!numberLineFits(sk.categoryId, sk.skillId)) continue;
+            const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+            if (!o.nlOn) continue;
+            sections.add(si);
+            if (!first) first = { sk, opts: o, fraction: numberLineIsFraction(sk.categoryId, sk.skillId) };
+        }
+    });
+    return first ? Object.assign(first, { sections }) : null;
+}
+/** The numbers a seeded sample of the skill uses (the band's height is decided from it). */
+function numberLineSample(nline, seed, count = 16) {
+    const out = [];
+    const base = (Number(seed) >>> 0) || 1;
+    for (let i = 0; i < count; i++) {
+        try {
+            const q = generateQuestionFor({ category: nline.sk.categoryId, skill: nline.sk.skillId, opts: nline.sk.opts, seed: (base + i) >>> 0, itemIndex: i });
+            out.push(...nlLineNumbers(q));
+        } catch (e) { /* a failed sample item adds nothing */ }
+    }
+    return out;
+}
+
 export async function buildSheet(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
@@ -1482,6 +1514,17 @@ export async function buildSheet(req = {}) {
     const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
+    // Wave 5.2: the number line at the top of the page. Its band is reserved NOW, from a seeded
+    // sample of the skill, so the capacity below is decided with it (no split cell, rebalanced
+    // last page); the line itself is drawn from the page's real items once they exist.
+    const nline = numberLineRequest(n);
+    if (nline) {
+        nline.spec0 = nlResolveLine(nline.opts, numberLineSample(nline, n.seed), { fraction: nline.fraction });
+        const band0 = refLineHTML(nline.spec0, { size: n.size, widthMm: LIVE_W_MM });
+        nline.hMm = band0.hMm;
+        header.refBandMm = layoutHeader.refBandMm = band0.hMm;
+        header.refBand = band0.html;
+    }
     // A lesson's step reminder strip sits above the grid on every page: the grid is that much
     // shorter (the strip's height comes off the body, never off a cell).
     if (n.stepStrip) {
@@ -1757,6 +1800,21 @@ export async function buildSheet(req = {}) {
     allocateHostSupports(hostItems, n);
 
     settleMixedGrades(skills, hostItems);
+    // Wave 5.2: draw the line from the page's own numbers, in the band reserved above.
+    let numberLine = null;
+    if (nline) {
+        const nums = hostItems.filter((it) => nline.sections.has(Number(it.section) || 0)).flatMap((it) => nlLineNumbers(it.q));
+        let spec = nlResolveLine(nline.opts, nums, { fraction: nline.fraction });
+        let band = refLineHTML(spec, { size: n.size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+        if (band.natural > nline.hMm + 0.05) {
+            // The sample counted in another kind of step (taller labels): keep its step so the band fits.
+            spec = nlResolveLine(Object.assign({}, nline.opts, { nlStep: stepName(nline.spec0.step) }), nums, { fraction: nline.fraction });
+            band = refLineHTML(spec, { size: n.size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+        }
+        header.refBand = band.html;
+        if (spec.warn) notes.push(spec.warn);
+        numberLine = { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes, warn: spec.warn };
+    }
     const input = {
         items: hostItems,
         skills,
@@ -1796,6 +1854,7 @@ export async function buildSheet(req = {}) {
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
+        numberLine,
         anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,

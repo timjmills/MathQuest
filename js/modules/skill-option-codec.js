@@ -118,6 +118,10 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
             } else if (def.type === 'rows') {
                 const enc = encodeRows(v);
                 if (enc) out.push(key + enc);
+            } else if (def.type === 'int' && def.signed) {
+                // A signed / decimal int (the number line's Start and End): "-" is N, "." is P, so
+                // the field never holds a character a code parser splits on (-10.5 -> N10P5).
+                if (v !== null && v !== undefined && Number.isFinite(Number(v))) out.push(key + String(Number(v)).replace('-', 'N').replace('.', 'P'));
             } else if (v !== null && v !== undefined && def.tokens) {
                 const t = _defToken(def, v);
                 if (t !== null) out.push(key + t);
@@ -176,6 +180,11 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
                 const v = back(body);
                 if (v !== undefined) raw[optId] = v;
             }
+            continue;
+        }
+        if (def.type === 'int' && def.signed) {
+            const m = /^(N?)(\d+)(?:P(\d+))?$/.exec(body);
+            if (m) raw[optId] = (m[1] ? -1 : 1) * Number(m[2] + (m[3] ? '.' + m[3] : ''));
             continue;
         }
         if (def.type === 'set') {

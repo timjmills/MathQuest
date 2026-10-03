@@ -13,7 +13,7 @@ import { SW, n2, st, solid, text, mm, by, opOf, num, answerOf, downArrow } from 
 import { opGlyph } from '../../tokens.js';
 
 const whole = (v, max) => Number.isInteger(v) && v >= 0 && v <= max;
-const arrowHead = (c, x, y, dir) => `<path d="M${n2(x)} ${n2(y)}L${n2(x - dir * 3.2)} ${n2(y - 1.6)}L${n2(x - dir * 3.2)} ${n2(y + 1.6)}Z" ${solid(c)}/>`;
+export const arrowHead = (c, x, y, dir) => `<path d="M${n2(x)} ${n2(y)}L${n2(x - dir * 3.2)} ${n2(y - 1.6)}L${n2(x - dir * 3.2)} ${n2(y + 1.6)}Z" ${solid(c)}/>`;
 
 /* ------------------------------------------------------------------ marked number line (RP-50/51) */
 

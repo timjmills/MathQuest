@@ -98,7 +98,14 @@
     "calculator": "6X",
     "skipAfter": "6Y",
     "rows": "1W",
-    "times": "1Z"
+    "times": "1Z",
+    "nlOn": "0R",
+    "nlFrom": "0S",
+    "nlTo": "0T",
+    "nlStep": "0U",
+    "nlLabels": "0V",
+    "nlMinor": "0W",
+    "nlHops": "0X"
   },
   "blocks": {
     "0": {
@@ -663,7 +670,50 @@
       "none": "N",
       "each": "E",
       "given": "G"
-    }
+    },
+    "nlOn": {},
+    "nlFrom": {},
+    "nlTo": {},
+    "nlStep": {
+      "1": "1",
+      "2": "2",
+      "5": "5",
+      "10": "T",
+      "20": "U",
+      "25": "Q",
+      "50": "F",
+      "100": "H",
+      "1000": "K",
+      "auto": "A",
+      "1/2": "B",
+      "1/3": "C",
+      "1/4": "D",
+      "1/5": "E",
+      "1/6": "G",
+      "1/8": "I",
+      "1/10": "J",
+      "1/12": "L",
+      "0.1": "M",
+      "0.01": "N"
+    },
+    "nlLabels": {
+      "2": "2",
+      "5": "5",
+      "10": "T",
+      "auto": "A",
+      "all": "L",
+      "ends": "E",
+      "none": "N"
+    },
+    "nlMinor": {
+      "0": "0",
+      "2": "2",
+      "4": "4",
+      "5": "5",
+      "10": "T",
+      "auto": "A"
+    },
+    "nlHops": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -697,7 +747,11 @@
     "onePage": "bool",
     "calculator": "bool",
     "skipAfter": "decimal",
-    "rows": "rows"
+    "rows": "rows",
+    "nlOn": "bool",
+    "nlHops": "bool",
+    "nlFrom": "decimal",
+    "nlTo": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
@@ -713,6 +767,7 @@
     "5N-5Z": "lessons, support ladder and later waves",
     "2U-2Z": "wave 1 lane C: skip-count lines and the number grid",
     "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)",
-    "1W-1Z": "wave 1 lane C2: count_by_tables row list and multiplication labels"
+    "1W-1Z": "wave 1 lane C2: count_by_tables row list and multiplication labels",
+    "0R-0X": "wave 5.2: the custom number line at the top of the page"
   }
 }

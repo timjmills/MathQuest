@@ -18,7 +18,7 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary, isNumberLineOption, numberLineSummary } from './skill-options.js';
 import { normalizeRows, downStart, onePagePlan, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
@@ -97,7 +97,8 @@ function _liveDef(def) {
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     const all = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
-    const shown = all.filter(d => !isPlayOption(d) && !isMoreOption(d));
+    const shown = all.filter(d => !isPlayOption(d) && !isMoreOption(d) && !isNumberLineOption(d));
+    const nline = defs.filter(isNumberLineOption).filter(d => !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
     const more = all.filter(isMoreOption);
     const play = all.filter(isPlayOption);
     const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
@@ -121,8 +122,28 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
             + `<span aria-hidden="true">&#9662;</span><span>More</span><span class="sko-more-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(moreSummary)}</span></summary>`
             + more.map(row).join('') + '</details>'
         : '';
-    return groups + moreBox + disclosure;
+    // Wave 5.2: the number line at the top of the page - seven settings behind one closed disclosure,
+    // its state in the summary, and a warning when the teacher's own range misses the page's numbers.
+    const nlDef = nline.find(d => d.id === 'nlOn');
+    let nlWarn = '';
+    if (nlDef && cur.nlOn && typeof _nlCoverCheck === 'function' && nlDef.nlSkill) {
+        try { nlWarn = _nlCoverCheck(nlDef.nlSkill.categoryId, nlDef.nlSkill.skillId, cur) || ''; } catch (e) { nlWarn = ''; }
+    }
+    const nlBox = nline.length
+        ? `<details class="sko-group sko-nline" data-sko-group="nline"${_nlOpen ? ' open' : ''} ontoggle="skoNlineOpen(this.open)" style="margin-top:10px;">`
+            + `<summary class="sko-nline-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
+            + `<span aria-hidden="true">&#9662;</span><span>Number line</span><span class="sko-nline-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(numberLineSummary(cur))}</span></summary>`
+            + (nlWarn ? `<div class="sko-nline-warn" role="alert" data-sko-warn="nline" style="margin:4px 0;padding:6px 8px;border:1px solid #b45309;border-radius:6px;font-size:0.75rem;color:var(--text);">&#9888; ${escHTML(nlWarn)}</div>` : '')
+            + nline.map(row).join('') + '</details>'
+        : '';
+    return groups + nlBox + moreBox + disclosure;
 }
+let _nlOpen = false;
+let _nlCoverCheck = null;
+/** Remembers whether the Number line disclosure is open, so a redraw after a change keeps it open. */
+export function skoNlineOpen(open) { _nlOpen = !!open; }
+/** The app installs the coverage check (refline-screen.js): (categoryId, skillId, opts) -> warning text or ''. */
+export function setNumberLineCoverCheck(fn) { _nlCoverCheck = typeof fn === 'function' ? fn : null; }
 let _playOpen = false;
 let _moreOpen = false;
 /** Remembers whether the More disclosure is open, so a redraw after a change keeps it open. */
@@ -199,7 +220,7 @@ export function optionControlHTML(def, cur, color, h) {
     if (def.type === 'int') {
         return `<label${tip} style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
             <span style="flex:1;">${escHTML(def.label)}</span>
-            <input type="number" value="${escHTML(v)}"${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
+            <input type="number" value="${escHTML(v)}"${def.placeholder ? ` placeholder="${escHTML(def.placeholder)}"` : ''}${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
                 style="width:80px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
                 onchange="${h.set(id, 'this.value')}">
         </label>${extra}`;
@@ -422,7 +443,7 @@ export function applyOptionEdit(next, defs, action, optId, raw) {
     if (action === 'set') {
         if (def.type === 'bool') next[optId] = raw === true || raw === 'true';
         else if (def.type === 'rows') next[optId] = normalizeRows(raw);
-        else if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; }
+        else if (def.type === 'int') { if (def.nullable && (raw === '' || raw === null)) next[optId] = null; else { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; } }
         else if (def.type === 'enum') { const hit = (def.values || [])[Number(raw)]; if (hit) next[optId] = hit.v; }
     } else if (action === 'toggle' && def.type === 'set') {
         const hit = (def.values || [])[Number(raw)];

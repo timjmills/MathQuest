@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { calcAllowedFor } from './skip-rule.js';
+import { syncPracticeRefLine } from './refline-screen.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
 import {
@@ -1366,6 +1367,13 @@ export function renderQuestion() {
     _restoreAnswerSlot();
     _renderQuestionImpl();
     try { _applyScreenCell(); } catch (e) { console.error('screen cell:', e); }
+    // Wave 5.2: the skill's number line above the card (refline-screen.js), when its options tick it on.
+    try {
+        const q = state.currentQ;
+        const key = q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
+        syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill,
+            opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
+    } catch (e) { /* the line is a hint: never block the card */ }
     // Widget hosts mount after a dynamic import; the chrome Check follows them.
     setTimeout(_syncChromeCheck, 0);
     setTimeout(_syncChromeCheck, 260);
