@@ -1339,6 +1339,21 @@ function wireChartSwipe(cellEl) {
     });
 }
 
+/** The disk mat's window (kitCellTwin): the same swipe cue, hidden when the mat fits or is scrolled to the end. */
+export function wireDiskSwipe(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('.mq-diskwin').forEach((w) => {
+        const upd = () => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        if (w.dataset.mqSwipe !== '1') {
+            w.dataset.mqSwipe = '1';
+            w.addEventListener('scroll', upd, { passive: true });
+            window.addEventListener('resize', upd);
+            setTimeout(upd, 300); setTimeout(upd, 1000);
+        }
+        upd();
+    });
+}
+
 export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     if (!cellEl || !input) return false;
     wireOpsWork(cellEl);
@@ -2582,6 +2597,7 @@ export function fitTwinRows(root) {
     if (!root || typeof getComputedStyle === 'undefined') return false;
     const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
     let changed = false;
+    wireDiskSwipe(root);
     // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks
     // hold printed digits, not inputs, so in a narrow cell they close up to the digit's own width;
     // the dividend's tracks keep their >= 44 px targets.
@@ -2908,6 +2924,26 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } else {
         return null;
     }
+    // The disk mat is drawn in paper millimetres (three L zones = 115 mm = 435 px), wider than a
+    // phone card. It scales down with its cell, never below the size at which its smallest label
+    // reaches the 8 pt floor (TY-11); past that it swipes inside its own window with the SP-11a cue.
+    tpl.content.querySelectorAll('svg.pv-disk-mat').forEach((svg) => {
+        const wMm = parseFloat(svg.getAttribute('width'));
+        const labels = Array.from(svg.querySelectorAll('text')).map((t) => parseFloat(t.getAttribute('font-size'))).filter((v) => v > 0);
+        if (!(wMm > 0) || !labels.length) return;
+        const pxPerMm = 96 / 25.4;
+        const minLabelPt = Math.min(...labels) / (25.4 / 72);
+        const floor = Math.min(1, 8 / minLabelPt);
+        svg.style.width = '100%';
+        svg.style.height = 'auto';
+        svg.style.maxWidth = `${Math.round(wMm * pxPerMm)}px`;
+        svg.style.minWidth = `${Math.ceil(wMm * pxPerMm * floor)}px`;
+        const win = document.createElement('div');
+        win.className = 'k2-chartwindow mq-diskwin';
+        svg.replaceWith(win);
+        win.appendChild(svg);
+        win.insertAdjacentHTML('beforeend', '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more</b></span>');
+    });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
     const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
