@@ -650,3 +650,14 @@ registerSkill('composing:ten_frame_build_teen', {
     workedSteps: frameSteps,
     wrongAnswer: frameWrong,
 });
+
+// The odd/even sort (gen-algebraic.js ODD_EVEN_SORT_PRINT): on paper the pupil circles the even
+// numbers and crosses out the odd ones, so the I Can line and the section line say that task.
+registerSkill('composing:select_even_odd', {
+    strings: strings({
+        iCan: 'I Can circle the even and odd numbers',
+        instructionKey: 'sort-even-odd',
+        steps: ['Look at the ones digit.', 'Is it 0, 2, 4, 6 or 8? The number is even: circle it.', 'Is it 1, 3, 5, 7 or 9? The number is odd: cross it out.'],
+        say: '__ is even. __ is odd.',
+    }),
+});

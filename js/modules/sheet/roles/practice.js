@@ -842,6 +842,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const uniformOwn = ownKeys.length && ownKeys[0] && ownKeys.every((k) => k === ownKeys[0]) && PAPER_TASK_KEYS.has(ownKeys[0]);
         const keys = sec.instructionKey ? [sec.instructionKey] : (mixedKinds || uniformOwn) ? ownKeys : hostKeys;
         let key = sec.instructionKey ? sectionInstructionKey(keys) : neutralForKinds(sectionInstructionKey(keys), pupil);
+        // One instruction per section (P-LG-5): a choose-all list beside items with another task
+        // (identify_angles: "Circle all the obtuse angles" beside "What type of angle is this?")
+        // is not covered by the choose-all line, so the section says the neutral "Solve." and
+        // each cell keeps its own task.
+        const paperCount = ownKeys.filter((k) => PAPER_TASK_KEYS.has(k)).length;
+        if (!sec.instructionKey && paperCount && paperCount < ownKeys.length) key = 'default-solve';
         let text;
         ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
         return { key, text };
