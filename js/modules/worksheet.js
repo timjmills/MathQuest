@@ -12,7 +12,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, itemWasHelped, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks, ltrStripValue,
 } from './screen-cell.js';
 
@@ -306,7 +306,7 @@ export function checkWorksheetMC(idx, btnEl) {
             worksheetConfettiTriggered.add(idx);
             if (typeof confetti === 'function') confetti(15);
             else if (typeof window !== 'undefined' && window.confetti) window.confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // Wrong: highlight the correct one, disable everything.
@@ -403,7 +403,7 @@ function handleWorksheetMscSubmit(idx, qq, selectedIds, mod) {
             worksheetConfettiTriggered.add(idx);
             if (typeof confetti === 'function') confetti(15);
             else if (typeof window !== 'undefined' && window.confetti) window.confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 600);
+            wsScheduleAdvance(idx, 600);
         }
     } else {
         card.style.background = 'rgba(239,71,111,0.08)';
@@ -497,7 +497,7 @@ function handleWorksheetClockSetSubmit(idx, qq, timeObj, mod) {
             worksheetConfettiTriggered.add(idx);
             if (typeof confetti === 'function') confetti(15);
             else if (typeof window !== 'undefined' && window.confetti) window.confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 600);
+            wsScheduleAdvance(idx, 600);
         }
     } else {
         card.style.background = 'rgba(239,71,111,0.08)';
@@ -631,7 +631,7 @@ function handleWorksheetDndSubmit(idx, qq, placement, mod) {
             worksheetConfettiTriggered.add(idx);
             if (typeof confetti === 'function') confetti(15);
             else if (typeof window !== 'undefined' && window.confetti) window.confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 600);
+            wsScheduleAdvance(idx, 600);
         }
     } else {
         card.style.background = 'rgba(239,71,111,0.08)';
@@ -768,7 +768,7 @@ function handleWorksheetDragFillSubmit(idx, qq, slotState, mod) {
             worksheetConfettiTriggered.add(idx);
             if (typeof confetti === 'function') confetti(15);
             else if (typeof window !== 'undefined' && window.confetti) window.confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 600);
+            wsScheduleAdvance(idx, 600);
         }
     } else {
         card.style.background = 'rgba(239,71,111,0.08)';
@@ -1866,7 +1866,7 @@ export function checkWorksheetAnswerFromColumns(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // The support ladder (support-ladder.js): a support in this card's cell, the digits kept.
@@ -1950,7 +1950,7 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // All filled but not all correct - show wrong styling
@@ -2100,7 +2100,7 @@ export function checkWorksheetOrderingAnswer(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // All filled but not all correct - show wrong styling
@@ -2181,7 +2181,7 @@ export function checkWorksheetExpandedAnswer(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // All filled but not all correct - show wrong styling
@@ -2223,7 +2223,26 @@ if (typeof document !== 'undefined' && !window.__mqActiveProblemBound) {
     });
 }
 
-export function advanceToNextProblem(currentIdx) {
+// Wave 1 / A3 critic r1: the auto-advance after a right answer must never steal the box a pupil has
+// just tapped. A pending advance (and its delayed focus) is cancelled by any pointerdown or Tab.
+let _wsAdv = null;
+let _wsAdvWired = false;
+function _wsCancelAdvance() {
+    if (_wsAdv) { clearTimeout(_wsAdv.t1); clearTimeout(_wsAdv.t2); _wsAdv = null; }
+}
+function wsScheduleAdvance(idx, ms) {
+    if (!_wsAdvWired && typeof document !== 'undefined') {
+        _wsAdvWired = true;
+        document.addEventListener('pointerdown', _wsCancelAdvance, true);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Tab') _wsCancelAdvance(); }, true);
+    }
+    _wsCancelAdvance();
+    const a = { t1: 0, t2: 0 };
+    _wsAdv = a;
+    a.t1 = setTimeout(() => { if (_wsAdv === a) advanceToNextProblem(idx, a); }, ms);
+}
+
+export function advanceToNextProblem(currentIdx, pending = null) {
     const nextIdx = currentIdx + 1;
     if (nextIdx >= state.worksheetQs.length) { setActiveProblem(null); return; } // No more problems
     setActiveProblem(nextIdx);
@@ -2236,8 +2255,9 @@ export function advanceToNextProblem(currentIdx) {
     // Scroll the next card into view smoothly
     nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Focus on the appropriate input after scroll completes
-    setTimeout(() => {
+    // Focus on the appropriate input after scroll completes (unless the pupil tapped a box meanwhile)
+    const t2 = setTimeout(() => {
+        if (pending) { if (_wsAdv !== pending) return; _wsAdv = null; }
         if (nextQ.isVerticalFormat) {
             // Focus on the ONES box: column answers are entered right to left (SP-20). A fact /
             // equation strip (data-mq-ltr) is typed in reading order, so it starts at its FIRST box
@@ -2256,6 +2276,7 @@ export function advanceToNextProblem(currentIdx) {
             if (nextInput) nextInput.focus();
         }
     }, 350);
+    if (pending) pending.t2 = t2;
 }
 
 // Track which worksheet questions have already triggered confetti
@@ -2410,14 +2431,14 @@ export function checkWorksheetAnswer(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // The support ladder (support-ladder.js): a support in this card's cell, the entry kept
         // and marked gently. Once it is spent, the red below.
         const lad = worksheetLadderWrong(idx, q, value);
         if (lad && (lad.wait || !lad.spent)) {
-            if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); }
+            if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); try { markMissingDigits(card); } catch (e) { /* optional */ } }
             input.style.borderColor = "";
             input.style.background = "";
             card.style.background = "";
@@ -2430,6 +2451,7 @@ export function checkWorksheetAnswer(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         markBoxSubmitted(input, false);
+        try { markMissingDigits(card); } catch (e) { /* optional */ }   // Wave 1 / A3
         wsRecordAnswer(idx, false);
     }
 }
@@ -3004,7 +3026,7 @@ export function checkWorksheetDualAnswer(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // Both filled but not both correct - show wrong styling
@@ -3082,7 +3104,7 @@ export function checkWorksheetCoordinateAnswer(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         card.style.background = "rgba(239,71,111,0.08)";
@@ -3160,7 +3182,7 @@ export function checkAreaModelInput(input, idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         // All filled but not all correct - show wrong styling
@@ -3272,7 +3294,7 @@ export function checkWorksheetNumberFamily(idx) {
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-            setTimeout(() => advanceToNextProblem(idx), 400);
+            wsScheduleAdvance(idx, 400);
         }
     } else {
         card.style.background = "rgba(239,71,111,0.08)";
