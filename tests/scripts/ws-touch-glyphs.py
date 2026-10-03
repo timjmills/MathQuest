@@ -21,15 +21,15 @@ OLD = {
   3: [(-0.175, -0.203,0), (-0.030, 0.030,0), (-0.215, 0.285,0)],
   4: [(-0.123, -0.250,0), (-0.188, 0.165,0), (0.112, -0.110,0), (0.113, 0.163,0)],
   5: [(0.130, -0.258,0), (-0.152, -0.255,0), (-0.170, 0.030,0), (0.172, 0.200,0), (-0.193, 0.335,0)],
-  6: [(-0.060, -0.240, 1), (-0.190, 0.060, 1), (-0.005, 0.380, 1)],
+  6: [(0.060, -0.265, 1), (-0.190, 0.060, 1), (-0.005, 0.380, 1)],
   7: [(0.170, -0.258, 1), (0.030, 0.037, 1), (-0.100, 0.350, 1), (-0.210, -0.253,0)],
   8: [(-0.165, -0.168, 1), (0.163, -0.165, 1), (-0.198, 0.200, 1), (0.193, 0.193, 1)],
   9: [(-0.020, -0.268, 1), (0.205, -0.030, 1), (0.152, 0.275, 1), (-0.163, 0.340, 1), (-0.185, -0.030,0)]},
  700: {1: [(0.010, -0.228,0)], 2: [(-0.193, -0.170,0), (0.180, 0.352,0)],
   3: [(-0.175, -0.205,0), (-0.030, 0.040,0), (-0.212, 0.282,0)],
   4: [(-0.126, -0.250,0), (-0.193, 0.165,0), (0.125, -0.100,0), (0.125, 0.180,0)],
-  5: [(0.135, -0.240,0), (-0.140, -0.240,0), (-0.170, 0.040,0), (0.163, 0.200,0), (-0.190, 0.330,0)],
-  6: [(-0.052, -0.230, 1), (-0.185, 0.060, 1), (0.000, 0.365, 1)],
+  5: [(0.135, -0.240,0), (-0.140, -0.240,0), (-0.170, 0.070,0), (0.163, 0.200,0), (-0.190, 0.330,0)],
+  6: [(0.060, -0.255, 1), (-0.185, 0.060, 1), (0.000, 0.365, 1)],
   7: [(0.172, -0.240, 1), (0.028, 0.037, 1), (-0.120, 0.370, 1), (-0.198, -0.237,0)],
   8: [(-0.155, -0.160, 1), (0.150, -0.163, 1), (-0.190, 0.200, 1), (0.188, 0.200, 1)],
   9: [(-0.030, -0.250, 1), (0.195, -0.030, 1), (0.140, 0.275, 1), (-0.160, 0.347, 1), (-0.195, -0.030,0)]},
@@ -65,6 +65,7 @@ def segdist(p, s):
     t = 0 if L == 0 else max(0, min(1, ((p[0]-ax)*dx+(p[1]-ay)*dy)/L))
     return math.hypot(p[0]-ax-t*dx, p[1]-ay-t*dy)
 
+RING_R, DOT_R, MIN_GAP, MIN_GAP_DBL = 0.13, 0.08, 0.108, 0.06
 out = {}
 for path, w in ((sys.argv[1], 400), (sys.argv[2], 700)):
     f = TTFont(path); gs = f.getGlyphSet(); cm = f.getBestCmap(); U = f['head'].unitsPerEm
@@ -80,7 +81,7 @@ for path, w in ((sys.argv[1], 400), (sys.argv[2], 700)):
         fl = Flat(gs); gs[name].draw(fl)
         def inside(x, y):
             pp = PointInsidePen(gs, (x, y)); gs[name].draw(pp); return pp.getResult()
-        dots = []; strokeR = []
+        dots = []; strokeR = []; placed = []
         for (ox, oy, dbl) in OLD[w].get(d, []):
             gx = (ox + adv / U / 2) * U; gy = (0.415 - oy) * U
             best = None
@@ -92,8 +93,13 @@ for path, w in ((sys.argv[1], 400), (sys.argv[2], 700)):
                     dd = min(segdist((x, y), s) for s in fl.segs)
                     # prefer stroke centre, lightly prefer staying near the landmark
                     score = dd - 0.6 * math.hypot(i*st, j*st)
+                    # minimum spacing (the S1 gate): edge to edge >= 0.6 x the counted dot
+                    # (0.108 em: the 0.18 em counted-dot rule), marks drawn at the M radii
+                    rad = RING_R if dbl else DOT_R
+                    if any(math.hypot(x - qx, y - qy) < (rad + qr + (MIN_GAP if not dbl and qr == DOT_R else MIN_GAP_DBL)) * U for (qx, qy, qr) in placed): continue
                     if best is None or score > best[0]: best = (score, x, y, dd)
             if best is None: best = (0, gx, gy, 0); print('MISS', w, d, file=sys.stderr)
+            placed.append((best[1], best[2], RING_R if dbl else DOT_R))
             dots.append([round(best[1]*S - adv*S/2, 1), round(-best[2]*S + BASE, 1), dbl])
             strokeR.append(round(best[3]*S, 1))
         res[d] = {'adv': round(adv*S, 2), 'd': sp.getCommands(), 'dots': dots, 'half': strokeR}

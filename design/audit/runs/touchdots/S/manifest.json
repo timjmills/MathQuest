@@ -1,5 +1,659 @@
 [
   {
+    "skill": "addition:add_facts",
+    "category": "addition",
+    "skillId": "add_facts",
+    "label": "Addition Facts (within 20)",
+    "grade": "1",
+    "dir": "addition__add_facts",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 5,
+          "rows": 4,
+          "perPage": 20,
+          "pages": 1,
+          "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 5,
+              "rows": 4,
+              "perPage": 20,
+              "pages": 1,
+              "cellW": 37.2,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 5 x 4, cells sized to the problems.",
+              "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 42.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 550978,
+        "title": "I Can add facts to 20",
+        "notes": [
+          "Dense: 5 x 4, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 3 = ?",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 7 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "4 + 3 = ?",
+            "ans": "7",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 3 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "5 + 6 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 5 = ?",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "8 + 5 = ?",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "10 + 1 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 8 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "7 + 5 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "4 + 8 = ?",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 9 = ?",
+            "ans": "18",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "6 + 3 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "7 + 3 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "8 + 8 = ?",
+            "ans": "16",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "5 + 9 = ?",
+            "ans": "14",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "2 + 9 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "1 + 9 = ?",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "3 + 4 = ?",
+            "ans": "7",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "fact",
+            "fclass": "standard",
+            "text": "9 + 2 = ?",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "3": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "4": {
+                "hMm": 42.1,
+                "fits": true
+              },
+              "5": {
+                "hMm": 42.1,
+                "fits": true
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 116,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 139,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 95
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            20
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 130
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
     "skill": "addition:add_column_multi",
     "category": "addition",
     "skillId": "add_column_multi",

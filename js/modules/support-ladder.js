@@ -291,7 +291,7 @@ export function ladderWrong(q, value, ctx = {}) {
     if (!e) {
         const rungs = rungsFor(q, ctx);
         if (!rungs.length) return null;
-        e = { n: 0, last: null, rungs };
+        e = { n: 0, last: null, rungs, q, kind: ctx.kind };
         _entries.set(q, e);
     }
     const v = String(value == null ? '' : value).trim();
@@ -321,11 +321,39 @@ export function ladderMessage(q) {
     return e && e.n ? messageFor(e) : '';
 }
 
+/**
+ * The touch-dot rung says HOW to use the dots, built from the item (critic round 1): the number
+ * to say, the number whose dots to touch, and the direction. Never the answer.
+ */
+function touchHow(e, id) {
+    let k = null;
+    try {
+        const q = Object.assign({}, e.q, { options: [] });
+        const kd = e.kind || cellKindFor(q);
+        k = kd && kd.a != null ? kd : binaryParts(q);
+    } catch (err) { k = null; }
+    if (!k || k.a == null || k.b == null) return '';
+    const op = opKey(k.op), a = Number(k.a), b = Number(k.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+    const one = (v) => v >= 0 && v <= 9;
+    if (op === '/') return `Count by ${b}s. Touch one dot for each count.`;
+    if (op === '*') {
+        const dotA = a < b; // the smaller factor carries the dots; count by the other
+        return `Count by ${dotA ? b : a}s. Touch a dot on ${dotA ? a : b} for each count.`;
+    }
+    if (op === '-') return id === 'touchall' && one(a) ? `Touch the dots on ${a}. Take away ${b}.` : `Say ${a}. Touch the dots on ${b} and count back.`;
+    if (id === 'touchall' && one(a) && one(b)) return 'Touch and count all the dots.';
+    const big = a >= b ? a : b, small = a >= b ? b : a;
+    return `Say ${big}. Touch the dots on ${small} and count on.`;
+}
+
 function messageFor(e) {
     if (e.n > e.rungs.length) return '';
     const r = e.rungs[e.n - 1];
     if (r.id === 'worked') return 'Here is how. Finish it, then try again.';
     const name = NAMES[r.id] || 'the help';
+    const how = TOUCH_IDS.includes(r.id) ? touchHow(e, r.id) : '';
+    if (how) return `Not yet. ${how}`;
     if (e.n === 1) return `Not yet. Use ${name}, then try again.`;
     return clashes(e.rungs[0].id, r.id) ? `Not yet. Now try ${name}.` : `Not yet. Now use ${name} too.`;
 }
@@ -616,6 +644,12 @@ export function drawLadder(root, q, ctx = {}) {
     // The touch-dot rung (owner report 2026-10-03): its message may only stand when the touch
     // numerals really are on the card. A cell that could not draw them drops that rung, and the
     // next rung (and its message) takes its place at once.
+    // Touch numerals need a 40 px digit (SF-34): once they appear, the cell keeps that size for
+    // the rest of the ladder, so the problem never changes size again.
+    if (root.querySelector('.ws-tn')) {
+        const sc = root.closest ? (root.closest('.mq-scell') || root.querySelector('.mq-scell')) : null;
+        if (sc) sc.setAttribute('data-mq-touch-floor', '1');
+    }
     const e = _entries.get(q);
     const cur = e && e.n >= 1 && e.n <= e.rungs.length ? e.rungs[e.n - 1] : null;
     if (cur && TOUCH_IDS.includes(cur.id) && !root.querySelector('[data-ws-touch], [data-ws-tally]')) {

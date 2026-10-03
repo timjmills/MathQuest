@@ -90,22 +90,22 @@ export function touchDotOrder(d) {
 /* ------------------------------------------------------------------ sizes */
 
 /**
- * Mark geometry, in em of the digit (diameters / widths). Andika's stroke is 0.08-0.10 em
- * (Regular): a single dot is 0.18 em, wider than the stroke so it stands proud of it, and nothing
- * is cut out of the stroke. A double is a 0.10 em dot in a thin open ring (0.19 em across): the
- * stroke runs through it, so the digit stays whole and reads first. Every mark keeps >= 0.085 em, a stroke width,
- * from the next at every size >= TOUCH_DOT_MIN.
+ * Mark geometry, in em of the digit (owner rulings 9-11, SUPPORTS.md §S1.1):
+ *   dot    single dot diameter (0.16 em: about twice Andika's 0.08-0.10 em stroke)
+ *   ring   outer diameter of a double's ring (0.23 em), rw its line (0.03 em)
+ *   inner  a double's solid centre dot
+ *   halo   white keyline round a single dot
+ *   ck     white keyline round a double's centre dot: it parts the dot from the stroke that runs
+ *          through the OPEN ring, so the dot reads as a dot and a copy keeps white in the gap
  */
 export const TOUCH_DOT_SIZES = Object.freeze({
-    // coordinator review 2026-10-03: the stroke stays WHOLE (no white keyline cuts it), the rings
-    // are small enough that every mark keeps a clear gap from the next one.
-    M: Object.freeze({ dot: 0.18, ring: 0.19, inner: 0.10, rw: 0.02 }),
+    M: Object.freeze({ dot: 0.16, ring: 0.23, inner: 0.08, rw: 0.03, halo: 0.018, ck: 0.034 }),
 });
 export const TOUCH_DOT_DEFAULT = 'M';
 
-/** Floors (paper mm, screen px): only reached below the touch-numeral minimum (TOUCH_DOT_MIN). */
-export const TOUCH_DOT_FLOOR_MM = Object.freeze({ dot: 1.2, inner: 0.8, rw: 0.18 });
-export const TOUCH_DOT_FLOOR_PX = Object.freeze({ dot: 6, inner: 4, rw: 0.8 });
+/** Physical floors: paper mm (photocopy), screen px (a 1x display). */
+export const TOUCH_DOT_FLOOR_MM = Object.freeze({ gap: 0.3, rw: 0.25, halo: 0.15, ck: 0.26 });
+export const TOUCH_DOT_FLOOR_PX = Object.freeze({ gap: 2, rw: 1.5, halo: 1, ck: 1.5 });
 
 /**
  * The minimum digit size at which touch dots are SET for a pupil to count (owner ruling
@@ -127,16 +127,21 @@ export function touchDotsFits(size, unit = 'pt') {
  * The mark geometry at a digit size, in em, with the floors applied: radii dotR / innerR / ringR,
  * ring stroke rw, the gap between centre dot and ring.
  */
-export function touchDotGeometry({ em = 28, unit = 'pt' } = {}) {
+export function touchDotGeometry({ em = 28, unit = 'pt', photocopy = false } = {}) {
     const s = TOUCH_DOT_SIZES.M;
     const v = Number(em) || 28;
     const px = unit === 'px';
     const F = px ? TOUCH_DOT_FLOOR_PX : TOUCH_DOT_FLOOR_MM;
-    const per = px ? 1 / v : 1 / (unit === 'mm' ? v : v * PT_MM);
-    const fl = (k, e) => Math.max(e, F[k] * per);
-    const innerR = fl('inner', s.inner) / 2, rw = fl('rw', s.rw);
-    const ringR = Math.max(s.ring / 2, innerR + rw * 1.25 + rw);
-    return { dotR: fl('dot', s.dot) / 2, innerR, rw, ringR, gap: ringR - rw - innerR };
+    const f = (k) => F[k] * (px ? 1 / v : 1 / (unit === 'mm' ? v : v * PT_MM)); // floor in em
+    const rw = Math.max(s.rw, f('rw'));
+    const gap = Math.max(s.ring / 2 - s.rw - s.inner / 2, f('gap') * (photocopy ? 1.25 : 1));
+    const innerR = s.inner / 2;
+    return {
+        dotR: s.dot / 2, innerR, rw, gap, ringR: innerR + gap + rw,
+        halo: Math.max(s.halo, f('halo')),
+        // >= 0.26 mm / 1.5 px, and always short of the ring line so the stroke visibly enters the ring
+        ck: Math.min(Math.max(s.ck, f('ck')), gap - 0.012),
+    };
 }
 
 /* ------------------------------------------------------------------ drawing */
@@ -153,8 +158,8 @@ const GREY = '#949494'; // INK-1: the sheet's one grey
  * @param {'pt'|'px'|'mm'} [o.unit]  'pt' paper (default), 'px' screen, 'mm'
  * @param {number} [o.weight=400]    400 / 700: which glyph table
  * @param {'solid'|'trace'} [o.ink]  solid black, or trace: the marks in the one grey (a faded
- *                                   hint; the numeral stays black). With `photocopy` a trace
- *                                   mark is a dashed outline instead of grey.
+ *                                   hint; the numeral stays black). Photocopy-safe marks are
+ *                                   always solid black, with the wider photocopy gap.
  * @param {boolean} [o.photocopy]
  * @param {number[]} [o.counted]     screen: per-mark touches already made (0, 1 or 2); a touched
  *                                   part turns the one grey
@@ -167,24 +172,23 @@ export function touchDotsMarks(d, o = {}) {
     const K = (v) => f1(v * 1000);
     const trace = o.ink === 'trace';
     const pc = !!o.photocopy;
-    const INK = trace && !pc ? GREY : '#000';
+    const INK = trace && !pc ? GREY : '#000'; // photocopy-safe: solid black (INK-20), the wider gap
     const counted = Array.isArray(o.counted) ? o.counted : [];
-    const dash = `stroke-dasharray="${K(g.rw * 1.2)} ${K(g.rw)}"`;
     return dots.map((p, i) => {
         const c = `cx="${K(p.x)}" cy="${K(p.y)}"`;
         const n = counted[i] || 0;
         const tag = o.tappable ? ` data-td-mark="${i}"` : '';
         const ink = (k) => (k ? GREY : INK);
         const parts = [];
-        // Nothing is ever cut out of the stroke: a dot is a solid disc ON the stroke, a double is
-        // that disc with a thin ring round it (the stroke runs through the ring).
         if (p.double) {
-            if (trace && pc) parts.push(`<circle ${c} r="${K(g.ringR - g.rw / 2)}" fill="none" stroke="#000" stroke-width="${K(g.rw)}" ${dash}/>`);
-            else parts.push(`<circle ${c} r="${K(g.ringR - g.rw / 2)}" fill="none" stroke="${ink(n >= 2)}" stroke-width="${K(g.rw)}"/>`);
+            // OPEN ring over the stroke (ruling 9), the centre dot on its white keyline (ruling 10)
+            parts.push(`<circle ${c} r="${K(g.ringR - g.rw / 2)}" fill="none" stroke="${ink(n >= 2)}" stroke-width="${K(g.rw)}"/>`);
+            parts.push(`<circle ${c} r="${K(g.innerR + g.ck)}" fill="#fff"/>`);
+            parts.push(`<circle ${c} r="${K(g.innerR)}" fill="${ink(n >= 1)}"/>`);
+        } else {
+            parts.push(`<circle ${c} r="${K(g.dotR + g.halo)}" fill="#fff"/>`);
+            parts.push(`<circle ${c} r="${K(g.dotR)}" fill="${ink(n >= 1)}"/>`);
         }
-        const r = p.double ? g.innerR : g.dotR;
-        if (trace && pc) parts.push(`<circle ${c} r="${K(r - g.rw / 2)}" fill="#fff" stroke="#000" stroke-width="${K(g.rw)}" ${dash}/>`);
-        else parts.push(`<circle ${c} r="${K(r)}" fill="${ink(n >= 1)}"/>`);
         return `<g class="ws-td-mark${p.double ? ' dbl' : ''}"${tag}>${parts.join('')}</g>`;
     }).join('');
 }
@@ -252,10 +256,14 @@ export function touchTallySVG(n = 10, o = {}) {
     const g = touchDotGeometry(o);
     const f3 = (v) => Number(v).toFixed(3);
     const count = Math.max(1, Math.min(20, Math.round(Number(n) || 10)));
-    const pitch = Math.max(0.36, g.dotR * 2 + 0.16);
+    // screen: dots a finger can touch one at a time (0.25 em dots at a 0.5 em pitch: 10 / 20 px
+    // at the 40 px phone digit); paper: the single touch dot's size
+    const scr = o.unit === 'px';
+    if (scr) g.dotR = Math.max(g.dotR, 0.125);
+    const pitch = scr ? Math.max(0.5, g.dotR * 2 + 0.2) : Math.max(0.36, g.dotR * 2 + 0.16);
     const pad = g.dotR + g.rw * 2;
     const counted = Array.isArray(o.counted) ? o.counted : [];
-    const traceOutline = o.ink === 'trace' && o.photocopy;
+    const traceOutline = false; // photocopy-safe: solid black, never a dashed outline (LS-2)
     const ink = o.ink === 'trace' && !o.photocopy ? GREY : '#000';
     const rows = Math.ceil(count / 5);
     let body = '';

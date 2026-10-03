@@ -93,7 +93,7 @@ register('equation', {
         // keeps its slot wherever it sits.
         // S2: touch dots on the GIVEN numbers (never on the unknown or the result).
         const tn = touchNumbers(p);
-        const to = touchOpts((ctx.metrics && ctx.metrics.digitPt) || 28, ctx.mode === 'screen' ? 'px' : 'pt');
+        const to = touchOpts((ctx.metrics && ctx.metrics.digitPt) || 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe);
         const num = (k) => (tn[k] ? touchNumberHTML(p[k], true, to) : esc(p[k]));
         const isDiv = p.op === '/' || p.op === '÷';
         if (isDiv && (p.notation === 'fraction' || p.notation === 'bracket')) {

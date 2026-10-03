@@ -1620,3 +1620,4 @@ html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-
 /* Touch numerals floor (WORKSHEET_DESIGN_STANDARD SF-34, 2026-10-03): a grid cell holding touch
    numerals draws its digits at 40 px, never the 29 px grid size. Additive. */
 .mq-scell.mq-grid-cell:has(.ws-tn) { --mq-digit: 40px; }
+.mq-scell.mq-grid-cell[data-mq-touch-floor] { --mq-digit: 40px; }   /* kept for the rest of the ladder */

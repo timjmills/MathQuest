@@ -110,7 +110,7 @@ export function touchColumns(rows, T, op, mode) {
 }
 
 /** The overlay options for a digit printed at `pt` points (or px on screen). */
-export const touchOpts = (em, unit = 'pt', ink = 'solid') => ({ em, unit, ink, label: false });
+export const touchOpts = (em, unit = 'pt', ink = 'solid', photocopy = false) => ({ em, unit, ink, label: false, photocopy: !!photocopy });
 
 /**
  * One digit track's span with the digit AS a touch numeral (touchdots.js): the touch numeral

@@ -2063,7 +2063,10 @@ async function buildRoleSheet(n, metaOf) {
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
-    const line = f0.line || '';
+    // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
+    // are raised to L; the fit line says so instead of the page's own digit size alone.
+    const touchUp = n.size !== 'L' && /ws-tn/.test(out.pupilHtml || '') && /class="ws-stack/.test(out.pupilHtml || '');
+    const line = (f0.line || '').replace(/Digits (\d+) pt\./, (m, pt) => (touchUp ? `Digits ${pt} pt; touch-dot cells 28 pt.` : m));
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
