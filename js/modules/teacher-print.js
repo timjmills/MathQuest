@@ -106,6 +106,8 @@ function initState() {
         anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
         key: true,
+        // Wave 4.4: where the key prints and what it looks like (defaults = today's key).
+        keyPlace: 'end', keyStyle: 'copy',
         seed: freshSeed(),
         view: 0,          // page index, or 'key'
         versions: 1,
@@ -180,7 +182,7 @@ export async function reprint(id) {
     toast('Preparing the pages…');
     try {
         const built = await buildAll(rec.req);
-        await printHtml(built.pupilHtml + built.keyHtml, rec.title || 'Worksheet', rec.req.paper);
+        await printHtml(built.docHtml || (built.pupilHtml + built.keyHtml), rec.title || 'Worksheet', rec.req.paper);
         rec.at = Date.now();
         const list = (readStore(PRINTS_KEY, []) || []).filter((p) => p.id !== id);
         writeStore(PRINTS_KEY, [rec, ...list].slice(0, 10));
@@ -315,6 +317,8 @@ function onClick(e) {
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
+        case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; renderSetup(); scheduleBuild(); break;
+        case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
         case 'new-numbers': pr.seed = freshSeed(); scheduleBuild(0); break;
@@ -677,9 +681,9 @@ function renderSetup() {
       <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('tab', 'Strand tab')}${check('title', 'Title')}</div>
     </div>
     <div class="tv-setting tv-divided">
-      <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">The same page with the answers written in.</p></div>
+      <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">${pr.keyStyle === 'short' ? 'A short list of every answer, page by page.' : 'The same page with the answers written in.'}</p></div>
       <button type="button" class="tv-switch" role="switch" aria-checked="${pr.key}" aria-labelledby="tvKeyL" aria-describedby="tvKeyD" data-act="key"></button>
-    </div>
+    </div>${pr.key ? keyOptionsHTML() : ''}
   </div>
   <div style="padding:16px 24px 24px;border-top:1px solid var(--tv-rule);display:flex;flex-direction:column;gap:8px;">
     <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>${printLabel}</span></button>
@@ -689,6 +693,17 @@ function renderSetup() {
   ${classicHTML()}`;
     const det = box.querySelector('.tv-extras');
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+}
+
+/** Wave 4.4: the key's placement and style, shown only while the key is on. */
+function keyOptionsHTML() {
+    return `
+    <div class="tv-keyopts" style="display:flex;flex-direction:column;gap:10px;margin-top:-6px;">
+      <div><span class="tv-label">Key placement</span>${seg('key-place', pr.keyPlace || 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement')}
+        <p class="tv-cap" style="margin-top:6px;">${pr.keyPlace === 'after-page' ? 'Each pupil page is followed by its own key.' : 'All key pages print after all pupil pages.'}</p></div>
+      <div><span class="tv-label">Key style</span>${seg('key-style', pr.keyStyle || 'copy', [['copy', 'Page copy'], ['short', 'Short']], 'Key style')}
+        <p class="tv-cap" style="margin-top:6px;">${pr.keyStyle === 'short' ? 'Short: labels and answers only, many pages on one sheet.' : 'Page copy: the pupil page with the answers filled in.'}</p></div>
+    </div>`;
 }
 
 /**
@@ -779,7 +794,7 @@ function requestFor(s, i) {
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
-        key: pr.key,
+        key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy' },
         seed: (pr.seed + i * 7919) >>> 0,
     };
 }
@@ -790,18 +805,23 @@ function currentReq() {
 }
 
 async function buildAll(req) {
-    const out = { parts: [], pupilHtml: '', keyHtml: '', pages: [], keyPages: 0 };
+    const out = { parts: [], pupilHtml: '', keyHtml: '', docHtml: '', pages: [], keyPages: 0 };
+    let after = false;
     for (const [ri, r] of req.parts.entries()) {
         let res;
         try { res = await buildSheet(r); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
         out.parts.push({ res, role: r.role, letters: r.letters });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';
+        out.docHtml += (res.docHtml || res.pupilHtml) + '\n';
+        if (res.keyOptions && res.keyOptions.on && res.keyOptions.placement === 'after-page') after = true;
         out.keyPages += res.keyPageCount || 0;
         for (let p = 0; p < res.pageCount; p++) {
             out.pages.push(r.role === 'more-practice' && r.letters && r.letters[p] ? `Practice ${r.letters[p]}` : `Page ${out.pages.length + 1}`);
         }
     }
+    // "At the end": every section's pupil pages, then every key (today's order).
+    if (!after) out.docHtml = out.pupilHtml + out.keyHtml;
     // Page labels must be unique when several sections repeat a letter.
     const seen = {};
     out.pages = out.pages.map((l) => { seen[l] = (seen[l] || 0) + 1; return seen[l] > 1 ? `${l} (${seen[l]})` : l; });
@@ -1018,7 +1038,7 @@ function titleOf() {
 
 async function doPrint() {
     if (!last || !last.pages.length) { toast('Add a skill first'); return; }
-    const html = last.pupilHtml + (pr.key ? last.keyHtml : '');
+    const html = pr.key ? last.docHtml : last.pupilHtml;
     const title = titleOf();
     rememberPrint(title);
     try { await printHtml(html, title, pr.paper); } catch (e) { console.warn('[teacher-print] print failed', e); toast('Could not open the print dialog'); }
@@ -1026,7 +1046,7 @@ async function doPrint() {
 
 function openTab() {
     if (!last || !last.pages.length) return;
-    const html = sheetDocument(last.pupilHtml + (pr.key ? last.keyHtml : ''), titleOf(), { paper: pr.paper });
+    const html = sheetDocument(pr.key ? last.docHtml : last.pupilHtml, titleOf(), { paper: pr.paper });
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
     const win = window.open(url, '_blank');
     if (!win) toast('Allow pop-ups to open the pages in a new tab');
@@ -1045,6 +1065,7 @@ function rememberPrint(title) {
         level: hit ? levelText(hit.level) : '',
         pages: last.pages.length,
         key: !!pr.key,
+        keyPlace: pr.keyPlace || 'end', keyStyle: pr.keyStyle || 'copy',
         columns: (last.parts[0] && last.parts[0].res.fits && last.parts[0].res.fits.cols) || null,
         at: Date.now(),
         req,

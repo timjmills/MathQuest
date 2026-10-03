@@ -318,3 +318,34 @@
 /* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
    vertical padding (row chrome), never its digits. Additive. */
 :is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
+
+/* ---------- INK-31: the answer-key ink (Wave 4.4, owner 2026-10-03) ----------
+   Key answers only: reddish orange #C2410C (5.2:1 on white; luma ~98/255, so a mono copy prints
+   it as a dark grey, darker than the trace grey #949494). Pupil pages, the key's copy of the
+   question and traced (grey) model answers are unchanged. */
+.ws-page.ws-key { --ws-key-ink: #c2410c; }
+.ws-page.ws-key [data-ws-ink="solid"],
+.ws-page.ws-key [data-ws-ink="solid"] :not(svg):not(svg *),
+.ws-page.ws-key [data-ws-key="words"] { color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-ink="solid"]:not([stroke="none"]),
+.ws-page.ws-key svg[data-ws-ink="solid"] :is(line, path, polyline, circle):not([stroke="none"]):not([stroke="#fff"]) { stroke: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg :is(text, tspan)[data-ws-ink="solid"],
+.ws-page.ws-key svg [data-ws-ink="solid"] :is(text, tspan) { fill: var(--ws-key-ink) !important; }
+.ws-page.ws-key .ws-choice[data-ws-ink="solid"] { outline-color: var(--ws-key-ink) !important; }
+/* A drawn answer (shade the model, build the blocks): the drawing is the answer, its printed
+   stimulus (the fraction to shade) stays black; the shading the pupil would add is the key ink. */
+.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"],
+.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"] :not(svg):not(svg *) { color: var(--ws-ink) !important; }
+.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"] svg [fill="#949494"] { fill: var(--ws-key-ink) !important; }
+
+/* ---------- the short answer key (Wave 4.4) ---------- */
+.ws-skey { display: flex; flex-direction: column; gap: 2mm; font-family: 'Andika', sans-serif; line-height: 1.25; }
+.ws-skey-h { font-weight: 700; font-size: 1.05em; border-bottom: var(--ws-hair) solid var(--ws-ink); padding-bottom: .5mm; margin-bottom: 1mm; }
+.ws-skey-grid { display: grid; gap: 1mm 3mm; align-items: center; }
+.ws-skey-it { display: flex; align-items: center; gap: 1.5mm; min-width: 0; break-inside: avoid; }
+.ws-skey-lab { flex: none; font-weight: 400; color: var(--ws-ink); }
+.ws-skey-ans { font-weight: 700; overflow-wrap: anywhere; }
+.ws-skey-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1; font-size: .85em; margin: 0 .3mm; }
+.ws-skey-frac > span:first-child { border-bottom: var(--ws-hair) solid currentColor; padding: 0 .6mm .2mm; }
+.ws-skey-frac > span:last-child { padding-top: .2mm; }
+.ws-skey-none { margin: 0; }

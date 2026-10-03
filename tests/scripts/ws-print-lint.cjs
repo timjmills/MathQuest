@@ -33,6 +33,8 @@
 //   --mix section|problem     kit, with --supports: how clashing supports are shared (default section)
 //   --opts '{"notation":["across"]}'  kit: option values every skill in scope carries (O6 appearance)
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
+//   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
+//   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
 //   --json out.json           machine-readable findings for the critic loop
 //   --baseline base.json      RATCHET: fail only where a (document, lint, rule) count rose above the
@@ -120,6 +122,8 @@ const has = k => argv.includes('--' + k);
 const KIT_SIZE = ['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L';
 
 const TOOL = 'ws-print-lint';
+// INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
+const KEY_INK = '#c2410c';
 const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT'];
 
 /**
@@ -440,6 +444,9 @@ function wsLintPage(cfg) {
             // circles, step icons). Anywhere else the colour is still an INK-1 defect.
             if (!isAllowed(c) && hex(c).toLowerCase() === '#5b2a86' && el.closest && el.closest('[data-mq-accent]')
                 && el.closest('.mq-lesson, [data-mq-lesson-strip]')) return;
+            // INK-31 (owner 2026-10-03, Wave 4.4): the key ink #c2410c, on a key page, on an answer mark only.
+            if (!isAllowed(c) && hex(c).toLowerCase() === '#c2410c' && el.closest && el.closest('[data-ws-mode="key"]')
+                && el.closest('[data-ws-ink="solid"], [data-ws-key="words"]')) return;
             if (!isAllowed(c)) F('L-INK', 'INK-1', sevIfBad, el, `${what} ${hex(c)} is not ink #000, paper #fff or grey #949494 (INK-1)${note}`, `${what} ${hex(c)}`);
         };
         if (textBearing && !svg) paint(cs.color, 'text colour');
@@ -1015,6 +1022,10 @@ function wsLintPage(cfg) {
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
             out.pages.push({
+                // Wave 4.4: a SHORT key page (labels + answers) and the items it lists, "page:cell"
+                short: pg.getAttribute('data-ws-key-style') === 'short',
+                shortItems: [...pg.querySelectorAll('[data-ws-short-page]')].map(e => `${e.getAttribute('data-ws-short-page')}:${e.getAttribute('data-ws-short-cell')}`),
+                labelled: ri.cells.filter(c => c.querySelector('[data-ws-label="letter"], [data-ws-label="tab"]')).length,
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
                 // INK-30: a lesson page (or a practice page's lesson step strip) may print the accent.
@@ -1321,6 +1332,8 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         for (const e of Object.values(p.colours)) {
             if (domHex.has(e.hex) && !e.margin) continue;
             if (e.hex === '#5b2a86' && !e.margin && dom.pages && dom.pages[i] && dom.pages[i].accentOk) continue;
+            // INK-31: the key ink prints on key pages (the DOM check proved it sits on answer marks only)
+            if (e.hex === KEY_INK && !e.margin && dom.pages && dom.pages[i] && dom.pages[i].key) continue;
             F('L-INK', 'INK-1', 'major', { page: i + 1 }, `printed page ${i + 1}: ${e.n} ${e.kind} paint(s) in ${e.hex}${e.kind === 'text' ? ` (e.g. "${e.sample}")` : ''}${e.margin ? ' in the @page margin box' : ` at ${e.at[0]}, ${e.at[1]} mm`} - only #000, #fff and #949494 print (INK-1${e.kind === 'text' ? ', INK-3' : ''})`, `pdf ${e.kind} ${e.hex}`);
         }
         if (p.illegible.length && !domIllegiblePages.has(i + 1)) {
@@ -1427,9 +1440,21 @@ function lintKitGeometry(dom, pdf, info, F) {
     const pupilParts = parts.filter(p => !p.key), keyParts = parts.filter(p => p.key);
     if (info.mode === 'kit') {
         if (!keyParts.length) F('L-KEY', 'AK-1', 'critical', {}, 'no answer key pages: every generated page has a facsimile key (AK-1)', 'no key');
-        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key);
+        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key && !p.short), shortKey = pages.filter(p => p.key && p.short);
+        // A facsimile key (at the end, or each page after its pupil page) is the same pages in the same order.
         if (key.length && key.length !== pupil.length) F('L-KEY', 'AK-4', 'critical', {}, `the key has ${key.length} page(s), the pupil sheet ${pupil.length}: the key is the same pages (AK-1, AK-4)`, 'key page count');
         key.forEach((k, i) => pupil[i] && compareKey(pupil[i], k, F));
+        // Wave 4.4: a SHORT key lists every labelled item of every pupil page exactly once, under its page.
+        if (shortKey.length) {
+            const items = shortKey.flatMap(p => p.shortItems);
+            const dup = items.filter((x, i) => items.indexOf(x) !== i);
+            if (dup.length) F('L-KEY', 'AK-4', 'critical', { page: shortKey[0].idx }, `the short key lists ${dup.length} item(s) twice (first ${dup[0]})`, 'short key duplicate');
+            pupil.forEach((p, i) => {
+                const mine = items.filter(x => x.startsWith(`${i + 1}:`));
+                const bad = mine.filter(x => +x.split(':')[1] > p.cells.length);
+                if (mine.length !== p.labelled || bad.length) F('L-KEY', 'AK-4', 'critical', { page: p.idx }, `pupil page ${i + 1} has ${p.labelled} labelled item(s); the short key lists ${mine.length}${bad.length ? ` (${bad.length} pointing past its last cell)` : ''} (AK-4)`, 'short key coverage');
+            });
+        }
     } else {
         for (const pt of keyParts) for (const k of pt.pages) {
             // pack: the pupil twin is the page with the same cell geometry
@@ -1682,7 +1707,7 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -1697,12 +1722,12 @@ async function runApp(source) {
                                 opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
-                        const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
+                        const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE });
+                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE, KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

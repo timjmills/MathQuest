@@ -30,6 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
+import { normKeyOptions, shortKeyRows, renderShortKey } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
@@ -1429,7 +1430,7 @@ function anchorSummary(mode, list, notes) {
  * @param {string[]} [req.letters]           More Practice: which letters (default from the count)
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
-export async function buildSheet(req = {}) {
+async function buildSheetCore(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
@@ -1788,6 +1789,7 @@ export async function buildSheet(req = {}) {
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
+        pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
         pageCount,
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits,
@@ -1804,6 +1806,65 @@ export async function buildSheet(req = {}) {
         notes,
         plan,
     };
+}
+
+/**
+ * Wave 4.4 (owner 2026-10-03): the answer key options. `req.key` is `true` / `false` (today's
+ * facsimile key at the end, unchanged) or `{on, placement: 'end'|'after-page', style: 'copy'|'short'}`.
+ * The sheet is built exactly as before; the key pages are then restyled (short) and ordered.
+ * Adds `docHtml` (pupil and key pages in print order) and `keyOptions` to the result.
+ */
+export async function buildSheet(req = {}) {
+    const ko = normKeyOptions(req.key);
+    const res = await buildSheetCore(Object.assign({}, req, { key: ko.on }));
+    return arrangeKey(res, ko, req);
+}
+
+/** Restyle and order the key pages of a built sheet (exported for the lane test). */
+export function arrangeKey(res, ko, req = {}) {
+    res.keyOptions = ko;
+    const pupil = res.pupilPages || [res.pupilHtml];
+    if (!ko.on) { res.docHtml = res.pupilHtml; return res; }
+    const plan0 = (res.keyPlans && res.keyPlans[0]) || res.plan || {};
+    const paper = (plan0.ctx && plan0.ctx.paper) || req.paper || 'A4';
+    const paperAttr = /letter/i.test(paper) ? 'letter' : 'a4';
+    const decorateKey = (html, i, role) => html
+        .replace(/<section ([^>]*?)class="ws-page ([^"]*)"/, (m, pre, c) => `<section ${pre}class="ws-page ${c}" data-ws-page="${i}" data-ws-paper="${paperAttr}" data-ws-role="${role}" data-ws-mode="key"`)
+        .replace('<footer class="ws-foot">', '<footer class="ws-foot" data-ws-teacher>');
+    let keyPages = res.keyPages || (res.keyHtml ? [res.keyHtml] : []);
+    let groupsByPage = null;
+    if (ko.style === 'short') {
+        const plans = res.keyPlans || (res.plan ? [res.plan] : []);
+        const rows = shortKeyRows(plans);
+        const head = plan0.header || {};
+        const opts = {
+            size: (plan0.ctx && plan0.ctx.size) || req.size || 'L', look: (plan0.ctx && plan0.ctx.look) || 'ican', paper,
+            header: { tab: head.tab }, footer: { left: (plan0.footer && plan0.footer.left) || '', right: ['Key', res.seed !== undefined ? `seed ${res.seed}` : ''].filter(Boolean).join(' · ') },
+        };
+        const role = `${res.role || 'sheet'}`;
+        if (rows.length === pupil.length) groupsByPage = rows.map((r) => renderShortKey([r], opts).map((h, j) => decorateKey(h, j + 1, role)));
+        keyPages = renderShortKey(rows, opts).map((h, j) => decorateKey(h, j + 1, role));
+        res.shortRows = rows.map((r) => ({ page: r.page, items: r.items.map((it) => ({ label: it.label, cell: it.cell, skill: it.skill })) }));
+    }
+    let doc;
+    if (ko.placement === 'after-page') {
+        const perPage = groupsByPage || (keyPages.length === pupil.length ? keyPages.map((k) => [k]) : null);
+        if (perPage) {
+            // "Key n/N" on the page that follows pupil page n/N, so the dialog's run stays readable.
+            const N = pupil.length;
+            const keyed = perPage.map((list, i) => list.map((h, j) => h.replace(/(<footer class="ws-foot"[^>]*><span>[\s\S]*?<\/span><b>)([^<]*)(<\/b>)/,
+                (m, a, c, b) => `${a}${ko.style === 'short' ? `Key ${i + 1}/${N}${list.length > 1 ? ` (${j + 1})` : ''}` : `Key ${c}`}${b}`)));
+            doc = pupil.map((p, i) => [p, ...keyed[i]].join('\n')).join('\n');
+            keyPages = keyed.flat();
+        } else {
+            res.notes = (res.notes || []).concat('The key prints at the end: its pages do not match the pupil pages one to one.');
+        }
+    }
+    res.keyPages = keyPages;
+    res.keyHtml = keyPages.join('\n');
+    res.keyPageCount = keyPages.length;
+    res.docHtml = doc || [res.pupilHtml, res.keyHtml].filter(Boolean).join('\n');
+    return res;
 }
 
 /* ====================================================== the P7.2b roles (roles/index.js) */
@@ -2067,6 +2128,7 @@ async function buildRoleSheet(n, metaOf) {
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
+        pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
@@ -2235,8 +2297,12 @@ async function buildLesson(n, metaOf) {
     const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
     const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
     const line = parts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
+        pupilPages: parts.flatMap((p) => tagPages(p.res.pupilPages, p)),
+        keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
+        keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
         // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
