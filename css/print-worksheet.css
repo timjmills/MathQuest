@@ -2909,3 +2909,15 @@
 }
 /* Stand-alone write-in boxes of the legacy print path: slightly rounded, never square (SL-11). */
 .print-edition .eq .blank-box, .print-edition .factfam .row .blank-box { border-radius: 1.25mm; }
+
+/* Answer key: a ticked "Circle ALL" option (print-sheet.js legacyKeyFill 3c). */
+.print-edition .opt-list .opt[data-ws-ticked]::before {
+    content: "\2713";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+}
+.print-edition .opt-list .opt[data-ws-ticked][data-ws-ink="trace"]::before { color: #949494; }

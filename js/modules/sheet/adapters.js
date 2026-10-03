@@ -165,6 +165,21 @@ const NO_SUCH_FORMAT = '__ws_no_such_print_format__';
  * the two spans are inline and nothing separated them. The markup now reads correctly with no
  * CSS at all, and the gap the stylesheet adds later simply widens it.
  */
+/**
+ * The labels of the options a choice item's `ans` names by id (`['opt1','opt3']`, `'opt2'` or the
+ * JSON string of an id list), in option order; null when `ans` is not a list of option ids.
+ */
+export function optionLabelsOf(p, value) {
+    const opts = p && Array.isArray(p.options) ? p.options.filter((o) => o && typeof o === 'object' && o.id != null) : [];
+    if (!opts.length) return null;
+    let ids = value;
+    if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { return null; } }
+    if (!Array.isArray(ids)) ids = [ids];
+    ids = ids.map(String);
+    if (!ids.length || !ids.every((id) => opts.some((o) => String(o.id) === id))) return null;
+    return opts.filter((o) => ids.includes(String(o.id))).map((o) => stripTags(String(o.label != null ? o.label : o.id)).trim());
+}
+
 function stamp(key, ctx) {
     if (ctx.state === 'blank') return '';
     const value = ctx.state === 'wrong'
@@ -222,7 +237,11 @@ const LEGACY_TEMPLATE = register('legacy', {
         const value = p && p.ans !== undefined ? p.ans : '';
         // SCC-A7: a simple value stamps itself; anything else is stamped with the legacy hint.
         let display;
-        if (value !== null && typeof value === 'object') {
+        const picked = optionLabelsOf(p, value);
+        if (picked) {
+            // A choice item stores option ids ("opt3") in `ans`; the key prints what they SAY.
+            display = picked.join('; ');
+        } else if (value !== null && typeof value === 'object') {
             const hint = callDep('answerKeyHint', [p], '');
             display = hint ? `${hint} = ${JSON.stringify(value)}` : JSON.stringify(value);
         } else {

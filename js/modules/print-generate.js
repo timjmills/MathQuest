@@ -5679,7 +5679,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         // picture — it used to print its empty label, a row of bare tick boxes — and a question
         // about a graph prints the graph above the options (`_msStem`).
         const opts = (problem.options || []).map(o => {
-            const lbl = (o && o.label != null) ? o.label : '';
+            // a fraction is written stacked over its bar, never with a slash (TY-7)
+            const lbl = (o && o.label != null) ? String(o.label).replace(/\b(\d+)\/(\d+)\b/g, '<span class="mq-frac" style="font-size:1em;"><span>$1</span><span>$2</span></span>') : '';
             // The screen's tinted angle wedge would print as a solid grey fan over the arc: dropped.
             const pic = o && typeof o.svg === 'string' && o.svg
                 ? `<span class="ms-opt-pic" style="display:inline-block;width:17mm;max-width:100%;line-height:0;vertical-align:middle;">${o.svg

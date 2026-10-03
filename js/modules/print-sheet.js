@@ -536,6 +536,20 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
     }
 
+    // 3c. A "Circle ALL" option list (printFormat 'multi-select'): the key ticks the box of every
+    // option the answer names by id, in the pupil's own boxes (AK-1, AK-2).
+    const optSpans = html.match(/<span class="opt">/g) || [];
+    if (q && q.printFormat === 'multi-select' && Array.isArray(q.options) && optSpans.length === q.options.length) {
+        let ids = q.ans;
+        if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { ids = null; } }
+        if (ids != null && !Array.isArray(ids)) ids = [ids];
+        const on = Array.isArray(ids) ? q.options.map((o) => !!o && ids.map(String).includes(String(o.id))) : [];
+        if (on.some(Boolean)) {
+            let k = 0;
+            return html.replace(/<span class="opt">/g, () => (on[k++] ? `<span class="opt" data-ws-ticked="1" data-ws-ink="${inkAttr}">` : '<span class="opt">'));
+        }
+    }
+
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
     const want = [q && q.printAnswer, raw, `Group ${raw}`].filter(Boolean).map((s) => String(s).trim().toLowerCase());
     const tickRe = /(<span style="min-width:6\.5em;">)([^<]+)(<\/span><span style="display:inline-block;width:1\.15em;height:1\.15em;[^"]*")(><\/span>)/g;
