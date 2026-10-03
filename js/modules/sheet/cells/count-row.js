@@ -231,6 +231,12 @@ function arcsGeom(p, ctx, c) {
     if (isTwin(ctx) && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     // digits: today's size, shrunk only as far as the widest number needs, never below the floor
     const pt = Math.max(FLOOR_PT, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
+    // the PHONE twin (TY-10b, critic phone29): the screen draws the digits at ~29 px, so px per mm there is 29 / (pt mm);
+    // the gap is capped at `twinGapPx` px absolute (24, set by the screen host on a phone), never under MIN_GAP
+    if (isTwin(ctx) && Number(p.twinGapPx) > 0) {
+        const kPhone = 29 / Math.max(1, pt * PT_MM);
+        gap = Math.min(gap, Math.max(MIN_GAP, Number(p.twinGapPx) / kPhone));
+    }
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
