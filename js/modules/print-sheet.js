@@ -30,7 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit } from './sheet/roles/practice.js';
+import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -221,6 +221,9 @@ const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'ob
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
+/** The counting & cardinality categories whose mixed pools are dealt in the kit look only. */
+const K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
+
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -245,6 +248,11 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
             if (k < tries && !refAccepts(sk, cand, key, seen, kept)) continue;
+            // A MIXED POOL page is one look (wave 1 lane D, critic 2026-10-03): a member drawn in
+            // the legacy look (no kit cell: a long "Answer:" line, a chart with nothing to write)
+            // is passed over for another draw while a few tries remain; the last try keeps it.
+            // (the K-2 counting & cardinality pools, whose every member has a kit cell)
+            if (k < Math.min(tries, 8) && K2_POOL_CATS.has(sk.categoryId) && isMixedMetaSkill(sk.skillId) && !(cand.cell && cand.cell.template && cand.cell.template !== 'legacy')) { if (!q) q = cand; continue; }
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -415,7 +423,11 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     // (one box) or its comma list (several).
     const boxSlots = html.match(/<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*><\/span>/g) || [];
     if (boxSlots.length >= 1) {
-        const parts = (Array.isArray(q && q.keyParts) ? q.keyParts.map(String)
+        // a number family's boxes, in reading order (each equation's missing places, left to right)
+        const nf = q && q.numberFamilyData && Array.isArray(q.numberFamilyData.equations) && Array.isArray(q.numberFamilyData.missingPositions)
+            ? q.numberFamilyData.equations.flatMap((eq, i) => [...(q.numberFamilyData.missingPositions[i] || [])].sort((x, y) => x - y).map((p) => eq.nums[p]))
+            : null;
+        const parts = (nf ? nf.map(String) : Array.isArray(q && q.keyParts) ? q.keyParts.map(String)
             : key && Array.isArray(key.value) ? key.value.map(String)
                 : boxSlots.length === 1 ? [display || raw] : raw.split(','))
             .map((t) => String(t).trim()).filter((t) => t !== '');
@@ -808,7 +820,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
-            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
+            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined, numberFamilyData: undefined });
             const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
@@ -1307,7 +1319,10 @@ function layoutOf(role, section, items, n, ctx) {
         const cnt = (k) => (N <= items.length ? kind.slice(0, N).filter((x) => x === k).length : Math.round(N * share(k)));
         const nw = cnt('w'), nf = cnt('f'), nn = N - nw - nf;
         const rN = Math.ceil(nn / Ln.cols);
-        const h = rN * splitCellH(Ln, fs ? rN : 0) + nw * hW + (Lf ? Math.ceil(nf / Lf.cols) * hF : 0);
+        // every row of a split-off group holds its tallest problem and its grid's borders
+        const hWr = Lw ? Math.max(hW, Lw.hMin + GRID_BORDERS_MM) : 0;
+        const groups = (rN > 0 ? 1 : 0) + (nw > 0 ? 1 : 0) + (nf > 0 ? 1 : 0);
+        const h = rN * splitCellH(Ln, fs ? rN : 0) + nw * hWr + (Lf ? Math.ceil(nf / Lf.cols) * hF : 0) + Math.max(0, groups - 1) * GRID_BORDERS_MM;
         if (h > G - 0.99) break;
         best = N;
     }
@@ -1706,13 +1721,31 @@ async function buildSheetOnce(req = {}) {
             // count that only just fits could spill to a second page), so a page of short items
             // is filled.
             if (pool && fitBest > 0) {
-                for (let g = 0; g < 16 && items.length < MAX_ITEMS; g++) {
+                const ceilP = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
+                for (let g = 0; g < 16 && items.length < MAX_ITEMS && items.length < ceilP * pagesWanted; g++) {
                     const more = finalRun(sec, si, base, items.length + 1, probe);
                     sec.floor = floorWith(si, more);
                     const cap = capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, more), n, lctx)) * pagesWanted;
                     if (cap <= more.length) { sec.floor = floorWith(si, items); break; }
                     items = more;
                 }
+                // whole rows: a pool page never leaves a bordered empty cell after its last problem
+                // (critic 2026-10-03, counting_all S: 7 problems in 2 columns). The row is filled
+                // when the page still holds it, else the lone problem goes.
+                try {
+                    const Lr = layoutOf(n.role, sec, withTwins(si, items), n, lctx);
+                    const cols = Math.max(1, Number(Lr && Lr.cols) || 1);
+                    const rem = items.length % cols;
+                    if (cols > 1 && rem && !(Lr && Lr.splitWide)) {
+                        const full = finalRun(sec, si, base, items.length + cols - rem, probe);
+                        sec.floor = floorWith(si, full);
+                        const capF = capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, full), n, lctx)) * pagesWanted;
+                        const ceilF = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
+                        if (capF >= full.length && full.length % cols === 0 && full.length <= ceilF * pagesWanted) items = full;
+                        else if (items.length - rem > 0) { items = finalRun(sec, si, base, items.length - rem, probe); sec.floor = floorWith(si, items); }
+                        else sec.floor = floorWith(si, items);
+                    }
+                } catch (e) { /* keep the count */ }
             }
             hostItems = hostItems.concat(items);
         });
@@ -2375,7 +2408,23 @@ export async function buildSheet(req = {}) {
         const s = secs[0];
         if (s.count !== undefined && s.count !== null && s.count !== 'auto' && s.count !== '') return r;
         const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
-        if (!(r.pageCount > wanted)) return r;
+        if (!(r.pageCount > wanted)) {
+            // FILL THE COUNT FIRST (critic 2026-10-03, RUBRIC C3): the capacity estimate can stop short
+            // (dot_array_mult L dealt 3 problems where 5 stand), and the rows were then stretched to
+            // share the page. One more problem at a time is tried while the sheet stays on the
+            // pages asked for, the rows measured as dealt, so the page holds what it can.
+            let best = r;
+            // never past the page ceiling the gate holds a page to (12.3 dense capacity: 30 / 20 / 12
+            // standard problems at S / M / L): the fill never adds past it
+            const sz = String(req.size || 'M').toUpperCase();
+            const ceil = () => ({ S: 30, M: 20, L: 12 })[sz] || 12;
+            for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
+                const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
+                if (!(more.pageCount <= wanted) || more.items.length <= best.items.length) break;
+                best = more;
+            }
+            return best;
+        }
         let n = r.items.length, best = r;
         for (let k = 0; k < 8 && n > 1 && best.pageCount > wanted; k++) {
             n -= 1;

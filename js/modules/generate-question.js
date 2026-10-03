@@ -905,6 +905,18 @@ function generateResolvedQuestion() {
                 }
             }
 
+            // "All Counting & Cardinality" is a K-2 review by its name: its domain's composing topic
+            // also holds Grade 3 fraction skills (a fraction wall sum), which it never deals (wave 1
+            // lane D, critic 2026-10-03: a skill's name is its declaration).
+            if (originalSkill === 'counting_all') {
+                const k2 = (sk, cat) => { const g = String(getSkillGrade(sk, cat)); return g === 'K' || g === '0' || g === '1' || g === '2'; };
+                const idx = allSkillsFlattened.map((s, i) => i).filter((i) => k2(allSkillsFlattened[i], allSkillCats[i]));
+                if (idx.length) {
+                    allSkillsFlattened = idx.map((i) => allSkillsFlattened[i]);
+                    allSkillCats = idx.map((i) => allSkillCats[i]);
+                }
+            }
+
             let targetCategory, targetSkill;
             let skillsWithCategories = [];
 

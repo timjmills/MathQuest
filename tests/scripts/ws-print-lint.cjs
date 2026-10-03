@@ -994,6 +994,21 @@ function wsLintPage(cfg) {
                     item: !model && !ITEM_BANDS.test(bandLabel),
                     // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
                     short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip, .pv-round1'),
+                    // L-DENSITY SPREAD: how tall the problem's own drawing is (its ink, the item label
+                    // and the cell padding left out), against the cell's inner height
+                    ink: (() => {
+                        const cr = c.getBoundingClientRect();
+                        const padT = parseFloat(getComputedStyle(c).paddingTop) || 0, padB = parseFloat(getComputedStyle(c).paddingBottom) || 0;
+                        let t = Infinity, b = -Infinity;
+                        for (const d of c.querySelectorAll('*')) {
+                            if (d.matches('[data-ws-label], [data-ws-label] *') || !visible(d)) continue;
+                            const r = d.getBoundingClientRect();
+                            if (!r.height || !r.width || r.height >= cr.height - 1) continue;
+                            t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                        }
+                        const inner = cr.height - padT - padB;
+                        return b > t && inner > 0 ? { h: mm(b - t), inner: mm(inner) } : null;
+                    })(),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -1431,6 +1446,28 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const body = p.footRect[1] - (p.padT || 0);
                 const used = p.gridBottom - p.gridTop;
                 if (body > 0 && used < body / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx}: its problems fill ${Math.round((used / body) * 100)}% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)`, 'orphan last page');
+            }
+            // L-DENSITY SPREAD (wave 1 lane D, critic 2026-10-03, RUBRIC C3): rows stretched to share a
+            // page read as padding when the page holds few problems. With the count on Auto, the
+            // problems of a practice page must fill their cells: the median row's tallest drawing at
+            // least half of the row's inner height (a row stretched to twice what it holds fails;
+            // the engine's SPREAD_CAP is 1.7 x). Fill the count first, then stretch. The last page of a multi-page sheet may be short.
+            // One-line problems (drawing under 20 mm: a fact, an equation) are left to DN-1's counts.
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && !(last && pt.pages.length > 1)) {
+                // per ROW: the row's tallest drawing against the row's inner height (a short problem
+                // beside a tall one is the tall one's row, not padding)
+                const rowsAt = new Map();
+                for (const x of p.cells.filter(c => c.item && c.ink && c.ink.inner > 0)) {
+                    const k = Math.round(x.rect[1]);
+                    const r = rowsAt.get(k) || { h: 0, inner: x.ink.inner };
+                    r.h = Math.max(r.h, x.ink.h); r.inner = Math.max(r.inner, x.ink.inner);
+                    rowsAt.set(k, r);
+                }
+                const fills = [...rowsAt.values()].filter(r => r.h >= 20).map(r => r.h / r.inner).sort((a, b) => a - b);
+                if (fills.length) {
+                    const med = fills[Math.floor((fills.length - 1) / 2)];
+                    if (med < 0.5) F('L-DENSITY', 'SPREAD', 'major', { page: p.idx }, `page ${p.idx}: the problems fill ${Math.round(med * 100)}% of their cells' height (median of ${fills.length} rows): rows stretched to share the page read as padding; put more problems on the page before stretching rows (RUBRIC C3 / H13)`, 'stretched rows');
+                }
             }
         });
     }

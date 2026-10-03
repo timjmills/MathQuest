@@ -73,23 +73,36 @@ const LETTER_CAP = 26;
  * @param {boolean} [opts.restartEachPage]  More Practice, Review, Test ...: every page starts at a.
  * @returns {{starts: number[], notes: string[]}}
  */
-export function labelStarts(counts, { style = 'letter', restartEachPage = false } = {}) {
+export function labelStarts(counts, { style = 'letter', restartEachPage = false, pageOf = null } = {}) {
     const starts = [];
     const notes = [];
+    // `pageOf[i]`: the page part i prints on (several parts may share a page). A restart happens
+    // only at a page boundary, with the page's whole count, so one page never shows two "a."
+    // (wave 1 lane D, critic 2026-10-03). Without it, every entry is its own page.
+    const pg = (i) => (Array.isArray(pageOf) ? pageOf[i] : i);
+    const pageTotal = (i) => counts.reduce((a, c, j) => a + (pg(j) === pg(i) ? c : 0), 0);
     let next = 1;
     counts.forEach((c, i) => {
-        if (restartEachPage) next = 1;
+        const firstOnPage = i === 0 || pg(i - 1) !== pg(i);
+        if (restartEachPage && firstOnPage) next = 1;
         // CL-13: a letter run never passes z.; if a page would, the run restarts at a. at that
         // page boundary and the dialog says so. Tabs (Daily look) have no such limit.
-        if (style === 'letter' && next > 1 && next + c - 1 > LETTER_CAP) {
+        if (style === 'letter' && firstOnPage && next > 1 && next + pageTotal(i) - 1 > LETTER_CAP) {
             next = 1;
-            notes.push(`Letters restart at a. on page ${i + 1} (a run never passes z.).`);
+            notes.push(`Letters restart at a. on page ${pg(i) + 1} (a run never passes z.).`);
         }
         starts.push(next);
         next += c;
     });
     return { starts, notes };
 }
+
+/**
+ * CL-13 (letters are never doubled): a sheet with a page of more than 26 labelled cells cannot be
+ * lettered without a second "a." on that page, so it is numbered with the CL-30 tabs instead.
+ * @param {number[]} pageCounts  labelled cells on each page
+ */
+export const lettersFit = (pageCounts) => pageCounts.every((c) => c <= LETTER_CAP);
 
 /** PT-FRM-4: the Score denominator is every scored cell on the whole sheet. */
 export const scoreDenominator = (counts) => counts.reduce((a, b) => a + (Number(b) || 0), 0);
@@ -138,4 +151,4 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     return pages;
 }
 
-export default { paginate, labelStarts, scoreDenominator, placeSections };
+export default { paginate, labelStarts, lettersFit, scoreDenominator, placeSections };

@@ -318,3 +318,7 @@
 /* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
    vertical padding (row chrome), never its digits. Additive. */
 :is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
+
+/* wave 1 lane D (critic 2026-10-03): a key's value in an equation's answer box sits in the MIDDLE
+   of the box at a size it holds ("120" no longer runs past the box edge from its bottom-left). */
+:is(.ws-page, .ws-sheet) .ws-eq .ws-box[data-ws-ink] { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; font-size: .72em; line-height: 1; vertical-align: bottom; }

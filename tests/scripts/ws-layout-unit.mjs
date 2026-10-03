@@ -269,6 +269,7 @@ eq(labelStarts([6, 6, 4, 4]).starts, [1, 7, 13, 17], 'CL-12: letters run on acro
 }
 eq(labelStarts([6, 6, 6, 6, 6], { style: 'tab' }).starts, [1, 7, 13, 19, 25], 'CL-33: Daily tabs number 1 to N across the sheet');
 eq(labelStarts([6, 6], { restartEachPage: true }).starts, [1, 1], 'PT-LBL-7: pages handed out alone restart at a.');
+eq(labelStarts([20, 4, 10], { pageOf: [0, 0, 1] }).starts, [1, 21, 1], 'CL-13: a run restarts at a. only at a page boundary, never inside a page (two parts of one page)');
 eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on the sheet');
 {
     // Two sections: the second joins the first page only when its instruction and rows fit.

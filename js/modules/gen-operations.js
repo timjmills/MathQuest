@@ -2146,9 +2146,10 @@ function _applyKitFactCell(q, skill, range) {
     }
     if (small) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
-        // `multiply` deals facts among boxed column work (its 2-digit items, mixed_multiplication):
-        // its fact prints the same answer box, never an open zone beside boxed neighbours
-        if (skill === 'multiply' && !across) q.cell.payload.ansBox = true;
+        // mixed_multiplication deals facts among boxed column work: its fact prints the same answer
+        // box, never an open zone beside boxed neighbours. `boxAns` (boolean) is this lane's flag;
+        // it is NOT Lane B's teacher option `ansBox` ('one'|'digit'|'off'), so the two never clash.
+        if (skill === 'multiply' && !across && state.skill === 'mixed_multiplication') q.cell.payload.boxAns = true;
         if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
             // A basic fact on screen is the same vertical fact: no place heads, no regroup row
             // (screen-cell.js draws a `facts-column-visual` item with the kit's fact markup).
@@ -4603,6 +4604,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     a, b, op: _mmDiv2 ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length,
                     ...(_mmDiv2 && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
                     unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
+                    resultBox: true,
                 } };
                 
                 q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">

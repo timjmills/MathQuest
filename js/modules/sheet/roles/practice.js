@@ -28,7 +28,7 @@ import {
 import {
     resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH,
 } from '../layout.js';
-import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
+import { paginate, labelStarts, lettersFit, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
 import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
@@ -611,16 +611,40 @@ function planItem(it, level, cols) {
  * each row is as tall as its tallest problem with DENSE_ROOM to spare, never the even share of the
  * grid a lone section fills, and three rows of either leave the page's 1 mm safety (PG-12).
  */
-export function splitCellH(L, rowsUsed = 0) {
+export function splitCellH(L, rowsUsed = 0, held = 0) {
     // A part that holds fewer rows than its page allows (wave 1 lane D: Mixed Multiplication's two
     // story rows drawn at a third of the page each, 1 mm over their content, a story overflowed)
     // takes 6 mm over its tallest problem (at most DENSE_ROOM), within the grid its rows can have.
     if (rowsUsed > 0 && rowsUsed < L.rows) return Math.round(Math.min(Math.max(L.cellH, L.hMin + 6), L.hMin * DENSE_ROOM, (L.gridH - 1) / rowsUsed) * 1000) / 1000;
-    return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
+    // a lone row of a split part holds its tallest problem AND the grid's two 1.5 pt borders
+    // (critic 2026-10-03: mixed_multiplication's 74.8 mm area model in a 75.3 mm one-row grid
+    // overflowed its own bottom border on paper)
+    const one = L.rows === 1 || held === 1 ? Math.min(L.hMin + GRID_BORDERS_MM, L.gridH - 1) : 0;
+    return Math.round(Math.max(one, Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows))) * 1000) / 1000;
 }
 
-/** A centred cell's content may be stretched to this multiple before a band passes 30 % (H13). */
-export const SPREAD_CAP = 1.9;
+/** The top and bottom border of one grid (2 x 1.5 pt), which every split-off grid adds to the page. */
+export const GRID_BORDERS_MM = 1.2;
+
+/**
+ * The row height a SPLIT part's rows are shaped against (critic 2026-10-03, dot_array_mult L: the
+ * part's cellH came from the tallest problem of the whole section, so a row of 67 mm arrays was
+ * drawn 97 mm tall): what the part's own tallest problem needs, with a little room, never more
+ * than the layout's cell. A section that is not split keeps its layout's cell.
+ */
+function partCellH(isSplit, its, L) {
+    if (!isSplit) return L.cellH;
+    const hs = its.map((it) => measuredH(it, L.cols)).filter((h) => h > 0);
+    if (!hs.length || hs.length < its.length) return L.cellH;
+    return Math.min(L.cellH, Math.max(...hs) + GRID_BORDERS_MM + 2);
+}
+
+/**
+ * A row may be stretched to this multiple (1.7) of what it holds (critic 2026-10-03, RUBRIC C3: rows
+ * stretched up to 1.9 x read as padding on a page of three problems). The page is filled with
+ * problems first (print-sheet.js counts what it holds); the stretch only shares the last few mm.
+ */
+export const SPREAD_CAP = 1.7;
 
 /**
  * The rows of a lone grid that leaves more than a fifth of its page empty, stretched to share the
@@ -660,7 +684,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
         const L = (sec.splitOf !== undefined && sec.splitOf !== null) || split.has(si)
-            ? Object.assign({}, L0, { cellH: splitCellH(L0, fineParts.has(si) ? Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols)) : 0), fill: false }) : L0;
+            ? Object.assign({}, L0, { cellH: splitCellH(L0, fineParts.has(si) ? Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols)) : 0, Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols))), fill: false }) : L0;
         // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
         // (anchors.js blockPlan) and a block is never split.
         const aMm = anchorBandOf(anchors, si);
@@ -863,7 +887,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     let sheetItems = split.items;
     const { size, look } = norm;
     const level = 1;                                        // PT 1.7: Independent and More Practice
-    const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
+    let labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
         : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label;       // CL-10 / CL-30, dialog override CL-20
     // RUBRIC H13: within a section, problems of one height sit together (tall first), so rows
     // can be sized to what they hold. The column count is the one the layout would choose.
@@ -904,7 +928,14 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const partsInOrder = pages.flatMap((pg) => pg.parts);
     // Only pupil problems are labelled and scored: a worked twin or an anchor band is neither.
     const counts = partsInOrder.map((p) => pupilCount(sheetItems[p.section].slice(p.chunk.from, p.chunk.from + p.chunk.count)));
-    const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false });
+    // the page each part prints on, so a letter run restarts only at a page boundary
+    const pageOf = pages.flatMap((pg, pi) => pg.parts.map(() => pi));
+    const pageCounts = pages.map((_, pi) => counts.reduce((a, c, j) => a + (pageOf[j] === pi ? c : 0), 0));
+    // CL-13: a page of more than 26 problems is numbered (CL-30 tabs), never lettered past z.
+    const lettersOff = labelStyle === 'letter' && !lettersFit(pageCounts);
+    if (lettersOff) labelStyle = 'tab';
+    const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false, pageOf });
+    if (lettersOff) labelNotes.push('More than 26 problems on a page: they are numbered, never lettered past z.');
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
     const score = scoreDenominator(counts);
     const { first, cont } = sheetHeaders(input, { ...words }, score);
@@ -958,8 +989,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // RUBRIC H13: each row as tall as what it holds (rowShape), when the rows differ.
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
-            const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+            const pcH = partCellH((sec.splitOf !== undefined && sec.splitOf !== null) || norm.sections.some((x) => x && x.splitOf === part.section), its, L);
+            const shape0 = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH);
+            // a split part's uniform rows take what the part holds, never the section's tallest cell
+            const shape = shape0 || (!fillByFlex && !noCapSec && pcH < L.cellH - 0.5 && !its.some((it) => it.anchor)
+                ? { heightMm: Math.round(part.chunk.rows * pcH * 100) / 100, rowsTpl: '' } : null);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
@@ -1022,7 +1057,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         // A grid of a several-grid page whose last row is short (a mixed pool's split group: three
         // word problems in two columns) widens its last problem over the empty track(s), so no
         // cell-sized hole is left beside it (wave 1 lane D, kit lint PAGEFILL).
-        if (!lone) {
+        {
             for (const x of sections) {
                 if (x.kind !== 'grid' || !x._its || x.cols < 2 || /mq-anchorgrid/.test(x.cls)) continue;
                 const rem = x.items.length % x.cols;
@@ -1032,7 +1067,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // small fact left alone in a strip twice its width (H13 the other way)
                 const span = x.cols - rem + 1;
                 const w = (itemInfo(x._its[x._its.length - 1], { size }).fp || {}).wMm || 0;
-                if (!(w >= 0.7 * (LIVE_W_MM * span / x.cols))) continue;
+                // ... or a tall drawn problem (an area model, a story): a bordered empty cell beside
+                // it reads as a missing problem (critic 2026-10-03, mixed_multiplication c.)
+                const tall = (measuredH(x._its[x._its.length - 1], x.cols) || 0) >= 40;
+                // (a lone grid keeps its rows as dealt: the pool fills whole rows, print-sheet.js)
+                if (lone || !(w >= 0.7 * (LIVE_W_MM * span / x.cols) || (tall && w >= 0.45 * (LIVE_W_MM * span / x.cols)))) continue;
                 last.style = `${last.style || ''}grid-column:span ${span};`;
             }
         }

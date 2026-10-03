@@ -213,10 +213,13 @@ const FILLERS = ['boxes', 'days', 'people', 'bags', 'cars', 'books'];
 /** Three words for the unit bank: the answer's unit and two nouns of the story (else neutral fillers). */
 export function unitBank(unit, others, seed = 0) {
     if (!unit.word) return [];
+    // an answer of 1 takes the singular ("1 apple"): the bank's other words are singular too, so
+    // the bank never reads "days · apple · boxes" (wave 1 lane D, critic 2026-10-03)
+    const one = !!unit.many && unit.word !== unit.many;
     const words = [unit.word];
     for (const w of [...others, ...FILLERS]) {
         if (words.length >= 3) break;
-        if (!words.some((x) => singular(x) === singular(w))) words.push(w);
+        if (!words.some((x) => singular(x) === singular(w))) words.push(one ? singular(w) : w);
     }
     // a fixed shuffle from the item's numbers, so the right word is not always first
     const k = Math.abs(Math.trunc(seed)) % 3;
@@ -569,15 +572,15 @@ const tw = (ctx, mm) => (isTwin(ctx) ? `max(44px, ${L(ctx, mm)})` : L(ctx, mm));
  * One writing box. On paper a span (`data-ws-slot`), on screen an input the pupil types in
  * (scratch, ungraded) carrying the value the model expects.
  */
-function wbox(ctx, { id, value = '', expect = '', w, h, pt, kind = 'digit', graded = false, small = false }) {
+function wbox(ctx, { id, value = '', expect = '', w, h, pt, kind = 'digit', graded = false, small = false, round = false }) {
     const ink = value !== '' ? inkOf(ctx) : null;
     const color = ink === 'trace' ? GREY : INK;
     const base = `box-sizing:border-box;width:${small && !isTwin(ctx) ? L(ctx, w) : tw(ctx, w)};height:${small && !isTwin(ctx) ? L(ctx, h) : tw(ctx, h)};border:${B(ctx, small ? 0.75 : 1)} solid ${small && isTwin(ctx) ? GREY : INK};`
-        + `border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${color};text-align:center;${KEY_FEATURES}`;
+        + `border-radius:${round ? '50%' : L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${color};text-align:center;${KEY_FEATURES}`;
     if (isTwin(ctx)) {
         const lab = kind === 'sign' ? 'sign' : kind === 'regroup' ? 'regroup digit' : 'digit';
         return `<input type="text" class="mq-wwork${small ? ' mq-wwsmall' : ''}" data-mq-kind="${kind}" data-mq-expect="${esc(expect)}" data-ws-graded="0"`
-            + ` maxlength="${kind === 'regroup' ? 2 : 1}" inputmode="${kind === 'sign' ? 'text' : 'numeric'}" autocomplete="off" spellcheck="false" tabindex="0"`
+            + ` maxlength="${kind === 'regroup' ? 2 : kind === 'number' ? 8 : 1}" inputmode="${kind === 'sign' ? 'text' : 'numeric'}" autocomplete="off" spellcheck="false" tabindex="0"`
             + ` aria-label="${lab}" style="${base}padding:0;margin:0;">`;
     }
     return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''}`
@@ -847,7 +850,7 @@ function pictureRow(ctx, pic) {
 }
 
 /** "Answer: [box] ______" and the unit-word bank under it. */
-function answerBlock(ctx, p, shown, unitShown, vertical = false) {
+function answerBlock(ctx, p, shown, unitShown, vertical = false, eq = '') {
     const bx = boxMm(ctx);
     const tp = textPt(ctx) + 2;
     const digits = Math.max(2, ...p.steps.map((s) => Math.max(digitsOf(s.top).length, digitsOf(s.bottom).length, digitsOf(s.ans).length)));
@@ -874,7 +877,7 @@ function answerBlock(ctx, p, shown, unitShown, vertical = false) {
             + `<span style="font-weight:700;line-height:1.1;">Answer:</span>${num}${unit}${bank}</div>`;
     }
     return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1.6)};">`
-        + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 2)};font-size:${P(ctx, tp)};flex-wrap:${isTwin(ctx) ? 'nowrap' : 'wrap'};justify-content:center;"><span style="font-weight:700;align-self:center;">Answer:</span>${num}${unit}</div>`
+        + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 2)};font-size:${P(ctx, tp)};flex-wrap:${isTwin(ctx) && !eq ? 'nowrap' : 'wrap'};justify-content:${eq && !isTwin(ctx) ? 'flex-start' : 'center'};">${eq || '<span style="font-weight:700;align-self:center;">Answer:</span>'}${num}${unit}</div>`
         + bank + '</div>';
 }
 
@@ -928,8 +931,29 @@ register(WW_TEMPLATE, {
         const two = p.steps.length > 1;
         const inRow = p.inRow !== false;
         const lastI = p.steps.length - 1;
+        // NEUTRAL FRAME (`p.neutral`, a story that chooses between × and ÷): the work is one
+        // equation row of equal boxes, [ ] ( ) [ ] = [ ], so neither the frame (a ÷ bracket, a
+        // partial-product row) nor the box counts give the sign away (wave 1 lane D, critic
+        // 2026-10-03). The pupil writes the sign in the ring; the key fills it.
+        if (p.neutral && !two) {
+            const st = p.steps[0], s = sh.steps[0];
+            const xy = (z) => (z.op === '/' ? [z.top, z.bottom] : [z.a, z.b]);
+            const [ea, eb] = xy(st), [va, vb] = xy(s);
+            const digits = Math.max(2, ...[st.top, st.bottom, p.ans].map((v) => digitsOf(v).length));
+            const bx = boxMm(ctx), pt = digitPt(ctx);
+            const w = Math.max(blankWidth(digits, sizeOf(ctx)), bx * 1.4);
+            const nb = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w, h: bx + 1, pt, kind: 'number' });
+            const ring = wbox(ctx, { id: 'w0-sign', value: put ? GLYPH[sh.picks[0]] : '', expect: GLYPH[st.op], w: bx, h: bx, pt, kind: 'sign', round: true });
+            const glyph = (g) => `<span aria-hidden="true" style="align-self:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${g}</span>`;
+            const eq = `<span class="mq-wwcols mq-wwneutral" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};">${nb('w0-a', va, ea)}${ring}${nb('w0-b', vb, eb)}${glyph('=')}</span>`;
+            const ansB = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', false, eq);
+            return `<div class="mq-ww" data-ww-ops="${st.op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">`
+                + `<div style="display:flex;flex-direction:column;align-items:stretch;">${storyHTML(ctx, p, true)}</div>`
+                + `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 2.5)};margin-top:${L(ctx, 2)};">${signRow(ctx, st.op, put ? sh.picks[0] : null, 0)}${ansB}</div></div>`;
+        }
+        const noSigns = p.signs === false;
         const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
-        const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '')).join('');
+        const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
         const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
         // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
         // (or a two-step story) makes the cell a full-width one (see fullW below).
@@ -945,7 +969,7 @@ register(WW_TEMPLATE, {
         const workW = blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 44);
         if (!twin && !narrow && !two && !p.kb && workW <= 88) {
             const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
-            const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
+            const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
             const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
             return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
         }

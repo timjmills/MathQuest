@@ -335,9 +335,9 @@ register('fact', {
         // the registry the template must stand alone, so the same value is inlined here.
         item.html = item.html.replace('<div class="ws-fact" style="', `<div class="ws-fact" style="--fd:${pt}pt;`);
         // SCC-T15 parity: the open answer zone is typed on screen, in the same place.
-        // `ansBox` (a fact dealt among boxed column work, mixed_multiplication): the printed answer is
+        // `boxAns` (a fact dealt among boxed column work, mixed_multiplication): the printed answer is
         // the kit's answer box too, so the pupil sees where to write (wave 1 lane D).
-        if ((ctx.mode === 'screen' && !ctx.static) || (p.ansBox && !Array.isArray(ctx.stepTracks))) {
+        if ((ctx.mode === 'screen' && !ctx.static) || (p.boxAns === true && !Array.isArray(ctx.stepTracks))) {
             const slot = blank({
                 id: 'ans', kind: 'number', shape: 'box', digits: n, graded: true, order: 0,
                 maxLength: n, inputmode: 'numeric', scopes: ['full', 'answer-only'],
@@ -424,7 +424,7 @@ register('fact', {
         const horiz = drawsAcross(p, ctx);
         const screen = ctx && ctx.mode === 'screen' && !ctx.static;
         return [{
-            id: 'ans', kind: 'number', shape: horiz ? 'line' : (screen || p.ansBox ? 'box' : 'open'), graded: true,
+            id: 'ans', kind: 'number', shape: horiz ? 'line' : (screen || p.boxAns === true ? 'box' : 'open'), graded: true,
             order: 0, maxLength: 3, inputmode: 'numeric', scopes: ['full', 'answer-only'],
         }];
     },

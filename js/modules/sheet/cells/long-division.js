@@ -88,15 +88,15 @@ function workRows(p, rows, shown = null) {
 }
 
 /**
- * The digit track (mm). A short problem (3-digit dividend by a 2-digit divisor) gets wider tracks on
- * paper, up to 1.3 x, so it is as wide as the 4-digit problems beside it and does not sit in a band
- * of empty cell (RUBRIC H13, wave 1 lane D): more room to write, never a smaller digit.
+ * The digit track (mm). ONE pitch for every problem of a page (critic 2026-10-03: a per-problem
+ * widening gave "8 8 0" wider digits than "4183" in the next cell). On paper at Size S the
+ * tracks are 1.2 x wider for every problem alike, so the small digits get more room to write and
+ * the cell is not three quarters empty (RUBRIC H13); M and L keep the base pitch.
  */
 function trackOf(p, ctx, g) {
     const base = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
     if (ctx.mode === 'screen') return base;
-    const t = String(p.dividend).length + String(p.divisor).length + 1 + (p.rbox ? 2 : 0);
-    return base * Math.min(1.3, Math.max(1, 7 / t));
+    return ctx.size === 'S' ? base * 1.2 : base;
 }
 
 register('division', {

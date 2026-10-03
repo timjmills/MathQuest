@@ -74,7 +74,9 @@ const unknownValue = (p) => {
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';
-    return u === 'op' ? 'circle' : u === 'result' ? 'line' : 'box';
+    // `resultBox`: a page whose other items box their unknown boxes the result too (one answer shape
+    // on the page, missing_mult_div, critic 2026-10-03)
+    return u === 'op' ? 'circle' : u === 'result' ? (p.resultBox ? 'box' : 'line') : 'box';
 };
 
 register('equation', {
@@ -123,8 +125,12 @@ register('equation', {
     },
     footprint(p, ctx) {
         const em = (ctx.metrics.digitPt / 72) * 25.4;
-        const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
-        const wMm = chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+        // the drawn sentence: the GIVEN numbers (the unknown is the slot, counted once as the
+        // blank), two 1 em operator tracks, four .28 em gaps (critic 2026-10-03: counting the
+        // unknown's digits as well made "12 x 8 = ___" a full-width line at L, one column of 8)
+        const u = p.unknown || 'result';
+        const known = (u === 'a' ? '' : String(p.a)) + (u === 'b' ? '' : String(p.b)) + (u === 'result' ? '' : String(p.result ?? compute(p)));
+        const wMm = known.length * em * 0.58 + 2 * em + 4 * 0.28 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         return {
             wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + (p.notation === 'fraction' ? ctx.metrics.writeMm + 4 : 1.5)) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction',
             factLike: false, maxCols: 4, stretchCap: STRETCH_CAP.equation,

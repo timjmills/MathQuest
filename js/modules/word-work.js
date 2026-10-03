@@ -105,7 +105,13 @@ export function applyWordWork(q) {
             for (const st of payload.steps) {
                 if (st.op === '/' && st.bottom > 0 && st.bottom <= 10 && st.top % st.bottom === 0 && st.top / st.bottom <= 10) st.fact = true;
             }
+            // the pupil CHOOSES × or ÷ here: the work is the neutral [ ] ( ) [ ] = [ ] row, never a
+            // ÷ bracket that prints the answer to "Circle the sign" (wave 1 lane D, critic 2026-10-03)
+            if (payload.steps.length === 1) { payload.neutral = true; payload.inRow = false; }
         }
+        // A remainder story is division by its name: there is no sign to choose, so no sign row and
+        // no "Circle the sign" (the frame's ÷ bracket would give the choice away).
+        if (payload && (/^remainder_/.test(skill) || /^remainder_/.test(outer)) && payload.steps.length === 1 && payload.steps[0].op === '/') payload.signs = false;
     } catch (e) { payload = null; }
     if (!payload) return q;
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
@@ -117,9 +123,9 @@ export function applyWordWork(q) {
     q.selfAnswering = true;
     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
     q.printFormat = 'story-work';
-    q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
+    q.printText = payload.signs === false ? 'Write the numbers in the boxes. Divide. Answer the question.' : 'Circle the sign. Write the numbers in the boxes. Solve.';
     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
-    q.screenInstr = 'Tap the sign. Type the numbers in the boxes. Solve.';
+    q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.' : 'Tap the sign. Type the numbers in the boxes. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;

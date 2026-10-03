@@ -11188,10 +11188,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // Number Family - Addition/Subtraction (Enhanced with alignment)
     if (problem.printFormat === "number-family-add-sub" && problem.numberFamilyData) {
         const data = problem.numberFamilyData;
+        let _nfSlot = 0;
 
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;">&nbsp;</span>`;
+                // P8: a named box slot (empty), so the key writes each family number in its own box
+                return `<span class="blank-box" data-ws-slot="nf${_nfSlot++}" data-ws-shape="box" style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;"></span>`;
             }
             return `<span style="display:inline-block;width:50px;height:36px;text-align:center;line-height:36px;font-weight:700;font-size:1.3rem;">${value}</span>`;
         };
@@ -11226,10 +11228,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // Number Family - Multiplication/Division (Enhanced with alignment)
     if (problem.printFormat === "number-family-mult-div" && problem.numberFamilyData) {
         const data = problem.numberFamilyData;
+        let _nfSlot = 0;
 
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;">&nbsp;</span>`;
+                // P8: a named box slot (empty), so the key writes each family number in its own box
+                return `<span class="blank-box" data-ws-slot="nf${_nfSlot++}" data-ws-shape="box" style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;"></span>`;
             }
             return `<span style="display:inline-block;width:50px;height:36px;text-align:center;line-height:36px;font-weight:700;font-size:1.3rem;">${value}</span>`;
         };
