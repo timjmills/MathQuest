@@ -1429,6 +1429,18 @@ function anchorSummary(mode, list, notes) {
  * @param {string[]} [req.letters]           More Practice: which letters (default from the count)
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
+/**
+ * SF-34: touch numerals never print under 24 pt, so on an S / M page the touch cells are raised
+ * (stacks and sentences to L, 28 pt; facts to 24 pt or more). The fit line says so instead of
+ * naming the page's own digit size alone.
+ */
+function touchFitLine(line, html, size) {
+    if (size === 'L' || !/ws-tn/.test(html || '')) return line;
+    const stack = /class="ws-stack/.test(html), fact = /class="ws-fact/.test(html);
+    const what = stack && fact ? 'touch-dot cells 24-28 pt' : stack ? 'touch-dot cells 28 pt' : 'touch-dot facts 24 pt or more';
+    return line.replace(/Digits (\d+) pt\./, (m, pt) => `Digits ${pt} pt; ${what}.`);
+}
+
 export async function buildSheet(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
@@ -1779,7 +1791,7 @@ export async function buildSheet(req = {}) {
     notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
-    const line = f0.line || '';
+    const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
     const fits = {
         cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: pageCount,
         note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '),
@@ -2065,8 +2077,7 @@ async function buildRoleSheet(n, metaOf) {
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
-    const touchUp = n.size !== 'L' && /ws-tn/.test(out.pupilHtml || '') && /class="ws-stack/.test(out.pupilHtml || '');
-    const line = (f0.line || '').replace(/Digits (\d+) pt\./, (m, pt) => (touchUp ? `Digits ${pt} pt; touch-dot cells 28 pt.` : m));
+    const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',

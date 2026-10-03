@@ -138,7 +138,9 @@ export function touchDotGeometry({ em = 28, unit = 'pt', photocopy = false } = {
     const innerR = s.inner / 2;
     return {
         dotR: s.dot / 2, innerR, rw, gap, ringR: innerR + gap + rw,
-        halo: Math.max(s.halo, f('halo')),
+        // Owner exception 2026-10-03 (R2-4): on SCREEN a single dot's white outline is a 0.5 px
+        // hairline, so the 4 and 5 strokes stay whole at standard resolution; paper keeps ruling 10.
+        halo: px ? 0.5 / v : Math.max(s.halo, f('halo')),
         // >= 0.26 mm / 1.5 px, and always short of the ring line so the stroke visibly enters the ring
         ck: Math.min(Math.max(s.ck, f('ck')), gap - 0.012),
     };

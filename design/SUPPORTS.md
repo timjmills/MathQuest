@@ -199,6 +199,10 @@ card live, says how to use them from the item ("Say 7. Touch the dots on 6 and c
 count back; count by for ×; one dot per count for ÷), and is dropped (with its message) when the
 cell could not draw them. The teacher's touch option applies in the quiz as in practice.
 Photocopy-safe sheets pass `photocopySafe` into the marks (solid black, wider gap).
+
+**Owner exception (2026-10-03, R2-4) to ruling 10:** on SCREEN the white outline round a SINGLE dot
+is a 0.5 px hairline (so the 4 and 5 strokes stay whole at standard resolution). Paper keeps the
+ruling-10 outline (>= 0.15 mm). The 6-9 centre-dot outline keeps its screen floor (1.5 px).
 Specimen: `node tests/scripts/ws-touchdots-specimen.cjs` → `design/audit/runs/touchdots/specimen.png`.
 
 ### S1.10 Tools and gate

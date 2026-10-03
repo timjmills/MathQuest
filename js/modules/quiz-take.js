@@ -215,7 +215,9 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'dualFractionAnswers',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
-    'screenInstr'];
+    'screenInstr',
+    // touch round 2: the teacher's skill options (touch dots and the other supports) travel too
+    'skillOptions'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
@@ -360,7 +362,7 @@ function renderQuizQuestion(qItem, flatIdx) {
 
     // S2: the teacher's ticked supports (touch numerals, cues) apply in the quiz as in practice
     let qtSupports = null;
-    try { qtSupports = kind ? screenSupportsFor(qd, kind, { index: flatIdx, total: (state.quizAllQuestions || []).length || 1, categoryId: qd.categoryId || q.categoryId, skillId: qd.skillId || q.skillId, options: q.opts || q.options || null }) : null; } catch (e) { qtSupports = null; }
+    try { qtSupports = kind ? screenSupportsFor(qd, kind, { index: flatIdx, total: (state.quizAllQuestions || []).length || 1, categoryId: qd.categoryId || q.categoryId, skillId: qd.skillId || q.skillId, options: qd.skillOptions || null }) : null; } catch (e) { qtSupports = null; }
     let instrHtml = '';
     let cellBody;
     if (kind && kind.kind === 'stack') {

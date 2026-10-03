@@ -168,6 +168,8 @@ export function candidatesFor(q, ctx = {}) {
         const k = kind && SCREEN_TEMPLATE[kind.kind] ? kind : bp;
         const p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
         const pay = { op: opKey(k.op), a: Number(k.a), b: Number(k.b) };
+        const tb = tableOf(q, k);
+        if (tb != null) pay.table = tb;
         return declared
             .filter((id) => !(bp && TOUCH_IDS.includes(id) && opKey(bp.op) !== '/'))
             .filter((id) => { try { return canDraw(id, p, tpl); } catch (e) { return false; } })
@@ -325,6 +327,14 @@ export function ladderMessage(q) {
  * The touch-dot rung says HOW to use the dots, built from the item (critic round 1): the number
  * to say, the number whose dots to touch, and the direction. Never the answer.
  */
+/** × : the table number (the paper rule, screenSupportsFor): the one factor in the set's constant. */
+function tableOf(q, k) {
+    const cs = q && q.skillOptions && Array.isArray(q.skillOptions.constant) ? q.skillOptions.constant.map(Number) : null;
+    if (!cs || !k || opKey(k.op) !== '*') return null;
+    const a = Number(k.a), b = Number(k.b);
+    return cs.includes(a) !== cs.includes(b) ? (cs.includes(a) ? a : b) : null;
+}
+
 function touchHow(e, id) {
     let k = null;
     try {
@@ -338,7 +348,9 @@ function touchHow(e, id) {
     const one = (v) => v >= 0 && v <= 9;
     if (op === '/') return `Count by ${b}s. Touch one dot for each count.`;
     if (op === '*') {
-        const dotA = a < b; // the smaller factor carries the dots; count by the other
+        // the paper rule (support-draw.js touchNumbers): count by the table number, dot the other
+        const t = tableOf(e.q, k);
+        const dotA = t != null ? t === b : a < b;
         return `Count by ${dotA ? b : a}s. Touch a dot on ${dotA ? a : b} for each count.`;
     }
     if (op === '-') return id === 'touchall' && one(a) ? `Touch the dots on ${a}. Take away ${b}.` : `Say ${a}. Touch the dots on ${b} and count back.`;
@@ -398,6 +410,8 @@ function redrawKit(root, q, ids, ctx) {
     const on = [...new Set([...had.filter((x) => !ids.some((y) => y !== x && clashes(x, y))), ...ids])];
     const supports = { on };
     if (opKey(kind.op) === '/') supports.tally = 10;
+    const tbl = tableOf(q, kind);
+    if (tbl != null) supports.table = tbl;
     const oldInputs = Array.from(old.querySelectorAll('input, select, textarea'));
     const html = kind.kind === 'stack'
         ? kindHTML(kind, { regroup: regroupFor(q.skillId || ctx.skillId || state.skill), supports })
@@ -603,7 +617,7 @@ function paneHTML(r) {
 
 function eqHTML(rs) {
     const p = rs[0].payload;
-    const html = withSupports('<span class="mq-sup-anchor"></span>', { a: p.a, b: p.b, op: p.op, supports: { on: rs.map((r) => r.id), reserve: [], ...(opKey(p.op) === '/' ? { tally: 10 } : {}) } },
+    const html = withSupports('<span class="mq-sup-anchor"></span>', { a: p.a, b: p.b, op: p.op, supports: { on: rs.map((r) => r.id), reserve: [], ...(opKey(p.op) === '/' ? { tally: 10 } : {}), ...(p.table != null ? { table: p.table } : {}) } },
         'equation', SCREEN_CTX, { problemWMm: 0, problemHMm: 0 });
     return html && !/^<span class="mq-sup-anchor"><\/span>$/.test(html)
         ? `<div class="ws-sheet mq-kit mq-ladder-pane" data-mq-ladder-on="${esc(rs.map((r) => r.id).join(' '))}">${html}</div>` : '';
