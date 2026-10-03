@@ -87,13 +87,25 @@ function workRows(p, rows, shown = null) {
     return out.slice(0, rows);
 }
 
+/**
+ * The digit track (mm). A short problem (3-digit dividend by a 2-digit divisor) gets wider tracks on
+ * paper, up to 1.3 x, so it is as wide as the 4-digit problems beside it and does not sit in a band
+ * of empty cell (RUBRIC H13, wave 1 lane D): more room to write, never a smaller digit.
+ */
+function trackOf(p, ctx, g) {
+    const base = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
+    if (ctx.mode === 'screen') return base;
+    const t = String(p.dividend).length + String(p.divisor).length + 1 + (p.rbox ? 2 : 0);
+    return base * Math.min(1.3, Math.max(1, 7 / t));
+}
+
 register('division', {
     render(p, ctx) {
         const g = geo(ctx);
         const D = String(p.dividend), V = String(p.divisor);
         const n = D.length, dv = V.length;
         const rows = rowsOf(p);
-        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
+        const trackMm = trackOf(p, ctx, g);
         const gutterMm = trackMm * 1.1;
         const k = keyOf(p);
         const ink = inkOf(ctx);
@@ -175,7 +187,7 @@ register('division', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const n = String(p.dividend).length, dv = String(p.divisor).length;
-        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
+        const trackMm = trackOf(p, ctx, g);
         const rows = rowsOf(p);
         return {
             wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),

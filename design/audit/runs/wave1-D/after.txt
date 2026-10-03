@@ -3,3 +3,7 @@ before (base 8fd2a10, 33-doc backlog, L): 33 documents failing
 after WIP 1c79121 (33 docs, L): 3 failing (dot_array_mult AK-2, mult_comparison PAGEFILL, mixed_multiplication H13 x4)
 after this commit, full --source kit (191 docs, L): ws-print-lint: OK (191 document(s), source kit; 0 finding(s) in 0 document(s))
 same 33 docs at size S: base 32 failing -> 4 failing at last check (PAGEFILL at the dense ceiling: missing_add_sub, missing_mult_div; mixed pools: mixed_composing, counting_all) - not in the gate, left for a follow-up
+
+Round 3 (2026-10-03, after merging claude/sweet-newton-c8wrv1):
+full --source kit, S: ws-print-lint: OK (191 document(s), source kit; 0 finding(s) in 0 document(s))
+full --source kit, L: ws-print-lint: OK (191 document(s), source kit; 0 finding(s) in 0 document(s))

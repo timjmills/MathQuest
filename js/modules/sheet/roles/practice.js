@@ -971,8 +971,20 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // cell's content in its MIDDLE (so the spare splits above and below, never one band
             // over 30 %, RUBRIC H13). Never gaps between rows (the owner's spare-height rule).
             // (one-page sections only: a section over several pages keeps one cell height, PT-ENG-6)
-            const spread = !gap.gap && lone && (laidOut.chunksBySection[part.section] || []).length === 1 && baseMm && !noCapSec && !its.some((it) => it.anchor) && !L.blocks
-                ? spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin) : null;
+            const chunks = laidOut.chunksBySection[part.section] || [];
+            let spread = null;
+            if (!gap.gap && lone && baseMm && !noCapSec && !its.some((it) => it.anchor) && !L.blocks) {
+                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
+                else if (chunks.every((c) => !c.blocks)) {
+                    // a section over several pages: the FIRST page's stretch, applied to every page
+                    // of the section, so a cell keeps one height across its pages (PT-ENG-6)
+                    const c0 = chunks[0];
+                    const its0 = sheetItems[part.section].slice(c0.from, c0.from + c0.count);
+                    const sh0 = c0.gridMm ? c0.gridMm : (rowShape(its0, L.cols, c0.rows, L.cellH) || {}).heightMm || c0.rows * L.cellH;
+                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin);
+                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
+                }
+            }
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -986,15 +998,17 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 rowsTpl: spread ? spread.rowsTpl : shape ? shape.rowsTpl : '',
                 rowGap: gap.gap || 0,
                 items: its.map((it) => planItem(it, level, L.cols)),
+                _its: its,
             });
         }
         // SPREAD across parts (wave 1 lane D): a page of several grids (a mixed pool dealt by height
         // class) that leaves more than a fifth of its body empty shares the spare among its grids'
         // rows the same way a lone grid does (spreadRows), never as gaps between rows.
         if (!lone && !input.stepStrip && !pg.parts.some((pp) => layouts[pp.section].blocks || (norm.sections[pp.section] || {}).noCap)) {
-            const grids = sections.filter((x) => x.kind === 'grid' && !x.rowGap && /fixed/.test(x.cls) && parseFloat(x.height) > 0 && !/mq-anchorgrid/.test(x.cls));
-            const L1 = layouts[pg.parts[0].section];
-            const availAll = (pg.cont ? L1.gridHCont : L1.gridH) - (pg.parts.length - 1) * instructionMm(size);
+            const grids = sections.filter((x) => x.kind === 'grid' && x._its && !x.rowGap && /fixed/.test(x.cls) && parseFloat(x.height) > 0 && !/mq-anchorgrid/.test(x.cls));
+            // the page body less the instruction lines it prints (a split-off group shares its line)
+            const hdr = { tab: input.header && input.header.tab === false ? false : words.tabLines, title: input.header && input.header.title === false ? '' : words.title, titleLines };
+            const availAll = bodyHeightMm(norm.paper, hdr, pg.cont ? { cont: true } : undefined) - sections.filter((x) => x.kind === 'html').length * instructionMm(size) - 2;
             const used = grids.reduce((a, x) => a + parseFloat(x.height), 0);
             if (grids.length === pg.parts.length && used > 0 && used < 0.8 * availAll) {
                 const f = (availAll - grids.length) / used;
@@ -1003,6 +1017,23 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     const sp = spreadRows(x._its, x.cols, x.rows, b, b * f + 1, 0);
                     if (sp) { x.height = `${sp.heightMm}mm`; x.rowsTpl = sp.rowsTpl; }
                 }
+            }
+        }
+        // A grid of a several-grid page whose last row is short (a mixed pool's split group: three
+        // word problems in two columns) widens its last problem over the empty track(s), so no
+        // cell-sized hole is left beside it (wave 1 lane D, kit lint PAGEFILL).
+        if (!lone) {
+            for (const x of sections) {
+                if (x.kind !== 'grid' || !x._its || x.cols < 2 || /mq-anchorgrid/.test(x.cls)) continue;
+                const rem = x.items.length % x.cols;
+                if (!rem || x.items.length < x.cols) continue;
+                const last = x.items[x.items.length - 1];
+                // only a problem wide enough for the widened cell (a word problem's 93 mm), never a
+                // small fact left alone in a strip twice its width (H13 the other way)
+                const span = x.cols - rem + 1;
+                const w = (itemInfo(x._its[x._its.length - 1], { size }).fp || {}).wMm || 0;
+                if (!(w >= 0.7 * (LIVE_W_MM * span / x.cols))) continue;
+                last.style = `${last.style || ''}grid-column:span ${span};`;
             }
         }
         for (const x of sections) delete x._its;

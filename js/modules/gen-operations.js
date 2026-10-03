@@ -2146,6 +2146,9 @@ function _applyKitFactCell(q, skill, range) {
     }
     if (small) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
+        // `multiply` deals facts among boxed column work (its 2-digit items, mixed_multiplication):
+        // its fact prints the same answer box, never an open zone beside boxed neighbours
+        if (skill === 'multiply' && !across) q.cell.payload.ansBox = true;
         if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
             // A basic fact on screen is the same vertical fact: no place heads, no regroup row
             // (screen-cell.js draws a `facts-column-visual` item with the kit's fact markup).

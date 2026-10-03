@@ -42,7 +42,9 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '' });
     });
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
-    const used = cells.length + (spanFirst ? cols - 1 : 0);
+    // a cell that spans tracks (grid-column:span N in its style) fills them: no blank run for them
+    const spans = cells.reduce((a, c) => { const m = c && typeof c === 'object' && /grid-column:\s*span\s+(\d+)/.exec(c.style || ''); return a + (m ? Number(m[1]) - 1 : 0); }, 0);
+    const used = cells.length + spans + (spanFirst ? cols - 1 : 0);
     if (used < n) out.push(blankRun((used % cols) + 1));
     const r = rows || Math.ceil(cells.length / cols);
     // `rowGap` (mm, RUBRIC H13 page fill): a sheet whose problem count is fixed (a Test, the
