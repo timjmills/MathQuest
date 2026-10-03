@@ -98,7 +98,8 @@
     "calculator": "6X",
     "skipAfter": "6Y",
     "rows": "1W",
-    "times": "1Z"
+    "times": "1Z",
+    "spaces": "1X"
   },
   "blocks": {
     "0": {
@@ -663,6 +664,10 @@
       "none": "N",
       "each": "E",
       "given": "G"
+    },
+    "spaces": {
+      "box": "B",
+      "line": "L"
     }
   },
   "scalarOnly": {
