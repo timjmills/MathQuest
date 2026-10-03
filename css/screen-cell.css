@@ -1616,3 +1616,31 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 /* count-by rows (critic C2 r7): when both cues show, the back cue says only "Back", so the strip stays one line at 390 */
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
+
+/* ---- Wave 1 / A3 (owner 2026-10-03): the WRONG DIGITS blink red, 3 cycles of 1.2 s, then hold steady red.
+   Practice card and online worksheet only; the A2 dashed edge and cross stay (colour is never the only cue).
+   Reduced motion: no blink, the steady red only. Additive: older saved HTML never carries these classes. */
+@keyframes mqWdBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit {
+    color: var(--mq-box-bad) !important; -webkit-text-fill-color: var(--mq-box-bad) !important;
+    animation: mqWdBlink 1.2s ease-in-out 3 !important;   /* beats .mq-scell * { animation: none } */
+}
+html body input.mq-live-wrong.mq-wd-empty.mq-wd-empty.mq-wd-empty { outline-width: 4px !important; }
+html body input.mq-live-wrong.mq-wd-mirrored.mq-wd-mirrored.mq-wd-mirrored {
+    color: transparent !important; -webkit-text-fill-color: transparent !important;
+}
+html body .mq-wd-mirror.mq-wd-mirror {
+    position: absolute; z-index: 4; display: flex; align-items: center; box-sizing: border-box; margin: 0;
+    pointer-events: none; color: #000 !important; line-height: 1; white-space: pre; border: 0; background: none;
+}
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd { display: inline-block; color: #000 !important; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad { color: var(--mq-box-bad) !important; animation: mqWdBlink 1.2s ease-in-out 3 !important; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss {
+    min-width: 0.62em; height: 1.05em; margin: 0 1px; box-sizing: border-box;
+    border: 2px dashed var(--mq-box-bad); border-radius: 3px; animation: mqWdBlink 1.2s ease-in-out 3 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit,
+    html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad, html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss { animation: none !important; }
+}
+@media print { .mq-wd-mirror { display: none !important; } }

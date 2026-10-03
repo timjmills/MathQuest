@@ -709,10 +709,12 @@ function _badgeDrop(el) {
 /** Badges whose box has left the page (a new question drew over the card) go with it. */
 export function pruneBadges() {
     Array.from(BADGES.keys()).forEach((el) => { if (!el.isConnected) _badgeDrop(el); });
+    Array.from(MIRRORS.keys()).forEach((el) => { if (!el.isConnected) _mirrorDrop(el); });
 }
 function _badgePlaceAll() {
     _badgeRaf = 0;
     Array.from(BADGES.keys()).forEach(_badgePlace);
+    Array.from(MIRRORS.keys()).forEach(_mirrorPlace);
 }
 function _badgeSoon() {
     if (!_badgeRaf && typeof requestAnimationFrame === 'function') _badgeRaf = requestAnimationFrame(_badgePlaceAll);
@@ -749,10 +751,124 @@ function _badgeTrack(el) {
     setTimeout(settle, 600);
 }
 
+/* ---- Wave 1 / A3 (owner 2026-10-03): the wrong DIGITS blink red; tapping a red box empties it ----
+ * Practice card and online worksheet only (never the quiz, never paper). A one-digit box that is wrong
+ * IS the wrong digit (class mq-wrong-digit). A box that holds several digits gets a mirror overlay, one
+ * span per digit compared by place value, right-aligned: wrong digits mq-wd-bad, a missing digit an
+ * empty mq-wd-miss box, the right digits stay black. The input's own text goes clear under the mirror,
+ * so typing is untouched (the mirror goes on the next keystroke or the tap that empties the box). */
+const MIRRORS = new Map();
+const _inQuiz = (el) => !!(el && el.closest && el.closest('#quizTakeView'));
+const _digitsOf = (s) => String(s == null ? '' : s).replace(/[,\s]/g, '');
+function _mirrorDrop(el) {
+    const m = MIRRORS.get(el);
+    if (m) { m.remove(); MIRRORS.delete(el); }
+    el.classList.remove('mq-wd-mirrored', 'mq-wrong-digit');
+}
+function _mirrorPlace(el) {
+    const m = MIRRORS.get(el);
+    if (!m) return;
+    const host = m.parentElement;
+    if (!el.isConnected || !host || !host.isConnected) { _mirrorDrop(el); return; }
+    const r = el.getBoundingClientRect(), hr = host.getBoundingClientRect(), cs = getComputedStyle(el);
+    // a box inside its own swipe row (a count-by row): the digits are clipped to the row's window
+    let clip = 'none';
+    for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') && a.scrollWidth > a.clientWidth + 1) {
+            const q = a.getBoundingClientRect();
+            const L = Math.max(0, q.left - r.left), R = Math.max(0, r.right - q.right);
+            clip = (L + R >= r.width) ? 'inset(0 100% 0 0)' : 'inset(0 ' + Math.round(R) + 'px 0 ' + Math.round(L) + 'px)';
+            break;
+        }
+    }
+    Object.assign(m.style, {
+        left: Math.round(r.left - hr.left - host.clientLeft + host.scrollLeft) + 'px',
+        top: Math.round(r.top - hr.top - host.clientTop + host.scrollTop) + 'px',
+        width: Math.round(r.width) + 'px', height: Math.round(r.height) + 'px', clipPath: clip,
+        fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing,
+        paddingLeft: cs.paddingLeft, paddingRight: cs.paddingRight,
+        justifyContent: /center/.test(cs.textAlign) ? 'center' : /right|end/.test(cs.textAlign) ? 'flex-end' : 'flex-start',
+    });
+}
+/** Mark the wrong digits of a box judged wrong. Returns true when it could compare digit by digit. */
+function _markWrongDigits(el, want) {
+    _mirrorDrop(el);
+    if (_inQuiz(el) || typeof document === 'undefined') return false;
+    const v = _digitsOf(el.value);
+    const w = (Array.isArray(want) ? want : [want]).map(_digitsOf).find((x) => /^\d+$/.test(x)) || '';
+    if (!/^\d+$/.test(v) || !w) return false;
+    if (v.length === 1 && w.length === 1) { el.classList.add('mq-wrong-digit'); return true; }
+    const host = el.closest('#questionCard, .problem-card');
+    if (!host) return false;
+    const n = Math.max(v.length, w.length);
+    const m = document.createElement('span');
+    m.className = 'mq-wd-mirror';
+    m.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < n; i++) {
+        const a = v[i - (n - v.length)], b = w[i - (n - w.length)];
+        const s = document.createElement('span');
+        if (a === undefined) { s.className = 'mq-wd mq-wd-miss'; s.textContent = ' '; }
+        else { s.className = a === b ? 'mq-wd' : 'mq-wd mq-wd-bad'; s.textContent = a; }
+        m.appendChild(s);
+    }
+    // on the card, like the corner mark (a cell's own redraws never touch it); _mirrorPlace keeps it on its box
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    host.appendChild(m);
+    MIRRORS.set(el, m);
+    el.classList.add('mq-wd-mirrored');
+    _mirrorPlace(el);
+    setTimeout(() => _mirrorPlace(el), 150);
+    return true;
+}
+let _tabAt = 0;
+let _clearWired = false;
+function _clearIfWrong(el) {
+    if (!el || _inQuiz(el) || el.disabled || el.readOnly || !el.classList.contains('mq-live-wrong')) return;
+    el.value = '';
+    el.classList.remove('mq-live-wrong', 'mq-live-correct', 'mq-wd-empty');
+    el.removeAttribute('aria-invalid');
+    _mirrorDrop(el);
+    _badgeDrop(el);
+    el.style.borderColor = ''; el.style.background = '';
+    // the item stays "helped" (host.dataset.mqHelped is kept): a cleared box still went red
+    const card = el.closest('.problem-card');
+    if (card && !card.querySelector('input.mq-live-wrong')) { card.style.background = ''; card.style.border = ''; }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+function _wireClear() {
+    if (_clearWired || typeof document === 'undefined') return;
+    _clearWired = true;
+    // a pupil's tap or click, or a Tab into the box - never a program focus (the app refocuses the box after Check)
+    document.addEventListener('pointerdown', (e) => { if (e.target && e.target.tagName === 'INPUT') _clearIfWrong(e.target); }, true);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Tab') _tabAt = Date.now(); }, true);
+    document.addEventListener('focusin', (e) => { if (Date.now() - _tabAt < 400 && e.target && e.target.tagName === 'INPUT') _clearIfWrong(e.target); }, true);
+    window.addEventListener('resize', () => Array.from(MIRRORS.keys()).forEach(_mirrorPlace));
+}
+/**
+ * The item was judged wrong at Check: the digit boxes the pupil left empty are missing digits, so
+ * they are marked too (an answer digit box only; a regroup box may rightly stay empty).
+ */
+export function markMissingDigits(root) {
+    if (!root || _inQuiz(root)) return 0;
+    let n = 0;
+    root.querySelectorAll('input.mq-digit, input.mq-cellslot:not(.mq-cellslot-host), input.ib-cell').forEach((el) => {
+        if (el.classList.contains('mq-carry') || LIVE_FN.has(el) || String(el.value || '').trim() !== '') return;
+        const want = LIVE_EXPECT.get(el);
+        if (!want || !want.some((w) => w !== '') || !el.offsetWidth) return;
+        _liveSet(el, false, true);
+        el.classList.add('mq-wrong-digit', 'mq-wd-empty');
+        n++;
+    });
+    return n;
+}
+
 function _liveSet(el, ok, bad) {
     el.classList.toggle('mq-live-correct', ok);
     el.classList.toggle('mq-live-wrong', bad);
     if (ok || bad) _badgeTrack(el);
+    el.classList.remove('mq-wd-empty');
+    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
     if (bad) {
         el.setAttribute('aria-invalid', 'true');
         // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
@@ -845,6 +961,8 @@ export function markBoxSubmitted(el, ok) {
     el.classList.toggle('mq-live-correct', !!ok);
     el.classList.toggle('mq-live-wrong', !ok);
     _badgeTrack(el);
+    if (!ok) { _wireClear(); const w = LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
+    else _mirrorDrop(el);
     if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     if (el.dataset.mqSubmitMark !== '1') {
         el.dataset.mqSubmitMark = '1';
@@ -852,6 +970,7 @@ export function markBoxSubmitted(el, ok) {
             if (LIVE_EXPECT.has(el)) return;               // a bound box re-judges itself
             el.classList.remove('mq-live-wrong', 'mq-live-correct');
             el.removeAttribute('aria-invalid');
+            _mirrorDrop(el);
         });
     }
 }
@@ -865,6 +984,7 @@ export function unwireLiveCorrect(el) {
     el.removeAttribute('data-mq-single');
     el.classList.remove('mq-live-correct', 'mq-live-wrong');
     el.removeAttribute('aria-invalid');
+    _mirrorDrop(el);
 }
 
 /**

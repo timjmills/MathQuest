@@ -11,7 +11,7 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
-import { markBoxSubmitted, itemWasHelped } from './screen-cell.js';
+import { markBoxSubmitted, itemWasHelped, markMissingDigits } from './screen-cell.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -1157,6 +1157,8 @@ export function checkAnswer(userAns, btnElement) {
     if (btnElement) btnElement.classList.add(isCorrect ? "correct" : "incorrect");
     // Wave 1 / A2: the one answer place takes the verdict's colour too (the message above stays).
     try { if (!(q.options && q.options.length)) markBoxSubmitted(document.getElementById('answerInput'), isCorrect); } catch (_) { /* optional */ }
+    // Wave 1 / A3: a digit box left empty in a wrong answer is a missing digit
+    try { if (!isCorrect) markMissingDigits(document.getElementById('questionCard')); } catch (_) { /* optional */ }
 
     if (isCorrect) {
         state.lastAnswerCorrect = true;

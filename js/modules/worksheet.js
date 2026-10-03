@@ -12,7 +12,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, itemWasHelped, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -2403,7 +2403,7 @@ export function checkWorksheetAnswer(idx) {
         // and marked gently. Once it is spent, the red below.
         const lad = worksheetLadderWrong(idx, q, value);
         if (lad && (lad.wait || !lad.spent)) {
-            if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); }
+            if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); try { markMissingDigits(card); } catch (e) { /* optional */ } }
             input.style.borderColor = "";
             input.style.background = "";
             card.style.background = "";
@@ -2416,6 +2416,7 @@ export function checkWorksheetAnswer(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         markBoxSubmitted(input, false);
+        try { markMissingDigits(card); } catch (e) { /* optional */ }   // Wave 1 / A3
         wsRecordAnswer(idx, false);
     }
 }
