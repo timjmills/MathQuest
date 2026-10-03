@@ -48,7 +48,7 @@ async function unit(page) {
             if (!defs.length) fail(`${cat}:${id} has no option schema`);
             const dflt = {};
             for (const d of defs) {
-                if (!['int', 'enum', 'bool', 'set'].includes(d.type)) fail(`${cat}:${id} option ${d.id} bad type ${d.type}`);
+                if (!['int', 'enum', 'bool', 'set', 'rows'].includes(d.type)) fail(`${cat}:${id} option ${d.id} bad type ${d.type}`);
                 if (!('default' in d)) fail(`${cat}:${id} option ${d.id} has no default`);
                 dflt[d.id] = d.default;
             }
