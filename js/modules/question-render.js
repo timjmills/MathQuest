@@ -899,9 +899,18 @@ export function wireBoxValidation(visualAidEl, q) {
         // If maxlength > 1 (rare: 2-digit one-shot quotient), put full ans in last box.
         if (N === 1) {
             slots.push({ el: colInputs[0], expect: ansStr, norm: numNorm });
+        } else if (colInputs[0].closest('[data-mq-ltr]')) {
+            // a fact / equation in digit boxes (ansBox 'digit') is judged by its VALUE: the digits
+            // typed, empty boxes ignored, so "_9" and "9_" are both 9; a value still on its way to the
+            // answer ("1" of "12") is neutral, never red.
+            const combined = () => colInputs.map((e) => (e.value || '').trim()).join('');
+            const want = ansStr.replace(/[^0-9]/g, '');
+            for (let i = 0; i < N; i++) {
+                slots.push({ el: colInputs[i], expect: '', norm: numNorm, customMatch: () => combined() === want,
+                    pending: () => { const c = combined(); return c.length < want.length && want.startsWith(c); } });
+            }
         } else if (ansStr.length <= N) {
-            // a fact / equation in digit boxes (data-mq-ltr) is written left to right: digits first
-            const pad = colInputs[0].closest('[data-mq-ltr]') ? 0 : N - ansStr.length;
+            const pad = N - ansStr.length;
             for (let i = 0; i < N; i++) {
                 const ch = i < pad ? '' : (ansStr.charAt(i - pad) || '');
                 slots.push({ el: colInputs[i], expect: ch, norm: numNorm });
@@ -1057,6 +1066,7 @@ export function wireBoxValidation(visualAidEl, q) {
             s.el.classList.add('box-correct');
             return;
         }
+        if (typeof s.pending === 'function' && s.pending()) return;   // still being typed
         // For fraction-input pairs, hold the wrong-paint until BOTH halves
         // are filled — otherwise typing the numerator (e.g. "2" en route to
         // "2/4") flashes red while the denominator is still empty. The

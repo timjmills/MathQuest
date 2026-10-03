@@ -1620,3 +1620,12 @@ html .mq-scell .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="
 html .mq-scell .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit { box-shadow: none !important; }
 /* a fact / equation with 'off': the host input keeps only the grey wash (no box, no line), as paper's blank zone */
 html .mq-scell .mq-ansoff input.mq-slot { border-color: transparent !important; }
+/* (owner follow-up) a FOCUSED box of a 'one' / 'off' strip keeps the strip's own edges, so "One box"
+   still reads as one box while the pupil types: the focus is shown by the yellow fill only. Lane A2's
+   right / wrong marks are left alone (:not(.mq-live-*)). */
+html .mq-scell .mq-kit .ws-stack.mq-ans-one .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, var(--mq-segr) !important; background-color: #FFF3A0 !important; }
+html .mq-scell .mq-kit .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="only"]) > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .mq-kit .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: none !important; background-color: #FFF3A0 !important; }

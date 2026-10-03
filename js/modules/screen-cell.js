@@ -161,6 +161,13 @@ function _cellKindFor(q) {
         // paper prints none), so the screen does not add one either.
         return { kind: 'stack', T, ...p, ...(q.regroup === false ? { regroup: false } : {}) };
     }
+    // A legacy column item that prints as a column (printFormat column-add / column-sub) but whose
+    // screen visual is its own drawing (sub_across_zeros): drawn as the kit stack too, so the column
+    // is the same on screen as on paper and honours the answer-box option (owner ruling 2026-10-02).
+    if (!q.cell && /^column-(add|sub)$/.test(String(q.printFormat || '')) && (p.op === '+' || p.op === '-') && !/column-answer-input/.test(v)) {
+        const T = Math.max(A.length, B.length) + 1;
+        if (ANS.length <= T) return { kind: 'stack', T, ...p };
+    }
     // Round 3 ("cards 1, 3, 6: the cell is empty except a short underline"): a generator that
     // names its kit cell (q.cell) is drawn from it even when its legacy visual is not recognised.
     const cellT = q.cell && q.cell.template;
@@ -1129,8 +1136,18 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
         const ex = stackExpectations(kind);
         if (stk.hasAttribute('data-mq-ltr')) {
             // a fact / equation in digit boxes is written left to right: box i holds the i-th digit
+            // judged by the VALUE the boxes hold together (empty boxes ignored: "_9" and "9_" are 9);
+            // a value still on its way to the answer stays neutral
             const a = String(kind.ans != null ? kind.ans : '').replace(/[^0-9]/g, '');
-            stk.querySelectorAll('input.mq-digit').forEach((inp, i) => { if (a[i] !== undefined && _liveBind(inp, a[i])) n++; });
+            const group = Array.from(stk.querySelectorAll('input.mq-digit'));
+            const value = () => group.map((e) => (e.value || '').trim()).join('');
+            const judge = (v) => {
+                if (!String(v || '').trim()) return null;
+                const c = value();
+                if (c === a) return true;
+                return c.length < a.length && a.startsWith(c) ? null : false;
+            };
+            group.forEach((inp) => { if (_liveBindFn(inp, judge, group)) n++; });
         } else stk.querySelectorAll('input.mq-digit').forEach((inp) => {
             const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('ans-', ''));
             if (Number.isFinite(col) && ex.ans[col] !== undefined && _liveBind(inp, ex.ans[col])) n++;

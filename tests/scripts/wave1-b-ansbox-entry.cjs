@@ -9,6 +9,9 @@ const CASES = [
     ['addition', 'add_facts', { ansBox: 'digit' }, 'ltr'],
     ['multiplication', 'mult_facts', { ansBox: 'digit' }, 'ltr'],
     ['division', 'div_facts', { ansBox: 'digit' }, 'ltr'],
+    // a short answer typed into the RIGHT-hand box (place value, as the key prints it) is green too
+    ['division', 'div_facts', { ansBox: 'digit' }, 'right'],
+    ['addition', 'add_facts', { ansBox: 'digit' }, 'right'],
     ['addition', 'add_100_regroup', {}, 'rtl'],
     ['subtraction', 'sub_100_regroup', { ansBox: 'one' }, 'rtl'],
 ];
@@ -30,8 +33,12 @@ const CASES = [
             const boxes = await page.$$('#visualAid input.mq-digit');
             if (!boxes.length) { console.log(`FAIL ${k} item ${item}: no digit boxes`); bad++; continue; }
             // the pupil types where the focus already is (the cell puts it there), digit by digit
-            const typed = dir === 'ltr' ? ans : [...ans].reverse().join('');
-            await page.evaluate(() => { const f = document.activeElement; if (!f || !f.classList.contains('mq-digit')) { const b = document.querySelectorAll('#visualAid input.mq-digit'); b[0].focus(); } });
+            const typed = dir === 'rtl' ? [...ans].reverse().join('') : ans;
+            if (dir === 'right') {
+                // right-align the digits: start in the box that leaves the answer ending in the last box
+                const start = Math.max(0, boxes.length - ans.length);
+                await page.evaluate((i) => document.querySelectorAll('#visualAid input.mq-digit')[i].focus(), start);
+            } else await page.evaluate(() => { const f = document.activeElement; if (!f || !f.classList.contains('mq-digit')) { const b = document.querySelectorAll('#visualAid input.mq-digit'); b[0].focus(); } });
             for (const ch of typed) { await page.keyboard.type(ch); await sleep(60); }
             await sleep(350);
             const r = await page.evaluate(() => Array.from(document.querySelectorAll('#visualAid input.mq-digit')).map((e) => ({ v: e.value, ok: e.classList.contains('mq-live-correct'), bad: e.classList.contains('mq-live-wrong') })));
