@@ -2104,7 +2104,7 @@ async function buildLesson(n, metaOf) {
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = lessonFor(sk.categoryId, sk.skillId);
-    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2, { sameOps: true });
+    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 4, { sameOps: true });
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
     // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.

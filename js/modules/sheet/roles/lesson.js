@@ -68,7 +68,8 @@ const PT_MM = 25.4 / 72;
 /** The lesson skill ('main') and one pool per prerequisite skill ('w0', 'w1'). */
 export function sources(skills, helpers = {}) {
     const main = skills[0];
-    const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 2);
+    // Up to four candidates: the Warm-up takes the first two whose problems are short (warmShape).
+    const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 4);
     // Lessons r3: an example case the main pool rarely deals (a 0 in the ones AND a one-place
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
@@ -93,8 +94,8 @@ function warmShape(pools, input) {
     const ctx = ctxOf(input);
     // A Warm-up is a quick look back: a prerequisite whose problem is taller than WARM_MAX_MM even
     // across the whole width (a pair of arrays, a story with a work box) would take the sheet's
-    // page by itself and push the lesson past it, so it is left out.
-    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length && hAt(pools[id].slice(0, 3), 1) <= WARM_MAX_MM);
+    // page by itself and push the lesson past it: the next shorter earlier skill takes its place.
+    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length && hAt(pools[id].slice(0, 3), 1) <= WARM_MAX_MM).slice(0, 2);
     const out = {};
     // A cell in a half of the width is as wide as a cell of a 4-column page: the measurement at 4
     // columns says whether it fits there (a template's own column cap is for a whole page of it).
@@ -118,7 +119,9 @@ function warmShape(pools, input) {
         return out;
     }
     if (ids.length > 1) {
-        const k = Math.min(...ids.map((id) => out[id].k));
+        // Two cells a half only when every half's cells fit a 4-column cell (a 2-digit by 2-digit
+        // stack does not, and spilled out of its cell).
+        const k = Math.min(...ids.map((id) => out[id].k), ...ids.map((id) => (fitsWidth(pools[id].slice(0, 3), 4) ? 2 : 1)));
         for (const id of ids) out[id] = k === 2 ? { k: 2, cols: 4 } : { k: 1, cols: 2 };
         // A half whose cells are half as tall as the other half's holds two rows of them, so the
         // row is never sized for a taller item than it holds (H13).
@@ -620,6 +623,14 @@ export function stateItems(example, data) {
         return m.length === 1 ? Number(m[0].replace(/\D/g, '')) : m.length ? -1 : 0;
     };
     const workOnly = (k, html) => {
+        // The reading panel (panel 1, its steps mark nothing yet) shows the story alone: its
+        // blank work would repeat the next panel's and push the chart onto a second page.
+        if (story && k === 0 && groups.length > 1) {
+            let h = html;
+            for (let j = Math.max(1, nSteps); j >= 1; j--) h = dropDiv(h, 'mq-wwstep', j - 1);
+            for (const c of ['mq-wwanswer', 'mq-wwwords', 'mq-wwbar']) h = dropDiv(h, c);
+            return h;
+        }
         if (nSteps < 2 || k === groups.length - 1) return html;
         const n = stepOf(k);
         if (n < 0) return html;
@@ -990,14 +1001,14 @@ const hOf = (x, cols) => (x && x.measured && x.measured[cols] && Number.isFinite
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
-function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
+function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null, opts = {}) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n);
+    const lay = opts.lay || chartLayout(n);
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
@@ -1061,16 +1072,16 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const zc = solve((q) => sum(rowsAt(q)), availAll, 0.8, 1);
         if (zc) { mode = 'grid3'; z = zc; }
     }
-    // Panels too tall even at zoom 1 (a word story: the story and its stack in every panel) take
-    // the drawing down rather than leave the sheet: never below 0.75, where the chart's L type
-    // (15 pt text, 28 pt digits) is still at least the S type (11 pt, 16 pt: the content floor).
     // Each row as tall as its OWN panels (a first panel of three step heads sets only its row).
     const rowsOne = (q) => Array.from({ length: lay.rows }, (_, r) => Math.max(...states.slice(r * cols, r * cols + cols).map((st) => base[states.indexOf(st)] + (q - 1) * dH[states.indexOf(st)])));
     let perRow = false;
     if (mode === 'one') {
         z = solve((q) => lay.rows * H(q), avail, 1, zMax);
-        if (!z && cols === 2 && lay.rows > 1) { z = solve((q) => sum(rowsOne(q)), avail, 0.75, zMax); perRow = !!z; }
-        if (!z) z = solve((q) => lay.rows * H(q), avail, 0.75, 1) || 0.75;
+        if (!z && cols === 2 && lay.rows > 1) { z = solve((q) => sum(rowsOne(q)), avail, 1, zMax); perRow = !!z; }
+        // Content never shrinks to fit: panels too tall at zoom 1 continue on a second chart page
+        // (whole panels, never split - the caller re-plans), else print at 1.
+        if (!z && opts.canSplit) return { split: true };
+        if (!z) z = 1;
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
@@ -1116,7 +1127,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         }
         if (mode === 'final') sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
     }
-    sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
+    if (opts.say !== false) sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
@@ -1172,7 +1183,9 @@ export function plan(input = {}) {
         // `stack`: a skill too wide for half the page gives each skill a full-width row of its own.
         const stacked = halves.some((id) => shape[id].stack);
         const rowsOf = (id) => shape[id].rows || 1;
-        const hOwn = (id) => Math.max(20, hAt(wPools[id].slice(0, shape[id].k * rowsOf(id)), shape[id].cols)) * rowsOf(id);
+        // (+4 mm a row: the key writes the answer under a fact stack's line, a digit taller than
+        // the blank line the pupil page was measured with.)
+        const hOwn = (id) => (Math.max(20, hAt(wPools[id].slice(0, shape[id].k * rowsOf(id)), shape[id].cols)) + 4) * rowsOf(id);
         const hW = Math.max(...halves.map(hOwn));
         const parts = halves.map((id) => {
             const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
@@ -1348,7 +1361,19 @@ export function plan(input = {}) {
     let secondShown = 0;
     let chartSizing = null;
     if (states.length && part !== 'sheet') {
-        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel));
+        const st = states.filter((s) => s.lessonState !== undefined);
+        const tail = extrasList.find((x) => x.lessonTail);
+        const tailP = extrasList.find((x) => x.lessonTailPanel);
+        let chart = chartPage(input, ctx, data, example, st, draws, second, tail, finals, tailP, { canSplit: st.length >= 2 });
+        if (chart.split) {
+            // The chart continues on a second page: the panels in order, a row of two per page,
+            // the Say band under the last (PT-ANC: whole panels, the example at full size).
+            const half = Math.ceil(st.length / 2);
+            const lay1 = { cols: 2, rows: 1, variant: 'col' };
+            const a = chartPage(input, ctx, data, example, st.slice(0, half), draws.slice(0, half), [], null, [], null, { lay: lay1, say: false });
+            chart = chartPage(input, ctx, data, example, st.slice(half), draws.slice(half), [], tail, [], tailP, { lay: lay1 });
+            out.push({ header: a.header, sections: a.sections });
+        }
         zoom = chart.zoom;
         secondShown = chart.second;
         chartSizing = chart.sizing;
