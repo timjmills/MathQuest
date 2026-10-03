@@ -759,7 +759,6 @@ function _badgeTrack(el) {
  * so typing is untouched (the mirror goes on the next keystroke or the tap that empties the box). */
 const MIRRORS = new Map();
 const _inQuiz = (el) => !!(el && el.closest && el.closest('#quizTakeView'));
-const _digitsOf = (s) => String(s == null ? '' : s).replace(/[,\s]/g, '');
 function _mirrorDrop(el) {
     const m = MIRRORS.get(el);
     if (m) { m.remove(); MIRRORS.delete(el); }
@@ -791,27 +790,77 @@ function _mirrorPlace(el) {
         justifyContent: /center/.test(cs.textAlign) ? 'center' : /right|end/.test(cs.textAlign) ? 'flex-end' : 'flex-start',
     });
 }
+/** A written number in parts: its sign, its digit runs and the marks between them (".", "/", a space). */
+function _wdParse(s) {
+    const t = String(s == null ? '' : s).trim().replace(/,/g, '').replace(/\s+/g, ' ').replace(/[−–]/g, '-');
+    const m = /^(-?)\s*([0-9./ ]*)$/.exec(t);
+    if (!m || !m[2] || !/\d/.test(m[2])) return null;
+    const parts = m[2].split(/([./ ])/);         // run, sep, run, sep, run ...
+    const runs = parts.filter((_, i) => i % 2 === 0);
+    const seps = parts.filter((_, i) => i % 2 === 1);
+    return { sign: m[1], runs, seps };
+}
+/** Line two parsed numbers up part by part; null when their shapes cannot be compared digit by digit. */
+function _wdAlign(v, w) {
+    let vr = v.runs, wr = w.runs, seps = v.seps;
+    const sameSeps = v.seps.join('|') === w.seps.join('|');
+    let dotMissing = false;
+    if (!sameSeps) {
+        // decimals line up at the point: a missing point (and the digits after it) are missing marks
+        const dec = (p) => p.seps.every((x) => x === '.') && p.seps.length <= 1;
+        if (!dec(v) || !dec(w)) return null;
+        vr = [v.runs[0], v.runs[1] != null ? v.runs[1] : ''];
+        wr = [w.runs[0], w.runs[1] != null ? w.runs[1] : ''];
+        seps = ['.'];
+        dotMissing = !v.seps.length;
+    }
+    const cells = [];
+    if (v.sign || w.sign) cells.push(v.sign && w.sign ? { ch: '-', cls: '' } : v.sign ? { ch: '-', cls: 'bad' } : { ch: ' ', cls: 'miss' });
+    vr.forEach((a, k) => {
+        if (k > 0) cells.push({ ch: seps[k - 1] === ' ' ? ' ' : seps[k - 1], cls: k === 1 && dotMissing ? 'miss' : '', sep: true });
+        const b = wr[k] || '';
+        const left = k > 0 && seps[k - 1] === '.';      // the digits after a point line up from the point
+        const n = Math.max(a.length, b.length);
+        for (let i = 0; i < n; i++) {
+            const x = left ? a[i] : a[i - (n - a.length)];
+            const y = left ? b[i] : b[i - (n - b.length)];
+            if (x === undefined) cells.push({ ch: ' ', cls: 'miss' });
+            else cells.push({ ch: x, cls: x === y ? '' : 'bad' });
+        }
+    });
+    return cells;
+}
+/** For tests: the marks a value gets against an answer ("." right, "b" wrong, "m" missing, "|" a separator), or null. */
+export function wrongDigitPattern(value, want) {
+    const v = _wdParse(value), w = _wdParse(want);
+    const cells = v && w ? _wdAlign(v, w) : null;
+    return cells ? cells.map((c) => (c.sep && c.cls !== 'miss' ? '|' : c.cls === 'bad' ? 'b' : c.cls === 'miss' ? 'm' : '.')).join('') : null;
+}
 /** Mark the wrong digits of a box judged wrong. Returns true when it could compare digit by digit. */
 function _markWrongDigits(el, want) {
     _mirrorDrop(el);
     if (_inQuiz(el) || typeof document === 'undefined') return false;
-    const v = _digitsOf(el.value);
-    const w = (Array.isArray(want) ? want : [want]).map(_digitsOf).find((x) => /^\d+$/.test(x)) || '';
-    if (!/^\d+$/.test(v) || !w) return false;
-    if (v.length === 1 && w.length === 1) { el.classList.add('mq-wrong-digit'); return true; }
+    const v = _wdParse(el.value);
+    if (!v) return false;
+    const ws = (Array.isArray(want) ? want : [want]).map(_wdParse).filter(Boolean);
+    const w = ws.find((x) => x.seps.join('|') === v.seps.join('|')) || ws[0];
+    if (!w) return false;
+    const plain = (p) => !p.sign && !p.seps.length && p.runs[0].length === 1;
+    if (plain(v) && plain(w)) { el.classList.add('mq-wrong-digit'); return true; }
+    const cells = _wdAlign(v, w);
+    if (!cells) return false;
     const host = el.closest('#questionCard, .problem-card');
     if (!host) return false;
-    const n = Math.max(v.length, w.length);
     const m = document.createElement('span');
     m.className = 'mq-wd-mirror';
     m.setAttribute('aria-hidden', 'true');
-    for (let i = 0; i < n; i++) {
-        const a = v[i - (n - v.length)], b = w[i - (n - w.length)];
+    m.dataset.v = el.value;
+    cells.forEach((c) => {
         const s = document.createElement('span');
-        if (a === undefined) { s.className = 'mq-wd mq-wd-miss'; s.textContent = ' '; }
-        else { s.className = a === b ? 'mq-wd' : 'mq-wd mq-wd-bad'; s.textContent = a; }
+        s.className = 'mq-wd' + (c.cls === 'bad' ? ' mq-wd-bad' : c.cls === 'miss' ? ' mq-wd-miss' : '') + (c.sep ? ' mq-wd-sep' : '');
+        s.textContent = c.cls === 'miss' ? ' ' : c.ch;
         m.appendChild(s);
-    }
+    });
     // on the card, like the corner mark (a cell's own redraws never touch it); _mirrorPlace keeps it on its box
     if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
     host.appendChild(m);
@@ -819,17 +868,36 @@ function _markWrongDigits(el, want) {
     el.classList.add('mq-wd-mirrored');
     _mirrorPlace(el);
     setTimeout(() => _mirrorPlace(el), 150);
+    _mirrorWatch();
     return true;
+}
+// A checker that empties or rewrites a box without an input event (the ladder's last try, Check all)
+// must not leave its old digits floating: a mirror whose box no longer holds its value goes.
+let _mirrorTimer = 0;
+function _mirrorWatch() {
+    if (_mirrorTimer || typeof setInterval !== 'function') return;
+    _mirrorTimer = setInterval(() => {
+        MIRRORS.forEach((m, el) => { if (!el.isConnected || el.value !== m.dataset.v) _mirrorDrop(el); });
+        if (!MIRRORS.size) { clearInterval(_mirrorTimer); _mirrorTimer = 0; }
+    }, 200);
+}
+/**
+ * THE one way a checker empties or resets a box it has marked: the value, the red / green, the
+ * corner mark and the digit mirror all go together (Wave 1 / A3 critic r1).
+ */
+export function clearBoxMark(el, value = '') {
+    if (!el) return;
+    el.value = value;
+    el.classList.remove('mq-live-wrong', 'mq-live-correct', 'mq-wd-empty');
+    el.removeAttribute('aria-invalid');
+    _mirrorDrop(el);
+    _badgeDrop(el);
 }
 let _tabAt = 0;
 let _clearWired = false;
 function _clearIfWrong(el) {
     if (!el || _inQuiz(el) || el.disabled || el.readOnly || !el.classList.contains('mq-live-wrong')) return;
-    el.value = '';
-    el.classList.remove('mq-live-wrong', 'mq-live-correct', 'mq-wd-empty');
-    el.removeAttribute('aria-invalid');
-    _mirrorDrop(el);
-    _badgeDrop(el);
+    clearBoxMark(el);
     el.style.borderColor = ''; el.style.background = '';
     // the item stays "helped" (host.dataset.mqHelped is kept): a cleared box still went red
     const card = el.closest('.problem-card');
@@ -839,10 +907,16 @@ function _clearIfWrong(el) {
 function _wireClear() {
     if (_clearWired || typeof document === 'undefined') return;
     _clearWired = true;
-    // a pupil's tap or click, or a Tab into the box - never a program focus (the app refocuses the box after Check)
+    // a pupil's tap or click empties a red box; a Tab into it only selects it (typing replaces it, and
+    // Tabbing THROUGH it keeps it) - never a program focus (the app refocuses the box after Check)
     document.addEventListener('pointerdown', (e) => { if (e.target && e.target.tagName === 'INPUT') _clearIfWrong(e.target); }, true);
     document.addEventListener('keydown', (e) => { if (e.key === 'Tab') _tabAt = Date.now(); }, true);
-    document.addEventListener('focusin', (e) => { if (Date.now() - _tabAt < 400 && e.target && e.target.tagName === 'INPUT') _clearIfWrong(e.target); }, true);
+    document.addEventListener('focusin', (e) => {
+        const t = e.target;
+        if (Date.now() - _tabAt < 400 && t && t.tagName === 'INPUT' && t.classList.contains('mq-live-wrong') && !_inQuiz(t)) {
+            setTimeout(() => { try { if (document.activeElement === t) t.select(); } catch (_) { /* not selectable */ } }, 0);
+        }
+    }, true);
     window.addEventListener('resize', () => Array.from(MIRRORS.keys()).forEach(_mirrorPlace));
 }
 /**

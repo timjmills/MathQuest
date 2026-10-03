@@ -105,7 +105,9 @@ const info = (page, i) => page.evaluate((i) => {
   const cs = getComputedStyle(el);
   return { v: el.value, bad: el.classList.contains('mq-live-wrong'), ok: el.classList.contains('mq-live-correct'),
     wd: el.classList.contains('mq-wrong-digit'), empty: el.classList.contains('mq-wd-empty'), digits, badColor, plain: mir ? mir.dataset.plain : null,
-    color: cs.webkitTextFillColor || cs.color, anim: nAnim, opacity: cs.opacity };
+    color: cs.webkitTextFillColor || cs.color, anim: nAnim, opacity: cs.opacity,
+    under: mir && mir.querySelector('.mq-wd-bad') ? getComputedStyle(mir.querySelector('.mq-wd-bad')).textDecorationLine : null,
+    sel: getComputedStyle(el, '::selection').backgroundColor, selStart: el.selectionStart, selEnd: el.selectionEnd };
 }, i);
 const helped = (page, host) => page.evaluate((host) => { const r = host === 'card' ? document.getElementById('questionCard') : document.getElementById('ws_card_0'); return r.dataset.mqHelped === '1'; }, host);
 
@@ -130,6 +132,12 @@ async function scenario(page, host, s, w, reduce) {
     const r = []; for (let i = 0; i < t.n; i++) r.push(await info(page, i));
     const last = r[t.n - 1];
     check(last.bad && last.wd && r.slice(0, -1).every((x) => x.ok && !x.wd), `${t0} only the wrong ones digit gets the class (${r.map((x) => (x.wd ? 'W' : x.ok ? 'g' : '-')).join('')})`);
+    check(last.sel === 'rgba(0, 0, 0, 0.12)', `${t0} a selected red entry sits on a pale grey selection, not the browser blue (${last.sel})`);
+    if (!reduce) {
+      // the digit blinks; the box (its dashed edge) never fades
+      let minOp = 1; for (let k = 0; k < 8; k++) { const o = await info(page, t.n - 1); minOp = Math.min(minOp, Number(o.opacity)); await sleep(90); }
+      check(minOp === 1, `${t0} the box itself does not fade while its digit blinks (min opacity ${minOp})`);
+    }
     if (!reduce) check(last.anim > 0, `${t0} the wrong digit blinks (${last.anim} animation)`);
     else check(last.anim === 0 && last.color === RED, `${t0} reduced motion: no blink, steady red (${last.anim}, ${last.color})`);
     if (!reduce) { await shot(page, host, name + '-wrong', w); await sleep(3800); const a = await info(page, t.n - 1); check(a.anim === 0 && a.color === RED && Number(a.opacity) === 1, `${t0} after 3 cycles the blink stops and holds steady red (${a.anim}, ${a.color}, ${a.opacity})`); }
@@ -137,8 +145,12 @@ async function scenario(page, host, s, w, reduce) {
     await page.evaluate((i) => document.querySelector(`[data-t="${i}"]`).focus(), t.n - 2);
     await page.keyboard.press('Tab'); await sleep(150);
     const tb = await page.evaluate(() => document.activeElement && document.activeElement.getAttribute('data-t'));
-    if (tb === String(t.n - 1)) { const c = await info(page, t.n - 1); check(c.v === '' && !c.bad && !c.wd, `${t0} Tab into the red box empties it and removes the red (${JSON.stringify(c.v)}, ${c.bad})`); }
-    else { await tap(page, t.n - 1); await sleep(100); const c = await info(page, t.n - 1); check(c.v === '' && !c.bad && !c.wd, `${t0} tap on the red box empties it and removes the red (Tab went to ${tb})`); }
+    if (tb === String(t.n - 1)) {
+      const c = await info(page, t.n - 1);
+      check(c.v !== '' && c.bad && c.selStart === 0 && c.selEnd === c.v.length, `${t0} Tab into the red box keeps and selects it, never erases it (${JSON.stringify(c.v)} sel ${c.selStart}-${c.selEnd})`);
+    } else check(true, `${t0} (Tab order went to ${tb}; Tab-select checked on the other hosts)`);
+    await tap(page, t.n - 1); await sleep(100);
+    { const c = await info(page, t.n - 1); check(c.v === '' && !c.bad && !c.wd, `${t0} a tap on the red box empties it and removes the red (${JSON.stringify(c.v)})`); }
     await tap(page, 0); await sleep(100);
     const g = await info(page, 0);
     check(g.ok && g.v === t.exp[0], `${t0} a green box tapped keeps its digit (${g.v})`);
@@ -172,6 +184,7 @@ async function scenario(page, host, s, w, reduce) {
     const want = 'b'+ '.'.repeat(t.exp[k].length - 1);
     check(r.bad && r.digits === want, `${t0} only the wrong tens digit is red in a 2-digit box (${r.digits} want ${want})`);
     check(r.plain === 'rgb(0, 0, 0)' && r.badColor === RED, `${t0} right digit black, wrong digit red (${r.plain}, ${r.badColor})`);
+    check(/underline/.test(r.under || ''), `${t0} the wrong digit is underlined too, not colour alone (${r.under})`);
     if (!reduce) check(r.anim > 0, `${t0} the wrong digit blinks`); else check(r.anim === 0, `${t0} reduced motion: no blink (${r.anim})`);
     if (!reduce) { await shot(page, host, name + '-wrong', w); await sleep(3800); const a = await info(page, k); check(a.anim === 0 && a.badColor === RED, `${t0} the blink stops and holds steady red (${a.anim}, ${a.badColor})`); }
     await tap(page, k); await sleep(120);
@@ -214,6 +227,75 @@ async function scenario(page, host, s, w, reduce) {
   check(g.v === a, `${t0} a right box tapped keeps its answer (${g.v})`);
 }
 
+// critic r1 #7: fractions per part, decimals at the point, the sign on its own
+async function shapes(page) {
+  await boot(page);
+  const cases = [
+    ['47', '42', '.b'], ['2', '12', 'm.'], ['3/5', '3/4', '.|b'], ['13/4', '3/4', 'b.|.'], ['1 2/3', '1 1/3', '.|b|.'],
+    ['3.25', '3.5', '.|bb'], ['3.5', '3.25', '.|bm'], ['3.4', '3.45', '.|.m'], ['35', '3.5', 'bbmm'],
+    ['-7', '7', 'b.'], ['7', '-7', 'm.'], ['-12', '-13', '..b'],
+  ];
+  const got = await page.evaluate(async (cases) => {
+    const m = await import('/js/modules/screen-cell.js');
+    return cases.map(([v, w]) => m.wrongDigitPattern(v, w));
+  }, cases);
+  cases.forEach(([v, w, want], i) => {
+    if (want === null) check(got[i] === null || /m/.test(got[i]), `[shapes] ${v} vs ${w}: a missing point is a missing mark (${got[i]})`);
+    else check(got[i] === want, `[shapes] ${v} vs ${w} -> ${want} (${got[i]})`);
+  });
+}
+
+// critic r1 #2: the ladder's last try empties the box with no input event: no ghost digits stay behind
+async function ghost(page, w) {
+  const t0 = `[${w} card ladder-spent]`;
+  await boot(page);
+  await setup(page, 'card', { c: 'addition', k: 'add_facts', kind: 'single', size: 'big' });
+  const a = await page.evaluate(() => String(window.state.currentQ.ans));
+  let res = null;
+  for (let k = 0; k < 10; k++) {
+    await page.evaluate((v) => { const el = document.getElementById('answerInput'); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); window.submitAnswer(); }, a.slice(0, -1) + flip(a.slice(-1)));
+    await sleep(500);
+    res = await page.evaluate(() => { const el = document.getElementById('answerInput'); return { v: el.value, mir: document.querySelectorAll('#questionCard .mq-wd-mirror').length, mirrored: el.classList.contains('mq-wd-mirrored') }; });
+    if (res.v === '') break;
+  }
+  check(res && res.v === '', `${t0} the ladder empties the box after its last try (${JSON.stringify(res)})`);
+  check(res && res.mir === 0 && !res.mirrored, `${t0} no ghost digits stay over the emptied box (${JSON.stringify(res)})`);
+  await page.keyboard.type('5', { delay: 15 });
+  const typed = await page.evaluate(() => { const el = document.getElementById('answerInput'); return { v: el.value, fill: getComputedStyle(el).webkitTextFillColor }; });
+  check(typed.v.endsWith('5') && typed.fill !== 'rgba(0, 0, 0, 0)', `${t0} a keyboard pupil types straight into it and sees the digit (${JSON.stringify(typed)})`);
+}
+
+// critic r1 #8: the auto-advance after a right answer never steals a box the pupil has just tapped
+async function advance(page, w) {
+  const t0 = `[${w} worksheet auto-advance]`;
+  await boot(page);
+  await page.evaluate(() => { const st = window.state; st.category = 'addition'; st.skill = 'add_facts'; st.range = 100; st.isMixedMode = false; st.quizMode = false; st.gameMode = 'worksheet'; st.problemCount = 4; window.initWorksheet(); });
+  await sleep(1200);
+  const ans = await page.evaluate(() => window.state.worksheetQs.map((q) => String(q.ans)));
+  // finish card 2, then within 750 ms tap card 4 (card 3 is where the advance would go) and type
+  await page.evaluate(() => { const el = document.getElementById('ws_input_1'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); });
+  await page.keyboard.type(ans[1], { delay: 15 });
+  await sleep(150);
+  await page.evaluate(() => { const el = document.getElementById('ws_input_3'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); });
+  for (const ch of ans[3]) { await page.keyboard.type(ch); await sleep(350); }
+  await sleep(900);
+  const r = await page.evaluate(() => ({ v2: document.getElementById('ws_input_2').value, v3: document.getElementById('ws_input_3').value, active: document.activeElement && document.activeElement.id }));
+  check(r.v3 === ans[3] && r.v2 === '', `${t0} the digits land in the tapped card, none in the card the advance would have picked (${JSON.stringify(r)})`);
+  // finish card 1 and tap card 3 within 750 ms: its digits land in card 3
+  await boot(page);
+  await page.evaluate(() => { const st = window.state; st.category = 'addition'; st.skill = 'add_facts'; st.range = 100; st.isMixedMode = false; st.quizMode = false; st.gameMode = 'worksheet'; st.problemCount = 4; window.initWorksheet(); });
+  await sleep(1200);
+  const a2 = await page.evaluate(() => window.state.worksheetQs.map((q) => String(q.ans)));
+  await page.evaluate(() => { const el = document.getElementById('ws_input_0'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); });
+  await page.keyboard.type(a2[0], { delay: 15 });
+  await sleep(100);
+  await page.evaluate(() => { const el = document.getElementById('ws_input_2'); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); });
+  for (const ch of a2[2]) { await page.keyboard.type(ch); await sleep(350); }
+  await sleep(900);
+  const r2 = await page.evaluate(() => ({ v1: document.getElementById('ws_input_1').value, v2: document.getElementById('ws_input_2').value }));
+  check(r2.v2 === a2[2] && r2.v1 === '', `${t0} finish card 1, tap card 3 within 750 ms: the digits land in card 3 (${JSON.stringify(r2)})`);
+}
+
 async function quiz(page, w) {
   for (const [c, k] of [['addition', 'add_facts'], ['multiplication', 'count_by_tables']]) {
     await boot(page);
@@ -252,6 +334,9 @@ async function run(w) {
   for (const host of ['card', 'worksheet']) for (const s of SCENARIOS) await scenario(page, host, s, w, true);
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
   await quiz(page, w);
+  await ghost(page, w);
+  await advance(page, w);
+  if (w === 1280) await shapes(page);
   const errs = problems.filter((p) => !/favicon/.test(p.text));
   check(errs.length === 0, `[${w}] no console errors ${errs.length ? JSON.stringify(errs.slice(0, 3)) : ''}`);
   await close();

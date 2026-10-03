@@ -11,7 +11,7 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
-import { markBoxSubmitted, itemWasHelped, markMissingDigits } from './screen-cell.js';
+import { markBoxSubmitted, itemWasHelped, markMissingDigits, clearBoxMark } from './screen-cell.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -1265,7 +1265,7 @@ export function checkAnswer(userAns, btnElement) {
         // marked gently and selected, so typing replaces it)
         if (answerInput) {
             if (gentle && answerInput.value) markTried(answerInput);
-            else answerInput.value = "";
+            else clearBoxMark(answerInput);      // value, red, cross and digit mirror go together (A3)
             answerInput.style.borderColor = "";
             answerInput.style.background = "";
             answerInput.disabled = false;
