@@ -1254,6 +1254,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `true-false` | Check one box: True or False. Finish the sentence. | True or False? |
 | `spot` | Find the mistake. Circle it. Write the correct answer. | Reason It |
 | `odd-one` | Circle the one that does not belong. Finish the sentence. | Reason It |
+| `sort-even-odd` | Circle the even numbers. Cross out the odd numbers. | the odd/even sort (a choose-all list with two marks); one line per section, never repeated in the cell |
 | `asn` | Check one box: Always, Sometimes or Never. Write an example. | Reason It |
 | `which` | Which answer is correct? Circle A or B. | Reason It |
 | `stretch` | Find more than one answer. Fill in the table. | Stretch |

@@ -109,6 +109,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'true-false': 'Check one box: True or False. Finish the sentence.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
+    'sort-even-odd': 'Circle the even numbers. Cross out the odd numbers.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',
     which: 'Which answer is correct? Circle A or B.',
     stretch: 'Find more than one answer. Fill in the table.',

@@ -709,6 +709,14 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * printed again on the same page). Not with step-by-step anchors (their bands are keyed by
  * section).
  */
+/** The library lines a choose-all list's section prints for it (RM-08 and its paper tasks). */
+const PAPER_TASK_KEYS = new Set(['default-circle-all', 'sort-even-odd']);
+
+/** A choose-all cell without its prompt line when the section line says exactly that. */
+function dropSamePrompt(html, line) {
+    return String(html).replace(/<div class="ms-prompt[^"]*">([^<]*)<\/div>/, (m, t) => (t.trim() === String(line).trim() ? '' : m));
+}
+
 /** A choose-all cell's prompt without its verb: "Circle all sums that equal 1." -> "Sums that equal 1." */
 export function circleAllCriterion(html) {
     return String(html).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Select|Tap|Check|Choose)\s+(?:ALL|all)\s+(?:of\s+)?(?:the\s+)?([a-z])/, (m, open, c) => `${open}${c.toUpperCase()}`);
@@ -753,6 +761,11 @@ export function itemInstructionKey(it) {
     // pool's one key, which is exactly the line that does not fit each kind.
     const q = it.q || {};
     if (q.printFormat === 'multi-select' && !q.printText) return 'default-circle-all';
+    // a choose-all list with its own paper task (the odd/even sort): that task's library line
+    if (q.printFormat === 'multi-select' && q.printText) {
+        const k = Object.keys(INSTRUCTION_LIBRARY).find((x) => INSTRUCTION_LIBRARY[x] === String(q.printText).trim());
+        if (k) return k;
+    }
     try {
         const p = getProvider(q.categoryId || '', q.skillId || '');
         // Only a skill's own strings (the default adapter's key is a placeholder).
@@ -826,7 +839,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const mixedKinds = new Set(ownKeys.filter(Boolean)).size > 1;
         // A group whose items all say one line of their own (a split-off row of choose-all
         // items, whose line is "Circle all the correct answers.") prints that line.
-        const uniformOwn = ownKeys.length && ownKeys[0] && ownKeys.every((k) => k === ownKeys[0]) && ownKeys[0] === 'default-circle-all';
+        const uniformOwn = ownKeys.length && ownKeys[0] && ownKeys.every((k) => k === ownKeys[0]) && PAPER_TASK_KEYS.has(ownKeys[0]);
         const keys = sec.instructionKey ? [sec.instructionKey] : (mixedKinds || uniformOwn) ? ownKeys : hostKeys;
         let key = sec.instructionKey ? sectionInstructionKey(keys) : neutralForKinds(sectionInstructionKey(keys), pupil);
         let text;
@@ -941,6 +954,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     if (instr[part.section].key === 'default-circle-all' && typeof pi.render === 'function') {
                         const draw = pi.render;
                         pi.render = (c) => circleAllCriterion(draw(c));
+                    } else if (PAPER_TASK_KEYS.has(instr[part.section].key) && typeof pi.render === 'function') {
+                        // the section line says the paper task: the cell does not say it again (P-LG-5)
+                        const draw = pi.render;
+                        const line = INSTRUCTION_LIBRARY[instr[part.section].key];
+                        pi.render = (c) => dropSamePrompt(draw(c), line);
                     }
                     return pi;
                 }),

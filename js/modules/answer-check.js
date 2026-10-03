@@ -1382,6 +1382,10 @@ export function submitAnswer() {
     // multi-select-check submits via its own in-widget Submit button.
     // The global Submit shortcut/button is a no-op for these items.
     if (q.answerType === "multi-select-check") {
+        // ...unless the list is drawn without one (the practice card, like the worksheet): the
+        // card's Check grades the rings
+        const mscHost = document.getElementById('multiSelectHost');
+        if (mscHost && typeof mscHost._mscCheck === 'function') mscHost._mscCheck();
         return;
     }
 

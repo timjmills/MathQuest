@@ -1756,7 +1756,11 @@ function _syncChromeCheck() {
         const input = document.getElementById('answerInput');
         const visualAid = document.getElementById('visualAid');
         const shown = (el) => !!el && el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
+        const mscHost = document.getElementById('multiSelectHost');
         if (_checkProxy()) {
+            show = true;
+        } else if (mscHost && mscHost.dataset.mscEmbedded === '1' && typeof mscHost._mscCheck === 'function') {
+            // a choose-all list drawn without its own Submit: the card's Check grades it
             show = true;
         } else if (paper && (paper.classList.contains('mq-slot-moved') || paper.classList.contains('mq-tick-mode'))) {
             show = !!input && !input.disabled && !!visualAid && shown(visualAid);
@@ -3388,8 +3392,12 @@ function _renderQuestionImpl() {
         }
         import('./widgets/multi-select-check.js').then(mod => {
             resetRetryState();
-            mod.renderMultiSelectCheck(q, host);
-            mod.setOnMultiSelectSubmit((qq, selectedIds) => {
+            // The practice card matches the worksheet (critic fractions-key D10): the options only
+            // in the cell, no Submit or counter there; the card's own Check grades the rings.
+            // (A MAP session keeps the widget's Submit: its flow is its own.)
+            const embedded = state.mapMode !== true;
+            mod.renderMultiSelectCheck(q, host, { embedded });
+            const onMsc = (qq, selectedIds) => {
                 const allCorrect = mod.checkMultiSelectCheck(qq, selectedIds);
                 const correctSet = new Set(qq.ans || []);
                 const selectedSet = new Set(selectedIds);
@@ -3458,7 +3466,21 @@ function _renderQuestionImpl() {
                         if (host._mscLock) host._mscLock();
                     },
                 });
-            });
+            };
+            mod.setOnMultiSelectSubmit(onMsc);
+            if (embedded) {
+                // the prompt is written by now: the screen verb is Tap, the fractions stacked
+                const qtEl = document.getElementById("questionText");
+                if (qtEl && !/[<>&]/.test(qtEl.textContent || '') && /\bClick\b|\d\/\d/i.test(qtEl.textContent || '')) {
+                    const said = String(qtEl.textContent).replace(/\bClick\b/g, 'Tap').replace(/\bclick\b/g, 'tap');
+                    import('./utils.js').then(u => { if (qtEl.isConnected) qtEl.innerHTML = u.stackSlashFractions(said); }).catch(() => {});
+                }
+                host._mscCheck = () => {
+                    const ids = Array.from(host.querySelectorAll('.msc-opt.selected')).map(el => el.dataset.id);
+                    if (ids.length) onMsc(q, ids);
+                };
+                _syncChromeCheck();
+            }
         }).catch(err => console.error('Failed to load multi-select-check widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
