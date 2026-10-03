@@ -654,8 +654,8 @@
     "card-1280": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "12 ÷ 3 = ?",
-      "ans": "4",
+      "text": "0 ÷ 10 = ?",
+      "ans": "0",
       "measure": {
         "hScroll": 0,
         "colours": [
@@ -725,7 +725,7 @@
     "card-820": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "40 ÷ 10 = ?",
+      "text": "48 ÷ 12 = ?",
       "ans": "4",
       "measure": {
         "hScroll": 0,
@@ -796,7 +796,7 @@
     "card-390": {
       "answerType": "number",
       "printFormat": "div-facts-horizontal",
-      "text": "24 ÷ 6 = ?",
+      "text": "32 ÷ 8 = ?",
       "ans": "4",
       "measure": {
         "hScroll": 0,

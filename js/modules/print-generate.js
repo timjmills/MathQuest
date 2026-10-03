@@ -4501,9 +4501,9 @@ function wsAnswerLine(digits, shiftMm = 0) {
         // one box per digit (owner ruling 2026-10-02): a joined strip the key fills digit by digit
         const n = Math.max(1, digits);
         const w = (wsWriteMm() * 0.95).toFixed(2);
-        return `<span class="ws-slot ws-slot--digits" data-ws-shape="box" style="display:inline-flex;vertical-align:bottom;`
+        return `<span class="ws-slot ws-slot--digits" data-ws-shape="box" style="display:inline-flex;vertical-align:middle;`
             + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `">`
-            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:${w}mm;height:${wsWriteMm()}mm;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:max(${w}mm, 0.82em);height:max(${wsWriteMm()}mm, 1.15em);line-height:1;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     }
     if (ab === 'off') {

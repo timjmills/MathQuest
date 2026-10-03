@@ -654,7 +654,7 @@
     "card-1280": {
       "answerType": "number",
       "printFormat": "sub-facts-vertical",
-      "text": "12 − 3 = ?",
+      "text": "16 − 7 = ?",
       "ans": "9",
       "measure": {
         "hScroll": 0,
@@ -725,7 +725,7 @@
     "card-820": {
       "answerType": "number",
       "printFormat": "sub-facts-vertical",
-      "text": "17 − 8 = ?",
+      "text": "13 − 4 = ?",
       "ans": "9",
       "measure": {
         "hScroll": 0,
@@ -796,8 +796,8 @@
     "card-390": {
       "answerType": "number",
       "printFormat": "sub-facts-vertical",
-      "text": "14 − 5 = ?",
-      "ans": "9",
+      "text": "18 − 10 = ?",
+      "ans": "8",
       "measure": {
         "hScroll": 0,
         "colours": [
@@ -857,7 +857,7 @@
           ],
           [
             "Andika",
-            6
+            7
           ]
         ],
         "smallTargets": [],

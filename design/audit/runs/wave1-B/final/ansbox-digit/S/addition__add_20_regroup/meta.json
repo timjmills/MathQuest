@@ -20,14 +20,14 @@
             "perPage": 15,
             "pages": 1,
             "cellW": 37.2,
-            "cellH": 76,
+            "cellH": 71.05,
             "requested": "auto",
             "clamped": false,
             "note": "Dense: 5 x 3, cells sized to the problems.",
             "line": "Fits: 5 columns x 3 rows, 15 per page, 1 page. Digits 16 pt. Dense: 5 x 3, cells sized to the problems.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 53.1,
+            "hMin": 49.7,
             "anchorMm": 0,
             "blocks": null
           }
@@ -54,23 +54,23 @@
           "ans": "18",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -82,23 +82,23 @@
           "ans": "17",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -110,23 +110,23 @@
           "ans": "14",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -138,23 +138,23 @@
           "ans": "11",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -166,23 +166,23 @@
           "ans": "11",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -194,23 +194,23 @@
           "ans": "13",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -222,23 +222,23 @@
           "ans": "12",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -250,23 +250,23 @@
           "ans": "13",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -278,23 +278,23 @@
           "ans": "12",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -306,23 +306,23 @@
           "ans": "15",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -334,23 +334,23 @@
           "ans": "15",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -362,23 +362,23 @@
           "ans": "16",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -390,23 +390,23 @@
           "ans": "14",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -418,23 +418,23 @@
           "ans": "11",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -446,23 +446,23 @@
           "ans": "14",
           "measured": {
             "1": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "2": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "3": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "4": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             },
             "5": {
-              "hMm": 53.1,
+              "hMm": 49.7,
               "fits": true
             }
           }
@@ -731,7 +731,7 @@
         "colours": [
           [
             "box-shadow",
-            25
+            29
           ],
           [
             "borderTopColor:rgb(221, 214, 238)",

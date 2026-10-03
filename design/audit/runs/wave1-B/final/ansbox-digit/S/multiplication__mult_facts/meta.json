@@ -619,7 +619,7 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 159,
+          "words": 139,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -654,8 +654,8 @@
     "card-1280": {
       "answerType": "number",
       "printFormat": "mult-facts-vertical",
-      "text": "11 × 4 = ?",
-      "ans": "44",
+      "text": "2 × 4 = ?",
+      "ans": "8",
       "measure": {
         "hScroll": 0,
         "colours": [
@@ -715,7 +715,7 @@
           ],
           [
             "Andika",
-            6
+            5
           ]
         ],
         "smallTargets": [],
@@ -725,8 +725,8 @@
     "card-820": {
       "answerType": "number",
       "printFormat": "mult-facts-vertical",
-      "text": "7 × 4 = ?",
-      "ans": "28",
+      "text": "1 × 0 = ?",
+      "ans": "0",
       "measure": {
         "hScroll": 0,
         "colours": [
@@ -796,8 +796,8 @@
     "card-390": {
       "answerType": "number",
       "printFormat": "mult-facts-vertical",
-      "text": "3 × 4 = ?",
-      "ans": "12",
+      "text": "5 × 4 = ?",
+      "ans": "20",
       "measure": {
         "hScroll": 0,
         "colours": [

@@ -538,9 +538,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
             // (b) print: the chosen box style is drawn, and the key writes every answer
             const MARK = {
-                digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg/,
-                one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)/,
-                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"/,   // a key's open zone: plain digits, no box
+                // kit cells, then the legacy print slots (print-generate.js wsStackHTML / wsAnswerLine)
+                digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg|ws-fact-write--digit|ws-slot--digits/,
+                one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)|class="ws-fact-write" style="[^"]*border:|class="ws-slot" data-ws-shape="line" style="[^"]*border:[^"]*border-radius/,
+                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:[\d.]+mm;(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"/,   // a key's open zone: plain digits, no box
             };
             try {
                 const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
@@ -572,7 +573,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                         if (value === 'one' && (has('.mq-ansoff, .mq-ans-off') || (kind.kind === 'stack' && !has('.mq-ans-one')))) fail('screen/practice', 'ansBox one: the card does not draw one box');
                         // the three values must LOOK different: the computed edges of the answer places
                         abSig[value] = Array.from(card.querySelectorAll('input')).filter(e => e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'))
-                            .map(e => { const cs = getComputedStyle(e); return [cs.borderTopWidth, cs.borderTopStyle, cs.borderLeftWidth, cs.borderBottomWidth, cs.boxShadow].join(' '); }).join('|');
+                            .map(e => { const cs = getComputedStyle(e); return [cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor, cs.borderLeftWidth, cs.borderBottomWidth, cs.borderBottomColor, cs.boxShadow].join(' '); }).join('|');
                         if (value === 'off' && abSig.digit !== undefined && abSig.one !== undefined) {
                             const kindName = kind.kind;
                             if (abSig.off === abSig.one || abSig.off === abSig.digit || (kindName === 'stack' && abSig.one === abSig.digit))
