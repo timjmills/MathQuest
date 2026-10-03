@@ -594,6 +594,9 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
         // A pv item's identity is its description plus what it prints: a sort prints the same
         // sentence every time and its whole variation is the tiles.
         if (pv) fp = `${text}|${printText}|${JSON.stringify(q.pv || null)}|${JSON.stringify(q.tiles || null)}|${JSON.stringify(q.numbers || null)}|${String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')}`;
+        // A count-by row (wave 1 C2): the row is the same step on every row of a typed-step page, so the pupil's
+        // gaps (the key) are what makes two rows different: they are part of the item's identity.
+        if (q.countBy && q.cell && q.cell.template === 'count-row') fp += `|${q.ans}|${(q.countBy.values || [])[0]}|${q.countBy.dir || ''}`;
         const item = {
             a: q.a, b: q.b, op: q.op, ans: q.ans, fp,
             fmt: q.printFormat || '(none)', type: q.answerType || '(none)',
@@ -913,20 +916,70 @@ function countByRules(items, F) {
         const p = it.cellP || {};
         if (it.cellT === 'count-row' && it.countBy) {
             const { step, values, blanks, pct } = it.countBy;
+            const o = it.opts || {};
             const fill = it.countBy.fill || 'one', nJ = it.countBy.jumps || 12;
-            if (![12, 15].includes(values.length) || values.length !== nJ || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the ${nJ} multiples of ${step}: ${values.join(', ')}`);
-            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
-            // ONE PAGE (owner 2026-10-02): rows are x 1 .. x 12 in order, twelve jumps long whatever "jumps" says.
-            if (it.opts && it.opts.onePage) {
-                const at = live.filter(x => x.cellT === 'count-row' && x.countBy).indexOf(it);
-                if (step !== (at % 12) + 1) bad.row.push(`one page: row ${at + 1} counts by ${step}, not ${(at % 12) + 1}`);
-                if (values.length !== 12) bad.row.push(`one page: a row of ${values.length} jumps (must be 12)`);
+            const fm = (n) => Number(n).toLocaleString('en-US');
+            // Wave 1 C2: the page's ROW LIST (option `rows`, or an old ticked-tables `constant`). Written here from the
+            // option's own promise, independently of count-rows.js: each dealt row is one of the chosen rows, and its
+            // numbers are that row's step run from its start in its direction, never below 0.
+            const normR = (r) => ({ step: Number(r.step), start: r.start || 'step', at: r.start === 'custom' ? Number(r.at) || 0 : null, dir: r.dir === 'down' ? 'down' : 'up' });
+            let chosen = Array.isArray(o.rows) && o.rows.length ? o.rows.map(normR) : null;
+            if (!chosen && Array.isArray(o.constant) && o.constant.length && o.constant.length < 12) chosen = [...new Set(o.constant)].sort((x, y) => x - y).map(n => normR({ step: n }));
+            const plainOnly = !!chosen && chosen.every(r => r.start === 'step' && r.dir === 'up' && r.step <= 12);
+            const timesOpt = o.times || 'none', onePageOn = !!o.onePage;
+            const row = it.countBy.row ? normR(it.countBy.row) : { step, start: it.countBy.start || 'step', at: it.countBy.startAt, dir: it.countBy.dir || 'up' };
+            const dir = row.dir === 'down' ? 'down' : 'up';
+            const same = (x, y) => x.step === y.step && x.start === y.start && x.at === y.at && x.dir === y.dir;
+            if (row.step !== step) bad.row.push(`the dealt row counts by ${row.step} but the item says ${step}`);
+            if (chosen) { if (!chosen.some(r => same(r, row))) bad.row.push(`the row ${JSON.stringify(row)} is not one of the chosen rows ${JSON.stringify(chosen).slice(0, 120)}`); }
+            else if (!onePageOn && !(step >= 2 && step <= 12)) bad.row.push(`a table row counts by ${step}`);
+            if (!values.every((v, i) => Number.isInteger(v) && v >= 0 && (i === 0 || v - values[i - 1] === (dir === 'down' ? -step : step)))) bad.row.push(`not a count ${dir === 'down' ? 'back' : 'on'} by ${step} (no negatives): ${values.join(', ')}`);
+            const sm = row.start;
+            if (dir === 'up') {
+                const first = sm === 'zero' ? 0 : sm === 'custom' ? row.at : step;
+                if (values[0] !== first) bad.row.push(`counting on from ${sm} should start at ${first}, not ${values[0]}`);
+                if (values.length !== nJ) bad.row.push(`a row of ${values.length} numbers, not ${nJ}`);
+            } else {
+                if (sm === 'step' && (values[0] !== nJ * step || values.length !== nJ)) bad.row.push(`counting back from the end of the table should run ${nJ * step} .. ${step}, not ${values[0]} .. ${values[values.length - 1]}`);
+                if (sm === 'zero' && (values[0] !== (nJ - 1) * step || values[values.length - 1] !== 0 || values.length !== nJ)) bad.row.push(`counting back to 0 should end on 0 after ${nJ} numbers, not ${values[values.length - 1]} after ${values.length}`);
+                if (sm === 'custom') {
+                    // every row holds the full nJ numbers: a start too small is raised to the smallest that works, keeping its ones
+                    const top = row.at >= (nJ - 1) * step ? row.at : (nJ - 1) * step + (row.at % step);
+                    if (values[0] !== top || values.length !== nJ) bad.row.push(`counting back from ${row.at} by ${step} should be ${nJ} numbers from ${top}, not ${values.length} from ${values[0]}`);
+                    if (row.at % step !== values[values.length - 1] % step && top !== row.at) bad.row.push('the ones of the typed start were lost');
+                }
             }
+            if (values.length !== nJ) bad.row.push(`a row of ${values.length} numbers, not ${nJ}`);
+            // The tab says the way when any chosen row goes down; the multiplication labels are the facts of the row, or absent.
+            const anyDown = chosen ? chosen.some(r => r.dir === 'down') : false, anyUp = chosen ? chosen.some(r => r.dir === 'up') : true;
+            const pageDir = !anyDown ? 'forward' : anyUp ? 'mixed' : 'back';
+            const tab = String(it.cellP && it.cellP.tab);
+            const wantTab = pageDir === 'forward' ? fm(step) : `${dir === 'down' ? '\u2212' : '+'}${fm(step)}`;
+            if (onePageOn && chosen && false) { /* the one-page list is cut to what fits: its tab follows the cut list */ }
+            else if (tab !== wantTab && !(onePageOn && chosen)) bad.row.push(`the step tab reads "${tab}", not "${wantTab}"`);
+            const labels = it.countBy.labels, isTable = values.every(v => v % step === 0);
+            if (timesOpt === 'none' || onePageOn || !isTable) {
+                if (labels || (it.cellP && it.cellP.labels)) bad.row.push(`multiplication labels shown (times=${timesOpt}, onePage=${onePageOn}, table=${isTable})`);
+            } else {
+                if (!Array.isArray(labels) || labels.length !== values.length || labels.some((l, i) => l !== `${fm(values[i] / step)} \u00d7 ${fm(step)}`)) bad.row.push(`the multiplication labels are not the facts of ${values.join(', ')}: ${labels && labels.slice(0, 3)}`);
+                if (!it.cellP || it.cellP.times !== timesOpt || JSON.stringify(it.cellP.labels) !== JSON.stringify(labels)) bad.row.push('the drawn labels are not the declared labels');
+            }
+            // The list is dealt in order, starting again when the page has more rows than were chosen.
+            const at = live.filter(x => x.cellT === 'count-row' && x.countBy).indexOf(it);
+            if (chosen && !plainOnly && o.order !== 'mixed' && !onePageOn && !same(chosen[at % chosen.length], row)) bad.row.push(`row ${at + 1} should be chosen row ${at % chosen.length + 1}, not ${JSON.stringify(row)}`);
+            // ONE PAGE (owner 2026-10-02): no rows chosen is x 1 .. x 12 in order; rows chosen is those rows once each, in order; twelve numbers a row.
+            if (onePageOn) {
+                if (!chosen && step !== (at % 12) + 1) bad.row.push(`one page: row ${at + 1} counts by ${step}, not ${(at % 12) + 1}`);
+                if (chosen && at < Math.min(12, chosen.length) && !same(chosen[at], row) && chosen.length <= 12) { /* the list may be cut where the page fills */ }
+                if (chosen && !chosen.some(r => same(r, row))) bad.row.push('one page: a row that was not chosen');
+                if (values.length !== 12) bad.row.push(`one page: a row of ${values.length} numbers (must be 12)`);
+            }
+            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
             if (fill !== 'one' && blanks.includes(1)) bad.row.push(`the second number is blank under fill=${fill}`);
             const pool = values.length - (fill === 'one' ? 1 : 2);
             const k = fill === 'half' ? Math.min(pool, Math.floor(values.length / 2)) : (pct >= 100 ? pool : Math.max(1, Math.round(pct / 100 * pool)));
             if (blanks.length !== k) bad.row.push(`${fill} / ${pct}% blank should leave ${k} of ${pool} gaps, not ${blanks.length}`);
-            if (pct < 100 && blanks.length && blanks.every((b, i) => b === values.length - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
+            if (pct < 100 && blanks.length && values.length >= 7 && blanks.every((b, i) => b === values.length - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
             const key = keyOf(it);
             if (key.join(',') !== blanks.map(i => values[i]).join(',')) bad.row.push(`the key ${key.join(', ')} is not the row at its gaps`);
             if (JSON.stringify(p.values) !== JSON.stringify(values) || JSON.stringify(p.blanks) !== JSON.stringify(blanks)) bad.row.push('the drawn row is not the declared row');
@@ -990,6 +1043,27 @@ function countByRules(items, F) {
             else if (h.response === 'missing' && !sentence.includes(Number(it.ans))) bad.hop.push(`the missing number ${it.ans} is not in ${sentence.join(', ')}`);
         }
     }
+    // Wave 1 C2: a page of mixed rows deals each chosen row (every row of the list within one round) and, shuffled, not in a fixed cycle.
+    const cbRows = live.filter(x => x.cellT === 'count-row' && x.countBy);
+    if (cbRows.length >= 12 && cbRows.every(x => x.opts && Array.isArray(x.opts.rows) && x.opts.rows.length >= 3 && x.opts.order === 'mixed' && !x.opts.onePage)) {
+        const n = cbRows[0].opts.rows.length;
+        const key = (x) => `${x.countBy.step}|${x.countBy.start}|${x.countBy.startAt}|${x.countBy.dir}`;
+        const seen = new Set(cbRows.slice(0, n).map(key));
+        if (seen.size < Math.min(n, new Set(cbRows[0].opts.rows.map(r => `${r.step}|${r.start || 'step'}|${r.start === 'custom' ? r.at : null}|${r.dir || 'up'}`)).size)) bad.row.push(`a shuffled page does not deal every chosen row in its first round (${seen.size} of ${n})`);
+        const seq = cbRows.map(key);
+        const cyc = n >= 4 && seq.length >= 2 * n && seq.slice(n, 2 * n).join() === seq.slice(0, n).join() && seq.slice(2 * n, 3 * n).join() === seq.slice(0, n).join();
+        if (cyc) bad.row.push('a shuffled page deals the rows in the same order every round');
+    }
+    // Wave 1 C2: no row of a page repeats another exactly (same numbers, same gaps), and the first printed run is not the same on every row of a one-step page.
+    {
+        const rowsList = live.filter(x => x.cellT === 'count-row' && x.countBy && !(x.opts && x.opts.onePage));
+        const pageOf = (k) => Math.floor(k / 6);
+        const seenKey = new Map();
+        rowsList.forEach((x, k) => {
+            const key = `${pageOf(k)}|${x.countBy.values.join()}|${x.countBy.blanks.join()}`;
+            if (seenKey.has(key)) bad.row.push(`rows ${seenKey.get(key) + 1} and ${k + 1} of a page are identical`); else seenKey.set(key, k);
+        });
+    }
     if (bad.row.length) F('count-row', `${bad.row.length} count-by rows are wrong: ${show(bad.row)}`);
     if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);
     if (bad.grid.length) F('mult-grid', `${bad.grid.length} charts are keyed wrongly: ${show(bad.grid)}`);
@@ -1018,7 +1092,22 @@ function bondRules(items, F) {
 const ANSBOX_SKILLS = new Set((() => { try { return [...fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-ansbox-skills.js'), 'utf8').matchAll(/^\s+'([a-z_]+:[a-z0-9_]+)':/gm)].map((m) => m[1]); } catch (e) { return []; } })());
 const OPTION_SWEEPS = {
     'multiplication:count_by_tables': [{ fill: 'one' }, { fill: 'half' }, { jumps: 15 }, { jumps: 15, fill: 'half' }, { order: 'mixed' },
-        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 }],
+        { onePage: true }, { onePage: true, fill: 'one', missing: 100 }, { onePage: true, fill: 'two', missing: 100 }, { onePage: true, jumps: 15 },
+        // Wave 1 lane C2: the row list (tables, typed steps, starts, directions), the multiplication labels, the ways they meet.
+        { rows: [{ step: 7 }] }, { rows: [{ step: 15 }] }, { rows: [{ step: 25 }] }, { rows: [{ step: 250 }] }, { rows: [{ step: 1000 }] }, { rows: [{ step: 25000 }] }, { rows: [{ step: 100000 }] },
+        { rows: [{ step: 7 }], jumps: 15 }, { rows: [{ step: 1000 }], jumps: 15 }, { rows: [{ step: 3 }, { step: 4 }, { step: 6 }] }, { constant: [7, 8, 9] }, { constant: [5] },
+        { rows: [{ step: 4, start: 'zero' }] }, { rows: [{ step: 4, start: 'zero', dir: 'down' }] }, { rows: [{ step: 6, dir: 'down' }] },
+        { rows: [{ step: 5, start: 'custom', at: 3 }] }, { rows: [{ step: 100, start: 'custom', at: 2300 }] }, { rows: [{ step: 1000, start: 'custom', at: 14000 }] },
+        { rows: [{ step: 100000, start: 'custom', at: 1000000 }] }, { rows: [{ step: 100000, start: 'custom', at: 1000000, dir: 'down' }], jumps: 15 },
+        { rows: [{ step: 1000, start: 'custom', at: 14000, dir: 'down' }] }, { rows: [{ step: 5, start: 'custom', at: 30, dir: 'down' }] }, { rows: [{ step: 100, start: 'custom', at: 3, dir: 'down' }] },
+        { rows: [{ step: 7, start: 'custom', at: 0, dir: 'down' }] }, { rows: [{ step: 4, start: 'custom', at: 99 }], fill: 'half' },
+        { rows: [{ step: 2, start: 'zero' }, { step: 5, start: 'custom', at: 3 }, { step: 25, start: 'custom', at: 100, dir: 'down' }, { step: 1000, start: 'custom', at: 2000, dir: 'down' }] },
+        { rows: [{ step: 2, start: 'zero' }, { step: 5, start: 'custom', at: 3 }, { step: 25, start: 'custom', at: 100, dir: 'down' }, { step: 1000, start: 'custom', at: 2000, dir: 'down' }], order: 'mixed' },
+        { rows: [{ step: 3 }, { step: 12, dir: 'down' }, { step: 8, start: 'zero' }], order: 'mixed' },
+        { rows: [{ step: 7 }], times: 'each' }, { times: 'each' }, { times: 'given' }, { rows: [{ step: 25, start: 'zero' }], times: 'each' }, { rows: [{ step: 1000, dir: 'down' }], times: 'each' },
+        { rows: [{ step: 50, start: 'custom', at: 200 }], times: 'given' }, { rows: [{ step: 5, start: 'custom', at: 3 }], times: 'each' }, { rows: [{ step: 12 }], times: 'each', jumps: 15 },
+        { onePage: true, rows: [{ step: 3 }, { step: 7 }, { step: 12, dir: 'down' }] }, { onePage: true, rows: [{ step: 25, start: 'zero' }, { step: 100, start: 'custom', at: 2300 }] },
+        { onePage: true, times: 'each' }, { onePage: true, rows: [{ step: 1000, start: 'custom', at: 14000 }], jumps: 15 }],
     'composing:hundreds_chart_fill': [
         { grid: 'rows' }, { grid: 'whole' }, { grid: 'whole', gaps: 'pattern' }, { grid: 'whole', gaps: 'row' }, { grid: 'whole', gaps: 'column' },
         { gaps: 'row' }, { gaps: 'column' }, { gaps: 'pattern' }, { grid: 'rows', gaps: 'row' }, { grid: 'rows', gaps: 'column' }, { gaps: 'row', tiles: 3 },
@@ -2335,6 +2424,7 @@ function selfTest() {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-'));
     const mjs = path.join(tmp, 'skill-options.mjs');
     fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
+    fs.writeFileSync(path.join(tmp, 'count-rows.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'count-rows.js')));   // skill-options.js imports it (wave 1 C2)
     const { optionsFor, pvBandFloor, pvBand } = await import(pathToFileURL(mjs).href);
     fs.rmSync(tmp, { recursive: true, force: true });
     const withNotation = new Set(skills

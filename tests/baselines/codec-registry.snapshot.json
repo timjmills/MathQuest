@@ -97,6 +97,8 @@
     "onePage": "2Y",
     "calculator": "6X",
     "skipAfter": "6Y",
+    "rows": "1W",
+    "times": "1Z",
     "ansBox": "6Q"
   },
   "blocks": {
@@ -657,6 +659,12 @@
     "onePage": {},
     "calculator": {},
     "skipAfter": {},
+    "rows": {},
+    "times": {
+      "none": "N",
+      "each": "E",
+      "given": "G"
+    },
     "ansBox": {
       "digit": "D",
       "one": "O",
@@ -694,7 +702,8 @@
     "jumps": "decimal",
     "onePage": "bool",
     "calculator": "bool",
-    "skipAfter": "decimal"
+    "skipAfter": "decimal",
+    "rows": "rows"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
@@ -710,6 +719,7 @@
     "5N-5Z": "lessons, support ladder and later waves",
     "2U-2Z": "wave 1 lane C: skip-count lines and the number grid",
     "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)",
+    "1W-1Z": "wave 1 lane C2: count_by_tables row list and multiplication labels",
     "6Q-6W": "wave 1 lane B: answer boxes (+ − × ÷)"
   }
 }

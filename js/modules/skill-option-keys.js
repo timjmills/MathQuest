@@ -107,6 +107,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '6X-6Z', owner: 'Wave 1 lane A (pupil practice: calculator, skip)' }),
     Object.freeze({ keys: '2U-2Z', owner: 'wave 1 lane C: skip-count lines and the number grid' }),
     Object.freeze({ keys: '6Q-6W', owner: 'wave 1 lane B: answer boxes (+ − × ÷)' }),
+    Object.freeze({ keys: '1W-1Z', owner: 'wave 1 lane C2: count_by_tables row list and multiplication labels' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -164,6 +165,9 @@ export const MULTI_KEYS = Object.freeze({
     gaps: '2W',          // hundreds_chart_fill, number_chart_fill: which squares are empty (scatter / row / column / pattern)
     grid: '2X',          // hundreds_chart_fill, number_chart_fill: the grid size (window / rows / whole)
     onePage: '2Y',       // count_by_tables: all twelve tables, x 1 to x 12, on one page
+    // Wave 1 lane C2 (sub-range 1W-1Z, count_by_tables). NEXT FREE IN 1W-1Z: 1X.
+    rows: '1W',          // count_by_tables: the list of count-by rows (step, start, direction each); written by count-rows.js encodeRows
+    times: '1Z',         // count_by_tables: the multiplication fact under each number (none / every number / printed ones)
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -332,6 +336,8 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // lane C (2U-2X)
     fill: Object.freeze({ two: 'T', one: 'O', half: 'H' }),
+    // lane C2 (1Z)
+    times: Object.freeze({ none: 'N', each: 'E', given: 'G' }),
     gaps: Object.freeze({ scatter: 'S', row: 'R', column: 'C', pattern: 'P' }),
     grid: Object.freeze({ window: 'W', rows: 'R', whole: 'F' }),
     // block 3 (2026-09-25)
@@ -395,6 +401,8 @@ export const SCALAR_ONLY = Object.freeze({
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
     missing: 'decimal', rule: 'bool', jumps: 'decimal', onePage: 'bool',
+    // lane C2 (1W): the row list, "2ZR5C3R25C100D" (count-rows.js); its own grammar, letters and digits only
+    rows: 'rows',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
     // block 6 (O2 ladders)

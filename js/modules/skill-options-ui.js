@@ -18,7 +18,8 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isClosedOption, playSummary } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isClosedOption, isMoreOption, playSummary } from './skill-options.js';
+import { normalizeRows, downStart, onePagePlan, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
 import { state } from './state.js';
@@ -96,7 +97,8 @@ function _liveDef(def) {
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     const all = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
-    const shown = all.filter(d => !isClosedOption(d));
+    const shown = all.filter(d => !isClosedOption(d) && !isMoreOption(d));
+    const more = all.filter(isMoreOption);
     const play = all.filter(isPlayOption);
     const boxes = all.filter(d => isClosedOption(d) && !isPlayOption(d));
     const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
@@ -120,12 +122,23 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
             + `<span aria-hidden="true">&#9662;</span><span>Answer boxes</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(boxesSum)}</span></summary>`
             + boxes.map((d) => row({ ...d, label: 'Draw the answer as' })).join('') + '</details>'
         : '';
-    return groups + boxDisclosure + disclosure;
+    // Wave 1 lane C2: "More" - the layout choices a crowded panel keeps behind one closed disclosure, values in its summary.
+    const moreSummary = more.map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label)).join(' · ');
+    const moreBox = more.length
+        ? `<details class="sko-group sko-more" data-sko-group="more"${_moreOpen ? ' open' : ''} ontoggle="skoMoreOpen(this.open)" style="margin-top:10px;">`
+            + `<summary class="sko-more-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
+            + `<span aria-hidden="true">&#9662;</span><span>More</span><span class="sko-more-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(moreSummary)}</span></summary>`
+            + more.map(row).join('') + '</details>'
+        : '';
+    return groups + boxDisclosure + moreBox + disclosure;
 }
 let _boxesOpen = false;
 /** Remembers whether the Answer boxes disclosure is open across a redraw. */
 export function skoBoxesOpen(open) { _boxesOpen = !!open; }
 let _playOpen = false;
+let _moreOpen = false;
+/** Remembers whether the More disclosure is open, so a redraw after a change keeps it open. */
+export function skoMoreOpen(open) { _moreOpen = !!open; }
 /** Remembers whether the Pupil play disclosure is open, so a redraw after a change keeps it open. */
 export function skoPlayOpen(open) { _playOpen = !!open; }
 
@@ -187,6 +200,7 @@ export function optionControlHTML(def, cur, color, h) {
     const tip = def.help ? ` title="${escHTML(def.help)}"` : '';
     const id = escHTML(def.id);
     const extra = h.extra ? (h.extra(def) || '') : '';
+    if (def.type === 'rows') return _rowsControlHTML(def, v, color, h, tip, cur) + extra;
     if (def.type === 'bool') {
         return `<label${tip} style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
             <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;flex:none;"
@@ -195,7 +209,7 @@ export function optionControlHTML(def, cur, color, h) {
         </label>${extra}`;
     }
     if (def.type === 'int') {
-        return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
+        return `<label${tip} style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
             <span style="flex:1;">${escHTML(def.label)}</span>
             <input type="number" value="${escHTML(v)}"${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
                 style="width:80px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
@@ -260,6 +274,84 @@ export function optionControlHTML(def, cur, color, h) {
         <select style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;text-overflow:ellipsis;"
             onchange="${h.set(id, 'this.value')}">${opts}</select>${full}
     </label>${extra}`;
+}
+
+/**
+ * Wave 1 lane C2: the list of count-by rows (type 'rows'). ONE control: the tables 1 to 12 as chips (a tap adds that
+ * table, a second tap removes it), a typed step to add, and one line per row with its step, where it starts and which
+ * way it runs. Every change is a whole new list, written as JSON into the host's own `set` handler by `mqRows`.
+ */
+export function mqRows(json, op, i, val) {
+    let rows = normalizeRows(json);
+    const at = Number(i);
+    const num = Math.round(Number(val));
+    if (op === 'chip') {
+        const n = Number(val);
+        rows = rows.some((r) => r.step === n) ? rows.filter((r) => r.step !== n) : rows.concat([{ step: n, start: 'step', dir: 'up' }]);
+    } else if (op === 'add') {
+        if (Number.isFinite(num) && num >= 1) rows = rows.concat([{ step: Math.min(STEP_MAX, num), start: 'step', dir: 'up' }]);
+    } else if (op === 'remove') rows = rows.filter((_, k) => k !== at);
+    else if (op === 'clear') rows = [];
+    else if (rows[at]) {
+        const r = { ...rows[at] };
+        if (op === 'step' && Number.isFinite(num) && num >= 1) r.step = num;
+        else if (op === 'start') { r.start = val === 'zero' || val === 'custom' ? val : 'step'; if (r.start === 'custom' && !Number.isFinite(r.at)) r.at = 0; }
+        else if (op === 'at' && Number.isFinite(num)) r.at = num;
+        else if (op === 'dir') r.dir = val === 'down' ? 'down' : 'up';
+        rows = rows.map((x, k) => (k === at ? r : x));
+    }
+    return JSON.stringify(normalizeRows(rows));
+}
+
+function _rowsControlHTML(def, rows, color, h, tip, cur) {
+    const list = normalizeRows(rows);
+    const id = escHTML(def.id);
+    const js = escHTML(JSON.stringify(list));
+    const call = (op, i, valExpr) => h.set(id, `mqRows('${js}','${op}',${i},${valExpr})`);
+    const field = 'padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;min-height:40px;box-sizing:border-box;';
+    const chips = Array.from({ length: 12 }, (_, k) => k + 1).map((n) => {
+        const on = list.some((r) => r.step === n);
+        return `<button type="button" aria-pressed="${on}" aria-label="Count by ${n}" onclick="${call('chip', -1, String(n))}" `
+            + `style="min-width:40px;min-height:40px;padding:0 6px;border:1px solid ${on ? color : 'var(--border)'};border-radius:7px;cursor:pointer;font-size:0.85rem;font-weight:${on ? 700 : 400};`
+            + `background:${on ? color + '22' : 'transparent'};color:var(--text);">${n}</button>`;
+    }).join('');
+    const nNum = Number((cur && cur.jumps) || 12) === 15 ? 15 : 12;
+    const rowsHtml = list.map((r, i) => {
+        const startSel = `<select aria-label="Row ${i + 1} starts at" onchange="${call('start', i, 'this.value')}" style="${field}width:100%;padding:6px 4px;">`
+            + [['step', 'Step'], ['zero', '0'], ['custom', 'Number']]
+                .map(([v, l]) => `<option value="${v}"${r.start === v ? ' selected' : ''}>${l}</option>`).join('') + '</select>';
+        const atInput = r.start === 'custom'
+            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:68px;flex:none;padding:6px 4px;">` : '';
+        const down = r.dir === 'down';
+        const dirBtn = `<button type="button" aria-label="Row ${i + 1} direction: ${down ? 'counting back' : 'counting on'}. Tap to change" onclick="${call('dir', i, `'${down ? 'up' : 'down'}'`)}" `
+            + `style="${field}flex:none;width:60px;padding:6px 2px;cursor:pointer;font-weight:600;font-size:0.76rem;">${down ? '&darr; Back' : '&uarr; On'}</button>`;
+        const lifted = down && r.start === 'custom' ? downStart(r, nNum) : null;
+        const note = lifted !== null && lifted !== r.at
+            ? `<div class="sko-row-note" style="font-size:0.7rem;color:var(--text-dim);padding:0 0 4px 0;">Starts at ${lifted.toLocaleString('en-US')} so the row has ${nNum} numbers.</div>` : '';
+        return `<div class="sko-row-line" style="padding:6px 0;border-top:1px solid var(--border);">`
+            + `<div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;">`
+            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:66px;flex:none;padding:6px 4px;">`
+            + `<span style="flex:1 1 96px;min-width:92px;">${startSel}</span>${atInput}${dirBtn}`
+            + `<button type="button" aria-label="Remove row ${i + 1}" onclick="${call('remove', i, '0')}" style="min-width:36px;min-height:40px;flex:none;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem;">&times;</button></div>${note}</div>`;
+    }).join('');
+    const full = list.length >= ROW_MAX;
+    return `<div class="sko-rows"${tip} style="font-size:0.82rem;color:var(--text);">`
+        + `<div style="font-weight:600;margin-bottom:6px;">${escHTML(def.label)}</div>`
+        + `<div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px;">Tap the tables to use</div>`
+        + `<div class="sko-rows-chips" style="display:flex;flex-wrap:wrap;gap:5px;">${chips}</div>`
+        + `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;"><span style="font-size:0.72rem;color:var(--text-dim);">Or type a step</span>`
+        + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" placeholder="25" aria-label="Count by (type a number)"${full ? ' disabled' : ''} style="${field}width:96px;">`
+        + `<button type="button"${full ? ' disabled' : ''} onclick="${call('add', -1, 'this.previousElementSibling.value')}" style="min-height:40px;padding:0 12px;border:1px solid ${color};border-radius:7px;background:${color}22;color:var(--text);cursor:pointer;font-weight:700;">Add</button>`
+        + (list.length ? `<button type="button" onclick="${call('clear', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text-dim);cursor:pointer;">Clear</button>` : '')
+        + `</div>`
+        + (cur && cur.onePage && list.length && (onePagePlan(list, 'Letter').cut > 0 || onePagePlan(list, 'A4').cut > 0) ? (() => {
+            const nL = onePagePlan(list, 'Letter').rows.length, nA = onePagePlan(list, 'A4').rows.length;
+            const msg = nL === nA ? `${nL} of ${list.length} rows fit on one page (Letter or A4)` : `${nL} of ${list.length} rows fit on one Letter page, ${nA} on A4`;
+            return `<div class="sko-onepage-note" style="font-size:0.74rem;font-weight:600;margin-top:8px;color:var(--text);">${msg}; the rest do not print.</div>`;
+        })() : '')
+        + (list.length ? `<div class="sko-rows-list" style="margin-top:8px;">${rowsHtml}</div>`
+            : `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;">None chosen: the page counts by the tables 2 to 12.</div>`)
+        + `</div>`;
 }
 
 function _lockedControlHTML(def, lock) {
@@ -341,6 +433,7 @@ export function applyOptionEdit(next, defs, action, optId, raw) {
     if (!def) return next;
     if (action === 'set') {
         if (def.type === 'bool') next[optId] = raw === true || raw === 'true';
+        else if (def.type === 'rows') next[optId] = normalizeRows(raw);
         else if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; }
         else if (def.type === 'enum') { const hit = (def.values || [])[Number(raw)]; if (hit) next[optId] = hit.v; }
     } else if (action === 'toggle' && def.type === 'set') {

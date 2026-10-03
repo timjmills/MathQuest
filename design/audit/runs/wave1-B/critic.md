@@ -420,3 +420,103 @@ Log it in STATUS for the subtraction family (R3-D9).
 - div_facts `notation=bracket`: ws-options-verify warns "1/6 answer(s) not found in the key text (e.g. '1')" (division family).
 - div_facts `constant=[n]`: the sheet is not titled "Divide by n" (P-31), on all 13 values.
 - The round-2 items still stand (add_word_problems lesson steps mismatch, place_value_disks chart overflow at 390, add_fractions_like raw ids, div_facts vertical on paper vs horizontal on screen).
+
+---
+
+# Round 4
+
+Critic: independent, Opus 5.5, medium effort. Tree head `7c29d97`. Date 2026-10-03.
+I ran everything on scratch copies of `7c29d97`, `81405d6` (round 3) and `50dbfa6` (the base), so nothing in the tree changed except this file. My probes and screenshots are in the session scratchpad (`lane-b-r4/`).
+
+## Verdict: FAIL (C4 = 7)
+
+| Criterion | Score | Why |
+|---|---|---|
+| C1 Ease of use | 8 | The worksheet focus is now LTR for fact strips and ones-first for stacks. 6 skills × 4 cards were typed with real keys, all RIGHT. The card's Check no longer reads the worksheet's boxes. The stack Off wash is visible when blurred (`rgb(238,238,238)`). Residual: R4-D4. |
+| C2 Educational value | 8 | One rule live and on Check. `1_2` is neutral and wrong. `07` / `00` / `008` are green and correct. A 1-digit answer moves to the ones box on leaving (card and quiz). No wrong value is ever green. R3-D9 is logged in STATUS. |
+| C3 Spacing and layout | 8 | R3-D2 is fixed on real renders. divide S: every key digit sits inside its box. sub_facts S: the digit has about 1.5 mm clear and a visible gap below the rule (no double rule). Per-digit keys (div_facts S, mixed_mult_div S, divide L) have 1.0 to 1.3 mm clear on every edge. ws-print-lint (with the R4-D2 fix) gives 0 L-KEY findings on 12 skills × S/L × {auto, digit, one, off}. |
+| C4 Standard fidelity | **7** | **The quiz ignores `ansBox` on every legacy skill** (R4-D1): divide, sub_facts and multiply at *digit* draw one box, and at *off* draw a full black box. The card and worksheet draw both correctly. SL-3 says "every screen host". Also: 2 of the 4 D7 exclusion reasons do not hold (R4-D3), and the new L-KEY check has a hole (R4-D2). |
+
+## Gates
+
+| Gate | Result |
+|---|---|
+| `wave1-b-ansbox-entry` | OK, 38 items, including the new worksheet leg and the edge cases. |
+| `wave1-a2-perbox` | OK: 644 PASS, 0 FAIL, no console errors. count_by_tables passes in this tree. No failure belongs to this lane. |
+| `ws-print-lint --source kit` (L-KEY with the R4-D2 fix), 12 + − × ÷ skills plus add_fractions_like, S and L, independent and more-practice, and each ansBox value | 0 L-KEY / L-OVERFLOW / L-INK findings from this lane. Findings that are not this lane's: mixed_mult_div L-DENSITY H13 (the same 22 on base `50dbfa6`), and add_fractions_like TY-7 plus empty key slots (pre-existing, logged in round 2). |
+| Hosts probe: 6 skills × {auto, digit, one, off} × {card, worksheet, quiz} × {390, 1280} | 144 renders: scrollWidth equals the viewport, 0 overflow, 0 console errors. Exception: R4-D1. |
+
+## Round-3 defects
+
+| ID | Status | Evidence |
+|---|---|---|
+| R3-D1 worksheet focus | FIXED | mult_facts / div_facts / sub_facts / multiply / divide digit: focus lands in box 0 on every card, and typing gives RIGHT (e.g. `[_ 3+ 2+]`, `[1+ 0+ 8+]`). add_100_regroup still lands in the ones box (2/3), RIGHT. |
+| R3-D2 legacy key sizing | FIXED | See C3. With the lint hole closed, `81405d6` sub_facts S gives 20 findings (ink crosses the edge by 0.5 mm), and `7c29d97` gives 0. |
+| R3-D3 leading zero | FIXED | `07` → green, Check correct; `00` → 0 correct; `008` → 8 correct. |
+| R3-D4 gap | FIXED | `1_2` / `1_0` are neutral live and wrong on Check. |
+| R3-D5 1-digit placement | FIXED (card and quiz) | div_facts 4: `[4 _]` → on leaving `[_ 4]`, the same as the key. Quiz 4 → `[_ 4]`, stored '4'. Residual: a leading zero is not dropped on leaving (`07` stays `0 7`, `08` in 3 boxes becomes `_ 0 8`), while the key shows `_ 7`. Folded into R4-D4. |
+| R3-D6 stack Off zone | FIXED | Card, worksheet and quiz at 390, blurred: a grey wash, no edge. |
+| R3-D7 missing option | PARTLY: see R4-D3 | |
+| R3-D8 docs | FIXED | SL-3 states the entry order, the value rule, right-align and key fit. STATUS lists the open items. |
+| R3-D9 across-zeros regroup | LOGGED | STATUS 2026-10-03 entry (subtraction family). |
+| Card Check read worksheet boxes (builder's own find) | FIXED | 12 worksheet boxes were left in the page, each filled with 9. add_facts digit 17 typed `[1+ 7+]`, Check correct. |
+
+## Why L-KEY flagged divide but not sub_facts (the builder's open question)
+
+The hole is the skip guard at `ws-print-lint.cjs` line 392:
+`if (!box || box.querySelector('[data-ws-slot] [data-ws-ink]') && box !== w) continue;`
+
+`Element.querySelector` matches the whole selector against the document and only limits the *result* to descendants, so the `[data-ws-slot]` part can be met by an ancestor **outside** `box`.
+
+- **sub_facts.** A legacy fact key is `div[data-ws-slot="answer"] > span.ws-fact-write (the bordered box) > span[data-ws-ink]`. So `box` = `.ws-fact-write`, which is not `w`, and the outer div supplies `[data-ws-slot]`. Every fact zone was skipped.
+- **divide.** The equation slot is `span.ws-slot[data-ws-ink]`, and it is bordered itself, so `box === w` and the guard never fires.
+
+**Fix:** `box.querySelector(':scope [data-ws-slot] [data-ws-ink]')`.
+**Proven:** with the fix, `81405d6` sub_facts S gives 20 L-KEY AK-2 findings, and `7c29d97` stays at 0 over the whole sample.
+
+There is a **second, latent hole.** The box search starts at the `[data-ws-ink]` element, not at the text node, and `bordered()` accepts a transparent border.
+- On a kit fact key at *digit*, `[data-ws-ink]` is the whole `span.ws-factans--digit`. Its border is `transparent` (sheet-kit.css:365), but it still counts as the box.
+- So every digit is judged against the strip's outer edge. The real per-digit boxes (`> span`, sheet-kit.css:366) are never used.
+- A digit that crosses its own box's seam passes. Today's renders are fine (1.0 mm or more clear), so nothing is wrong yet.
+
+**Fix:** walk from `n.parentElement` up to `w`'s parent, and make `bordered()` require a border colour with alpha > 0.
+
+## Defects (RUBRIC §6)
+
+```json
+{
+  "lane": "wave1-B",
+  "round": 4,
+  "pass": false,
+  "scores": { "C1": 8, "C2": 8, "C3": 8, "C4": 7 },
+  "defects": [
+    { "id": "R4-D1", "criterion": "C4", "severity": "major",
+      "where": "js/modules/quiz-take.js:209 QUIZ_CELL_FIELDS; withAnsBox (screen-cell.js:107) reads q.ansBox / q.cell.payload.ansBox / q.skillOptions.ansBox",
+      "what": "quizQuestionData copies neither `ansBox` nor `skillOptions`. Kit items survive through cell.payload.ansBox; every legacy item (legacy-eq / legacy-fact / legacy-stack, about 25 of the 72) loses the option in a built, saved or shared quiz. Measured at 390 and 1280: divide, sub_facts and multiply at digit draw 1 input and no strip in the quiz (2 or 3 digit boxes on the card and worksheet); at off the quiz draws a full black box (the card draws none). add_facts and div_facts (kit) are correct in the quiz.",
+      "fix": "Add 'ansBox' to QUIZ_CELL_FIELDS. Also copy skillOptions.ansBox, or set q.ansBox before serialising, so withAnsBox sees it.",
+      "check": "Add a quiz leg to wave1-b-ansbox-entry: through quizQuestionData + compressTestForURL, divide / sub_facts / multiply at digit show a data-mq-ltr strip with N inputs; at off, no black edge; at one, one box. 1-digit and 2-digit answers are stored correctly." },
+    { "id": "R4-D2", "criterion": "C3", "severity": "minor",
+      "where": "tests/scripts/ws-print-lint.cjs L-KEY fit block, lines 385-392",
+      "what": "(a) The skip guard's querySelector matches through ancestors outside `box`, so every legacy fact zone is skipped. This is why round 3's sub_facts key was never flagged. (b) The box is found from the [data-ws-ink] element, not the glyph, and transparent borders count, so kit per-digit keys are judged against the whole strip, not each digit's box.",
+      "fix": "(a) ':scope [data-ws-slot] [data-ws-ink]'. (b) Start the walk at the text node's parentElement; bordered() requires a non-transparent border colour.",
+      "check": "Two --self-test mutations: a legacy fact zone with a 40 pt digit in a 6 mm box fails, and a kit .ws-factans--digit key with one digit translated 2 mm across its seam fails. 81405d6 sub_facts S fails (20 findings); 7c29d97 passes." },
+    { "id": "R4-D3", "criterion": "C4", "severity": "minor",
+      "where": "design/STATUS.md (R3-D7 exclusions); js/modules/skill-ansbox-skills.js",
+      "what": "Two exclusion reasons hold and two do not. HOLD: sub_check_by_adding and div_check_by_multiplying (the place written is the error-analysis page's 'correct answer' box). DO NOT HOLD: (1) missing_mult_div is excluded because 'the unknown can be any term, a mid-expression box'. But subtraction:missing_add_sub has the same six positions (gen-operations.js:4332) and IS in the list (legacy-eq), so the lane contradicts itself. (2) add_three is excluded because 'the box is the template's own drawing'. But add-three draws `a + b + c = [box]` (ops-counters.js:288-292), an addition equation with one numeric answer, and styledAnswerSlot (sheet/cell.js:305) is the reusable helper the fact and equation templates already call. That is work not done, not a reason the option does not apply.",
+      "fix": "Either offer ansBox on missing_mult_div and add_three (apply styledAnswerSlot on paper and withAnsBox on screen), or remove missing_add_sub too and restate one consistent rule in SL-3 ('the answer place after =' vs 'any missing-number box').",
+      "check": "offeredOptionsFor('division','missing_mult_div') and ('addition','add_three') include ansBox and their digit keys print digit boxes; or missing_add_sub is removed and SL-3 names the rule." },
+    { "id": "R4-D4", "criterion": "C1", "severity": "minor",
+      "where": "screen-cell.js rightAlignLtrStrip; the card's tryAdvance (question-render.js:1110)",
+      "what": "A correct answer typed with a leading zero turns green but behaves differently. `07` for 7 (2 boxes) and `008` for 8 stay on the card and need Check, while `7`, `08` and `00` auto-advance. On leaving, the leading zero is kept (`0 7`, `_ 0 8`), while the key prints `_ 7`, which SL-3's right-align sentence promises.",
+      "fix": "In rightAlignLtrStrip, use ltrStripValue(...).value (leading zeros dropped) for the digits, then right-align them, so `07` becomes `_ 7`, and re-run tryAdvance after the move.",
+      "check": "Card add_facts digit, keys 0,7, then blur: the boxes become `_ 7` and the card advances like a plain `7`." }
+  ],
+  "to_raise_to_10": {
+    "C1": "R4-D4; the same auto-advance for every correct entry.",
+    "C2": "Every correct entry is marked and placed the same way. The across-zeros key fills its regroup marks (R3-D9, subtraction family).",
+    "C3": "A lint that can see every key digit against its own box (R4-D2), so the fit is guarded, not only observed.",
+    "C4": "The option on the quiz for legacy skills (R4-D1); one consistent scope rule with add_three and missing_mult_div (R4-D3)."
+  },
+  "summary": "Every round-3 defect is fixed on real renders: worksheet LTR focus, one value rule, no gaps, right-align, the stack Off wash, the legacy key digits inside their boxes, and the docs. It still fails C4: the quiz drops ansBox for every legacy skill, because QUIZ_CELL_FIELDS does not carry it (digit draws one box, off draws a black box). The new L-KEY check missed sub_facts because querySelector's descendant combinator matches an ancestor outside the box; ':scope' closes it, and it flags round 3's sub_facts key 20 times."
+}
+```

@@ -31,6 +31,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -101,10 +102,19 @@ function normaliseRequest(req = {}) {
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
     let onePage = false;
     for (const sec of sections) {
+        let rowCount = ONE_PAGE_ITEMS;
         const on = sec.skills.some((k) => {
-            try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+            try {
+                if (k.skillId !== 'count_by_tables') return false;
+                const o = normalizeOptions(k.categoryId, k.skillId, k.opts || {});
+                // wave 1 C2: with rows chosen the sheet prints THOSE rows once each, in order, as many as the paper holds, else x 1 to x 12
+                if (o.onePage && o.rows && o.rows.length) rowCount = onePageRows(o.rows).length;
+                return !!o.onePage;
+            } catch (e) { return false; }
         });
-        if (on) { sec.count = 12; sec.pages = 1; sec.columns = 1; onePage = true; }
+        if (on) {
+            sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true;
+        }
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections,
@@ -1268,7 +1278,17 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
-    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
+    // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
+    let titleOpts = {};
+    if (sk.skillId === 'count_by_tables') {
+        try {
+            const no = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+            // the one-page sheet prints only the rows that fit: the title names those, in the order they print
+            if (no.onePage && no.rows && no.rows.length) no.rows = onePageRows(no.rows);
+            titleOpts = { opts: no };
+        } catch (e) { titleOpts = {}; }
+    }
+    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
     return meta;
@@ -1440,6 +1460,7 @@ function anchorSummary(mode, list, notes) {
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
 export async function buildSheet(req = {}) {
+    setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();

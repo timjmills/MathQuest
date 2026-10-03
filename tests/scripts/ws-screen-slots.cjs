@@ -22,6 +22,8 @@ const has = (k) => process.argv.includes('--' + k);
 const ONLY = (arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const CATEGORY = arg('category', '');
 const HOSTS = (arg('hosts', 'card,map,worksheet,quiz') || '').split(',');
+// --opts '{"times":"each"}' (wave 1 C2): the skill's options in the set's option store, which every host reads.
+const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
 const FROM = parseInt(arg('from', '0'), 10);
 const TO = parseInt(arg('to', '100000'), 10);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -147,6 +149,7 @@ function DETECT(cellSel, hostSel, textSel) {
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
             await page.evaluate(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) { /* ignore */ } });
         }
+        if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
         const note = (host, r) => {
             checked++;
             if (r && r.paper && r.paper.length) paperVerbs.push(`${key.padEnd(44)} ${host.padEnd(10)} paper verb on screen: "${r.paper[0]}"`);

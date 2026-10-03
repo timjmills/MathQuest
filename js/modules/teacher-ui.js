@@ -283,6 +283,7 @@ export function optionsReadOnlyHTML(categoryId, skillId, opts) {
         const v = d.id in cur ? cur[d.id] : d.default;
         let text;
         if (d.type === 'bool') text = v ? 'Yes' : 'No';
+        else if (d.type === 'rows') text = typeof d.summary === 'function' ? d.summary(v) : String(Array.isArray(v) ? v.length : 0);
         else if (d.type === 'set') {
             const all = d.values || [];
             const picked = all.filter((x) => Array.isArray(v) && v.includes(x.v)).map((x) => x.l);

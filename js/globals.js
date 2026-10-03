@@ -44,7 +44,7 @@ import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/v
 // Layer 4: Game Logic
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
 import { generateQuestion, generateQuestionFor } from './modules/generate-question.js';
-import { skoPlayOpen, skoBoxesOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
+import { skoPlayOpen, skoBoxesOpen, skoMoreOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
 import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions } from './modules/skill-option-store.js';
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
 import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
@@ -284,7 +284,7 @@ Object.assign(window, {
     // Question Generation & Rendering
     generateQuestion, generateQuestionFor,
     // Per-skill options that travel with a skill set (owner, 2026-09-24)
-    skoPlayOpen, skoBoxesOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
+    skoPlayOpen, skoBoxesOpen, skoMoreOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
     parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions,
     getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions,
     encodeOptionPayload, decodeOptionPayload, optionSuffix,

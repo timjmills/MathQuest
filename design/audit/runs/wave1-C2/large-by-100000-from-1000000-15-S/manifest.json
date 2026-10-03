@@ -1,0 +1,458 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 3,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 3 pages. Digits 16 pt.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 3,
+              "cellW": 186,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 3 pages. Digits 16 pt.",
+              "cls": "standard",
+              "digitPt": 16,
+              "hMin": 51.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 3,
+        "keyPageCount": 3,
+        "seed": 244652,
+        "title": "I Can count by 100,000 from 1,000,000 (15 jumps)",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1400000, 1600000, 1700000, 1800000, 2000000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1500000, 1600000, 1900000, 2000000, 2200000, 2300000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1300000, 1400000, 1700000, 1800000, 1900000, 2200000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1300000, 1500000, 1800000, 1900000, 2100000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1400000, 1700000, 1900000, 2000000, 2200000, 2300000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1400000, 1600000, 1700000, 1900000, 2100000, 2300000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1500000, 1600000, 1800000, 1900000, 2100000, 2200000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1500000, 1700000, 1800000, 2000000, 2200000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1400000, 1500000, 1800000, 1900000, 2000000, 2300000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1400000, 1500000, 1600000, 1800000, 2300000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1400000, 1500000, 1800000, 2000000, 2200000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1400000, 1700000, 1800000, 1900000, 2300000, 2400000",
+            "measured": {
+              "1": {
+                "hMm": 51.1,
+                "fits": true
+              },
+              "2": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "3": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "4": {
+                "hMm": 51.1,
+                "fits": false
+              },
+              "5": {
+                "hMm": 51.1,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 89,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p2.png",
+            "words": 79,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p3.png",
+            "words": 79,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 120,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p2.png",
+            "words": 110,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p3.png",
+            "words": 110,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 3,
+          "cells": [
+            4,
+            4,
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 150
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 3,
+          "cells": [
+            4,
+            4,
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 234
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]
