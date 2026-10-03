@@ -499,7 +499,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
             let k = 0;
             const filled = digitStrips[0].replace(/<i ([^>]*)><\/i>/g, (m, attrs) => {
                 const d = k >= pad ? digits[k - pad] : ''; k++;
-                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${d}</b></i>` : m;
+                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${d}</b></i>` : m;
             });
             return html.replace(digitStrips[0], filled);
         }
@@ -518,7 +518,9 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         if (digits.length > tracks) return null;
         // The answer digits sit INSIDE the same box the pupil page draws (owner ruling 2026-10-02):
         // the box is the zone itself, a grid of the stack's own tracks.
-        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        // (critic B r3 D2) the digit is set at the box's writing size (never taller than the box), so it
+        // sits clear inside it with padding instead of crossing its bottom edge
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:min(1em, calc(${h} * 0.82));display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
         return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);">${cells}</span>`);
     }
 
@@ -526,7 +528,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     // box, the value written on it.
     const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
     if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
-        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:flex-end;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${escText(display)}</b></span>`));
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${escText(display)}</b></span>`));
     }
 
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).

@@ -1629,3 +1629,9 @@ html .mq-scell .mq-kit .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-
     box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important; }
 html .mq-scell .mq-kit .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
     box-shadow: none !important; background-color: #FFF3A0 !important; }
+
+/* WAVE 1 / B r3 (critic B r3 D6): a stack with 'off' keeps a visible writing zone when no box is
+   focused - the light grey wash a fact with 'off' shows (no edge, no line), so a pupil who taps away
+   still sees where to write. Below Lane A2's marks and the yellow focus fill. */
+html .mq-scell .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit:not(:focus):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    background-color: #EEEEEE !important; }

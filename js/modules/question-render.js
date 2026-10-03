@@ -16,7 +16,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, ltrStripValue,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -903,12 +903,13 @@ export function wireBoxValidation(visualAidEl, q) {
             // a fact / equation in digit boxes (ansBox 'digit') is judged by its VALUE: the digits
             // typed, empty boxes ignored, so "_9" and "9_" are both 9; a value still on its way to the
             // answer ("1" of "12") is neutral, never red.
-            const combined = () => colInputs.map((e) => (e.value || '').trim()).join('');
-            const want = ansStr.replace(/[^0-9]/g, '');
+            // one rule with the live mark and Check (ltrStripValue): no gap, leading zeros dropped
+            const want = ansStr.replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
             for (let i = 0; i < N; i++) {
                 // expect = the whole value, which no single box holds: only customMatch (the combined value) can pass
-                slots.push({ el: colInputs[i], expect: '\u0000' + want, norm: numNorm, customMatch: () => combined() === want,
-                    pending: () => { const c = combined(); return c.length < want.length && want.startsWith(c); } });
+                slots.push({ el: colInputs[i], expect: '\u0000' + want, norm: numNorm,
+                    customMatch: () => { const r = ltrStripValue(colInputs); return !r.gap && r.value === want; },
+                    pending: () => { const r = ltrStripValue(colInputs); return r.gap || (r.zerosOnly && want !== '0') || (r.value.length < want.length && want.startsWith(r.value)); } });
             }
         } else if (ansStr.length <= N) {
             const pad = N - ansStr.length;

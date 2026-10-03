@@ -950,6 +950,44 @@ function wsLintPage(cfg) {
         }
     }
 
+    /* ------------------------------------------------------------------ L-KEY fit (critic B r3 D2)
+     * A key value written INTO a drawn answer box must sit inside it: the digits' INK (not the line box)
+     * is measured with the canvas's actual glyph bounds and compared with the box's inner edge. The box
+     * is the written element itself or its nearest ancestor (up to 2) with a visible border. */
+    {
+        const cvs = document.createElement('canvas').getContext('2d');
+        const bordered = (e) => { const c = getComputedStyle(e); return ['Top', 'Bottom', 'Left', 'Right'].filter((k) => parseFloat(c[`border${k}Width`]) > 0 && c[`border${k}Style`] !== 'none').length >= 3; };
+        const PADMM = 0.3;
+        for (const ri of rootInfo) {
+            for (const w of ri.el.querySelectorAll('[data-ws-ink]')) {
+                if (!visible(w)) continue;
+                let box = null;
+                for (let e = w, k = 0; e && k < 3; e = e.parentElement, k++) { if (bordered(e)) { box = e; break; } }
+                if (!box || box.querySelector('[data-ws-slot] [data-ws-ink]') && box !== w) continue;
+                const walker = document.createTreeWalker(w, NodeFilter.SHOW_TEXT);
+                for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+                    const t = (n.nodeValue || '').trim();
+                    if (!/^[0-9.,]+$/.test(t)) continue;
+                    const pe = n.parentElement, cs = getComputedStyle(pe);
+                    cvs.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+                    const m = cvs.measureText(t);
+                    if (!m.fontBoundingBoxAscent) continue;
+                    const rg = document.createRange(); rg.selectNodeContents(n);
+                    const rr = rg.getBoundingClientRect();
+                    // the content area is centred in the line box: baseline = top + half-leading + font ascent
+                    const content = m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+                    const base = rr.top + (rr.height - content) / 2 + m.fontBoundingBoxAscent;
+                    const ink = { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent,
+                        left: rr.left + (rr.width - m.width) / 2 - m.actualBoundingBoxLeft, right: rr.left + (rr.width - m.width) / 2 + m.actualBoundingBoxRight };
+                    const br = box.getBoundingClientRect(), bc = getComputedStyle(box);
+                    const inner = { top: br.top + parseFloat(bc.borderTopWidth), bottom: br.bottom - parseFloat(bc.borderBottomWidth), left: br.left + parseFloat(bc.borderLeftWidth), right: br.right - parseFloat(bc.borderRightWidth) };
+                    const over = Math.max(inner.top - ink.top, ink.bottom - inner.bottom, inner.left - ink.left, ink.right - inner.right);
+                    if (mm(over) > -PADMM) F('L-KEY', 'AK-2', 'major', box, `key value "${t}" is not clear inside its answer box (ink ${mm(over) > 0 ? 'crosses the edge by ' + mm(over) : 'within ' + mm(-over)} mm; needs >= ${PADMM} mm padding): key digits sit clear inside the box the pupil writes in`, 'key glyph outside box');
+                }
+            }
+        }
+    }
+
     /* ------------------------------------------------------------------ geometry for the node side */
     const mmRect = (r, o) => [mm(r.left - o.left), mm(r.top - o.top), mm(r.width), mm(r.height)];
     const slotAnswered = s => {

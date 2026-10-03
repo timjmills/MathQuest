@@ -11,7 +11,7 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
-import { markBoxSubmitted, itemWasHelped } from './screen-cell.js';
+import { markBoxSubmitted, itemWasHelped, ltrStripValue, rightAlignLtrStrip } from './screen-cell.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -1696,9 +1696,15 @@ export function submitAnswer() {
         // harvest those — students can type into the visual and press Enter.
         let input = document.getElementById("answerInput").value;
         if (!input) {
-            const cols = document.querySelectorAll('.column-answer-input');
+            // the card's own boxes only: a worksheet left in the page holds .column-answer-input too
+            const qc = document.getElementById('questionCard');
+            const cols = (qc || document).querySelectorAll('.column-answer-input');
             if (cols.length > 0) {
-                const harvested = Array.from(cols).map(el => el.value || '').join('').trim();
+                const ltr = cols[0].closest('[data-mq-ltr]');
+                if (ltr) rightAlignLtrStrip(ltr);
+                // a fact strip (ansBox 'digit'): one rule with the live mark - a gap is wrong, "07" is 7
+                const harvested = ltr ? ltrStripValue(cols).text
+                    : Array.from(cols).map(el => el.value || '').join('').trim();
                 if (harvested) input = harvested;
             }
         }

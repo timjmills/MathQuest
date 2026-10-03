@@ -3,6 +3,21 @@
 > **2026-10-02: the work order is now `design/MASTER_PLAN.md`** (8 waves in the owner's order; owner to confirm the order before work starts). Key answer colour changed to **reddish orange**.
 
 
+> **2026-10-03, Wave 1 lane B (answer boxes, `ansBox`) round 4 — open items:**
+> - **R3-D9 (subtraction family, §10.1 migration):** `subtraction:sub_across_zeros` key prints its regroup boxes EMPTY (legacy
+>   key fill). The answer digits are right and inside their boxes, and regroup boxes are unscored (RM-02), so it does not block
+>   lane B; but for across-zeros the regroup marks are the lesson, and one box per column cannot hold the "10" a zero becomes.
+>   Fix with the family migration: emit `q.cell` stack with a regroup trace so the kit key fills it.
+> - **R3-D7 exclusions (no Answer-boxes option, by design for now):** `addition:add_three` (kit template `add-three`: counters plus a
+>   sentence whose box is the template's own drawing; the option needs that template to read `ansBox` - addition family);
+>   `division:missing_mult_div` (the unknown can be any term - factor, divisor, dividend - so its box is a mid-expression
+>   missing-number box (SL-6), not the answer place after `=` that `ansBox` governs); `subtraction:sub_check_by_adding` and
+>   `division:div_check_by_multiplying` (error-analysis items: the place written is the check drawing's "correct answer" box,
+>   governed by the error-analysis page, not a fact/equation/column answer). Revisit each with its family migration.
+> - Legacy key sizing (R3-D2) is fixed in this round: the legacy equation slot is at least 1.15 em tall, key digits are set at
+>   the slot's writing size, the fact box stands 1.5 mm below its rule, and `ws-print-lint` L-KEY (AK-2) now fails any key
+>   digit whose ink is not >= 0.3 mm inside its box.
+
 > **2026-10-02, Wave 1 lane C (count-by + number charts):** `multiplication:count_by_tables` now defaults to **fill = two**
 > (the first two numbers print). **An old count-by printout reprints with TWO numbers filled, not one, so a pre-lane share code
 > or saved set gives a row with one fewer blank (owner request).** A row of 15 jumps is titled "I Can count by 1 to 12 (15 jumps)";

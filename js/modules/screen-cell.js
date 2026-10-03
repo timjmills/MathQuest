@@ -525,6 +525,48 @@ export function regroupFor(skillId) {
     return !/no_?regroup|without_regroup/i.test(String(skillId || ''));
 }
 
+/**
+ * The ONE rule for a fact / equation written in digit boxes (ansBox 'digit', data-mq-ltr), used by
+ * the live mark, the card's Check, the worksheet's column check and the quiz (critic B r3 D3/D4):
+ *   - empty boxes at either END are ignored ("9_" and "_9" are 9);
+ *   - an empty box BETWEEN digits is a gap: never green live, wrong on Check ("1_2" is not 12);
+ *   - the value is judged as a NUMBER: leading zeros are dropped ("07" is 7), live and on Check alike.
+ * Returns {text, value, gap, zerosOnly}: `text` is what Check compares ('' when empty; with a gap it
+ * keeps a space so no numeric compare can pass), `value` the digits without leading zeros.
+ */
+export function ltrStripValue(inputs) {
+    const v = Array.from(inputs || []).map((e) => String((e && e.value) || '').replace(/[^0-9]/g, ''));
+    let a = 0; while (a < v.length && !v[a]) a++;
+    let b = v.length - 1; while (b >= a && !v[b]) b--;
+    if (a > b) return { text: '', value: '', gap: false, zerosOnly: false };
+    const mid = v.slice(a, b + 1);
+    const gap = mid.some((d) => !d);
+    const raw = mid.join('');
+    const value = raw.replace(/^0+(?=\d)/, '');
+    return { text: gap ? mid.map((d) => d || ' ').join('') : value, value, gap, zerosOnly: /^0+$/.test(raw) };
+}
+
+/**
+ * Right-align a fact strip's digits when the pupil leaves it, so a 1-digit answer sits in the ones
+ * box on screen exactly as the paper key prints it (critic B r3 D5). A strip with a gap is left alone.
+ */
+export function rightAlignLtrStrip(stk) {
+    if (!stk) return false;
+    const boxes = Array.from(stk.querySelectorAll('input.mq-digit, input.column-answer-input, input.mq-qt-digit'));
+    const uniq = boxes.filter((b, i) => boxes.indexOf(b) === i);
+    const r = ltrStripValue(uniq);
+    if (!r.text || r.gap) return false;
+    const digits = uniq.map((e) => String(e.value || '').replace(/[^0-9]/g, '')).filter(Boolean);
+    const pad = uniq.length - digits.length;
+    let moved = false;
+    uniq.forEach((e, i) => {
+        const want = i >= pad ? digits[i - pad] : '';
+        if ((e.value || '') !== want) { e.value = want; moved = true; }
+    });
+    if (moved) uniq.forEach((e) => { try { e.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) { /* no events */ } });
+    return moved;
+}
+
 /* ------------------------------------------------------------------ entry order (SP-20) */
 
 /**
@@ -589,6 +631,13 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
                 }
             });
         });
+        if (stk.hasAttribute('data-mq-ltr') && stk.dataset.mqAlign !== '1') {
+            stk.dataset.mqAlign = '1';
+            stk.addEventListener('focusout', (e) => {
+                if (e.relatedTarget && stk.contains(e.relatedTarget)) return;
+                rightAlignLtrStrip(stk);
+            });
+        }
         if (autofocus) {
             const ones = stk.hasAttribute('data-mq-ltr') ? boxes[0] : boxes[boxes.length - 1];
             try { ones.focus({ preventScroll: true }); } catch (e) { ones.focus(); }
@@ -1140,12 +1189,14 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
             // a value still on its way to the answer stays neutral
             const a = String(kind.ans != null ? kind.ans : '').replace(/[^0-9]/g, '');
             const group = Array.from(stk.querySelectorAll('input.mq-digit'));
-            const value = () => group.map((e) => (e.value || '').trim()).join('');
+            const want = a.replace(/^0+(?=\d)/, '');
             const judge = (v) => {
                 if (!String(v || '').trim()) return null;
-                const c = value();
-                if (c === a) return true;
-                return c.length < a.length && a.startsWith(c) ? null : false;
+                const r = ltrStripValue(group);
+                if (r.gap) return null;                                   // never green with a gap (D4)
+                if (r.value === want) return true;                         // by value: "07" is 7 (D3)
+                if (r.zerosOnly && want !== '0') return null;              // a leading zero on its way
+                return r.value.length < want.length && want.startsWith(r.value) ? null : false;
             };
             group.forEach((inp) => { if (_liveBindFn(inp, judge, group)) n++; });
         } else stk.querySelectorAll('input.mq-digit').forEach((inp) => {

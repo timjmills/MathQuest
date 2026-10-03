@@ -4118,6 +4118,9 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     // across the stack's tracks (same height as the old zone, so the cell geometry holds).
     // ansBox (owner ruling 2026-10-02): column work defaults to one box per digit, a fact to one box.
     const ab = resolveAnsBox(_ANSBOX, o.cls === 'ws-fact' ? 'other' : 'stack');
+    // (critic B r3 D2) a drawn answer box stands at least 1.5 mm clear of the sum rule, so the rule and
+    // the box's top edge never read as one double rule
+    const FACT_BOX_GAP_MM = 1.5;
     const zoneH = o.answerMm || size.answerMm;
     if (ab === 'digit') {
         // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
@@ -4125,14 +4128,14 @@ function wsStackHTML(a, b, op, pt, o = {}) {
         // a 1-digit product two; the strip may then reach under the operator's track
         const d = Math.max(A.length, B.length);
         const n = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
-        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneH}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
             + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     } else if (ab === 'off') {
         html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;"></span>`;
     } else {
         // the open answer zone is ONE full black-outlined box across the stack's tracks
-        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;box-sizing:border-box;`
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
             + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
     }
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
@@ -4506,12 +4509,16 @@ function wsAnswerLine(digits, shiftMm = 0) {
             + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:max(${w}mm, 0.82em);height:max(${wsWriteMm()}mm, 1.15em);line-height:1;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     }
+    // (critic B r3 D2) the slot is never shorter than the printed operands: at least 1.15 em tall (as the
+    // digit strip above), so the key's digit, set at the slot's writing size, sits clear inside it
+    const slotH = `max(${wsWriteMm()}mm, 1.15em)`;
+    const slotW = `max(${wsBlankMm(digits)}mm, ${(Math.max(1, digits) * 0.62 + 0.8).toFixed(2)}em)`;
     if (ab === 'off') {
-        return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+        return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;width:${slotW};height:${slotH};`
             + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
     }
     return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
-        + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+        + `width:${slotW};height:${slotH};`
         + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
         + `box-sizing:border-box;border:${STROKE.hair}pt solid ${INK.ink};border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
 }

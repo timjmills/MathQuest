@@ -11,7 +11,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, ltrStripValue,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -471,10 +471,13 @@ function _mountQuizCell(flatIdx) {
         // restore a saved answer, right-aligned across the tracks
         const saved = String(hidden.value || '').replace(/[^0-9]/g, '');
         if (saved) {
-            const pad = boxes[0].closest('[data-mq-ltr]') ? 0 : boxes.length - saved.length;
+            // right-aligned for columns AND fact strips: the paper key puts a 1-digit answer in the ones box (r3 D5)
+            const pad = Math.max(0, boxes.length - saved.length);
             boxes.forEach((b, i) => { b.value = i >= pad ? (saved.charAt(i - pad) || '') : ''; });
         }
-        const compose = () => boxes.map(b => (b.value || '').trim()).join('');
+        const ltrStrip = boxes[0].closest('[data-mq-ltr]');
+        // a fact strip: one rule with the card and the worksheet - a gap is kept (wrong), "07" is 7
+        const compose = () => ltrStrip ? ltrStripValue(boxes).text : boxes.map(b => (b.value || '').trim()).join('');
         boxes.forEach(b => {
             b.addEventListener('input', () => { hidden.value = compose(); });
             b.addEventListener('change', () => {

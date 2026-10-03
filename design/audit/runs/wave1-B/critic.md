@@ -263,3 +263,160 @@ The default ("Automatic") is close to passing on every host. The option, which i
 - place_value_disks card-390: the H/T/O chart overflows the cell, and the O column is clipped.
 - add_fractions_like key items e and f print raw ids `Answer: ["opt4"]` (as noted in round 1).
 - div_facts prints as a vertical fact on paper but shows as a horizontal equation on screen.
+
+---
+
+# Round 3
+
+Critic: independent, Opus 5.5, medium effort. I did not build this lane. Tree head `81405d6` (round 3 = `28f79e6` + `81405d6` on `755cffc`). Date 2026-10-03.
+The evidence was restored with `git checkout -- design/audit/runs` after the gates. Only this file changed. My own probes and screenshots are in the session scratchpad, not in the tree.
+
+## Verdict: FAIL
+
+| Criterion | Score | Why it is not 8 |
+|---|---|---|
+| C1 Ease of use | 7 | The practice card now enters per-digit facts left to right. But on the online worksheet, after a correct answer the worksheet moves focus to the **ones (last) box** of the next per-digit fact. A pupil who types "24" gets `[_ _ 2]`: the 4 is lost (R3-D1). On screen, a stack with "Off" shows no writing place at all when the box is not focused (R3-D6). |
+| C2 Educational value | 7 | Because of R3-D1, a pupil who knows the fact is marked wrong on the worksheet's Check. Value-based judging is right in the common cases. It has three edge faults: a leading zero turns the box red but Check accepts it (R3-D3); a gap between digits is accepted (R3-D4); and paper and screen place a 1-digit answer in different boxes (R3-D5). |
+| C3 Spacing and layout | 7 | On the legacy equation skills (divide, mult_zeros, add_sub_10s …), the **Automatic** (one box) key prints digits larger than the box, so they cross its edges. The sub_facts key digit crosses the bottom of its box, and the near-double rule is still there (R3-D2). ws-print-lint reports 0 findings on these pages. |
+| C4 Standard fidelity | 8 | One / Off now reach the screen for stacks, and the focused box keeps the strip's outline. Paper and screen match for strip width, seams and Off. The option is on 72 skills. Docs are reworded. Small residuals: R3-D7 and R3-D8. |
+
+## Gates (from the tree, one at a time via `/tmp/mq-browser-run.sh`)
+
+| Gate | Result |
+|---|---|
+| `wave1-b-ansbox-entry` | OK: 28 items, all green. **Gap:** it covers only the practice card. It never lets the worksheet auto-advance, which is where R3-D1 happens. |
+| `ws-options-verify --skill add_100_regroup` | OK, 12/12. ansBox digit / one / off pass, including the new "values look different" screen check. The two `level` key-text warnings are pre-existing (see round 2). |
+| `ws-options-verify --skill div_facts` | OK, 33/33. These warnings are not from this lane: the P-31 `constant` titles, `notation=bracket` "1/6 answers not found in the key text", and `cover=needed` "identical sheet". |
+| `ws-screen-slots --skills add_facts,add_100_regroup,div_facts,sub_across_zeros` | OK: 16 host renders, 0 doubled, 0 paper verbs. |
+| `wave1-a2-perbox` | OK, 0 FAIL, no console errors. |
+| `ws-print-lint --source kit` (add_facts, add_100_regroup, sub_across_zeros) | OK, 0 findings. I also ran it on divide, sub_facts, multiply and add_sub_10s: 0 findings. **It does not see R3-D2.** |
+| Dry-run merge onto `claude/sweet-newton-c8wrv1` (`50dbfa6`) | `50dbfa6` is an ancestor of HEAD, so this is a fast-forward with **0 conflicts**. |
+
+## Round-2 defects
+
+| ID | Status | Evidence |
+|---|---|---|
+| R2-D1 LTR entry for facts / equations | FIXED on the card, BROKEN on the worksheet | Entry gate and my probe: 15, 12 and 100 typed left to right are all green. On the worksheet, the auto-advance focuses the last box (R3-D1). |
+| R2-D2 One / Off on screen for stacks | FIXED | My re-shoot at `81405d6` (the `final/ansbox-*` PNGs predate the focus fix). add_100_regroup card-390: "one" draws one outline across 3 tracks, and the focused ones box shows only a yellow fill with no inner edge. "off" draws no outline. "digit" draws 3 joined boxes. sub_across_zeros now draws the kit stack: 3 regroup boxes and 3 answer boxes, the same as paper. |
+| R2-D3 legacy skills per digit + option | FIXED | add_10/20_*, sub_10/20_*, sub_facts, multiply, divide, mult_zeros, sub_across_zeros, mixed_*, equal_sign, add_sub_10s/100s and missing_add_sub are listed. Their paper honours digit / one / off (add_20_regroup and divide digit keys, sub_facts one / digit keys). Residual misses: R3-D7. |
+| R2-D4 screen strip from the band | FIXED | add_100_regroup card: 14 + 7 draws 3 boxes. "one" spans the same width. |
+| R2-D5 one width per section | FIXED | div_facts digit key: every item has 2 boxes, including 108÷12 and 110÷11. |
+| R2-D6 paper vs screen for off / seams | FIXED | Fact digit boxes share their seams on paper (`margin-left: -hair`) as on screen. Fact Off: paper is a blank zone, screen a grey wash with no line. |
+| R2-D7 panel summary | FIXED | add_100_regroup: "Answer boxes · Automatic: one box per digit (column work)". div_facts: "Automatic: one box". The inner label reads "Draw the answer as". |
+| R2-D8 docs | FIXED | grep for "answer line / Black line" finds only generic stroke text, SL-1 / AX-5 (widths) and the Say / oral lines. |
+
+## Value-based judging, probed (practice card, ansBox digit, fresh page per entry)
+
+`_` is an empty box; `+` green, `x` red, no mark = neutral. "Check" is the card's submit.
+
+| Skill (boxes) | Answer | Entry → live | Check |
+|---|---|---|---|
+| add_facts (2) | 10 | `10` → `1+ 0+`; `1_` → neutral; `_1` → neutral; `01` → `0 1x`; typed ones-first → first key neutral, then `1+ 0+` | correct / wrong / wrong / wrong / correct |
+| add_facts (2) | 7 | `7_` → `7+`; `_7` → `7+`; **`07` → `0 7x`**; `70` → `7 0x` | correct / correct / **correct** / wrong |
+| add_facts (2) | 0 | `0_`, `_0` → green; **`00` → `0 0x`** | correct / correct / **correct** |
+| add_facts (2) | 12 | `12` → green; `21` → red; `1_` and `_1` → neutral | correct / wrong / wrong |
+| mult_facts (3) | 100 | `100` → green; `10_` and `1_0` → neutral; `001` → red | correct / wrong / wrong / wrong |
+| mult_facts (3) | 10 | `10_` and `_10` → green; **`1_0` → `1+ _ 0+`** | correct / correct / **correct** |
+| mult_facts (3) | 12 | `12_` and `_12` → green; **`1_2` → green**; `21_` → neutral | correct / correct / **correct** / wrong |
+| mult_facts (3) | 7 | `7__` and `__7` → green; **`_07` → `_ 0 7x`**; `70_` → neutral | correct / correct / **correct** / wrong |
+| div_facts (2) | 10, 12, 0, 7 | the same pattern as add_facts | the same |
+
+**What this shows:**
+
+- No wrong value is ever green.
+- A value on its way to the answer ("1" of "12" or of "10") stays neutral and never turns red. Typing ones-first gives no red flash.
+- The faults are at the edges:
+  - Leading zeros: the live boxes say red and Check says correct (R3-D3).
+  - Digits with a gap between them are accepted (R3-D4).
+  - The worksheet's own column check fires as soon as the number of filled boxes reaches the answer's length. With answer 3, typing "0" toward "03" is judged at once.
+
+## The open item: sub_across_zeros key regroup boxes print empty
+
+**Not blocking for this lane.** The answer digits are right and sit inside the per-digit boxes on every item (L key, 12 items). RM-02 marks regroup boxes as unscored. The empty regroup row is the legacy key fill, and it belongs to the subtraction family's §10.1 migration.
+
+It is still a real C2 gap for that family:
+- In "subtract across zeros", the regroup marks are the lesson.
+- The kit stack keys do fill the carry boxes (add_100_regroup key shows "1").
+- One box per column cannot hold the "10" a zero becomes.
+
+Log it in STATUS for the subtraction family (R3-D9).
+
+## Defects, ranked (RUBRIC §6 form)
+
+```json
+{
+  "lane": "wave1-B",
+  "round": 3,
+  "pass": false,
+  "scores": { "C1": 7, "C2": 7, "C3": 7, "C4": 8 },
+  "caps": [],
+  "defects": [
+    { "id": "R3-D1", "criterion": "C1", "severity": "critical",
+      "where": "js/modules/worksheet.js advanceToNextProblem (~line 2229: nextQ.isVerticalFormat -> colInputs[colInputs.length - 1].focus()); online worksheet, ansBox 'digit' on add_facts, subtract, mult_facts, div_facts",
+      "what": "Per-digit facts are drawn as LTR strips (data-mq-ltr), but their q.isVerticalFormat is true. So after each correct answer, the worksheet auto-advance focuses the ONES (last) box of the next card, as for column work. LTR auto-advance stops at the last box. Probe: mult_facts card 1, answer 24, typed where the focus landed -> [_ _ 2] with the 4 lost. add_facts, div_facts and subtract land on 'box 1 of 2'. A 2-digit answer typed naturally loses its second digit, and Check marks the pupil wrong. This is R2-D1 again, in the worksheet host.",
+      "fix": "In advanceToNextProblem (and any other worksheet focus path), when the next card's .ws-stack has data-mq-ltr, focus colInputs[0]. Keep ones-first only for real column stacks.",
+      "check": "Add a worksheet leg to wave1-b-ansbox-entry: answer card 0, let it auto-advance, type card 1's answer where the focus is, and expect all boxes green on add_facts, mult_facts and div_facts digit." },
+
+    { "id": "R3-D2", "criterion": "C3", "severity": "major",
+      "where": "print-generate.js wsAnswerLine (the 'one' / Automatic branch) + print-sheet.js legacyKeyFill; final/ansbox-one/S/division__divide/independent-key-p1 items b, c, d, f, g, k, o; final/ansbox-one/S/subtraction__sub_facts/independent-key-p1 (every item)",
+      "what": "The legacy equation skills' DEFAULT key prints its bold answer taller and wider than the slot box. '11', '12' and '10' after '=' cross the box's top, bottom and sides. The pupil box is also shorter than the printed operands. On sub_facts (legacy-fact, Automatic = one box), the key digit runs through the box's bottom edge and the sum rule sits about 0.5 mm above the box top, so it reads as a double rule (noted in round 2, still open). This is the round-1 D8 class ('key digits sit clear inside the box'). It applies to divide, mult_zeros, add_sub_10s, add_sub_100s, missing_add_sub, mixed_division, mixed_mult_div, sub_facts and multiply. ws-print-lint reports 0 findings on these pages.",
+      "fix": "Size the legacy slot to Hw (as the kit fact / equation does) and set the key digit at the slot's writing size, not the display size. Put a gap of at least 1.5 mm between the fact rule and the box, or let the box's top edge be the rule. Teach ws-print-lint to fail when a key glyph's bbox is not inside its slot's bbox.",
+      "check": "The divide and sub_facts S and L keys show every digit clear inside its box with visible padding. ws-print-lint fails on 81405d6 and passes after the fix." },
+
+    { "id": "R3-D3", "criterion": "C2", "severity": "minor",
+      "where": "screen-cell.js wireLiveCorrect LTR judge (c === a string compare) vs answer-check numeric compare",
+      "what": "With a leading zero, the live boxes and Check disagree. '07' for 7, '00' for 0 and '_07' for 7 in 3 boxes turn red live, then Check says correct and awards credit. One answer gets two verdicts.",
+      "fix": "Pick one rule. Either compare values (strip leading zeros in the live judge) or reject leading zeros in Check too.",
+      "check": "'07' for 7 gives the same verdict live and on Check." },
+
+    { "id": "R3-D4", "criterion": "C2", "severity": "minor",
+      "where": "same judge; worksheet.js checkWorksheetAnswerFromColumns (whitespace removed)",
+      "what": "Empty boxes between digits are ignored. With 3 boxes, '1_0' for 10 and '1_2' for 12 are green and Check accepts them. On paper, '1 _ 2' in place-value boxes is ambiguous (102?), and a teacher would not accept it.",
+      "fix": "Accept empty boxes only at the ends (leading or trailing). A gap inside the digits stays neutral live and is wrong on Check.",
+      "check": "mult_facts digit: '1_2' for 12 is not green." },
+
+    { "id": "R3-D5", "criterion": "C4", "severity": "minor",
+      "where": "final/ansbox-digit/S/division__div_facts/independent-key-p1 (9 in the right box) vs the card (focus in the left box, '9_' green)",
+      "what": "In per-digit facts, the paper key right-aligns a 1-digit answer in the ones box. The screen focuses the left box, and the pupil's natural entry is '9_'. Paper and screen teach two placements for the same answer.",
+      "fix": "Choose one placement and use it on both. Either right-align on screen (move a lone digit to the ones box on blur, or start entry from the box that right-aligns the answer's band), or left-align the fact key.",
+      "check": "A 1-digit answer sits in the same box on the key and on the card after entry." },
+
+    { "id": "R3-D6", "criterion": "C1", "severity": "minor",
+      "where": "css/screen-cell.css '.ws-stack.mq-ans-off .ab > input.mq-digit { box-shadow: none }'; add_100_regroup off, card-390 unfocused",
+      "what": "A stack with Off shows nothing at all under the sum rule when its box is not focused. The comment says 'only the light grey wash', but none is visible. A fact with Off keeps a grey wash. A pupil who taps away cannot see where to write.",
+      "fix": "Keep the grey wash (or the fact's wash) on stack Off inputs.",
+      "check": "add_100_regroup off card-390, blurred, shows a visible writing zone under the rule." },
+
+    { "id": "R3-D7", "criterion": "C4", "severity": "minor",
+      "where": "js/modules/skill-ansbox-skills.js (72); offeredOptionsFor",
+      "what": "Some skills fit the lane's own criterion ('a column, a fact or an equation with one numeric answer') but get no Answer-boxes option: addition:add_three ('6 + 6 + 5 = ?', template add-three), division:missing_mult_div ('___ ÷ 7 = 8'), and probably sub_check_by_adding and div_check_by_multiplying ('Write the correct answer'). The measurement only counts stack / fact / eq screen kinds.",
+      "fix": "Include them, or record in STATUS why each is excluded.",
+      "check": "offeredOptionsFor('addition','add_three') offers ansBox, or STATUS lists the exclusion." },
+
+    { "id": "R3-D8", "criterion": "C4", "severity": "minor",
+      "where": "WORKSHEET_DESIGN_STANDARD.md SL-3; design/STATUS.md",
+      "what": "SL-3 says per-digit entry uses 'the stack's auto-advance'. It does not say that facts and equations are typed left to right and judged by value, while columns are typed ones first. STATUS has no lane-B entry for the open items (R3-D9, the legacy key sizing).",
+      "fix": "Add one SL-3 sentence on entry order and judging. Add a STATUS line for the open items.",
+      "check": "SL-3 names the LTR rule. STATUS lists the open items." },
+
+    { "id": "R3-D9", "criterion": "C2", "severity": "minor",
+      "where": "final/L/subtraction__sub_across_zeros/independent-key-p1 (regroup row empty on all 12 items)",
+      "what": "The legacy key leaves the regroup boxes empty, while kit stack keys fill them. Not blocking for lane B: regroup boxes are unscored (RM-02), and the answer digits are inside their boxes. For across-zeros the regroup marks are the lesson, and one box per column cannot hold the '10' a zero becomes.",
+      "fix": "Subtraction family §10.1 migration: give the item q.cell stack with a regroup trace so the key fills it.",
+      "check": "The sub_across_zeros key shows the regroup marks." }
+  ],
+  "to_raise_to_10": {
+    "C1": "Worksheet focus follows the strip's direction (R3-D1); a visible Off zone for stacks on screen (R3-D6).",
+    "C2": "One verdict per answer, live and on Check (R3-D3); no gaps accepted (R3-D4); the across-zeros key shows the regroup (R3-D9, family).",
+    "C3": "Legacy key digits clear inside their boxes, and no near-double rule (R3-D2).",
+    "C4": "One placement for a 1-digit answer on paper and screen (R3-D5); the option on add_three and missing_mult_div (R3-D7); SL-3 and STATUS text (R3-D8)."
+  },
+  "summary": "Every round-2 defect is fixed where it was found. Value-based judging never turns a wrong value green or a value in progress red, and paper equals screen for one / off / digit. It fails on the online worksheet: after each correct answer the auto-advance focuses the ones box of an LTR fact strip, so a 2-digit answer loses its second digit and is marked wrong. The legacy equation and fact skills' default keys also print digits that break out of their boxes."
+}
+```
+
+## Outside this lane (log for the owning families)
+
+- div_facts `notation=bracket`: ws-options-verify warns "1/6 answer(s) not found in the key text (e.g. '1')" (division family).
+- div_facts `constant=[n]`: the sheet is not titled "Divide by n" (P-31), on all 13 values.
+- The round-2 items still stand (add_word_problems lesson steps mismatch, place_value_disks chart overflow at 390, add_fractions_like raw ids, div_facts vertical on paper vs horizontal on screen).
