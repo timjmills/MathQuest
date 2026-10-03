@@ -2621,6 +2621,13 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     // a kit twin is already drawn at the host's size (--mq-k2)
     if (root.matches('.k2-twin, [data-mq-k2]') || root.querySelector('[data-mq-k2]')) return 1;
     root.style.removeProperty('zoom');
+    // the disk mat keeps its paper width under a host's zoom (the worksheet scales the cell to its
+    // digit size; the mat was drawn to 790 px at 1280): its caps are divided by the zoom
+    const capMats = (z) => root.querySelectorAll('svg.pv-disk-mat[data-mq-paper-w]').forEach((s) => {
+        s.style.maxWidth = `${Math.round(Number(s.dataset.mqPaperW) / z)}px`;
+        s.style.minWidth = `${Math.ceil(Number(s.dataset.mqFloorW) / z)}px`;
+    });
+    capMats(1);
     delete root.dataset.mqFit;
     delete root.dataset.mqFitShort;
     const sizes = _numeralSizes(root);
@@ -2637,6 +2644,7 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     if (f < Math.min(want, max) * 0.97) root.dataset.mqFitShort = '1';
     if (f <= 1.04) return 1;
     root.style.setProperty('zoom', f.toFixed(3));
+    capMats(f);
     root.dataset.mqFit = f.toFixed(2);
     return f;
 }
@@ -2862,6 +2870,8 @@ export function fitTwinRows(root) {
  * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
  */
 const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart']);
+const PV_PLACE_WORDS = new Set(['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands', 'millions',
+    'one', 'ten', 'hundred', 'thousand', 'tenths', 'hundredths', 'thousandths']);
 const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
 
 function _categoriesOf(skillId, given) {
@@ -3047,6 +3057,41 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
     tpl.innerHTML = _screenSizes(html, digitPt);
+    // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
+    // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
+    // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a
+    // line never splits a box from its word and the boxes and digits keep their full size.
+    tpl.content.querySelectorAll('.pv-blanks .pv-slotgroup').forEach((grp) => {
+        const kids = Array.from(grp.children);
+        const isSlot = (el) => el.hasAttribute('data-ws-slot') || !!el.querySelector('[data-ws-slot]');
+        const words = kids.filter((el) => !isSlot(el)).map((el) => el.textContent.trim());
+        if (!words.length || !words.every((w) => PV_PLACE_WORDS.has(w))) return;
+        // the frame's last word ("ones") follows the group: it joins the last pair
+        const tail = [];
+        for (let s = grp.nextElementSibling; s && !isSlot(s); s = s.nextElementSibling) {
+            if (!PV_PLACE_WORDS.has(s.textContent.trim())) break;
+            tail.push(s);
+        }
+        const pairs = [];
+        kids.forEach((el) => {
+            if (isSlot(el) || !pairs.length) {
+                const pr = document.createElement('span');
+                pr.className = 'mq-slotpair';
+                pr.style.cssText = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+                pairs.push(pr);
+            }
+            pairs[pairs.length - 1].appendChild(el);
+        });
+        tail.forEach((el) => pairs[pairs.length - 1].appendChild(el));
+        pairs.forEach((pr) => grp.appendChild(pr));
+        grp.style.flexWrap = 'wrap';
+        grp.style.whiteSpace = 'normal';
+        grp.style.justifyContent = 'center';
+        grp.style.rowGap = '2mm';
+        grp.style.columnGap = '0.45em';
+        grp.style.maxWidth = '100%';
+        grp.classList.add('mq-pairwrap');
+    });
     const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'))
         .filter((s) => s.getAttribute('data-ws-graded') !== '0');
     const chart = p.kind === 'chart';
@@ -3113,6 +3158,8 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         svg.style.height = 'auto';
         svg.style.maxWidth = `${Math.round(wMm * pxPerMm)}px`;
         svg.style.minWidth = `${Math.ceil(wMm * pxPerMm * floor)}px`;
+        svg.dataset.mqPaperW = String(Math.round(wMm * pxPerMm));
+        svg.dataset.mqFloorW = String(Math.ceil(wMm * pxPerMm * floor));
         const win = document.createElement('div');
         win.className = 'k2-chartwindow mq-diskwin';
         svg.replaceWith(win);

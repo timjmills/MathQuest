@@ -1629,3 +1629,18 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 /* count-by rows (critic C2 r7): when both cues show, the back cue says only "Back", so the strip stays one line at 390 */
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
+
+/* SL-3 (2026-10-03): an inline-blanks input adopted into a kit box (unit_form's "__ thousands") drew its own
+   ib-cell border inside the box's border: two boxes. The box is the slot; the input fills it, borderless.
+   The per-box live marks stay on the box (.mq-cellbox:has(> input.mq-live-*)). */
+html body .mq-scell .mq-cellbox > input.ib-cell { width: 100% !important; height: 100% !important; min-width: 0 !important; border: 0 !important; margin: 0 !important; }
+/* ...and the active-box highlight (yellow + ring) moves from that input to its box: on the input it was clipped by the
+   box's overflow to a thick top edge. */
+html body .mq-scell .mq-cellbox > input.ib-cell { outline: none !important; box-shadow: none !important; animation: none !important; display: block !important; vertical-align: top !important; }
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) {
+    background-color: #fff3a0 !important; box-shadow: 0 0 0 3px #f2c200 !important; overflow: visible;
+    animation: mq-active-pulse 1.3s ease-in-out infinite !important;
+}
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box) > input.ib-cell,
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) > input.ib-cell { background: transparent !important; }
