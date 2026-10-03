@@ -1179,6 +1179,7 @@ export function plan(input = {}) {
     const halves = wIds.filter((id) => wPools[id].length && shape[id]);
     let letter = 1;
     let warmCount = 0;
+    let warmSide = null;
     if (halves.length) {
         // `stack`: a skill too wide for half the page gives each skill a full-width row of its own.
         const stacked = halves.some((id) => shape[id].stack);
@@ -1222,6 +1223,7 @@ export function plan(input = {}) {
             const instrH = sameInstr ? 0 : twoLines ? m.instr * 1.75 : m.instr;
             const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map(() => '1fr'), parts } : parts[0];
             groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, { h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }));
+            warmSide = { group: groups[groups.length - 1], items: halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id))), instr: sameInstr ? t0 : '', ids: halves };
         }
     }
 
@@ -1292,6 +1294,25 @@ export function plan(input = {}) {
         groups.push(band(m.strip + stripH + chantH + top.h, { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h, grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
     // The Guided strip sits in two thirds of the width beside the Steps: its label and instruction
     // wrap to two lines ("Guided / Practice:"), so the band counts the second line.
+    } else if (weDo.length && warmSide && warmSide.group.h + m.strip + m.instr * 0.75 + weH > m.budget) {
+        // The Warm-up and the Guided band do not share a page (a two-step story at L): the band
+        // order stands (PT-OPN-1), so the Warm-up moves BESIDE the Guided cells, under the Steps,
+        // rather than leave its page half empty above a Guided band pushed overleaf.
+        groups.splice(groups.indexOf(warmSide.group), 1);
+        const its = warmSide.items;
+        const wc = 2;
+        const wr = Math.ceil(its.length / wc);
+        const cellW = Math.max(20, hAt(its, 4)) + 4;
+        const sideH = m.strip + m.instr * 3 + wr * cellW;
+        const h = Math.max(weH, zH + sideH);
+        const wgrid = gridPart(its.map((it) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: 4 })), { cols: wc, rows: wr, cellH: cellW, labels, start: 1 });
+        weBand.parts[0].content = gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: h / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: h, labels: 'none' });
+        weBand.parts[1] = { kind: 'col', cls: 'mq-lwedoside', parts: [
+            { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-lstepsbox" style="height:${(h - sideH).toFixed(2)}mm">${stepsZone ? stepsZone.render(zoneCtx) : ''}</div>` },
+            // (The library's _emphasis_ marks are for the instruction part; a band strip prints plain text.)
+            { kind: 'band', label: 'Warm-up:', instr: String(warmSide.instr || instructionText(instructionKeyOf(its, input.skills), its)).replace(/_/g, ''), content: wgrid },
+        ] };
+        groups.push(band(m.strip + m.instr * 0.75 + h, weBand, { h, grid: [weBand.parts[0].content], cap: 0.1, capIfEmpty: 0.35 }));
     } else if (weDo.length) groups.push(band(m.strip + m.instr * 0.75 + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
