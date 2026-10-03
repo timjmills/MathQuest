@@ -906,7 +906,8 @@ export function wireBoxValidation(visualAidEl, q) {
             const combined = () => colInputs.map((e) => (e.value || '').trim()).join('');
             const want = ansStr.replace(/[^0-9]/g, '');
             for (let i = 0; i < N; i++) {
-                slots.push({ el: colInputs[i], expect: '', norm: numNorm, customMatch: () => combined() === want,
+                // expect = the whole value, which no single box holds: only customMatch (the combined value) can pass
+                slots.push({ el: colInputs[i], expect: '\u0000' + want, norm: numNorm, customMatch: () => combined() === want,
                     pending: () => { const c = combined(); return c.length < want.length && want.startsWith(c); } });
             }
         } else if (ansStr.length <= N) {
