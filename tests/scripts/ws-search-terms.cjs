@@ -300,6 +300,22 @@ const QUERIES = [
         if (miss.length) failures.push(`(b) "${q}": ${miss.join(', ')} not in top 5 (got ${keys.join(', ')})`);
         else passed++;
     }
+    // (d) primary skills: every PRIMARY_SKILLS phrase puts its skill at rank 1 in findSkills AND first in
+    //     a grouped picker (groupByRank: the order teacher-sets uses; the student list and teacher
+    //     library show the ranked order directly; Navigator / quiz builder reorder their groups the same way)
+    let prim = 0;
+    for (const [key, phrases] of Object.entries(st.PRIMARY_SKILLS)) {
+        for (const q of phrases) {
+            const hits = finder.findSkills(q);
+            const first = hits[0] && hits[0].key;
+            const g = finder.groupByRank(hits.map((h) => h.entry));
+            const groupedFirst = g[0] && g[0].items[0] && g[0].items[0].items[0] && g[0].items[0].items[0].key;
+            if (first !== key) failures.push(`(d) "${q}": rank 1 is ${first}, not primary ${key}`);
+            else if (groupedFirst !== key) failures.push(`(d) "${q}": grouped picker shows ${groupedFirst} first, not ${key}`);
+            else prim++;
+        }
+    }
+    console.log(`ws-search-terms: ${prim} primary-skill queries rank 1 in the list and in grouped pickers`);
     if (QUERIES.length < 150) failures.push(`query table has ${QUERIES.length} queries, needs >= 150`);
     console.log(`ws-search-terms: ${entries.length} skills, terms per skill min ${ns[0]} / median ${ns[Math.floor(ns.length / 2)]} / max ${ns[ns.length - 1]}; ${passed}/${QUERIES.length} queries pass`);
     if (failures.length) {

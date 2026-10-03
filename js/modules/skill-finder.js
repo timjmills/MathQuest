@@ -85,6 +85,23 @@ export function skillSearchScores(query) {
     return m;
 }
 
+/**
+ * The order a grouped view shows a ranked list in: groups follow the rank of their best member, so
+ * the top hit is always the first row shown. `list` is already ranked; returns
+ * [{ id, items: [{ id, items: [...] }] }] for two group levels (default domain -> category).
+ */
+export function groupByRank(list, outer = (s) => s.domainId, inner = (s) => s.categoryId) {
+    const groups = new Map();
+    for (const s of list) {
+        const o = outer(s), i = inner(s);
+        if (!groups.has(o)) groups.set(o, new Map());
+        const g = groups.get(o);
+        if (!g.has(i)) g.set(i, []);
+        g.get(i).push(s);
+    }
+    return [...groups].map(([id, g]) => ({ id, items: [...g].map(([cid, items]) => ({ id: cid, items })) }));
+}
+
 /** Order any list of {categoryId, skillId} by a query: matches only, best first. */
 export function rankByQuery(list, query, keyOf = (s) => `${s.categoryId}:${s.skillId}`) {
     const scores = skillSearchScores(query);

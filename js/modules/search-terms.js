@@ -455,6 +455,40 @@ export const SKILL_TERMS = {
 
 /* ================================================================= misspellings */
 
+/* ================================================================= primary skills */
+
+// The PRIMARY skill for a concept: for these exact queries it ranks first, above every match but an
+// exact label match. Keyed by 'categoryId:skillId' (a union merges cleanly); phrases are normalised.
+export const PRIMARY_SKILLS = {
+    'multiplication:count_by_tables': ['skip counting', 'skip count', 'skipcounting', 'skip countin', 'count by', 'counting by',
+        'count in', 'counting in', 'counting in multiples', 'skip counting by 1 to 12'],
+    'multiplication:mult_facts': ['times tables', 'times table', 'timestables', 'multiplication tables', 'multiplication facts', 'times', 'multiply', 'multiplication', 'x'],
+    'addition:add_facts': ['plus', 'add', 'adding', 'addition', 'addition facts', 'sum'],
+    'subtraction:sub_facts': ['take away', 'takeaway', 'minus', 'subtract', 'subtraction', 'subtraction facts', 'difference'],
+    'division:div_facts': ['divide', 'division', 'divided by', 'division facts'],
+    'division:share_into_groups': ['sharing', 'share equally', 'fair share'],
+    'addition:add_100_regroup': ['carrying', 'carry'],
+    'subtraction:sub_100_regroup': ['borrowing', 'borrow'],
+    'composing:number_bonds': ['number bonds', 'number bond', 'part whole'],
+    'composing:make_ten': ['bonds to 10', 'make 10', 'make ten'],
+    'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'hundred chart', 'number square'],
+    'composing:odd_even': ['odd and even', 'odd or even', 'even numbers', 'odd numbers'],
+    'measurement:time_hour': ['telling time', 'tell the time', 'oclock', 'clock'],
+    'measurement:time_half_hour': ['half past'],
+    'measurement:time_quarter': ['quarter past', 'quarter to'],
+    'measurement:money_count': ['money', 'coins', 'counting money'],
+    'graphs:pictograph': ['pictogram', 'pictograph', 'picture graph'],
+    'graphs:tally_chart': ['tally', 'tally chart', 'tally marks'],
+    'graphs:bar_graph': ['bar chart', 'bar graph'],
+    'fractions:identify': ['fractions', 'fraction'],
+    'placevalue:place_value_disks': ['place value'],
+    'order_of_operations:oop_easy': ['order of operations', 'bodmas', 'bidmas', 'pemdas'],
+    'algebra:tape_diagram': ['bar model', 'tape diagram'],
+    'area_perimeter:perimeter': ['perimeter'],
+    'area_perimeter:area': ['area'],
+    'angles_lines:symmetry': ['symmetry', 'line of symmetry'],
+};
+
 export const MISSPELLINGS = {
     multipication: 'multiplication', multiplcation: 'multiplication', multiplacation: 'multiplication', mulitplication: 'multiplication',
     multiplicaton: 'multiplication', multiplikation: 'multiplication', multply: 'multiply', mutiply: 'multiply', multipy: 'multiply',
@@ -648,6 +682,7 @@ export function buildSearchIndex(entries) {
             sets: [tokSet([labelPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet(t.code)],
             wp: /word|_wp_|story/.test(`${e.label} ${e.skillId}`.toLowerCase()),
             phrases: { extra: t.extra, concept: t.concept },
+            primary: (PRIMARY_SKILLS[`${e.categoryId}:${e.skillId}`] || []).map((x) => normalize(x)),
             demote: (/^mixed|_all$|^all_|^operations_all|^vocab/.test(e.skillId) ? 0.4 : 0) + (/no pictures|no visuals|_plain|_nv$/.test(`${e.label} ${e.skillId}`.toLowerCase()) ? 0.2 : 0),
         };
     });
@@ -720,6 +755,7 @@ export function searchIndex(index, query) {
         if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
         else if (q.length > 1 && (` ${it.labelBare} `).includes(` ${phrase} `)) score += 15;
         if (phrase.length >= 1) {
+            if (it.primary.includes(phrase) || it.primary.includes(q.join(' '))) score += 60;
             if (it.phrases.extra.includes(phrase)) score += 14;
             else if (it.phrases.concept.includes(phrase)) score += 6;
         }

@@ -18,7 +18,7 @@
 // options (skill-options.js optionsFor) is shown. Chosen values live on the queue item as
 // `item.opts`; the share code carries them once skill-codes.js encodes `opts`.
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { skillSearchScores, rankByQuery, onSkillSearchReady, groupByRank } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import {
@@ -321,8 +321,9 @@ function renderBrowser() {
     if (ui.view === 'thumbs') { renderThumbs(box, shown, inSet); return; }
     let html = '';
     // While searching, the best match leads: domains and categories follow the rank of their best skill.
+    // (the same order skill-finder.js groupByRank gives, which ws-search-terms checks)
     const firstAt = new Map();
-    shown.forEach((s, i) => { if (!firstAt.has(s.domainId)) firstAt.set(s.domainId, i); if (!firstAt.has(s.categoryId)) firstAt.set(s.categoryId, i); });
+    groupByRank(shown).forEach((d, di) => { firstAt.set(d.id, di); d.items.forEach((c, ci) => firstAt.set(c.id, ci)); });
     const byRank = (id) => (searching && firstAt.has(id) ? firstAt.get(id) : Infinity);
     const domainList = Object.entries(DOMAINS);
     if (searching) domainList.sort((a, b) => byRank(a[0]) - byRank(b[0]));
