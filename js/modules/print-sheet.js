@@ -1811,25 +1811,19 @@ function settleMixedGrades(metas, items) {
     }
 }
 
-function earlierSkills(sk, count = 1, { fallback = false, sameOps = false } = {}) {
+function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
     let own = null;
     try { own = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { own = null; }
     const out = [];
-    const opsNamed = (s) => { const t = `${(s && s.v) || ''} ${(s && (s.l || s.label)) || ''}`.toLowerCase().replace(/multi[-_ ]step/g, ''); return ['add', 'sub', 'mult', 'div'].filter((w) => new RegExp(`\\b${w}|${w === 'add' ? 'addition' : w === 'sub' ? 'subtract' : w === 'mult' ? 'multipl' : 'divi'}`).test(t)); };
-    const ownOps = sameOps ? opsNamed((SKILLS[sk.categoryId] || []).find((x) => x.v === sk.skillId) || { v: sk.skillId }) : [];
     const ok = (s, cat) => {
         if (!s || s.v === sk.skillId || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) return false;
         try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
         let g = null;
         try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
-        if (own !== null && (g === null || g > own)) return false;
-        // A lesson's Warm-up holds to the skill's NAME: an addition lesson never warms up on
-        // "Add & Subtract by 100s" (900 - 100): every operation the step names, the skill names.
-        if (sameOps && ownOps.length) { const o = opsNamed(s); if (!o.length || o.some((x) => !ownOps.includes(x))) return false; }
-        return true;
+        return !(own !== null && (g === null || g > own));
     };
     const take = (cat, idxs) => {
         const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
@@ -2104,17 +2098,7 @@ async function buildLesson(n, metaOf) {
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = lessonFor(sk.categoryId, sk.skillId);
-    // A skill whose earlier steps are no warm-up (a two-step story's category lists tape diagrams
-    // before it) names its own: two-step change stories are add / subtract chains, so they warm
-    // up on one add fact and one subtract fact (coordinator ruling 2026-10-03).
-    const WARM_FOR = {
-        'algebra:multi_step_word': ['addition:add_facts', 'subtraction:sub_facts'],
-        'algebra:multi_step_word_plain': ['addition:add_facts', 'subtraction:sub_facts'],
-    };
-    const own = WARM_FOR[`${sk.categoryId}:${sk.skillId}`];
-    const warmSkills = data ? data.skills.map(skillRef)
-        : own ? own.map((k) => ({ categoryId: k.split(':')[0], skillId: k.split(':')[1] }))
-        : earlierSkills(sk, 4, { sameOps: true });
+    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
     // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.

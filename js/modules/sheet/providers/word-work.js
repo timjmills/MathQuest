@@ -51,11 +51,9 @@ export function wordWorkSteps(q) {
     const cues = cuesOf(p);
     const out = [step('Read the story two times.')];
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
-    // A two-step story says each step as ONE move (circle its sign, work it): three moves a step
-    // would run past the six steps a Model shows, and the second step would never be seen.
-    if (p.steps.length > 1) p.steps.forEach((st, i) => out.push(step(`Step ${i + 1}: Circle ${GLYPH[st.op]}. ${workLine(st)}`, [{ slot: `op${i}`, value: GLYPH[st.op] }])));
-    else p.steps.forEach((st, i) => {
-        out.push(step(`Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
+    p.steps.forEach((st, i) => {
+        const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
+        out.push(step(`${pre}Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
         out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`));
         out.push(step(workLine(st)));
     });

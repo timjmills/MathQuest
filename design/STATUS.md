@@ -142,3 +142,24 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 ## 9. Escalations
 
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
+
+## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
+
+These are deferred to Wave 8 (owner ruling 2026-10-03: lessons and anchor charts wait for the Lesson wave). A fix
+for all of them was built and then reverted from the Steps-box / hint branch; see commits `504f71a`, `8971231`,
+`f98e75e`, `a1ae434` (reverted by the commit that adds this section) for a worked approach.
+
+- **Anchor chart overflows** (`ws-grade-render --roles lesson`, OVERFLOW) for add / sub / mult / div word problems
+  and `multi_step_word`: every panel repeats the story and the column work, so a 2 x 2 chart runs past the page.
+  The rule to keep: never zoom below 1 (content never shrinks); fit by structure (story only in panel 1, the work
+  only after it; continue on a second chart page with whole panels, full width).
+- **Off-skill Warm-up**: an addition word-problem lesson warms up on `add_sub_100s` ("900 − 100"); a lesson with no
+  lesson data takes the two skills listed before it, whatever their operation. Rule: only earlier skills whose name
+  holds no operation the skill's own name lacks; a prerequisite too tall for a Warm-up is replaced, never the band
+  dropped (PT-OPN-1).
+- **`multi_step_word`**: the Warm-up uses tape-diagram items that overlap the next band (ruling: warm up on one add
+  and one subtract fact skill); the Model clamps to six steps, so only Step 1 shows (say each step as one move:
+  "Step 1: Circle +. 17 + 27 = 44."); at L the Warm-up and the Guided band cannot share a page (ruling: the Warm-up
+  sits beside the Guided cells, under the Steps).
+- **mult lesson Warm-up**: `mult_properties` arrays overflow the sheet; a 2-digit by 2-digit stack spills a 4-column
+  half cell; the key's answer digits need about 4 mm more row height than the pupil page.

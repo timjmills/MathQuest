@@ -68,8 +68,7 @@ const PT_MM = 25.4 / 72;
 /** The lesson skill ('main') and one pool per prerequisite skill ('w0', 'w1'). */
 export function sources(skills, helpers = {}) {
     const main = skills[0];
-    // Up to four candidates: the Warm-up takes the first two whose problems are short (warmShape).
-    const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 4);
+    const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 2);
     // Lessons r3: an example case the main pool rarely deals (a 0 in the ones AND a one-place
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
@@ -87,15 +86,10 @@ export const measureCols = () => [1, 2, 3, 4];
 
 const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));
 
-const WARM_MAX_MM = 70;
-
 /** How many cells each prerequisite gets in its share of the width. */
 function warmShape(pools, input) {
     const ctx = ctxOf(input);
-    // A Warm-up is a quick look back: a prerequisite whose problem is taller than WARM_MAX_MM even
-    // across the whole width (a pair of arrays, a story with a work box) would take the sheet's
-    // page by itself and push the lesson past it: the next shorter earlier skill takes its place.
-    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length && hAt(pools[id].slice(0, 3), 1) <= WARM_MAX_MM).slice(0, 2);
+    const ids = Object.keys(pools).filter((id) => /^w\d$/.test(id) && (pools[id] || []).length);
     const out = {};
     // A cell in a half of the width is as wide as a cell of a 4-column page: the measurement at 4
     // columns says whether it fits there (a template's own column cap is for a whole page of it).
@@ -119,9 +113,7 @@ function warmShape(pools, input) {
         return out;
     }
     if (ids.length > 1) {
-        // Two cells a half only when every half's cells fit a 4-column cell (a 2-digit by 2-digit
-        // stack does not, and spilled out of its cell).
-        const k = Math.min(...ids.map((id) => out[id].k), ...ids.map((id) => (fitsWidth(pools[id].slice(0, 3), 4) ? 2 : 1)));
+        const k = Math.min(...ids.map((id) => out[id].k));
         for (const id of ids) out[id] = k === 2 ? { k: 2, cols: 4 } : { k: 1, cols: 2 };
         // A half whose cells are half as tall as the other half's holds two rows of them, so the
         // row is never sized for a taller item than it holds (H13).
@@ -507,23 +499,6 @@ const isRound = (it) => {
     return !!(c && c.template === 'pv' && c.payload && c.payload.kind === 'round' && Number.isFinite(Number(c.payload.n)));
 };
 
-/** `html` without its first <div class="cls ..."> element (nested divs balanced). */
-function dropDiv(html, cls, nth = 0) {
-    const h = String(html || '');
-    const open = new RegExp(`<div class="${cls}[" ]`, 'g');
-    let at = -1;
-    for (let i = 0, m = open.exec(h); m; m = open.exec(h), i++) if (i === nth) { at = m.index; break; }
-    if (at < 0) return h;
-    const re = /<div\b|<\/div>/g;
-    re.lastIndex = at;
-    let depth = 0;
-    for (let m = re.exec(h); m; m = re.exec(h)) {
-        depth += m[0] === '</div>' ? -1 : 1;
-        if (depth === 0) return h.slice(0, at) + h.slice(re.lastIndex);
-    }
-    return h;
-}
-
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
 function stateDrawing(it, steps, groups, k, c) {
     const merged = groups.map((g) => ({ marks: g.marks }));
@@ -566,9 +541,6 @@ export function generalStep(text) {
     const body = t.slice(pre.length);
     if (/^Look at the key words?\b/i.test(body)) return `${pre}Look at the key words.`;
     if (!/\d/.test(body)) return t;
-    // "Step 1: Circle +. 17 + 27 = 44." -> "Step 1: Circle +. Work it out."
-    const circ = body.match(/^(Circle \S+\.) [\d,.\s]+[-+×÷−*/][\d,.\s]+=\s*[\d,.]+(\s*R\s*\d+)?\.?$/);
-    if (circ) return `${pre}${circ[1]} Work it out.`;
     if (/^Write .* in the boxes\.?$/i.test(body)) return `${pre}Write the numbers in the boxes.`;
     if (/^Write the answer\b/i.test(body)) return `${pre}Write the answer and its label word.`;
     if (/^[\d,.\s]+[-+×÷−*/][\d,.\s]+=\s*[\d,.]+(\s*R\s*\d+)?\.?$/.test(body)) return `${pre}Work it out.`;
@@ -608,39 +580,7 @@ export function stateItems(example, data) {
     const groups = stateGroups(steps);
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length);
-    const draw0 = (k, c) => stateDrawing(example, steps, groups, k, c);
-    // A story's panels after the first show the WORK only: the story is read in panel 1, and four
-    // copies of it pushed the chart past the page (two-step stories most of all).
-    const story = !!(example && example.q && example.q.cell && example.q.cell.template === 'word-work');
-    const drawCls = (k) => (story && k > 0 ? 'mq-cdraw mq-cdraw-work' : 'mq-cdraw');
-    // Cut in the HTML (not by CSS alone) so the host measures the panel as it prints.
-    // A two-step story's panels show the step they work: the reading panel the story alone, a
-    // "Step n" panel that step's column work alone, the last panel all of it (two stacks in
-    // every panel ran the chart past the page).
-    const nSteps = story ? ((example.q.cell.payload && example.q.cell.payload.steps) || []).length : 0;
-    const stepOf = (k) => {
-        const m = groups[k].steps.map((i) => steps[i].text).join(' ').match(/Step (\d+):/g) || [];
-        return m.length === 1 ? Number(m[0].replace(/\D/g, '')) : m.length ? -1 : 0;
-    };
-    const workOnly = (k, html) => {
-        // The reading panel (panel 1, its steps mark nothing yet) shows the story alone: its
-        // blank work would repeat the next panel's and push the chart onto a second page.
-        if (story && k === 0 && groups.length > 1) {
-            let h = html;
-            for (let j = Math.max(1, nSteps); j >= 1; j--) h = dropDiv(h, 'mq-wwstep', j - 1);
-            for (const c of ['mq-wwanswer', 'mq-wwwords', 'mq-wwbar']) h = dropDiv(h, c);
-            return h;
-        }
-        if (nSteps < 2 || k === groups.length - 1) return html;
-        const n = stepOf(k);
-        if (n < 0) return html;
-        let h = html;
-        for (let j = nSteps; j >= 1; j--) if (j !== n) h = dropDiv(h, 'mq-wwstep', j - 1);
-        return h;
-    };
-    // (The page's full-width floor of a two-step cell is no floor for a chart panel.)
-    const fitPanel = (h) => (story ? h.replace(/(<div class="mq-ww"[^>]*?)min-width:[^;"]+;/, '$1') : h);
-    const drawing = (k, c) => fitPanel(workOnly(k, story && k > 0 ? dropDiv(draw0(k, c), 'mq-wwstory') : draw0(k, c)));
+    const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
     // Lessons r1: a closing step that draws nothing ("Check: add back") is not squeezed into the
     // last panel: it gets a line of its own under the panels, its words beside its name.
     const marked = (i) => ((steps[i] && steps[i].marks) || []).length > 0;
@@ -673,7 +613,7 @@ export function stateItems(example, data) {
             // Lessons r3: a panel whose step counts on draws the hops beside its words (the side
             // column has the room; under the fact they would push the panels past the page).
             const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
-            const draw = `<div class="${drawCls(k)}" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
+            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
@@ -681,7 +621,7 @@ export function stateItems(example, data) {
     }));
     const draws = groups.map((g, k) => Object.assign({}, base, {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
-        render: (c) => `<div class="${drawCls(k)}">${drawing(k, c)}</div>`,
+        render: (c) => `<div class="mq-cdraw">${drawing(k, c)}</div>`,
     }));
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
@@ -1001,14 +941,14 @@ const hOf = (x, cols) => (x && x.measured && x.measured[cols] && Number.isFinite
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
-function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null, opts = {}) {
+function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = opts.lay || chartLayout(n);
+    const lay = chartLayout(n);
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
@@ -1030,10 +970,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const panelW = lay.variant === 'row' ? 186 * 0.42 : 186 / cols - 8;
         return panelW / boundW;
     });
-    // A story's drawing is laid out at its own width (story, signs, columns, label words): it is
-    // never zoomed past 1, where it would run out of its panel's sides.
-    const storyChart = !!(example && example.q && example.q.cell && example.q.cell.template === 'word-work');
-    const zMax = storyChart ? 1 : Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
+    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
     const H = (z) => Math.max(...states.map((st, k) => base[k] + (z - 1) * dH[k]));
     // The largest zoom in [lo, hi] at which `total(z)` fits `room`; 0 when not even `lo` does.
     const solve = (total, room, lo, hi) => {
@@ -1072,17 +1009,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const zc = solve((q) => sum(rowsAt(q)), availAll, 0.8, 1);
         if (zc) { mode = 'grid3'; z = zc; }
     }
-    // Each row as tall as its OWN panels (a first panel of three step heads sets only its row).
-    const rowsOne = (q) => Array.from({ length: lay.rows }, (_, r) => Math.max(...states.slice(r * cols, r * cols + cols).map((st) => base[states.indexOf(st)] + (q - 1) * dH[states.indexOf(st)])));
-    let perRow = false;
-    if (mode === 'one') {
-        z = solve((q) => lay.rows * H(q), avail, 1, zMax);
-        if (!z && cols === 2 && lay.rows > 1) { z = solve((q) => sum(rowsOne(q)), avail, 1, zMax); perRow = !!z; }
-        // Content never shrinks to fit: panels too tall at zoom 1 continue on a second chart page
-        // (whole panels, never split - the caller re-plans), else print at 1.
-        if (!z && opts.canSplit) return { split: true };
-        if (!z) z = 1;
-    }
+    if (mode === 'one') z = solve((q) => lay.rows * H(q), avail, 1, zMax) || 1;
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -1105,16 +1032,9 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         // The panels take the body left over (by flex: the header's real height is only known to
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
-        const fill = !!opts.lay || lay.variant === 'row' || lay.rows * rowH >= room - 2;
+        const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
-        if (perRow) {
-            // The rows share the room in proportion to their own panels.
-            const hr = rowsOne(z);
-            const k = room / sum(hr);
-            grid.rowsTpl = hr.map((h) => `${Math.round(h * k * 10) / 10}fr`).join(' ');
-            rowH = room / lay.rows;
-        }
-        sections.push(fill || perRow ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
+        sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
         if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
@@ -1127,7 +1047,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         }
         if (mode === 'final') sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
     }
-    if (opts.say !== false) sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
+    sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
@@ -1179,14 +1099,11 @@ export function plan(input = {}) {
     const halves = wIds.filter((id) => wPools[id].length && shape[id]);
     let letter = 1;
     let warmCount = 0;
-    let warmSide = null;
     if (halves.length) {
         // `stack`: a skill too wide for half the page gives each skill a full-width row of its own.
         const stacked = halves.some((id) => shape[id].stack);
         const rowsOf = (id) => shape[id].rows || 1;
-        // (+4 mm a row: the key writes the answer under a fact stack's line, a digit taller than
-        // the blank line the pupil page was measured with.)
-        const hOwn = (id) => (Math.max(20, hAt(wPools[id].slice(0, shape[id].k * rowsOf(id)), shape[id].cols)) + 4) * rowsOf(id);
+        const hOwn = (id) => Math.max(20, hAt(wPools[id].slice(0, shape[id].k * rowsOf(id)), shape[id].cols)) * rowsOf(id);
         const hW = Math.max(...halves.map(hOwn));
         const parts = halves.map((id) => {
             const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
@@ -1223,7 +1140,6 @@ export function plan(input = {}) {
             const instrH = sameInstr ? 0 : twoLines ? m.instr * 1.75 : m.instr;
             const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map(() => '1fr'), parts } : parts[0];
             groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, { h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }));
-            warmSide = { group: groups[groups.length - 1], items: halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id))), instr: sameInstr ? t0 : '', ids: halves };
         }
     }
 
@@ -1292,28 +1208,7 @@ export function plan(input = {}) {
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h, { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h, grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    // The Guided strip sits in two thirds of the width beside the Steps: its label and instruction
-    // wrap to two lines ("Guided / Practice:"), so the band counts the second line.
-    } else if (weDo.length && warmSide && warmSide.group.h + m.strip + m.instr * 0.75 + weH > m.budget) {
-        // The Warm-up and the Guided band do not share a page (a two-step story at L): the band
-        // order stands (PT-OPN-1), so the Warm-up moves BESIDE the Guided cells, under the Steps,
-        // rather than leave its page half empty above a Guided band pushed overleaf.
-        groups.splice(groups.indexOf(warmSide.group), 1);
-        const its = warmSide.items;
-        const wc = 2;
-        const wr = Math.ceil(its.length / wc);
-        const cellW = Math.max(20, hAt(its, 4)) + 4;
-        const sideH = m.strip + m.instr * 3 + wr * cellW;
-        const h = Math.max(weH, zH + sideH);
-        const wgrid = gridPart(its.map((it) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: 4 })), { cols: wc, rows: wr, cellH: cellW, labels, start: 1 });
-        weBand.parts[0].content = gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: h / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: h, labels: 'none' });
-        weBand.parts[1] = { kind: 'col', cls: 'mq-lwedoside', parts: [
-            { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-lstepsbox" style="height:${(h - sideH).toFixed(2)}mm">${stepsZone ? stepsZone.render(zoneCtx) : ''}</div>` },
-            // (The library's _emphasis_ marks are for the instruction part; a band strip prints plain text.)
-            { kind: 'band', label: 'Warm-up:', instr: String(warmSide.instr || instructionText(instructionKeyOf(its, input.skills), its)).replace(/_/g, ''), content: wgrid },
-        ] };
-        groups.push(band(m.strip + m.instr * 0.75 + h, weBand, { h, grid: [weBand.parts[0].content], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + m.instr * 0.75 + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);
@@ -1382,20 +1277,7 @@ export function plan(input = {}) {
     let secondShown = 0;
     let chartSizing = null;
     if (states.length && part !== 'sheet') {
-        const st = states.filter((s) => s.lessonState !== undefined);
-        const tail = extrasList.find((x) => x.lessonTail);
-        const tailP = extrasList.find((x) => x.lessonTailPanel);
-        let chart = chartPage(input, ctx, data, example, st, draws, second, tail, finals, tailP, { canSplit: st.length >= 2 });
-        if (chart.split) {
-            // The chart continues on a second page: the panels in order, a row of two per page,
-            // the Say band under the last (PT-ANC: whole panels, the example at full size).
-            const half = Math.ceil(st.length / 2);
-            // One panel a row, full width, the rows sharing the page (never a half-empty sheet).
-            const lay1 = { cols: 1, rows: 0, variant: 'col' };
-            const a = chartPage(input, ctx, data, example, st.slice(0, half), draws.slice(0, half), [], null, [], null, { lay: Object.assign({}, lay1, { rows: half }), say: false });
-            chart = chartPage(input, ctx, data, example, st.slice(half), draws.slice(half), [], tail, [], tailP, { lay: Object.assign({}, lay1, { rows: st.length - half }) });
-            out.push({ header: a.header, sections: a.sections });
-        }
+        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel));
         zoom = chart.zoom;
         secondShown = chart.second;
         chartSizing = chart.sizing;
