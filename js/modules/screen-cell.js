@@ -2851,14 +2851,7 @@ export function fitTwinRows(root) {
                 const slot = twin.querySelector('.k2-tile-slot');
                 const r = slot ? slot.getBoundingClientRect() : null;
                 const small = r ? Math.min(r.width, r.height) : 0;       // the host's input is at least 44 px each way, so no tile shrinks below that
-                let floor = small > 0 ? cur * 44 / small : cur * 0.75;
-                // owner ruling 2026-10-03 (TY-10b): on a phone the row's digits stay at about 29 px (the boxes scale with them,
-                // same box:digit ratio); an exception to the 40 px card floor, count-by rows only
-                if (typeof window !== 'undefined' && window.innerWidth <= 480) {
-                    const dg = twin.querySelector('.k2-countrow-body .k2-given, .k2-countrow-body input.mq-cellslot');
-                    const fs = dg ? parseFloat(getComputedStyle(dg).fontSize) : 0;
-                    if (fs > 0) floor = Math.max(floor, cur * 29 / fs);
-                }
+                const floor = small > 0 ? cur * 44 / small : cur * 0.75;
                 const k = Math.max(Math.min(cur, floor), cur * have / need);
                 if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
             }
