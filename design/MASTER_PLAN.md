@@ -75,7 +75,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | 3.1 | Home: six large tiles (Make skill sheet, Make mixed review, Make quiz, Make lesson — hidden until Wave 8, Send practice code, Practice map) and a small secondary menu. **Practice map** opens the MAP strand picker (strands → their MAP skills → print practice / send practice link; MAP skills only). |
 | 3.2 | Gallery picker by default wherever skills are chosen: Big 3 / Medium 4 / Small 5 across plus a list view; search, Grade, Domain, Topic; select many at once. |
 | 3.3 | Sets auto-save in the browser until deleted; a Sets area lists every set for any paper, quiz or code. |
-| 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz. Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
+| 3.4 | **WRM page** (new, teacher-facing): grades → units → small steps with a grade filter and search. Opening a step shows its skills, pre-skills and related skills. From a step or unit: print a worksheet, send a practice code, make a quiz — for the step's own skills **or its pre-skills** (owner list: "students can practise the pre-skills or the actual skill for the chosen lesson"). Data comes from Wave 2 and the WRM reference site. Today there is no WRM screen. |
 | 3.5 | Critic teacher-r1 at 1280 / 820 / 390, every action clicked. |
 
 ## Wave 4 — Three worksheets: skill, mixed, quiz
@@ -131,7 +131,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Minutes → hours (90 min = 1.5 h = 1 ½ h) | partial (hours → minutes only) | add the reverse, with decimal and mixed hours |
 | Line / dot plots | exists `line_plot*` | re-grade |
 | Adding decimals | exists `add_decimal` | re-grade |
-| Two-step change problems (add-add, add-sub, sub-add, sub-sub) | exists `multi_step_word` | re-grade |
+| Two-step change problems: start → more/less → more/less again → final (add-add, add-sub, sub-add, sub-sub) | exists `multi_step_word` | re-grade, and add a teacher option choosing which of the four change patterns (default all four, equally) |
 | Ordering times / a time between two times | exists `order_clocks_*`, `elapsed_*` | re-grade |
 | Equal groups total | exists | re-grade |
 | Meaning of a coordinate point in context | missing | new skill |
