@@ -40,6 +40,7 @@
 // field when there is no one-letter field ("~_5A12"), so the payload never starts with a digit.
 import { optionsFor, normalizeOptions, packOptions } from './skill-options.js';
 import { OPTION_KEYS, VALUE_TOKENS, MULTI_KEY_RE } from './skill-option-keys.js';
+import { encodeRows, decodeRows } from './count-rows.js';
 
 export const OPTION_PAYLOAD_VERSION = 1;
 
@@ -114,6 +115,9 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
                 out.push(key + list.map(x => _setToken(def.id, x)).join(''));
             } else if (def.type === 'bool') {
                 out.push(key + (v ? '1' : '0'));
+            } else if (def.type === 'rows') {
+                const enc = encodeRows(v);
+                if (enc) out.push(key + enc);
             } else if (v !== null && v !== undefined && def.tokens) {
                 const t = _defToken(def, v);
                 if (t !== null) out.push(key + t);
@@ -155,6 +159,7 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
         const body = field.slice(keyLen);
+        if (def.type === 'rows') { raw[optId] = decodeRows(body); continue; }
         if (def.tokens) {
             const w = def.tokenWidth || 1;
             const byTok = {};

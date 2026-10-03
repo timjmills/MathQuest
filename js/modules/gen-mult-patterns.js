@@ -16,9 +16,10 @@
 // Randomness is Math.random, which generateQuestionFor() seeds, so a page is reproducible.
 
 import { state } from './state.js';
-import { dealIndex } from './page-deal.js';
+import { dealIndex, pageConstant } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
+import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePagePlan } from './count-rows.js';
 import { k2Twin, renderCell } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
@@ -82,71 +83,155 @@ const pctCount = (pct, n) => (pct >= 100 ? n : Math.max(1, Math.min(n, Math.roun
 
 let _lastTable = null;
 
+const _gapCache = new Map();
+const _hash = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+function _mulberry(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+/** The k-th distinct set of gaps for a row on this page: a pure function of the page seed, the row key and k. */
+function listBlanks(deal, rowKey, k, rowKeyLen = 12) {
+    const pageSeed = pageConstant('cbt-gaps', 1 << 30);
+    const ck = `${pageSeed}|${rowKey}`;
+    const c = _gapCache.get(ck) || { list: [], j: 0 };
+    const per = rowKeyLen > 12 ? 5 : 6;
+    const lines = (b) => [0, 1, 2].slice(0, rowKeyLen > 12 ? 3 : 2).map((l) => b.filter((i) => i >= l * per && i < (l + 1) * per).join());   // the gaps of each line: no two rows of a page share a line
+    const saved = Math.random;
+    try {
+        while (c.list.length <= k && c.j < 600) {
+            Math.random = _mulberry((pageSeed ^ _hash(rowKey) ^ Math.imul(c.j + 1, 2654435761)) >>> 0);
+            c.j++;
+            const b = deal(true);
+            if (c.list.some((x) => x.join() === b.join())) continue;
+            const lb = lines(b);
+            if (c.list.some((x) => lines(x).some((l, k) => l === lb[k])) && c.j < 500) continue;
+            c.list.push(b);
+        }
+    } finally { Math.random = saved; }
+    if (_gapCache.size > 300) _gapCache.clear();
+    _gapCache.set(ck, c);
+    return c.list[k % Math.max(1, c.list.length)];
+}
+
 export function genCountByTables(q) {
-    let tables = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
-    const idx = itemAt();
-    // R3 (critic round 3): with every table ticked (untouched) a page of five rows was the 1s to
-    // the 5s in order, and counting by 1 is not practice. Untouched, the page deals 2 to 12 in a
-    // shuffled round, so any page samples across the tables its title names; a teacher who
-    // ticks tables keeps the order option.
-    const untouched = tables.length === 12;
-    if (untouched) tables = tables.filter((v) => v >= 2);
-    let t;
-    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
-    if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
-        // In order, every table ticked: the page walks up the tables, spread across 2 to 12
-        // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
-        if (_page <= tables.length) {
-            // one table from each stretch of the list, so the pages differ but always climb
-            const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
-            t = tables[randInt(lo, hi)];
-        } else t = tables[idx % tables.length];
-    // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
-    } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
-        // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
-        // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
-        // tables; page-deal.js shuffles each round from the page's own seeded rng.
-        t = tables[dealIndex('cbt-table', tables.length)];
-        if (!Number.isFinite(state.itemIndex) && t === _lastTable && tables.length > 1) t = tables[(tables.indexOf(t) + 1) % tables.length];
-    } else {
-        t = tables[idx % tables.length];
-    }
-    // Owner 2026-10-02: "All 12 tables on one page" deals x 1 to x 12 in order on a printed page (live play deals as usual).
+    // Owner 2026-10-02: "All rows on one page" deals the rows once each, in order, on a printed page (live play deals as usual).
     const onePage = !!opt('onePage') && Number.isFinite(state.itemIndex);
-    if (onePage) t = (idx % 12) + 1;
+    const idx = itemAt();
+    // Wave 1 lane C2: the page's ROW LIST (count-rows.js). The old ticked tables (a raw `constant` that a caller left
+    // un-folded) are the same thing as plain rows, so both end up here.
+    const ticks = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
+    let pageRows = normalizeRows(opt('rows'));
+    if (!pageRows.length && ticks.length < 12) pageRows = ticks.map((n) => ({ step: n, start: 'step', dir: 'up' }));
+    const plainSteps = pageRows.length && pageRows.every(isPlainRow) ? [...new Set(pageRows.map((r) => r.step))].sort((a, b) => a - b) : null;
+    if (plainSteps && plainSteps.length === 12 && !onePage) pageRows = [];          // every table: the usual page
+    let row, plan = null;
+    if (onePage && pageRows.length) {
+        plan = onePagePlan(pageRows); pageRows = plan.rows; row = plan.rows[idx % plan.rows.length];
+    } else if (!onePage && pageRows.length && !plainSteps) {
+        row = opt('order') === 'mixed' && pageRows.length > 1 ? pageRows[dealIndex('cbt-row', pageRows.length)] : pageRows[idx % pageRows.length];
+    } else {
+        let tables = plainSteps ? plainSteps : ticks;
+        // R3 (critic round 3): with every table ticked (untouched) a page of five rows was the 1s to
+        // the 5s in order, and counting by 1 is not practice. Untouched, the page deals 2 to 12 in a
+        // shuffled round, so any page samples across the tables its title names; a teacher who
+        // ticks tables keeps the order option.
+        const untouched = !plainSteps;
+        if (untouched) tables = tables.filter((v) => v >= 2);
+        let t;
+        const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
+        if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
+            // In order, every table ticked: the page walks up the tables, spread across 2 to 12
+            // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
+            if (_page <= tables.length) {
+                // one table from each stretch of the list, so the pages differ but always climb
+                const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
+                t = tables[randInt(lo, hi)];
+            } else t = tables[idx % tables.length];
+        // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
+        } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
+            // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
+            // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
+            // tables; page-deal.js shuffles each round from the page's own seeded rng.
+            t = tables[dealIndex('cbt-table', tables.length)];
+            if (!Number.isFinite(state.itemIndex) && t === _lastTable && tables.length > 1) t = tables[(tables.indexOf(t) + 1) % tables.length];
+        } else {
+            t = tables[idx % tables.length];
+        }
+        // no rows chosen on the one-page sheet: x 1 to x 12 in order (the table is still dealt above, so the page's random draws are the same as before)
+        row = { step: onePage ? (idx % 12) + 1 : t, start: 'step', dir: 'up' };
+    }
+    const t = row.step;
     _lastTable = t;
-    // Wave 1 lane C: the row runs to 12 or 15 jumps; the first one, two or about half the numbers print.
+    // Wave 1 lane C: the row runs to 12 or 15 numbers; the first one, two or about half the numbers print.
     const n = !onePage && Number(opt('jumps')) === 15 ? 15 : 12;
-    const values = Array.from({ length: n }, (_, i) => t * (i + 1));
+    // Wave 1 lane C2: where the row starts and which way it runs (count-rows.js rowValues). Down never goes below 0.
+    const values = rowValues(row, n);
+    const down = row.dir === 'down';
+    const sum = rowsSummary(pageRows, n);
+    const dirOpt = sum.dir === 'up' ? 'forward' : sum.dir === 'down' ? 'back' : 'mixed';
+    const len = values.length;
     const pct = Number(opt('missing')) || 50;
     const fill = opt('fill') || 'two';
+    const deal = (uniform = false) => {
+        const half = fill === 'half';
+        const skip = half ? 2 : (fill === 'one' ? 1 : 2);                 // the numbers that always show
+        const pool = Array.from({ length: len - skip }, (_, i) => i + skip);
+        const k = half ? Math.min(pool.length, Math.floor(len / 2)) : pctCount(pct, pool.length);
+        if (!uniform || k >= pool.length) return spreadBlanks(pool, k);
+        // a typed list's rows: any k of the pool at random, but never more than three gaps in a row (so no row ends in one long gap)
+        for (let t2 = 0; t2 < 40; t2++) {
+            const pick = shuffle(pool.slice()).slice(0, k).sort((x, y) => x - y);
+            let run = 1, worst = 1;
+            for (let q2 = 1; q2 < pick.length; q2++) { run = pick[q2] === pick[q2 - 1] + 1 ? run + 1 : 1; worst = Math.max(worst, run); }
+            if (worst <= 3) return pick;
+        }
+        return spreadBlanks(pool, k);
+    };
+    // A page never repeats a row (wave 1 C2): item k of a typed list takes the k-th DISTINCT candidate set of gaps for its row,
+    // and neighbouring candidates open with a different printed run (7, 14, 21 ... must not open every row of a one-step page).
+    // The candidates are a pure function of (the page's seed, the row, k), so a regenerated item is the same item.
+    // Printed pages with a chosen list only (a plain list's FIRST pass through its tables, and the usual tables page, print exactly as before).
     let blanks;
-    if (fill === 'half') {
-        // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
-        const pool = Array.from({ length: n - 2 }, (_, i) => i + 2);
-        blanks = spreadBlanks(pool, Math.min(pool.length, Math.floor(n / 2)));
-    } else {
-        const skip = fill === 'one' ? 1 : 2;                              // the numbers that always show
-        const pool = Array.from({ length: n - skip }, (_, i) => i + skip);
-        blanks = spreadBlanks(pool, pctCount(pct, pool.length));
-    }
+    if (Number.isFinite(state.itemIndex) && pageRows.length && (onePage || !plainSteps || plainSteps.length < 6)) {
+        blanks = listBlanks(deal, `${t}|${row.start}|${row.at}|${row.dir}|${len}|${fill}|${pct}`, idx, len);
+    } else blanks = deal();
     const parts = blanks.map(i => values[i]);
     const shape = opt('shape') || 'box';
+    // The multiplication fact under a number ("3 × 4"): only where every number is a multiple of the step.
+    const timesMode = onePage ? 'none' : (opt('times') || 'none');
+    const isTable = values.every(v => v % t === 0);
+    const labels = timesMode !== 'none' && isTable ? values.map(v => `${fmt(v / t)} × ${fmt(t)}`) : null;
 
-    q.text = `Count by ${t}. Write the missing numbers.`;
-    q.printText = 'Count by the number in the box. Write the missing numbers.';
+    q.text = `${down ? 'Count back' : 'Count'} by ${fmt(t)}. Write the missing numbers.`;
+    q.printText = `${down ? 'Count back' : 'Count'} by the number in the box. Write the missing numbers.`;
     q.ans = list(parts);
     q.keyParts = parts.map(String);
     q.acceptedAnswers = acceptLists(parts);
     q.answerType = 'text';
     q.selfAnswering = true;
     q.options = [];
-    q.a = t; q.b = n; q.op = '×';
-    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n };
-    q.hint = `Each number is ${t} more than the one before. Count on by ${t}.`;
-    q.skillLabel = `Count by ${t}`;
-    const payload = { values, blanks, look: 'arcs', tab: String(t), shape };
-    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // twelve rows on one page: tighter chrome, digits at the S working size
+    q.a = t; q.b = len; q.op = '×';
+    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n, dir: down ? 'down' : 'up', dirOpt, start: row.start,
+        startAt: row.start === 'custom' ? row.at : null, row: { ...row }, page: { steps: sum.steps.slice(), from: sum.from, rows: pageRows.length },
+        times: labels ? timesMode : 'none', labels: labels ? labels.slice() : null };
+    q.hint = down ? `Each number is ${fmt(t)} less than the one before. Count back by ${fmt(t)}.` : `Each number is ${fmt(t)} more than the one before. Count on by ${fmt(t)}.`;
+    q.skillLabel = `${down ? 'Count back' : 'Count'} by ${fmt(t)}`;
+    // The step tab shows the way when it can change (a page with rows going down): "−7" back, "+7" on in a mixed page.
+    const tab = dirOpt === 'forward' ? fmt(t) : `${down ? '−' : '+'}${fmt(t)}`;
+    const payload = { values, blanks, look: 'arcs', tab, shape };
+    if (labels) { payload.times = timesMode; payload.labels = labels; }
+    if (onePage) {
+        payload.compact = true; q.countBy.onePage = true;
+        // chosen rows on one page: a short list spreads its rows over the page height (extra space above and below each row) instead of
+        // leaving the lower half empty; and when a two-line row is among them the one-line rows keep a little, so heights stay within 1.6x
+        if (plan) {
+            // the same air round every row (so one-line and two-line rows stay within 1.6x of each other and keep the teacher's order)
+            // the paper's spare height, shared out as air above and below every row (at most 13 mm a side: a short list keeps extra
+            // space round each row, it is not stretched down the page)
+            const pad = Math.min(plan.mixed ? 3 : 13, Math.max(0, plan.spare - 6) / (2 * plan.rows.length));   // 6 mm kept back: the layout's row rounding; a mixed page keeps its two heights over 1.6x apart, so each row stays its own height
+            if (pad > 0.05) payload.vpad = Math.round(pad * 10) / 10;
+        }
+    }   // the rows on one page: tighter chrome, digits at the S working size
     q.cell = { template: 'count-row', v: 1, payload };
     q.visual = k2Twin('count-row', payload);
     q.printFormat = 'count-row';

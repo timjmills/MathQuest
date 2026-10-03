@@ -5,6 +5,7 @@ import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-gen
 import { getSkillIndex } from './skill-search.js';
 import { optionsFor, offeredOptionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS, pvRefusal } from './skill-options.js';
 import { optionControlHTML as sharedOptionControlHTML, applyOptionEdit } from './skill-options-ui.js';
+import { normalizeRows } from './count-rows.js';
 import { getSetOptions, setSetOptions, hasSetOptions } from './skill-option-store.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
@@ -332,6 +333,7 @@ export function setPrintSkillOption(sIdx, skIdx, optId, raw) {
         const def = defs.find(d => d.id === optId);
         if (!def) return;
         if (def.type === 'bool') { next[optId] = !!raw; return; }
+        if (def.type === 'rows') { next[optId] = normalizeRows(raw); return; }
         if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
         if (def.type === 'enum') {
             const hit = (def.values || [])[Number(raw)];

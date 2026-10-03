@@ -19,6 +19,7 @@
 
 import { registerSkill } from '../contract.js';
 import { num, arr, obj, operands, chooseWrong, strings, step, clampSteps, fmt } from './util.js';
+import { downStart } from '../../count-rows.js';
 
 /** A `strings` member whose library key (and steps) depend on the item: `pick(q)` -> def. */
 function stringsBy(pick) {
@@ -40,7 +41,7 @@ function countData(q) {
     const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
     const keys = listOf(q).map(num);
     const blanks = keys.map((k) => values.indexOf(k)).filter((i) => i > 0);
-    return { step: t, values, blanks };
+    return { step: t, values, blanks, dir: 'up' };
 }
 
 /** Worked steps of a row with gaps: jump by the step to each missing number (slots blank0 ..). */
@@ -64,6 +65,7 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
     const c = [];
     if (!blanks.length) return null;
     // skipped a multiple: wrote the NEXT number at the first gap and carried on from there
+    const sgn = stepN < 0 ? -1 : 1;
     const skip = blanks.map((i, k) => (k === 0 ? values[i] + stepN : values[i]));
     c.push({ value: joinLike(q, [...skip, ...tail]), misconception: 'skipped-multiple', slot: 'b0', slots: { b0: String(skip[0]) },
         explain: `Skipped a number: wrote ${fmt(skip[0])}, not ${fmt(values[blanks[0]])}.` });
@@ -71,44 +73,84 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
     const i1 = blanks.find((i) => i > 0 && !blanks.includes(i - 1));
     if (i1 !== undefined && stepN !== 1) {
         const k = blanks.indexOf(i1);
-        const v = blanks.map((i) => values[i]); v[k] = values[i1 - 1] + 1;
+        const v = blanks.map((i) => values[i]); v[k] = values[i1 - 1] + sgn;
         c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'counted-by-one', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
-            explain: `Counted on by 1 after ${fmt(values[i1 - 1])}, not by ${fmt(stepN)}.` });
+            explain: `Counted ${sgn < 0 ? 'back' : 'on'} by 1 after ${fmt(values[i1 - 1])}, not by ${fmt(Math.abs(stepN))}.` });
     }
     // a place-value slip where the count crosses a hundred (96, 108 written as 98)
-    const i2 = blanks.find((i) => i > 0 && Math.floor(values[i] / 100) > Math.floor(values[i - 1] / 100) && values[i] - 10 > values[i - 1]);
+    const i2 = blanks.find((i) => i > 0 && Math.abs(values[i] - values[i - 1]) > 10 && Math.abs(values[i] - values[i - 1]) < 100
+        && Math.floor(values[i] / 100) !== Math.floor(values[i - 1] / 100) && values[i] - 10 * sgn !== values[i - 1]);
     if (i2 !== undefined) {
         const k = blanks.indexOf(i2);
-        const v = blanks.map((i) => values[i]); v[k] = values[i2] - 10;
-        c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'hundred-slip', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
-            explain: `Crossed the hundred and lost a ten: wrote ${fmt(v[k])}, not ${fmt(values[i2])}.` });
+        const v = blanks.map((i) => values[i]); v[k] = values[i2] - 10 * sgn;
+        if (v[k] >= 0) c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'hundred-slip', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
+            explain: `Crossed the hundred and ${sgn < 0 ? 'gained' : 'lost'} a ten: wrote ${fmt(v[k])}, not ${fmt(values[i2])}.` });
     }
     const w = chooseWrong(q, c);
     if (w && key.length) w.display = String(Array.isArray(w.value) ? w.value.join(', ') : w.value);
     return w;
 }
 
+/** What a count-by page is about, from the item (its page summary) or, with no item, the section's row list (canonical rows). */
+function cbPage(q, ref = {}) {
+    if (q && q.countBy) {
+        const c = q.countBy;
+        return { dir: c.dirOpt === 'back' ? 'down' : c.dirOpt === 'mixed' ? 'mixed' : 'up', steps: (c.page && c.page.steps) || [], from: c.page ? c.page.from : null };
+    }
+    const rows = ref && ref.opts && Array.isArray(ref.opts.rows) ? ref.opts.rows : [];
+    const steps = [...new Set(rows.map((r) => r.step))];
+    const downs = rows.filter((r) => r.dir === 'down').length;
+    const nn = ref && ref.opts && Number(ref.opts.jumps) === 15 ? 15 : 12;
+    // the start a row really prints: a back row too short for nn numbers is raised (count-rows.js downStart)
+    const froms = [...new Set(rows.map((r) => (r.start !== 'custom' ? null : r.dir === 'down' ? downStart(r, nn) : r.at)))];
+    return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
+}
+// The steps in the order the rows are listed (and print), every one of them: the title never shortens to "and 5 more".
+const stepWords = (steps) => (!steps.length ? '1 to 12'
+    : steps.length === 1 ? fmt(steps[0])
+        : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`);
+
 registerSkill('multiplication:count_by_tables', {
-    // The "I Can" line follows the row's length (12 or 15 jumps): derived from the item, never fixed.
-    strings: stringsBy((q) => ({
-        iCan: q && q.countBy && q.countBy.jumps === 15 ? 'I Can count by 1 to 12 (15 jumps)' : 'I Can count by 1 to 12',
-        instructionKey: 'count-by-row',
-        steps: [
-            'Read the number in the box. That is the jump.',
-            'Add the jump to a number to get the next one.',
-            'Write each missing number in its box.',
-            'Check: the last number is the last jump.',
-        ],
-        say: 'I count by __: __, __, __.',
-        sayValues: (q) => { const d = countData(q); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
-    })),
+    // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:
+    // derived from the item (or the section's options), never fixed.
+    strings: stringsBy((q, ref = {}) => {
+        const { dir, steps, from } = cbPage(q, ref);
+        const verb = dir === 'down' ? 'count back by' : dir === 'mixed' ? 'count on and back by' : 'count by';
+        const what = stepWords(steps);
+        const jumps = (q && q.countBy && q.countBy.jumps === 15) || (!q && ref && ref.opts && Number(ref.opts.jumps) === 15) ? ' (15 jumps)' : '';
+        const key = dir === 'down' ? 'count-back-row' : dir === 'mixed' ? 'count-sign-row' : 'count-by-row';
+        return {
+            iCan: `I Can ${verb} ${what}${from !== null ? ` from ${fmt(from)}` : ''}${jumps}`,
+            instructionKey: key,
+            steps: dir === 'up' ? [
+                'Read the number in the box. That is the jump.',
+                'Add the jump to a number to get the next one.',
+                'Write each missing number in its box.',
+                'Check: every jump is the same size.',
+            ] : dir === 'down' ? [
+                'Read the number in the box. That is the jump.',
+                'Take the jump away from a number to get the next one.',
+                'Write each missing number in its box.',
+                'Check: each number is smaller than the one before.',
+            ] : [
+                'Read the sign in the box. + means count on. − means count back.',
+                'Add or take away the jump to get the next number.',
+                'Write each missing number in its box.',
+                'Check: the numbers go the way the sign says.',
+            ],
+            say: dir === 'down' ? 'I count back by __: __, __, __.' : 'I count by __: __, __, __.',
+            sayValues: (item) => { const d = countData(item); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
+        };
+    }),
     misconceptions: ['skipped-multiple', 'counted-by-one', 'hundred-slip'],
     workedSteps: (q) => {
         const d = countData(q);
         if (!d) return [];
-        return rowSteps(d.values, d.blanks, `Count by ${d.step}: each jump adds ${d.step}.`, () => `+ ${d.step}`);
+        const down = d.dir === 'down';
+        const sign = down ? '\u2212' : '+';
+        return rowSteps(d.values, d.blanks, `Count ${down ? 'back ' : ''}by ${fmt(d.step)}: each jump ${down ? 'takes away' : 'adds'} ${fmt(d.step)}.`, () => `${sign} ${fmt(d.step)}`);
     },
-    wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.step) : null; },
+    wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.dir === 'down' ? -d.step : d.step) : null; },
 });
 
 /* ===================================================================== number patterns */
