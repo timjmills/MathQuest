@@ -126,6 +126,7 @@ Still open, for the owner or a later wave:
 - The `effort:` field in `.claude/agents/*.md` cannot be seen by the agent itself; the model (Sonnet 5.5) was confirmed, the effort setting was not observable.
 - Wave 2 has no recorded baseline: `ws-wrm` today = 872 steps, 359 not fully covered (149 partial, 210 gap), 162 proposals.
 - 5.3 (same skill twice with different supports) needs a share-code decision, since a skill id would appear twice.
+- Decimals family (found by the Wave 5.2 number-line lane, 2026-10-03): `ws-print-lint --source kit --skills decimals:add_decimal` fails L-KEY AK-4 ("key page 2 has 12 answer slots, pupil page 1 has 0") at S and L. It fails identically on the base commit b684322 with the number line off, so it predates 5.2: the pupil page's decimal answer slots carry no slot hook the lint counts. Open for the decimals lane.
 
 ## 8. Container fix: browser gates and the proxy CA (2026-10-02)
 

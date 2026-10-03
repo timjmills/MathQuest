@@ -259,7 +259,10 @@ export function refLineGeom(c, spec, widthMm) {
     if (!oneEnd) body += arrowHead(c, 0, axisY, -1);
     body += arrowHead(c, W, axisY, 1);
     const onGrid = (i, k) => k > 0 && ((i % k) + k) % k === 0;
-    const labelled = (i) => (want === 'none' ? false : want === 'ends' ? (i === i0 || i === i1) : onGrid(i, labelEvery));
+    // Both ends always carry their number (the pupil reads where the line starts and stops); a grid
+    // label too close to an end gives way to it.
+    const nearEnd = (i) => !(i === i0 || i === i1) && (Math.abs(i - i0) * pitch < maxW + gapMm || Math.abs(i1 - i) * pitch < maxW + gapMm);
+    const labelled = (i) => (want === 'none' ? false : (i === i0 || i === i1) ? true : want === 'ends' ? false : onGrid(i, labelEvery) && !nearEnd(i));
     let labels = '', ticks = '', hops = '';
     for (let i = i0; i <= i1; i++) {
         const drawn = onGrid(i, tickEvery) || i === i0 || i === i1;
@@ -279,11 +282,6 @@ export function refLineGeom(c, spec, widthMm) {
                 + `<path d="M${n2(xb - 0.4)} ${n2(axisY - 1.2)}l-1.6 -1.1l0.3 1.7Z" fill="#000" ${st(c, SW.fine)}/>`;
         }
         if (!labelled(i)) continue;
-        // An end label that would collide with its labelled neighbour is dropped (the end stays drawn).
-        if ((i === i0 || i === i1) && !onGrid(i, labelEvery || 1) && want !== 'ends') {
-            const near = i === i0 ? Math.ceil(i0 / labelEvery) * labelEvery : Math.floor(i1 / labelEvery) * labelEvery;
-            if (Math.abs(near - i) * pitch < maxW + gapMm) continue;
-        }
         const lab = labelOf(i, step);
         if (lab.whole !== undefined) labels += text(c, x(i), labTop + mm(pt) * 0.8, lab.whole, { pt, ref: true });
         else {

@@ -132,6 +132,7 @@ function normaliseRequest(req = {}) {
         // own `cover` / `mix` option (the default: every problem, clashing supports by section).
         coverage: req.coverage ? normCoverage(req.coverage) : null,
         mix: req.mix ? normMix(req.mix) : null,
+        testHints: req.testHints === true,
         // The lesson packet (role 'lesson'): Independent pages after the teaching sheet, and the
         // optional Mixed practice page.
         practicePages: req.practicePages !== undefined && req.practicePages !== null ? clampInt(req.practicePages, 0, 10, 1) : 1,
@@ -1434,19 +1435,41 @@ function anchorSummary(mode, list, notes) {
  * (skill-options.js numberLineFits) with it ticked on. null when none does. `sections` = the
  * sections whose numbers the line must cover (every section of a skill that asked for it).
  */
+// Wave 5.2: the check pages that carry no hint scaffold by default (P-SC-5: hints on tests are
+// the teacher's option, `req.testHints`).
+const NO_HINT_ROLES = new Set(['test', 'pre-skill-check', 'fact-probe']);
+/**
+ * Draw the line from the page's own items into the band reserved for it (`nline.hMm`) and put it
+ * on `header`. ONE line per page, shared by every section that asked for it (a mixed page draws
+ * one line covering all their numbers): one reference in one place, one reserved height, so the
+ * capacity of every section is decided once and a pupil never meets two different scales.
+ */
+function drawNumberLine(nline, items, size, header) {
+    const nums = items.flatMap((it) => nlLineNumbers(it.q));
+    let spec = nlResolveLine(nline.opts, nums, { fraction: nline.fraction });
+    let band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+    if (band.natural > nline.hMm + 0.05) {
+        spec = nlResolveLine(Object.assign({}, nline.opts, { nlStep: stepName(nline.spec0.step) }), nums, { fraction: nline.fraction });
+        band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+    }
+    header.refBand = band.html;
+    return { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes, warn: spec.warn };
+}
 function numberLineRequest(n) {
     let first = null;
     const sections = new Set();
+    const keys = new Set();
     n.sections.forEach((sec, si) => {
         for (const sk of sec.skills) {
             if (!numberLineFits(sk.categoryId, sk.skillId)) continue;
             const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
             if (!o.nlOn) continue;
             sections.add(si);
+            keys.add(`${sk.categoryId}:${sk.skillId}`);
             if (!first) first = { sk, opts: o, fraction: numberLineIsFraction(sk.categoryId, sk.skillId) };
         }
     });
-    return first ? Object.assign(first, { sections }) : null;
+    return first ? Object.assign(first, { sections, keys }) : null;
 }
 /** The numbers a seeded sample of the skill uses (the band's height is decided from it). */
 function numberLineSample(nline, seed, count = 16) {
@@ -1966,6 +1989,17 @@ async function buildRoleSheet(n, metaOf) {
     }
     const header = Object.assign({}, n.header);
     delete header.titleLines;
+    // Wave 5.2: the number line, reserved before any capacity is worked out (see buildSheet).
+    // A test / check page carries no hint scaffold unless the teacher allows hints on tests
+    // (PEDAGOGY P-SC-5: a teacher option, `req.testHints`); every other role carries it.
+    const nline = NO_HINT_ROLES.has(n.role) && !n.testHints ? null : numberLineRequest(n);
+    if (nline) {
+        nline.spec0 = nlResolveLine(nline.opts, numberLineSample(nline, n.seed), { fraction: nline.fraction });
+        const band0 = refLineHTML(nline.spec0, { size: n.size, widthMm: LIVE_W_MM });
+        nline.hMm = band0.hMm;
+        header.refBandMm = band0.hMm;
+        header.refBand = band0.html;
+    }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
     const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
@@ -2117,17 +2151,20 @@ async function buildRoleSheet(n, metaOf) {
         input.extras = ex;
     }
 
+    const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
+    if (numberLine && numberLine.warn) notes.push(numberLine.warn);
     const line = f0.line || '';
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
+        numberLine,
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,

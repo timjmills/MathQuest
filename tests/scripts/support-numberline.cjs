@@ -142,6 +142,31 @@ const SAMPLES = [
                 log(`  ${tag}: line ${r.nl.from} to ${r.nl.to} by ${r.nl.step}, band ${r.nl.hMm} mm, ${r.pageCount}+${r.keyPageCount} pages${r.nl.notes && r.nl.notes.length ? ' (' + r.nl.notes.join('; ') + ')' : ''}`);
             }
         }
+        // every page role where supports are allowed carries the line; test / check pages do not
+        for (const role of ['more-practice', 'guided', 'scripted-model', 'mixed-practice', 'review', 'stretch', 'reason-it', 'error-analysis', 'test', 'pre-skill-check']) {
+            const r = await page.evaluate(async ({ role }) => {
+                const req = { role, sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_20_mixed', opts: { nlOn: true } }] }], size: 'L', key: true, seed: 99 };
+                let out;
+                try { out = await window.buildSheet(req); } catch (e) { return { err: e.message, unsupported: !!(e && e.unsupported) }; }
+                const host = document.createElement('div');
+                host.style.cssText = 'position:absolute;left:0;top:0;width:210mm;background:#fff';
+                host.innerHTML = out.pupilHtml + out.keyHtml;
+                document.body.appendChild(host);
+                await new Promise((res) => setTimeout(res, 50));
+                const pages = [...host.querySelectorAll('.ws-page')].map((p) => {
+                    const body = p.querySelector('.ws-body');
+                    return { band: !!p.querySelector('.ws-refline'), overflow: body ? Math.max(0, body.scrollHeight - body.clientHeight) : 0, pageOverflow: Math.max(0, p.scrollHeight - p.clientHeight) };
+                });
+                host.remove();
+                return { pages, nl: out.numberLine };
+            }, { role });
+            if (r.err) { check(r.unsupported, `${role}: ${r.err}`); log(`  ${role}: n/a (${r.err})`); continue; }
+            const want = !['test', 'pre-skill-check'].includes(role);
+            check(r.pages.length > 0 && r.pages.every((p) => p.band === want), `${role}: band ${want ? 'missing on a page' : 'printed on a check page'}`);
+            check(r.pages.every((p) => p.overflow <= 1 && p.pageOverflow <= 1), `${role}: a page overflows ${JSON.stringify(r.pages)}`);
+            if (want) check(r.nl && r.nl.covers, `${role}: the line does not cover the page (${JSON.stringify(r.nl)})`);
+            log(`  ${role}: ${want ? 'line ' + (r.nl ? r.nl.from + ' to ' + r.nl.to : '?') : 'no line (check page)'}, ${r.pages.length} pages`);
+        }
         // a teacher range that misses the page warns
         const warn = await page.evaluate(async () => {
             const out = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true, nlFrom: 0, nlTo: 5 } }] }], size: 'M', key: false, seed: 7 });
@@ -215,27 +240,38 @@ async function shots(h) {
     for (const smp of [SAMPLES[0], SAMPLES[2]]) {
         for (const w of [390, 1280]) {
             await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1.5 });
-            await page.evaluate(({ smp }) => {
+            // The REAL hosts: the practice card through renderQuestion, the online worksheet
+            // through initWorksheet, waited on until the question is drawn and the layout settled.
+            await page.evaluate(async ({ smp }) => {
+                const st = (await import('./js/modules/state.js')).state;
+                st.category = smp.cat; st.skill = smp.skill; st.skillOptions = smp.opts;
+                st.skillOptionsBySkill = Object.assign({}, st.skillOptionsBySkill || {}, { [smp.cat + ':' + smp.skill]: smp.opts });
+                st.gameMode = 'practice';
+                st.currentQ = window.generateQuestionFor({ category: smp.cat, skill: smp.skill, opts: smp.opts, seed: 11 });
                 window.showView('gameView');
-                const q = window.generateQuestionFor({ category: smp.cat, skill: smp.skill, opts: smp.opts, seed: 11 });
-                return import('./js/modules/refline-screen.js').then((m) => m.syncPracticeRefLine(q, { categoryId: smp.cat, skillId: smp.skill, opts: smp.opts }));
+                window.renderQuestion();
             }, { smp });
+            await waitFor(page, () => { const c = document.getElementById('questionCard'); return !!(c && c.offsetHeight > 80 && document.querySelector('#mqRefLine svg') && /\d/.test(c.innerText)); }, 15000, 'practice card');
             await hideOverlays(page);
+            await new Promise((r) => setTimeout(r, 900));
             const host = await page.$('#mqRefLine');
             if (host) {
                 const box = await host.boundingBox();
                 const card = await (await page.$('#questionCard')).boundingBox();
-                await page.screenshot({ path: path.join(SHOT_DIR, `${smp.id}-card-${w}.png`), clip: { x: 0, y: Math.max(0, box.y - 10), width: w, height: Math.min(700, box.height + (card ? card.height : 300) + 30) } });
+                await page.screenshot({ path: path.join(SHOT_DIR, `${smp.id}-card-${w}.png`), clip: { x: 0, y: Math.max(0, box.y - 10), width: w, height: Math.min(900, box.height + (card ? card.height : 300) + 30) } });
             }
-            await page.evaluate(({ smp }) => {
-                window.showView('worksheetView');
-                const qs = [0, 1, 2, 3, 4, 5].map((i) => window.generateQuestionFor({ category: smp.cat, skill: smp.skill, opts: smp.opts, seed: 20 + i }));
-                return import('./js/modules/refline-screen.js').then((m) => m.syncWorksheetRefLine(qs, { categoryId: smp.cat, skillId: smp.skill, opts: smp.opts }));
+            await page.evaluate(async ({ smp }) => {
+                const st = (await import('./js/modules/state.js')).state;
+                st.category = smp.cat; st.skill = smp.skill; st.skillOptions = smp.opts; st.problemCount = 6; st.gameMode = 'worksheet';
+                window.initWorksheet();
             }, { smp });
+            await waitFor(page, () => { const g = document.getElementById('worksheetGrid'); return !!(g && g.dataset.mqLaidOut === '1' && g.children.length && document.querySelector('#mqWsRefLine svg')); }, 20000, 'worksheet laid out');
+            await hideOverlays(page);
+            await new Promise((r) => setTimeout(r, 300));
             const wh = await page.$('#mqWsRefLine');
             if (wh) {
                 const box = await wh.boundingBox();
-                await page.screenshot({ path: path.join(SHOT_DIR, `${smp.id}-worksheet-${w}.png`), clip: { x: 0, y: Math.max(0, box.y - 10), width: w, height: Math.min(600, box.height + 300) } });
+                await page.screenshot({ path: path.join(SHOT_DIR, `${smp.id}-worksheet-${w}.png`), clip: { x: 0, y: Math.max(0, box.y - 10), width: w, height: Math.min(900, box.height + 600) } });
             }
         }
     }
