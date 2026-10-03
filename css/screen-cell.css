@@ -1644,3 +1644,43 @@ html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) {
 }
 html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box) > input.ib-cell,
 html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) > input.ib-cell { background: transparent !important; }
+/* ---- Wave 1 / A3 (owner 2026-10-03): the WRONG DIGITS blink red, 3 cycles of 1.2 s, then hold steady red.
+   Practice card and online worksheet only; the A2 dashed edge and cross stay (colour is never the only cue).
+   Reduced motion: no blink, the steady red only. Additive: older saved HTML never carries these classes. */
+@keyframes mqWdBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit {
+    color: var(--mq-box-bad) !important; -webkit-text-fill-color: var(--mq-box-bad);
+    /* the DIGIT blinks (its fill colour), never the box: the dashed edge holds still (critic r1) */
+    animation: mqWdBlinkInk 1.2s ease-in-out 3 !important;   /* beats .mq-scell * { animation: none } */
+}
+/* a red box the pupil is in shows its text cursor (a digit slot's caret is otherwise hidden) */
+html body .mq-scell.mq-scell.mq-scell input.mq-live-wrong.mq-live-wrong:focus,
+html body input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: #000 !important; }
+@keyframes mqWdBlinkInk { 0%, 100% { -webkit-text-fill-color: var(--mq-box-bad); } 50% { -webkit-text-fill-color: rgba(179, 38, 30, 0.2); } }
+/* a kept wrong entry is selected after a wrong try: no browser blue under the red digit (1.26:1) */
+html body input.mq-live-wrong::selection { background: rgba(0, 0, 0, 0.12); color: var(--mq-box-bad); -webkit-text-fill-color: var(--mq-box-bad); }
+html body input.mq-live-wrong.mq-wd-mirrored::selection { background: rgba(0, 0, 0, 0.12); color: transparent; -webkit-text-fill-color: transparent; }
+html body input.mq-live-wrong.mq-wd-empty.mq-wd-empty.mq-wd-empty { outline-width: 4px !important; }
+html body input.mq-live-wrong.mq-wd-mirrored.mq-wd-mirrored.mq-wd-mirrored {
+    color: transparent !important; -webkit-text-fill-color: transparent !important;
+}
+html body .mq-wd-mirror.mq-wd-mirror {
+    position: absolute; z-index: 4; display: flex; align-items: center; box-sizing: border-box; margin: 0;
+    pointer-events: none; color: #000 !important; line-height: 1; white-space: pre; border: 0; background: none;
+}
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd { display: inline-block; color: #000 !important; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad {
+    color: var(--mq-box-bad) !important; animation: mqWdBlink 1.2s ease-in-out 3 !important;
+    /* colour is never the only cue: a 3 px underline that outlasts the blink and reduced motion */
+    text-decoration: underline 3px var(--mq-box-bad) !important; text-underline-offset: 4px; text-decoration-skip-ink: none;
+}
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-sep.mq-wd-miss { min-width: 0.3em; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss {
+    min-width: 0.62em; height: 1.05em; margin: 0 1px; box-sizing: border-box;
+    border: 2px dashed var(--mq-box-bad); border-radius: 3px; animation: mqWdBlink 1.2s ease-in-out 3 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit,
+    html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad, html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss { animation: none !important; }
+}
+@media print { .mq-wd-mirror { display: none !important; } }
