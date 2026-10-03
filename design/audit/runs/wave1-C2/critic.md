@@ -429,3 +429,40 @@ Graded at **f756b7a** (round-6 fixes on 45d509b). Diff reviewed: 45d509b..f756b7
 5. **Carried, owner observation (C4):** count-row screen boxes 44 px and digits 22 px against the C1 48 px input / 40 px card digit; one rule should govern.
 
 **To reach 10:** no first view ever hides the start and no box takes focus off-screen (1); no cue claims boxes that are not there, and the turn arrows always show when the row fits (2); evidence matches the code (3).
+
+# Round 8 (Opus, medium)
+
+Graded at **a5c1834**, the round-7 fixes on f756b7a. I reviewed the diff f756b7a..a5c1834 (`screen-cell.js` `wireSwipeRows`: program focus held, `moreRight` cue, full width when every column fits, `watchTabKey`; 3 additive CSS rules; the gate). Print modules were not touched. I restored the gates' re-shot evidence with `git checkout -- design/audit/runs`, and my probes ran from the scratchpad.
+
+## Verdict: PASS
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 9 | No first view hides the start. With Missing 20 % (first box in column 6) the 390 card opens at scrollLeft 0, shows the start, withholds focus and shows "Swipe ➜ for more boxes". In my probe that held for 6 of 6 cards, 4 with the box hidden and 2 with it in view and focused, and the same for 14,000. At 820 and 1280 the box is in view, so focus is kept (16 of 16). A Tab or tap is the pupil's own move: it shows the box, and typing lands in it. |
+| C2 Educational value | 9 | Start first everywhere. The turn arrows (↴) now show on the 1280 quiz. Rows, order, titles and keys are unchanged. |
+| C3 Spacing and layout | 8 | The card at 390 is clean, with a whole-column window, the tab above the row and a one-line cue strip (33 px when both cues show). The worksheet at 390 still uses a 237 px, 3-column window inside an about 330 px cell. |
+| C4 Standard fidelity | 8 | Print is byte-identical to 4911898 (`wave1-c2-onepage` 12/12), and `wave1-c2-sizes` is OK. B&W, Andika, TY-10a, two lines of six. The carried owner question on 44 px boxes and 22 px digits is still open. |
+
+## Gates run (one at a time)
+- `wave1-c2-phone`: **OK**, 230 PASS, including the new Missing 20 % and 90 % cases on card and worksheet, the program-focus, Tab and tap typing checks, and 1280 and 820.
+- `wave1-c2-onepage` (MQ_BASE_ROOT = 4911898 checkout): **OK**. Also OK: `wave1-c2-sizes`, `-defaults` (exit 0), `-dupes` and `-panel`.
+- `ws-screen-answer --skills multiplication:count_by_tables`: **OK** (card, worksheet 3/3, quiz 3/3, live green).
+- `ws-stamp-assets --check` OK. `node --input-type=module --check` OK on `screen-cell.js` and `count-row.js`.
+- 50dbfa6 (`claude/sweet-newton-c8wrv1`) is an ancestor of a5c1834, so the merge is a **fast-forward**.
+
+## Round-7 defects
+1. **Hidden-start opening (Missing 20 %): fixed.** The card at 390 rests at 0 with the start in the 322 px window (318 px for 14,000), with no focus in the row and the forward cue on (probe `r7-sparse2`; screenshot `r7-card-20pct.png` checked). Tab from outside still scrolls to show the box. I accept that: a Tab is the pupil's own move, and a focused box out of view would mean typing blind. My round-7 check that asked for "scrollLeft 0 after the first Tab" contradicted the rule against typing blind, so I withdraw it.
+2. **1280 quiz 1,000,000 ×15: fixed.** The probe gives scrollWidth 693 = clientWidth 693, no cue, 2 of 2 ↴ inside, and 0 hidden numbers (quiz-1280.png checked). At 820 the same holds for all 4 cases. At 390 the quiz swipes, and its cue shows only while numbers are hidden.
+3. **Stale evidence: fixed.** The re-shot 1280 card and worksheet for `large-by-100000…-L` have no stray in-arrows.
+4. **Cue strip on two lines at 390: fixed.** It reads "⟵ Back  Swipe ➞" on one 33 px line.
+
+## Notes (not scored, nothing blocks)
+1. **C3, to reach 10. Where:** the worksheet at 390 (`phone-worksheet-*.png`), `screen-cell.js` `mode()` (`avail` = frame width).
+   - **What:** the window is 237 px (3 columns) in an about 330 px cell. There are about 45 px of white space on each side, and the pupil swipes more than they need to.
+   - **Fix:** measure `avail` from the cell's inner box (less its padding), not the frame. Where 4 columns of pitch 86 (320 px) fit, take 4.
+   - **Check:** in `wave1-c2-phone` at worksheet 390, assert window ≥ 4·pitch − gap whenever the cell's content box allows it.
+2. **C1, to reach 10.** When the card withholds focus, a pupil with a hardware keyboard who types goes nowhere.
+   - **Fix:** on the first printable keydown with nothing focused, move to the first box, using the Tab rule (scroll to the leftmost start that shows it).
+   - **Check:** card 390 Missing 20 %. Press "7" with BODY focused. The first box holds "7" and is fully in the window.
+3. **C4, carried to the owner:** count-row screen boxes are 44 px and digits 22 px, against the C1 48 px input and 40 px card digit. One rule should govern.
+4. **C2, to reach 10:** an oral frame ("Say: 6, 12, 18 …") in the hint on the card. It is not part of this lane's brief.
