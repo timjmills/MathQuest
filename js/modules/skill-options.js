@@ -2507,7 +2507,8 @@ Object.assign(P12_OPTIONS, {
 // Each skill offers the step groups its generator really deals (measured, 120 items each).
 const _SKIP_GROUPS = {
     wide: [['1s, 2s, 5s and 10s', '(1|2|5|10)'], ['3s, 4s and 6s', '(3|4|6)'], ['7s, 8s, 9s, 11s and 12s', '(7|8|9|11|12)']],
-    line: [['2s, 5s and 10s', '(2|5|10)'], ['3s, 4s and 6s', '(3|4|6)'], ['25s', '(25)']],
+    // skip_count_line / skip_count_grid (2026-10-03): Grade 2 (2.NBT.A.2) deals 2s, 5s and 10s only.
+    g2: [['2s', '(2)'], ['5s', '(5)'], ['10s', '(10)']],
     step: [['2s, 5s and 10s', '(2|5|10)'], ['3s and 4s', '(3|4)']],
 };
 const _skipBy = (re, groups = 'wide') => _p12Kinds('step', 'Count by', _SKIP_GROUPS[groups].map(([l, g]) => [l, re(g)]),
@@ -2520,8 +2521,8 @@ Object.assign(P12_OPTIONS, {
     'patterns:seq_5': [_orderDrag('Fill the gap', '^Complete'), _seqGap()],
     'patterns:seq_10': [_orderDrag('Fill the gap', '^Complete'), _seqGap()],
     'patterns:count_by_fill': [_orderDrag('Fill the sequence', '^Complete the count'), _skipBy(n => `count-by-${n}s`)],
-    'patterns:skip_count_line': [_skipBy(n => `by ${n}s\\.`, 'line')],
-    'patterns:skip_count_grid': [_skipBy(n => `by ${n}s\\.`)],
+    'patterns:skip_count_line': [_skipBy(n => `by ${n}s\\.`, 'g2')],
+    'patterns:skip_count_grid': [_skipBy(n => `by ${n}s\\.`, 'g2')],
     'patterns:count_by_step_up': [_skipBy(n => `by ${n}s\\.`, 'step')],
     'patterns:count_by_step_down': [_skipBy(n => `by ${n}s\\.`, 'step')],
     'patterns:count_by_powers_of_10': [

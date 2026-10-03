@@ -12392,23 +12392,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         </div></div>`;
     }
 
-    // Skip Counting Number Line
-    if (problem.printFormat === "skip-count-line" && problem.visual) {
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
-            ${printVisualWrap(problem.visual)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
-        </div></div>`;
-    }
-
-    // Skip Counting Grid
-    if (problem.printFormat === "skip-count-grid" && problem.visual) {
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
-            ${printVisualWrap(problem.visual)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
-        </div></div>`;
-    }
+    // skip_count_line / skip_count_grid: migrated to the kit count-row cell (2026-10-03); their legacy branches are gone.
 
     // Grid Fill (number_seq_fill, count_by_step_up, count_by_step_down, count_by_powers_of_10)
     // Renders the grid from q.gridFill: filled cells show the value, blanks show an underline.

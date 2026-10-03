@@ -20,6 +20,7 @@
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
+import { skillHay, rankSkillHits } from './skill-search-terms.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -610,10 +611,10 @@ function renderPickResults(i, q) {
     if (!box) return;
     const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) { box.innerHTML = '<p class="tv-cap" style="padding:8px 12px;">Type to search.</p>'; return; }
-    const hits = skillCatalogue().filter((s) => {
-        const hay = `${s.label} ${s.categoryName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
+    const hits = rankSkillHits(skillCatalogue().filter((s) => {
+        const hay = skillHay(s.categoryId, s.skillId, s.label, s.categoryName);
         return words.every((w) => hay.includes(w));
-    }).slice(0, 40);
+    }), q, (s) => `${s.categoryId}:${s.skillId}`, (s) => s.label).slice(0, 40);
     box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-act="pick-skill" data-sec="${i}" data-key="${esc(s.categoryId + '|' + s.skillId)}"${tvpAttrs(s.categoryId, s.skillId)}><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
         : '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>';
 }

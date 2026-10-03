@@ -1,6 +1,7 @@
 // skills-organizer.js - Full-screen skill browsing, preview, and queue management
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
+import { skillHay, hayMatches, pinnedKeys, pinFirstInDom } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
@@ -70,7 +71,7 @@ export function soInitialize() {
                 const rawLabel = skill.l.replace(/\s*\(Visual\)\s*/g, '').replace(/^[^\w]*/, '');
                 const cleanLabel = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 // Escape for HTML attributes
-                const safeLabel = skill.l.toLowerCase().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const safeLabel = skillHay(cat.id, skill.v, skill.l).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                 html += `<div class="so-skill-card" `;
                 html += `data-so-skill="${skill.v}" data-so-cat="${cat.id}" data-so-domain="${domainId}" `;
@@ -263,7 +264,7 @@ export function soApplyFilters() {
         // Search filter
         if (show && so.searchText) {
             const label = card.dataset.soLabel || '';
-            if (!label.includes(so.searchText)) {
+            if (!hayMatches(label, so.searchText)) {
                 show = false;
             }
         }
@@ -273,6 +274,13 @@ export function soApplyFilters() {
     });
 
     // Hide empty category groups
+    // 2026-10-03: a query that names a skill outright ("skip counting") lists it first (skill-search-terms.js).
+    {
+        const pin = pinnedKeys(so.searchText)[0];
+        const [pc, ps] = pin ? pin.split(':') : [];
+        const el = pin ? [...cards].find((c) => c.dataset.soCat === pc && c.dataset.soSkill === ps && c.style.display !== 'none') : null;
+        try { pinFirstInDom(el || null, el ? el.closest('.so-domain-section')?.parentElement : null); } catch (e) { /* ordering is a nicety */ }
+    }
     catGroups.forEach(group => {
         const visibleCards = group.querySelectorAll('.so-skill-card:not([style*="display: none"])');
         group.style.display = visibleCards.length > 0 ? '' : 'none';

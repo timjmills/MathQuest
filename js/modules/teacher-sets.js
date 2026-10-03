@@ -18,6 +18,7 @@
 // options (skill-options.js optionsFor) is shown. Chosen values live on the queue item as
 // `item.opts`; the share code carries them once skill-codes.js encodes `opts`.
 
+import { skillHay, rankSkillHits } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import {
@@ -292,7 +293,7 @@ function matches(s, q) {
     if (ui.levels.length && !ui.levels.includes(s.level) && s.level !== 'M') return false;
     if (ui.levels.length && s.level === 'M') return false;
     if (!q) return true;
-    const hay = `${s.label} ${s.categoryName} ${s.domainName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
+    const hay = skillHay(s.categoryId, s.skillId, s.label, s.categoryName, s.domainName);
     return q.split(/\s+/).every((w) => hay.includes(w));
 }
 

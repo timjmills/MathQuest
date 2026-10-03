@@ -602,3 +602,63 @@ export function genHopLine(q, skill) {
     q.printFormat = 'hop-line';
     return q;
 }
+
+/* ============================================== skip counting (Grade 2, 2.NBT.A.2), 2026-10-03 */
+// patterns:skip_count_grid and patterns:skip_count_line, drawn by the SAME kit `count-row` drawing as count_by_tables
+// (Lane C2): plain printed numbers, a full black answer box for each missing number, one hop arc with an arrowhead per
+// jump. The line adds the ruled number line (payload.axis) with each number under its tick, and its step label ("+5")
+// is a hint that fades (tabHint). Grade 2 content: the steps are 2s, 5s and 10s (2.NBT.A.2; counting in 2s is WRM Y1),
+// never 11s or 3s on a Grade 2 sheet.
+export const SKIP_STEPS = [2, 5, 10];
+
+/** The step of this item: dealt in rounds over the steps, so a page shows each step in turn. */
+function skipStep(key, steps) {
+    return steps.length === 1 ? steps[0] : steps[dealIndex(key, steps.length)];
+}
+
+function skipItem(q, { values, blanks, step, axis }) {
+    const parts = blanks.map(i => values[i]);
+    q.text = `Skip count by ${step}s. Write the missing numbers.`;
+    q.printText = 'Skip count. Write the missing numbers.';
+    q.ans = list(parts);
+    q.keyParts = parts.map(String);
+    q.acceptedAnswers = acceptLists(parts);
+    q.answerType = 'text';
+    q.selfAnswering = true;
+    q.options = [];
+    q.a = step; q.b = values.length; q.op = '+';
+    q.countBy = { step, values: values.slice(), blanks: blanks.slice(), dir: 'up', dirOpt: 'forward', jumps: values.length, axis: !!axis,
+        page: { steps: [step], from: null, rows: 0 } };
+    q.hint = `Each number is ${step} more than the one before. Count on by ${step}.`;
+    q.skillLabel = `Skip count by ${step}s`;
+    const payload = axis
+        ? { values, blanks, look: 'arcs', tab: `+${step}`, tabHint: true, axis: true, shape: 'box' }
+        : { values, blanks, look: 'arcs', tab: String(step), shape: 'box' };
+    q.cell = { template: 'count-row', v: 1, payload };
+    q.visual = k2Twin('count-row', payload);
+    q.printFormat = 'count-row';
+    return q;
+}
+
+/** skip_count_grid: twelve numbers (two lines of six), the step times 1 to 12; the first two print, 4-6 of the rest are boxes. */
+export function genSkipCountGrid(q) {
+    const step = skipStep('scg-step', SKIP_STEPS);
+    const values = Array.from({ length: 12 }, (_, i) => step * (i + 1));
+    const pool = Array.from({ length: 10 }, (_, i) => i + 2);
+    const blanks = spreadBlanks(pool, randInt(4, 6));
+    return skipItem(q, { values, blanks, step });
+}
+
+/** skip_count_line: eight numbers on a number line (six when Max Number is small), every number within Max Number. */
+export function genSkipCountLine(q, range) {
+    const cap = Math.max(20, Number(range) || 100);
+    const steps = SKIP_STEPS.filter(s => 5 * s <= cap);
+    const step = skipStep('scl-step', steps.length ? steps : [2]);
+    const n = Math.max(6, Math.min(8, Math.floor(cap / step) + 1));
+    const maxStart = Math.max(0, Math.floor((cap - (n - 1) * step) / step));
+    const start = randInt(0, Math.min(maxStart, 40)) * step;
+    const values = Array.from({ length: n }, (_, i) => start + step * i);
+    const pool = Array.from({ length: n - 2 }, (_, i) => i + 2);
+    const blanks = spreadBlanks(pool, n >= 8 ? 3 : 2);
+    return skipItem(q, { values, blanks, step, axis: true });
+}

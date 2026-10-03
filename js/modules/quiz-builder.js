@@ -9,6 +9,7 @@
 // of the teacher previews (teacher-preview.js), and the preview column stays visible at tablet
 // widths (it is the only way to add questions). Skills are buttons, so the keyboard reaches them.
 
+import { skillHay, hayMatches, pinnedKeys, pinFirstInDom } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
 import { shuffle } from './utils.js';
@@ -331,7 +332,7 @@ function qbInitialize() {
                 const gc = GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' };
                 const rawLabel = skill.l.replace(/\s*\(Visual\)\s*/g, '').replace(/^[^\w]*/, '');
                 const cleanLabel = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const safeLabel = skill.l.toLowerCase().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const safeLabel = skillHay(cat.id, skill.v, skill.l).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                 html += `<button type="button" class="qb-skill-card" `;
                 html += `data-qb-skill="${skill.v}" data-qb-cat="${cat.id}" data-qb-domain="${domainId}" `;
@@ -559,13 +560,20 @@ function qbApplyFilters() {
         }
         if (show && qb.searchText) {
             const label = card.dataset.qbLabel || '';
-            if (!label.includes(qb.searchText)) show = false;
+            if (!hayMatches(label, qb.searchText)) show = false;
         }
 
         card.style.display = show ? '' : 'none';
         if (show) totalVisible++;
     });
 
+    // 2026-10-03: a query that names a skill outright ("skip counting") lists it first (skill-search-terms.js).
+    {
+        const pin = pinnedKeys(qb.searchText)[0];
+        const [pc, ps] = pin ? pin.split(':') : [];
+        const el = pin ? [...cards].find((c) => c.dataset.qbCat === pc && c.dataset.qbSkill === ps && c.style.display !== 'none') : null;
+        try { pinFirstInDom(el || null, el ? el.closest('.qb-domain-section')?.parentElement : null); } catch (e) { /* ordering is a nicety */ }
+    }
     catGroups.forEach(group => {
         const visible = group.querySelectorAll('.qb-skill-card:not([style*="display: none"])');
         group.style.display = visible.length > 0 ? '' : 'none';

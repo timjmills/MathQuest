@@ -37,6 +37,12 @@
 //                                     (every number, or only the printed ones). A HINT: drawn black at
 //                                     levels 1 and 3, grey at level 2 (Guided), and dropped at level 0
 //                                     (Test, pre-skill check, review: PEDAGOGY P-7 "hints off on tests").
+//   axis?: true                       (skip_count_line, 2026-10-03) the NUMBER-LINE look of an 'arcs' row: the same
+//                                     hop arcs and arrowheads above a ruled line with a tick at every number, the
+//                                     given numbers plain under their ticks and each missing number a full answer
+//                                     box under its tick. The whole line stands on ONE line of the page.
+//   tabHint?: true                    the step tab ("+5") is a HINT, not structure: black at levels 1 and 3, grey at
+//                                     level 2, dropped at level 0 (Test), PEDAGOGY P-7.
 // }
 //
 // WIDE NUMBERS (wave 1 C2). A box is as wide as the widest number ("1,200,000"), content never
@@ -67,6 +73,10 @@ const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by column
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
+/** The step tab this render draws: a hint tab (`tabHint`) is dropped at level 0. */
+const tabOf = (p, ctx) => (p.tabHint && lvlOf(ctx) < 1 ? '' : (p.tab || ''));
+/** The number line under an axis row: line + ticks (mm). */
+const AXIS_MM = 4.2;
 /** The multiplication label drawn under number `i`, or '' (none): a hint, so never at level 0. */
 function labelAt(p, ctx, i) {
     if (!Array.isArray(p.labels) || !p.times || p.times === 'none' || p.look === 'train' || lvlOf(ctx) < 1) return '';
@@ -92,8 +102,8 @@ function geom(p, ctx) {
     const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
     // The step tab grows with its text ("−25,000"): the pentagon's point and padding plus the digits at the tab's own size.
     const tabPtEst = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64) * 1.05, 20);
-    const tabLen = String(p.tab || '').length;
-    const tabBody = look === 'arcs' && p.tab ? (tabLen <= 2 ? TAB_MM[size] : Math.max(TAB_MM[size], tabLen * 0.6 * tabPtEst * PT_MM + 7)) : 0;
+    const tabLen = String(tabOf(p, ctx)).length;
+    const tabBody = look === 'arcs' && tabOf(p, ctx) ? (tabLen <= 2 ? TAB_MM[size] : Math.max(TAB_MM[size], tabLen * 0.6 * tabPtEst * PT_MM + 7)) : 0;
     const tab = tabBody ? tabBody + 2 : 0;
     // The multiplication label ("12 × 25") is at least as wide as its text: the box widens so neighbouring labels never touch.
     const lblPt = Math.max(8, zonePt(ctx));
@@ -148,7 +158,7 @@ const EXIT_MM = 7.5;        // the turn arrow that leaves a line (6 mm + its mar
 
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
-    const perRow = n >= 13 ? 5 : Math.ceil(n / 2);             // 12 -> 6 + 6; 15 -> 5 + 5 + 5
+    const perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
     const rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
     const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
@@ -170,7 +180,7 @@ function arcsGeom(p, ctx, c) {
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
-    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + gap, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : 3.8, pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact };
+    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + gap, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : (p.axis ? 5 : 3.8), pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact, axis: !!p.axis, axisH: p.axis ? AXIS_MM : 0 };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -212,13 +222,13 @@ const TAB_FLOOR_PT = 14;
 const tabPt = (g) => { const pt = Math.min(g.pt * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
 
 /** The step tab: a bold number in a pentagon pointing into the row ("7>"). */
-function stepTab(ctx, g, text) {
+function stepTab(ctx, g, text, ink = INK) {
     const w = g.tabBody, h = g.h;
     const sw = SW.heavy;
     const body = `<polygon points="${n2(sw)},${n2(sw)} ${n2(w - 3.2)},${n2(sw)} ${n2(w - sw)},${n2(h / 2)} ${n2(w - 3.2)},${n2(h - sw)} ${n2(sw)},${n2(h - sw)}" `
-        + `fill="#fff" stroke="${INK}" stroke-width="${n2(sw)}" stroke-linejoin="round"/>`
+        + `fill="#fff" stroke="${ink}" stroke-width="${n2(sw)}" stroke-linejoin="round"/>`
         + `<text x="${n2((w - 3) / 2 + 0.3)}" y="${n2(h / 2)}" dominant-baseline="central" text-anchor="middle" font-family="Andika, sans-serif" `
-        + `font-weight="700" font-size="${n2(tabPt(g) * 25.4 / 72)}" fill="${INK}">${esc(text)}</text>`;
+        + `font-weight="700" font-size="${n2(tabPt(g) * 25.4 / 72)}" fill="${ink}">${esc(text)}</text>`;
     return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
         + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="count by ${esc(text)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
 }
@@ -244,6 +254,22 @@ function arcsSVG(ctx, g, k) {
     }
     return `<svg aria-hidden="true" viewBox="0 0 ${n2(W)} ${n2(H)}" style="display:block;width:${L(ctx, W)};height:${L(ctx, H)};overflow:visible;">`
         + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+/**
+ * The number line of an axis row (skip_count_line): a ruled line through the tick of every number, an arrowhead at
+ * the right end (the count goes on), each tick standing straight above its number or its answer box.
+ */
+function axisSVG(ctx, g, k) {
+    const W = k * g.pitch - g.gap, H = g.axisH, y = 0.6;
+    const x0 = -Math.min(3, g.gap / 2), x1 = W + Math.min(4, g.gap / 2 + 1);
+    let d = `M${n2(x0)} ${n2(y)} H${n2(x1 - 0.3)} `;
+    for (let i = 0; i < k; i++) { const x = i * g.pitch + g.w / 2; d += `M${n2(x)} ${n2(y - 1.4)} V${n2(H)} `; }
+    const head = `<path d="M${n2(x1 + 0.6)} ${n2(y)} l-2.6 -1.3 v2.6 z" fill="${INK}"/>`;
+    // the drawing is as wide as the line's arrowhead, so a swiping screen row never clips the head off
+    const Wv = x1 + 1;
+    return `<svg class="k2-countrow-axis" aria-hidden="true" viewBox="0 0 ${n2(Wv)} ${n2(H)}" style="display:block;width:${L(ctx, Wv)};height:${L(ctx, H)};overflow:visible;">`
+        + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy * 0.7)}" stroke-linecap="butt"/>${head}</svg>`;
 }
 
 /**
@@ -300,18 +326,18 @@ register('count-row', {
         const tabsCol = [];
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
-            const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) : '';
+            const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) + (g.axis ? axisSVG(ctx, g, part.length) : '') : '';
             const turns = g.look === 'arcs' && g.tab && g.rows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, tabOf(p, ctx), p.tabHint && lvlOf(ctx) === 2 ? GREY : INK) : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
             // screen twin (critic C2 r4): the step tab and the arrow column sit OUTSIDE the swiping row, in a fixed column beside it,
             // so no number or box can ever slide under them; wireSwipeRows (screen-cell.js) keeps each entry level with its line
             if (swipeTabs) { tabsCol.push(`<div data-mq-tabfor="${r}" style="display:flex;align-items:flex-end;${r ? `margin-top:${L(ctx, 2.5)};` : ''}">${tabCol}</div>`); }
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;gap:${L(ctx, g.gap)};${arcs ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;gap:${L(ctx, g.gap)};${arcs && !g.axis ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -346,7 +372,7 @@ register('count-row', {
     footprint(p, ctx) {
         const g = geom(p, ctx || {});
         const w = g.tab + g.perRow * g.pitch - g.gap + 4;
-        const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
+        const h = g.rows * (g.arcH + (g.axisH || 0) + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
         return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (Number(p.vpad) > 0 ? Number(p.vpad) : 0)), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };

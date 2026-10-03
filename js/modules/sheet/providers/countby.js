@@ -153,6 +153,40 @@ registerSkill('multiplication:count_by_tables', {
     wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.dir === 'down' ? -d.step : d.step) : null; },
 });
 
+/* ============================================ skip counting: grid row and number line (2026-10-03) */
+// patterns:skip_count_grid and patterns:skip_count_line (Grade 2, 2.NBT.A.2): the count_by_tables row drawing with
+// the steps 2, 5 and 10; the line adds the ruled number line and a fading "+5" step label (gen-mult-patterns.js).
+function skipProvider(line) {
+    return {
+        strings: stringsBy((q) => ({
+            iCan: line ? 'I Can skip count on a number line' : 'I Can skip count by 2s, 5s and 10s',
+            instructionKey: line ? 'skip-count-line' : 'skip-count-row',
+            steps: line ? [
+                'Look at two numbers side by side. How much is each jump?',
+                'Add the jump to a number to get the next one.',
+                'Write each missing number in the box under its tick.',
+                'Check: every jump is the same size.',
+            ] : [
+                'Read the number in the box. That is the jump.',
+                'Add the jump to a number to get the next one.',
+                'Write each missing number in its box.',
+                'Check: every jump is the same size.',
+            ],
+            say: 'I skip count by __: __, __, __.',
+            sayValues: (item) => { const d = countData(item); return d ? [d.step, d.values[0], d.values[1], d.values[2]] : null; },
+        })),
+        misconceptions: ['skipped-multiple', 'counted-by-one', 'hundred-slip'],
+        workedSteps: (q) => {
+            const d = countData(q);
+            return d ? rowSteps(d.values, d.blanks, `Skip count by ${fmt(d.step)}: each jump adds ${fmt(d.step)}.`, () => `+ ${fmt(d.step)}`) : [];
+        },
+        wrongAnswer: (q) => { const d = countData(q); return d ? rowWrongs(q, d.values, d.blanks, d.step) : null; },
+        footprint: { kind: 'count-row', factLike: false, maxCols: 1, measure: true },
+    };
+}
+registerSkill('patterns:skip_count_grid', skipProvider(false));
+registerSkill('patterns:skip_count_line', skipProvider(true));
+
 /* ===================================================================== number patterns */
 
 function patternData(q) {

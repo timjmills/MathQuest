@@ -211,7 +211,7 @@ export const SKILL_STANDARDS = {
     'multiplication:mult_zeros': { ccss: ['3.NBT.A.3'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 10, 100 and Multiples of Ten
     'multiplication:mult_placeholder_zero': { ccss: ['4.NBT.B.5', '5.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Write the Placeholder Zero
     'multiplication:mult_missing_digit': { ccss: ['4.NBT.B.5'], ee: [] }, // Find the Missing Digit (Multiplication)
-    'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 1–12 (3.OA.7 prep: skip-counting the tables)
+    'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Skip counting: count by 1–12 (3.OA.7 prep: skip-counting the tables)
 
     // ---- division
     'division:div_facts': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Division Facts (1-12)
@@ -518,8 +518,8 @@ export const SKILL_STANDARDS = {
     'patterns:seq_5': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Count by 5s
     'patterns:seq_10': { ccss: ['2.NBT.A.2', 'K.CC.A.1'], ee: ['M.EE.2.NBT.2', 'M.EE.K.CC.1', 'M.EE.3.NBT.3'] }, // Count by 10s
     'patterns:count_by_fill': { ccss: ['2.NBT.A.2', '3.OA.D.9'], ee: ['M.EE.2.NBT.2', 'M.EE.3.OA.8'] }, // Count-By Fill-In (1-12)
-    'patterns:skip_count_line': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Skip Counting Number Line (Visual)
-    'patterns:skip_count_grid': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Skip Counting Grid (Visual)
+    'patterns:skip_count_line': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Skip counting on a number line (2s, 5s, 10s; kit count-row axis, 2026-10-03)
+    'patterns:skip_count_grid': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Skip counting by 2s, 5s and 10s (kit count-row, 2026-10-03)
     'patterns:count_by_step_up': { ccss: ['2.NBT.A.2', '3.OA.D.9'], ee: ['M.EE.2.NBT.2', 'M.EE.3.OA.8'] }, // Count Up by Step (Grid)
     'patterns:count_by_step_down': { ccss: ['2.NBT.A.2', '3.OA.D.9'], ee: ['M.EE.2.NBT.2', 'M.EE.3.OA.8'] }, // Count Down by Step (Grid)
     'patterns:count_by_powers_of_10': { ccss: ['2.NBT.A.2'], ee: ['M.EE.2.NBT.2'] }, // Count by Powers of 10 (Grid)
