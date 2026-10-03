@@ -36,7 +36,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | Atomised Lesson V20 | The owner supplies it when the lesson wave starts |
 | Skip | A teacher option; appears only after N wrong tries (default 5) |
 | Calculator | Per skill, teacher option, off by default |
-| Faded packets | A skill-worksheet option that fades supports all → mixed → none, either over 1, 2, 3, 4, 5 … pages (one page fades within the page) or every N problems (e.g. every 3) (owner 2026-10-03) |
+| Faded supports | A skill-worksheet option that fades supports all → mixed → none, in three modes: **Faded problems** (every N problems, e.g. 3), **Faded page** (across one page), **Faded packet** (across 2, 3, 4, 5 … pages) (owner 2026-10-03) |
 | WRM page | Teacher-facing only; from a small step or unit: print a worksheet, send a practice code, make a quiz |
 | Deploy | Each Wave 1 lane deploys (push to master) as soon as it passes critic ≥ 8 + full gates + stamp (owner 2026-10-02) |
 | Skip setting | Per skill, default 5 wrong tries; travels with the skill (skill option) |
@@ -82,7 +82,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 | # | Item | Today |
 |---|---|---|
-| 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **faded packet**: supports fade all → mixed → none. The teacher sets the fade **either by pages** (over 1, 2, 3, 4, 5 … pages; a 1-page packet fades within the page) **or by problems** (a support is removed every N problems, e.g. every 3) (owner 2026-10-03) | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
+| 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **Fade supports** (all → mixed → none), three named modes (owner 2026-10-03): **Faded problems** — a support is removed every N problems (e.g. every 3); **Faded page** — the fade runs across one page; **Faded packet** — the fade runs across 2, 3, 4, 5 … pages | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
 | 4.2 | Mixed worksheet: per-skill weights (equal by default) and "Mix in prerequisite skills" (all listed, none ticked) | built on the teacher-UI branch, not live |
 | 4.3 | Quiz worksheet: mixed with points (each / by type / per question), built from CCSS / EE / WRM step or unit, standards breakdown on the key | built on the teacher-UI branch, not live |
 | 4.4 | Answer key: at the end **or** after each page; **short** (answer list) **or** mirror layout; answers in **reddish orange** | one on/off switch; keys always after all pages; mirror only; black (`--ws-ink`) |
