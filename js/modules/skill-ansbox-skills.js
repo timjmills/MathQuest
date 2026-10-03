@@ -4,7 +4,7 @@
 // numeric answer - kit templates, or legacy print with a screen stack / fact / equation - so the
 // answer-box option (`ansBox`, owner ruling 2026-10-02) changes what they draw. Word problems,
 // charts and models are not listed: their answer places are the drawing's own.
-// skill-options.js offers the option on these skills only. 72 skills.
+// skill-options.js offers the option on these skills only. 74 skills.
 import { registerAnsBoxSkills } from './skill-options.js';
 
 export const ANSBOX_SKILLS = Object.freeze({
@@ -38,10 +38,12 @@ export const ANSBOX_SKILLS = Object.freeze({
     'addition:add_missing_digit': 'stack',
     'addition:add_sub_100s': 'legacy-eq',
     'addition:add_sub_10s': 'legacy-eq',
+    'addition:add_three': 'add-three',
     'addition:equal_sign': 'legacy-stack',
-    'addition:mixed_addition': 'legacy-stack+stack',
+    'addition:mixed_addition': 'add-three+legacy-stack+stack',
     'division:div_facts': 'fact',
     'division:divide': 'legacy-eq',
+    'division:missing_mult_div': 'legacy-eq',
     'division:mixed_division': 'legacy-eq',
     'division:mixed_mult_div': 'legacy-eq+legacy-fact',
     'multiplication:mixed_multiplication': 'stack',

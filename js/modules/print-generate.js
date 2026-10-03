@@ -11369,7 +11369,15 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     
     // Missing Number - Addition/Subtraction
     if (problem.printFormat === "missing-number") {
-        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
+        // the answer place after "=" honours the answer-box option (SL-3 scope, critic B r4 D3); a blank
+        // elsewhere in the sentence is a missing-number box and stays one box
+        const atEnd = /=\s*(?:___|\?)\s*$/.test(String(problem.text || ''));
+        // both carry data-ws-slot so the pupil page and its key count the same slots (AK-4) and the key
+        // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
+        // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
+        const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
+        const emptyBox = atEnd ? wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"')
+            : '<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-flex;align-items:center;justify-content:center;width:max(40px, 1.6em);height:max(40px, 1.3em);box-sizing:border-box;border:0.75pt solid #000;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -11383,7 +11391,15 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     // Missing Factor - Multiplication/Division
     if (problem.printFormat === "missing-factor") {
-        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
+        // the answer place after "=" honours the answer-box option (SL-3 scope, critic B r4 D3); a blank
+        // elsewhere in the sentence is a missing-number box and stays one box
+        const atEnd = /=\s*(?:___|\?)\s*$/.test(String(problem.text || ''));
+        // both carry data-ws-slot so the pupil page and its key count the same slots (AK-4) and the key
+        // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
+        // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
+        const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
+        const emptyBox = atEnd ? wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"')
+            : '<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-flex;align-items:center;justify-content:center;width:max(40px, 1.6em);height:max(40px, 1.3em);box-sizing:border-box;border:0.75pt solid #000;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}

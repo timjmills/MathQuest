@@ -83,7 +83,8 @@ const CASES = [
     // ---- (critic B r3 D3, D4, D5) one verdict live and on Check; no gap; a 1-digit answer right-aligned
     const EDGE = [
         // [skill, answer wanted, boxes typed ('_' = leave empty), expected live, expected Check]
-        ['addition', 'add_facts', 7, '07', 'green', true],
+        ['addition', 'add_facts', 7, '07', 'green', true, '_7'],
+        ['multiplication', 'mult_facts', 8, '008', 'green', true, '__8'],
         ['addition', 'add_facts', 0, '00', 'green', true],
         ['multiplication', 'mult_facts', 7, '_07', 'green', true],
         ['multiplication', 'mult_facts', 12, '1_2', 'neutral', false],
@@ -91,7 +92,7 @@ const CASES = [
         ['multiplication', 'mult_facts', 12, '12_', 'green', true],
         ['division', 'div_facts', 9, '9_', 'green', true],
     ];
-    for (const [c, k, want, typed, live, check] of EDGE) {
+    for (const [c, k, want, typed, live, check, leaves] of EDGE) {
         const got = await page.evaluate(async (c, k, want, typed) => {
             const st = window.state;
             window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, { ansBox: 'digit' }, { silent: true });
@@ -105,25 +106,81 @@ const CASES = [
             const b = Array.from(document.querySelectorAll('#visualAid input.mq-digit'));
             if (b.length < typed.length) return { skip: true, n: b.length };
             const fire = (e) => { e.dispatchEvent(new Event('input', { bubbles: true })); };
+            const s00 = st.score;
+            // the card's own auto-advance calls transitionToNextQuestion: record that it did
+            window.__mqAdv = false;
+            if (!window.__mqAdvWrapped) { const t0 = window.transitionToNextQuestion; window.transitionToNextQuestion = function () { window.__mqAdv = true; return t0.apply(this, arguments); }; window.__mqAdvWrapped = true; }
             [...typed].forEach((ch, i) => { b[i].focus(); b[i].value = ch === '_' ? '' : ch; fire(b[i]); });
             b.forEach((e) => e.blur());
-            await new Promise((r) => setTimeout(r, 300));
+            await new Promise((r) => setTimeout(r, 150));
             const marks = b.filter((e) => e.value).map((e) => e.classList.contains('mq-live-correct') ? 'green' : e.classList.contains('mq-live-wrong') ? 'red' : 'neutral');
             const lv = marks.every((m) => m === 'green') ? 'green' : marks.some((m) => m === 'red') ? 'red' : 'neutral';
             const after = b.map((e) => e.value || '_').join('');
-            // Check: the card's submit, by its own checker
-            const s0 = st.score;
-            document.querySelectorAll('.feedback-area').forEach((f) => f.classList.remove('correct', 'incorrect'));
-            window.submitAnswer();
-            await new Promise((r) => setTimeout(r, 300));
-            const verdict = st.score > s0 || !!document.querySelector('.feedback-area.correct');
-            return { lv, after, verdict, fb: Array.from(document.querySelectorAll('.feedback-area')).map((f) => f.className + '|' + f.textContent.slice(0, 40)).join(' ; '), ha: st.hasAnswered };
+            // a right answer auto-advances the card (r4 D4: "07" like a plain "7"); else Check, by the card's own checker
+            await new Promise((r) => setTimeout(r, 1500));
+            // advanced = the card judged it right by itself (no Check pressed): the score rose, or the card moved on
+            const advanced = window.__mqAdv === true || st.score > s00;
+            let verdict = advanced;
+            if (!advanced) {
+                document.querySelectorAll('.feedback-area').forEach((f) => f.classList.remove('correct', 'incorrect'));
+                window.submitAnswer();
+                await new Promise((r) => setTimeout(r, 300));
+                verdict = st.score > s00 || !!document.querySelector('.feedback-area.correct');
+            }
+            return { lv, after, verdict, advanced, fb: Array.from(document.querySelectorAll('.feedback-area')).map((f) => f.className + '|' + f.textContent.slice(0, 40)).join(' ; '), ha: st.hasAnswered };
         }, c, k, want, typed);
         if (got.skip) { console.log(`skip ${k} ${want} '${typed}' (no such item / boxes ${got.n})`); continue; }
         const alignOk = typed.replace(/_/g, '').length === 1 && !/^_*0/.test(typed) ? got.after.replace(/_/g, '').length === 1 && got.after.endsWith(String(want)) : true;
-        const ok = got.lv === live && got.verdict === check && alignOk;
+        // a correct entry auto-advances, whatever its leading zeros (r4 D4); it leaves right-aligned as the key prints it
+        const ok = got.lv === live && got.verdict === check && alignOk && (!check || got.advanced) && (!leaves || got.after === leaves);
         n++; if (!ok) bad++;
-        console.log(`${ok ? 'ok  ' : 'FAIL'} edge ${k} ans ${want} typed '${typed}' -> live ${got.lv} (want ${live}), Check ${got.verdict ? 'correct' : 'wrong'} (want ${check ? 'correct' : 'wrong'}), boxes after leaving '${got.after}'${ok ? '' : ' ' + got.fb + ' ' + got.ha}`);
+        console.log(`${ok ? 'ok  ' : 'FAIL'} edge ${k} ans ${want} typed '${typed}' -> live ${got.lv} (want ${live}), Check ${got.verdict ? 'correct' : 'wrong'}${got.advanced ? ' (auto-advanced)' : ''} (want ${check ? 'correct' : 'wrong'}), boxes after leaving '${got.after}'${ok ? '' : ' ' + got.fb + ' ' + got.ha}`);
+    }
+
+    // ---- (critic B r4 D1) the QUIZ, through quizQuestionData + compressTestForURL: legacy skills keep the
+    // option - digit draws the per-digit strip (and stores the typed value), off no black edge, one a box
+    for (const [c, k] of [['division', 'divide'], ['subtraction', 'sub_facts'], ['multiplication', 'multiply']]) {
+        for (const ab of ['digit', 'off', 'one']) {
+            for (let it = 0; it < 2; it++) {
+                await page.evaluate((c, k, ab, it) => {
+                    window.clearSetOptions({ silent: true });
+                    const q = window.generateQuestionFor({ category: c, skill: k, seed: 900 + it * 7, itemIndex: it, opts: { ansBox: ab } });
+                    const test = { id: null, name: 'Boxes', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: [{ id: 0, skillId: k, points: 1, questionData: window.quizQuestionData(q) }] }],
+                        settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                    window.handleQuizURL(window.compressTestForURL(test));
+                    const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                    window.startQuizTest();
+                }, c, k, ab, it);
+                await sleep(600);
+                const r = await page.evaluate(async () => {
+                    const st = window.state;
+                    const qd = st.quizAllQuestions[st.quizOrder[st.quizQuestionIndex]].question.questionData;
+                    const cell = document.querySelector('#quizTakeView .qt-cell');
+                    const vis = (e) => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
+                    const ins = Array.from(cell.querySelectorAll('input')).filter((e) => e.type !== 'hidden' && vis(e) && !e.classList.contains('mq-carry'));
+                    const strip = cell.querySelector('.ws-stack');
+                    const digits = strip ? Array.from(strip.querySelectorAll('input.mq-digit, input.mq-qt-digit')) : [];
+                    const black = (e) => { const cs = getComputedStyle(e); const sides = ['Top', 'Bottom', 'Left', 'Right'].filter((k) => parseFloat(cs[`border${k}Width`]) > 0 && /rgb\(0, 0, 0\)/.test(cs[`border${k}Color`]) && cs[`border${k}Style`] !== 'none').length;
+                        const sh = /rgb\(0, 0, 0\)/.test(cs.boxShadow || ''); return sides >= 2 || sh; };
+                    let stored = null;
+                    if (digits.length) {
+                        const a = String(qd.ans).replace(/[^0-9]/g, '');
+                        const pad = digits.length - a.length;
+                        digits.forEach((e, i) => { e.value = i >= pad ? a[i - pad] : ''; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+                        await new Promise((res) => setTimeout(res, 150));
+                        const h = document.getElementById('qtAnswerInput'); stored = h ? h.value : null;
+                    }
+                    return { ans: String(qd.ans), ansBox: qd.ansBox, n: ins.length, digits: digits.length, ltr: !!(strip && strip.hasAttribute('data-mq-ltr')), black: ins.map(black), stored };
+                });
+                let ok;
+                if (ab === 'digit') ok = r.digits >= r.ans.length && r.digits >= 2 && String(r.stored).replace(/^0+(?=\d)/, '') === r.ans;
+                else if (ab === 'off') ok = r.n >= 1 && r.black.every((b) => !b) && r.digits <= 1;
+                else ok = r.n === 1 && r.black[0] === true;
+                n++; if (!ok) bad++;
+                console.log(`${ok ? 'ok  ' : 'FAIL'} quiz ${k} ${ab} ans ${r.ans}: carried ansBox=${r.ansBox}, ${r.n} input(s), strip ${r.digits}${r.ltr ? ' (LTR)' : ''}, black edges [${r.black.join(',')}]${r.stored != null ? `, stored '${r.stored}'` : ''}`);
+                await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
+            }
+        }
     }
 
     await app.close();

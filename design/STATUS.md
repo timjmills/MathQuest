@@ -8,12 +8,10 @@
 >   key fill). The answer digits are right and inside their boxes, and regroup boxes are unscored (RM-02), so it does not block
 >   lane B; but for across-zeros the regroup marks are the lesson, and one box per column cannot hold the "10" a zero becomes.
 >   Fix with the family migration: emit `q.cell` stack with a regroup trace so the kit key fills it.
-> - **R3-D7 exclusions (no Answer-boxes option, by design for now):** `addition:add_three` (kit template `add-three`: counters plus a
->   sentence whose box is the template's own drawing; the option needs that template to read `ansBox` - addition family);
->   `division:missing_mult_div` (the unknown can be any term - factor, divisor, dividend - so its box is a mid-expression
->   missing-number box (SL-6), not the answer place after `=` that `ansBox` governs); `subtraction:sub_check_by_adding` and
->   `division:div_check_by_multiplying` (error-analysis items: the place written is the check drawing's "correct answer" box,
->   governed by the error-analysis page, not a fact/equation/column answer). Revisit each with its family migration.
+> - **R3-D7 / R4-D3 (scope, SL-3):** `addition:add_three` and `division:missing_mult_div` now offer the option (add_three's
+>   `= [ ]` under its counters; missing_mult_div's `= ___` items, as missing_add_sub). Still excluded, by the SL-3 scope rule:
+>   `subtraction:sub_check_by_adding` and `division:div_check_by_multiplying` (error-analysis items: the place written is the
+>   error-analysis page's "correct answer" box).
 > - Legacy key sizing (R3-D2) is fixed in this round: the legacy equation slot is at least 1.15 em tall, key digits are set at
 >   the slot's writing size, the fact box stands 1.5 mm below its rule, and `ws-print-lint` L-KEY (AK-2) now fails any key
 >   digit whose ink is not >= 0.3 mm inside its box.

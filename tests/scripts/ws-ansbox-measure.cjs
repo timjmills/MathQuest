@@ -28,7 +28,8 @@ const CATS = ['addition', 'subtraction', 'multiplication', 'division'];
                 let q = null;
                 try { q = window.generateQuestionFor({ category: c, skill: k, seed: 7001 + i, itemIndex: i, itemCount: 24 }); } catch (e) { q = null; }
                 const t = q && q.cell && q.cell.template;
-                if (t === 'stack' || t === 'fact' || t === 'equation') { seen.add(t); continue; }
+                // add-three: a + b + c = [ ] under its counters (critic B r4 D3: its answer box honours the option)
+                if (t === 'stack' || t === 'fact' || t === 'equation' || t === 'add-three') { seen.add(t); continue; }
                 // a legacy-printed + − × ÷ item whose answer is one number in a column, a fact or an
                 // equation: the legacy print slots (print-generate.js) and the screen kinds honour it too
                 let k2 = null; try { k2 = q ? cellKindFor(q) : null; } catch (e) { k2 = null; }

@@ -956,19 +956,26 @@ function wsLintPage(cfg) {
      * is the written element itself or its nearest ancestor (up to 2) with a visible border. */
     {
         const cvs = document.createElement('canvas').getContext('2d');
-        const bordered = (e) => { const c = getComputedStyle(e); return ['Top', 'Bottom', 'Left', 'Right'].filter((k) => parseFloat(c[`border${k}Width`]) > 0 && c[`border${k}Style`] !== 'none').length >= 3; };
+        // a VISIBLE border: width, a style, and a colour that is not transparent (critic B r4 D2b)
+        const seen = (c, k) => { const col = c[`border${k}Color`] || ''; return parseFloat(c[`border${k}Width`]) > 0 && c[`border${k}Style`] !== 'none' && !/^transparent$|rgba\([^)]*,\s*0\)$/.test(col.trim()); };
+        const bordered = (e) => { const c = getComputedStyle(e); return ['Top', 'Bottom', 'Left', 'Right'].filter((k) => seen(c, k)).length >= 3; };
         const PADMM = 0.3;
         for (const ri of rootInfo) {
             for (const w of ri.el.querySelectorAll('[data-ws-ink]')) {
                 if (!visible(w)) continue;
-                let box = null;
-                for (let e = w, k = 0; e && k < 3; e = e.parentElement, k++) { if (bordered(e)) { box = e; break; } }
-                if (!box || box.querySelector('[data-ws-slot] [data-ws-ink]') && box !== w) continue;
                 const walker = document.createTreeWalker(w, NodeFilter.SHOW_TEXT);
                 for (let n = walker.nextNode(); n; n = walker.nextNode()) {
                     const t = (n.nodeValue || '').trim();
                     if (!/^[0-9.,]+$/.test(t)) continue;
-                    const pe = n.parentElement, cs = getComputedStyle(pe);
+                    // the box is found from the GLYPH's own element upward (a per-digit key is judged
+                    // against its own digit box, not the whole strip), and only inside this writing place
+                    // (':scope': a slot nested inside the box is another answer's, critic B r4 D2a)
+                    const pe = n.parentElement;
+                    let box = null;
+                    for (let e = pe, k = 0; e && k < 4; e = e.parentElement, k++) { if (bordered(e)) { box = e; break; } }
+                    if (!box || box !== w && !box.contains(w) && !w.contains(box)) continue;
+                    if (box !== w && box.querySelector(':scope [data-ws-slot] [data-ws-ink]')) continue;
+                    const cs = getComputedStyle(pe);
                     cvs.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
                     const m = cvs.measureText(t);
                     if (!m.fontBoundingBoxAscent) continue;
@@ -1914,6 +1921,22 @@ const SELF_TESTS = [
         const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
         k.querySelector('[data-ws-cell] [data-ws-slot]').querySelectorAll('.p11-key').forEach(e => e.remove());
     } },
+    // critic B r4 D2: the key-fit check sees a legacy fact zone and each box of a per-digit key
+    { name: 'key digit too big for a legacy fact zone', expect: ['L-KEY', 'AK-2'], keyMatch: 'key glyph outside box', fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const c = k.querySelector('[data-ws-cell]');
+        const d = document.createElement('div');
+        d.innerHTML = '<div class="ws-fact" data-ws-slot="answer" data-ws-shape="open" style="font-size:16pt;display:grid;grid-template-columns:repeat(3,1em);"><span class="ws-fact-write" style="grid-column:1 / -1;height:6mm;box-sizing:border-box;border:0.75pt solid #000;display:grid;grid-template-columns:repeat(3,1fr);"><span data-ws-ink="solid" style="height:100%;line-height:6mm;display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:40pt;"></span><span data-ws-ink="solid" style="height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:40pt;line-height:6mm;"></span><span data-ws-ink="solid" style="height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:40pt;line-height:6mm;">8</span></span></div>';
+        c.appendChild(d.firstChild);
+    } },
+    { name: 'per-digit key digit shifted across its seam', expect: ['L-KEY', 'AK-2'], keyMatch: 'key glyph outside box', fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const c = k.querySelector('[data-ws-cell]');
+        const seg = (d, x) => `<i style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:5mm;height:9mm;box-sizing:border-box;border:0.75pt solid #000;"><b style="font-weight:700;color:#000;line-height:1;font-size:0.8em;${x}">${d}</b></i>`;
+        const d = document.createElement('div');
+        d.innerHTML = `<span class="ws-factans ws-factans--digit" data-ws-slot="answer" data-ws-shape="box" data-ws-ink="solid" style="display:inline-flex;font-size:20pt;">${seg('1', '')}${seg('2', 'position:relative;left:2mm;')}</span>`;
+        c.appendChild(d.firstChild);
+    } },
     { name: 'screen verb on paper', expect: ['L-VERBS', 'BD-12'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Click the right answer.'; } },
     { name: 'instruction over 12 words', expect: ['L-VERBS', 'BD-10'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Add the two numbers and then write the answer in the boxes below the line.'; } },
     { name: '"Part 01" section heading', expect: ['L-VERBS', 'BD-1'], fn: () => { document.querySelector('.ws-page .ws-body').insertAdjacentHTML('afterbegin', '<h2 class="section-num" style="font-size:12pt;margin:0">Part 01</h2>'); } },
@@ -1971,7 +1994,8 @@ async function selfTest() {
         });
         return page;
     };
-    const fired = (r, [lint, rule]) => r.findings.some(f => f.lint === lint && f.rule === rule);
+    let _keyMatch = null;   // a self-test may name the finding key it plants (several checks share AK-2)
+    const fired = (r, [lint, rule]) => r.findings.some(f => f.lint === lint && f.rule === rule && (!_keyMatch || f.key === _keyMatch));
     try {
         {
             const page = await prepare();
@@ -1982,6 +2006,7 @@ async function selfTest() {
             else console.log('  ok   clean fixture: 0 findings');
         }
         for (const t of SELF_TESTS) {
+            _keyMatch = t.keyMatch || null;
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
@@ -1994,6 +2019,7 @@ async function selfTest() {
                 else bad.push(`${t.name}: expected ${e.join(' ')}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
             }
         }
+        _keyMatch = null;
         for (const t of LEGACY_SELF_TESTS) {
             const page = await env.browser.newPage();
             await page.setViewport({ width: 794, height: 1100, deviceScaleFactor: 1 });

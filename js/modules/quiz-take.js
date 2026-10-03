@@ -215,13 +215,19 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'dualFractionAnswers',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
-    'screenInstr'];
+    'screenInstr',
+    // wave 1 lane B r4: the answer-box option (legacy items carry it here, kit items also in cell.payload)
+    'ansBox'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
         text: q.text, ans: q.ans, hint: q.hint, options: q.options,
         answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel,
     };
+    // r4 D1: the answer-box option travels with every item (a legacy item has no kit payload to carry it)
+    const ab = q.ansBox != null ? q.ansBox : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox
+        : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox : null;
+    if (ab != null) d.ansBox = ab;
     for (const k of QUIZ_CELL_FIELDS) {
         const v = q[k];
         if (v === undefined || v === null || typeof v === 'function') continue;
