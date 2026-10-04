@@ -52,7 +52,15 @@ function visible(el) {
     const b = el.getBoundingClientRect();
     if (b.width < 4 || b.height < 4) return false;
     const cs = getComputedStyle(el);
-    return cs.visibility !== 'hidden' && cs.display !== 'none';
+    if (cs.visibility === 'hidden' || cs.display === 'none') return false;
+    // a box hidden under ANOTHER typing box (a widget's twin input drawn on top of it) is not the one
+    // the pupil sees: the one on top is
+    const x = b.left + b.width / 2, y = b.top + b.height / 2;
+    if (x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight) {
+        const top = document.elementFromPoint(x, y);
+        if (top && top !== el && !el.contains(top) && top.matches && top.matches('input, textarea, [contenteditable="true"]')) return false;
+    }
+    return true;
 }
 
 function valueOf(el) { return el.isContentEditable ? (el.textContent || '').trim() : String(el.value || '').trim(); }
