@@ -75,11 +75,14 @@ const visibleHost = (h) => h.offsetParent !== null || h.getClientRects().length 
 
 // Nothing else is in the way: the point at the middle of the box is the box itself (no pop-up,
 // hint or celebration covers it), and it is on screen.
-function uncovered(el) {
+function onScreen(el) {
     const b = el.getBoundingClientRect();
     const x = b.left + b.width / 2, y = b.top + b.height / 2;
-    if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return false;
-    const top = document.elementFromPoint(x, y);
+    return x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight;
+}
+function uncovered(el) {
+    const b = el.getBoundingClientRect();
+    const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
     return !!top && (top === el || el.contains(top));
 }
 
@@ -97,8 +100,13 @@ function selectIfLoose(active) {
         if (ae.matches('[tabindex]:not([tabindex="-1"]), [role="button"]') && !inProblem) return;
     }
     if (active.closest('[data-mq-swiperow]')) return;
-    if (!uncovered(active)) return;
-    try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+    // a box below the fold is scrolled to (gently, to its nearest edge); one on screen must not be covered
+    if (onScreen(active)) {
+        if (!uncovered(active)) return;
+        try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+    } else {
+        try { active.focus({ preventScroll: true }); active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
+    }
 }
 
 export function refreshActiveBox() {
