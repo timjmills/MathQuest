@@ -1682,3 +1682,12 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     }
 }
 html body :is(#questionCard, #worksheetView .problem-card, .qt-question-card) :is(input, textarea)::placeholder { color: transparent !important; }
+
+/* critic D4 (2026-10-04): the next-box glow is drawn INSIDE the box, so a neighbouring box or a row
+   edge can never cover or clip it; and a box still holding a wrong digit keeps its red (no yellow fill). */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView) .mq-active-box.mq-active-box.mq-active-box {
+    box-shadow: inset 0 0 0 3px #f2c200, inset 0 0 0 var(--mq-next-ring) rgba(242, 194, 0, 0.45) !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView) .mq-active-box.mq-active-box.mq-active-box.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg, #fde8e7) !important;
+}

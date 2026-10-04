@@ -10,6 +10,29 @@
 const HOSTS = '#questionCard, .online-edition .problem-card.mq-active-problem, .qt-question-card';
 const SKIP_TYPES = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
 const OPTIONAL = /carry|regroup/i;
+const isOptional = (el) => OPTIONAL.test(el.className) || /regroup|carry/i.test((el.closest('[data-mq-kind]') || el).getAttribute('data-mq-kind') || '');
+const DIGIT = 'input.mq-digit, input.column-answer-input';
+
+// Column digits are written ones first (SP-20, wireStackEntry): within one row of one stack the
+// next box is the RIGHTMOST empty one, so each row's digit boxes are listed right to left.
+function entryOrder(boxes) {
+    const out = [];
+    for (let i = 0; i < boxes.length; i++) {
+        const el = boxes[i];
+        if (!el.matches(DIGIT) || isOptional(el)) { out.push(el); continue; }
+        const stack = el.closest('.ws-stack, .column-problem, [data-mq-cell]') || el.parentElement;
+        const top = Math.round(el.getBoundingClientRect().top);
+        const run = [el];
+        while (i + 1 < boxes.length) {
+            const nx = boxes[i + 1];
+            if (!nx.matches(DIGIT) || isOptional(nx) || Math.round(nx.getBoundingClientRect().top) !== top
+                || (nx.closest('.ws-stack, .column-problem, [data-mq-cell]') || nx.parentElement) !== stack) break;
+            run.push(nx); i++;
+        }
+        out.push(...run.reverse());
+    }
+    return out;
+}
 
 function isAnswerBox(el) {
     if (!el || el.disabled || el.readOnly) return false;
@@ -36,7 +59,7 @@ function pickActive(host) {
     if (!boxes.length) return { boxes, active: null };
     const ae = document.activeElement;
     if (ae && boxes.includes(ae) && !ae.classList.contains('mq-live-correct')) return { boxes, active: ae };
-    const next = boxes.find(el => !valueOf(el) && !OPTIONAL.test(el.className) && !el.classList.contains('mq-live-correct'));
+    const next = entryOrder(boxes).find(el => !valueOf(el) && !isOptional(el) && !el.classList.contains('mq-live-correct'));
     return { boxes, active: next || null };
 }
 
@@ -49,8 +72,10 @@ export function refreshActiveBox() {
         const { active } = pickActive(host);
         if (active) keep.add(active);
     }
+    // Touch the class only when it changes: re-adding a class the box already has is still a DOM
+    // mutation, which would wake the observer every frame (critic D1).
     document.querySelectorAll('.mq-active-box').forEach(el => { if (!keep.has(el)) el.classList.remove('mq-active-box'); });
-    keep.forEach(el => el.classList.add('mq-active-box'));
+    keep.forEach(el => { if (!el.classList.contains('mq-active-box')) el.classList.add('mq-active-box'); });
 }
 
 function schedule() {
