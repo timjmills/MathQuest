@@ -352,3 +352,72 @@ when the hint modal closes, refocus the pulsing box (in the hint modal's close h
 - **C2:** R4-3 fixed.
 - **C3:** the 8 reflects the scroll moves under R4-1. It reaches 9 when they are gone, and 10 with D5 settled.
 - **C4:** unchanged from round 3 (the owner's ruling on the yellow and D5).
+
+---
+
+# Round 5 (commits 0321fd1, 07743c1)
+
+Critic: independent, Opus medium, 2026-10-04. Logs are in the scratchpad under `pulse-critic/r5/`. New probes:
+- `scen2.cjs`: taps without any pre-scroll by the probe, and Space / typing on buttons.
+- `nextq.cjs`: the next question after a Check tap.
+- `dot.cjs`: the rounding dot.
+- `steal.cjs`: now takes a host and a `WAIT` (400 ms and 3000 ms), so a later re-focus would be caught.
+
+## Verdict: FAIL (one defect, R5-1)
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+| Online worksheet, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+| Quiz, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+
+## R4 defects: closed (measured)
+
+- **R4-1 closed.**
+  - Ordering tiles: focus stays on `body` at +0.5 s and +3 s, with no scroll (`scen2` a2, 390 and 1280).
+  - `steal.cjs` full card 390: 0 scroll jumps. The only focus moves are coins (3, the widget's own, as at 1c60eda)
+    and the rounding dot (3).
+  - The rounding dot is a probe artifact, as the coordinator said. `circle.mq-rl-dot` is `visibility:hidden` at
+    x=−23 (`dot.cjs`), so no pupil can tap it. A tap on the real line (`.mq-rl svg`) keeps focus on `div.mq-rl`
+    at +0.5 s and +3 s.
+  - The worksheet at 390 matches the card at WAIT 400 and 3000.
+- **R4-2 closed.** A tap on the instruction at y=0 leaves y=0 at +0.5 s and +3 s (`scen2` b, 390 and 1280).
+  - Correction to round 4: `scen.cjs` row A scrolls the target into view itself before tapping
+    (`tap()` → `scrollIntoView`). Part of the round-4 jump was my probe's doing. `scen2` taps in place.
+- **R4-3 closed.** `missing.cjs` shows `mq-live-wrong mq-wrong-digit mq-wd-empty` on the empty tens box in all four
+  runs (motion and reduced motion, with and without the auto-focus delay). Flow at 390 shows a wrong active box
+  with `anim=none`, so it keeps its red.
+- **R4-4 closed.** After Hint is clicked and closed with Escape, typing "5" lands in the pulsing ones box
+  (values `["", "5"]`).
+
+## Regression checks
+
+- **Focused on load.**
+  - Full card 390 sweep: 442/443. The one miss, `order_greatest_to_least`, came 400 ms after the previous skill's
+    tile tap, inside the 800 ms guard. That is a harness artifact.
+  - `nextq.cjs`, real flow: after a right answer sent with a tap on Check, the next question's box is focused
+    (q2 / q3 / q4: BOX) at 390 and 1280.
+- **Worksheet 1280 sweep:** 455/455 pulsing, 0 order defects, 0 placeholders, 0 errors.
+- **Perf:** idle card `raf3s 0`, `recs {}`, 0.000 s.
+- **Flows:** card, worksheet and quiz at 390 are unchanged from round 3.
+- **`scen.cjs` 390:** zoom, idle at 31 s / 301 s, toasts and the end modal behave as in round 4.
+- **Console:** 0 errors.
+
+## R5-1 · major (C1 −1 on every host): Space on a focused button is hijacked into the box, so keyboard and switch users cannot press Hint, Read or Check
+- **Where:** `js/modules/active-box.js`, the new `keydown` capture listener in `installActiveBox()`. `' '` has
+  `e.key.length === 1`, and a button is not `TYPING`, so the listener moves focus to the pulsing box before the
+  button activates.
+- **Measured** (`scen2` c, 390 and 1280): focus is on `#hintBtn`. After pressing Space, the hint modal is not
+  open and focus is in `input.column-answer-input.mq-active-box`. The same path breaks Space on Check.
+  Switch-access devices and Chromebook keyboard users press buttons with Space. Many of the owner's SEN pupils use
+  these, and nothing on screen tells them why the button did nothing.
+- **Fix:** leave Space alone. At the top of the listener add `if (e.key === ' ') return;`. Also return when
+  `ae.matches('button, a[href], select, summary, [role="button"], [role="option"], [role="checkbox"], [role="radio"]')`
+  and the key is not a digit or a letter. Digits and letters should still go to the box (R4-4).
+- **Proof:** in `scen2.cjs` row c, "Space on focused Hint" shows `modal: true` and focus still on `#hintBtn`, and
+  row d still shows `"5"` in the box.
+
+## What raises each score to 10
+- **C1:** R5-1 fixed.
+- **C2 and C3 (now 9):** the owner's ruling on D5, the worksheet card that pulses beside the box.
+- **C4:** unchanged (the owner's ruling on the yellow inside the B&W cell).

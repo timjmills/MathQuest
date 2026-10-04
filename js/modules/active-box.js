@@ -164,9 +164,12 @@ export function installActiveBox() {
     // button) goes into the pulsing box instead of being lost (critic R4-4). Count-by rows on a phone
     // have their own digit-key rule.
     document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey || e.metaKey || e.altKey || !e.key || e.key.length !== 1) return;
+        if (e.ctrlKey || e.metaKey || e.altKey || !e.key || e.key.length !== 1 || e.key === ' ') return;
         const ae = document.activeElement;
         if (ae && ae.matches && ae.matches(TYPING)) return;
+        // on a button, link or option only a digit or a letter goes to the box: Space, Enter and
+        // punctuation keep pressing the control (switch-access and keyboard pupils, critic R5-1)
+        if (ae && ae.matches && ae.matches('button, a[href], select, [role="button"], [role="option"]') && !/^[0-9a-z]$/i.test(e.key)) return;
         const box = document.querySelector('.mq-active-box');
         if (!box || box.closest('[data-mq-swiperow]') || !onScreen(box) || !uncovered(box)) return;
         try { box.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
