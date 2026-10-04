@@ -59,7 +59,11 @@ function pickActive(host) {
     if (!boxes.length) return { boxes, active: null };
     const ae = document.activeElement;
     if (ae && boxes.includes(ae) && !ae.classList.contains('mq-live-correct')) return { boxes, active: ae };
-    const next = entryOrder(boxes).find(el => !valueOf(el) && !isOptional(el) && !el.classList.contains('mq-live-correct'));
+    // A word-problem box the pupil copies a story number into, where that place holds no digit
+    // (data-mq-expect=""), must stay blank — pulsing it would invite a wrong digit (critic D6). Only
+    // these copy boxes: skipping blank ANSWER boxes would reveal how many digits the answer has.
+    const mustStayBlank = (el) => el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '';
+    const next = entryOrder(boxes).find(el => !valueOf(el) && !isOptional(el) && !mustStayBlank(el) && !el.classList.contains('mq-live-correct'));
     return { boxes, active: next || null };
 }
 

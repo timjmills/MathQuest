@@ -119,3 +119,75 @@ Wave 1 1.2) beside the pulsing box. It is the approved earlier design, so it cos
 - **C3:** D4 fixed.
 - **C4:** D4 fixed. The yellow stays in the screen-only feedback band SP-30 allows. Print is unaffected
   (`@media print` rule at screen-cell.css:1362).
+
+---
+
+# Round 2 (commit c4d5d68)
+
+Critic: independent, Opus medium, 2026-10-04. I re-ran my own probes one at a time through
+`/tmp/mq-browser-run.sh`. Logs are in the scratchpad under `pulse-critic/r2/`. One new probe,
+`pulse-critic/expect.cjs`, asks of every word-problem skill whether the pulsing box expects a value.
+
+## Verdict: FAIL (one defect left, D6)
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 1280 and 390 | 8 | 7 | 9 | 8 | no |
+| Online worksheet, 1280 and 390 | 7 | 7 | 9 | 8 | no |
+| Quiz, 1280 and 390 | 7 | 7 | 9 | 8 | no |
+
+## Round 1 defects: all closed (measured)
+
+- **D1 closed.** `perf.cjs`, idle card with a box active: `raf3s 0`, `recs {}`, ScriptDuration 0.000 s.
+  - In `flow.cjs` the idle readings are 0/0 on card and quiz at both widths.
+  - On the worksheet they are 1–2 rAF and ≤ 34 mutations per 2 s. Those come from the worksheet's own widgets,
+    not a loop.
+- **D2 closed.** Card blurred before typing: the ones box pulses (x=667 at 1280, x=219 at 390), the tens box
+  does not.
+  - Worksheet stacks start on the ones box (`zoom-ws-stack-390.png`).
+  - Order defects from `sweep.cjs`: card 1280 0, card 390 0, worksheet 390 0. The coordinator reports worksheet
+    1280 and quiz 390 as 0.
+- **D3 closed.** No regroup or carry box pulses in any sweep.
+- **D4 closed.** In `zoom-ws-stack-390.png` and `zoom-wp-regroup-390.png` the ring is inside the box and closed
+  on all four sides. No neighbour overpaints it and no row clips it.
+- **Extra closed.** A focused `.mq-live-wrong` box keeps its red fill.
+- **Still true:**
+  - Exactly one box is active. Card 1280 428/428, card 390 428/428, worksheet 390 455/455, all moving, 0 errors,
+    0 visible placeholders.
+  - A right box never pulses (case 2), and a red box tapped clear becomes next (case 3b).
+  - Home and Skills Navigator inputs never pulse.
+  - Reduced motion is steady: `animation: none`, `#fff3a0`, inset ring 5 px.
+  - 0 console errors in every run.
+
+## D6 · major (C2 −1 on all hosts; C1 −1 on worksheet and quiz): the pulse lands on a word-work box that must stay EMPTY
+
+- **Where:** `js/modules/active-box.js`, `pickActive()`, the `next` search. Word-work operand boxes are
+  `input.mq-wwork` with `data-mq-expect` (sheet/cells/word-work.js:579). A box the item does not use carries
+  `data-mq-expect=""`.
+- **Measured:**
+  - `expect.cjs quiz`, 1280, at question start: in **24 of 46** word-problem skills the pulsing box expects
+    nothing. Those are every `add_wp_*` / `add_wp_*_plain`, `add/sub_word_problems(_plain)`,
+    `mult_word_problems(_plain)`, `word_problems_mixed_plain` and `multi_step_word_plain`.
+  - Example, `add_wp_10` (2 + 4): the pulse sits on the TENS box of the top row (worksheet x=232, quiz x=609 at
+    1280, crop `zoom-wp-regroup-390.png`). The "2" belongs in the ones box beside it. A pupil who follows the
+    pulse writes 2 in the tens place, which reads as 20.
+  - The card shows the same thing after any blur (flow-card-1280 / 390 `add_wp_10` "blur" step). The worksheet
+    and quiz show it at the start, because they do not autofocus.
+  - In round 1 the regroup box sat in this spot. D3 moved the pulse one box down, onto another box that must
+    stay blank.
+- **Fix:** in `pickActive()`, skip word-work boxes the item does not use. For example, add
+  `&& !(el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '')` to the `next` predicate,
+  next to `!isOptional(el)`.
+  - Restrict it to `input.mq-wwork`. Do not apply it to the answer row (`.mq-wwans` / host digit boxes).
+    Skipping blank answer digits would tell the pupil how many digits the answer has.
+  - The operand rows hold numbers given in the story, so skipping them leaks nothing.
+- **Proof:** `expect.cjs quiz` and `expect.cjs card` (the card variant blurs first) print
+  `pulsing a word-work box that expects NOTHING: 0`. The `sweep.cjs` order checks stay at 0.
+
+## What raises each score to 10
+- **C1 and C2:** D6 fixed, so on every host and every skill the first pulse is a box the pupil must fill.
+- **C3:** at 9 now. The inset halo grows to 9 px inside the box. On the small regroup-size boxes that tints the
+  glyph area while the pupil types. To reach 10, cap the inner halo at 6 px: keyframes 50%
+  `--mq-next-ring: 6px`.
+- **C4:** at 8. The highlight is screen-only and allowed by SP-30. To reach 10, the owner needs to rule on D5:
+  the worksheet card pulses beside the box, so the worksheet shows two pulsing things.

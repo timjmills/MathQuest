@@ -1669,7 +1669,7 @@ html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss {
 @property --mq-next-fill { syntax: '<color>'; inherits: false; initial-value: #fff3a0; }
 @keyframes mq-next-glow {
     0%, 100% { --mq-next-ring: 3px; --mq-next-fill: #fff3a0; }
-    50%      { --mq-next-ring: 9px; --mq-next-fill: #ffe14d; }
+    50%      { --mq-next-ring: 6px; --mq-next-fill: #ffe14d; }
 }
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView) .mq-active-box.mq-active-box.mq-active-box {
     background-color: var(--mq-next-fill) !important;
