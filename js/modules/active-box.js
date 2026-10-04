@@ -104,6 +104,7 @@ function uncovered(el) {
 // never scrolled to after a tap — only on load or a re-render (critic R4-2).
 let lastTap = { t: 0, target: null };
 let lastInput = { t: 0, el: null };
+const swipeOffered = new WeakSet();
 function isTapTarget(el) {
     for (let n = el; n && n !== document.body; n = n.parentElement) {
         if (n.matches && n.matches(HOSTS + ', ' + POPUP)) return false;
@@ -132,7 +133,15 @@ function selectIfLoose(active) {
         const inProblem = ae.closest(HOSTS + ', ' + POPUP) || ae.matches(HOSTS + ', ' + POPUP);
         if (ae.matches('[tabindex]:not([tabindex="-1"]), [role="button"]') && !inProblem) return;
     }
-    if (active.closest('[data-mq-swiperow]')) return;
+    // A count-by row manages its own focus: it accepts a box its start shows and holds back one it
+    // does not (then the first digit typed goes there). Offer each such box the focus ONCE, so the row
+    // can make that choice — a refusal must not be retried every frame.
+    if (active.closest('[data-mq-swiperow]')) {
+        if (swipeOffered.has(active)) return;
+        swipeOffered.add(active);
+        try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+        return;
+    }
     // a box below the fold is scrolled to (gently, to its nearest edge); one on screen must not be covered
     if (onScreen(active)) {
         if (!uncovered(active)) return;
