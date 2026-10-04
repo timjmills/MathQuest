@@ -40,7 +40,7 @@ const _full = (vals) => vals.every((v) => v !== null);
 
 /**
  * verdicts[r][p]: true (right for this row), false (wrong), null (empty, or a printed number).
- * A whole row is right when it is a fact of the family no earlier row has already written.
+ * A whole row is right when it is a fact of the family that no other row already holds.
  */
 export function judgeFamily(data, values) {
     const facts = familyFacts(data);
@@ -48,8 +48,12 @@ export function judgeFamily(data, values) {
     // claim[r]: the fact (by its place in facts[op]) that finished row r holds
     const claim = rows.map(() => null);
     const taken = new Set();
-    // pass 1: every finished row that is a fact claims it, first come first served
-    rows.forEach((row, r) => {
+    // pass 1: every finished row that is a fact claims it. A row whose printed numbers leave it fewer
+    // facts claims first (critic D2), then rows top to bottom: of two rows holding the same fact, the
+    // lower one on the page is the repeat that turns red.
+    const order = rows.map((row, r) => r).sort((x, y) => rows[y].given.filter(Boolean).length - rows[x].given.filter(Boolean).length || x - y);
+    order.forEach((r) => {
+        const row = rows[r];
         if (!_full(row.vals)) return;
         const i = (facts[row.op] || []).findIndex((x, k) => _fits(x, row.vals) && !taken.has(row.op + '|' + k));
         if (i >= 0) { claim[r] = i; taken.add(row.op + '|' + i); }
