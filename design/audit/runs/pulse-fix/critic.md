@@ -191,3 +191,43 @@ Critic: independent, Opus medium, 2026-10-04. I re-ran my own probes one at a ti
   `--mq-next-ring: 6px`.
 - **C4:** at 8. The highlight is screen-only and allowed by SP-30. To reach 10, the owner needs to rule on D5:
   the worksheet card pulses beside the box, so the worksheet shows two pulsing things.
+
+---
+
+# Round 3 (commit 1c60eda)
+
+Critic: independent, Opus medium, 2026-10-04. Re-run one at a time. Logs are in the scratchpad under
+`pulse-critic/r3/`.
+
+## Verdict: PASS
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+| Online worksheet, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+| Quiz, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+
+## Measured
+
+- **D6 closed.** `expect.cjs` reports 0 of 46 word-problem skills pulsing a box that expects nothing, both on
+  the quiz at start and on the card after a blur.
+  - On both hosts `firstNeededIsActive` is true, and the pulsing box expects a digit (for example `add_wp_10`
+    expects "2" or "4").
+  - `zoom-wp-regroup-390.png` shows the ones box of the top row pulsing.
+  - The skip applies only to `input.mq-wwork` copy boxes (active-box.js `mustStayBlank`). Blank answer boxes are
+    never skipped, so the pulse does not reveal how many digits the answer has.
+- **Glow cap.** Over 1.2 s the inner glow runs from 3 to 6 px (inset). Reduced motion stays steady at 5 px with
+  `animation: none`.
+- **Regression checks.**
+  - Card 390: 428/428 skills with exactly one box pulsing and moving, 0 order defects.
+  - Worksheet 1280: 455/455, 0 order defects.
+  - Both sweeps: 0 visible placeholders and 0 errors.
+  - Perf on the idle card with a box active: `raf3s 0`, `recs {}`, ScriptDuration 0.000 s.
+  - 0 console errors in every run.
+
+## What keeps it below 10 (no defect costs a pass)
+- **C1, C2 and C3 at 9:** the worksheet's current problem card still pulses beside the box (D5). An owner
+  ruling decides whether to make the card highlight steady.
+- **C4 at 8:** the yellow highlight is screen-only feedback chrome inside the B&W cell, which SP-30 allows. It
+  reaches 10 only if the owner rules on D5 and approves the yellow inside the cell, or swaps it for an ink-only
+  cue.
