@@ -1691,3 +1691,12 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box.mq-live-wrong {
     background-color: var(--mq-box-bad-bg, #fde8e7) !important;
 }
+
+/* critic R4-3 (2026-10-04): a box judged wrong or missing keeps its red mark even while it is the next
+   box (the caret sits in it): the yellow fill, ring and pulse give way to the A2/A3 marks. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit) {
+    animation: none !important;
+    box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
+    border-color: var(--mq-box-bad, #B3261E) !important;
+}

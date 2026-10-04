@@ -231,3 +231,124 @@ Critic: independent, Opus medium, 2026-10-04. Re-run one at a time. Logs are in 
 - **C4 at 8:** the yellow highlight is screen-only feedback chrome inside the B&W cell, which SP-30 allows. It
   reaches 10 only if the owner rules on D5 and approves the yellow inside the cell, or swaps it for an ink-only
   cue.
+
+---
+
+# Round 4 (commits aca0560..5fab1b7: auto-select, no pop-ups over play)
+
+Critic: independent, Opus medium, 2026-10-04. I ran my probes one at a time. Logs are in the scratchpad under
+`pulse-critic/r4/`. New probes:
+- `steal.cjs`: every skill on the card. It blurs, taps the first non-button tap target, and records where focus
+  and scroll land.
+- `scen.cjs`: blank tap after scrolling up, Hint / Read / Check, count row, zoom, idle timing, toasts and the
+  end modal.
+- `missing.cjs`: a missing digit at Check.
+
+HEAD 6f74ef3 differs from 5fab1b7 only in evidence PNGs.
+
+## Verdict: FAIL
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 | 6 | 7 | 8 | 8 | no |
+| Practice card, 1280 | 7 | 7 | 8 | 8 | no |
+| Online worksheet, 1280 and 390 | 7 | 8 | 8 | 8 | no |
+| Quiz, 1280 and 390 | 7 | 8 | 8 | 8 | no |
+
+The worksheet and quiz C1 score is inferred. They share `selectIfLoose()` with the card, and the R4-1 tap targets
+(ordering tiles, rounding dots) render on them too. I did not sweep them separately, so I scored them down.
+
+## Gates
+
+| Gate | Result |
+|---|---|
+| wave1-a-probe | exit 0 |
+| wave1-a2-perbox | exit 0 |
+| **wave1-a3-wrongdigits** | **FAIL**, see R4-3 |
+| ws-screen-answer | exit 0 |
+| test-wrong-retry-skip | exit 0 |
+| hint-popup-e2e | ALL CHECKS PASSED (run against a server on :8765; the first run had none) |
+| wave1-c2-phone | exit 0 |
+
+## What works (measured)
+
+- **Focused on load.** Card 390 and 1280: 443/443 skills with a pulsing box have it focused. 0 console errors.
+- **Buttons keep focus.** Read and Hint keep their own focus. The hint modal opens (`.hint-modal-card`) and the
+  hint-popup-e2e gate passes. Check (wrong answer) keeps focus on `#qcCheckBtn`.
+- **No loop.** A count row samples one focus 10 times over 2 s. Idle script time is 0.000 s over 3 s. Perf on the
+  idle card: `raf3s 0`, `recs {}`.
+- **Zoom.** The pop-up holds the only active box (1 inside, 1 in total). Closing it returns focus to the card box.
+- **Idle timing.** At 31 s the timer pauses, with no modal and no nudge. At 301 s the idle modal shows. Dismissing
+  it returns focus to the box.
+- **Toasts and end modal.** A plain toast is suppressed. The XP toast shows with `pointer-events: none`. The
+  end-of-session modal still shows ("Done", score, Play again / Home; `scen-end-390.png`). The box behind it is
+  not focused.
+
+## Defects
+
+### R4-1 · major (card C1 −2 at 390, −1 at 1280; worksheet / quiz C1 −1): tapping a tap target throws the focus into a typing box
+- **Where:** `js/modules/active-box.js` `selectIfLoose()`. A tap on a non-focusable tap target (a `div` with
+  `onclick`, or an SVG `circle`) leaves focus on `body`, so the code treats it as a "blank tap".
+- **Measured** (`steal.cjs`, card): in 14 skills a tap on the widget moves focus into an input.
+  - **Ordering tiles**, 8 skills: `order_negatives`, `order_fractions`, `order_decimals`, `order_fdp`,
+    `conversions_all`, `order_least_to_greatest`, `order_greatest_to_least`, `all_domains_mixed`. The tile
+    `div.ordering-tile[onclick]` sends focus to `input.order-input-box`. At 390 the page also scrolls 67–82 px on
+    every tile tap.
+  - **Rounding number-line dots**, 3 skills: `round_nl_thousands`, `round_nl_ten_thousands`,
+    `round_nl_hundred_thousands`. `circle.mq-rl-dot` sends focus to `input.ib-cell`.
+  - **Coin taps**, 3 skills: `money_count`, `coin_value`, `money_notation`. These move focus to
+    `input.tm-cointap-in`, but that is the widget's own behaviour: it does the same at 1c60eda, so it is not
+    charged here.
+  - Baseline at 1c60eda (same probe, same skills): ordering and rounding taps leave focus alone.
+  - On a phone, every tile or dot tap now raises the soft keyboard over the widget the pupil is using, and moves
+    the page.
+- **Fix:** in `installActiveBox()`, record the last `pointerdown` target in a capture listener:
+  `lastDown = { t: e.target, at: Date.now() }`. In `selectIfLoose()`, return early when `Date.now() - lastDown.at < 800`
+  and the target or an ancestor inside the host is a tap target. Test that with
+  `closest('[onclick], [draggable="true"], [role="button"], [data-order-value], circle, svg [class], label')`, or
+  with `getComputedStyle(x).cursor` being `pointer` or `grab` on the target or an ancestor up to the host. Only a
+  pointerdown on a plain region (text, cell background, card padding) counts as a blank tap.
+- **Proof:** `steal.cjs 390` and `steal.cjs 1280` report `focus moved to a box after the tap` = 3 (the coin widget
+  only) and `scroll jump >40px` = 0.
+
+### R4-2 · major (card C1 −1 at 390): a blank tap after scrolling up jumps the page back down to the box
+- **Where:** `selectIfLoose()`. The off-screen branch calls `scrollIntoView({block:'nearest'})`.
+- **Measured** (`scen.cjs`, `add_wp_100`): the pupil scrolls to the top (y=0) to reread the story, then taps the
+  instruction or the story text. Focus goes to the box and the page jumps to y=352 at 390 (y=202 at 1280). Tapping
+  the story again leaves it at y=413. A pupil reading the story is pulled away from it by every tap.
+- **Fix:** scroll to an off-screen box only on load and after a re-render, never after a pupil tap. When the
+  trigger was a `pointerdown` within 800 ms (the same `lastDown` as R4-1) and the box is off screen, either skip
+  `selectIfLoose()` (the box still pulses), or focus with `preventScroll: true` and do not call `scrollIntoView`.
+  Skipping is better on phones, because a programmatic focus there can raise the keyboard and scroll anyway.
+- **Proof:** in `scen.cjs` the "blank tap on the text after scroll-up" rows keep `y` within 40 px of `y0` at 390
+  and 1280. The "load word problem" row still shows the box focused.
+
+### R4-3 · major (card C2 −1; it fails a gate): a missing digit is no longer marked red at Check (wave1-a3-wrongdigits FAIL)
+- **Where:** the gate reports `FAIL [390 card add_100_regroup reduced-motion] a missing digit at Check: its empty
+  box is marked red`. The box has `bad:false, empty:false`.
+- **Measured** (`missing.cjs`): the pupil fills the ones box, blurs, and Check runs.
+  - If Check runs before the next frame, the tens box is marked
+    (`mq-live-wrong mq-wrong-digit mq-wd-empty`).
+  - Once auto-focus has put the caret in the empty tens box (150 ms later, and on every reduced-motion run), the
+    box stays unmarked (`mq-active-box` only). The feedback still says "Not yet", but the missing digit is not
+    shown in red.
+  - At 1c60eda the same thing happens when the empty box is focused by hand. So the checker already skips a
+    focused empty box. Auto-select now makes that state the normal one after any blur, which is why the A3
+    missing-digit cue disappears.
+- **Fix** (in the checker, not the gate): make `markMissingDigits()` (screen-cell.js:928) mark a focused empty box
+  too. Trace why the card's Check path leaves the focused box unmarked or unmarks it; `answer-check.js:1161` is
+  the call. A pulse on a red empty box is fine: the red-fill override for `.mq-active-box.mq-live-wrong` already
+  exists. Alternatively, have `selectIfLoose()` leave the focus alone for 400 ms after a Check press.
+- **Proof:** `node tests/scripts/wave1-a3-wrongdigits.cjs` exits 0. `missing.cjs` shows `mq-wd-empty` on the tens
+  box in all four rows.
+
+### R4-4 · minor (no score cost): after Hint / Read, typing goes nowhere until the pupil taps the box
+After the hint modal closes, focus stays on `#hintBtn`. That follows the "buttons keep focus" rule, and on touch
+devices the button does not hold focus anyway. On a Chromebook keyboard the first keystrokes are lost. Option:
+when the hint modal closes, refocus the pulsing box (in the hint modal's close handler).
+
+## What raises each score to 10
+- **C1:** R4-1 and R4-2 fixed, and R4-4 handled.
+- **C2:** R4-3 fixed.
+- **C3:** the 8 reflects the scroll moves under R4-1. It reaches 9 when they are gone, and 10 with D5 settled.
+- **C4:** unchanged from round 3 (the owner's ruling on the yellow and D5).

@@ -99,7 +99,23 @@ function uncovered(el) {
 // takes it, so typing always lands there. A pupil who taps a button, another box or a pop-up keeps
 // that focus. A count-by row on a phone manages its own focus (it holds back a box the start does
 // not show), so its boxes are never auto-focused here.
+// The pupil's last tap. A tap on a widget (a tile, a dot, a coin, a drawing) is the pupil working
+// THERE: focus is not pulled back into a typing box for it (critic R4-1), and a box off screen is
+// never scrolled to after a tap — only on load or a re-render (critic R4-2).
+let lastTap = { t: 0, target: null };
+function isTapTarget(el) {
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+        if (n.matches && n.matches(HOSTS + ', ' + POPUP)) return false;
+        if (n.matches && n.matches('[onclick], [draggable="true"], [role="button"], [role="option"], svg, label, button, a[href], select')) return true;
+        const c = getComputedStyle(n).cursor;
+        if (c === 'pointer' || c === 'grab' || c === 'grabbing' || c === 'move') return true;
+    }
+    return false;
+}
+
 function selectIfLoose(active) {
+    const sinceTap = Date.now() - lastTap.t;
+    if (sinceTap < 800 && lastTap.target && isTapTarget(lastTap.target)) return;
     const ae = document.activeElement;
     if (ae && ae !== document.body && ae !== document.documentElement && ae.matches) {
         if (ae.matches(TYPING) || ae.matches('button, a[href], select')) return;          // the pupil chose that
@@ -113,6 +129,7 @@ function selectIfLoose(active) {
         if (!uncovered(active)) return;
         try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
     } else {
+        if (sinceTap < 1500) return;   // the pupil scrolled away and tapped: leave the page where they put it
         try { active.focus({ preventScroll: true }); active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
     }
 }
@@ -142,6 +159,18 @@ function schedule() {
 export function installActiveBox() {
     if (typeof document === 'undefined' || window.__mqActiveBoxInstalled) return;
     window.__mqActiveBoxInstalled = true;
+    document.addEventListener('pointerdown', (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
+    // A key typed while no typing place has the focus (after a hint pop-up closes, after a tap on a
+    // button) goes into the pulsing box instead of being lost (critic R4-4). Count-by rows on a phone
+    // have their own digit-key rule.
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey || e.altKey || !e.key || e.key.length !== 1) return;
+        const ae = document.activeElement;
+        if (ae && ae.matches && ae.matches(TYPING)) return;
+        const box = document.querySelector('.mq-active-box');
+        if (!box || box.closest('[data-mq-swiperow]') || !onScreen(box) || !uncovered(box)) return;
+        try { box.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
+    }, true);
     for (const ev of ['focusin', 'focusout', 'input', 'change', 'click']) document.addEventListener(ev, schedule, true);
     // Questions are re-rendered by many code paths; watch the DOM rather than hooking each one.
     const mo = new MutationObserver(schedule);
