@@ -318,7 +318,9 @@ export function renderQuestionDots() {
     // otherwise grow with the answered + current count.
     const answered = (state.questionHistory || []).length;
     const current = state.qCount || 0;
-    const fixed = state.problemCount > 0 ? state.problemCount : 0;
+    // "Unlimited" is stored as problemCount 999999 (share-code N0): that is no fixed length — drawing a
+    // dot per question made a 285,000 px row that pushed the card off the screen (owner report 2026-10-04).
+    const fixed = state.problemCount > 0 && state.problemCount < 1000 ? state.problemCount : 0;
     const total = fixed > 0 ? fixed : Math.max(answered, current);
     if (total <= 0) { row.innerHTML = ''; return; }
     const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
