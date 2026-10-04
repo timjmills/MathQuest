@@ -103,6 +103,7 @@ function uncovered(el) {
 // THERE: focus is not pulled back into a typing box for it (critic R4-1), and a box off screen is
 // never scrolled to after a tap — only on load or a re-render (critic R4-2).
 let lastTap = { t: 0, target: null };
+let lastInput = { t: 0, el: null };
 function isTapTarget(el) {
     for (let n = el; n && n !== document.body; n = n.parentElement) {
         if (n.matches && n.matches(HOSTS + ', ' + POPUP)) return false;
@@ -117,6 +118,14 @@ function selectIfLoose(active) {
     const sinceTap = Date.now() - lastTap.t;
     if (sinceTap < 800 && lastTap.target && isTapTarget(lastTap.target)) return;
     const ae = document.activeElement;
+    // the box the pupil has just filled RIGHT (it turned green as they typed) hands the caret on to the
+    // next box, so the next number goes where it belongs (owner 2026-10-04: "move to the blank box")
+    const justRight = ae && ae !== active && ae.classList && ae.classList.contains('mq-live-correct')
+        && ae === lastInput.el && Date.now() - lastInput.t < 1500;
+    if (justRight) {
+        try { active.focus({ preventScroll: !onScreen(active) ? false : true }); } catch (e) { /* ignore */ }
+        return;
+    }
     if (ae && ae !== document.body && ae !== document.documentElement && ae.matches) {
         if (ae.matches(TYPING) || ae.matches('button, a[href], select')) return;          // the pupil chose that
         // a focusable WRAPPER (a card, a cell) is a blank part of the problem: it does not hold the focus
@@ -160,6 +169,8 @@ export function installActiveBox() {
     if (typeof document === 'undefined' || window.__mqActiveBoxInstalled) return;
     window.__mqActiveBoxInstalled = true;
     for (const ev of ['pointerdown', 'mousedown', 'touchstart', 'click']) document.addEventListener(ev, (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
+    // only the box the pupil is typing in (widgets re-fire input on a hidden combined box afterwards)
+    document.addEventListener('input', (e) => { if (e.target === document.activeElement) lastInput = { t: Date.now(), el: e.target }; }, true);
     // A key typed while no typing place has the focus (after a hint pop-up closes, after a tap on a
     // button) goes into the pulsing box instead of being lost (critic R4-4). Count-by rows on a phone
     // have their own digit-key rule.
