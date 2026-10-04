@@ -1700,3 +1700,8 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
     border-color: var(--mq-box-bad, #B3261E) !important;
 }
+
+/* Touch dots floor (SF-34, owner 2026-10-04: "worksheet mode touchpoints might be too small"): a grid
+   cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
+   size, so each dot is big enough to see and touch. Additive. */
+.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
