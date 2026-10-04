@@ -804,7 +804,10 @@ export function nextQuestion() {
     // Show worked-example preview on the very first question of a new skill
     // in this session (gradual release: I do → we do → you do).
     // Only fires in practice/boss/race modes — worksheet/MAP have their own flows.
-    if (typeof window !== 'undefined' && typeof window.shouldShowPreview === 'function') {
+    // Owner 2026-10-04: no pop-up may cover the answer box during play, so the worked preview no longer
+    // opens by itself; the pupil or teacher opens it from "Show me how" (launch-chrome.js).
+    const AUTO_WORKED_PREVIEW = false;
+    if (AUTO_WORKED_PREVIEW && typeof window !== 'undefined' && typeof window.shouldShowPreview === 'function') {
         if (state.qCount === 1
             && state.currentQ
             && ['practice', 'boss', 'race'].includes(state.gameMode)

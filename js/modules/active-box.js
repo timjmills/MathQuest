@@ -8,6 +8,9 @@
 // Screen only: print never runs this.
 
 const HOSTS = '#questionCard, .online-edition .problem-card.mq-active-problem, .qt-question-card';
+// The enlarge (zoom) pop-up copies a problem's answer boxes; while it is open it is the ONLY host.
+const POPUP = '.zoom-overlay .zoom-content';
+const TYPING = 'input, textarea, select, [contenteditable="true"]';
 const SKIP_TYPES = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
 const OPTIONAL = /carry|regroup/i;
 const isOptional = (el) => OPTIONAL.test(el.className) || /regroup|carry/i.test((el.closest('[data-mq-kind]') || el).getAttribute('data-mq-kind') || '');
@@ -68,9 +71,40 @@ function pickActive(host) {
 }
 
 let queued = false;
+const visibleHost = (h) => h.offsetParent !== null || h.getClientRects().length > 0;
+
+// Nothing else is in the way: the point at the middle of the box is the box itself (no pop-up,
+// hint or celebration covers it), and it is on screen.
+function uncovered(el) {
+    const b = el.getBoundingClientRect();
+    const x = b.left + b.width / 2, y = b.top + b.height / 2;
+    if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return false;
+    const top = document.elementFromPoint(x, y);
+    return !!top && (top === el || el.contains(top));
+}
+
+// The next box is SELECTED, not only lit (owner 2026-10-04): when no typing place has the focus —
+// on load, after a re-render, or when the pupil taps a blank part of the screen — the pulsing box
+// takes it, so typing always lands there. A pupil who taps a button, another box or a pop-up keeps
+// that focus. A count-by row on a phone manages its own focus (it holds back a box the start does
+// not show), so its boxes are never auto-focused here.
+function selectIfLoose(active) {
+    const ae = document.activeElement;
+    if (ae && ae !== document.body && ae !== document.documentElement && ae.matches) {
+        if (ae.matches(TYPING) || ae.matches('button, a[href], select')) return;          // the pupil chose that
+        // a focusable WRAPPER (a card, a cell) is a blank part of the problem: it does not hold the focus
+        const inProblem = ae.closest(HOSTS + ', ' + POPUP) || ae.matches(HOSTS + ', ' + POPUP);
+        if (ae.matches('[tabindex]:not([tabindex="-1"]), [role="button"]') && !inProblem) return;
+    }
+    if (active.closest('[data-mq-swiperow]')) return;
+    if (!uncovered(active)) return;
+    try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+}
+
 export function refreshActiveBox() {
     if (typeof document === 'undefined') return;
-    const hosts = [...document.querySelectorAll(HOSTS)].filter(h => h.offsetParent !== null || h.getClientRects().length);
+    const popups = [...document.querySelectorAll(POPUP)].filter(visibleHost);
+    const hosts = popups.length ? popups.slice(-1) : [...document.querySelectorAll(HOSTS)].filter(visibleHost);
     const keep = new Set();
     for (const host of hosts) {
         const { active } = pickActive(host);
@@ -80,6 +114,7 @@ export function refreshActiveBox() {
     // mutation, which would wake the observer every frame (critic D1).
     document.querySelectorAll('.mq-active-box').forEach(el => { if (!keep.has(el)) el.classList.remove('mq-active-box'); });
     keep.forEach(el => { if (!el.classList.contains('mq-active-box')) el.classList.add('mq-active-box'); });
+    if (keep.size === 1) selectIfLoose([...keep][0]);
 }
 
 function schedule() {

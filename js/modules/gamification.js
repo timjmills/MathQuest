@@ -577,8 +577,14 @@ export function toggleCelebrations(enabled) {
     savePersistentData();
 }
 
+// Pupil play (owner 2026-10-04): nothing may cover the answer box or take the typing focus. During play
+// the only pop-ups are the XP message after a right answer (it leaves by itself) and the idle nudge after
+// 5 minutes without activity.
+const _inPupilPlay = () => typeof document !== 'undefined' && ['gameView', 'worksheetView', 'quizTakeView']
+    .some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); });
 export function showCelebrationModal({ emoji, title, message, subMessage, autoDismissMs }) {
     if (!state.celebrationsEnabled) return;
+    if (_inPupilPlay()) return;
     // Brief mascot cheer on every celebration trigger.
     if (typeof window !== 'undefined' && typeof window.flashMascotCheer === 'function') {
         window.flashMascotCheer(title || message);
@@ -796,7 +802,8 @@ export function getSessionTimeFormatted() {
 }
 
 // ===== GAME STATS BANNER =====
-const IDLE_THRESHOLD_MS = 30000; // 30 seconds of no interaction → idle + modal
+const IDLE_THRESHOLD_MS = 30000; // 30 seconds of no interaction → the timer pauses (gauge shows it)
+const IDLE_MODAL_MS = 300000;    // 5 minutes of no interaction → the idle pop-up (owner 2026-10-04)
 const EFFORT_PER_10SEC = 1;      // +1 effort every 10s of active time
 const EFFORT_PER_ATTEMPT = 5;    // +5 for trying any question
 const EFFORT_PER_CORRECT = 3;    // +3 bonus on top of attempt for correct
@@ -1025,9 +1032,11 @@ export function startBannerTimer() {
                 // "redirecting" away from the MAP selector.
                 const gameViewActive = document.getElementById('gameView') &&
                     document.getElementById('gameView').classList.contains('active');
-                if (!state._idleModalShown && gameViewActive && document.body.classList.contains('student-mode')) {
-                    showIdleModal();
-                }
+            }
+            if (timeSinceInteraction >= IDLE_MODAL_MS && !state._idleModalShown
+                && document.getElementById('gameView') && document.getElementById('gameView').classList.contains('active')
+                && document.body.classList.contains('student-mode')) {
+                showIdleModal();
             }
         } else {
             // Active — accumulate time (unless frozen)
@@ -1753,6 +1762,7 @@ const NUDGE_MESSAGES = [
 ];
 
 function showNudgePopup() {
+    if (_inPupilPlay()) return;   // the gauge still shows the off-task alert; no pop-up over the work
     // Remove existing popup if any
     dismissNudgePopup();
 
