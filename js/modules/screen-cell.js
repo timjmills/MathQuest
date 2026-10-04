@@ -520,6 +520,8 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
  * neutral whatever is typed. The expected values live in a WeakMap, never in the page's markup.
  */
 const LIVE_EXPECT = new WeakMap();
+// test hook (read-only): the answers a live box accepts — lets the browser sweeps type a right answer
+if (typeof window !== 'undefined') window.__mqLiveExpect = (el) => (LIVE_EXPECT.get(el) || null);
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
 /*
