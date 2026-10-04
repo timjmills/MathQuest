@@ -421,3 +421,84 @@ Critic: independent, Opus medium, 2026-10-04. Logs are in the scratchpad under `
 - **C1:** R5-1 fixed.
 - **C2 and C3 (now 9):** the owner's ruling on D5, the worksheet card that pulses beside the box.
 - **C4:** unchanged (the owner's ruling on the yellow inside the B&W cell).
+
+---
+
+# Round 6 (head bdf53f6: R5-1 fix, caret moves on after a right answer, Listen reads the whole box)
+
+Critic: independent, Opus medium, 2026-10-04. Logs are in the scratchpad under `pulse-critic/r6/`. New probes:
+- `typing.cjs`: types the right answer key by key into whatever box has focus, and samples the focus after every
+  key. Where a box's value is unknown it tries each candidate and keeps the one that turns green.
+- `listen.cjs`: spies on `speakAnswerOption` and presses Listen.
+
+## Verdict: PASS
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+| Online worksheet, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+| Quiz, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+
+The quiz has no live green marks, so the caret-advance does not apply there. Its pulse and focus regressions are
+covered by the round 3–5 sweeps, and the code path is unchanged.
+
+## R5-1: closed
+`scen2` row c, at 390 and 1280: Space on a focused Hint opens the hint modal (`modal: true`), and focus stays on
+`#hintBtn`. Row d: "5" typed after the hint closes lands in the pulsing ones box.
+
+## Caret moves on after a right answer (measured)
+
+- **It never leaves a box early.** `early=0` in every run, so the caret never leaves a box while a multi-digit
+  right answer is still being typed.
+  - Card 390 and 1280: `hundreds_chart_fill` 25, `count_by_tables` 28/35/56/70/77 and 28/42/49/63/84,
+    `add_sub_fact_family` 8/8/5, `number_families_add` 10.
+  - Worksheet 390 and 1280: `count_by_tables` 6/10/14/18 … 9/15/21/30/33, fact family 16/16/10 and 20/20/5.
+- **Where it goes next.** After each green box the caret is on the pulsing box (`offPulse=0`). On the worksheet,
+  the last box of a problem hands on to the first box of the next problem.
+- **Stack entry.** Typing the right ones digit moves the caret to the tens box, which is the pulsing box
+  (ones-first). A wrong digit keeps the caret in place. There is no jump into a regroup box.
+- **Count rows on a phone** (390, swipe row): no box is auto-focused on load, by design. Once the pupil taps the
+  pulsing box, each right number moves the caret to the next box, and that box is scrolled into view inside the
+  row.
+- **Boxes that do not go green while typing** (`count_by_step_up` grid cells, the last fact-family box): the caret
+  stays put. That is correct, because the trigger is the green mark.
+
+## Listen (measured, card 1280)
+
+| Skill | Spoken |
+|---|---|
+| `add_100_regroup` | "Here is how. 1. Ones: 8 plus 4 equals 12. Type 2. Regroup 1 ten. 2. Tens: 4 plus 1 regrouped equals 5. Type 5. 3. The sum is blank. Say: 48 plus 4 equals blank." |
+| `mult_facts` | "… 12 times 2 is 12 groups of 2 … Type blank. Say: 12 times 2 equals blank." |
+| `add_wp_20` | "… Tap plus. Add. … 14 plus 4 equals blank. 6. Type the answer: blank books. Say: The answer is blank blank." |
+
+In every case the spoken text is the title, every step and the Say line, using the screen wording ("Type",
+"Tap"), with signs as words and blanks as "blank".
+
+## Regressions: none
+
+| Check | Result |
+|---|---|
+| Card 390 sweep | 428/428 pulsing, 0 order defects, 0 placeholders, 0 errors |
+| `nextq` 390 | next question focused after a Check tap (q2 / q3 / q4) |
+| `steal` 390 at 3 s | ordering tile keeps focus off the box; only coins (the widget's own) and the hidden rounding dot (probe artifact) move it; 0 scroll jumps |
+| `scen2` | rounding line and tile taps keep focus; a blank tap after scrolling up keeps y=0 at 0.5 s and 3 s |
+| `missing.cjs` | `mq-wd-empty` red in all four runs |
+| Perf | `raf3s 0`, `recs {}`, 0.000 s |
+
+## Nits (no score cost)
+
+- **N1.** A worked box with steps but no Say line has no Listen button, because Listen sits inside `.mq-lw-say`
+  (`workedHTML`, support-ladder.js:756). Seen on a fallback skill id. Fix: render Listen whenever `steps.length` is
+  non-zero, outside the Say line.
+- **N2.** "Count by 2, 12 times: 2, 4, 6, …." is spoken with the ellipsis. Fix: in `toSpeech`, map `…` to
+  "and so on".
+- **N3.** One page error appeared, `Cannot read properties of undefined (reading 'answerType')`. It came only when
+  the probe started a new worksheet less than a second after finishing the previous one, during a 4-skill
+  sequence. It did not reproduce for any skill alone or in pairs. This looks like a pending
+  `advanceToNextProblem` timer outliving `initWorksheet`. It is a harness-speed race in pre-existing worksheet
+  code, not this change. Suggested guard: cancel `_wsAdv` in `initWorksheet` (worksheet.js:2222).
+
+## What keeps it below 10
+- **C1, C2 and C3 at 9:** D5 (the worksheet card that pulses beside the box) is still waiting on the owner.
+- **C4 at 8:** the yellow inside the black-and-white cell is allowed as screen feedback (SP-30); 10 needs the
+  owner's ruling.
