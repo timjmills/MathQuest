@@ -969,6 +969,9 @@ function _liveMark(el, final) {
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
+    // a missing digit marked at Check stays marked while the box is still empty: a blur or a move (the
+    // ladder redraws the stack around the box the caret is in) is not the pupil answering it
+    if (v === '' && el.classList.contains('mq-wd-empty')) return;
     const num = LIVE_NUM.has(el);
     const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
     const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));

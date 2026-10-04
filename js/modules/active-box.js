@@ -159,7 +159,7 @@ function schedule() {
 export function installActiveBox() {
     if (typeof document === 'undefined' || window.__mqActiveBoxInstalled) return;
     window.__mqActiveBoxInstalled = true;
-    document.addEventListener('pointerdown', (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
+    for (const ev of ['pointerdown', 'mousedown', 'touchstart', 'click']) document.addEventListener(ev, (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
     // A key typed while no typing place has the focus (after a hint pop-up closes, after a tap on a
     // button) goes into the pulsing box instead of being lost (critic R4-4). Count-by rows on a phone
     // have their own digit-key rule.
