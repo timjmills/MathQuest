@@ -1475,9 +1475,11 @@ export function startFromLanding() {
 
     const s = parsed.settings;
 
-    // Remove modal
+    // Remove modal. The pupil's own choices (timer, count, mode) are read from the removed pop-up
+    // below: it used to look them up in the page after removing it, so every choice was lost.
     const overlay = document.getElementById('studentLandingOverlay');
     if (overlay) overlay.remove();
+    const _pick = (id) => (overlay ? overlay.querySelector('#' + id) : null);
 
     // Force student mode (not in the teacher's board window, ?board=1: it stays a teacher view)
     let boardWindow = false;
@@ -1511,7 +1513,7 @@ export function startFromLanding() {
     if (s.timer !== undefined && s.timer !== '?') {
         timerDuration = s.timer;
     } else {
-        const el = document.getElementById('landingTimer');
+        const el = _pick('landingTimer');
         timerDuration = el ? parseInt(el.value, 10) : 0;
     }
 
@@ -1525,7 +1527,7 @@ export function startFromLanding() {
             problemCount = s.problemCount;
         }
     } else {
-        const el = document.getElementById('landingCount');
+        const el = _pick('landingCount');
         const val = el ? parseInt(el.value, 10) : 20;
         if (val === 0) {
             infinityMode = true;
@@ -1539,7 +1541,7 @@ export function startFromLanding() {
     if (s.gameMode && s.gameMode !== '?') {
         gameMode = s.gameMode;
     } else {
-        const el = document.getElementById('landingMode');
+        const el = _pick('landingMode');
         gameMode = el ? el.value : 'practice';
     }
 

@@ -28,10 +28,10 @@ const { open } = require('/home/user/MathQuest/tests/lib/ws-harness.cjs');
       return { title: document.querySelector('.landing-modal h2').textContent, pills: document.querySelectorAll('.landing-modal .landing-skills .landing-badge').length,
         startVisible: b.top >= 0 && b.bottom <= innerHeight, modalH: Math.round(md.height), vh: innerHeight, focused: document.activeElement && document.activeElement.classList.contains('landing-start-btn') };
     });
-    await page.screenshot({ path: path.join(__dirname, `land-${w}-${n}.png`) });
+    await page.screenshot({ path: path.join(require('os').tmpdir(), `land-${w}-${n}.png`) });
     if (n === 23) { await page.click('.landing-skill-list summary'); await new Promise(r => setTimeout(r, 200));
       m.afterOpen = await page.evaluate(() => { const b = document.querySelector('.landing-start-btn'); b.scrollIntoView({ block: 'nearest' }); const r = b.getBoundingClientRect(); return { startReachable: r.top >= 0 && r.bottom <= innerHeight }; });
-      await page.screenshot({ path: path.join(__dirname, `land-${w}-${n}-open.png`) }); }
+      await page.screenshot({ path: path.join(require('os').tmpdir(), `land-${w}-${n}-open.png`) }); }
     console.log(w, h, n, code.split('-').length, JSON.stringify(m), 'errors', errs.length);
     await app.close();
   }
