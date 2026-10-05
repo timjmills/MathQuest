@@ -1395,6 +1395,14 @@ export function showStudentLandingModal(parsed) {
         skillsHTML += '<div class="landing-skill-code">' + parsed.skillsCode + '</div>';
     }
     skillsHTML += '</div>';
+    // Many skills (owner 2026-10-05): a long wall of pills overwhelms a pupil and pushed Start Playing
+    // off the screen. Past 3 skills the pop-up says how many, and the list folds away behind a tap.
+    const nSkills = decodedSkills.length;
+    const manySkills = nSkills > 3;
+    if (manySkills) {
+        skillsHTML = '<details class="landing-skill-list"><summary>See the ' + nSkills + ' skills</summary>'
+            + skillsHTML.replace('class="landing-skills"', 'class="landing-skills landing-skills-scroll"') + '</details>';
+    }
 
     // Build settings display
     let settingsHTML = '<div class="landing-settings" style="margin:12px 0;">';
@@ -1446,13 +1454,19 @@ export function showStudentLandingModal(parsed) {
     overlay.id = 'studentLandingOverlay';
     overlay.className = 'landing-overlay';
     overlay.innerHTML = '<div class="landing-modal">' +
-        '<h2>Ready to Practice!</h2>' +
-        '<p>Your teacher has set up a practice session for you.</p>' +
+        (manySkills
+            ? '<h2>Ready to Practice ' + nSkills + ' Skills?</h2>' +
+              '<p>Your teacher has set up a practice session for you. Click Start Playing!</p>'
+            : '<h2>Ready to Practice!</h2>' +
+              '<p>Your teacher has set up a practice session for you.</p>') +
         skillsHTML +
         settingsHTML +
         '<button class="btn btn-primary landing-start-btn" onclick="startFromLanding()">Start Playing!</button>' +
         '</div>';
     document.body.appendChild(overlay);
+    // the pupil can start straight away: Enter or Space presses Start Playing
+    const startBtn = overlay.querySelector('.landing-start-btn');
+    if (startBtn) try { startBtn.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
 }
 
 export function startFromLanding() {
