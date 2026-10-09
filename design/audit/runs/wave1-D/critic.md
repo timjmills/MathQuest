@@ -750,3 +750,188 @@ Print rows cover the pupil page and the key. Where only one size is named, the o
   - counting_all: the parity prompt.
 - **Unchanged and still at 8+:** odd_even, whole_as_fraction, ten_frame_build, long_div_2digit, remainder_interpret.
 - **Regression set holds:** add_fractions_like, add_20_regroup, time_5min, multiply and mult_properties print pixel-identical to round 4. mixed_addition changed only as intended (one sign place).
+
+---
+
+# Round 6: independent critic (Opus medium), 2026-10-09
+
+Tree: claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535 at a08a37d (round-6 GS 2f9c30c, round-6 P 6e177ea, round-7 a08a37d).
+I made my own renders with `ws-grade-render --roles independent`: at S with every screen host (card 1280/820/390, worksheet 1280, quiz 1280) and at L print only, for the 16 documents.
+I also rendered mixed_multiplication at the print-lint seed (`hash('multiplication__mixed_multiplication:print')` = 4030286246) at S and L, with a scratchpad copy of the renderer whose only change is the seed.
+Because the lint seed showed defects the harness seed does not, I probed the three pool documents over 15 seeds at S and L (`buildSheet`, items per page, grid fill, key text against its slot box). I ran the same probe on the round-5 tree 08272b1 (a scratchpad worktree served through MQ_ROOT) to separate new defects from old ones.
+For the regression set I rendered S on this tree, on origin/claude/sweet-newton-c8wrv1 (4970e4b) and on 08272b1, and pixel-diffed them.
+The 10 PNGs this report cites are in `renders/r6/`. All scratchpad worktrees are removed.
+
+## Verdict: FAIL (15 of 16 pass; mixed_multiplication fails)
+
+Round 6/7 fixed every round-5 defect except D5-4, which is only part-fixed (cosmetic). At the harness seed all 16 documents grade 8 or better on every version.
+**multiplication:mixed_multiplication fails on pages the harness seed does not deal:**
+- **At the lint seed (S):** the column-work row now fills (5 across, no hole). But it mixes two digit sizes, and the fact cells' answer box is shorter than the digits printed above it. On the key, "30" and "110" run 4 mm past their boxes (D6-1).
+- **On 6 of 30 sampled seeds (S and L):** the page holds 2–4 problems over a 36–68 % empty strip (H5). Some deals also bring legacy members with a doubled slot or a hint that gives the answer away (D6-2).
+These defects are **not regressions**. The fill and legacy-member results are identical on 08272b1, and the builder already lists the key overflow as known. They are in-lane, and earlier rounds missed them because every round graded only the harness seed.
+
+## Gates
+| Gate | Result |
+|---|---|
+| ws-grade-render meta (16 skills, S, all hosts) | 0 console errors. hScroll 0 and smallTargetCount 0 on every host, except mixed_multiplication worksheet-1280 (1 small target, a desktop host, so H6 does not apply) |
+| Number families, order-free repeat probe (both skills, S and L, seeds 1–20) | **0 of 80 pages repeat a family**. No blank run and no re-laid grid. number_families_mult S = 8 distinct in 2 × 4 on every seed |
+| Slot boxes at S (DOM, mm) | `.ws-box` clear height **6.00 mm** (missing_mult_div, missing_add_sub, mixed_multiplication). div_zero quotient boxes 3.9 × 6.7 mm. The mixed_multiplication missing-digit box is **3.5 × 6.0 mm** |
+| Key text against its box (mixed_multiplication, 15 seeds × S/L) | **4 of 15 S pages** have a fact answer 15 px (4 mm) past the bottom of its box (seeds 120, 180, 260, 280, and the lint seed). L: 0 of 15 |
+| Pool page fill (15 seeds × S/L, grid height ÷ space above the footer) | mixed_multiplication **6 of 30 below 70 %** (S 100: 0.43, S 140: 0.41, S 160: 0.64; L 100: 0.56, L 140: 0.61, L 200: 0.32). The same 6 on 08272b1. mixed_composing 1 of 30 (L 180: 0.63, same on 08272b1). counting_all 0 of 30 |
+| Orchestrator gates (print-lint S/L 0/191, determinism, content-audit, code-snapshot 608, layout-unit 563, lint self-test 50, screen-answer, boot-smoke) | Not re-run; taken as reported |
+
+**Lint gap:** `ws-print-lint` passes the lint-seed page although the key prints "110" across its box border. L-OVERFLOW does not compare the text inside a slot with the slot's box on the key document. The `fits` capacity is also not compared with the items dealt: seed 100 S reports `perPage 4` and prints 2.
+
+## Round-5 defects: status
+| # | Round-5 defect | Status on a08a37d |
+|---|---|---|
+| D5-1 | number_families_mult S repeats families | **FIXED.** `nfDedupeKey` (family.js) → `data-ws-dedupe`, which `signature()` and lint REPEAT both read. The generator deals the band's 10 families before any repeats. S prints 8 distinct (4,5) (3,5) (2,3) (2,2) (2,4) (3,4) (2,5) (3,3) in 2 × 4. 0 of 40 pages repeat. **On 2 × 5:** at S a 4-fact family needs about 170 px of a cell, and 5 rows give 171 px, so 2 × 5 would cram. I agree with the builder. See D6-4 for the better route to 10 |
+| D5-2 | missing_add_sub worksheet lines + title | **FIXED.** Worksheet 1280, card and quiz box every unknown (`cellKindFor` returns null for `resultBox`). The title "I Can find the missing number (+, −)" is on S, L and the keys |
+| D5-3 | sign place square on paper | **FIXED.** The column-frame sign place is a ring when `signRow === false` (S a, b, f; key shows × in the ring). The same ring now also prints on mixed_addition / mixed_subtraction stories (see the regression check), which is consistent |
+| D5-4 | worksheet row 3 ragged | **PARTLY.** The cards in row 3 are now equal height. Card 5's bordered cell is still 260 px against card 6's 535 px: the 9 × 4 array at 45 px pitch is unchanged. The ragged edge moved inside card 5, as a 290 px white band (45 % of the card) under its cell. Residue: D6-3 |
+| D5-5 | borderless empty run | **FIXED.** `cut` is removed and the lint counts every `blankrun` as a hole. compare_objects S now lays its two tower cells across the full row (closed frame, no open rule). No lane page I rendered has a blank run |
+| D5-6.1 | `.ws-box` under 6 mm | **FIXED.** Clear height 6.00 mm at S (additive rule, kit-wide) |
+| D5-6.2 | mult_comparison answer rows uneven | **Left as is, acceptable.** The box rows differ by 1.1 mm (a/d) and 1.9 mm (g/h). Only the story text start moves (36 px against 58 px from the cell top). Nit, no score cost |
+| D5-6.3 | div_zero ones-zero quotients | **FIXED.** S deals 9 of 28 with a ones zero (110, 220, 120, 140, 320, 330, 210). Nit: 110 appears three times (770 ÷ 7, 880 ÷ 8, 990 ÷ 9) |
+| D5-6.4 | counting_all shapes touching the border | **FIXED.** Worksheet cards 2, 4, 5 have a 12 px inner pad |
+
+## Non-lane regression spot check
+- **Against round 5 (08272b1 → a08a37d), S print, pixel diff:**
+  - add_fractions_like, add_20_regroup, time_5min and multiply are **identical**.
+  - mixed_addition and mixed_subtraction differ only in the story's sign place, now a ring (D5-3 applies kit-wide to the column frame). That is intended and matches the screen.
+  - compare_objects: round 5's open L-frame beside a and b is gone. The two tower cells now share the row inside a closed frame (`renders/r6/REGRESSION-compare_objects-S-tree.png`). Better.
+- **Against live (4970e4b):** every changed document also differs from live through round 5's own changes and live's later commits (4970e4b is not an ancestor). Nothing in the round-6/7 diff touches them beyond the two items above.
+
+## CL-2a: does add_sub_10s S's 2 × 10 "look good"?
+**Yes, it meets CL-2a.** `renders/r6/add_sub_10s-S-p1.png`:
+- 20 distinct facts (0 + 10 … 90 + 10, 10 − 10 … 100 − 10), which is the skill's whole pool.
+- 20 equal cells (CL-3) in whole rows, with the grid ending about 10 mm above the footer. There is no hole and no strip.
+- One slot shape. The key is correct on all 20 items.
+- Each sentence sits in the middle of its cell, with side bands of about 22 % (under H13's 30 %).
+- The listed alternative, 4 × 5, would give 175 px cells for "100 − 10 = ___" (about 170 px wide at S), which is a cramped row. 2 × 10 is the better page.
+- Scores: C1 8, C2 8, C3 8, C4 9.
+
+## Visual grading
+Print rows cover the pupil page and the key. Where only one size is named, the other size scored the same or higher. Screen rows cover card 1280/820/390, worksheet 1280 and quiz 1280. "Harness" is the `ws-grade-render` seed.
+
+| Document | Version | Clarity | Pedagogy | Layout | Parity | Result |
+|---|---|---|---|---|---|---|
+| composing:odd_even | S, L, key | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 9 | PASS |
+| composing:whole_as_fraction | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:div_zero_in_quotient | S, S key, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| composing:ten_frame_build | S key, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:dot_array_mult | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:add_sub_10s | S (2 × 10, CL-2a), S key | 8 | 8 | 8 | 9 | PASS |
+| | L | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 8 | PASS |
+| division:missing_mult_div | S, S key, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mixed_multiplication | S, S key, L, L key (harness) | 8 | 8 | 8 | 8 | PASS |
+| | S + key, lint seed | **7** | 8 | **7** | **7** | FAIL (D6-1) |
+| | S/L seeds 100, 140, 160 / 200 | 8 | **7** | **5** (H5) | **6** (H8) | FAIL (D6-2) |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS (D6-3 residue) |
+| | card, quiz | 8 | 8 | 8 | 8 | PASS |
+| composing:mixed_composing | S, L, keys (harness) | 8 | 8 | 8 | 8 | PASS |
+| | L seed 180 | 8 | 8 | **7** | 8 | FAIL (D6-5) |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS |
+| counting_mixed:counting_all | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:long_div_2digit | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mult_comparison | S, S key, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:remainder_interpret | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:number_families_add | S, L key | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:number_families_mult | S, S key (8 in 2 × 4) | 8 | 8 | 8 | 8 | PASS |
+| | L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| subtraction:missing_add_sub (touched) | S (30 in 3 × 10), S key, L | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280, card, quiz | 8 | 8 | 8 | 8 | PASS |
+
+## Defects (ranked, §6 form)
+
+**D6-2 [CRITICAL, in lane, not a regression] mixed_multiplication: about 1 page in 5 is under-filled, and pool legacy members print doubled slots and answer hints.**
+- **What:**
+  - S seed 100 prints **2 problems** (a word-work story and an 8 × 6 array). The grid fills 43 % of the space above the footer, and the bottom 57 % of the page is empty. `fits` reports 2 × 2 = 4 per page.
+  - Seed 140 S has 2 problems (fill 0.41). Seed 160 S has 4 (0.64). L seeds 100, 140 and 200 fill 0.56, 0.61 and 0.32.
+  - **H5 → C3 ≤ 5** on those pages.
+  - Some deals bring legacy members:
+    - seed 180 S b: "What is 11 × 0? … 11 × 0 = ? … **Any number × 0 = 0** … Answer: ___". The hint gives the answer away on the pupil page (C2 7).
+    - seed 180 S a: "16 × 379 = ☐" **and** "Answer: ___" (a doubled slot, H8 → C4 ≤ 6).
+    - seed 160 S c: "I can multiply ☐ / I must add ☐", "Say: Each group has __" and "Answer: ___" in one cell.
+- **Where:** `renders/r6/mixed_multiplication-S-seed100-p1.png` and `renders/r6/mixed_multiplication-S-seed180-p1.png`.
+- **Cause:** `buildSheetFilled` (print-sheet.js 2656 ff.) has three gaps.
+  1. Its fill loop `break`s the first time count + 1 spills onto a second page. When the next draw is a tall member, the page stays at 2.
+  2. `fillOf()` returns 1 for any page with more than one grid, so the strip checks never run on pool pages.
+  3. The re-deal from derived seeds is used only for holes and repeats, never for a spill.
+- **Not a regression:** identical counts and fill on 08272b1.
+- **Fix:**
+  1. In `buildSheetFilled`, when count + 1 spills, try the same count from derived seeds (seed + k × 7919, k = 1…4) before breaking. Keep the first deal that stays on the pages asked.
+  2. Make `fillOf()` measure the last grid's bottom against the page's available height when there are several grids. Re-deal while fill < 0.80 on an auto independent page.
+  3. Drop the legacy members from the mixed_multiplication pool, or give them kit cells. The candidates are the `mult_properties` "What is …? / Answer:" cell and the area-model "Use the model … Answer:" cell. Their answer-revealing caption must also go ("Any number × 0 = 0" is a hint, and hints fade on independent pages).
+- **Check:** across seeds 1–30 at S and L, every mixed_multiplication page has a grid fill ≥ 0.80 and items ≥ `fits.perPage` − 1. No pupil page contains "Answer:" next to a box, and none contains "Any number".
+
+**D6-1 [MAJOR, in lane, known per builder] mixed_multiplication lint seed S: the column-work row mixes two digit sizes, and the fact answer box is smaller than its digits.**
+- **What:** row e–i at the lint seed (`renders/r6/mixed_multiplication-S-lintseed-key.png`) holds:
+  - three missing-digit stacks (e 6☐ × 4 = 256, g, i) at about 4.5 mm digits;
+  - two facts (f 3 × 10, h 11 × 10) drawn at about 10 mm (37 px font).
+  - The facts' answer box is 15.5 × 6.0 mm, shorter than the printed operand digits, so the pupil must write 110 smaller than the problem.
+  - On the key, "30" and "110" are set at the fact size and hang 15 px (4 mm) out of the box, crossing its bottom border.
+  - Across 15 seeds this hits 4 of 15 S pages (seeds 120, 180, 260, 280). L is clean (0 of 15).
+  - The missing-digit box is 3.5 mm wide (the same digit is printed 4.5 mm wide).
+- **Cost:** C1 7 (box smaller than the digits; two sizes in one row); C3 7 (one row, two drawing scales); C4 7 (the key's answer crosses its slot; AK-1).
+- **Cause:** fact.js 351–356, the `boxAns` path. `blank({shape:'box'})` takes the kit's Hw (6 mm at S), but the fact sets `--fd: ${pt}pt` from `factDigitPt(cols)`, and the key value inherits that size. The fine-split group (practice.js `fineSplit`) does not give its members one digit size.
+- **Fix:**
+  1. In the `boxAns` branch, size the box from the fact's digit: height `calc(var(--fd) * 1.25)`, width `n × DIGIT_EM × var(--fd)`. Alternatively, set the key value's font-size to the box's key size, `.72em` of Hw, as `.ws-box` does elsewhere.
+  2. In the fine-split group, pass one `pt` (the smallest member's) to every cell, so stacks and facts share a digit size.
+  3. Give the missing-digit box (`ws-box--unknown`) at least the digit width plus 1 mm (about 5.5 mm at S).
+- **Check:** probe every key `.ws-box` / `[data-ws-slot]` box: no text rect extends more than 1 px outside its box at S and L over seeds 1–30. In one fine-split row, `--fd` / digit pt is identical in every cell.
+
+**D6-3 [MINOR] mixed_multiplication worksheet: row 3 is level only at the card edge.**
+- **What:** the D5-4 fix stretches card 5's chrome. Its bordered cell stays at 260 px against card 6's 535 px, leaving a 290 px white band (45 % of card 5) under the number line. The cause is still the 9 × 4 array at 45 px pitch.
+- **Where:** `renders/r6/mixed_multiplication-worksheet-1280.png`.
+- **Fix:** cap the worksheet host's dot pitch at 32 px, so a 9-row array's cell is no more than 420 px (screen-cell.css, `.mq-wscard` arrays twin). Then revert the stretch rule, so the cells, not just the cards, match.
+- **Check:** the bordered cells in one worksheet row differ by no more than 25 % in height.
+
+**D6-4 [MINOR] number_families_mult S: the page could hold 10 to 12 families, not 8.**
+- **What:** 8 in 2 × 4 is clean (row height 203 px; side bands 28–31 %), but the 5 × 5 band's 10 families cannot fill 3 × 4. The S page therefore prints fewer families than number_families_add S (12 in 3 × 4). Cell d (2, 2, 4) has a 31 % right band, at the H13 line.
+- **Fix:** deal the default S page from a 2–6 band (10 pairs + 5 squares = 15 families), which restores 12 distinct in 3 × 4. Alternatively, say in the option panel that the 2–5 band holds 8 per page.
+- **Check:** S prints 12 distinct in 3 × 4 at seeds 1–20 with 0 repeats.
+
+**D6-5 [MINOR, in lane, not a regression] mixed_composing L seed 180: a 37 % strip under 3 problems.**
+- **What:** the page holds frac-model, frac-model and frac-wall: a, b, and a full-width number line c. It ends at 63 % of the page, with an empty band of about 290 px above the footer (C3 7).
+- **Not a regression:** the same on 08272b1.
+- **Where:** `renders/r6/mixed_composing-L-seed180-p1.png`.
+- **Fix:** the same `buildSheetFilled` fill-floor as D6-2 fix 2.
+- **Check:** seeds 1–30 at S and L have mixed_composing grid fill ≥ 0.80.
+
+**D6-6 [MINOR, lint] ws-print-lint does not see these defects.**
+- L-OVERFLOW does not check slot text against the slot's box on the key.
+- PAGEFILL is not run against `fits.perPage` on pool pages at other seeds.
+- **Fix:** add a key-slot containment rule (the text range rect of a `[data-ws-slot]` or `.ws-box` within its box, 1 px tolerance). Add a multi-seed pool fill check (seeds 1–10) for `mixed_*` skills.
+- **Check:** the lint fails on a08a37d's mixed_multiplication at seeds 100 and 4030286246 (S), and passes once D6-1 and D6-2 are fixed.
+
+## Pre-existing, out-of-lane items
+- **Daily tabs under an "I Can" title:** missing_add_sub S and missing_mult_div S print 30 items in 3 × 10 with black number tabs (the letters run out after z), under an "I Can" title. 3 × 10 is not in CL-2's list. 30 at S is within DN-1a. These pages were unchanged in round 5 and are not graded down here. Owner question: extend CL-2a to "3 × 10 for one-symbol answers at S", or cap these pages at 26 so the I Can letters hold.
+- **mixed_multiplication worksheet card 4** reads "Fact Family: 10, 8, 80" as its instruction (no verb, and it restates the set). The same appears on round 5.
+- div_zero_in_quotient: 110 three times on one S page (different divisors). Item variety nit.
+
+## What passes
+- **Fixed and good this round:**
+  - number_families_mult: order-free de-duplication end to end (generator, buildSheet, lint), 8 distinct families on every seed.
+  - missing_add_sub: boxed slots on every host, correct title.
+  - The ringed sign place on paper.
+  - PG-15's closed frame restored, with holes removed by layout (compare_objects S better than in round 5).
+  - `.ws-box` clear height 6 mm.
+  - Ones-zero quotients in div_zero.
+  - counting_all worksheet padding.
+- **add_sub_10s S 2 × 10 meets CL-2a.**
+- **Unchanged and still at 8+ on the harness seed:** odd_even, whole_as_fraction, ten_frame_build, dot_array_mult, missing_mult_div, counting_all, long_div_2digit, mult_comparison, remainder_interpret, number_families_add, mixed_composing.
+- **Regression set holds:** four documents are pixel-identical to round 5. mixed_addition and mixed_subtraction changed only as intended (the ring), and compare_objects improved.
