@@ -2593,10 +2593,11 @@ export async function buildSheet(req = {}) {
                     const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
                     return dup(more) || more.items.length <= best.items.length;
                 })()));
-                if (capped) {
+                // Fewer, longer columns for the distinct problems the skill can give (the page
+                // is held short by its own pool): the fullest whole-row layout on the pages asked.
+                const relay = async (pick0) => {
                     const c0 = Number(best.fits && best.fits.cols) || 1;
-                    let pick = hole(best) || dup(best) ? null : best;
-                    let pickFill = pick ? fillOf(pick) : 0;
+                    let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     for (let c = c0; c >= 1; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c) continue;
@@ -2610,21 +2611,36 @@ export async function buildSheet(req = {}) {
                         }
                         if (pickFill >= 0.85) break;
                     }
+                    return pick;
+                };
+                if (capped) {
+                    const pick = await relay(hole(best) || dup(best) ? null : best);
                     if (pick) return pick;
                 } else if (!hole(best) && !dup(best) && fillOf(best) < 0.85) {
                     // A page that still has distinct problems to give and leaves a strip under
                     // its rows (round 4 D-D: missing_mult_div L, 2 x 8 over a 16 % strip where a
                     // ninth row stands) takes whole rows more in the same columns while the page
                     // holds them: two columns then take any row count, not only CL-2's 2/3/4/5/8.
+                    // A row that repeats a problem is dealt again from a derived seed (seed +
+                    // k x 7919, reproducible); when no deal gives the row without a repeat, the
+                    // pool caps the page and it is re-laid in fewer columns (round 5 follow-up:
+                    // number_families_mult_med S, 9 in 3 x 3 over a 30 % strip).
                     const c0 = Number(best.fits && best.fits.cols) || 1;
-                    let pick = best, pickFill = fillOf(best);
+                    const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+                    let pick = best, pickFill = fillOf(best), poolCapped = false;
                     for (let n = best.items.length + c0; n <= best.items.length + 3 * c0 && n <= Math.max(ceil(), best.items.length + 2 * c0) * wanted; n += c0) {
-                        const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c0, freeRows: true })] }));
-                        if (alt.pageCount > wanted || dup(alt) || hole(alt) || alt.items.length !== n) break;
+                        let alt = null;
+                        for (let k = 0; k <= 3; k++) {
+                            const a1 = await buildSheetOnce(Object.assign({}, req, k ? { seed: (base + k * 7919) >>> 0 } : {}, { sections: [Object.assign({}, s, { count: n, columns: c0, freeRows: true })] }));
+                            if (!dup(a1)) { alt = a1; break; }
+                        }
+                        if (!alt) { poolCapped = true; break; }
+                        if (alt.pageCount > wanted || hole(alt) || alt.items.length !== n) break;
                         const f = fillOf(alt);
                         if (f > 1.001 || f <= pickFill) break;
                         pick = alt; pickFill = f;
                     }
+                    if (pickFill < 0.85 && poolCapped) return relay(pick);
                     return pick;
                 }
             }
