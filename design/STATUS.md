@@ -209,10 +209,18 @@ Browser gates failed with `net::ERR_CERT_AUTHORITY_INVALID` on every CDN (fonts,
 
 Gate failures and load numbers measured before this fix (~12:30 UTC) are not trustworthy and are being rerun.
 
+### Open for the model-role lane (recorded by Fraction key r4, not fixed there)
+- R5 (critic fractions-key r3): the Scripted Model page splits a 4-step model over two pages (page 2 holds one panel and
+  the Say line, 51-59 % blank); each panel repeats the whole cell beside a mostly empty step column; the model never draws
+  the renamed fractions step 2 names ("2/3 = 20/30"). Role-level, also on main (countby critic P1-P3).
+- R8 (critic fractions-key r3): fraction_of_set independent S prints one lone item (main: one small cell, 59 % of the
+  page blank). Pre-existing; the B&W glyphs and the one instruction hold.
+
 ## 9. Escalations
 
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
+- 2026-10-09 Wave 1 lane "Fraction key" (`adbb61b8450078736`) fix round 4: builder escalated to Opus medium (the ceiling) - critic rounds 1 to 3 failed (r3: the one-list cap leaked from the first deal, a 21-23 % blank strip on L practice pages, choose-all options ~11 px on Chromebook screens).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
