@@ -336,7 +336,9 @@ async function realRow(fails) {
         await setSkill(page, 'addition', 'add_facts', null);
         await startCard(page, 'addition', 'add_facts'); await sleep(900);
         const checkSel = await page.evaluate(() => { const b = [...document.querySelectorAll('#gameView button')].find((x) => /check|submit/i.test(x.textContent) && x.offsetParent); if (b && !b.id) b.id = 'tt-check2'; return b ? '#' + b.id : null; });
-        const t0 = await top(page, checkSel);
+        // Check measured from the card's own top: main's wrong-answer chrome above the card (the question dots row) is not this line's
+        const rel = async () => (await top(page, checkSel)) - (await top(page, '#questionCard'));
+        const t0 = await rel();
         const cellH = () => page.evaluate(() => Math.round(document.querySelector('#visualAid .mq-scell, #visualAid').getBoundingClientRect().height));
         const h0 = await cellH();
         await wrongCard(page); await sleep(1000);
@@ -350,7 +352,7 @@ async function realRow(fails) {
         const c = await centre(page, '#gameView .ws-tn[role="button"]', 0);
         await page.touchscreen.tap(c.x, c.y); await sleep(300);
         ok(/^Touched 1$/.test((await said(page, '#gameView')) || ''), `card: the row counts: "${await said(page, '#gameView')}"`);
-        const t1 = await top(page, checkSel);
+        const t1 = await rel();
         // the numerals themselves may draw a little taller than the plain digits; nothing else may grow
         const grow = Math.max(0, (await cellH()) - h0);
         ok(t1 - t0 <= r.fbH + grow + 2, `card: only the message row is added (${t0} -> ${t1}, row ${r.fbH} [${r.gap}], numerals ${grow})`);
