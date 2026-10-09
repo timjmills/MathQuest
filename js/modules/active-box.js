@@ -149,7 +149,10 @@ function selectIfLoose(active) {
     if (active !== activeEl || sig !== activeSig) { activeEl = active; activeSig = sig; activeSince = Date.now(); }
     if (document.activeElement === active) { revealSettled(active); return; }
     const sinceTap = Date.now() - lastTap.t;
-    if (sinceTap < 800 && lastTap.target && isTapTarget(lastTap.target)) return;
+    // a tap on a widget IN the problem keeps the pupil there; a tap on chrome outside it (the quiz's
+    // Next, a nav button that re-rendered the question) does not hold the new box back (critic CF-D3)
+    const tapIn = lastTap.target && lastTap.target.isConnected && lastTap.target.closest && lastTap.target.closest(HOSTS + ', ' + POPUP);
+    if (sinceTap < 800 && tapIn && isTapTarget(lastTap.target)) return;
     const ae = document.activeElement;
     // the box the pupil has just filled RIGHT (it turned green as they typed) hands the caret on to the
     // next box, so the next number goes where it belongs (owner 2026-10-04: "move to the blank box")
@@ -179,7 +182,7 @@ function selectIfLoose(active) {
         if (!uncovered(active)) return;
         try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
     } else {
-        if (sinceTap < 1500) return;   // the pupil scrolled away and tapped: leave the page where they put it
+        if (sinceTap < 1500 && tapIn) return;   // the pupil scrolled away and tapped in the problem: leave the page where they put it
         try { active.focus({ preventScroll: true }); active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
     }
 }

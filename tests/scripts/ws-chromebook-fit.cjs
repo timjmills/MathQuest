@@ -15,6 +15,10 @@
 // its box into view on load. Every item FAILS if Check / Next is off screen. The online worksheet
 // also reports how many cards show in full.
 //
+// Boss and race also FAIL when the arena / track is out of view (at the top or after the page has
+// scrolled to a box), and the quiz FAILS when, after a click on Next, the pulsing box has not got the
+// focus (typing would go nowhere).
+//
 // It also checks that nothing else changed: the home screen and a tall screen (1366 x 960) keep
 // the full app header, and the compact header never engages there.
 //
@@ -39,8 +43,8 @@ const SHOTS = arg('shots', null);
 // The compact chrome's budget: the most a short screen may spend above the question paper
 // (header row + play bar + the card's own top line). An item whose problem is taller than what is
 // left is genuinely tall.
-const CHROME_BUDGET = 190;
-const ARENA_BUDGET = 90;   // the boss arena or the race track, folded (css/play-compact.css)
+const CHROME_BUDGET = 150;
+const ARENA_BUDGET = 0;    // the boss arena and the race track ride in the play bar (css/play-compact.css)
 // The known tall shapes, always in the sample on top of one skill per category.
 const TALL = [
     'addition:add_column_multi', 'addition:add', 'subtraction:subtract', 'division:long_div_2digit',
@@ -91,6 +95,7 @@ function MEASURE(host) {
         go: gR ? Math.round(gR.bottom) : null, goTop: gR ? Math.round(gR.top) : null,
         paperTop: Math.round(pR.top), cardsFull,
         goInPaper: !!(goEl && paper && paper.contains(goEl)),
+        arena: (() => { const a = Array.from(document.querySelectorAll('#bossArena, #raceTrack')).find(vis); if (!a) return null; const q = a.getBoundingClientRect(); return q.top >= -0.5 && q.bottom <= H + 0.5; })(),
     };
 }
 
@@ -223,6 +228,18 @@ async function startHost(page, host, c, k, seed) {
                         if (host !== 'worksheet' && !seen && m.boxKind === 'active') { verdict = 'FAIL'; fails.push(`${tag}: tall item, active box not brought into view on load`); }
                         else if (verdict === 'ok') verdict = 'tall';
                     } else { verdict = 'FAIL'; fails.push(`${tag}: answer box bottom ${m.box} > fold ${m.fold} (paper top ${m.paperTop})`); }
+                }
+                // boss / race: the arena or the track stays in view, also when the page has scrolled to a box
+                if ((host === 'boss' || host === 'race') && !(m.arena && m.load && m.load.arena)) { verdict = 'FAIL'; fails.push(`${tag}: the ${host === 'boss' ? 'arena' : 'track'} is not in view (top ${m.arena}, on load ${m.load && m.load.arena})`); }
+                // quiz: after Next (a click), the next question's pulsing box has the focus, so typing lands
+                if (host === 'quiz') {
+                    const next = await page.$('#quizTakeView .qt-nav-btn.next');
+                    if (next) {
+                        await next.click();
+                        await sleep(700);
+                        const f = await page.evaluate(() => { const a = document.querySelector('#quizTakeView .mq-active-box'); return { has: !!a, typing: !!a && a.matches('input, textarea, [contenteditable="true"]'), focused: !!a && document.activeElement === a }; });
+                        if (f.typing && !f.focused) { verdict = 'FAIL'; fails.push(`${tag}: after Next the pulsing box does not have the focus`); }
+                    }
                 }
                 rows.push({ skill: s, size: `${size.w}x${size.h}`, host, ...m, load: undefined, verdict });
                 line.push(`${host} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' || m.boxKind === 'paper' ? `(${m.boxKind})` : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);

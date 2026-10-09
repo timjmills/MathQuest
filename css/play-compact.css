@@ -1,14 +1,18 @@
 /* ============================================================================
-   CHROMEBOOK FIT: the compact play header (owner, 2026-10-09)
+   CHROMEBOOK FIT: the compact play bar (owner, 2026-10-09)
    Pupils mostly play on Chromebooks: ~1366 x 650 or 1280 x 600 of visible page. During PUPIL PLAY
    (the practice card, boss, race, the online worksheet, the quiz) the chrome above the problem
    used to take ~420 px, so the answer box sat below the fold. On short screens this sheet folds the
-   chrome, never the question:
-     row 1   brand mark | stats chips (effort, streak, time, score, mood, full screen) | My Stats | Menu
-             (the row of app controls lives behind Menu: js/modules/play-compact.js)
-     row 2   Exit + score + topic | skill progress | timer        (the practice card)
-             Back + Worksheet + Check All + New, kept on screen    (the online worksheet)
-     then the problem; Check / Next (and the quiz's Previous / Next) stay pinned to the bottom edge.
+   chrome into ONE sticky play bar and never touches the question:
+     practice  brand | Exit + score + topic | skill progress | timer | My Stats | Menu
+     boss/race brand | Exit + score + topic | the arena / the track  | timer | My Stats | Menu
+     worksheet brand | Back + Worksheet + Check All + New               | My Stats | Menu
+     quiz      brand | name + Q n of N + answered (+ quiz timer)        | My Stats | Menu
+   Menu (js/modules/play-compact.js) drops down the stats chips (effort, streak, time, score, mood,
+   full screen) and every app control (role, XP, MAP Test, Pop-ups, Voice, Sound, Adaptive, Reset,
+   Theme). The bar stays at the top while the page scrolls; Check / Next and the quiz's Previous /
+   Next stay pinned to the bottom edge.
+   How: the active play view is `display: contents`, so its own bar joins the page grid's first row.
    Scope: html.mq-play (a play view is active) + body.student-mode + a short, laptop-wide screen.
    Tall screens, phones in portrait, the home screen, teacher screens and print are untouched.
    ADDITIVE ONLY: nothing here changes a rule outside that scope.
@@ -17,27 +21,50 @@
 .mq-play-menu-btn { display: none; }
 
 @media screen and (max-height: 860px) and (min-width: 700px) {
-    /* ---- The page: one grid so the brand, the stats and the Menu share one row ---- */
+    /* ---- The page grid: row 1 is the play bar, every other block spans the width below it ---- */
     html.mq-play body.student-mode .container {
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;
         align-items: center;
-        column-gap: 10px;
+        column-gap: 8px;
         row-gap: 6px;
-        padding: 6px 14px 12px;
+        padding: 0 14px 12px;
     }
-    html.mq-play body.student-mode .container > * { grid-column: 1 / -1; }
-    html.mq-play body.student-mode .container > .nav-bar { display: contents; }
-    html.mq-play body.student-mode .nav-bar > .nav-logo { grid-column: 1; grid-row: 1; margin-left: 0; gap: 0; font-size: 0; }
+    html.mq-play body.student-mode .container > *,
+    html.mq-play body.student-mode .container > .view.active > * { grid-column: 1 / -1; min-width: 0; }
+    html.mq-play body.student-mode .container > .nav-bar,
+    html.mq-play body.student-mode .container > :is(#gameView, #worksheetView, #quizTakeView).active { display: contents; }
+    /* the bar's backdrop: a sticky strip behind row 1, so what scrolls under it never shows through */
+    html.mq-play body.student-mode .container::before {
+        content: "";
+        grid-row: 1; grid-column: 1 / -1;
+        align-self: stretch;
+        margin: 0 -14px;
+        position: sticky; top: 0; z-index: 24;
+        background: var(--bg-world, #e6f2f2);
+        box-shadow: 0 6px 8px -8px rgba(0, 0, 0, 0.3);
+    }
+    /* every item of row 1: sticky, 54 px tall (44 px buttons and their edge), 5 px clear of the top */
+    html.mq-play body.student-mode .nav-bar > .nav-logo,
+    html.mq-play body.student-mode #gameView > :is(.game-header, #skillProgressContainer, #timerContainer, #bossArena, #raceTrack),
+    html.mq-play body.student-mode #worksheetView > .game-header,
+    html.mq-play body.student-mode #quizTakeView > .qt-topbar,
+    html.mq-play body.student-mode #myStatsBar,
+    html.mq-play body.student-mode .mq-play-menu-btn {
+        grid-row: 1;
+        position: sticky; top: 5px; z-index: 25;
+        margin: 5px 0;
+        box-sizing: border-box;
+    }
+    html.mq-play body.student-mode .nav-bar > .nav-logo { grid-column: 1; margin-left: 0; gap: 0; font-size: 0; }
     html.mq-play body.student-mode .nav-bar > .nav-logo > span { display: none; }
     html.mq-play body.student-mode .nav-bar > .nav-logo::before { width: 44px; height: 44px; font-size: 20px; }
-    html.mq-play body.student-mode #studentBanner { grid-column: 2; grid-row: 1; padding: 0; margin: 0; min-width: 0; }
-    html.mq-play body.student-mode #myStatsBar { grid-column: 3; grid-row: 1; padding: 0; margin: 0; }
+    html.mq-play body.student-mode #myStatsBar { grid-column: 5; padding: 0; }
     html.mq-play body.student-mode #myStatsBar .mystats-bar-btn { min-height: 44px; padding: 0 14px !important; font-size: 0.9rem !important; }
 
-    /* ---- Menu: the app controls drop down from the row instead of filling two rows ---- */
+    /* ---- Menu: the stats chips and the app controls drop down from the bar ---- */
     html.mq-play body.student-mode .mq-play-menu-btn {
-        grid-column: 4; grid-row: 1;
+        grid-column: 6;
         display: inline-flex; align-items: center; gap: 6px;
         min-height: 44px; min-width: 44px; padding: 0 14px;
         font: 800 0.95rem/1 var(--mq-font-ui, 'Nunito', sans-serif);
@@ -50,13 +77,23 @@
     html.mq-play body.student-mode .mq-play-menu-btn:hover { border-color: var(--mq-purple, #6d4ae0); }
     html.mq-play body.student-mode .mq-play-menu-btn:focus-visible { outline: 3px solid var(--mq-purple, #6d4ae0); outline-offset: 2px; }
     html.mq-play.mq-navopen body.student-mode .mq-play-menu-btn { background: var(--mq-purple, #6d4ae0); color: #fff; border-color: var(--mq-purple, #6d4ae0); }
-    html.mq-play body.student-mode .nav-bar > .nav-stats { display: none; }
-    html.mq-play.mq-navopen body.student-mode .nav-bar > .nav-stats {
-        display: flex;
-        position: absolute;
-        top: 58px; right: 14px;
-        z-index: 950;
+    html.dark.mq-play body.student-mode .mq-play-menu-btn { color: #e4dcff; }
+    html.mq-play body.student-mode #navStats,
+    html.mq-play body.student-mode #studentBanner { display: none; }
+    /* open: the stats chips on top, the controls under them, fixed to the bar's right edge */
+    html.mq-play.mq-navopen body.student-mode #studentBanner,
+    html.mq-play.mq-navopen body.student-mode #navStats {
+        position: fixed;
+        right: max(14px, calc((100vw - 1200px) / 2 + 14px));
         width: min(560px, calc(100vw - 28px));
+        box-sizing: border-box;
+        z-index: 950;
+        margin: 0;
+    }
+    html.mq-play.mq-navopen body.student-mode #studentBanner { display: block; top: 68px; padding: 0; }
+    html.mq-play.mq-navopen body.student-mode #navStats {
+        display: flex;
+        top: 128px;
         flex-wrap: wrap; align-items: center; gap: 10px;
         padding: 14px;
         background: var(--mq-paper, #fff);
@@ -66,16 +103,20 @@
     }
     html.mq-play.mq-navopen body.student-mode .nav-stats .btn,
     html.mq-play.mq-navopen body.student-mode .nav-stats .nav-popup-toggle { min-height: 44px; }
+    /* the MAP list and the voice picker open over the controls, never under one another */
+    html.mq-play.mq-navopen body.student-mode .nav-stats .map-nav-menu,
+    html.mq-play.mq-navopen body.student-mode .nav-stats .voice-picker-popover { z-index: 960; }
 
-    /* ---- Stats: one row of small chips (the banner keeps every value and its tooltip) ---- */
+    /* ---- Stats: one row of chips (in the Menu; every value and tooltip kept) ---- */
     html.mq-play body.student-mode #studentBanner .game-stats-banner {
         flex-direction: row;
-        max-width: 560px;
-        margin: 0 auto;
+        max-width: none;
+        margin: 0;
         padding: 3px 10px;
-        min-height: 44px;
-        border-radius: 12px;
-        box-shadow: none;
+        min-height: 52px;
+        border-radius: 14px;
+        background: var(--mq-paper, #fff);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
     }
     html.mq-play body.student-mode #studentBanner .game-stats-banner::before { display: none; }
     html.mq-play body.student-mode #studentBanner .gsb-center-layout { flex-direction: row; gap: 12px; justify-content: center; }
@@ -91,20 +132,14 @@
     html.mq-play body.student-mode #studentBanner .gsb-mood-face { font-size: 1.15rem; }
     html.mq-play body.student-mode #studentBanner .gsb-fullscreen-btn { min-width: 44px; min-height: 44px; font-size: 1rem; padding: 0; }
 
-    /* the on-task timer chip: lifted clear of the pinned Check / Next bar */
+    /* the on-task timer chip and the toasts: lifted clear of the pinned Check / Next bar */
     html.mq-play body.student-mode .floating-timer { bottom: 84px; }
+    html.mq-play body.student-mode .toast-notification { bottom: 84px !important; }
 
-    /* ---- Practice card: Exit + score + topic | progress | timer on ONE row ---- */
-    html.mq-play body.student-mode #gameView.active {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(180px, 34%) auto;
-        align-items: center;
-        column-gap: 8px;
-    }
-    html.mq-play body.student-mode #gameView > * { grid-column: 1 / -1; }
+    /* ---- Practice card, boss, race ---- */
     html.mq-play body.student-mode #gameView > .game-header {
-        grid-column: 1; grid-row: 1;
-        padding: 4px 12px; margin: 0; min-height: 52px;
+        grid-column: 2;
+        padding: 0 12px; min-height: 54px;
         flex-wrap: nowrap; gap: 10px;
         border-radius: 14px;
     }
@@ -112,39 +147,46 @@
     html.mq-play body.student-mode #gameView > .game-header .btn { min-height: 44px; }
     html.mq-play body.student-mode #gameTopicDisplay { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     html.mq-play body.student-mode #gameView > #skillProgressContainer {
-        grid-column: 2; grid-row: 1;
-        margin: 0; max-width: none; min-height: 52px; padding: 4px 16px; gap: 10px;
-        box-sizing: border-box;
+        grid-column: 3;
+        width: clamp(170px, 20vw, 300px);
+        max-width: none; min-height: 54px; padding: 0 14px; gap: 8px;
     }
-    html.mq-play body.student-mode #skillProgressText { white-space: nowrap; font-size: 0.85rem; }
-    html.mq-play body.student-mode #gameView > #timerContainer { grid-column: 3; grid-row: 1; margin: 0; }
-    html.mq-play body.student-mode #timerDisplay { padding: 6px 14px; min-height: 52px; box-sizing: border-box; font-size: 1.4rem; display: flex; align-items: center; gap: 6px; }
-    html.mq-play body.student-mode #timerValue { font-size: 1.4rem; }
-    html.mq-play body.student-mode #gameView > .q-dots-row { margin: 2px auto 0; padding: 2px 10px; }
-    html.mq-play body.student-mode #gameView #questionCard.mq-card { margin-top: 6px; padding-top: 6px; padding-bottom: 0; }
+    html.mq-play body.student-mode #skillProgressText { white-space: nowrap; font-size: 0.82rem; }
+    html.mq-play body.student-mode #gameView > #timerContainer { grid-column: 4; }
+    html.mq-play body.student-mode #timerDisplay { padding: 0 12px; min-height: 54px; box-sizing: border-box; font-size: 1.3rem; display: flex; align-items: center; gap: 6px; }
+    html.mq-play body.student-mode #timerValue { font-size: 1.3rem; }
+    /* boss and race: the arena or the track takes the progress bar's place in the bar, so the
+       pupil sees the hit or the car move while answering */
+    html.mq-play body.student-mode .container:has(#bossArena[style*="block"]) #skillProgressContainer,
+    html.mq-play body.student-mode .container:has(#raceTrack[style*="block"]) #skillProgressContainer,
+    html.mq-play body.student-mode #gameView > :is(#bossStatus, #raceStatus) { display: none !important; }
+    html.mq-play body.student-mode #gameView > :is(#bossArena, #raceTrack) {
+        grid-column: 3;
+        width: clamp(220px, 26vw, 380px);
+        height: 54px; padding: 0 12px;
+        border-width: 2px; border-radius: 14px;
+        overflow: hidden;
+    }
+    html.mq-play body.student-mode #bossArena .char-sprite { bottom: 2px; font-size: 1.8rem; }
+    html.mq-play body.student-mode #bossArena .boss-track { bottom: 6px; }
+    html.mq-play body.student-mode #raceTrack[style*="block"] { display: flex !important; flex-direction: column; justify-content: center; }
+    html.mq-play body.student-mode #raceTrack .race-lane { height: 23px; margin: 0; border-bottom-width: 1px; }
+    html.mq-play body.student-mode #raceTrack .race-car { bottom: 0; font-size: 1.05rem; }
+
+    html.mq-play body.student-mode #gameView > .q-dots-row { margin: 0 auto; padding: 2px 10px; }
+    html.mq-play body.student-mode #gameView #questionCard.mq-card { margin-top: 0; padding-top: 6px; padding-bottom: 0; }
     html.mq-play body.student-mode #gameView #questionCard.mq-card > .mq-qtop { margin-bottom: 4px; }
     html.mq-play body.student-mode #gameView #questionCard.mq-card #questionPaper.mq-qpaper { margin-top: 0; }
     /* The older short-screen rule (ui-components.css, max-height 760) capped the visual at 46vh and
        scrolled it inside the card, which hid a tall cell's answer row in a nested scroll box. The
        chrome is folded now and Check / Next are pinned, so the cell keeps its full height here. */
     html.mq-play body.student-mode #gameView .visual-aid { max-height: none; }
-    /* Boss and race: the arena and the track keep their characters, on a lower stage */
-    html.mq-play body.student-mode #gameView > .boss-status,
-    html.mq-play body.student-mode #gameView > .race-status { margin: 0; font-size: 0.9rem; line-height: 1.2; }
-    html.mq-play body.student-mode #gameView > .boss-arena { height: 68px; margin: 0; border-width: 3px; }
-    html.mq-play body.student-mode #gameView > .boss-arena .char-sprite { bottom: 14px; font-size: 2.2rem; }
-    html.mq-play body.student-mode #gameView > .race-track-container { padding: 2px 16px; margin: 0; }
-    html.mq-play body.student-mode #gameView > .race-track-container .race-lane { height: 26px; margin-bottom: 2px; }
-    html.mq-play body.student-mode #gameView > .race-track-container .race-car { bottom: 1px; font-size: 1.35rem; }
 
     /* Check / Hint / Read / Skip and Next stay on screen, pinned to the bottom edge while the card
-       runs past it (sticky: on a short item they sit in place, under the problem, as before). */
-    /* overflow-x: hidden made the card and the view scroll containers, which a sticky bar binds
-       to; clip cuts the same sideways overflow without making one. */
-    html.mq-play body.student-mode #gameView.active,
-    html.mq-play body.student-mode #questionCard,
-    html.mq-play body.student-mode #worksheetView.active,
-    html.mq-play body.student-mode #quizTakeView.active { overflow-x: clip; overflow-y: visible; }
+       runs past it (sticky: on a short item they sit in place, under the problem, as before).
+       overflow-x: hidden made the card a scroll container, which a sticky bar binds to; clip cuts
+       the same sideways overflow without making one. */
+    html.mq-play body.student-mode #questionCard { overflow-x: clip; overflow-y: visible; }
     /* Only a bar that holds Check is pinned: on an item answered by a tap on a choice the bar holds
        just Hint and Read, and pinning it would cover the choices. */
     html.mq-play body.student-mode #questionCard > .mq-qactions:has(> #qcCheckBtn.mq-show),
@@ -155,6 +197,7 @@
         margin-top: 4px !important;
         padding: 4px 0 5px;
         background: var(--mq-paper, #fff);
+        border-top: 1px solid var(--mq-rule, #ddd);
         box-shadow: 0 -6px 10px -8px rgba(0, 0, 0, 0.25);
     }
     /* the bar's buttons at a 46 px touch height (the Check button was 53 px of padding) */
@@ -165,26 +208,47 @@
     html.dark.mq-play body.student-mode #questionCard > .mq-qactions,
     html.dark.mq-play body.student-mode #questionCard > .next-btn-container { background: var(--bg-card, #1e1e2e); }
 
-    /* ---- Online worksheet: the bar with Check All stays at the top while the pupil scrolls ---- */
+    /* ---- Online worksheet: Back / Check All / New ride in the play bar ---- */
     html.mq-play body.student-mode #worksheetView > .game-header {
-        position: sticky; top: 0; z-index: 30;
-        padding: 4px 12px; margin-bottom: 8px; min-height: 52px;
+        grid-column: 2 / span 3;
+        padding: 0 12px; min-height: 54px;
+        flex-wrap: nowrap; gap: 10px;
+        border-radius: 14px;
+        border: 2px solid var(--mq-rule, #ddd);
     }
+    html.mq-play body.student-mode #worksheetView > .game-header > div { min-width: 0; }
     html.mq-play body.student-mode #worksheetView > .game-header .btn { min-height: 44px; }
+    html.mq-play body.student-mode #worksheetSkillPill { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
-    /* ---- Quiz: slimmer top bar, Previous / Next pinned to the bottom edge ---- */
-    html.mq-play body.student-mode #quizTakeView .qt-topbar { padding: 4px 14px; margin-bottom: 6px; }
-    html.mq-play body.student-mode #quizTakeView .qt-progress { margin-bottom: 6px; }
-    html.mq-play body.student-mode #quizTakeView .qt-question-card { padding-top: 10px; margin-bottom: 0; }
-    html.mq-play body.student-mode #quizTakeView .qt-nav {
-        position: sticky; bottom: 0; z-index: 30;
-        margin-top: 6px; padding: 8px 0 10px;
-        background: var(--bg-world, #e6f2f2);
+    /* ---- Quiz: the top bar rides in the play bar; Previous / Next pinned to the bottom edge ---- */
+    html.mq-play body.student-mode #quizTakeView > .qt-topbar {
+        grid-column: 2 / span 3;
+        padding: 0 14px; min-height: 54px;
+        flex-wrap: nowrap;
+        background: var(--mq-paper, #fff);
+        border: 2px solid var(--mq-rule, #ddd);
+        border-radius: 14px;
     }
+    html.mq-play body.student-mode #quizTakeView > .qt-progress { margin: 0; }
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card { padding-top: 6px; margin-bottom: 0; }
+    html.mq-play body.student-mode #quizTakeView .qt-q-header { margin-bottom: 2px; }
+    /* a bar chart is drawn at the practice card's size (the quiz stretched it to the cell's width,
+       ~500 px tall, so the bars were scrolled away while the question asked about them) */
+    html.mq-play body.student-mode #quizTakeView .k2-svg.fg-bars { max-width: min(100%, 460px) !important; margin-inline: auto; }
+    html.mq-play body.student-mode #quizTakeView > .qt-nav {
+        position: sticky; bottom: 0; z-index: 30;
+        margin-top: 0; padding: 6px 12px 8px;
+        background: var(--mq-paper, #fff);
+        border-top: 1px solid var(--mq-rule, #ddd);
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -6px 10px -8px rgba(0, 0, 0, 0.25);
+    }
+    html.dark.mq-play body.student-mode #quizTakeView > .qt-nav,
+    html.dark.mq-play body.student-mode #quizTakeView > .qt-topbar { background: var(--bg-card, #1e1e2e); }
 
-    /* active-box scrolls the next box into view "nearest": keep it clear of the pinned bars */
-    html.mq-play { scroll-padding-top: 12px; scroll-padding-bottom: 90px; }
-    html.mq-play:has(body.student-mode #worksheetView.active) { scroll-padding-top: 76px; scroll-padding-bottom: 16px; }
+    /* active-box scrolls the next box into view "nearest": keep it clear of the sticky bars */
+    html.mq-play { scroll-padding-top: 76px; scroll-padding-bottom: 80px; }
+    html.mq-play:has(body.student-mode #worksheetView.active) { scroll-padding-bottom: 16px; }
 }
 
 /* Wide short screens: the question dots ride in the card's top line, right of "Q1 + skill", instead
