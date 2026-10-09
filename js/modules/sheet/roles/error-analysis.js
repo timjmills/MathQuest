@@ -579,7 +579,11 @@ export function prepare(it, info = {}) {
     const room0 = times ? roomOf(it) * 2 : roomOf(it) + 1;
     // ONE fix width a page (critic pv-r2): the page passes its widest item's room as `o.room`
     let room = room0;
-    const ownLine = kind === 'value' && ownShapeOf(it) === 'line';
+    // div_facts Mix (`divForm`): the page deals one third each of Standard, Long division and
+    // Fraction, and the bracket's quotient is written in boxes where the other two write on a
+    // line. ONE fix shape per page (EA r5, B) would then drop every long-division item, so a Mix
+    // item's fix is always written on a line - the page keeps one fix shape AND all three forms.
+    const ownLine = kind === 'value' && (ownShapeOf(it) === 'line' || !!(it.q && it.q.divMix));
     // a fraction ("n/d") or a mixed number ("w n/d") is fixed as one: the last two parts over a bar
     const fracFix = kind === 'parts' && !labels && glue && (P.parts.length === 2 || P.parts.length === 3) && glue[glue.length - 2].trim() === '/'
         && !glue[0].trim() && !glue[glue.length - 1].trim() && (P.parts.length === 2 || !glue[1].trim());

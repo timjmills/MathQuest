@@ -125,11 +125,24 @@ export function cellKindFor(q) {
             return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
         }
     }
+    // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
+    // carries the paper's "Divide." line and the hosts' digit size like the other forms (critic R1
+    // D9 / D10: it fell through to the legacy twin, which restated "54 ÷ 9 = ?" over a 48 px bracket).
+    if (cellT === 'division' && pay.fact && p.op === '/') return { kind: 'division', ...p, fact: true };
+    // div_facts' Fraction form: the kit equation template's fraction drawing, its slot typed.
+    if (cellT === 'equation' && pay.notation === 'fraction' && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', frac: true, ...p };
     if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
+    // div_facts' Vertical form (divForm): a 12s-table dividend has three digits (144 ÷ 12); the
+    // paper draws it on the fact template, so the screen does too.
+    if (cellT === 'fact' && pay.notation === 'vertical' && p.op === '/' && A.length <= 3 && B.length <= 2 && ANS.length <= 2) return { kind: 'fact', ...p };
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
     }
+    // div_facts' Standard form (an across division FACT): the paper's tight tracks, and on a Mix
+    // page the slot under the sentence as paper prints it (critic R3 §6: 0.7 em on screen against
+    // 0.29 em on paper; the Mix slot beside on screen, under on paper).
+    if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
     if (!v.trim()) return { kind: 'eq', ...p };
     return null;
 }
@@ -244,6 +257,25 @@ export function equationHTML(k, slotHtml) {
     // S2: touch dots on the given numbers (k.supports, screenSupportsFor).
     const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
     const to = touchOpts(40, 'px');
+    // div_facts' Fraction form (divForm): the dividend over the divisor on a bar, = [slot] - the
+    // kit equation template's fraction drawing, same markup as paper (cells/equation.js).
+    if (k.frac) {
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" style="align-items:center" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+            + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+            + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
+            + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
+    if (k.divFact) {
+        // the kit equation cell's division-fact tracks (cells/equation.js ACROSS_OP_EM / ACROSS_GAP_EM)
+        const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
+        const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
+        const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
+        if (k.mix) {
+            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
+                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+        }
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`
         + `<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
@@ -683,8 +715,8 @@ function _badgePlace(el) {
     if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
     b.dataset.kind = kind;
     const r = el.getBoundingClientRect();
-    // not shown while the box is not, nor while this item's hint box is open over it
-    const hintOpen = !!host.querySelector('.hint-popup.active');
+    // not shown while the box is not
+    // (the hint now sits in page flow above the cell, so the tick stays while it is open)
     // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
     let clipped = false;
     for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
@@ -694,7 +726,7 @@ function _badgePlace(el) {
             if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
         }
     }
-    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
+    if (!r.width || !r.height || clipped) { b.style.display = 'none'; return; }
     b.style.display = '';
     const c = _badgeSpot(el, r, host);
     const hr = host.getBoundingClientRect();
@@ -2618,6 +2650,7 @@ export function ringCellHTML(p) {
  */
 export function workRowsHTML(k) {
     if (!k || k.kind !== 'division') return '';
+    if (k.fact) return '';      // a division FACT has no working rows (paper: workRows 0)
     const n = String(k.a).length;
     const steps = Math.max(1, Math.min(4, String(Math.floor(k.a / k.b)).length));
     const strip = (label) => `<div class="mq-workrow" role="group" aria-label="${attr(label)}"><span class="mq-workop">−</span>`

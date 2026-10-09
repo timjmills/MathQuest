@@ -196,7 +196,8 @@ export const MULTI_KEYS = Object.freeze({
     digits: '5K',        // how many digits (area models, box division)
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
-    // NEXT FREE IN BLOCK 5: 5N.
+    divForm: '5N',       // div_facts: standard / long division / fraction / vertical / mix (2026-10-03)
+    // NEXT FREE IN BLOCK 5: 5P.
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
@@ -316,6 +317,7 @@ export const VALUE_TOKENS = Object.freeze({
     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
+    divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
