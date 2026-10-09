@@ -285,7 +285,9 @@ Lesson and Independent pages of five other skills, rendered by `ws-grade-render 
 | `addition:add_facts` | Pixel-identical, every page and key, S and L |
 | `multiplication:mult_facts` | Pixel-identical, every page and key, S and L |
 | `division:long_div_2digit` | Only the bracket arc's join with the vinculum (161-774 px a page): the arc meets one continuous bar |
-| `division:divide` | Lesson p2 changed on purpose (R-2): warm-up 3, Independent 12, strip 0.34 (S) / 0.25 (L) against the parent's 0.37; p1 only its Score. Independent identical |
+| `division:divide` | Lesson p2 changed on purpose (R-2): warm-up 3, Independent 12. After critic R4's R-4 the Independent band is 2 x 6 at S and L, so "121 ÷ 11 = ___" keeps CL-8's 3 mm from its cell border (5.4 mm at S, 8.9 mm at L); p1 only its Score. Independent identical |
 | `division:div_remainders` | Lesson p2 changed: no overflow at S or L (the parent overflowed at S); the warm-up band is one look and one digit size (R-3: the kit cell drawn at the legacy cell's 28 pt, line beside). Independent identical |
 
 Round-4 lesson pages of the two other division skills: [cmp-r4-div_remainders-lesson-p2-S.png](cmp-r4-div_remainders-lesson-p2-S.png), [cmp-r4-div_remainders-lesson-p2-L.png](cmp-r4-div_remainders-lesson-p2-L.png), [cmp-r4-divide-lesson-p2-S.png](cmp-r4-divide-lesson-p2-S.png), [cmp-r4-divide-lesson-p2-L.png](cmp-r4-divide-lesson-p2-L.png).
+
+R-4 (critic R4, follow-up): the lesson's Independent band takes only column counts where every problem it may print keeps 3 mm from its cell's side borders, measured by the host (`measured[cols].slackMm`). No div_facts evidence page changed (pixel-compared); `add_facts` and `mult_facts` stay pixel-identical to `50dbfa6`.

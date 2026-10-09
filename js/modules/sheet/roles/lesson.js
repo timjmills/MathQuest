@@ -96,6 +96,9 @@ export const reflowsAt = (it, cols) => {
     return !!it && it.template === 'equation' && !!a && !!b && Number.isFinite(a.hMm) && Number.isFinite(b.hMm) && b.hMm > a.hMm * 1.25;
 };
 
+/** CL-8: the least space (mm) a problem keeps from its cell's side borders. */
+const CL8_MM = 3;
+
 const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));
 
 /** How many cells each prerequisite gets in its share of the width. */
@@ -1282,7 +1285,11 @@ export function plan(input = {}) {
     // One across look on the page (critic R3 N-2): the Guided cells keep a division fact's line
     // beside the sentence, so the Independent band takes only columns where it stays beside.
     const icOpts = [icWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= icWanted);
-    const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 6).some((it) => reflowsAt(it, c)));
+    // ... and only columns where every problem the band may print keeps CL-8's 3 mm from the cell's
+    // side borders, measured (`slackMm`; critic R4 R-4: "121 ÷ 11 = ___" ended 0.8 mm from its
+    // border in 3 columns) - fewer columns, never a cramped or shrunk problem.
+    const cramped = (it, c) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm < CL8_MM; };
+    const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)));
     const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);

@@ -996,6 +996,7 @@ function measureItems(items, { size, look, colsList }) {
                     const padR = parseFloat(cs.paddingRight) || 0;
                     let hPx = r.height;
                     let fits = true;
+                    let slackPx = Infinity;
                     let contentBottom = r.top;
                     let stampH = 0;
                     const pics = [];
@@ -1010,6 +1011,11 @@ function measureItems(items, { size, look, colsList }) {
                         }
                         if (el.closest('.ws-legacy-answer')) continue;
                         contentBottom = Math.max(contentBottom, er.bottom);
+                        // CL-8: how near the drawing comes to the cell's side borders (its leaves,
+                        // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
+                        if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
+                            slackPx = Math.min(slackPx, er.left - r.left, r.right - er.right);
+                        }
                         if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
                         // A clip under 1 mm is a stroke or a line box, not hidden content.
                         if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
@@ -1085,10 +1091,12 @@ function measureItems(items, { size, look, colsList }) {
                     }
                     const modes = Object.assign({}, best.modes || {});
                     for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW };
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW,
+                        slackMm: Math.min(best.slackMm === undefined ? Infinity : best.slackMm, slackPx / PX_PER_MM) };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+                if (Number.isFinite(best.slackMm)) it.measured[c].slackMm = Math.floor(best.slackMm * 10) / 10;
                 if (best.modes && Object.keys(best.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;

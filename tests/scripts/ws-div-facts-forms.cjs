@@ -630,6 +630,26 @@ const MARK = {
                 `R-3 ${sk} lesson ${size} warm-up: one digit size (${[...new Set(fs.map((x) => Math.round(x)))].join('/')} px), one answer place (${[...new Set(w.map((x) => (x.under ? 'under' : 'beside')))].join('/')}), labels clear (${w.filter((x) => !x.clear).length} touch)`);
         }
 
+        // R-4 (critic R4): no lesson cell's ink comes within CL-8's 3 mm of its side borders - on a
+        // page that deals a 3-digit dividend into its Independent band (the widest fact), for divide
+        // and div_facts Standard at S and L. The seed is the evidence seed when it deals one, else
+        // the first seed from 1 that does.
+        const THREE = /<span>\d{3}<\/span><span[^>]*>÷/;
+        for (const [sk, opts] of [['divide', {}], ['div_facts', { divForm: 'standard' }]]) for (const size of ['S', 'L']) {
+            let r = null, seed = evSeed('lesson', `division__${sk}`);
+            for (let k = 0; k < 60; k++) {
+                const t = await evBuild('lesson', size, opts, { skill: ['division', sk], seed });
+                const p2 = (t.pupil.split(/class="ws-page\b/)[2] || '');
+                if (THREE.test(p2.split('Independent Practice:')[1] || '')) { r = t; break; }
+                seed = k + 1;
+            }
+            if (!r) { check(false, `R-4 ${sk} lesson ${size}: a seed that deals a 3-digit dividend into page 2`); continue; }
+            const pg = (await inkScan(page, r.doc)).pages[1];
+            const near = pg.cells.filter((c) => !c.empty).map((c) => Math.min(c.left, c.right) * c.w / (96 / 25.4));
+            const worstMm = Math.min(...near);
+            check(worstMm >= 3, `R-4 ${sk} lesson ${size} (seed ${seed}): every cell's ink ${worstMm.toFixed(1)} mm or more from its side borders (>= 3 mm, CL-8)`);
+        }
+
         check(app.problems.filter((p) => p.type !== 'requestfailed').length === 0, `no console errors (${app.problems.map((p) => p.text).slice(0, 3).join(' | ')})`);
     } catch (e) {
         check(false, 'threw: ' + (e && e.stack || e));
