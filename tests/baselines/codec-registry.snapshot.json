@@ -99,6 +99,7 @@
     "skipAfter": "6Y",
     "rows": "1W",
     "times": "1Z",
+    "divForm": "5N",
     "spaces": "1X"
   },
   "blocks": {
@@ -664,6 +665,13 @@
       "none": "N",
       "each": "E",
       "given": "G"
+    },
+    "divForm": {
+      "standard": "S",
+      "long": "L",
+      "fraction": "F",
+      "vertical": "V",
+      "mix": "M"
     },
     "spaces": {
       "box": "B",

@@ -336,7 +336,10 @@ export function speakQuestion() {
 export function speakHint() {
     if (!("speechSynthesis" in window)) return;
     const body = document.querySelector('#hintModal .hint-modal-body');
-    const text = body ? _toSpeakable(body.textContent || '') : '';
+    // a line break between steps is read as a sentence break (pause), never run together
+    let raw = '';
+    if (body) { const c = body.cloneNode(true); c.querySelectorAll('br').forEach((br) => br.replaceWith('. ')); raw = (c.textContent || '').replace(/\.\s*\.\s/g, '. '); }
+    const text = raw ? _toSpeakable(raw) : '';
     if (!text) return;
     try { window.speechSynthesis.cancel(); } catch (_) {}
     const utterance = new SpeechSynthesisUtterance(text);
