@@ -64,6 +64,21 @@ const COMPACT_GAP_MM = 2.8;    // room for the short jump arrow between boxes (o
 const TWIN_ROW = 4;
 const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by columns (~24 px at the card's 3.4 px/mm)
 
+/**
+ * Item 7 (wave 1): a count row placed in a cell narrower than the full line - the Opener's and the Scripted Model's
+ * Model cell, half the page wide - wraps to THAT cell's width (more, shorter lines), never shrinking its digits for it.
+ * Only a print cell of 2+ columns narrows; the one-column sheets, the one-page sheet and the screen twin keep their line.
+ */
+const narrowCols = (p, ctx) => (!p.compact && ctx && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
+const narrowLive = (p, ctx, live) => { const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
+/** The fewest even lines whose numbers keep `boxW` mm each (and `gap` between) in `avail(rows)` mm. */
+function wrapRows(n, rows0, boxW, gap, avail) {
+    for (let rows = rows0; rows <= n; rows++) {
+        const per = Math.ceil(n / rows);
+        if (per * boxW + (per - 1) * gap <= avail(rows) + 1e-6) return { rows: Math.ceil(n / per), perRow: per };
+    }
+    return { rows: n, perRow: 1 };
+}
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
@@ -107,7 +122,7 @@ function geom(p, ctx) {
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
     // owner 2026-10-03: the arcs are gone, so the one-page sheet gives their 3 mm to the boxes (the page stays as full as before)
     const baseH = S(ctx).writeMm + (p.compact ? 6.4 : 2.5);
-    const live = p.compact ? COMPACT_LIVE_MM : LIVE_MM;
+    const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM : LIVE_MM);
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
@@ -207,6 +222,8 @@ function linesGeom(p, ctx, c) {
     }
     if (!twin && gapFor(n, w, false) < minGap - 1e-6) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
+        // a narrow (Model) cell: more lines before any digit shrinks
+        if (narrowCols(p, ctx) > 1) perRow = wrapRows(n, Math.ceil(n / perRow), w, minGap, (r) => live - tab - (r > 1 ? EXIT_MM : 0)).perRow;
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
             pt = Math.max(FLOOR_PT, Math.min(basePt, (w - 2.4) / (chars * 0.56 * PT_MM)));
@@ -226,10 +243,16 @@ function linesGeom(p, ctx, c) {
 
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
-    const perRow = n >= 13 ? 5 : Math.ceil(n / 2);             // 12 -> 6 + 6; 15 -> 5 + 5 + 5
-    const rows = Math.ceil(n / perRow);
+    let perRow = n >= 13 ? 5 : Math.ceil(n / 2);             // 12 -> 6 + 6; 15 -> 5 + 5 + 5
+    let rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
     const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
+    if (narrowCols(p, ctx) > 1) {
+        // a narrow (Model) cell: more lines, each box keeping today's digits (never below the size's floor)
+        const kS = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
+        const bMin = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4) * kS;
+        ({ rows, perRow } = wrapRows(n, rows, bMin, MIN_GAP, (r) => live - tab - (r > 1 ? EXIT_MM : 0)));
+    }
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill
     const pitch = (avail + MIN_GAP) / perRow;                   // box + gap, so six boxes and five gaps fill the line
     const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
@@ -457,7 +480,7 @@ register('count-row', {
         return { value: parts.join(', '), display: parts.map(fmt).join(', '), slots };
     },
     footprint(p, ctx) {
-        const g = geom(p, ctx || {});
+        const g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
         const w = g.tab + g.perRow * g.pitch - g.gap + 4;
         const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
