@@ -44,6 +44,8 @@
 //                             derived (hash(cat__skill:print:k)) - each page its own document `cat:skill@seed`
 //                             (a pool deals different members at every seed: critic r6 D6-6)
 //   --seed-list a,b,c         kit: lint every pool skill at exactly these seeds instead
+//   --letters A,B             kit, --roles more-practice: the letters asked (the teacher print screen's
+//                             default is A,B); without it the role prints its one default letter
 //
 // WHAT A DOCUMENT IS
 //   pack    one file of the mock-up pack; every `.ws-page` is one printed A4 sheet.
@@ -1374,7 +1376,7 @@ function tmpFile(name) {
     return path.join(TMP, name);
 }
 
-async function lintDocument(page, { id, mode, printBackground = false, notes = [] }) {
+async function lintDocument(page, { id, mode, printBackground = false, notes = [], pool = false }) {
     await page.emulateMediaType('print');
     await page.evaluate(() => document.fonts && document.fonts.ready);
     const box = await page.evaluate(wsPageBox);
@@ -1392,7 +1394,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     const findings = dom.findings.map(f => ({ ...f }));
     const F = (lint, rule, sev, loc, msg, key) => findings.push({ lint, rule, sev, msg, key: key || msg, ...loc });
     const dest = t => pdf.dests[t] || null;
-    const info = { id, mode, printedPages: pdf.pages.length, box, notes: [...notes] };
+    const info = { id, mode, printedPages: pdf.pages.length, box, notes: [...notes], pool };
 
     // ---- legacy: printed page of every tagged element
     if (mode === 'legacy') {
@@ -1509,7 +1511,19 @@ function lintKitGeometry(dom, pdf, info, F) {
             // print screen's default; --count N fixes it and turns this off), a practice page whose
             // problems end more than 20% of the body above the footer wastes the page. The last page
             // of a multi-page sheet may be short (PG-23).
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !(last && pt.pages.length > 1)) {
+            // (wave 1 lane D round 9, critic r7 D7-1) every More Practice letter is a sheet of its
+            // own, handed out alone (PT-MPR-1): only the last page of a LETTER that runs to several
+            // pages may be short, never letter B because it prints after letter A
+            const letterOf = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return m ? m[1] : ''; };
+            const mpLetter = p.role === 'more-practice' ? letterOf(p) : '';
+            const shortOk = mpLetter
+                ? (() => { const same = pt.pages.filter(q => q.role === 'more-practice' && letterOf(q) === mpLetter); return same.length > 1 && same[same.length - 1] === p; })()
+                : (last && pt.pages.length > 1);
+            // L-DENSITY POOL-MIN (round 9, critic r7 D7-1: mixed_multiplication More Practice printed
+            // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
+            if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
+                F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
                 // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
                 // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
@@ -1764,7 +1778,7 @@ async function legacyDocumentHtml(page) {
     });
 }
 
-async function lintHtmlInSheetPage(app, html, id, mode) {
+async function lintHtmlInSheetPage(app, html, id, mode, { pool = false } = {}) {
     const SAVE = arg('save-html', null);
     if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html'), html); }
     const sheet = await app.page.browser().newPage();
@@ -1778,7 +1792,7 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         // a sheet linted without its own stylesheets or fonts measures nothing real
         if (failed.length) throw new Error(`the document's stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
-        const res = await lintDocument(sheet, { id, mode });
+        const res = await lintDocument(sheet, { id, mode, pool });
         if (mode === 'kit' && arg('supports', null)) {
             const sr = await sheet.evaluate(supportCheckInPage);
             res.findings.push(...sr.findings);
@@ -1833,7 +1847,7 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE }) => {
+                    html = await page.evaluate(async ({ s, seed, LETTERS, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -1848,19 +1862,19 @@ async function runApp(source) {
                                 opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined, letters: role === 'more-practice' && LETTERS ? LETTERS : undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE });
+                    }, { s, seed, LETTERS: arg('letters', null) ? arg('letters', '').split(',').map(x => x.trim().toUpperCase()).filter(Boolean) : null, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
                     process.stdout.write(`  ${id}: n/a (${html.unsupported})\n`);
                     continue;
                 }
-                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
+                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', { pool: source === 'kit' && poolSkill(s) });
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
@@ -2061,6 +2075,30 @@ const SELF_TESTS = [
         // the two grids end 28 % of the problem area above the footer
         for (const x of [g, g2]) { x.style.flex = 'none'; x.style.height = `${(foot - top) * 0.36}px`; x.style.gridTemplateRows = 'repeat(2, 1fr)'; }
     } },
+    // wave 1 lane D round 9 (critic r7 D7-1): More Practice letter B is a sheet of its own, so a strip
+    // under its problems fails although it prints after letter A
+    { name: 'strip under More Practice letter B (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = `Practice ${'AB'[i]}`;
+        });
+        const g = p2.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p2.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.7}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
+    } },
+    { name: 'a mixed pool page of one problem (kit)', mode: 'kit', pool: true, expect: ['L-DENSITY', 'POOL-MIN'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells.slice(1).forEach(c => c.remove());
+        g.style.gridTemplateColumns = '1fr'; g.style.gridTemplateRows = '1fr';
+    } },
     // wave 1 lane D round 8 (critic r6 D6-1): the key's "110" hung 4 mm out of its answer box
     { name: 'key answer outside its box', expect: ['L-KEY', 'AK-2'], fn: () => {
         const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
@@ -2153,7 +2191,7 @@ async function selfTest() {
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
-            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack' });
+            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool });
             await page.close();
             const exp = Array.isArray(t.expect[0]) ? t.expect : [t.expect];
             for (const e of exp) {
