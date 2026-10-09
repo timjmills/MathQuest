@@ -910,3 +910,6 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
    whole row and fit() scales it inside the frame instead of clipping its last box. Additive. */
 .tv-sko-frame :is(.tvp-visual, .k2-twin, .k2-countrow, .k2-countrow-frame, [data-mq-swiperow]):has(.k2-countrow-body) { max-width: none !important; width: max-content !important; min-width: 0 !important; }
 .tv-sko-frame .k2-countrow-frame [data-mq-swiperow] { flex: none !important; }
+/* critic search-terms r5 U-E (2026-10-09): the Sets search box keeps the line for its "Showing results for ..." notice
+   reserved at all times, so the Level row never jumps when a correction appears or goes. Additive. */
+.tv-panel-head .tv-search:has(> #tvSkillSearch) { margin-bottom: 12px; }

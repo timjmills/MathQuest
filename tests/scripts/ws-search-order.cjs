@@ -125,50 +125,128 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
         await page.evaluate(() => { const el = document.getElementById('qbSearchInput'); el.value = 'tme'; el.dispatchEvent(new Event('input', { bubbles: true })); });
         const after = await rects();
         if (before.join('|') !== after.join('|')) failures.push(`notice moved the quiz builder filter row: ${before.join('|')} -> ${after.join('|')}`);
-        // critic r4 U-B / U-C: in EVERY box the corrected-search line is VISIBLE at Chromebook size
-        // (the topmost element at its centre is the line, probed with pointer-events on), and in the Sets
-        // picker it does not cover the Level label.
-        for (const [w, h] of [[1366, 650], [1280, 720]]) {
+        // critic r4 U-B / U-C, r5 U-D / U-E / U-F: in EVERY box, at every Chromebook size, the corrected-search line
+        //   - is VISIBLE: the topmost element at its left, centre and right, on its first AND last line, is the line
+        //     (probed with pointer-events on), and it lies inside the window;
+        //   - is READ IN FULL: the exact text, no ellipsis, scrollWidth <= clientWidth and scrollHeight <= clientHeight
+        //     (a long word may run wider than the box or wrap, never be cut off);
+        //   - in the student box and the print picker is the results list's FIRST row (never on the list's border);
+        //   - in the Sets picker never covers the Level label, and the Level row never moves (the line is reserved).
+        const WORDS = [['tme', 'time'], ['multiplcation', 'multiplication'], ['probabilty', 'probability'], ['perimter', 'perimeter']];
+        const BOXES = [
+            ['skillSearchInput', async () => { await page.evaluate(() => { window.setUserRole && window.setUserRole('student'); window.goHome && window.goHome(); }); }],
+            ['soSearchInput', async () => { await page.evaluate(() => { window.soInitialize && window.soInitialize(); window.showView('skillsOrganizerView'); }); }],
+            ['qbSearchInput', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.openQuizBuilder(); window.showView('quizBuilderView'); }); }],
+            ['tvlSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('library'); }); }],
+            ['tvSkillSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('sets'); }); }],
+            ['tvPick0', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('print'); window.tvOpenPrintWith(window.skillQueue);
+                const b = document.querySelector('#teacherMain [data-screen="print"] [data-act="pick"]'); if (b && !document.getElementById('tvPick0')) b.click(); }); }],
+        ];
+        const LIST = { skillSearchInput: 'skillSearchResults', tvPick0: 'tvPickRes0' };
+        const probe = (id, want, list) => page.evaluate((i, w, l) => {
+            const box = document.getElementById(i);
+            if (!box || !box.offsetParent) return 'NO BOX';
+            const n = document.getElementById(i + 'Fix');
+            if (!n || n.hidden) return 'NO NOTICE';
+            if (n.textContent !== `Showing results for ${w}`) return `TEXT ${JSON.stringify(n.textContent)}`;
+            if (l) {
+                const ls = document.getElementById(l);
+                if (!ls || ls.firstElementChild !== n) return `NOT the first row of ${l} (first: ${ls && ls.firstElementChild ? ls.firstElementChild.id || ls.firstElementChild.className || ls.firstElementChild.tagName : 'none'})`;
+            }
+            n.scrollIntoView({ block: 'nearest' });
+            const cs = getComputedStyle(n);
+            if (cs.textOverflow === 'ellipsis') return 'ELLIPSIS';
+            if (n.scrollWidth > n.clientWidth) return `TRUNCATED scrollWidth ${n.scrollWidth} > clientWidth ${n.clientWidth}`;
+            if (n.scrollHeight > n.clientHeight + 1) return `CLIPPED scrollHeight ${n.scrollHeight} > clientHeight ${n.clientHeight}`;
+            const r = n.getBoundingClientRect();
+            if (!r.width || !r.height) return 'ZERO SIZE';
+            if (r.left < 0 || r.right > window.innerWidth || r.top < 0 || r.bottom > window.innerHeight) return `OUT OF WINDOW ${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.right)},${Math.round(r.bottom)}`;
+            // the bold corrected word itself is inside the line's box (not cut by an ancestor)
+            const strong = n.querySelector('strong');
+            const sr = strong && strong.getBoundingClientRect();
+            if (!sr || sr.right > r.right + 0.5 || sr.bottom > r.bottom + 0.5) return 'WORD OUTSIDE THE LINE';
+            const pe = n.style.pointerEvents; n.style.pointerEvents = 'auto';
+            const ys = [r.top + 4, r.bottom - 4];
+            const pts = [];
+            for (const y of ys) pts.push([r.left + 4, y], [r.left + r.width / 2, y], [r.right - 4, y]);
+            pts.push([(sr.left + sr.right) / 2, (sr.top + sr.bottom) / 2]);
+            const bad = pts.map(([x, y]) => document.elementFromPoint(x, y)).find((hit) => !hit || !(hit === n || n.contains(hit)));
+            n.style.pointerEvents = pe;
+            if (bad !== undefined) return `HIDDEN under ${bad ? bad.id || bad.className || bad.tagName : 'nothing'}`;
+            if (l) {
+                // inside the list's border box: never on (or over) its border
+                const ls = document.getElementById(l), lr = ls.getBoundingClientRect();
+                const inL = lr.left + ls.clientLeft, inT = lr.top + ls.clientTop, inR = lr.right - parseFloat(getComputedStyle(ls).borderRightWidth || '0');
+                if (r.top < inT - 0.5 || r.left < inL - 0.5 || r.right > inR + 0.5) return `ON THE LIST BORDER ${Math.round(r.top)}/${Math.round(inT)} ${Math.round(r.left)}/${Math.round(inL)} ${Math.round(r.right)}/${Math.round(inR)}`;
+            }
+            if (i === 'tvSkillSearch') {
+                const lv = document.getElementById('tvLevelL').getBoundingClientRect();
+                if (lv.top < r.bottom && lv.bottom > r.top && lv.left < r.right && lv.right > r.left) return 'COVERS the Level label';
+            }
+            return 'OK';
+        }, id, want, list);
+        const levelTop = () => page.evaluate(() => { const l = document.getElementById('tvLevelL'); return l ? Math.round(l.getBoundingClientRect().top + window.scrollY) : null; });
+        let checked = 0;
+        for (const [w, h] of [[1366, 768], [1280, 720], [1366, 650]]) {
             await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
-            const BOXES = [
-                ['skillSearchInput', async () => { await page.evaluate(() => { window.setUserRole && window.setUserRole('student'); window.goHome && window.goHome(); }); }],
-                ['soSearchInput', async () => { await page.evaluate(() => { window.soInitialize && window.soInitialize(); window.showView('skillsOrganizerView'); }); }],
-                ['qbSearchInput', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.openQuizBuilder(); window.showView('quizBuilderView'); }); }],
-                ['tvlSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('library'); }); }],
-                ['tvSkillSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('sets'); }); }],
-                ['tvPick0', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('print'); window.tvOpenPrintWith(window.skillQueue);
-                    const b = document.querySelector('#teacherMain [data-screen="print"] [data-act="pick"]'); if (b && !document.getElementById('tvPick0')) b.click(); }); }],
-            ];
             for (const [id, go] of BOXES) {
                 await go();
                 await sleep(400);
-                await page.focus('#' + id).catch(() => {});
-                await page.evaluate((i) => { const el = document.getElementById(i); if (el) el.value = ''; }, id);
-                await page.type('#' + id, 'tme').catch(() => {});
-                await sleep(250);
-                const res = await page.evaluate((i) => {
-                    const box = document.getElementById(i);
-                    if (!box || !box.offsetParent) return 'NO BOX';
-                    const n = document.getElementById(i + 'Fix');
-                    if (!n || n.hidden) return 'NO NOTICE';
-                    n.scrollIntoView({ block: 'nearest' });
-                    const r = n.getBoundingClientRect();
-                    const pe = n.style.pointerEvents; n.style.pointerEvents = 'auto';
-                    const pts = [[r.left + 4, r.top + r.height / 2], [r.left + r.width / 2, r.top + r.height / 2], [r.right - 4, r.top + r.height / 2]];
-                    const bad = pts.map(([x, y]) => document.elementFromPoint(x, y)).find((hit) => !hit || !(hit === n || n.contains(hit)));
-                    n.style.pointerEvents = pe;
-                    if (!r.width || !r.height) return 'ZERO SIZE';
-                    if (bad !== undefined) return `HIDDEN under ${bad ? bad.id || bad.className || bad.tagName : 'nothing'}`;
-                    if (i === 'tvSkillSearch') {
-                        const l = document.getElementById('tvLevelL').getBoundingClientRect();
-                        if (l.top < r.bottom && l.bottom > r.top && l.left < r.right && l.right > r.left) return 'COVERS the Level label';
+                for (const [typo, want] of WORDS) {
+                    await page.focus('#' + id).catch(() => {});
+                    await page.evaluate((i) => { const el = document.getElementById(i); if (el) { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); } }, id);
+                    const lv0 = id === 'tvSkillSearch' ? await levelTop() : null;
+                    await page.type('#' + id, typo).catch(() => {});
+                    await sleep(250);
+                    const res = await probe(id, want, LIST[id]);
+                    checked++;
+                    if (res !== 'OK') failures.push(`notice ${id} "${typo}" at ${w}x${h}: ${res}`);
+                    if (id === 'tvSkillSearch') {
+                        const lv1 = await levelTop();
+                        if (lv0 !== lv1) failures.push(`Sets: the Level row moved ${lv0} -> ${lv1} when "${typo}" was corrected at ${w}x${h}`);
                     }
-                    return n.textContent;
-                }, id);
-                if (res !== 'Showing results for time') failures.push(`notice visible ${id} at ${w}x${h}: ${res}`);
+                }
                 await page.evaluate((i) => { const el = document.getElementById(i); if (el) { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); } }, id);
             }
         }
+        // critic r5 U-D: the student box keeps its notice as the list's first row whenever the list is rebuilt:
+        // after "+" on a result, and after a blur and a refocus (real clicks and keystrokes)
+        for (const [w, h] of [[1366, 650], [1280, 720]]) {
+            await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+            await BOXES[0][1]();
+            await sleep(400);
+            await page.evaluate(() => { const el = document.getElementById('skillSearchInput'); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); });
+            await page.click('#skillSearchInput');
+            await page.type('#skillSearchInput', 'tme');
+            await sleep(300);
+            let res = await probe('skillSearchInput', 'time', 'skillSearchResults');
+            if (res !== 'OK') failures.push(`student "tme" at ${w}x${h}: ${res}`);
+            const plus = await page.evaluateHandle(() => [...document.querySelectorAll('#skillSearchResults button')].find((b) => /addToSkillQueue/.test(b.getAttribute('onclick') || '')));
+            if (!plus || !(await plus.evaluate((b) => !!b))) failures.push(`student at ${w}x${h}: no "+" button in the results`);
+            else {
+                await plus.click();
+                await sleep(700);
+                res = await probe('skillSearchInput', 'time', 'skillSearchResults');
+                if (res !== 'OK') failures.push(`student after "+" at ${w}x${h}: ${res}`);
+                // take it back off the queue (the list was rebuilt, so find its "+" again)
+                await page.evaluate(() => { const b = [...document.querySelectorAll('#skillSearchResults button')].find((x) => /addToSkillQueue/.test(x.getAttribute('onclick') || '')); if (b) b.click(); });
+                await sleep(500);
+            }
+            // blur (a real click on empty page space), then refocus with a real click
+            await page.mouse.click(5, h - 5);
+            await sleep(500);
+            await page.click('#skillSearchInput');
+            await sleep(400);
+            res = await probe('skillSearchInput', 'time', 'skillSearchResults');
+            if (res !== 'OK') failures.push(`student after blur and refocus at ${w}x${h}: ${res}`);
+            // a rebuild by the app's own code (handleSkillSearch without typing)
+            await page.evaluate(() => window.handleSkillSearch(document.getElementById('skillSearchInput').value));
+            await sleep(200);
+            res = await probe('skillSearchInput', 'time', 'skillSearchResults');
+            if (res !== 'OK') failures.push(`student after a handleSkillSearch rebuild at ${w}x${h}: ${res}`);
+            await page.evaluate(() => { const el = document.getElementById('skillSearchInput'); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.blur(); });
+        }
+        console.log(`ws-search-order: ${checked} notice checks (6 boxes x 4 corrections x 3 Chromebook sizes) + student rebuild checks`);
     } catch (e) {
         failures.push(`exception: ${e.message}`);
     } finally {
