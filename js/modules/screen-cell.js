@@ -1558,14 +1558,21 @@ function wireChartSwipe(cellEl) {
 }
 
 /** The disk mat's window (kitCellTwin): the same swipe cue, hidden when the mat fits or is scrolled to the end. */
+// ONE shared resize listener for every disk window on the page (critic nit: one per render piled up
+// and kept old nodes alive); it updates the windows that are in the page now.
+const diskWinEnd = (w) => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+let diskResizeWired = false;
 export function wireDiskSwipe(root) {
     if (!root || !root.querySelectorAll) return;
+    if (!diskResizeWired && typeof window !== 'undefined') {
+        diskResizeWired = true;
+        window.addEventListener('resize', () => document.querySelectorAll('.mq-diskwin').forEach(diskWinEnd));
+    }
     root.querySelectorAll('.mq-diskwin').forEach((w) => {
-        const upd = () => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        const upd = () => diskWinEnd(w);
         if (w.dataset.mqSwipe !== '1') {
             w.dataset.mqSwipe = '1';
             w.addEventListener('scroll', upd, { passive: true });
-            window.addEventListener('resize', upd);
             setTimeout(upd, 300); setTimeout(upd, 1000);
         }
         upd();
@@ -1794,7 +1801,9 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         el.setAttribute('inputmode', kind ? 'text' : 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
-        el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
+        el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        if (fixedW) el.dataset.mqFixed = '1';
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
@@ -2403,18 +2412,20 @@ export function unmonoCell(root) {
 const _n = (v) => { const x = Number(String(v == null ? '' : v).replace(/,/g, '')); return Number.isFinite(x) ? x : null; };
 
 /** One boxed answer slot for wireCellSlots: `w` is the digit capacity (SL-2: the section's width). */
-export function cellSlot(w = 2, label = '') {
+export function cellSlot(w = 2, label = '', fixed = false) {
     const n = Math.max(1, Math.min(8, w | 0));
-    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}" style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
+    // `fixed`: the box holds exactly `w` digits (a unit-form place box is one digit): maxlength is w,
+    // and a full box hands the caret on (active-box.js)
+    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}"${fixed ? ' data-mq-fixed="1"' : ''} style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths) {
+export function inlineBlanksHTML(text, widths, fixed = false) {
     let i = 0;
     const html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
-        return cellSlot(w);
+        return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
     return i ? `<div class="mq-ibline">${html}</div>` : '';
 }
@@ -2951,7 +2962,7 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -3403,7 +3414,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         table.setAttribute('data-mq-join', '');
         slots.forEach((s, k) => {
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
             const box = t.content.firstChild;
             box.classList.add('mq-cellbox--chart');
             s.replaceWith(box);
@@ -3411,9 +3422,12 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         mode = 'slots';
     } else if (inline && sets && sets[0] && sets[0].length === slots.length) {
         slots.forEach((s, k) => {
-            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(/[^0-9]/g, '').length));
+            // a unit-form place box (fixedWidth) holds its own digits exactly: 1 for "7 hundreds"
+            const fx = !!q.inlineBlanksData.fixedWidth;
+            const len = String(sets[0][k]).replace(/[^0-9]/g, '').length;
+            const w = fx ? Math.max(1, Math.min(8, len)) : Math.max(2, Math.min(8, len));
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
             s.replaceWith(box);

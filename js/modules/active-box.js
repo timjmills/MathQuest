@@ -152,6 +152,30 @@ function selectIfLoose(active) {
     }
 }
 
+// A FULL box hands the caret on (critic placevalue-phones D1, "the lost 0"): when the box the pupil
+// is typing in holds its whole digit count (its maxlength) after their own keystroke, the caret moves
+// to the next empty answer box of the same problem, in entry order (ones first in a column). This is
+// on every host and whether the digit is right or wrong: it reveals nothing, it only stops the next
+// digit joining a box that cannot take it. Only boxes with a fixed digit count (maxlength) move on;
+// a box whose answer may be longer never does. A count-by row keeps its own focus rule, and a widget
+// that has already moved the caret itself is left alone.
+function advanceIfFull(el) {
+    if (!el || el !== document.activeElement || el.tagName !== 'INPUT' || !isAnswerBox(el)) return;
+    const max = el.maxLength;
+    if (!(max > 0) || String(el.value || '').length < max) return;
+    if (el.closest('[data-mq-swiperow]')) return;
+    const host = el.closest(POPUP) || el.closest(HOSTS);
+    if (!host) return;
+    const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
+    const i = boxes.indexOf(el);
+    if (i < 0) return;
+    const ok = (b) => !valueOf(b) && !isOptional(b) && !b.classList.contains('mq-live-correct')
+        && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
+    const next = boxes.slice(i + 1).find(ok) || boxes.slice(0, i).find(ok);
+    if (!next) return;
+    try { next.focus({ preventScroll: onScreen(next) }); } catch (e) { /* ignore */ }
+}
+
 export function refreshActiveBox() {
     if (typeof document === 'undefined') return;
     const popups = [...document.querySelectorAll(POPUP)].filter(visibleHost);
@@ -179,7 +203,12 @@ export function installActiveBox() {
     window.__mqActiveBoxInstalled = true;
     for (const ev of ['pointerdown', 'mousedown', 'touchstart', 'click']) document.addEventListener(ev, (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
     // only the box the pupil is typing in (widgets re-fire input on a hidden combined box afterwards)
-    document.addEventListener('input', (e) => { if (e.target === document.activeElement) lastInput = { t: Date.now(), el: e.target }; }, true);
+    document.addEventListener('input', (e) => {
+        if (e.target !== document.activeElement) return;
+        lastInput = { t: Date.now(), el: e.target };
+        // the pupil's own keystroke (not a script's re-fired input): after the widgets have run
+        if (e.isTrusted) { const el = e.target; setTimeout(() => advanceIfFull(el), 0); }
+    }, true);
     // A key typed while no typing place has the focus (after a hint pop-up closes, after a tap on a
     // button) goes into the pulsing box instead of being lost (critic R4-4). Count-by rows on a phone
     // have their own digit-key rule.

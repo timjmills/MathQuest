@@ -82,6 +82,10 @@ below; this file only points to them.
 | **2026-09-27, recorded, not built:** answers on every printed key are reddish orange (owner 2026-10-02; was red) (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
 | **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker; several skills can be selected in one go in thumbnail or list view | `design/TEACHER_SCREENS.md` "Selecting skills" |
 
+| **2026-10-09, provisional (lead):** the four-zone place-value disk mat swipes inside its cell on a 390 px phone (SP-11a extended to disk mats) until the owner rules | `WORKSHEET_DESIGN_STANDARD.md` SP-11a |
+
+Open question (place-value disks lane): on a phone, keep the four-zone disk mat as a swipe, or draw it 2 × 2 (Th H over T O)?
+
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
 of coin unless the teacher changes it — keep the default?

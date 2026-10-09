@@ -293,7 +293,8 @@ function frameHTML(ctx, text, key, digits) {
     // slot, the slot and what follows it stay together on the last line.
     if (parts.length === 2) {
         const pre = parts[0].trim().split(/\s+/).filter(Boolean);
-        const last = pre.pop() || '';
+        // a short label ("hundreds disks:") is one piece in the group, so its words share one size and baseline
+        const last = pre.length <= 2 ? pre.splice(0).join(' ') : (pre.pop() || '');
         const grp = `<span class="pv-slotgroup" style="display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;">${piece(ctx, last)}${slot}${piece(ctx, parts[1])}</span>`;
         return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${piece(ctx, pre.join(' '))}${grp}</div>`;
     }
