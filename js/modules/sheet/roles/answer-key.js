@@ -355,7 +355,7 @@ function gridPart(part, ctx, report) {
         // critic r3 (N-1, lead ruling on Q1): the key marks a Model cell, so its traced worked answer
         // stays a black given there while a Guided Practice trace takes the key ink (key only).
         let html = itemHtml(item, ctx, report);
-        if (ctx.state === 'answered' && (item.model || report.inModel)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
+        if (report.key && (item.model || report.inModel)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
         return {
             html,
             cls: [gi.cls, item.cls].filter(Boolean).join(' '),
@@ -441,8 +441,8 @@ export function renderPages(plan, opts = {}) {
     const ctx = resolveCtx(base);
     const pages = plan.pages && plan.pages.length ? plan.pages : [{ sections: plan.sections || [] }];
     const n = pages.length;
-    const report = { gaps: [], label: 1, cellNo: 0, page: 1, index: 0 };
     const key = state === 'answered';
+    const report = { gaps: [], label: 1, cellNo: 0, page: 1, index: 0, key };
 
     const out = pages.map((pg, i) => {
         report.page = i + 1;

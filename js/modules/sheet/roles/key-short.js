@@ -99,7 +99,14 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
             const pLeft2 = pLeft.filter((_, j) => !loUsed.has(j));
             const st = align(pLeft2.map((i) => pTok[i].struct), kLeft2.map((i) => kTok[i].struct));
             const structTwin = new Map(kLeft2.map((ki, j) => [ki, st.has(j) ? pTok[pLeft2[st.get(j)]] : null]));
-            ks.forEach((ki, j) => { if (exact.has(j)) verdict.set(ki, 'same'); });
+            // the pupil page traces it and the key inks it solid (a Guided Practice hop, a traced
+            // digit): on a worked Model a given, elsewhere the answer the pupil goes over
+            const overTrace = (t) => (t.svg ? (/^(text|tspan)$/i.test(t.tag) ? 'ans' : 'add') : 'text');
+            ks.forEach((ki, j) => {
+                if (!exact.has(j)) return;
+                const t = kTok[ki], twin = pTok[ps[exact.get(j)]];
+                verdict.set(ki, twin.trace && !t.trace && !modelCells.has(c) && t.text.replace(/&nbsp;|\s/g, '') + (t.svg ? 'x' : '') ? (/\sdata-ws-ink="solid"/.test(t.attrs) ? 'ans' : overTrace(t)) : 'same');
+            });
             kLeft.forEach((ki, j) => {
                 const t = kTok[ki];
                 if (/\sdata-ws-cell="/.test(t.attrs) || /\bmq-pupil\b/.test(attrOf(t.attrs, 'class'))) return;
@@ -115,7 +122,7 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
                 // item the answer the pupil goes over (key ink) - its text only on a printed line or box
                 if (twin.trace) {
                     if (modelCells.has(c)) verdict.set(ki, 'given');
-                    else verdict.set(ki, solid ? 'ans' : (t.svg ? (/^(text|tspan)$/i.test(t.tag) ? 'ans' : 'add') : 'text'));
+                    else verdict.set(ki, solid ? 'ans' : overTrace(t));
                     return;
                 }
                 // the same element with new text (a filled write-on line, a sign box, an answer-row

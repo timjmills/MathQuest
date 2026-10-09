@@ -97,12 +97,14 @@ async function alignProbe({ role, FAM }) {
                 // all given, nothing in key ink; a traced answer anywhere else is the pupil's, key ink
                 const model = cell.matches('[data-ws-key-model]') || !!cell.querySelector('[data-ws-key-model]');
                 const traced = !!pcell.querySelector('[data-ws-ink="trace"]');
+                // a trace the key prints again (a worked chart state) is the same given on both pages
+                const traceKept = (t) => K.some((y) => y.s === t && y.el.closest('[data-ws-ink="trace"]'));
                 if (model && traced) {
                     const or = [...cell.querySelectorAll('*')].find((e) => vis(e) && (w.getComputedStyle(e).color === ORANGE || (e instanceof w.SVGElement && (w.getComputedStyle(e).stroke === ORANGE || w.getComputedStyle(e).fill === ORANGE))));
                     if (or) issues.push(`${where} the worked Model prints "${or.textContent.trim().slice(0, 16)}" in key ink`);
                     return;
                 }
-                const pT = tally(P, (x) => !x.el.closest('[data-ws-ink="trace"]')), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
+                const pT = tally(P, (x) => !x.el.closest('[data-ws-ink="trace"]') || traceKept(x.s)), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
                 // (a hint the key leaves out, e.g. a model's traced count, is not a given in key ink)
                 const kO = tally(K, (x) => w.getComputedStyle(x.el).color === ORANGE);
                 for (const [t, n] of pT) if ((kB.get(t) || 0) < n && (kO.get(t) || 0) > 0) issues.push(`${where} given text "${t.slice(0, 24)}" in key ink`);
@@ -135,7 +137,9 @@ async function alignProbe({ role, FAM }) {
                 // (`data-ws-key-mark`); and a ring the key draws where the pupil twin draws none (or a
                 // transparent one) is the answer, in key ink
                 const els = (c) => [...c.querySelectorAll('*')].filter((e) => !(e instanceof w.SVGElement) && vis(e));
-                const esig = (e) => [e.tagName, e.getAttribute('class') || '', e.getAttribute('data-ws-slot') || '', e.getAttribute('data-ws-shape') || ''].join('|');
+                // the element's build: tag, class, slot, shape and its inline style without colours
+                const esig = (e) => [e.tagName, e.getAttribute('class') || '', e.getAttribute('data-ws-slot') || '', e.getAttribute('data-ws-shape') || '',
+                    (e.getAttribute('style') || '').split(';').map((d) => d.trim()).filter((d) => d && !/^(color|fill|stroke)\s*:/i.test(d)).map((d) => d.replace(/#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|\b(?:black|white|transparent)\b/gi, 'C')).join(';')].join('|');
                 const edges = (cs) => {
                     const o = [];
                     for (const s of ['Top', 'Right', 'Bottom', 'Left']) if (cs['border' + s + 'Style'] !== 'none' && parseFloat(cs['border' + s + 'Width']) > 0 && cs['border' + s + 'Color'] !== 'rgba(0, 0, 0, 0)') o.push(cs['border' + s + 'Color']);
@@ -144,6 +148,13 @@ async function alignProbe({ role, FAM }) {
                 };
                 const KE = els(cell).filter((e) => !e.matches('[data-ws-key-text]')), PE = els(pcell);
                 const me = lcsMap(PE.map(esig), KE.map(esig));
+                {   // then what is left by its build alone (a ring restyles the element it rings)
+                    const used = new Set(me.values());
+                    const kl = KE.map((e, j) => j).filter((j) => !me.has(j)), pl = PE.map((e, i) => i).filter((i) => !used.has(i));
+                    const lsig = (e) => esig(e).split('|').slice(0, 4).join('|');
+                    const m2 = lcsMap(pl.map((i) => lsig(PE[i])), kl.map((j) => lsig(KE[j])));
+                    for (const [a, b] of m2) me.set(kl[a], pl[b]);
+                }
                 KE.forEach((e, j) => {
                     const kb = edges(w.getComputedStyle(e));
                     if (!kb.length) return;

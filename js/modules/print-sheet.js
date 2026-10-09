@@ -1931,7 +1931,7 @@ export function arrangeKey(res, ko, req = {}) {
                 // critic r3 (N-3): a part that falls back to the end still keeps the sheets whole, so
                 // its key starts on a front and the next section never starts on a back
                 const blank = blankBack(paperAttr);
-                const nPages = (list) => list.reduce((n, h) => n + (String(h).match(/<section class="ws-page/g) || []).length, 0);
+                const nPages = (list) => list.reduce((n, h) => n + (String(h).match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length, 0);
                 const out = [...pupil];
                 if (nPages(out) % 2) out.push(blank);
                 out.push(...keyPages);

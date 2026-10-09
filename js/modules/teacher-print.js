@@ -832,7 +832,7 @@ async function buildAll(req) {
         // critic r3 (N-3): with "Start each key on a new sheet" every section keeps its sheets whole,
         // so the next section never starts on the back of the last one
         const ko = res.keyOptions || {};
-        if (ko.on && ko.newSheet && (part.match(/<section class="ws-page/g) || []).length % 2) part += '\n' + blankBack(/letter/i.test(r.paper || '') ? 'letter' : 'a4');
+        if (ko.on && ko.newSheet && (part.match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length % 2) part += '\n' + blankBack(/letter/i.test(r.paper || '') ? 'letter' : 'a4');
         out.docHtml += part + '\n';
         if (res.keyOptions && res.keyOptions.on && res.keyOptions.placement === 'after-page') after = true;
         out.keyPages += res.keyPageCount || 0;
@@ -843,7 +843,7 @@ async function buildAll(req) {
     // "At the end": every section's pupil pages, then every key (today's order).
     if (!after) out.docHtml = out.pupilHtml + out.keyHtml;
     // critic r3 (N-2): the pages the printer will run, blank backs included
-    out.docPages = (out.docHtml.match(/<section class="ws-page/g) || []).length;
+    out.docPages = (out.docHtml.match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length;
     out.newSheet = after && req.parts.some((r) => r.key && r.key.newSheet);
     // Page labels must be unique when several sections repeat a letter.
     const seen = {};
