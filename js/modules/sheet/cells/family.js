@@ -308,12 +308,12 @@ register('number-family', {
             const v = b ? box(g, b.id, { wMm: bw, hMm: g.stripMm, value: vals[b.id] || '', ink, mark: g.twin ? 'cell' : null }) : c(esc(eq.nums[k]), 'text-align:center');
             return k === 0 ? v : k === 1 ? c(nfOp(eq.op), 'font-weight:700;text-align:center') + v : c('=', 'font-weight:700;text-align:center') + v;
         }).join('')).join('');
-        const lines = `<div style="display:inline-grid;grid-template-columns:auto 1em auto 1em auto;column-gap:0.28em;row-gap:${g.em(1.2)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
+        const lines = `<div style="display:inline-grid;grid-template-columns:auto 1em auto 1em auto;column-gap:0.28em;row-gap:${g.em(0.8)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
         // (round 5 D-E: the gaps are kept tight so three families stand in a column at L, 2 x 3)
         const set = `<div style="display:inline-block;white-space:nowrap;border:${HAIR} solid ${INK.ink};border-radius:${g.em(3)};padding:${g.em(0.5)} ${g.em(2.5)};line-height:1">`
             + (p.nums || []).map((v) => esc(v)).join(', ') + '</div>';
         const dk = nfDedupeKey(p);
-        const body = `<div${dk ? ` data-ws-dedupe="${esc(dk)}"` : ''} style="display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">${set}${lines}</div>`;
+        const body = `<div${dk ? ` data-ws-dedupe="${esc(dk)}"` : ''} style="display:flex;flex-direction:column;align-items:center;gap:${g.em(1.2)}">${set}${lines}</div>`;
         return root(g, 'number-family', body, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
