@@ -15,6 +15,7 @@ import {
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -839,7 +840,18 @@ function _wsGenerate(i) {
     let q = null;
     let fallback = null;                 // the first candidate that is not a copy of the item before it
     const kitPool = WS_K2_POOL_CATS.has(state.category) && isMixedMetaSkill(state.skill);
-    for (let attempt = 0; attempt < 12; attempt++) {
+    // Round 5 (critic r4 D-F): skipping the members the screen cannot draw left the rest of the pool
+    // over-weighted (3 of 6 cards whole_as_fraction, two in a row). A kit pool redraws (more seeded
+    // tries, still deterministic) until the member differs from the card before it and holds at most
+    // 2 of any 6 cards in a row (the window this card closes); the cap relaxes only when the tries
+    // run out.
+    const memberOf = (x) => (x && (x.poolMember || x.skillId)) || '';
+    const win = earlier.slice(Math.max(0, i - 5)).map(memberOf);
+    const prevMember = i > 0 ? memberOf(earlier[i - 1]) : '';
+    const fairMember = (m) => !m || (m !== prevMember && win.filter((x) => x === m).length < 2);
+    let kitFallback = null;              // a kit cell that broke only the variety rule
+    const tries = kitPool ? 24 : 12;
+    for (let attempt = 0; attempt < tries; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
         try {
@@ -855,12 +867,17 @@ function _wsGenerate(i) {
         // the paper deal does (print-sheet.js generateRun): a member drawn in the legacy look
         // (a check-box list with Submit, a trade chart with buttons) is passed over while a few
         // tries remain, so every card is a kit cell with a paper twin.
-        if (kitPool && attempt < 8 && !_wsKitCell(cand)) { if (!q) q = cand; continue; }
+        if (kitPool && attempt < 20 && !_wsKitCell(cand)) { if (!q) q = cand; continue; }
+        if (kitPool && attempt < 20 && !fairMember(memberOf(cand))) {
+            if (!kitFallback && !seen.has(_wsItemKey(cand))) kitFallback = cand;
+            continue;
+        }
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;
         if (!q) q = cand;
     }
+    if (kitPool && kitFallback && (!_wsKitCell(q) || seen.has(_wsItemKey(q)))) q = kitFallback;
     if (q && seen.has(_wsItemKey(q)) && fallback) q = fallback;
     if (!q) {
         // Last resort: the unseeded live-play path, as before this wave.
@@ -1342,8 +1359,10 @@ function _wsRenderCard(grid, q, i) {
             .replace(/id="divSortNo"/g, `id="ws_divSortNo_${i}"`);
         questionDisplay = modifiedVisual;
     } else if (isNumberFamily) {
-        // For number families, modify input IDs to be unique per problem
-        let modifiedVisual = q.visual
+        // For number families, modify input IDs to be unique per problem. Round 5: the kit
+        // number-family cell (paper's drawing) replaces the legacy coloured family when it can draw it
+        const nfKit = q.answerType === 'number-family' ? familyScreenVisual(q) : '';
+        let modifiedVisual = (nfKit || q.visual)
             .replace(/class="number-family-input"/g, `class="number-family-input ws-number-family-input"`)
             .replace(/class="fact-family-input"/g, `class="fact-family-input ws-fact-family-input"`)
             .replace(/onclick="checkNumberFamily\(\)"/g, `onclick="checkWorksheetNumberFamily(${i})"`)
@@ -1440,7 +1459,7 @@ function _wsRenderCard(grid, q, i) {
             slotInCell = true;
         }
     }
-    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : '';
+    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : (isNumberFamily && q.answerType === 'number-family' && familyScreenVisual(q)) ? FAMILY_SCREEN_INSTRUCTION : '';
     const answerRow = (!slotInCell && !answerInputStyle) ? `<div class="mq-answerrow">${inputHtml}</div>` : '';
     const parkedInput = (!slotInCell && answerInputStyle) ? inputHtml : '';
 

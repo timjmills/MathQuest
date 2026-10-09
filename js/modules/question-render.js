@@ -18,6 +18,7 @@ import {
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
     screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -2418,7 +2419,10 @@ function _renderQuestionImpl() {
         document.getElementById("answerOptions").style.display = "none";
         document.getElementById("answerInputArea").style.display = "none";
         visualAid.style.display = "block";
-        visualAid.innerHTML = q.visual;
+        // round 5: the kit number-family cell (paper's drawing) when it can draw the item
+        const nfKit = q.answerType === "number-family" ? familyScreenVisual(q) : '';
+        visualAid.innerHTML = nfKit || q.visual;
+        if (nfKit) { const qtEl = document.getElementById('questionText'); if (qtEl) qtEl.textContent = FAMILY_SCREEN_INSTRUCTION; }
         document.getElementById("feedbackArea").style.display = "none";
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";

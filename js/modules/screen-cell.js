@@ -3324,9 +3324,15 @@ function equationKitTwin(q, categoryId = '') {
     if (!(u === 'a' || u === 'b' || (u === 'result' && p.resultBox))) return undefined;
     if (p.notation === 'fraction' || p.notation === 'bracket') return undefined;
     if (q.answerType && q.answerType !== 'number') return undefined;
-    if (Array.isArray(q.options) && q.options.length) return undefined;
-    // a drawing of its own (a rule box, a tick list) is the item's cell: it stays
-    if (String(q.visual || '').trim()) return undefined;
+    // a generator's numeric distractors (`buildNumericOptions`) on a typed item are the game's
+    // fallback, not a multiple-choice cell (round 5: missing_mult_div kept them, so its card and
+    // worksheet fell back to the legacy text with a line); a real choice item stays out
+    if (Array.isArray(q.options) && q.options.length && q.answerType && q.answerType !== 'number') return undefined;
+    // a drawing of its own (a rule box, a tick list) is the item's cell: it stays. A visual that is
+    // only the equation's own words restated (no drawing, every number already in the sentence)
+    // is not a drawing, and the kit sentence replaces it.
+    const _vis = String(q.visual || '').replace(/<span class="answer-blank-inline"><\/span>/g, ' ').trim();
+    if (_vis && (/<(svg|img|table|canvas|input|button)\b|class=/i.test(_vis) || !_visualSaysNumbers(_vis, String(q.text || '')))) return undefined;
     if (typeof document === 'undefined') return undefined;
     let html = '';
     let digitPt = 28;
@@ -3347,9 +3353,69 @@ function equationKitTwin(q, categoryId = '') {
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
     const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="equation" data-mq-kind="missing">${wrap.innerHTML}</div>`;
-    const instr = printInstructionFor(q, categoryId) || 'Find the missing number.';
+    // round 5 D-D: one instruction for the one box; the equation is said once, in the cell
+    const instr = 'Type the missing number.';
     return { mode: 'blank', html: body, instr, count: 0, kit: 'equation' };
 }
+
+/**
+ * Round 5 (critic r4, number families): the screen hosts drew the legacy family ("(Easy)" heading,
+ * coloured rows, a black "Check Answers" button inside the cell) while paper prints the kit's
+ * `number-family` cell. `familyScreenVisual(q)` draws the SAME kit cell (B&W, Andika, the three
+ * numbers in their box, one equation per line) and puts one typed box per missing number, in the
+ * key's order, as the legacy `<input class="number-family-input" data-eq data-pos data-answer>`
+ * every host already wires and checks (any order, number-family-check.js). '' when the item is not
+ * a number family the kit can draw (the caller keeps the stored visual).
+ */
+export function familyScreenVisual(q) {
+    const d = q && q.numberFamilyData;
+    if (!d || !Array.isArray(d.equations) || !Array.isArray(d.missingPositions)) return '';
+    if (d.equations.some((e) => !e || !Array.isArray(e.nums) || e.nums.length !== 3)) return '';
+    if (typeof document === 'undefined') return '';
+    const payload = {
+        nums: [d.a, d.b, d.c].filter((v) => v !== undefined && v !== null),
+        eqs: d.equations.map((e) => ({ nums: e.nums.slice(), op: e.op })),
+        miss: d.equations.map((_, i) => (Array.isArray(d.missingPositions[i]) ? d.missingPositions[i].slice() : [])),
+    };
+    // the kit's blank order (family.js nfBlanks): equation by equation, positions ascending
+    const order = [];
+    payload.eqs.forEach((eq, i) => payload.miss[i].slice().sort((x, y) => x - y).forEach((k) => order.push({ i, k, v: eq.nums[k] })));
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell({ cell: { template: 'number-family', payload, v: 1 }, text: '', ans: '' }, ctx);
+    } catch (e) { return ''; }
+    if (!html || /data-ws-refused/.test(html)) return '';
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'));
+    if (slots.length !== order.length) return '';
+    slots.forEach((sl, n) => {
+        const o = order[n];
+        const st = sl.getAttribute('style') || '';
+        const w = (st.match(/(?:^|;)\s*width:\s*([^;]+)/) || [])[1] || '2.2em';
+        const h = (st.match(/(?:^|;)\s*height:\s*([^;]+)/) || [])[1] || '1.4em';
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'number-family-input';
+        inp.setAttribute('data-eq', String(o.i));
+        inp.setAttribute('data-pos', String(o.k));
+        inp.setAttribute('data-answer', String(o.v));
+        inp.setAttribute('inputmode', 'numeric');
+        inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('aria-label', `missing number ${n + 1}`);
+        inp.setAttribute('style', `width:${w};height:${h};`);
+        sl.replaceWith(inp);
+    });
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    return `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-nfkit" data-mq-kit="number-family">${wrap.innerHTML}</div>`;
+}
+
+/** The instruction the screen hosts print over a kit number family (the cell says the rest). */
+export const FAMILY_SCREEN_INSTRUCTION = 'Type the missing numbers.';
 
 /**
  * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
