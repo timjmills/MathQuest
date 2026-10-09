@@ -1,0 +1,879 @@
+{
+  "skill": "division:div_zero_in_quotient",
+  "category": "division",
+  "skillId": "div_zero_in_quotient",
+  "label": "Zero in the Quotient",
+  "grade": "4",
+  "dir": "division__div_zero_in_quotient",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 4,
+        "rows": 7,
+        "perPage": 28,
+        "pages": 1,
+        "note": "Fits: 4 columns x 7 rows, 28 per page, 1 page. Digits 16 pt. Dense: 4 x 7, cells sized to the problems. More than 26 problems on a page: they are numbered, never lettered past z.",
+        "sections": [
+          {
+            "cols": 4,
+            "rows": 7,
+            "perPage": 28,
+            "pages": 1,
+            "cellW": 46.5,
+            "cellH": 28.45,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 4 x 7, cells sized to the problems.",
+            "line": "Fits: 4 columns x 7 rows, 28 per page, 1 page. Digits 16 pt. Dense: 4 x 7, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 21.3,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 699696,
+      "title": "I Can divide when the quotient has a zero",
+      "notes": [
+        "Dense: 4 x 7, cells sized to the problems.",
+        "More than 26 problems on a page: they are numbered, never lettered past z."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "612 ÷ 2 = ?",
+          "ans": "306",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "721 ÷ 7 = ?",
+          "ans": "103",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "864 ÷ 8 = ?",
+          "ans": "108",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "915 ÷ 3 = ?",
+          "ans": "305",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "763 ÷ 7 = ?",
+          "ans": "109",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "808 ÷ 8 = ?",
+          "ans": "101",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "945 ÷ 9 = ?",
+          "ans": "105",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "972 ÷ 9 = ?",
+          "ans": "108",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "804 ÷ 4 = ?",
+          "ans": "201",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "606 ÷ 3 = ?",
+          "ans": "202",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "505 ÷ 5 = ?",
+          "ans": "101",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "921 ÷ 3 = ?",
+          "ans": "307",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "756 ÷ 7 = ?",
+          "ans": "108",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "636 ÷ 6 = ?",
+          "ans": "106",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "742 ÷ 7 = ?",
+          "ans": "106",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "408 ÷ 2 = ?",
+          "ans": "204",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "515 ÷ 5 = ?",
+          "ans": "103",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "618 ÷ 3 = ?",
+          "ans": "206",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "206 ÷ 2 = ?",
+          "ans": "103",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "630 ÷ 6 = ?",
+          "ans": "105",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "735 ÷ 7 = ?",
+          "ans": "105",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "618 ÷ 6 = ?",
+          "ans": "103",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "912 ÷ 3 = ?",
+          "ans": "304",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "848 ÷ 8 = ?",
+          "ans": "106",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "642 ÷ 6 = ?",
+          "ans": "107",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "832 ÷ 8 = ?",
+          "ans": "104",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "808 ÷ 4 = ?",
+          "ans": "202",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "short-division",
+          "fclass": "short",
+          "text": "954 ÷ 9 = ?",
+          "ans": "106",
+          "measured": {
+            "1": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 21.3,
+              "fits": true
+            },
+            "5": {
+              "hMm": 21.3,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 182,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 290,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          28
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 154
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          28
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 259
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -558,14 +558,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         : (target && target.rowsByCols && bySize(target.rowsByCols[cols])[size]) || (EXPLICIT_TARGET_ROWS[cols] || cols);
     let rows = Math.min(targetRows, hard);
     // CL-2: a two-column grid takes one of the permitted shapes.
-    if (cols === 2) rows = TWO_COL_ROWS.find((r) => r <= rows) || 1;
+    if (cols === 2 && !section.freeRows) rows = TWO_COL_ROWS.find((r) => r <= rows) || 1;
     // 12.1: a ceiling is never exceeded.
     const ceilRows = Math.max(1, Math.floor(ceiling / cols));
     if (rows > ceilRows) {
         rows = ceilRows;
         notes.push(`At most ${ceiling} problems on this page.`);
     }
-    if (cols === 2 && rows > 1) rows = TWO_COL_ROWS.find((r) => r <= rows) || rows;
+    if (cols === 2 && rows > 1 && !section.freeRows) rows = TWO_COL_ROWS.find((r) => r <= rows) || rows;
     // RUBRIC H13 (owner 2026-09-25): a section of problems of different heights (a place-value
     // mat among one-line frames) is not paged as if every problem were the tallest. Its rows are
     // sized to what they hold (groupByHeight + packByHeight), so the page holds as many rows as
@@ -585,7 +585,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const packCeil = section.dense && (section.ceiling === undefined || section.ceiling === null)
                 ? bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling : ceiling;
             let fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
-            if (cols === 2 && fit > 1) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
+            if (cols === 2 && fit > 1 && !section.freeRows) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
             if (fit > rows) {
                 rows = fit;
                 packed = true;
@@ -611,7 +611,10 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // however dense it asks to be (round-3 re-grade: a Test printed 20 facts at L under a
         // "At most 12 problems" note).
         const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
-        const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
+        // A page laid in free rows (print-sheet.js buildSheet: a strip left under the dense rows)
+        // may take short problems up to DN-1's scored count (20 at L), as the fill below does.
+        const dCeil1 = section.freeRows ? Math.max(dCeil0, DN1_AT[size] || DN1_MAX) : dCeil0;
+        const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil1, ceiling) : dCeil1;
         const colOpts = requested === 'auto'
             ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
@@ -631,8 +634,9 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
-            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
-            if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
+            // (free rows: the rows take the problems' own measured height, buildSheet checks the page)
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * (section.freeRows ? 1 : room))), Math.floor(dCeil / c)));
+            if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
@@ -665,7 +669,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const fit = Math.floor((G - SAFETY_H_MM) / (hMin * DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
-            if (cols === 2 && want > 1) want = TWO_COL_ROWS.find((r) => r <= want) || want;
+            if (cols === 2 && want > 1 && !section.freeRows) want = TWO_COL_ROWS.find((r) => r <= want) || want;
             if (want > rows) {
                 rows = want;
                 filled = true;
@@ -778,6 +782,16 @@ const legacyH = (it, cols, cellH) => {
     return m && Number.isFinite(m.hMm) && m.hMm > 0 ? Math.min(cellH, m.hMm + 1) : cellH;
 };
 
+/**
+ * Rows of the same content stand at the same height (round 5 D-E: number_families_add S printed
+ * rows of 200 / 282 px for the same families, because each row's stretch was capped by its own
+ * shortest problem). Rows whose tallest problem is the same height (within 0.5 mm) all take the
+ * smallest height any of them was given.
+ */
+export function evenRows(w, H) {
+    return H.map((h, r) => Math.min(h, ...H.filter((_, j) => Math.abs(w[j] - w[r]) <= 0.5)));
+}
+
 export function rowShape(items, cols, rows, cellH) {
     if (!items.length || rows < 1) return null;
     const w = [];
@@ -804,6 +818,7 @@ export function rowShape(items, cols, rows, cellH) {
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
     // (critic guided-r1 lint: a compare page at L left an 80 mm strip under 18 short rows).
     if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * cellH) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
+    H = evenRows(w, H);
     const total = H.reduce((a, b) => a + b, 0);
     return { rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(total * 100) / 100 };
 }

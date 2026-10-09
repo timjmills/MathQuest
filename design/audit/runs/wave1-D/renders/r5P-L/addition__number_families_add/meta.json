@@ -1,0 +1,236 @@
+{
+  "skill": "addition:number_families_add",
+  "category": "addition",
+  "skillId": "number_families_add",
+  "label": "Number Families (Add & Subtract)",
+  "grade": "1",
+  "dir": "addition__number_families_add",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 71,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 54215,
+      "title": "I Can complete a number family (+, −)",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 4, 9",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 71,
+              "fits": false
+            },
+            "4": {
+              "hMm": 71,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "1, 1, 2",
+          "measured": {
+            "1": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "9, 9, 18",
+          "measured": {
+            "1": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "8, 9, 17",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 71,
+              "fits": false
+            },
+            "4": {
+              "hMm": 71,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "9, 4, 13",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 71,
+              "fits": false
+            },
+            "4": {
+              "hMm": 71,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 8, 10",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 71,
+              "fits": false
+            },
+            "4": {
+              "hMm": 71,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 132,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 155,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 106
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 126
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

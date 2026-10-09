@@ -1,0 +1,478 @@
+{
+  "skill": "addition:add_sub_10s",
+  "category": "addition",
+  "skillId": "add_sub_10s",
+  "label": "Add & Subtract by 10s",
+  "grade": "1",
+  "dir": "addition__add_sub_10s",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 8,
+        "perPage": 16,
+        "pages": 1,
+        "note": "Fits: 2 columns x 8 rows, 16 per page, 1 page. Digits 28 pt. Dense: 2 x 8, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 8,
+            "perPage": 16,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 28.375,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 2 x 8, cells sized to the problems.",
+            "line": "Fits: 2 columns x 8 rows, 16 per page, 1 page. Digits 28 pt. Dense: 2 x 8, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 16,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 862246,
+      "title": "I Can add and subtract 10s",
+      "notes": [
+        "Dense: 2 x 8, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "70 + 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "40 − 10 = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "100 − 10 = ?",
+          "ans": "90",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "40 + 10 = ?",
+          "ans": "50",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "30 + 10 = ?",
+          "ans": "40",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "10 − 10 = ?",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "90 − 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "50 − 10 = ?",
+          "ans": "40",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "60 − 10 = ?",
+          "ans": "50",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "30 − 10 = ?",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "90 + 10 = ?",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "20 − 10 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "70 − 10 = ?",
+          "ans": "60",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "80 − 10 = ?",
+          "ans": "70",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "0 + 10 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "60 + 10 = ?",
+          "ans": "70",
+          "measured": {
+            "1": {
+              "hMm": 16,
+              "fits": true
+            },
+            "2": {
+              "hMm": 16,
+              "fits": true
+            },
+            "3": {
+              "hMm": 16,
+              "fits": false
+            },
+            "4": {
+              "hMm": 16,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 109,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 128,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          16
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 94
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          16
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 110
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

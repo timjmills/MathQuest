@@ -1,0 +1,236 @@
+{
+  "skill": "multiplication:mult_comparison",
+  "category": "multiplication",
+  "skillId": "mult_comparison",
+  "label": "Times as Many Word Problems (Visual)",
+  "grade": "4",
+  "dir": "multiplication__mult_comparison",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 72.7,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 978949,
+      "title": "I Can solve times-as-many stories",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 81 pencils. That is 9 times as many as Ravi has. How many pencils does R",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 48.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76,
+              "fits": false
+            },
+            "4": {
+              "hMm": 95.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi has 10 apples. Zara has 3 times as many apples. How many apples does Zara h",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 48.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 66.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76,
+              "fits": false
+            },
+            "4": {
+              "hMm": 95.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 28 cookies. That is 4 times as many as Tom has. How many cookies does T",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 48.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 72.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76,
+              "fits": false
+            },
+            "4": {
+              "hMm": 95.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 6 buttons. Sam has 48 buttons. How many times as many buttons does Sam h",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 39.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 45.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 66.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 85.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 crayons. Leo has 35 crayons. How many times as many crayons does Leo h",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 39.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 45.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 66.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 85.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 8 stamps. Mia has 5 times as many stamps. How many stamps does Mia have?",
+          "ans": "40",
+          "measured": {
+            "1": {
+              "hMm": 48.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 60,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76,
+              "fits": false
+            },
+            "4": {
+              "hMm": 95.1,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 182,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 213,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 92
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

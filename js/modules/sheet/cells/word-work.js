@@ -772,7 +772,10 @@ function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', no
 /** The story, the key words bold and underlined when asked (never colour, PT-WPR-6). */
 function storyHTML(ctx, p, narrow = false) {
     const ops = p.hl ? p.steps.map((s) => s.op) : [];
-    const lines = p.lines.map((line) => {
+    // A sentence's last word never wraps alone onto a line (round 5 D-H3: "has." on
+    // mult_comparison L): the space before it is non-breaking (one character for one, so the cue
+    // ranges below still index the same letters).
+    const lines = p.lines.map((line0) => String(line0).replace(/ (?=[^\s]+[.?!](?:\s|$))/g, '\u00a0')).map((line) => {
         if (!ops.length) return `<div>${esc(line)}</div>`;
         let out = '', i = 0;
         for (const [s, e] of cueRanges(line, ops)) {
