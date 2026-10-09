@@ -178,6 +178,48 @@ const SAMPLES = [
         check(ax.add_decimal && ax.add_decimal.to === 20 && /stroke-width/.test(ax.add_decimal.svg) && (ax.add_decimal.svg.match(/<line/g) || []).length > 100, `D8 add_decimal tenths: ${JSON.stringify(ax.add_decimal && { ...ax.add_decimal, svg: 0 })}`);
         for (const [k, v] of Object.entries(ax)) if (v && v.from !== undefined) log(`  auto ${k}: ${v.from} to ${v.to} by ${v.step}${v.minor && v.minor !== 'auto' ? ' / ' + v.minor : ''}, labels ${v.labels} (every ${v.labelEvery})`);
 
+        /* critic nl-r3 D1-D4 */
+        const r3 = await page.evaluate(async () => {
+            const rs = await import('./js/modules/refline-screen.js');
+            const kit = await import('./js/modules/sheet/index.js');
+            const o = {};
+            o.mixA = !!rs.skillLine('addition', 'mixed_addition', { nlOn: true });
+            o.mixS = !!rs.skillLine('subtraction', 'mixed_subtraction', { nlOn: true });
+            o.mixSet = !!rs.skillLine('addition', 'mixed_addition', { nlOn: true, nlFrom: 0, nlTo: 100 });
+            o.patDef = !!rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true });
+            const pa = rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true, pattern: ['add', 'sub'] });
+            o.patOff = [];
+            if (pa) {
+                const fine = (pa.step.num / pa.step.den) / (pa.minor && pa.minor !== 'auto' && pa.minor !== '0' ? Number(pa.minor) : 1);
+                for (let i = 0; i < 12; i++) {
+                    const q = window.generateQuestionFor({ category: 'patterns', skill: 'number_patterns_rule', opts: { nlOn: true, pattern: ['add', 'sub'] }, seed: 500 + i, itemIndex: i });
+                    for (const x of kit.nlLineNumbers(q)) if (x.v < pa.from || x.v > pa.to || Math.abs(x.v / fine - Math.round(x.v / fine)) > 1e-9) o.patOff.push(x.v);
+                }
+            }
+            o.pat = !!pa;
+            const orr = rs.skillLine('integers', 'ordering_rationals', { nlOn: true });
+            const svg = orr ? kit.refLineHTML(orr, { size: 'M', widthMm: 186 }).html : '';
+            const host = document.createElement('div');
+            host.innerHTML = svg;
+            o.ordPairs = [...host.querySelectorAll('[data-ws-frac]')].map((g) => [...g.querySelectorAll('text')].map((t) => t.textContent.trim()));
+            o.d4 = {};
+            for (const [c, sk] of [['patterns', 'seq_2'], ['patterns', 'seq_5'], ['patterns', 'seq_10'], ['number_sense', 'estimate_sum'], ['subtraction', 'mixed_add_sub']]) {
+                const v = new Set();
+                for (const seed of [11, 22, 33]) for (const role of ['independent', 'more-practice']) {
+                    const b = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: c, skillId: sk, opts: { nlOn: true } }], pages: 1 }], size: 'M', key: true, seed });
+                    v.add(b.numberLine ? `${b.numberLine.from}..${b.numberLine.to}` : 'none');
+                }
+                o.d4[sk] = [...v];
+            }
+            return o;
+        });
+        check(!r3.mixA && !r3.mixS && r3.mixSet, `R3-D1 mixed pools: auto ${r3.mixA}/${r3.mixS}, with ends ${r3.mixSet}`);
+        check(!r3.patDef && r3.pat && !r3.patOff.length, `R3-D2 number_patterns_rule: default ${r3.patDef}, count on/back ${r3.pat}, off the ticks ${r3.patOff.slice(0, 6)}`);
+        const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+        check(!r3.ordPairs.some(([n, d]) => gcd(Math.abs(Number(String(n).replace('−', '-'))), Number(d)) > 1), `R3-D3 ordering_rationals labels not in lowest terms: ${JSON.stringify(r3.ordPairs)}`);
+        for (const [k, v] of Object.entries(r3.d4)) check(v.length === 1 && v[0] !== 'none', `R3-D4 ${k}: the line changes with the seed / role: ${v.join(' | ')}`);
+        log(`  r3: mixed pools need both ends; pattern rule count on/back only; ordering_rationals labels ${r3.ordPairs.map((p) => p.join('/')).join(' ')}; lines ${Object.entries(r3.d4).map(([k, v]) => k + ' ' + v[0]).join(', ')}`);
+
         /* critic nl-r2 D6 + D7: every fitting skill at S and L: the band on EVERY pupil and key page, and the rows it costs */
         if (!process.argv.includes('--quick')) {
             const list = await page.evaluate(async () => {
@@ -189,7 +231,9 @@ const SAMPLES = [
             const sweep = { noBand: [], lost: [], n: 0 };
             for (const [cat, sk] of list) for (const size of ['S', 'L']) {
                 const r = await page.evaluate(async ({ cat, sk, size }) => {
-                    const mk = (on) => ({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: sk, opts: on ? { nlOn: true } : {} }], pages: 1 }], size, key: true, seed: 77 });
+                    // (critic nl-r3 D1/D2: the mixed pools draw the line only with both ends set; the pattern rule only for count on / back)
+                    const extra = /^mixed_(addition|subtraction)$/.test(sk) ? { nlFrom: 0, nlTo: 100 } : sk === 'number_patterns_rule' ? { pattern: ['add', 'sub'] } : {};
+                    const mk = (on) => ({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: sk, opts: on ? Object.assign({ nlOn: true }, extra) : Object.assign({}, extra, { nlFrom: undefined, nlTo: undefined }) }], pages: 1 }], size, key: true, seed: 77 });
                     let a, b;
                     try { a = await window.buildSheet(mk(true)); b = await window.buildSheet(mk(false)); } catch (e) { return null; }
                     const html = a.pupilHtml + a.keyHtml;
@@ -202,6 +246,11 @@ const SAMPLES = [
                 if (r.on < r.off) sweep.lost.push(`${sk}@${size} ${r.off}→${r.on}`);
             }
             check(!sweep.noBand.length, `D6 pages without the line: ${sweep.noBand.join(', ')}`);
+            // critic nl-r3 D5: these kept their count by giving up cell slack; they may not lose it again
+            for (const k of ['sub_50_no_regroup@L', 'sub_50_regroup@L', 'sub_50_mixed@L', 'sub_100_no_regroup@L', 'sub_100_regroup@L', 'sub_100_mixed@L',
+                'sub_1k_no_regroup@L', 'sub_1k_regroup@L', 'sub_1k_mixed@L', 'sub_decimal@L', 'order_fdp@L', 'compare@S']) {
+                check(!sweep.lost.some((x) => x.startsWith(k + ' ')), `R3-D5 ${k} lost capacity to the band again`);
+            }
             log(`  sweep: ${sweep.n} builds; band on every page of ${sweep.n - sweep.noBand.length}; ${sweep.lost.length} lose capacity to the band (D7, recorded): ${sweep.lost.join(', ')}`);
         }
 

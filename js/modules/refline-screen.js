@@ -25,7 +25,7 @@ import { setNumberLineCoverCheck } from './skill-options-ui.js';
 import { nlResolveLine, nlLineNumbers, nlItemSteps, nlCommonStep, nlStepName, refLineHTML } from './sheet/index.js';
 
 const PX_PER_MM = 3.4;     // the screen twin's scale (k2kit.js --mq-k2)
-const SAMPLE = 40;
+const SAMPLE = 240;  // critic nl-r3 D4: enough to reach the skill's declared range, so a page never widens it
 const SAMPLE_SEED = 7001;  // fixed: the line never depends on the page's seed
 const _basis = new Map();
 
@@ -34,7 +34,31 @@ export function lineOpts(categoryId, skillId, opts) {
     if (!categoryId || !skillId || !numberLineFits(categoryId, skillId)) return null;
     let o = null;
     try { o = normalizeOptions(categoryId, skillId, opts || {}); } catch (e) { o = null; }
-    return o && o.nlOn ? o : null;
+    if (!o || !o.nlOn) return null;
+    return numberLineBlocked(categoryId, skillId, o) ? null : o;
+}
+
+/**
+ * Why a skill that offers the line draws none with these options, or '' (critic nl-r3 D1, D2).
+ * The mixed add / subtract pools deal from 4 + 2 to six-digit sums, so no Auto line serves them:
+ * the line is drawn only once the teacher sets both ends. number_patterns_rule draws it only for
+ * count on / count back starting in the ones or tens (doubling, × 10 and growing steps cannot be
+ * read on one additive line).
+ */
+const _NL_MANUAL = new Set(['addition:mixed_addition', 'subtraction:mixed_subtraction']);
+export function numberLineBlocked(categoryId, skillId, o) {
+    const k = `${categoryId}:${skillId}`;
+    const set = (v) => v === null || v === undefined || v === '' ? null : (Array.isArray(v) ? v : [v]).map(String);
+    if (_NL_MANUAL.has(k) && (o.nlFrom === null || o.nlFrom === undefined || o.nlTo === null || o.nlTo === undefined)) {
+        return 'This mix deals sums from single digits to hundreds of thousands, so the line needs its two ends: set Starts at and Ends at.';
+    }
+    if (k === 'patterns:number_patterns_rule') {
+        const pat = set(o.pattern), pl = set(o.places);
+        if (!pat || pat.some((v) => v !== 'add' && v !== 'sub') || !pl || pl.some((v) => v !== '1' && v !== '10')) {
+            return 'The line is drawn for Count on / Count back starting in the ones or tens only: doubling, × 10 and growing steps cannot be read on one number line.';
+        }
+    }
+    return '';
 }
 
 /**
@@ -184,7 +208,11 @@ export function numberLineCoverWarning(categoryId, skillId, opts) {
 }
 function numberLinePanelInfo(categoryId, skillId, opts) {
     const spec = skillLine(categoryId, skillId, opts);
-    if (!spec) return { warn: '', summary: numberLineSummary(opts || {}) };
+    if (!spec) {
+        let why = '';
+        try { const o = normalizeOptions(categoryId, skillId, opts || {}); why = o && o.nlOn ? numberLineBlocked(categoryId, skillId, o) : ''; } catch (e) { why = ''; }
+        return { warn: why, summary: why ? 'On · not drawn (see below)' : numberLineSummary(opts || {}) };
+    }
     return { warn: spec.warn || '', summary: numberLineSummary(opts || {}, spec) };
 }
 setNumberLineCoverCheck(numberLinePanelInfo);

@@ -469,7 +469,42 @@ export function sectionClass(infos) {
  *   hMin: number, requested: 'auto'|number, ceiling: number, fill: boolean, count: number,
  * }}
  */
+/**
+ * Wave 5.2 (critic nl-r3 D5): the number-line band under the header comes out of the cells'
+ * SLACK before it costs a row. The section is laid out with and without the band; when the band
+ * would drop rows and the band-less grid's rows still fit the shorter grid at their minimum height
+ * (hMin: the content never shrinks), the page keeps that grid with each row giving up its share.
+ */
 export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
+    const L1 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, ctx);
+    const band = Number(ctx.header && ctx.header.refBandMm) || 0;
+    if (!(band > 0) || Number(section.gridH) > 0) return L1;
+    const L0 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, Object.assign({}, ctx, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) }));
+    if (!(L0.perPage > L1.perPage)) return L1;
+    const G = L1.gridH;
+    const hMin = Math.max(L0.hMin, L1.hMin);
+    if (!(hMin > 0)) return L1;
+    if (L0.packed) {
+        // Rows sized to what they hold: keep as many of the band-less rows as their OWN heights
+        // (tallest first, as packByHeight pages them) fit in the shorter grid.
+        const ord = groupByHeight(items || [], L0.cols);
+        const rowH = [];
+        for (let i = 0; i < ord.length; i += L0.cols) rowH.push(Math.max(...ord.slice(i, i + L0.cols).map((it) => measuredH(it, L0.cols))));
+        let k = 0, sum = 0;
+        while (k < Math.min(L0.rows, rowH.length) && sum + rowH[k] <= G - SAFETY_H_MM) { sum += rowH[k]; k++; }
+        if (k * L0.cols <= L1.perPage) return L1;
+        const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
+        return Object.assign({}, L0, { rows: k, perPage: k * L0.cols, pages: L0.count ? Math.ceil(L0.count / (k * L0.cols)) : 1, gridH: G, gridHCont: L1.gridHCont,
+            cellH: r3(Math.min(L0.cellH, (G - SAFETY_H_MM) / k)), note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
+    }
+    if (L0.rows * hMin > G - SAFETY_H_MM) return L1;
+    const cellH = r3(Math.min(L0.cellH, (G - SAFETY_H_MM) / L0.rows));
+    const pages = L0.count ? Math.ceil(L0.count / L0.perPage) : 1;
+    const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
+    return Object.assign({}, L0, { gridH: G, gridHCont: L1.gridHCont, cellH, hMin: r2(hMin), pages, fill: L0.fill && cellH >= G / L0.rows - 0.01, note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
+}
+
+function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
     const size = SIZES[ctx.size] ? ctx.size : DEFAULT_SIZE;
     const look = LOOKS[ctx.look] ? ctx.look : DEFAULT_LOOK;
     const role = section.role || 'independent';

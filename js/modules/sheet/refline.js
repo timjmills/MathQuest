@@ -330,7 +330,9 @@ function labelOf(i, step) {
     if (step.kind === 'frac') {
         const g = gcd(i, step.den);
         if (i % step.den === 0) return { whole: String(i / step.den).replace('-', '−') };
-        return { num: String(i * step.num).replace('-', '−'), den: String(step.den), g };
+        // in lowest terms (critic nl-r3 D3): 6/12 reads ½, 4/12 reads ⅓
+        const r = gcd(Math.abs(i * step.num), step.den) || 1;
+        return { num: String((i * step.num) / r).replace('-', '−'), den: String(step.den / r), g };
     }
     if (step.kind === 'dec') {
         const places = String(step.den).length - 1;
