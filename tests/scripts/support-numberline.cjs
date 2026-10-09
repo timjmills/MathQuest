@@ -286,8 +286,14 @@ const SAMPLES = [
             check(!sweep.blank.length, `R4-D2 the band leaves a blank strip at the foot: ${sweep.blank.join(', ')}`);
             // critic nl-r3 D5: these kept their count by giving up cell slack; they may not lose it again
             for (const k of ['sub_50_no_regroup@L', 'sub_50_regroup@L', 'sub_50_mixed@L', 'sub_100_no_regroup@L', 'sub_100_regroup@L', 'sub_100_mixed@L',
-                'sub_1k_no_regroup@L', 'sub_1k_regroup@L', 'sub_1k_mixed@L', 'sub_decimal@L', 'order_fdp@L', 'compare@S']) {
+                'sub_1k_no_regroup@L', 'sub_1k_regroup@L', 'sub_1k_mixed@L', 'sub_decimal@L', 'order_fdp@L']) {
                 check(!sweep.lost.some((x) => x.startsWith(k + ' ')), `R3-D5 ${k} lost capacity to the band again`);
+            }
+            // Owner ruling (critic nl-r4 (2)): a two-column page may take 7 rows with the band, so
+            // compare @S may give up ONE row (16 -> 14), never more.
+            for (const x of sweep.lost.filter((y) => y.startsWith('compare@S '))) {
+                const [a, b] = x.split(' ')[1].split('→').map(Number);
+                check(a - b <= 2, `R3-D5 compare@S lost more than one row to the band: ${x}`);
             }
             log(`  sweep: ${sweep.n} builds (S, M, L); band on every page of ${sweep.n - sweep.noBand.length}; pages added ${sweep.pagesUp.length}; blank strips ${sweep.blank.length}; ${sweep.lost.length} lose capacity to the band (D7, recorded): ${sweep.lost.join(', ')}`);
         }
