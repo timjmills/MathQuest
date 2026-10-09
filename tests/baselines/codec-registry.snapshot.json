@@ -98,7 +98,8 @@
     "calculator": "6X",
     "skipAfter": "6Y",
     "rows": "1W",
-    "times": "1Z"
+    "times": "1Z",
+    "divForm": "5N"
   },
   "blocks": {
     "0": {
@@ -663,6 +664,13 @@
       "none": "N",
       "each": "E",
       "given": "G"
+    },
+    "divForm": {
+      "standard": "S",
+      "long": "L",
+      "fraction": "F",
+      "vertical": "V",
+      "mix": "M"
     }
   },
   "scalarOnly": {
