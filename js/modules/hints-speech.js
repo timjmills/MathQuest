@@ -22,29 +22,74 @@ function _wordProblemStoryAnchor() {
     const card = document.getElementById('questionCard');
     if (!card || card.offsetParent === null) return null;
     const q = state.currentQ || {};
-    const isWord = /word|story/i.test(String(q.skillId || state.skill || '')) || /word|story/i.test(String(q.printFormat || ''));
+    // a word skill by its own id, its print format, or the word skill the pupil chose (a mixed
+    // pool such as mixed_subtraction deals its items under the pool's member ids)
+    const WORD = /word|story|_wp(_|$)/i;
+    const queued = (Array.isArray(window.skillQueue) ? window.skillQueue : []).map((s) => (s && s.skillId) || '').join(' ');
+    const isWord = WORD.test(String(q.skillId || '')) || WORD.test(String(state.skill || '')) || WORD.test(String(q.printFormat || ''))
+        || WORD.test(queued) || /\b(mixed_subtraction|operations_all)\b/.test(queued);   // pools that deal story items
+    const va = document.getElementById('visualAid');
+    const qt = document.getElementById('questionText');
+    const shown = (e) => !!e && e.getClientRects().length > 0 && e.getBoundingClientRect().height > 4 && e.getBoundingClientRect().width > 4;
     let story = card.querySelector(_STORY_SEL);
-    if (story && story.getClientRects().length === 0) story = null;
+    if (story && !shown(story)) story = null;
     if (!story && isWord) {
-        const va = document.getElementById('visualAid');
-        const qt = document.getElementById('questionText');
-        if (va && va.getClientRects().length && va.textContent.trim()) story = va;
-        else if (qt && qt.getClientRects().length && qt.textContent.trim()) story = qt;
+        // The story text is the instruction line when it is drawn (not the hidden duplicate):
+        // the hint goes INSIDE that line's block, right under its text and never wider than it.
+        if (qt && shown(qt) && !qt.classList.contains('mq-dup') && qt.textContent.trim()) {
+            return { el: qt, inside: true };
+        }
+        // Otherwise find the story sentence inside the drawing: the deepest block that holds
+        // the start of the question's text (not the whole drawing or the working).
+        const key = String((qt && qt.textContent) || q.text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);
+        if (va && key.length >= 8) {
+            let best = null;
+            va.querySelectorAll('div, p, span').forEach((e) => {
+                if (shown(e) && (e.textContent || '').replace(/\s+/g, ' ').includes(key)) best = e;   // later = deeper
+            });
+            if (best && best !== va) story = best;
+        }
+        if (!story && qt && shown(qt) && qt.textContent.trim()) return { el: qt, inside: true };
+        if (!story && va && shown(va) && va.textContent.trim()) story = va;
     }
     if (!story) return null;
     // Climb out of side-by-side rows (story beside a picture or word bank) so the
-    // hint lands under the whole row, never beside the story.
+    // hint lands under the whole row, never beside the story; never out of the drawing.
     let el = story;
-    while (el.parentElement && el !== card && el.parentElement !== card) {
+    while (el.parentElement && el !== card && el !== va && el.parentElement !== card && el.parentElement !== va) {
         const cs = window.getComputedStyle(el.parentElement);
         const rowish = (/flex/.test(cs.display) && !/column/.test(cs.flexDirection)) || /grid/.test(cs.display) || cs.display === 'contents';
         if (!rowish) break;
         el = el.parentElement;
     }
-    return el;
+    return { el, inside: false };
 }
 
-function _renderHintInline(anchor, titleHTML, bodyHTML) {
+// The screen band a hint may use: below the pinned top bar, above the pinned bottom bar
+// (Hint / Read / Check, sticky at the card's foot).
+function _visibleBand() {
+    let top = 0, bottom = window.innerHeight;
+    const bars = document.querySelectorAll('#gameView .game-header, #questionCard > .mq-qactions, #questionCard > .next-btn-container');
+    bars.forEach((b) => {
+        if (!b.getClientRects().length) return;
+        const cs = window.getComputedStyle(b);
+        const r = b.getBoundingClientRect();
+        if (cs.position === 'fixed' || cs.position === 'sticky') {
+            if (r.top < window.innerHeight / 2) top = Math.max(top, r.bottom);
+            else bottom = Math.min(bottom, window.innerHeight - r.height - 4);
+        }
+    });
+    // a sticky bottom bar only pins once the page scrolls; reserve its height either way
+    const qa = document.querySelector('#questionCard > .mq-qactions');
+    if (qa && qa.getClientRects().length && window.getComputedStyle(qa).position === 'sticky') {
+        bottom = Math.min(bottom, window.innerHeight - qa.getBoundingClientRect().height - 4);
+    }
+    if (top === 0) top = 72;   // the play bar
+    return { top: top + 6, bottom: bottom - 6 };
+}
+
+function _renderHintInline(where, titleHTML, bodyHTML) {
+    const anchor = where.el;
     closeHintPopup();
     const title = String(titleHTML).replace(/^[^A-Za-z<]+/, '');
     const box = document.createElement('div');
@@ -60,7 +105,8 @@ function _renderHintInline(anchor, titleHTML, bodyHTML) {
         '</div>' +
         '<div class="hint-modal-body">' + bodyHTML + '</div>' +
         '<button type="button" class="mq-hint-inline-got" onclick="closeHintPopup()">Got it!</button>';
-    anchor.insertAdjacentElement('afterend', box);
+    if (where.inside) anchor.appendChild(box);
+    else anchor.insertAdjacentElement('afterend', box);
     const onKey = (ev) => { if (ev.key === 'Escape' || ev.key === 'Esc') closeHintPopup(); };
     box._hintKeyHandler = onKey;
     document.addEventListener('keydown', onKey);
@@ -68,9 +114,17 @@ function _renderHintInline(anchor, titleHTML, bodyHTML) {
     // unless the pair is taller than the screen, then the hint wins.
     try {
         const sr = anchor.getBoundingClientRect(), hr = box.getBoundingClientRect();
-        const bar = 80;
-        const fits = hr.bottom - sr.top <= window.innerHeight - bar;
-        const dy = fits ? sr.top - bar : (hr.bottom > window.innerHeight ? hr.bottom - window.innerHeight + 8 : (hr.top < bar ? hr.top - bar : 0));
+        const band = _visibleBand();
+        let dy = 0;
+        if (hr.bottom - sr.top <= band.bottom - band.top) {
+            // story and hint together: the least scroll that shows both
+            if (sr.top < band.top) dy = sr.top - band.top;
+            else if (hr.bottom > band.bottom) dy = hr.bottom - band.bottom;
+        } else {
+            // too tall for both: the whole hint, its top just under the story's last line
+            dy = hr.bottom - band.bottom;
+            if (hr.top - dy < band.top) dy = hr.top - band.top;
+        }
         if (dy) window.scrollBy(0, dy);
     } catch (_) {}
 }
