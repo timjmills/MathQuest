@@ -4,10 +4,10 @@
 // tree and on a base checkout and fails unless every pupil page and key page is byte-identical.
 //
 // RE-PINNED (critic countby-arrows r1 D4, 2026-10-09): the owner approved short arrows replacing the arcs (narrow boxes, the
-// same 12 numbers, 3-digit rows at 14.7 pt), so the base is now the lane commit that made those fixes, PINNED below, and the
+// same 12 numbers, 3-digit rows at 14.7 pt), so the base is now the lane commit that made those fixes, PINNED at efeb910, and the
 // new rules are asserted directly by invariants(). Never drop the check; re-pin only to an owner-approved commit.
-//   git archive PIN | tar -x -C /tmp/base-PIN
-//   MQ_BASE_ROOT=/tmp/base-PIN /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-onepage.cjs
+//   git archive efeb910 | tar -x -C /tmp/base-efeb910
+//   MQ_BASE_ROOT=/tmp/base-efeb910 /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-onepage.cjs
 // (internally it re-runs itself with MQ_ROOT=<base> and `--digest` to read the base's digest)
 const { spawnSync } = require('child_process');
 const crypto = require('crypto');
@@ -112,7 +112,7 @@ async function rowsCheck() {
 (async () => {
   if (process.argv.includes('--digest')) { console.log('DIGEST ' + JSON.stringify(await digest())); return; }
   const base = process.env.MQ_BASE_ROOT;
-  if (!base) { console.error('set MQ_BASE_ROOT to a checkout of the base commit (git archive PIN | tar -x -C <dir>)'); process.exit(2); }
+  if (!base) { console.error('set MQ_BASE_ROOT to a checkout of the base commit (git archive efeb910 | tar -x -C <dir>)'); process.exit(2); }
   const now = await digest();
   const r = spawnSync(process.execPath, [__filename, '--digest'], { env: Object.assign({}, process.env, { MQ_ROOT: base }), encoding: 'utf8', maxBuffer: 1 << 26 });
   const line = (r.stdout || '').split('\n').find((l) => l.startsWith('DIGEST '));
