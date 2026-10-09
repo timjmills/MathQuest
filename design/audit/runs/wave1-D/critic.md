@@ -935,3 +935,182 @@ Print rows cover the pupil page and the key. Where only one size is named, the o
 - **add_sub_10s S 2 × 10 meets CL-2a.**
 - **Unchanged and still at 8+ on the harness seed:** odd_even, whole_as_fraction, ten_frame_build, dot_array_mult, missing_mult_div, counting_all, long_div_2digit, mult_comparison, remainder_interpret, number_families_add, mixed_composing.
 - **Regression set holds:** four documents are pixel-identical to round 5. mixed_addition and mixed_subtraction changed only as intended (the ring), and compare_objects improved.
+
+# Round 7: independent critic (Opus medium), 2026-10-09
+
+Tree: claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535 at cf39d5d (round-8 fixes 44ac865 and aef4b2f, ruling CL-2b 068b2ec).
+- **My renders.** I ran `ws-grade-render --roles independent` for the 16 documents at S and at L, with every screen host (card 1280/820/390, worksheet 1280, quiz 1280).
+- **Pool probe.** A scratchpad probe calls `window.buildSheet` with the teacher-print request shape. It lays out the pupil page and the key in the app's stylesheet, then records build time, page fill (problem area to the footer), H13 bands, overflow, key ink against its box, "Answer:" / "Any number" and legacy cells. It covered mixed_multiplication, mixed_composing and mixed_addition, Independent, S and L, at seeds 1–30, 100, 140, 160, 180, 200, 220 and the lint seed: **222 pages**.
+- **More Practice.** I ran the same probe on the **More Practice** role, which is the teacher print screen's default page type (`teacher-print.js` `newSection` → `role: 'more-practice'`). It covered the 16 documents at S and L, seeds 1–2, and the three pools at seeds 1–10.
+- **Main-thread probe.** A long-task observer measured how long `buildSheet` blocks the page.
+- **Lint.** I ran `ws-print-lint --seed-list` on this tree and against a08a37d (MQ_ROOT) to check D6-6.
+- **Regression set.** I rendered it at S on this tree, on a08a37d (round 6) and on origin/claude/sweet-newton-c8wrv1 (now f1dae55), and pixel-diffed the three.
+- **Files.** The 10 PNGs this report cites are in `renders/r7/`. The scratchpad worktrees are removed.
+
+## Verdict: FAIL
+
+**The Independent page passes: 16 of 16 documents, and every D6 defect in that role is fixed or accepted.**
+- mixed_multiplication's 74 sampled pages all reach the fill floor (lowest 0.812). None has a band, a legacy cell, an "Answer:" row, an "Any number" line or a key value out of its box. The column-work row prints one digit size.
+
+**The round fails on two findings that no earlier round tested:**
+- **D7-1 [CRITICAL] The More Practice page type is broken for lane skills.** It is the page a teacher gets by default.
+  - mixed_multiplication deals **one problem per page** on 5 of 10 S seeds and 6 of 10 L seeds, filling 25–40 % of the page.
+  - number_families_mult and add_sub_10s repeat problems on one page.
+  - dot_array_mult S spreads 2 arrays over a 600 px row on 3–4 pages.
+  - RUBRIC requires 8 on every page type (H5, C3 ≤ 5).
+- **D7-2 [MAJOR] A hard pool page freezes the app for up to a minute.** The build runs as ONE main-thread task: 56.5 s for mixed_multiplication S seed 11 and 41.3 s for mixed_addition S seed 6, measured as a single long task during which no timer fired. 1 build in 5 at S takes over 10 s.
+
+## Gates
+| Gate | Result |
+|---|---|
+| ws-grade-render, 16 documents, S and L, all hosts | 0 console errors on every document. hScroll 0 and smallTargetCount 0 everywhere, except mixed_multiplication worksheet-1280 (1 small target; a desktop host, so H6 does not apply) |
+| Pool probe, Independent, 222 pages | **Fill:** lowest mixed_multiplication 0.818 (S) / 0.812 (L); mixed_composing 0.893 / 0.859; mixed_addition 0.868 / 0.815. **H13 bands:** 0, except mixed_addition S seed 6 (h, 37 %). **Items:** at least 3 on every page (3-problem pages: mixed_multiplication S 4/37, L 12/37; mixed_addition L 12/37). **Legacy cells, "Answer:", "Any number":** 0 / 0 / 0 |
+| Key ink against its box | Clean in the PNGs. The range-rect probe also flags line-box overshoot on Odd/Even labels and family digits; the PNGs show those are false positives. The lint's glyph-ink measure (AK-2) is the right tool |
+| D6-6 lint check | `ws-print-lint --seed-list 100,4030286246` against **a08a37d** FAILS: PAGEFILL 57 % at seed 100; AK-2 "30 runs 3 mm outside its box" at the lint seed. The same run on cf39d5d passes. `--seed-list 6` on cf39d5d **fails** mixed_addition (L-DENSITY H13, cell h 37 %), so the lint sees what the fill loop kept |
+| Orchestrator gates (boot-smoke, screen-slots, share-options, screen-answer, code-snapshot, layout-unit; builder's full kit lint 0/281 S/L --seeds 10, determinism, content audit) | Not re-run by me; taken as reported |
+
+## Round-6 defects: status
+| # | Round-6 defect | Status on cf39d5d |
+|---|---|---|
+| D6-1 | two digit sizes in the column row; the key's 30 / 110 hung out of their boxes | **FIXED for mixed_multiplication** (`renders/r7/mixed_multiplication-S-lintseed-key.png`). Row e–i prints the facts at the stacks' digit size, and 30 / 110 sit inside their boxes. Seed 100 S has 4 facts beside a missing-digit stack, all at one size. **Not covered:** a fact beside stacks in an ordinary grid row. mixed_addition S seed 7 prints "14 + 6" at about 10 mm beside 4.5 mm stacks (D7-4). **Missing-digit box: not changed.** It measures 4.1 × 6.5 mm at S, and the standard asks for track − 1 mm, minimum 4.4 mm, dashed (§6, LS-8, VA-7). The key digit touches its edges at S and at L. The builder says widening it would break the place-value tracks. I accept that for this lane, but this is a kit-wide pre-existing gap (see out-of-lane) |
+| D6-2 | under-filled pool pages; legacy members; the "Any number × 0" giveaway | **FIXED on Independent.** Fill is at least 0.81 on all 222 probe pages. No legacy member, no "Answer:" and no "Any number" appear on any page. seed 100 S now prints 9 problems (`mixed_multiplication-S-seed100-p1.png`). mult_properties no longer prints "Any number × 1 = that number" / "× 0 = 0" (regression set). **Residue:** when none of the 24 re-deals passes, the best deal is kept even with an H13 band (mixed_addition S seed 6, D7-3). **Not applied to More Practice** (D7-1) |
+| D6-3 | worksheet row 3 cells unequal | **PARTLY.** Card 6's 9 × 4 array cell is capped at 418 px (was 535). Card 5's cell is 260 px, so the two cells differ by 38 % (round-6 check: ≤ 25 %). The white band under card 5's cell is about 175 px (33 % of the card), down from 290 px. Minor |
+| D6-4 | number_families_mult S holds 8 | Left, as an owner suggestion. Accepted |
+| D6-5 | mixed_composing L seed 180 strip | **FIXED.** It now prints 4 problems with fill 0.93. The lowest mixed_composing L fill is 0.859 |
+| D6-6 | lint blind to key overflow and to other seeds | **FIXED** (see Gates) |
+| CL-2b | pages over 26 items numbered 1–N | **MET.** missing_add_sub S and missing_mult_div S number 1–30 in black tabs from the first item, with no letters. 3 × 10 at S looks good (8 8 8 8) |
+
+## Build time (teacher print path, `window.buildSheet`, this container's headless Chromium)
+| Pool, size | Median | p90 | Max | > 10 s | > 20 s |
+|---|---|---|---|---|---|
+| mixed_multiplication S | 4.0 s | 16.5 s | **63.1 s** | 8 / 37 | 3 / 37 |
+| mixed_multiplication L | 2.9 s | 13.6 s | **63.8 s** | 5 / 37 | 2 / 37 |
+| mixed_addition S | 3.9 s | 15.9 s | **41.0 s** | 8 / 37 | 2 / 37 |
+| mixed_addition L | 0.5 s | 3.0 s | 15.1 s | 1 / 37 | 0 |
+| mixed_composing S / L | 0.6 / 0.5 s | 2.5 / 1.6 s | 5.1 / 2.8 s | 0 | 0 |
+
+**The page is frozen, not just slow.** A long-task observer recorded `buildSheet` as one task:
+- mixed_multiplication S seed 11: 56.5 s;
+- mixed_addition S seed 6: 41.3 s;
+- a fast seed: 2.7 s.
+
+A 100 ms interval fired 4 times in 56 s. So "Building the page…" cannot paint, nothing on the screen responds, and Chrome may offer to kill the tab.
+
+`teacher-print.js` rebuilds on every option change (350 ms debounce) and on "New numbers", from a fresh random seed. A teacher therefore meets a 10–60 s freeze about once in every five pool builds at S. A school Chromebook is slower than this container. **Not acceptable** (LESSONS L2 / usability): see D7-2.
+
+## Visual grading
+Print rows cover the pupil page and the key. Where only one size is named, the other size scored the same or higher. Screen rows cover card 1280/820/390, worksheet 1280 and quiz 1280. "Seeds" means the 37-seed probe.
+
+| Document | Version | Clarity | Pedagogy | Layout | Parity | Result |
+|---|---|---|---|---|---|---|
+| composing:odd_even | S, L, key | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 9 | PASS |
+| composing:whole_as_fraction | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:div_zero_in_quotient | S, S key, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| composing:ten_frame_build | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:dot_array_mult | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen (worksheet: cells now level at 420 px) | 8 | 8 | 8 | 8 | PASS |
+| | **More Practice S** | 8 | 8 | **5** (H5/H13) | 7 | **FAIL (D7-1)** |
+| addition:add_sub_10s | S (2 × 10), L, key | 8 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 8 | PASS |
+| | **More Practice S** (30 from a pool of 20) | 8 | **6** | 8 | **7** | **FAIL (D7-1)** |
+| division:missing_mult_div | S (1–30, CL-2b), S key, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mixed_multiplication | S, L, keys: harness, lint seed and 37 seeds | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS (D6-3 residue) |
+| | card, quiz | 8 | 8 | 8 | 8 | PASS |
+| | **More Practice S/L** (1 problem per page on 11 of 20) | 8 | **6** | **3** (H5) | **6** | **FAIL (D7-1)** |
+| composing:mixed_composing | S, L, keys (37 seeds) | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS |
+| | More Practice S (last page fills 49–66 %) | 8 | 8 | 8 | 8 | PASS (the last page may be short, PG-23) |
+| counting_mixed:counting_all | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:long_div_2digit | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mult_comparison | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:remainder_interpret | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:number_families_add | S, L key | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| | More Practice S (fill 0.70) | 8 | 8 | **6** | 8 | **FAIL (D7-1)** |
+| multiplication:number_families_mult | S (8 in 2 × 4), L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| | **More Practice S** (12 from 10 families, fill 0.70–0.74) | 8 | **6** | **6** | 7 | **FAIL (D7-1)** |
+| subtraction:missing_add_sub | S (1–30, CL-2b), S key, L | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280, card, quiz | 8 | 8 | 8 | 8 | PASS |
+
+The other More Practice pages pass the probe numbers: odd_even, whole_as_fraction, div_zero, ten_frame_build, missing_mult_div, missing_add_sub, long_div, mult_comparison, remainder_interpret, counting_all. Their fill is at least 0.89 and no page repeats a problem. Repeats across pages A and B are allowed. counting_all S's last page fills 0.55–0.62, a short last page.
+
+## Defects (ranked, §6 form)
+
+**D7-1 [CRITICAL, in lane, pre-existing, never graded] More Practice (the teacher's default page type) under-fills and repeats on lane skills.**
+- **What:**
+  - **mixed_multiplication:** Practice A and B hold **one problem each** on S seeds 1, 3, 5, 8, 10 and L seeds 1–5, 8 and 10. Fill is 0.25–0.40, and the score box reads "/1" (`renders/r7/MP-mixed_multiplication-S-seed1-A.png`). That is H5 (a lone item on a page), so C3 ≤ 5. Round 8 made it worse on 3 of 5 seeds against a08a37d: seed 1 went from 6 to 2 problems, seed 3 from 6 to 2 and seed 4 from 8 to 4. Removing the legacy members shrank the pool, and the fill floor does not run for this role.
+  - **number_families_mult S:** 12 per page from a 10-family band, so (5, 3, 15) and (4, 4, 16) each print twice on Practice A. The 4 × 3 grid ends with a 26–30 % strip (`MP-number_families_mult-S-seed1-A.png`).
+  - **number_families_add S:** fill 0.70.
+  - **add_sub_10s S:** 30 per page from 20 facts, so "10 − 10" prints 4 times and "20 − 10" 3 times on one page (`MP-add_sub_10s-S-seed1-key.png`).
+  - **dot_array_mult S:** 6 arrays per letter over 2–3 pages. Practice A page 1 holds 2 arrays in a 615 px row, with about 30 % empty above and below each (`MP-dot_array_mult-S-seed1-A1.png`). Fill 0.43–0.79.
+- **Cause:**
+  - `autoPoolPage()` (print-sheet.js) returns false for any role other than `'independent'`, so `buildSheetFilled`'s re-deal never runs on More Practice.
+  - The single-skill distinct-problem cap and the even-row reseat (print-sheet.js 2874 ff., the round-4 D-B fix) are not applied to `morePracticePlan`.
+  - The same pages are identical on a08a37d, apart from the mixed_multiplication counts above.
+- **Fix:**
+  1. Run the pool fill floor for `role: 'more-practice'` per letter page (each letter is one page asked).
+  2. Apply the distinct-problem cap and the even-row fill to the More Practice plan, as on Independent: 2 × 10 for add_sub_10s, 8 for number_families_mult.
+  3. Give dot_array_mult More Practice the Independent page's grid (2 × 4 at S).
+- **Check:** probe More Practice for the 16 documents at S and L, seeds 1–10. Every letter page needs fill ≥ 0.81 (except a sheet's last page), at least 3 problems, no H13 band and no repeat within a page. Add `--roles more-practice` to the lane's lint run.
+
+**D7-2 [MAJOR, in lane, introduced by round 8] Pool builds block the main thread for up to a minute.**
+- **What:** see the build-time table. The longest measured page builds as one 56.5 s task. 8 of 37 S builds of mixed_multiplication and of mixed_addition take more than 10 s.
+- **Cause:** `buildSheetFilled` builds up to 25 deals. `poolQuality` lays out each one twice (pupil and key) synchronously in `pageCheck`, and nothing yields between deals. The outer `buildSheet` re-deal (k ≤ 3) can wrap that in turn.
+- **Fix:**
+  1. Yield between deals (`await new Promise(r => setTimeout(r))`) so the page paints and stays responsive, and show "Finding a page that fills…" on the preview.
+  2. Judge the cheap plan figures (`pageFillOf`, item count) first, and lay out only the candidates that pass them.
+  3. Measure the key only for the deal that will be kept.
+  4. Cap the total time (for example 5 s) and keep the best deal found so far.
+  5. Better still, make the first deal fill: after a spill, pick the next member from the ones that fit the space left.
+- **Check:** across seeds 1–30 at S, the median build is under 1.5 s and the maximum under 5 s. No single long task exceeds 1 s while a build runs.
+
+**D7-3 [MINOR, in lane (every mixed pool), not a regression] When no re-deal passes, the kept page can still fail H13.**
+- **What:** mixed_addition S seed 6 kept deal 118791 after trying all 24 re-deals (37 s). Cell h, "300 + 100 = ___", leaves a 37 % band. `ws-print-lint --seed-list 6` fails it on L-DENSITY H13 (`renders/r7/mixed_addition-S-seed6-key.png`). On a08a37d the same seed was much worse: fill 0.65 and a legacy "Answer:" cell.
+- **Fix:** comes with D7-2 fix 5. A pool that cannot fill with a short fact should take another kind of member for the last slot, rather than keep a banded page.
+- **Check:** `ws-print-lint --seeds 30` on the mixed pools at S and L is clean.
+
+**D7-4 [MINOR, not a regression] A fact in an ordinary grid row prints at the fact ladder's size beside small stacks.**
+- **What:** mixed_addition S seed 7 row a–c prints "14 + 6" with about 10 mm digits beside "61 + 23" with 4.5 mm digits (`renders/r7/mixed_addition-S-seed7-p1.png`). The D6-1 one-digit-size rule runs only inside a fine-split column-work group (practice.js 837 ff.) and for `boxAns` facts.
+- **Fix:** apply the same `pt: metricPt` to every fact that shares a grid section with a stack.
+- **Check:** every row with a stack has one digit size, measured as stack digit font-size equal to fact `--fd`.
+
+**D7-5 [MINOR] D6-3 residue: worksheet row 3 cells still differ by 38 %.**
+- **What:** card 5's cell is 260 px and card 6's is 418 px (`renders/r7/mixed_multiplication-worksheet-1280.png`).
+- **Fix:** the cap could be 340 px, or card 5's cell could stretch to the row (`align-items: stretch` on the cell, with the drawing centred).
+- **Check:** ≤ 25 % difference.
+
+## Pre-existing, out-of-lane items
+- **Missing-digit box (kit-wide, stack.js / sheet-kit.css):** it computes to a **solid** border, 4.1 mm wide at S. The standard asks for a short-dash outline (LS-8, owner ruling 2026-09-19) and track − 1 mm with a 4.4 mm minimum (§6, VA-7). live f1dae55 has no dashed rule either. At S and L the key digit touches the box edges. Owner / kit lane.
+- **mult_properties (legacy):** "3 × 7 = 2 × 7 + ____ × 7. What is the missing number? Answer: ___" still has two answer places. The giveaway line is gone, which is better.
+- **mixed_multiplication worksheet card 4:** "Fact Family: 10, 8, 80" is the instruction, with no verb. It is the same on rounds 5 and 6.
+- **3-problem L pool pages:** mixed_multiplication and mixed_addition L each print 3 problems on 12 of 37 seeds. These pages pass the fill floor and H13, and L's default is 2 × 2, so I did not grade them down. Owner question: should an L review page hold at least 4?
+
+## Non-lane regression spot check
+- **Against round 6 (a08a37d → cf39d5d), S print, pixel diff:**
+  - add_fractions_like, add_20_regroup, time_5min, multiply and compare_objects are **identical**.
+  - mult_properties differs only because "Any number × 1 = that number" / "× 0 = 0" is removed (intended).
+  - mixed_addition and mixed_subtraction deal kit members only. Both harness pages grade 8 8 8 8, with no "Answer:" row and a full grid. Better.
+- **Against live (f1dae55):** the changed documents also differ through rounds 5–8 and live's own later commits, which are not ancestors of this tree. Nothing in the round-8 diff touches them beyond the items above.
+
+## What passes
+- **The Independent role, all 16 documents, at S and L and on every screen host.** It now holds on many seeds for the three pools, not only the harness seed.
+- **Fixed this round:**
+  - pool fill floor on the printed page;
+  - kit-only pool members;
+  - no answer-giving property line;
+  - one digit size and contained key values in mixed_multiplication's column row;
+  - lint AK-2 and multi-seed pool lint, which demonstrably fail the round-6 tree;
+  - CL-2b numbering on the 30-item pages;
+  - the worksheet dot-array cap.
+- **The regression set holds:** five documents pixel-identical to round 6; three changed only as intended.
