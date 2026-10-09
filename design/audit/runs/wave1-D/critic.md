@@ -567,3 +567,186 @@ Print rows cover the pupil page and the key. Where only one size is named, the o
   - mixed_multiplication L: every vertical fact boxed.
 - **The regression set holds:** add_20_regroup, time_5min and compare_objects are unchanged, and the add_fractions_like doubled slot is gone.
 - **The lint gained L-ANSAREA.** It still needs: PAGEFILL measured from the grid top, an empty-bordered-region check, and a repeated-item check.
+
+# Round 5: independent critic (Opus medium), 2026-10-09
+
+Tree: claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535 at 08272b1 (round-5 sub-lanes G 5197575, S dbeea7d, P d65034e + follow-up 08272b1).
+I made my own renders with `ws-grade-render --roles independent`: at S with every screen host (card 1280/820/390, worksheet 1280, quiz 1280) and at L print only, for the 15 lane documents plus subtraction:missing_add_sub.
+For the regression set I rendered S (print and screen) on this tree, on origin/claude/sweet-newton-c8wrv1 (now 4970e4b, a scratchpad worktree served through MQ_ROOT) and on the round-4 tree 451f424 (a second worktree), and pixel-diffed them.
+Live has moved since round 4 (4970e4b is not an ancestor of this tree: it carries the Steps-box lane and a layout revert), so tree-vs-live differences are not all this lane's. The tree-vs-451f424 diff isolates what round 5 changed.
+The 10 PNGs this report cites are in `renders/r5/`. Both worktrees are removed.
+
+## Verdict: FAIL (14 of 16 pass)
+
+Round 5 fixed the round-4 critical (D-A) and most of the majors. **14 of the 15 lane documents pass** on every version I graded.
+Two documents fail:
+- **number_families_mult S** still deals the same family twice: 4 of its 12 problems are reorders of another problem (a/g, c/i, d/k, e/h). The default 5 × 5 band has only 10 families (6 pairs + 4 squares), so 12 cannot be dealt without repeats. The new REPEAT lint misses it because its signature is ordered.
+- **subtraction:missing_add_sub** (out of lane, touched this round): the paper is now boxed throughout, but the worksheet still draws result unknowns as lines beside operand boxes. The pre-existing title "I Can subtract missing numbers +/−" sits over a page that is half additions.
+
+Two claims did not reproduce in `ws-grade-render`: missing_mult_div L and missing_add_sub L print **16 in 2 × 8**, not 18 in 2 × 9. (The 2 × 8 rows are spread to the page, so there is no strip, and 16 is the 12.1 ceiling for one-symbol grids. Not a defect.) number_families_mult S prints 12 in 3 × 4, not 16.
+
+## Gates
+| Gate | Result |
+|---|---|
+| ws-grade-render meta (16 skills, S, all hosts) | 0 console errors; hScroll 0 on every host; smallTargetCount 0 on every host except mixed_multiplication worksheet-1280 (1, a desktop host, H6 does not apply) |
+| `ws-content-audit --category multiplication` (re-run by me) | **OK**, 27 skills, 0 failing (times-story-addsub included) |
+| Equation keys (missing_mult_div, missing_add_sub, add_sub_10s; S and L) | Every item evaluated by script: 0 wrong keys, 0 exact-text repeats |
+| Orchestrator gates (print-lint S/L 0/191, determinism, content-audit + self-test, code-snapshot 608, layout-unit 558, lint self-test 49, standards, boot-smoke, screen-answer, screen-slots, share-options) | Not re-run; taken as reported |
+
+**Lint gap:** REPEAT compares `signature(q)` (text + answer + payload, in order). A number family dealt as 4, 5, 20 and again as 5, 4, 20 has two signatures, so the lint passes number_families_mult S with 4 repeats. The fix is in D5-1 below.
+
+## Round-4 defects: status
+| # | Round-4 defect | Status on 08272b1 |
+|---|---|---|
+| D-A | mult_comparison take-away story (H3) | **FIXED.** S keys: 9, 30, 7, 8, 7, 40, 3, 9, 4. Every story is solved by × or ÷ (`q.storyOps`). There is no 2 × 2 item, and the content audit is OK |
+| D-B | add_sub_10s S repeats and empty bordered area | **FIXED.** 20 distinct facts (0 + 10 … 90 + 10, 10 − 10 … 100 − 10) in 2 × 10. There is no repeat and no hole, and the grid ends 10 mm above the footer. The grid shape is the freeRows question below |
+| D-C | mixed_multiplication doubled sign, unit verb, worksheet band | **FIXED.** S stories a, b, f have one sign place (the frame's operator box) under "Write the sign. Solve. Write the unit word.". On the worksheet, card 3 has one ring and card 5 (number line) is sized to its content. Residue: D5-3 |
+| D-D | missing_mult_div title, screen, L density | **FIXED.** The title is "I Can find the missing number (×, ÷)". Card, worksheet and quiz say "Type the missing number." over the boxed sentence, with no restated equation. Worksheet slots are boxes. L prints 16 in 2 × 8 with the rows spread to the page (no strip) |
+| D-E | number families fill, rows, variety | **PARTLY.** L prints 6 in 2 × 3 for both skills. S rows are equal (add 203 px × 4; mult 203 px × 4). number_families_add S has 12 distinct families with 2 doubles. **number_families_mult S repeats 4 families** (D5-1) |
+| D-F | mixed_composing worksheet pool skew | **FIXED.** Six cards from five members; whole_as_fraction is cards 1 and 6, not adjacent |
+| D-G | missing_add_sub mixed slot shapes / L density | **PARTLY.** Paper is all boxes at S and L. The worksheet still mixes lines and boxes (D5-2). L prints 16 in 2 × 8 (page full), where live printed 20 in 4 × 5 |
+| D-H1 | div_zero quotient boxes 4.3 mm | **FIXED.** Measured 16–17 px = 4.4 mm wide, 7.1 mm tall |
+| D-H2 | dot_array L one dot size | **FIXED.** d (3 × 10) has the same pitch as a, b, c |
+| D-H3 | lone last word | **FIXED.** "Ravi has." and "Tom has." stay together on mult_comparison L |
+| D-H4 | mixed_composing key order | **FIXED.** "(any order)" sits under 1/2 + 1/4 + 1/4 at S and L |
+| D-H5 | counting_all odd/even screen prompt | **FIXED.** "Odd or even? Tap one box." |
+| pre-existing | number families screen hosts legacy | **FIXED.** Card, worksheet and quiz draw the kit family cell: B&W Andika, one box per answer, no "(Easy)" heading, no in-cell Check button |
+
+## Non-lane regression spot check
+Round 5 against round 4 (451f424 → 08272b1):
+- **Print unchanged (pixel-identical), S:**
+  - add_fractions_like, add_20_regroup, time_5min, multiply, mult_properties.
+  - Their screen diffs are the animated background only.
+- **Changed by this round, as intended:** mixed_addition. The pool story drops the "Circle the sign" row, which leaves one sign place, on paper and on the worksheet. Nothing else moved.
+- **Changed by this round, cosmetic: compare_objects S.** The empty run beside a and b (2 tower cells in a 4-track row) lost its right and bottom border. The frame's top rule now runs on over open paper. See the judgement below and `renders/r5/REGRESSION-compare_objects-S-tree-vs-live.png` (tree on the left).
+
+Against live (4970e4b): live's mult_properties S prints **2 problems over a page-wide hole**, and its mixed_addition S prints 4. The tree prints 7 and 6, so the tree is better on both. Those differences come from live's own later commits, not from this lane.
+
+## freeRows and the borderless empty run: judgement
+
+**freeRows (2 × 9, 2 × 10; dense ceiling at L 16 → 20 for short problems).**
+- **Count: acceptable.** DN-1a (2026-09-25) already lets a kit page of short problems hold 30 / 24 / 20 at S / M / L. So 20 at S, and up to 20 at L, is within the standard.
+- **Shape: not covered by the letter of the standard.** 2 × 9 and 2 × 10 are not in CL-2's list (2 × 2 / 3 / 4 / 5 / 8 for independent pages). 12.1's Independent row still says "up to 16 … using the 2 × 5 and 2 × 8 grids". The only 2 × 10 in the standard is the 2-up practice strip.
+- The cells are equal (CL-3) and the rows are whole, so nothing looks wrong on the page. In my renders freeRows took effect only on add_sub_10s S.
+- **Raise it with the owner.** Either amend CL-2 to read "2 × n (n ≤ 10) for one-symbol answers when the count is held by the skill's distinct pool", and align 12.1's Independent row with DN-1a, or require the pool-capped page to use a listed shape: add_sub_10s S would be 4 × 5 = 20 (CL-2's open 4 × 5). Until the owner rules, I do not fail add_sub_10s S on it.
+- One side effect to note: S and L now both print add_sub_10s in two columns. S differs only in count (20 against 16) and digit size, and leaves side bands of about 22 % of each cell.
+
+**Borderless empty run (`.blankrun.cut`, grid.js + sheet-kit.css): cosmetics, and against the standard.**
+- PG-15 says the remainder is "one unruled blank area **inside the closed outer frame**". The cut opens the frame instead.
+- On compare_objects S the result is an L-shaped frame with a top rule that runs over nothing. A teacher reads that as a printing fault.
+- The empty area is the same size as before. The hole is hidden, not removed.
+- The real fixes in this round are the ones that avoid the hole: `hole()` in buildSheet re-deals or re-lays single-skill pages. Those work: no lane page has an empty run.
+- Recommendation: revert the `cut` class (keep PG-15's closed frame), and remove holes by layout, the way buildSheet now does for single-skill pages. Do not count the borderless run as a fix.
+
+## Visual grading
+Print rows cover the pupil page and the key. Where only one size is named, the other size scored the same or higher. Screen rows cover card 1280/820/390, worksheet 1280 and quiz 1280.
+
+| Document | Version | Clarity | Pedagogy | Layout | Parity | Result |
+|---|---|---|---|---|---|---|
+| composing:odd_even | S, L, key | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 9 | PASS |
+| composing:whole_as_fraction | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:div_zero_in_quotient | S, S key | 8 | 8 | 8 | 9 | PASS |
+| | L | 9 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| composing:ten_frame_build | S key, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:dot_array_mult | S, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:add_sub_10s | S | 8 | 8 | 8 | 8 | PASS (CL-2 shape to the owner) |
+| | L, L key | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 8 | PASS |
+| division:missing_mult_div | S, S key | 8 | 8 | 8 | 8 | PASS |
+| | L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mixed_multiplication | S, S key | 8 | 8 | 8 | 8 | PASS |
+| | L, L key | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS |
+| composing:mixed_composing | S, L, keys | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280 | 8 | 8 | 8 | 8 | PASS |
+| counting_mixed:counting_all | S, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:long_div_2digit | S key, L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mult_comparison | S, S key | 8 | 8 | 8 | 8 | PASS |
+| | L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:remainder_interpret | S, L key | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:number_families_add | S | 8 | 8 | 8 | 8 | PASS |
+| | L key | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:number_families_mult | S, S key | 8 | **7** | 8 | 8 | FAIL |
+| | L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| subtraction:missing_add_sub (touched) | S, S key, L | **7** | 8 | 8 | 8 | FAIL |
+| | worksheet 1280 | **7** | 8 | 8 | **7** | FAIL |
+| | card, quiz | 8 | 8 | 8 | 8 | PASS |
+
+## Defects (ranked, §6 form)
+
+**D5-1 [MAJOR] number_families_mult S: a third of the page repeats a family.**
+- What: S deals 12 families from the default 5 × 5 band. Only 10 exist: {2,3} {2,4} {2,5} {3,4} {3,5} {4,5} and 4 squares. a (4, 5, 20) = g (5, 4, 20); c (3, 2, 6) = i (2, 3, 6); d (2, 4, 8) = k (4, 2, 8); e (4, 3, 12) = h (3, 4, 12). Each pair is the same four facts in a different order.
+- Where: `renders/r5/number_families_mult-S-key.png`.
+- Cause:
+  1. `_familyPair` (gen-operations.js 2204) deals pairs without repeat until the 6 unequal pairs run out, then cycles.
+  2. buildSheet's `dup()` and lint REPEAT use the ordered `signature(q)` (print-sheet.js 159), so a reordered family does not count as a repeat. The fill therefore goes on to 12.
+- Cost: C2 7 on S and S key (repeats on one page, the round-4 standard). Getting to 10 needs every family on the page to be distinct.
+- Fix:
+  1. Give number-family items a canonical deal key. Set `q.dealKey = 'nf:' + [a, b].sort() + ':' + op` in the two family branches, and use it in `signature()` when it is present. Then `dup()` and REPEAT both see the repeat, and the existing pool-cap path stops the page at the distinct pool.
+  2. At S the 5 × 5 band then caps at 10. Lay that out as 3 × 3 = 9 (6 pairs + 3 squares), or better, deal the default S page from a 2–6 band (10 pairs + squares at 1 in 6). Say which in the option panel's note.
+- Check: render number_families_mult S at seeds 1–20; 0 pages with two items whose sorted (a, b) match; REPEAT self-test gains a reordered-family case.
+
+**D5-2 [MAJOR, touched out-of-lane] missing_add_sub: the worksheet mixes lines and boxes, and the title misleads.**
+- Worksheet 1280: cards 1–4 (result unknown: "15 − 10 = ___") draw an underline, and cards 5–6 draw a box. Paper now boxes every unknown (`resultBox: true`).
+  - Cause: the screen path for this skill does not reach `equationKitTwin`'s `resultBox` branch (screen-cell.js 3324). The worksheet card still renders the legacy line.
+  - Fix: route missing_add_sub's worksheet and card through the kit equation twin with `p.resultBox` (as missing_mult_div now does), so every slot is a box.
+  - Cost: C1 7 (two slot shapes in one grid) and C4 7 (paper box against screen line). `renders/r5/missing_add_sub-worksheet-1280.png`.
+- Title (pre-existing on live, but this skill was moved to the kit this lane): "I Can subtract missing numbers +/−" sits over a page where 7 of 16 L items are additions ("10 + 9 = ☐", "☐ + 2 = 11"). It is also ungrammatical.
+  - Fix: add `'subtraction:missing_add_sub': 'I Can find the missing number (+, −)'` to TITLES in `js/modules/sheet/providers/titles.js`, matching missing_mult_div.
+  - Cost: print C1 7. `renders/r5/missing_add_sub-L-p1.png`.
+- Check: worksheet shows 6 boxed slots; the title matches; `ws-screen-slots` shows 0 shape mismatches for the skill.
+
+**D5-3 [MINOR] mixed_multiplication: the story's sign place is a square digit box on paper, a ring on screen.**
+- What: after D-C, the one sign place on paper is the operator-track box of the column frame. It is drawn exactly like the digit boxes beside it (S a, b, f). The worksheet draws the same place as a ring, and mult_comparison's paper draws it as a ring.
+- Why it matters: the pupil should know a sign is wanted from the slot's shape (C1). The instruction "Write the sign." carries it today.
+- Fix: in word-work.js's column-frame operator cell, draw `circle()` (Hw + 2 mm) when `signRow === false`.
+- Where: `renders/r5/mixed_multiplication-S-p1.png` and `renders/r5/mixed_multiplication-worksheet-1280.png` (card 3).
+- Check: the sign slot is round on paper and on screen.
+
+**D5-4 [MINOR] mixed_multiplication worksheet: row 3 is ragged.**
+- What: card 5 (number line, 375 px) sits beside card 6, a 9 × 4 dot array at 45 px pitch that is 650 px tall. Card 5's band is gone, but the grid now has a short card next to a long one.
+- Fix: cap the dot pitch on the worksheet host so a 9-row array is ≤ 420 px, or deal the tall member into a row of its own height class.
+- Check: card heights in one worksheet row are within 25 % of each other.
+
+**D5-5 [MINOR] The borderless empty run (kit-wide, `.blankrun.cut`).**
+- What: the run leaves an open frame with a dangling top rule (compare_objects S). It contradicts PG-15, and the empty area is no smaller than before.
+- Fix: remove `cut` from `blankRun()` (grid.js 19) and the CSS rule (sheet-kit.css 164), restoring PG-15's closed frame. Keep the buildSheet hole-avoidance, and extend it to mixed-height pages: compare_objects S should lay the two tower cells 2-across over half the width, or move them into the full-width rows.
+- Check: lint HOLE stays green; no page shows an open frame.
+
+**D5-6 [MINOR] Small items.**
+1. Kit `box()` slots at S measure 21 px tall (5.6 mm outer), under SL-4's Hw 6 mm clear height (missing_mult_div S, missing_add_sub S). The key digit is set at .72 em inside it. Fix: make `.ws-box` `box-sizing: content-box` (or height `calc(var(--ws-hw) + 2 × var(--ws-hair))`) so the clear height is Hw. This is kit-wide, not this lane.
+2. mult_comparison S d, e, h (the "how many times as many" items, which have no unit bank) are centred in their cells while a, b, c, f, g, i are top-anchored, so the answer row is at three different heights in one section (CL-6). Fix: top-anchor every word-work cell.
+3. div_zero_in_quotient deals only X0Y quotients (28 of 28 at S). A quotient with a zero in the ones (840 ÷ 4 = 210) is the second named edge case. Fix: deal 1 in 4 with the zero in the ones place.
+4. counting_all worksheet cards 2, 4, 5: the shapes touch the cell's left border (0–2 px pad). Fix: 3 mm pad on the count cell's screen twin.
+5. The orchestrator's claims of "missing_mult_div / missing_add_sub L 18 in 2 × 9" and "number_families_mult S 16" do not match `ws-grade-render` on 08272b1 (16, 16, 12). Re-check the claims against the same harness before reporting them.
+
+## Pre-existing, out-of-lane items
+- **mult_properties S (tree = round 4, better than live):** legacy cells e–g have a sentence blank AND an "Answer: ___" line (H8 doubled slot), and a and d restate "What is 1 × 3?" over "3 × 1 = ?". On the worksheet, cards 4 and 6 draw the distributive arrays small, with nearly touching dots and no "2 rows / ? rows" captions.
+- **mixed_addition S:** the stacked cells a–d and f have no answer row under the rule. 16 + 16 is drawn at twice the size of its neighbours. Cells b–d have empty bands of 60–70 % (H13). "110303 + 41" sits on a K–5 review. On the worksheet, card 6 has a "Yes" check box clipped to a corner. All of these are the same on round 4 and on live.
+- add_fractions_like e/f: "Circle ALL sums…" over check boxes with slashed fractions (legacy, the same as before).
+
+## What passes
+- **Fixed and good this round:**
+  - mult_comparison: ×/÷ stories only, varied answers, one ring, words kept together.
+  - add_sub_10s S: 20 distinct facts, no hole.
+  - missing_mult_div: title, boxed screen twins without the restated equation, L page full.
+  - number_families_add: S 12 distinct with even rows, L 6 in 2 × 3, kit screen cell on all hosts.
+  - mixed_multiplication: one sign place, the worksheet number-line card sized to content.
+  - mixed_composing worksheet: varied, with "(any order)" in the key.
+  - div_zero boxes 4.4 mm.
+  - dot_array: one dot size.
+  - counting_all: the parity prompt.
+- **Unchanged and still at 8+:** odd_even, whole_as_fraction, ten_frame_build, long_div_2digit, remainder_interpret.
+- **Regression set holds:** add_fractions_like, add_20_regroup, time_5min, multiply and mult_properties print pixel-identical to round 4. mixed_addition changed only as intended (one sign place).
