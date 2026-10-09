@@ -304,7 +304,10 @@ register('stack', {
         // for column work): 'digit' draws the answer strip, one box per digit, the key's digits in
         // them; 'one' draws the open zone as ONE box, the key's digits inside it; 'off' keeps the
         // plain open zone (no box). A Guided cell's digit boxes are a scaffold and stay either way.
-        const ansBox = p.ansBox === 'one' || p.ansBox === 'off' ? p.ansBox : 'digit';
+        // A missing-digit item (p.unknown, VA-7) GIVES its answer row: its answer place is the one
+        // missing digit, so the answer row keeps its plain printed digits and the option does not
+        // apply (critic B r5 D4: given digits never wear the answer-box shape).
+        const ansBox = p.unknown ? null : p.ansBox === 'one' || p.ansBox === 'off' ? p.ansBox : 'digit';
         let answer = p.answer || (level >= 2 ? 'boxes' : 'open');
         let boxInk = null;
         if (ansBox === 'digit') {

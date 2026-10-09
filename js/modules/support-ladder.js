@@ -161,7 +161,7 @@ export function candidatesFor(q, ctx = {}) {
     if (q.answerType === 'clock-set') {
         return [{ id: 'ring', how: 'csring' }, { id: 'steps', how: 'pane', pane: 'steps', payload: { steps: DRAW_STEPS } }];
     }
-    const kind = ctx.kind !== undefined ? ctx.kind : cellKindFor(Object.assign({}, q, { options: [] }));
+    const kind = _givenOnly(ctx.kind !== undefined ? ctx.kind : cellKindFor(Object.assign({}, q, { options: [] })));
     const bp = kind && SCREEN_TEMPLATE[kind.kind] ? null : binaryParts(Object.assign({}, q, { options: [] }));
     if ((kind && SCREEN_TEMPLATE[kind.kind]) || bp) {
         const tpl = kind && SCREEN_TEMPLATE[kind.kind] ? SCREEN_TEMPLATE[kind.kind] : 'equation';
@@ -355,13 +355,18 @@ function kitRootIn(root) {
     return all.find((el) => { const up = el.parentElement && el.parentElement.closest('.ws-supported'); return !up || !root.contains(up); }) || null;
 }
 
+// A missing-operand sentence drawn as a digit strip (screen-cell _missingOperandStrip) carries the
+// ANSWER in its blank's operand: the supports would draw it, so it keeps the legacy item's
+// supports (none from the kit), as before the strip existed.
+const _givenOnly = (k) => (k && k.missing ? null : k);
+
 /**
  * Redraw the kit cell with the ladder's supports `ids` (touch dots, boxed sign, start arrow) beside
  * the ones the set gave it; `[]` takes the ladder's off again. The pupil's live inputs (their
  * entry, their listeners) are moved into the new drawing, never re-created.
  */
 function redrawKit(root, q, ids, ctx) {
-    const kind = ctx.kind || cellKindFor(Object.assign({}, q, { options: [] }));
+    const kind = _givenOnly(ctx.kind || cellKindFor(Object.assign({}, q, { options: [] })));
     if (!kind || !SCREEN_TEMPLATE[kind.kind]) return false;
     const old = kitRootIn(root);
     if (!old) return false;

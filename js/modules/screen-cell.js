@@ -96,7 +96,33 @@ export function binaryParts(q) {
  *   division  US bracket division, quotient slot above the vinculum (VA-60, VA-61)
  */
 export function cellKindFor(q) {
-    return withAnsBox(q, _cellKindFor(q));
+    const k = _cellKindFor(q);
+    return k ? withAnsBox(q, k) : _missingOperandStrip(q);
+}
+
+/**
+ * A missing-number sentence whose blank is NOT after "=" ("[ ] + 5 = 18", "6 × [ ] = 42") at ansBox
+ * 'digit': the blank is drawn as the same digit strip as "13 + 5 = [ ][ ]", so one section has one
+ * slot shape on screen as on paper (critic B r5 D6). Every other value keeps the legacy drawing.
+ */
+function _missingOperandStrip(q) {
+    if (!q || (q.printFormat !== 'missing-number' && q.printFormat !== 'missing-factor')) return null;
+    if (Array.isArray(q.options) && q.options.length > 0) return null;
+    if (q.answerType && q.answerType !== 'number') return null;
+    const raw = q.ansBox != null ? q.ansBox : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null;
+    if (resolveAnsBox(raw, 'other') !== 'digit') return null;
+    const m = plainText(q.text).match(/^(\d{1,7}|\?|_+)\s*([+\-−–×xX*÷/])\s*(\d{1,7}|\?|_+)\s*=\s*(\d{1,7})\s*$/);
+    if (!m) return null;
+    const blankA = !/^\d/.test(m[1]), blankB = !/^\d/.test(m[3]);
+    if (blankA === blankB) return null;
+    const op = OP_NORM[m[2]];
+    const ans = Number(String(q.ans).replace(/,/g, ''));
+    if (!op || !Number.isInteger(ans) || ans < 0) return null;
+    const a = blankA ? ans : Number(m[1]), b = blankB ? ans : Number(m[3]), c = Number(m[4]);
+    if (computeOp(a, op, b) !== c) return null;
+    const band = q.printFormat === 'missing-factor' ? 3 : 2;              // the paper slot's band (SL-2)
+    const strip = Math.max(String(ans).length, band);
+    return { kind: 'stack', layout: 'eq', missing: blankA ? 'a' : 'b', a, b, c, op, ans, strip, T: strip, regroup: false, ansBox: 'digit', ltr: true };
 }
 
 /**
@@ -477,13 +503,25 @@ export function eqDigitsHTML(k, { idPrefix = '', answerClass = 'column-answer-in
     const digits = `<span class="ws-stack mq-eqdigits" data-mq-ltr="1" style="--t:${strip}" data-ws-slot="answer" data-ws-shape="open">${cells}</span>`;
     if (k.twin === 'add-three' && k.payload) {
         // the kit's own counters sentence (drawn as on paper), its one answer box swapped for the strip
+        // Drawn exactly as the auto twin is (gen-operations _kitTwin: the screen ctx, whose digit size
+        // fits the host width), and "= [ ][ ]" kept together as one unit that wraps under the sum
+        // when the row does not fit, so the strip never crosses the frame at 390 (critic B r5 D3).
         try {
-            const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+            const ctx = resolveCtx({ mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
             const html = renderCell({ cell: { template: 'add-three', v: 1, payload: Object.assign({}, k.payload, { ansBox: null }) } }, ctx);
-            const swapped = _screenSizes(html, (ctx.metrics && ctx.metrics.digitPt) || 28)
-                .replace(/<span data-ws-slot="answer"[^>]*>[^<]*<\/span>/, digits);
+            const swapped = String(html)
+                .replace(/(<div class="ws-eq" style="display:inline-flex;)([^"]*?)white-space:nowrap;/, '$1flex-wrap:wrap;justify-content:center;max-width:100%;$2')
+                .replace(/(<span style="[^"]*">=<\/span>)<span data-ws-slot="answer"[^>]*>[^<]*<\/span>/,
+                    (m, eq) => `<span class="mq-eqtail" style="display:inline-flex;align-items:center;gap:0.2em;white-space:nowrap">${eq}${digits}</span>`);
             if (swapped.includes('mq-eqdigits')) return `<div class="ws-sheet mq-kit">${swapped}</div>`;
         } catch (e) { /* fall back to the plain sentence */ }
+    }
+    if (k.missing === 'a' || k.missing === 'b') {
+        // the blank where the sentence has it, the given result after "=" (critic B r5 D6)
+        const side = (w, x) => (k.missing === w ? digits : `<span>${x}</span>`);
+        const said = `${k.missing === 'a' ? 'blank' : k.a} ${spokenOp(k.op)} ${k.missing === 'b' ? 'blank' : k.b} equals ${k.c}`;
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(said)}">`
+            + `${side('a', k.a)}<span class="o">${opGlyph(k.op)}</span>${side('b', k.b)}<span class="o">=</span><span>${k.c}</span></div></div>`;
     }
     const ops = Array.isArray(k.operands) && k.operands.length > 2 ? k.operands : [k.a, k.b];
     const lhs = ops.map((x) => `<span>${x}</span>`).join(`<span class="o">${opGlyph(k.op)}</span>`);
@@ -496,7 +534,8 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     if (!k) return '';
     // S2: the item's supports (screenSupportsFor): touch dots on the digits, and the cues, tally
     // row and panes drawn round the problem by the same code as paper (support-draw.js).
-    const kk = supports && supports.on && supports.on.length ? Object.assign({}, k, { supports }) : k;
+    // a missing-operand strip's blank operand holds the answer: no supports are drawn from it (r5 D6)
+    const kk = supports && supports.on && supports.on.length && !k.missing ? Object.assign({}, k, { supports }) : k;
     let html = '';
     // ansBox 'off' (the plain look): the host's slot keeps a ruled writing line, no box.
     if (k.ansBox === 'off' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansoff">${slotHtml}</span>`;
@@ -521,7 +560,7 @@ const SCREEN_TEMPLATE = { eq: 'equation', fact: 'fact', stack: 'stack', division
  * on the online worksheet and in live practice). null when there is none.
  */
 export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '', skillId = '', options = null } = {}) {
-    if (!q || !k) return null;
+    if (!q || !k || k.missing) return null;
     const o = q.skillOptions || options || {};
     let def = null;
     try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }

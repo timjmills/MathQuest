@@ -22,13 +22,15 @@ function entryOrder(boxes) {
     const out = [];
     for (let i = 0; i < boxes.length; i++) {
         const el = boxes[i];
-        if (!el.matches(DIGIT) || isOptional(el)) { out.push(el); continue; }
+        // a fact / equation in digit boxes (ansBox 'digit', data-mq-ltr) is written in reading order:
+        // its next box is the LEFTMOST empty one, so it keeps its order
+        if (!el.matches(DIGIT) || isOptional(el) || el.closest('[data-mq-ltr]')) { out.push(el); continue; }
         const stack = el.closest('.ws-stack, .column-problem, [data-mq-cell]') || el.parentElement;
         const top = Math.round(el.getBoundingClientRect().top);
         const run = [el];
         while (i + 1 < boxes.length) {
             const nx = boxes[i + 1];
-            if (!nx.matches(DIGIT) || isOptional(nx) || Math.round(nx.getBoundingClientRect().top) !== top
+            if (!nx.matches(DIGIT) || isOptional(nx) || nx.closest('[data-mq-ltr]') || Math.round(nx.getBoundingClientRect().top) !== top
                 || (nx.closest('.ws-stack, .column-problem, [data-mq-cell]') || nx.parentElement) !== stack) break;
             run.push(nx); i++;
         }

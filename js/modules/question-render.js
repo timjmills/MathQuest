@@ -828,11 +828,43 @@ function attachZoomBehavior(visualAidEl, q) {
 //
 // Public surface (also attached to window in globals.js):
 //   wireBoxValidation(visualAidEl, q)
+// The digit strip's right answer is submitted like a typed one (critic B r5 D1): its value goes into
+// the hidden #answerInput and the card's checker takes it from there (score, message, XP, advance).
+function _wireLtrStripSubmit(strip, cols, q) {
+    if (!strip || !cols.length || !q) return;
+    const want = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    if (!want) return;
+    const tryRight = () => {
+        if (state.hasAnswered || state.currentQ !== q) return;
+        if (cols.some(el => el.disabled || !el.isConnected)) return;
+        const r = ltrStripValue(cols);
+        if (r.gap || r.text === '' || r.value !== want) return;
+        const ai = document.getElementById('answerInput');
+        if (ai) ai.value = r.text;
+        if (typeof window.submitAnswer === 'function') window.submitAnswer();
+    };
+    cols.forEach(el => {
+        if (el.dataset._ltrSubmit === '1') return;
+        el.dataset._ltrSubmit = '1';
+        el.addEventListener('input', tryRight);
+    });
+}
+
 export function wireBoxValidation(visualAidEl, q) {
     if (!visualAidEl || !q) return;
 
     // Detect which box system(s) are present.
-    const colInputs = Array.from(visualAidEl.querySelectorAll('.column-answer-input'));
+    let colInputs = Array.from(visualAidEl.querySelectorAll('.column-answer-input'));
+    // A fact / equation in digit boxes (ansBox 'digit', data-mq-ltr) is ONE answer written in boxes,
+    // so it is left to the card's own checker, exactly as the single 'one' box is (critic B r5 D1):
+    // a right value goes through submitAnswer -> checkAnswer, which scores, shows the message,
+    // awards XP once and advances. The live red/green is the strip's own (screen-cell judgeLtrStrip).
+    const ltrStrip = colInputs.length && colInputs[0].closest('[data-mq-ltr]');
+    if (ltrStrip) {
+        const stripCols = colInputs.filter(el => el.closest('[data-mq-ltr]') === ltrStrip);
+        colInputs = colInputs.filter(el => !stripCols.includes(el));
+        _wireLtrStripSubmit(ltrStrip, stripCols, q);
+    }
     const bxInputs = Array.from(visualAidEl.querySelectorAll('.bx-roof, .bx-sub, .bx-rem'));
     const amInputs = Array.from(visualAidEl.querySelectorAll('.area-model-input, .area-model-total'));
     const nfInputs = Array.from(visualAidEl.querySelectorAll('.number-family-input, .fact-family-input'));
@@ -861,7 +893,7 @@ export function wireBoxValidation(visualAidEl, q) {
 
     const anyBoxes = colInputs.length > 0 || bxInputs.length > 0 || amInputs.length > 0
         || nfInputs.length > 0 || lkInputs.length > 0 || ibCells.length > 0 || hasDual
-        || ciInputs.length > 0 || gfCells.length > 0 || npInputs.length > 0 || hasFi;
+        || ciInputs.length > 0 || gfCells.length > 0 || npInputs.length > 0 || hasFi || !!ltrStrip;
     if (!anyBoxes) return;
 
     // Hide #answerInputArea + global Check button — student types only into the boxes.
@@ -900,18 +932,6 @@ export function wireBoxValidation(visualAidEl, q) {
         // If maxlength > 1 (rare: 2-digit one-shot quotient), put full ans in last box.
         if (N === 1) {
             slots.push({ el: colInputs[0], expect: ansStr, norm: numNorm });
-        } else if (colInputs[0].closest('[data-mq-ltr]')) {
-            // a fact / equation in digit boxes (ansBox 'digit') is judged by its VALUE: the digits
-            // typed, empty boxes ignored, so "_9" and "9_" are both 9; a value still on its way to the
-            // answer ("1" of "12") is neutral, never red.
-            // one rule with the live mark and Check (ltrStripValue): no gap, leading zeros dropped
-            const want = ansStr.replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
-            for (let i = 0; i < N; i++) {
-                // expect = the whole value, which no single box holds: only customMatch (the combined value) can pass
-                slots.push({ el: colInputs[i], expect: '\u0000' + want, norm: numNorm,
-                    customMatch: () => { const r = ltrStripValue(colInputs); return !r.gap && r.value === want; },
-                    pending: () => { const r = ltrStripValue(colInputs); return r.gap || (r.zerosOnly && want !== '0') || (r.value.length < want.length && want.startsWith(r.value)); } });
-            }
         } else if (ansStr.length <= N) {
             const pad = N - ansStr.length;
             for (let i = 0; i < N; i++) {
@@ -1120,6 +1140,7 @@ export function wireBoxValidation(visualAidEl, q) {
     const tryAdvance = () => {
         if (advanced) return;
         if (state.hasAnswered) return;
+        if (!slots.length) return;          // only a digit strip: the card's checker owns it
         if (!allCorrect()) {
             if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
             return;

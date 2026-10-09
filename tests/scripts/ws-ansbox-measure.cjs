@@ -28,6 +28,9 @@ const CATS = ['addition', 'subtraction', 'multiplication', 'division'];
                 let q = null;
                 try { q = window.generateQuestionFor({ category: c, skill: k, seed: 7001 + i, itemIndex: i, itemCount: 24 }); } catch (e) { q = null; }
                 const t = q && q.cell && q.cell.template;
+                // a missing-digit column GIVES its answer row; its answer place is the one missing digit,
+                // which the option does not restyle (critic B r5 D4)
+                if (t === 'stack' && q.cell.payload && q.cell.payload.unknown) continue;
                 // add-three: a + b + c = [ ] under its counters (critic B r4 D3: its answer box honours the option)
                 if (t === 'stack' || t === 'fact' || t === 'equation' || t === 'add-three') { seen.add(t); continue; }
                 // a legacy-printed + − × ÷ item whose answer is one number in a column, a fact or an
