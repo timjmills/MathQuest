@@ -1775,3 +1775,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
 .mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
+
+/* ---- WAVE 1 / 1.1 r6 (lane B, additive): an 'off' answer place keeps no black edge while it is the
+   next box. active-box.js now gives that box the focus, and the quiz's focus rule (black border,
+   specificity 0,6,0) beat the 'off' rule; the yellow inset ring of .mq-active-box is the focus cue.
+   Lane A2's right / wrong marks are left alone. */
+html body .qt-question-card .ws-cell.mq-scell .mq-ansoff .qt-answer-input.mq-slot:is(:focus, .mq-active-box):not(.mq-live-correct):not(.mq-live-wrong),
+html body .mq-scell .mq-ansoff input.mq-slot:is(:focus, .mq-active-box):not(.mq-live-correct):not(.mq-live-wrong) { border-color: transparent !important; }

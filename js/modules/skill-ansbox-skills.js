@@ -4,7 +4,7 @@
 // numeric answer - kit templates, or legacy print with a screen stack / fact / equation - so the
 // answer-box option (`ansBox`, owner ruling 2026-10-02) changes what they draw. Word problems,
 // charts and models are not listed: their answer places are the drawing's own.
-// skill-options.js offers the option on these skills only. 74 skills.
+// skill-options.js offers the option on these skills only. 70 skills.
 import { registerAnsBoxSkills } from './skill-options.js';
 
 export const ANSBOX_SKILLS = Object.freeze({
@@ -35,7 +35,6 @@ export const ANSBOX_SKILLS = Object.freeze({
     'addition:add_50_regroup': 'stack',
     'addition:add_column_multi': 'stack',
     'addition:add_facts': 'fact',
-    'addition:add_missing_digit': 'stack',
     'addition:add_sub_100s': 'legacy-eq',
     'addition:add_sub_10s': 'legacy-eq',
     'addition:add_three': 'add-three',
@@ -46,9 +45,7 @@ export const ANSBOX_SKILLS = Object.freeze({
     'division:missing_mult_div': 'legacy-eq',
     'division:mixed_division': 'legacy-eq',
     'division:mixed_mult_div': 'legacy-eq+legacy-fact',
-    'multiplication:mixed_multiplication': 'stack',
     'multiplication:mult_facts': 'fact',
-    'multiplication:mult_missing_digit': 'stack',
     'multiplication:mult_zeros': 'legacy-eq',
     'multiplication:multiply': 'legacy-fact',
     'subtraction:missing_add_sub': 'legacy-eq',
@@ -80,7 +77,6 @@ export const ANSBOX_SKILLS = Object.freeze({
     'subtraction:sub_50_regroup': 'stack',
     'subtraction:sub_across_zeros': 'legacy-stack',
     'subtraction:sub_facts': 'legacy-fact',
-    'subtraction:sub_missing_digit': 'stack',
     'subtraction:subtract': 'fact',
 });
 registerAnsBoxSkills(ANSBOX_SKILLS);

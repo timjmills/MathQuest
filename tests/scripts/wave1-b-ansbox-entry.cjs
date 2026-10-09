@@ -39,9 +39,14 @@ const CASES = [
                 const start = Math.max(0, boxes.length - ans.length);
                 await page.evaluate((i) => document.querySelectorAll('#visualAid input.mq-digit')[i].focus(), start);
             } else await page.evaluate(() => { const f = document.activeElement; if (!f || !f.classList.contains('mq-digit')) { const b = document.querySelectorAll('#visualAid input.mq-digit'); b[0].focus(); } });
+            const qText = await page.evaluate(() => window.state.currentQ.text);
             for (const ch of typed) { await page.keyboard.type(ch); await sleep(60); }
-            await sleep(350);
+            // (r5 D1) a right answer now scores and moves on at once, as at 'auto': read the boxes before
+            // the card slides out, then let its move to the next item finish before the next case
+            await sleep(120);
             const r = await page.evaluate(() => Array.from(document.querySelectorAll('#visualAid input.mq-digit')).map((e) => ({ v: e.value, ok: e.classList.contains('mq-live-correct'), bad: e.classList.contains('mq-live-wrong') })));
+            for (let t = 0; t < 40; t++) { if (await page.evaluate((x) => window.state.currentQ.text !== x, qText)) break; await sleep(100); }
+            await sleep(700);
             const filled = r.filter((x) => x.v);
             const ok = filled.length === ans.length && filled.every((x) => x.ok && !x.bad) && filled.map((x) => x.v).join('') === ans;
             n++;
@@ -87,8 +92,9 @@ const CASES = [
         ['multiplication', 'mult_facts', 8, '008', 'green', true, '__8'],
         ['addition', 'add_facts', 0, '00', 'green', true],
         ['multiplication', 'mult_facts', 7, '_07', 'green', true],
-        ['multiplication', 'mult_facts', 12, '1_2', 'neutral', false],
-        ['multiplication', 'mult_facts', 10, '1_0', 'neutral', false],
+        // (r5 D2) a strip left with a gap is judged by place value: its wrong / missing places go red
+        ['multiplication', 'mult_facts', 12, '1_2', 'red', false],
+        ['multiplication', 'mult_facts', 10, '1_0', 'red', false],
         ['multiplication', 'mult_facts', 12, '12_', 'green', true],
         ['division', 'div_facts', 9, '9_', 'green', true],
     ];
@@ -110,7 +116,8 @@ const CASES = [
             // the card's own auto-advance calls transitionToNextQuestion: record that it did
             window.__mqAdv = false;
             if (!window.__mqAdvWrapped) { const t0 = window.transitionToNextQuestion; window.transitionToNextQuestion = function () { window.__mqAdv = true; return t0.apply(this, arguments); }; window.__mqAdvWrapped = true; }
-            [...typed].forEach((ch, i) => { b[i].focus(); b[i].value = ch === '_' ? '' : ch; fire(b[i]); });
+            // a '_' box is left alone (never typed into): a right value already scored and right-aligned
+            [...typed].forEach((ch, i) => { if (ch === '_' || b[i].readOnly) return; b[i].focus(); b[i].value = ch; fire(b[i]); });
             b.forEach((e) => e.blur());
             await new Promise((r) => setTimeout(r, 150));
             const marks = b.filter((e) => e.value).map((e) => e.classList.contains('mq-live-correct') ? 'green' : e.classList.contains('mq-live-wrong') ? 'red' : 'neutral');
@@ -119,7 +126,8 @@ const CASES = [
             // a right answer auto-advances the card (r4 D4: "07" like a plain "7"); else Check, by the card's own checker
             await new Promise((r) => setTimeout(r, 1500));
             // advanced = the card judged it right by itself (no Check pressed): the score rose, or the card moved on
-            const advanced = window.__mqAdv === true || st.score > s00;
+            // (critic B r5 D1) only a SCORE counts: a transition call alone once froze the card unscored
+            const advanced = st.score > s00;
             let verdict = advanced;
             if (!advanced) {
                 document.querySelectorAll('.feedback-area').forEach((f) => f.classList.remove('correct', 'incorrect'));
@@ -135,6 +143,43 @@ const CASES = [
         const ok = got.lv === live && got.verdict === check && alignOk && (!check || got.advanced) && (!leaves || got.after === leaves);
         n++; if (!ok) bad++;
         console.log(`${ok ? 'ok  ' : 'FAIL'} edge ${k} ans ${want} typed '${typed}' -> live ${got.lv} (want ${live}), Check ${got.verdict ? 'correct' : 'wrong'}${got.advanced ? ' (auto-advanced)' : ''} (want ${check ? 'correct' : 'wrong'}), boxes after leaving '${got.after}'${ok ? '' : ' ' + got.fb + ' ' + got.ha}`);
+    }
+
+    // ---- (critic B r5 D1) a right answer TYPED on the keyboard into the card's digit strip scores and moves
+    // on exactly as at 'auto': score +1 and a correct message by 1000 ms, the next question by 4.5 s, XP once
+    for (const [c, k] of [['addition', 'add_facts'], ['division', 'div_facts'], ['multiplication', 'multiply']]) {
+        for (const ab of ['digit', null]) {
+            const q0 = await page.evaluate(async (c, k, ab) => {
+                const st = window.state;
+                window.clearSetOptions({ silent: true }); if (ab) window.setSetOptions(c, k, { ansBox: ab }, { silent: true });
+                st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; st.skillOptions = null;
+                window.showView('gameView');
+                st.currentQ = window.generateQuestion(); window.renderQuestion();
+                await new Promise((r) => setTimeout(r, 500));
+                const d = document.getElementById('mqWorkedDismiss'); if (d) d.click();
+                const strip = document.querySelector('#visualAid [data-mq-ltr] input.mq-digit');
+                const el = strip || document.getElementById('answerInput');
+                el.focus();
+                window.__xpCalls = 0;
+                if (!window.__xpWrapped && typeof window.awardXP === 'function') { const f = window.awardXP; window.awardXP = function () { window.__xpCalls++; return f.apply(this, arguments); }; window.__xpWrapped = true; }
+                return { ans: String(st.currentQ.ans), text: st.currentQ.text, strip: !!strip, score: st.score };
+            }, c, k, ab);
+            for (const ch of q0.ans) { await page.keyboard.type(ch); await sleep(40); }
+            // poll to 1000 ms: the score, the 'correct' message (seen at any moment), and never a strip box
+            // disabled while the item is still unscored
+            const mid = { score: q0.score, fb: false, disabledUnscored: false };
+            for (let t = 0; t < 10; t++) {
+                const m = await page.evaluate(() => ({ score: window.state.score, fb: !!document.querySelector('.feedback-area.correct'),
+                    dis: Array.from(document.querySelectorAll('#visualAid [data-mq-ltr] input')).some((e) => e.disabled) }));
+                mid.score = m.score; mid.fb = mid.fb || m.fb; if (m.dis && m.score === q0.score) mid.disabledUnscored = true;
+                await sleep(100);
+            }
+            await sleep(3500);
+            const end = await page.evaluate(() => ({ text: window.state.currentQ && window.state.currentQ.text, xp: window.__xpCalls }));
+            const ok = (!!ab === q0.strip) && mid.score === q0.score + 1 && mid.fb && !mid.disabledUnscored && end.text !== q0.text;
+            n++; if (!ok) bad++;
+            console.log(`${ok ? 'ok  ' : 'FAIL'} card keyboard ${k} ${ab || 'auto'} ans ${q0.ans}: strip ${q0.strip}, score ${q0.score} -> ${mid.score} by 1000 ms, message ${mid.fb ? 'correct' : 'none'}, next question ${end.text !== q0.text ? 'yes' : 'NO'} by 4.5 s, awardXP calls ${end.xp}`);
+        }
     }
 
     // ---- (critic B r4 D1) the QUIZ, through quizQuestionData + compressTestForURL: legacy skills keep the

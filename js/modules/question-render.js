@@ -17,7 +17,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, ltrStripValue,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, ltrStripValue, rightAlignLtrStrip,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -834,14 +834,23 @@ function _wireLtrStripSubmit(strip, cols, q) {
     if (!strip || !cols.length || !q) return;
     const want = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
     if (!want) return;
+    let busy = false;
     const tryRight = () => {
-        if (state.hasAnswered || state.currentQ !== q) return;
-        if (cols.some(el => el.disabled || !el.isConnected)) return;
+        if (busy || state.hasAnswered || state.currentQ !== q) return;
+        if (cols.some(el => el.disabled || el.readOnly || !el.isConnected)) return;
         const r = ltrStripValue(cols);
         if (r.gap || r.text === '' || r.value !== want) return;
-        const ai = document.getElementById('answerInput');
-        if (ai) ai.value = r.text;
-        if (typeof window.submitAnswer === 'function') window.submitAnswer();
+        busy = true;
+        try {
+            // the digits sit right-aligned, as the key prints them ("7" in the ones box), before the verdict
+            rightAlignLtrStrip(strip);
+            const ai = document.getElementById('answerInput');
+            if (ai) ai.value = r.text;
+            if (typeof window.submitAnswer === 'function') window.submitAnswer();
+            // answered: the strip is read-only (never disabled before the verdict), so no empty box of it
+            // pulses as "the next answer box" while the card moves on (active-box.js skips read-only)
+            if (state.hasAnswered) cols.forEach(el => { el.readOnly = true; });
+        } finally { busy = false; }
     };
     cols.forEach(el => {
         if (el.dataset._ltrSubmit === '1') return;
