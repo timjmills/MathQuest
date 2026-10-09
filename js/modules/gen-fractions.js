@@ -6178,20 +6178,18 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.text = `Simplify: ${rawNum}/${rawDen}`;
                 q.answerType = "text";
                 q.ans = simplifyFraction(rawNum, rawDen);
-                const wrongs = new Set();
-                let simpAttempts = 0;
-                while (wrongs.size < 3 && simpAttempts < 30) {
-                    simpAttempts++;
-                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
-                    if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
-                }
-                q.options = shuffle([q.ans, ...wrongs]);
+                // A production item: the pupil writes the simplest fraction in the drawing's own box
+                // - a numerator box over a denominator box (data-mq-join="/", wired by wireCellSlots on the
+                // card, the online worksheet and the quiz) - not a choice of four.
+                q.options = [];
                 q.hint = `Find a number that divides both ${rawNum} and ${rawDen} evenly. Try dividing by ${multiplier}!`;
                 q.visual = `<div style="text-align:center;">
-                    <div style="margin-bottom:15px;">
+                    <div class="frac-equation" style="margin-bottom:15px;display:inline-flex;align-items:center;gap:14px;">
                         ${fracHTML(rawNum, rawDen, 'xl')}
+                        <span class="frac-equals">=</span>
+                        <span data-mq-join="/" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;"><span class="fm-box" data-mq-cell="1" data-mq-w="3" data-mq-label="numerator" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:2.4em;height:1.5em;flex:none;border:2px solid #000;border-radius:4px;background:#fff;"></span><span aria-hidden="true" style="display:block;align-self:stretch;min-width:2.4em;border-top:3px solid #000;margin:4px 0;"></span><span class="fm-box" data-mq-cell="1" data-mq-w="3" data-mq-label="denominator" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:2.4em;height:1.5em;flex:none;border:2px solid #000;border-radius:4px;background:#fff;"></span></span>
                     </div>
-                    <div style="font-size:0.9rem;color:var(--text-dim);">Divide top and bottom by the same number</div>
+                    <div style="font-size:0.9rem;">Divide top and bottom by the same number</div>
                 </div>`;
             }
             return;
