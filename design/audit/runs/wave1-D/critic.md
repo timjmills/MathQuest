@@ -133,3 +133,226 @@ Row spread lets the lint pass on pages that are still sparse. It turns a PAGEFIL
 
 ## What passes
 The lint work is real. 0/191 at S and L, with a stricter lint. Paired odd/even dots, the whole-as-fraction slot, the dot-array frame, the boxed div_zero key, the ten-frame min width and the PG-23 packByHeight rebalance are all good work.
+
+---
+
+# Round 3: independent critic (Opus medium), 2026-10-09
+
+Tree: claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535 at ce4d090 (round-2 fixes in 219c057, plus determinism 8cac51a and split placement ce4d090).
+I made my own renders with `ws-grade-render --roles independent`, at S (with every screen host) and at L, for the 15 lane documents.
+I rendered the regression set on this tree and on origin/claude/sweet-newton-c8wrv1 (c91cc8b, a git worktree served through MQ_ROOT).
+The renders are in my scratchpad. The 10 PNGs this report cites are copied to `renders/r3/`.
+
+## Verdict: FAIL
+
+The gates are green, and 9 of the 11 round-2 defects are fixed or mostly fixed. The paper pages are clearly better than round 2.
+Even so, **4 of 15 documents pass** on every version I graded: odd_even, ten_frame_build, remainder_interpret and counting_all.
+counting_all passes on paper only. Its online worksheet fails.
+Two problems are new and were caused by the lane:
+- **div_zero_in_quotient**: the practice card's inputs are under 44 px at 820 and 390 (H6). On live they were not.
+- **Legacy cells**: the adapters `stamp()` change prints a doubled "Answer: ____" line under legacy check-box items (H8). This hits out-of-lane skills too (add_fractions_like S).
+
+## Gates I ran (all on ce4d090)
+| Gate | Result |
+|---|---|
+| `ws-print-lint --source kit --size S` | **OK**, 191 documents, 0 findings |
+| `ws-print-lint --source kit --size L` | **OK**, 191 documents, 0 findings |
+| Lint integrity (`git diff origin/... -- ws-print-lint.cjs ws-layout-unit.mjs`) | Rules and assertions are only added (L-DENSITY PG-23 ORPHAN, L-DENSITY SPREAD, packByHeight / fineSplit asserts); nothing is loosened |
+| `ws-layout-unit` | OK, 545 assertions |
+| `ws-sheet-determinism` | OK |
+| `ws-boot-smoke` | OK |
+| `ws-screen-answer` (all 15 lane skills) | OK: card, worksheet 3/3 and quiz 3/3 for every skill, and live green. **number_families_add now passes**, so the STATUS §10 pre-existing failure does not reproduce here |
+| `ws-content-audit --skill` (missing_mult_div, mult_comparison, remainder_interpret, counting_all, mixed_composing, mixed_multiplication, div_zero_in_quotient, add_sub_10s) | OK, 0 failing |
+| `node --input-type=module --check` on the 10 changed modules | clean |
+
+The lint passes several pages graded below 8 here. It has no check for these three things:
+- an empty bordered cell (dot_array_mult S);
+- S printing the same grid as L (DN-1a, LESSONS L1);
+- a one-line problem in a tall cell (SPREAD skips drawings under 20 mm, so mixed_addition S passes with a cell 37 % / 43 % empty and a 24 % page strip).
+
+## Round-2 defects: status
+| # | Round-2 defect | Status on ce4d090 |
+|---|---|---|
+| 1 | mixed_multiplication L: clipped cell d, empty boxed cell | **FIXED.** 6 problems, one full page, no overflow, no empty cell. New slot defect, see D5 |
+| 2 | missing_mult_div L: 1 × 8 | **PARTLY.** Now 2 × 8 = 16. Live printed 3 × 6 = 18, and a 16 % strip is left under the grid. Answer shapes are now all boxes (fixed) |
+| 3 | Size S ignored (add_sub_10s, mixed_composing) | **add_sub_10s NOT FIXED**: S and L both print the same 16 items in 2 × 8 (D3). mixed_composing: the empty boxed cell is gone and 6 problems fill the page (fixed) |
+| 4 | `ansBox` clash with Lane B | **FIXED.** Renamed to `boxAns`, scoped to mixed_multiplication. The `multiply` page no longer boxes its answers |
+| 5 | Row spread reads as padding | **PARTLY.** SPREAD_CAP is 1.7 (round 2 asked for about 1.3). counting_all and mixed_composing now hold 6. dot_array_mult L still holds 3 problems, about half of each cell empty (D2) |
+| 6 | Legacy cells in kit pools; counting_all deals Grade 3 | **FIXED on paper.** K-2 pools deal kit cells; counting_all deals K-2 only. **Still legacy on the online worksheet** (D7) |
+| 7 | mult_comparison frame gives the sign away; "apple" | **FIXED.** Neutral ☐ ○ ☐ = ☐ frame; the unit is singular only when the answer is 1. New defects D4 |
+| 8 | long_div_2digit inconsistent tracks | **FIXED.** One track pitch per page. The S cells are still mostly empty (D6) |
+| 9 | number_families "Answer: ____" line | **FIXED.** The key fills the boxes |
+| 10 | Labels past z | **FIXED.** Pages over 26 problems are numbered (div_zero S 28, missing_mult_div S 30) |
+| 11 | missing_mult_div S key overflow | **FIXED.** Key values are centred and fit their boxes |
+
+## Non-lane regression spot check (tree vs live, independent, S and L)
+- addition:add_20_regroup, measurement:time_5min, composing:base10_build: **pixel-identical** at S and L.
+- multiplication:multiply: **changed at S and L, for the better.** The boxed answer is gone, so round-2 D4 is resolved. The × now has its own track, where live printed "×12" touching the digits.
+- fraction_operations:add_fractions_like: identical at L. **REGRESSION at S**: items e and f ("Circle ALL sums that equal 1", check boxes) now also print an "Answer: ____" line, which is a doubled answer slot (H8). See D1.
+- subtraction:mixed_subtraction S: the footer seed differs (756635 on live, 764554 on the tree) because of the derived-seed reseat, so the page deals other items. Neutral. Fact cell c ("5 − 2") prints at a much larger digit size than the stacked cell d beside it (minor, pool-wide).
+- addition:mixed_addition S: 5 problems where live had 4. It is still sparse: cell a (16 + 16) is 37 % / 43 % empty above and below, with a 24 % strip under the grid. Not worse than live, and the lint passes it (gap above).
+
+## Visual grading
+Print rows show the pupil page and key. Where only one size is named, the other size scored the same or higher. Screen rows cover card 1280/820/390, worksheet 1280 and quiz 1280.
+
+| Document | Version | Clarity | Pedagogy | Layout | Parity | Result |
+|---|---|---|---|---|---|---|
+| composing:odd_even | S, L, key | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 9 | PASS |
+| composing:whole_as_fraction | S, L key | 8 | 8 | 8 | 9 | PASS |
+| | screen (all hosts) | 8 | **7** | 8 | **7** | FAIL |
+| division:div_zero_in_quotient | L key | 9 | 8 | 8 | 9 | PASS |
+| | S | **7** | 8 | 8 | 9 | FAIL |
+| | card 820 / 390 | **5** | 8 | 8 | 8 | FAIL (H6) |
+| composing:ten_frame_build | S, L key | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:dot_array_mult | S | 8 | 8 | **6** | 8 | FAIL |
+| | L | 8 | 8 | **6** | 8 | FAIL |
+| | screen | **7** | 8 | 8 | 8 | FAIL |
+| addition:add_sub_10s | L | 9 | 8 | 8 | 9 | PASS |
+| | S | 9 | 8 | **6** | 9 | FAIL |
+| | screen | 9 | 8 | 8 | 8 | PASS |
+| division:missing_mult_div | S, S key | 8 | **6** | 9 | 8 | FAIL |
+| | L | 8 | **6** | **7** | 8 | FAIL |
+| | screen | **7** | **6** | 8 | **7** | FAIL |
+| multiplication:mixed_multiplication | S | **6** | 8 | 8 | 8 | FAIL |
+| | L, L key | **7** | 8 | 8 | 8 | FAIL |
+| | screen | 8 | 8 | **7** | 8 | FAIL |
+| composing:mixed_composing | S, L | **7** | 8 | 8 | 8 | FAIL |
+| | worksheet 1280 | **6** | 8 | **6** | **6** | FAIL |
+| counting_mixed:counting_all | S, L | 8 | 8 | 8 | 8 | PASS |
+| | worksheet 1280 | **7** | 8 | **6** | **7** | FAIL |
+| division:long_div_2digit | L key | 8 | 8 | 8 | 9 | PASS |
+| | S | 8 | 8 | **6** | 8 | FAIL (H13) |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mult_comparison | L, L key | **7** | **6** | 8 | 8 | FAIL |
+| | S key | **7** | **7** | 8 | 8 | FAIL |
+| | worksheet 1280 | 8 | 8 | **7** | **7** | FAIL |
+| division:remainder_interpret | S key, L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:number_families_add | S | 8 | **7** | **6** | 8 | FAIL |
+| | screen (pre-existing legacy) | **6** | 8 | 8 | **6** | FAIL |
+| multiplication:number_families_mult | L key | 8 | 8 | **6** | 8 | FAIL (H13) |
+| | screen (pre-existing legacy) | **6** | 8 | **7** | **6** | FAIL |
+
+## Defects (ranked, §6 form)
+
+**D1 [CRITICAL, out-of-lane regression] Legacy check-box items print a doubled answer slot.**
+- What: add_fractions_like S items e and f ("Circle ALL sums that equal 1") draw check boxes and, below them, "Answer: ____". Live drew no line.
+- Where: `renders/r3/REGRESSION-add_fractions_like-S-p1.png`. Cause: `js/modules/sheet/adapters.js` `stamp()`, round-1 AK-4, now draws the `blank()` line in the pupil state on every legacy cell that has a display value, including cells whose own slots are check boxes or circles.
+- Why: H8 (doubled answer slot) caps C4 at 6, and C1 loses a point. It reaches every legacy skill whose print HTML already holds its own answer place, not only lane documents.
+- Fix: in `stamp()`, return '' when the legacy HTML already carries a writing place (`data-ws-slot`, `.blank-box`, `input[type=checkbox]`, check-box glyphs, or a "Circle" / "Check" instruction). Add a print-lint rule: a cell may not hold both a box / check slot and an `Answer:` line.
+- Check: add_fractions_like S e and f have no Answer line; a lint sweep finds no cell with two slot kinds.
+
+**D2 [MAJOR] dot_array_mult: an empty bordered cell at S, and padding at L.**
+- What: S prints 7 problems in a 2 × 4 grid, so cell h is an **empty boxed cell**. This is the round-2 "never leave an empty bordered track" rule, and claim (c) said it was fixed. Its rows also differ in height (a/b 73 mm, g 47 mm).
+- What: L prints only 3 problems (/3). Cells a and b are 114 mm tall with 59 mm of content (bands 25 % / 24 %). Row c is 25 % / 22 % empty, and a 10 % strip remains.
+- Where: `renders/r3/dot_array_mult-S-p1.png`, `dot_array_mult-L-p1.png`.
+- Why: C3 6 at both sizes (C3: page not at capacity, white space that is not deliberate).
+- Fix:
+  1. Apply the pool "fill whole rows" step to single-skill pages too: a measured, row-packed section deals a count that fills its last row (8 at S).
+  2. At L, a 3 × 10 array is 87 mm wide and fits a 93 mm half cell. Allow it in 2 columns (the `maxCols` / width test in the footprint) so L holds 4 problems in 2 × 2.
+  3. Lower SPREAD_CAP toward 1.3 when the count is Auto.
+  4. Add a lint check: no bordered cell without an item.
+- Check: S has 8 problems and no empty cell; L has 4 or more problems, each row at least 65 % ink.
+
+**D3 [MAJOR] add_sub_10s S prints the L page (LESSONS L1, DN-1a "Size S never prints the grid of L").**
+- What: S and L print the same 16 items in 2 × 8. S digits measure 22 px against 27 px at L: almost the same size, because the columns-win ladder scales the digits back up.
+- Where: `renders/r3/add_sub_10s-S-p1.png` against the L page. meta reports "Digits 16 pt" at S, while the rendered cap height is about 5.8 mm, roughly 23 pt.
+- Why: C3 6 at S (L1 class).
+- Fix: in `fact.js`, when the beside form is sized at S, measure at the S digit size before the columns ladder grows it. Then let the page take 3 columns (62 mm cells hold "100 − 10 = ____" at 16 pt), or 2 × 10 = 20 (the skill's distinct-fact pool).
+- Check: S shows more items or columns than L, and the S digit cap height is about 4 mm.
+
+**D4 [MAJOR] mult_comparison: answers do not vary, and the sign is answered twice.**
+- What (L10): on the seeded L page **all 4 answers are 2** (8 ÷ 4, 6 ÷ 3, 16 ÷ 8, 14 ÷ 7). On S, 4 of 6 answers are 2.
+- What: the instruction says "Circle the sign", and the frame then asks for the same sign in the ○ (the key shows it in both places), so one answer is written twice.
+- What: on the online worksheet the "= ☐" answer box wraps under the equation on all 6 cards. The paper ○ is a square box on screen.
+- What: in c, "has." wraps alone onto a line.
+- Where: `renders/r3/mult_comparison-L-key.png`; the S key; `worksheet-1280`.
+- Why: C2 6 at L and 7 at S; C1 7 (doubled response); worksheet C3 7 and C4 7.
+- Fix:
+  1. Deal multiplier and base from the seeded rng with an anti-repeat on the answer across the page (the L10 rule; the page-deal held values in `page-deal.js` are a likely suspect).
+  2. Change the instruction to "Write the sign in the circle. Write the numbers. Solve." and keep the sign bank as a reference row that is not circled.
+  3. In `screen-cell`, keep "= ☐" on the equation's line (nowrap) and draw the sign slot round.
+- Check: no answer appears more than twice on a page of 6; the worksheet cards show one line per equation.
+
+**D5 [MAJOR] mixed_multiplication: answer places differ between cells, and the story frame is not explained.**
+- What: on L, vertical facts c (1 × 10) and d (10 × 8) have an open answer zone while e (11 × 1) has a box, so one section uses two slot shapes (C1 rule).
+- What: on S, the three story items a, b and f each carry a sign bank, a 3 + 4 digit-box frame with an operator box, a unit bank and a unit line, under the instruction "Solve.". Nothing tells the pupil to choose the sign, write the numbers or pick the unit.
+- What: on the online worksheet, card 5 (number line) has an empty band about 40 % deep above the line.
+- Where: `renders/r3/mixed_multiplication-L-key.png`, `mixed_multiplication-S-p1.png`.
+- Why: C1 7 at L and 6 at S; screen C3 7.
+- Fix: stamp `boxAns` on every vertical fact this pool deals, or on none. Give word-work cells in a pool their own instruction line inside the cell, as the counting_all parity cell already does ("Write the sign. Write the numbers. Solve."), from the word-work provider strings.
+- Check: c, d and e have the same slot; each story cell shows its own verb line.
+
+**D6 [MAJOR] long_div_2digit S: H13 on width.**
+- What: each 93 mm cell holds a 34 mm drawing, leaving bands of 33 % (left) and 31 % (right). The drawing is 36 % of the cell width, which is under the builder's own `narrowCells` threshold of 40 %. Rows are 20 % / 20 % empty.
+- Where: `renders/r3/long_div_2digit-S-p1.png`, cell a measured at 349 × 267 px.
+- Why: H13 caps C3 at 6.
+- Fix: at S, the problem's own width allows 3 columns (62 mm cells), giving 9 problems in 3 × 3. Let the `long` footprint's `maxCols` follow the measured width at S (12.3 "one more column at S"). Apply the `narrowCells` test to single-skill sections, not only to the reseat.
+- Check: S prints 3 columns; no cell has a side band of 30 % or more.
+
+**D7 [MAJOR] Pool online worksheets still deal legacy cards (mixed_composing, counting_all).**
+- mixed_composing worksheet:
+  - Card 4 is "Click ALL the ODD numbers": a check-box list with a grey Submit button. The verb is not "Tap", and the task differs from paper (Circle even / Cross out odd).
+  - Card 5 is "Build 38. Trade 1 ten for 10 ones." with Compose / Decompose buttons.
+  - Card 1 reads "Type 3 as a fraction with denominator 1."
+- counting_all worksheet: card 1 "Which tower is taller?" has towers about 10 mm tall; card 3 "What number comes after 8?" is a tall card about 80 % empty.
+- Why: RUBRIC C3 says no card of a different "type" from its neighbours; parity (L5) fails. Worksheet C1 6–7, C3 6, C4 6–7.
+- Fix: the screen deal must use the same kit members as the paper deal. Apply the K-2 pool "kit cells only" filter in the screen pool path (generate-question / mixed play), and drop the legacy members from the screen pool.
+- Check: every worksheet card is a kit `screen-cell` and has a paper twin.
+
+**D8 [MAJOR, new] div_zero_in_quotient card: touch targets under 44 px (H6).**
+- What: the new short-division card has quotient inputs of 34 × 56 px at 820 and 28 × 47 px at 390, and regroup inputs of 19 × 29 and 15 × 24 px. meta reports smallTargetCount 5 on card-820 and card-390, and 30 on the worksheet.
+- What: live (one quotient box over a long-division frame) had 0.
+- Where: `renders/r3/div_zero_in_quotient-card-390.png`.
+- Why: H6 caps C1 at 5 on card-820 and card-390.
+- Fix: give `mq-cellslot` a minimum of 44 × 48 px on touch widths. Make the `mq-opswork` regroup boxes at least 44 px, or not focusable (they are scratch, VA-13).
+- Check: smallTargetCount is 0 on card-820 and card-390.
+
+**D9 [MAJOR] missing_mult_div: off-name items, density at L, screen parity.**
+- What: 9 of the 30 S items ask for a product ("12 × 8 = ☐", "4 × 5 = ☐"), not a missing factor. The title reads "I Can divide missing factors ×/÷".
+- What: L prints 16 against live's 18, with a 16 % strip under the grid.
+- What: on screen, the worksheet's inactive slots are underlines while paper uses boxes, and the card repeats the equation above the cell ("___ ÷ 9 = 3" over the same equation).
+- Where: `renders/r3/missing_mult_div-S-key.png` (items 1, 3, 7, 8, 14, 16, 19, 28, 30), the L page and the worksheet.
+- Why: C2 6. Read strictly as H3, the name caps C2 at 4; the content audit does not catch it because it reads operations, not the unknown's role. Also L C3 7 and screen C1 7 / C4 7.
+- Fix: put the unknown on a factor (or on the dividend or divisor of a division fact) for every item, or rename the skill. Use the title "I Can find missing factors". Draw boxes for every slot on the worksheet. Drop the duplicated prompt text above the screen cell.
+- Check: 0 items whose unknown is the product; the worksheet slots are boxes.
+
+**D10 [MAJOR] number_families_add / _mult: S prints the L page, H13 at L, and a doubles mismatch.**
+- What: S prints the same 2 × 2 = 4 as L, where S fits 2 × 3.
+- What: number_families_mult L cell d is 30 % empty above and 27 % below (H13).
+- What: number_families_add prints double families with repeated rows ("1 + 1", "1 + 1", "2 − 1", "2 − 1"), while _mult collapses them to 2 rows.
+- What: the titles read "I Can add number families & subtract" and "I Can multiply number families & divide".
+- Why: C3 6; C2 7 for add.
+- Fix: size the family cell from its measured height at S; top-align cells in a row (or size the row to the 4-row item and give 2-row items a short row); collapse double families in add the way mult does; titles "I Can complete a number family (+, −)".
+- Check: S holds more than L; no band of 30 % or more.
+
+**D11 [MINOR] dot_array_mult and whole_as_fraction screens: the prompt repeats the frame and gives away the method.**
+- What: dot_array_mult reads "Multiply the array: 2 rows × 4 columns = ?" above a cell that already shows "2 rows × 4 columns / 2 × 4 = ☐". whole_as_fraction reads "Type 2 as a fraction with denominator 1." (round-1 D5 again, on screen). Both differ from the paper instruction.
+- Why: screen C1 7, C2 7 (whole_as_fraction), C4 7.
+- Fix: use the paper strings through the BD-11 verb map ("Multiply the rows by the columns. Type the answer." / "Type the whole number as a fraction.").
+
+**D12 [MINOR] div_zero_in_quotient S: regroup boxes too small to write in.**
+- What: the box between the dividend digits measures 2.6 × 4.8 mm at S (10 × 18 px); at L it is 4.8 × 5.8 mm. TY-21 sets 4.4 mm wide as the minimum and SL-12 a 6 / 7 / 8 mm regroup strip.
+- Why: C1 7 at S.
+- Fix: in `long-division.js`, set the regroup box width to max(4.4 mm, track − 1 mm), with height from the regroup row.
+
+**D13 [MINOR] mixed_composing: draw task without an instruction, and ungrammatical titles.**
+- What: item d ("95" over a Tens / Ones chart and a "| = 1 ten, o = 1 one" key) is a draw task, but the only instruction is "Solve.".
+- What: titles across the lane are ungrammatical: "I Can make mixed number sense", "I Can divide zero in the quotient", "I Can work on all counting & cardinality".
+- What: remainder_interpret says "beads in each plate" where "on each plate" is right.
+- Fix: a per-cell verb line for draw cells ("Draw 95."); title strings from the provider (L6).
+
+## What passes
+- odd_even (paired dots, one task, a correct facsimile key).
+- ten_frame_build (10 = the 1–10 deal, at the minimum frame size at S).
+- remainder_interpret (three interpretation types, bank and unit line, at S and L).
+- counting_all on paper (K-2 only, with the parity caption in its own cell).
+- The div_zero L key, whole_as_fraction on paper, add_sub_10s L, long_div L, and long_div / remainder / ten_frame / odd_even on every screen host.
+- The fixes to the round-2 defects are real: boxAns scoping, the neutral sign frame, numbered labels, centred key values, one track pitch, mixed_multiplication with no overflow, and deterministic seeded pages (ws-sheet-determinism OK).
+- The lint is honest: it only gained rules. It is now missing three checks: an empty bordered cell, S grid = L grid, and a one-line item in a tall cell.
+
+## Known pre-existing, out-of-lane items
+- The number_families_add / _mult screen hosts are legacy: an "(Easy)" heading, left brackets, and a black "Check Answers" button inside the cell next to the orange CHECK. They are the same on live. ws-screen-answer now passes them.
+- mixed_addition S sparseness is not a regression; live was worse. It is a lint gap.
