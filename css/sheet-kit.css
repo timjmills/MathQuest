@@ -334,3 +334,25 @@
 :is(.ws-page, .ws-sheet) .ws-fact .ws-factbox { box-sizing: border-box; width: max(var(--w, 14mm), calc(var(--fn, 2) * 0.72em + 2mm + 2 * var(--ws-hair)));
     height: calc(max(var(--ws-hw), 1.2em) + 2 * var(--ws-hair)); display: inline-flex; align-items: center; justify-content: center;
     font-size: 1em; line-height: 1; vertical-align: top; overflow: visible; }
+
+/* ---------- CL-40 label keep-out (Lane D round 10) ----------
+   A cell that carries a tab or a letter publishes the keep-out edge: --ws-ko is the label's real
+   width + 1 mm from the cell's left edge (a w2 / w3 tab is 1.4 / 1.5 tab sides wide), and --ws-koin
+   is the same edge measured from the cell's content box (the 3 mm padding, 2 mm in a fact cell).
+   A template whose content starts at the top-left uses max(its own inset, var(--ws-koin)). */
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab, > .ws-letter) { --ws-ko: calc(var(--ws-tab, 5mm) + 1mm); --ws-koin: calc(var(--ws-ko) - 3mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab.w2) { --ws-ko: calc(var(--ws-tab, 5mm) * 1.4 + 1mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab.w3) { --ws-ko: calc(var(--ws-tab, 5mm) * 1.5 + 1mm); }
+:is(.ws-page, .ws-sheet) .ws-cell.fact:has(> .ws-tab, > .ws-letter) { --ws-koin: calc(var(--ws-ko) - 2mm); }
+/* The top band: every other labelled cell starts its content below the keep-out (label side + 1 mm),
+   so a centred first line, a drawing or a box never reaches into the tab. The word-work story keeps its
+   first line BESIDE the tab instead (--ws-koin above), so it gives up no height. A cell with spare
+   height (justify-content: safe center) only loses slack; content never shrinks. */
+.ws-page .ws-grid > .ws-cell:has(> .ws-tab, > .ws-letter):not([data-ws-cell="word-work"]) { padding-top: max(3mm, var(--ws-ko)); }
+.ws-page .ws-grid > .ws-cell.fact:has(> .ws-tab, > .ws-letter) { padding-top: max(var(--fp, 2mm), var(--ws-ko)); }
+.ws-page .ws-grid > .ws-cell.ws-cell-compact:has(> .ws-tab, > .ws-letter) { padding-top: var(--ws-ko); }
+/* a legacy cell's first line is HTML at 1rem whose text box rises above its line box: it gets 1 mm more */
+.ws-page .ws-grid > .ws-cell.mq-legacy:has(> .ws-tab, > .ws-letter) { padding-top: calc(var(--ws-ko) + 1mm); }
+/* a sequence strip, a counter picture or a remainder division fills its cell's height on a dense page: it keeps the normal top
+   padding and steps RIGHT of the keep-out instead (the drawing is centred in what is left) */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="seqstrip"], [data-ws-cell="counters"], [data-ws-cell="remainder"]):has(> .ws-tab, > .ws-letter) { padding-top: 3mm; padding-left: var(--ws-ko); }

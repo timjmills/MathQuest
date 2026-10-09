@@ -956,7 +956,7 @@ function renderWork(p, ctx) {
         const glyph = (g) => `<span aria-hidden="true" style="align-self:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${g}</span>`;
         const eq = `<span class="mq-wwcols mq-wwneutral" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};">${nb('w0-a', va, ea)}${ring}${nb('w0-b', vb, eb)}${glyph('=')}</span>`;
         const ansB = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', false, eq);
-        return `<div class="mq-ww" data-ww-ops="${st.op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">`
+        return `<div class="mq-ww" data-ww-ops="${st.op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : KO(ctx, narrow ? 2.5 : 5)};">`
             + `<div style="display:flex;flex-direction:column;align-items:stretch;">${storyHTML(ctx, p, true)}</div>`
             + `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 2.5)};margin-top:${L(ctx, 2)};">${p.signRow === false ? '' : signRow(ctx, st.op, put ? sh.picks[0] : null, 0)}${ansB}</div></div>`;
     }
@@ -982,7 +982,7 @@ function renderWork(p, ctx) {
         const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
         const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
         const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
-        return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
+        return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${KO(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
     }
     const body = side
         ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
@@ -994,8 +994,15 @@ function renderWork(p, ctx) {
     // it as not fitting the column and prints it in the full-width group at the bottom
     // (practice.js splitWide) instead of a tall, half-empty column cell (RUBRIC H13).
     const fullW = !twin && narrow && !side ? `min-width:${L(ctx, 120)};` : '';
-    return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
+    return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : KO(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
 }
+
+/**
+ * CL-40 label keep-out: a left inset that never puts the first line inside the label square + 1 mm.
+ * The cell publishes `--ws-koin` (the tab's real width + 1 mm, less the cell padding) when it carries
+ * a tab or letter (sheet-kit.css); without a label it is 0 and the template's own inset stands.
+ */
+const KO = (ctx, mm) => `max(${L(ctx, mm)}, var(--ws-koin, 0mm))`;
 
 register(WW_TEMPLATE, {
     render(p, ctx) {
@@ -1008,7 +1015,7 @@ register(WW_TEMPLATE, {
         if (!isTwin(ctx) && html.includes('class="mq-wwsigns"')) {
             return html.replace(/(<div class="mq-wwsigns"[^>]*style=")([^"]*)(">)/, (m, a, st, c) => `${a}${st}align-items:center;${c}<span class="mq-wwcap" style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.2;white-space:nowrap;">Circle the sign:</span>`);
         }
-        return `<div class="mq-wwcap" style="font-family:'Andika','Open Sans',sans-serif;color:${INK};font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 1)};padding-left:${isTwin(ctx) ? '0' : L(ctx, 2.5)};${isTwin(ctx) ? 'text-align:center;' : ''}">${esc(String((isTwin(ctx) && p.captionScreen) || p.caption))}</div>${html}`;
+        return `<div class="mq-wwcap" style="font-family:'Andika','Open Sans',sans-serif;color:${INK};font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 1)};padding-left:${isTwin(ctx) ? '0' : KO(ctx, 2.5)};${isTwin(ctx) ? 'text-align:center;' : ''}">${esc(String((isTwin(ctx) && p.captionScreen) || p.caption))}</div>${html}`;
     },
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
