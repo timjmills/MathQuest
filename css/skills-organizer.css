@@ -658,6 +658,6 @@
 /* A skill's teacher note (data.js desc) under its name in the preview. Additive. */
 .so-hover-popup .so-popup-desc {
     font-size: 0.8rem;
-    color: var(--text-dim);
+    color: var(--text-secondary);
     margin: -4px 0 10px;
 }

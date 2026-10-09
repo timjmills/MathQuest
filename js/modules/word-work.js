@@ -120,14 +120,30 @@ export function applyWordWork(q) {
     return q;
 }
 
-/** A hint built from a word-work payload alone (no names): the sign and the number sentence. */
+/** A hint built from a word-work payload alone (no names): the sign and the number sentence.
+ *  Multi-step: one line per step, and a later step never prints the earlier step's answer
+ *  (it says "your Step 1 answer"), so the hint does not fill the Step 1 boxes. */
 export function workHint(p) {
-    const G = { '+': '+', '-': '−', '*': '×', '/': '÷' };
-    const V = { '+': 'add', '-': 'subtract', '*': 'multiply', '/': 'divide' };
-    const lines = (p && p.steps || []).map((st, i) => {
-        const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
-        const v = V[st.op] || 'work it out';
-        return `${pre}${pre ? v : v.charAt(0).toUpperCase() + v.slice(1)}: ${st.top} ${G[st.op] || st.op} ${st.bottom} = ?`;
+    const G = { '+': '+', '-': '\u2212', '*': '\u00d7', '/': '\u00f7' };
+    const V = { '+': 'Add', '-': 'Subtract', '*': 'Multiply', '/': 'Divide' };
+    const steps = (p && p.steps) || [];
+    if (steps.length <= 1) {
+        return steps.map((st) => `${V[st.op] || 'Work it out'}: ${st.top} ${G[st.op] || st.op} ${st.bottom} = ?`).join('');
+    }
+    const lines = steps.map((st, i) => {
+        const pre = `Step ${i + 1}: `;
+        const prev = i > 0 ? steps[i - 1].ans : undefined;
+        const yours = `your Step ${i} answer`;
+        let a = st.top, b = st.bottom, aPrev = false, bPrev = false;
+        if (prev !== undefined && String(a) === String(prev)) { a = yours; aPrev = true; }
+        else if (prev !== undefined && String(b) === String(prev)) { b = yours; bPrev = true; }
+        switch (st.op) {
+            case '+': return (aPrev || bPrev) ? `${pre}Add ${aPrev ? b : a} to ${aPrev ? a : b}.` : `${pre}Add ${a} and ${b}.`;
+            case '-': return `${pre}Subtract ${b} from ${a}.`;
+            case '*': return `${pre}Multiply ${aPrev ? a : b} by ${aPrev ? b : a}.`;
+            case '/': return `${pre}Divide ${a} by ${b}.`;
+            default: return `${pre}${a} ${st.op} ${b} = ?`;
+        }
     });
-    return lines.join(' ');
+    return lines.join('<br>');
 }
