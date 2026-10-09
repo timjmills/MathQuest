@@ -221,6 +221,40 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             }
             return [bad.length ? [`answer is not ${v} away: ${bad.slice(0, 2).join(' | ')}`] : [], []];
         },
+        // Wave 1 lane C2: count_by_tables' ROW LIST. On the generator and the screen the item's own countBy record is read;
+        // on a printed sheet only the item's sentence ("Count back by 1,000.") is, so the row's start is not checkable there.
+        rows(v, items) {
+            const list = Array.isArray(v) ? v : [];
+            const cb = items.map(q => q.countBy).filter(Boolean);
+            const fails = [];
+            if (cb.length) {
+                const steps = new Set(list.map(r => Number(r.step)));
+                const bad = cb.filter(c => !steps.has(c.step));
+                if (bad.length) fails.push(`${bad.length} row(s) count by ${[...new Set(bad.map(c => c.step))]}, not one of ${[...steps]}`);
+                for (const r of list) {
+                    const hit = cb.filter(c => c.step === Number(r.step));
+                    const badStart = hit.filter(c => (r.start === 'zero' && !c.values.includes(0)) || (r.start === 'custom' && c.dir !== 'down' && c.values[0] !== r.at) || (r.start === 'step' || !r.start ? (c.dir === 'down' ? false : c.values[0] !== c.step) : false));
+                    if (badStart.length) fails.push(`step ${r.step}: ${badStart.length} row(s) do not start where "${r.start || 'step'}" says (first number ${badStart[0].values[0]})`);
+                    const badDir = hit.filter(c => (r.dir === 'down') !== (c.dir === 'down') && list.filter(x => Number(x.step) === Number(r.step)).length === 1);
+                    if (badDir.length) fails.push(`step ${r.step}: ${badDir.length} row(s) go ${badDir[0].dir}, not ${r.dir || 'up'}`);
+                }
+                const miss = [...steps].filter(x => !cb.some(c => c.step === x));
+                if (miss.length && cb.length >= list.length) fails.push(`no row counts by ${miss[0]} (the list is not dealt)`);
+            } else {
+                const t = items.map(q => qText(q)).filter(x => /^Count (back )?by /.test(x));
+                const steps = new Set(list.map(r => Number(r.step)));
+                const bad = t.filter(x => !steps.has(Number((/by ([\d,]+)\./.exec(x) || [])[1].replace(/,/g, ''))));
+                if (bad.length) fails.push(`${bad.length} printed row(s) count by a step that was not chosen`);
+                for (const r of list) if (r.dir === 'down' && list.filter(x => Number(x.step) === Number(r.step)).length === 1 && t.some(x => new RegExp('^Count by ' + Number(r.step).toLocaleString('en-US') + '\\.').test(x))) fails.push(`step ${r.step}: printed counting on, but the row counts back`);
+            }
+            return [fails, []];
+        },
+        times(v, items) {
+            const cb = items.map(q => q.countBy).filter(Boolean);
+            if (!cb.length) return [[], []];
+            const bad = cb.filter(c => (v === 'none' ? !!c.labels : (!c.labels || c.times !== v)));
+            return [bad.length ? [`times "${v}" but ${bad.length} row(s) have ${v === 'none' ? 'labels' : 'no labels'}`] : [], []];
+        },
         dir(v, items) {
             const words = items.map(q => qText(q).toLowerCase());
             const more = words.filter(s => /\bmore\b/.test(s)).length, less = words.filter(s => /\bless\b/.test(s)).length;
@@ -384,7 +418,16 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             continue;
         }
         if (def.type === 'bool') { tries.push({ def, value: !def.default }); continue; }
-        if (def.type === 'int') { tries.push({ def, value: def.min }, { def, value: def.max }); continue; }
+        if (def.type === 'rows') {
+            // Wave 1 C2: real teacher lists - a table, a typed big step, a start and a direction, and a mixed list.
+            const R = (step, start, at, dir) => Object.assign({ step }, start ? { start } : {}, at !== undefined ? { at } : {}, dir ? { dir } : {});
+            for (const v of [[R(7)], [R(25000)], [R(4, 'zero')], [R(5, 'custom', 3)], [R(1000, 'custom', 14000, 'down')], [R(6, undefined, undefined, 'down')],
+                [R(2, 'zero'), R(5, 'custom', 3), R(25, 'custom', 100, 'down'), R(1000, 'custom', 2000, 'down')]]) tries.push({ def, value: v });
+            continue;
+        }
+        if (def.type === 'int') {
+            tries.push({ def, value: def.min }, { def, value: def.max }); continue;
+        }
         if (def.type === 'enum') { for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l }); continue; }
         if (def.type === 'set') {
             const all = def.values.map(x => x.v);

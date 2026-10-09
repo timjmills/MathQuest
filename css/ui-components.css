@@ -8348,3 +8348,18 @@ html.dark .student-def strong {
 .nav-stats .nav-tip-wrap.student-only + .nav-tip-wrap.student-only { margin-left: 4px; }
 .dark .nav-stats .nav-tip-wrap > .nav-popup-toggle { background: #2A2740; border-color: #4A4660; }
 .dark .nav-stats .nav-tip-wrap > .nav-popup-toggle .popup-toggle-label { color: #E9E6F5; }
+
+/* Many skills in a shared link (owner 2026-10-05): the pop-up never runs off the screen (Start Playing
+   always reachable), and the skill list folds behind "See the N skills", scrolling inside itself. Additive. */
+.landing-modal { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; box-sizing: border-box; }
+.landing-skill-list { margin: 8px 0 4px; }
+.landing-skill-list > summary { cursor: pointer; font-weight: 700; font-size: 0.95rem; color: var(--accent-purple, #7c4dff); padding: 6px 0; list-style-position: inside; }
+.landing-skills.landing-skills-scroll { max-height: 40vh; overflow-y: auto; margin: 6px 0; }
+/* critic follow-ups: the fold's tap line is a 44 px target, and Start Playing stays pinned to the bottom of
+   the pop-up when the pop-up has to scroll (short landscape phones, the list opened). */
+.landing-skill-list > summary { min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0; }
+.landing-modal .landing-start-btn { position: sticky; bottom: 0; }
+.landing-skill-list > summary { list-style: none; }
+.landing-skill-list > summary::-webkit-details-marker { display: none; }
+.landing-skill-list > summary::before { content: '\25B8'; }
+.landing-skill-list[open] > summary::before { content: '\25BE'; }
