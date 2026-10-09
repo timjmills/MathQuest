@@ -1744,6 +1744,12 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 .ws-tn.mq-tn-hit:focus-visible { outline: 3px solid var(--mq-focus, #1a73e8); outline-offset: 2px; border-radius: 4px; }
 .mq-tn-count { font-family: Andika, sans-serif; font-size: 16px; color: #595959; margin: 6px 0 0; display: flex; gap: 12px; align-items: center; justify-content: center; }
 .mq-tn-count .mq-tn-reset { min-height: 44px; padding: 0 14px; font: inherit; border: 1px solid #949494; border-radius: 8px; background: #fff; color: #222; cursor: pointer; }
+/* critic r4 (2026-10-09): Start again never wraps; a ladder rung's count shares the ladder message's row on the
+   practice card and the quiz (R4-5), so only that one row appears after a wrong answer. Additive. */
+.mq-tn-count .mq-tn-reset { white-space: nowrap; flex: none; }
+.mq-tn-count .mq-tn-said { min-width: 0; overflow-wrap: anywhere; }
+.mq-tn-count.mq-tn-inrow { display: inline-flex; vertical-align: middle; margin: 0 0 0 12px; gap: 10px; font-size: 16px; font-weight: 400; }
+.mq-tn-count.mq-tn-inrow .mq-tn-said:empty { display: none; }
 
 /* ---- Steps-box lane (D3): an open hint sits in flow between the bar and the paper, pushing
    the cell down, so it never covers the story it hints about (RUBRIC C1: chrome never covers). */
