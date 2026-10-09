@@ -196,29 +196,59 @@ function selectIfLoose(active) {
 // that has already moved the caret itself is left alone.
 function advanceIfFull(el) {
     if (!el || el !== document.activeElement || el.tagName !== 'INPUT' || !isAnswerBox(el)) return;
-    // A count-by box knows its own number's digit count (data-mq-full, count-row.js): it is full when that many digits are in it
-    // (small fixes item 1: in the quiz "21" then "28" joined as "2128"). Its maxlength stays wider (a pupil may still write more).
-    const full = Number(el.dataset.mqFull) || 0;
-    const max = full || el.maxLength;
-    const len = full ? String(el.value || '').replace(/\D/g, '').length : String(el.value || '').length;
-    if (!(max > 0) || len < max) return;
-    // other boxes in a count-by row keep the row's own focus rule; a box that knows its count moves on, and the row treats a
-    // focus coming from one of its own boxes as the pupil's move (screen-cell.js wireSwipeRows: it scrolls the next box into view)
-    if (el.closest('[data-mq-swiperow]') && !full) return;
+    if (el.dataset.mqFull) return;          // a count-by box moves on at the pupil's next number (nextNumberKey), never by itself
+    const max = el.maxLength;
+    if (!(max > 0) || String(el.value || '').length < max) return;
+    if (el.closest('[data-mq-swiperow]')) return;
     const host = el.closest(POPUP) || el.closest(HOSTS);
     if (!host) return;
     const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
     const i = boxes.indexOf(el);
     if (i < 0) return;
-    const ok = (b) => !valueOf(b) && !isOptional(b) && !b.classList.contains('mq-live-correct')
-        && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
-    const next = boxes.slice(i + 1).find(ok) || boxes.slice(0, i).find(ok);
+    const next = nextEmptyBox(boxes, i);
     if (!next) return;
+    moveTo(next);
+}
+
+const okNext = (b) => !valueOf(b) && !isOptional(b) && !b.classList.contains('mq-live-correct')
+    && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
+function nextEmptyBox(boxes, i) { return boxes.slice(i + 1).find(okNext) || boxes.slice(0, i).find(okNext) || null; }
+function moveTo(next) {
     // the browser scrolls the box into view unless ALL of it is on screen already (a box 1 px under the fold is scrolled to)
     const r = next.getBoundingClientRect();
     const whole = r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth;
     try { next.focus({ preventScroll: whole && !underPinnedBar(next) }); } catch (e) { /* ignore */ }
     if (!whole || underPinnedBar(next)) { try { next.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ } }
+}
+
+// A count-by box (data-mq-full = its number's digits, count-row.js) that is full hands the pupil's NEXT number to the next box
+// (small fixes item 1: in the quiz "21" then "28" joined as "2128"). The caret never moves by itself - that would tell the
+// answer's length, and a too-long number typed in one go must stay in its box (critic r1 D1, wave1-a3) - so the hand-on waits
+// for the next digit, and only a digit started after a pause (a new number) goes on; a digit typed straight on stays.
+const NEW_NUMBER_PAUSE = 600;
+const lastKeyAt = new WeakMap();
+function nextNumberKey(e) {
+    const el = e.target;
+    if (!/^[0-9]$/.test(e.key || '') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!el || el.tagName !== 'INPUT' || !el.dataset || !el.dataset.mqFull || el !== document.activeElement || !isAnswerBox(el)) return;
+    const last = lastKeyAt.get(el) || 0;
+    lastKeyAt.set(el, Date.now());
+    const v = String(el.value || '');
+    if (v.replace(/\D/g, '').length < Number(el.dataset.mqFull)) return;
+    if (el.selectionStart !== v.length || el.selectionEnd !== v.length) return;       // the pupil is editing inside the number
+    if (Date.now() - last < NEW_NUMBER_PAUSE) return;                                   // typed straight on: the same number
+    const host = el.closest(POPUP) || el.closest(HOSTS);
+    if (!host) return;
+    const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
+    const i = boxes.indexOf(el);
+    const next = i < 0 ? null : nextEmptyBox(boxes, i);
+    if (!next || next.tagName !== 'INPUT') return;
+    e.preventDefault();
+    moveTo(next);
+    next.value = e.key;
+    lastKeyAt.set(next, Date.now());
+    lastInput = { t: Date.now(), el: next };
+    next.dispatchEvent(new Event('input', { bubbles: true }));   // the host composes its answer from its boxes
 }
 
 export function refreshActiveBox() {
@@ -270,6 +300,7 @@ export function installActiveBox() {
         if (!box || box.closest('[data-mq-swiperow]') || !onScreen(box) || !uncovered(box)) return;
         try { box.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
     }, true);
+    document.addEventListener('keydown', nextNumberKey, true);
     for (const ev of ['focusin', 'focusout', 'input', 'change', 'click']) document.addEventListener(ev, schedule, true);
     // Questions are re-rendered by many code paths; watch the DOM rather than hooking each one.
     const mo = new MutationObserver(schedule);

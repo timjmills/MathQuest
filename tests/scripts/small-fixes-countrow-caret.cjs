@@ -74,8 +74,8 @@ for (const vp of SIZES) {
           }, root, host);
           const tag = `[${vp.width}x${vp.height} ${host} ${k}${opts ? ' by 25' : ''}${wrong ? ' wrong digits' : ''}]`;
           const exp = info.ans.split(/\s*,\s*/).slice(0, info.n);
-          const wantFull = exp.map((e, i) => (info.prevLen[i] === e.replace(/\D/g, '').length ? e.replace(/\D/g, '').length : 0));
-          check(info.n >= 2 && info.full.every((f, i) => (Number(f) || 0) === wantFull[i]), `${tag} ${info.n} boxes; a box moves on by itself only after a number of the same length (${info.full.map((f) => f || '-').join('/')})`);
+          const wantFull = exp.map((e) => e.replace(/\D/g, '').length);
+          check(info.n >= 2 && info.full.every((f, i) => (Number(f) || 0) === wantFull[i]), `${tag} ${info.n} boxes, each knows its number's digit count (${info.full.join('/')})`);
           // wrong: change the last digit of every number (same length), so nothing turns green to move the caret
           const typed = exp.map((e) => (wrong ? e.replace(/\d$/, (m) => String((Number(m) + 1) % 10)) : e).replace(/\D/g, ''));
           // the pupil taps the first box once, then just types
@@ -86,13 +86,12 @@ for (const vp of SIZES) {
           let offView = 0, stayFails = 0;
           for (let i = 0; i < typed.length; i++) {
             await page.keyboard.type(typed[i], { delay: 20 });
-            // at a change of length the box holds the caret (it would tell the answer's length): the pupil types a Space
-            if (!wantFull[i]) {
-              const stays = await page.evaluate((i) => document.activeElement === document.querySelector(`[data-t="${i}"]`), i);
-              // (on the card and the worksheet a RIGHT number turns green and hands the caret on - owner 2026-10-04; that shows nothing new)
-              if (!stays && (wrong || host === 'quiz')) { stayFails++; console.log('   box', i, 'moved on at a change of length'); }
-              await page.keyboard.press('Space');
-            }
+            // the caret never moves by itself (it would tell the answer's length): it stays until the pupil's next number
+            // (on the card and the worksheet a RIGHT number turns green and hands the caret on - owner 2026-10-04; that shows nothing new)
+            await sleep(150);
+            const stays = await page.evaluate((i) => document.activeElement === document.querySelector(`[data-t="${i}"]`), i);
+            if (!stays && (wrong || host === 'quiz')) { stayFails++; console.log('   box', i, 'moved on by itself'); }
+            await sleep(700);   // the pupil thinks of the next number
             await sleep(120);
             // the box the caret is now in is fully on screen and inside its row's window
             const ok = await page.evaluate(() => {
@@ -112,14 +111,14 @@ for (const vp of SIZES) {
           const got = vals.map((v) => v.replace(/\D/g, ''));
           check(JSON.stringify(got) === JSON.stringify(want), `${tag} every box holds its own number: ${got.join('|')} (want ${want.join('|')})`);
           check(offView === 0, `${tag} the box the caret moves to is in view each time (${offView} off)`);
-          check(stayFails === 0, `${tag} a box at a change of length keeps the caret until Space (${stayFails})`);
-          // a number too long for a box at a change of length stays in that box (critic r1 D1)
-          const bi = wantFull.findIndex((f) => !f);
+          check(stayFails === 0, `${tag} a full box keeps the caret until the pupil's next number (${stayFails})`);
+          // a number too long for its box, typed in one go, stays in that box (critic r1 D1, wave1-a3)
+          const bi = 0;
           if (bi >= 0 && !wrong && host !== 'quiz') {
             await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }, bi);
             await page.keyboard.type(exp[bi].replace(/\D/g, '') + '0', { delay: 20 });
             const v = await page.evaluate((i) => document.querySelector(`[data-t="${i}"]`).value.replace(/\D/g, ''), bi);
-            check(v === exp[bi].replace(/\D/g, '') + '0', `${tag} a too-long number at a change of length stays in its box (${v})`);
+            check(v === exp[bi].replace(/\D/g, '') + '0', `${tag} a too-long number typed in one go stays in its box (${v})`);
           }
           if (host === 'quiz') {
             const hidden = await page.evaluate(() => document.getElementById('qtAnswerInput').value);
