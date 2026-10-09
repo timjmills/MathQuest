@@ -1,6 +1,7 @@
 // skills-organizer.js - Full-screen skill browsing, preview, and queue management
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
+import { skillSearchScores, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
@@ -229,6 +230,7 @@ export function soFilterGrade(grade) {
 
 export function soSearchInput(value) {
     so.searchText = (value || '').toLowerCase().trim();
+    so.searchHits = skillSearchScores(so.searchText);   // shared thesaurus search (skill-finder.js)
     soApplyFilters();
 }
 
@@ -262,8 +264,8 @@ export function soApplyFilters() {
 
         // Search filter
         if (show && so.searchText) {
-            const label = card.dataset.soLabel || '';
-            if (!label.includes(so.searchText)) {
+            const hits = so.searchHits || (so.searchHits = skillSearchScores(so.searchText));
+            if (!hits || !hits.has(`${card.dataset.soCat}:${card.dataset.soSkill}`)) {
                 show = false;
             }
         }
@@ -273,6 +275,7 @@ export function soApplyFilters() {
     });
 
     // Hide empty category groups
+    soOrderByRank(cards, so.searchText ? (so.searchHits || null) : null);
     catGroups.forEach(group => {
         const visibleCards = group.querySelectorAll('.so-skill-card:not([style*="display: none"])');
         group.style.display = visibleCards.length > 0 ? '' : 'none';
@@ -802,3 +805,38 @@ export function soDeselectAllVisible() {
     soRenderQueuePanel();
     soUpdateHeaderCount();
 }
+
+// While a query is active, groups and cards follow the rank of their best match (top hit first);
+// with no query the original order comes back.
+function soOrderByRank(cards, hits) {
+    const score = (card) => (hits ? hits.get(`${card.dataset.soCat}:${card.dataset.soSkill}`) : undefined);
+    const groups = new Set(), sections = new Set();
+    cards.forEach((card, i) => {
+        if (card.dataset.soOrig === undefined) card.dataset.soOrig = String(i);
+        const g = card.parentElement; if (g) groups.add(g);
+    });
+    const best = new Map();
+    const order = (parent, kids, keyOf) => {
+        kids.forEach((k, i) => { if (k.dataset.soOrig === undefined) k.dataset.soOrig = String(i); });
+        kids.slice().sort((a, b) => (hits ? (keyOf(b) - keyOf(a)) : 0) || (+a.dataset.soOrig - +b.dataset.soOrig))
+            .forEach((k) => parent.appendChild(k));
+    };
+    groups.forEach((g) => {
+        const kids = [...g.children].filter((c) => c.dataset && c.dataset.soSkill);
+        if (!kids.length) return;
+        order(g, kids, (c) => score(c) ?? -1);
+        const top = Math.max(-1, ...kids.map((c) => score(c) ?? -1));
+        const grp = g.closest('.so-category-group') || g;
+        best.set(grp, Math.max(best.get(grp) ?? -1, top));
+        const sec = grp.closest('.so-domain-section');
+        if (sec) { sections.add(sec); best.set(sec, Math.max(best.get(sec) ?? -1, top)); }
+    });
+    const parents = new Map();
+    for (const grp of best.keys()) { if (!grp.parentElement) continue; if (!parents.has(grp.parentElement)) parents.set(grp.parentElement, []); parents.get(grp.parentElement).push(grp); }
+    parents.forEach((kids, parent) => order(parent, kids, (k) => best.get(k) ?? -1));
+}
+
+// The standards / WRM terms load after boot: re-rank a Navigator search that is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try { if (so.searchText) { so.searchHits = skillSearchScores(so.searchText); soApplyFilters(); } } catch (e) { /* view not built */ }
+});

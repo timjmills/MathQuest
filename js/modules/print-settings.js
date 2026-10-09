@@ -2,7 +2,7 @@ import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUM
 import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor } from './generate-question.js';
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
-import { getSkillIndex } from './skill-search.js';
+import { getSkillIndex, searchSkillIndex } from './skill-search.js';
 import { optionsFor, offeredOptionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS, pvRefusal } from './skill-options.js';
 import { optionControlHTML as sharedOptionControlHTML, applyOptionEdit } from './skill-options-ui.js';
 import { normalizeRows } from './count-rows.js';
@@ -647,15 +647,10 @@ export function handlePrintDialogSearch(query) {
         return;
     }
 
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
 
-    const matches = index.filter(item => {
-        // Skip mixed/meta skills
-        if (item.skillId === 'mixed' || item.skillId.startsWith('mixed_')) return false;
-        return terms.every(term => item.searchText.includes(term));
-    });
+    const matches = index.filter(item => !(item.skillId === 'mixed' || item.skillId.startsWith('mixed_')));
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;">No skills found.</div>';
