@@ -123,6 +123,7 @@ import { tvGo } from './modules/teacher-shell.js';
 import './modules/word-work-screen.js';
 // The next answer box pulses yellow on every pupil screen (owner, 2026-10-04).
 import { installActiveBox } from './modules/active-box.js';
+import { installPlayCompact, togglePlayMenu } from './modules/play-compact.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -150,6 +151,7 @@ function confirmResetAdaptiveLevels() {
 // Attach ALL functions to window for inline handlers
 // ==========================================
 Object.assign(window, {
+    togglePlayMenu,
     // Teacher view
     tvGo,
     // State & Data (needed by some inline handlers and template code)
@@ -563,3 +565,4 @@ document.addEventListener('click', function(e) {
 // Bootstrap the application
 bootstrap();
 installActiveBox();
+installPlayCompact();

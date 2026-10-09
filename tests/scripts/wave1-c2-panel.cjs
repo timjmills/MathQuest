@@ -66,7 +66,7 @@ const rowsNow = (page) => page.evaluate((c, s) => window.getSetOptions(c, s).row
     const setSel = async (i, kind, value) => {
       await page.evaluate((i, kind, value) => {
         const lines = document.querySelectorAll('#skillOptionsPopover .sko-row-line');
-        if (kind === 'direction') { lines[i].querySelector('button[aria-label^="Row"]').click(); return; }   // the direction is one toggle button
+        if (kind === 'direction') kind = 'counts';   // owner 2026-10-03: the direction is a drop-down in the row's sentence ("up" / "down")
         const el = [...lines[i].querySelectorAll('select')].find((s) => new RegExp(kind).test(s.getAttribute('aria-label')));
         el.value = value; el.dispatchEvent(new Event('change', { bubbles: true }));
       }, i, kind, value);
@@ -93,8 +93,11 @@ const rowsNow = (page) => page.evaluate((c, s) => window.getSetOptions(c, s).row
     });
     check(/Starts at 275 so the row has 12 numbers/.test(noteInfo.notes[2]) && /Starts at 11,000 so the row has 12 numbers/.test(noteInfo.notes[3]), `${W}: lifted starts are explained: ${JSON.stringify(noteInfo.notes)}`);
     const selW = await page.evaluate(() => [...document.querySelectorAll('#skillOptionsPopover .sko-row-line select')].map((e) => Math.round(e.getBoundingClientRect().width)));
-    check(selW.length && selW.every((w2) => w2 >= 90), `${W}: the start dropdown has room to show "Number" (widths ${selW})`);
-    check(noteInfo.heights.every((hh) => hh <= 52), `${W}: every row editor is one line (heights ${noteInfo.heights})`);
+    check(selW.length && selW.every((w2) => w2 >= 60), `${W}: the start and direction drop-downs have room for their words (widths ${selW})`);
+    // owner 2026-10-03: the row reads as a sentence ("Count by [3] starting at [3 (the step)] [up] ..."), at most two lines
+    // (three on a 390 px phone, where the sentence wraps)
+    const maxH = W < 600 ? 140 : 100;
+    check(noteInfo.heights.every((hh) => hh <= maxH), `${W}: every row editor is at most ${W < 600 ? 'three' : 'two'} lines (heights ${noteInfo.heights})`);
     // remove one row and put it back through its chip
     await page.evaluate(() => document.querySelectorAll('#skillOptionsPopover .sko-row-line')[3].querySelector('button[aria-label^="Remove"]').click());
     await sleep(250);

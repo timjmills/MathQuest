@@ -120,19 +120,22 @@ export function rowsSummary(rows, n = 12) {
 // twelve lines are full; with none chosen it is the tables x 1 to x 12. The test below is the cell's own arithmetic
 // (sheet/cells/count-row.js, compact), kept in step with it.
 
-const S_LIVE = 178, S_GAP = 1, S_TAB = 12, FLOOR = 9;
+const S_LIVE = 178, S_GAP = 4.2, S_TAB = 12, FLOOR = 9;   // S_GAP: the jump-arrow gap (count-row.js COMPACT_MIN_GAP)
 const fmtLen = (n) => Number(n).toLocaleString('en-US').length;
 
 /** How many lines one row takes on the one-page sheet: 1, or 2 when its numbers are too wide for one line at the floor. */
 export function rowLines(row, signed = false, n = 12) {
     const values = rowValues(row, n);
     const chars = Math.max(1, ...values.map(fmtLen));
-    if (chars <= 3) return 1;
     const tabLen = fmtLen(row.step) + (signed ? 1 : 0);
     const tab = (tabLen <= 2 ? S_TAB : Math.max(S_TAB, tabLen * 0.6 * Math.min(16 * 1.05, 20) * 0.3528 + 7)) + 2;
-    const pitch = (S_LIVE - tab + S_GAP) / values.length;
-    const pt = Math.min(16, 18, (pitch - S_GAP - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4);
-    return pt >= FLOOR ? 1 : 2;
+    // the cell's compactFit (sheet/cells/count-row.js) at its worst case (every number a box), kept in step: boxes at their
+    // writing width (>= 9 mm), every gap >= S_GAP (a 2.2 mm arrow, 1 mm clear each side); digits may shrink to FLOOR (TY-10a)
+    const k = values.length, avail = S_LIVE - tab, PT = 0.3528;
+    const room = avail - (k - 1) * S_GAP;
+    const w = room / k;
+    if (w >= 9 && (w - 1.8) / (chars * 0.56 * PT) >= FLOOR) return 1;
+    return 2;
 }
 
 /** The tables the one-page sheet prints when no rows are chosen. */
@@ -143,7 +146,7 @@ export const ONE_PAGE_ITEMS = 12;
  * height those cells share under the header and the instruction. Both are measured on the sheet (wave1-c2-onepage asserts the
  * cap is tight: the next chosen row would make a second page, on A4 and on Letter).
  */
-export const ROW_MM = { 1: 17.1, 2: 33.2 };
+export const ROW_MM = { 1: 16.5, 2: 32.0 };   // re-measured 2026-10-03: the jump arrows replaced the arcs over each line
 export const ONE_PAGE_BODY = { A4: 226, Letter: 208 };
 export const MIX_ROW_MM = 0.6;
 let _paper = 'A4';

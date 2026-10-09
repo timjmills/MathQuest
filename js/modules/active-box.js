@@ -93,6 +93,19 @@ function uncovered(el) {
     const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
     return !!top && (top === el || el.contains(top));
 }
+// Chromebook fit (css/play-compact.css): on a short screen Check / Next stay pinned to the bottom
+// edge (position: sticky) and the worksheet's bar to the top. A box that has scrolled under such a
+// bar is not covered by a pop-up: it is off screen in all but name, so it is scrolled to like one.
+const PINNED = '#questionCard > .mq-qactions, #questionCard > .next-btn-container, #quizTakeView .qt-nav, #worksheetView > .game-header';
+function underPinnedBar(el) {
+    const b = el.getBoundingClientRect();
+    for (const bar of document.querySelectorAll(PINNED)) {
+        if (bar.contains(el) || getComputedStyle(bar).position !== 'sticky') continue;
+        const r = bar.getBoundingClientRect();
+        if (r.height > 0 && b.bottom > r.top + 1 && b.top < r.bottom - 1 && b.right > r.left && b.left < r.right) return true;
+    }
+    return false;
+}
 
 // The next box is SELECTED, not only lit (owner 2026-10-04): when no typing place has the focus —
 // on load, after a re-render, or when the pupil taps a blank part of the screen — the pulsing box
@@ -115,9 +128,31 @@ function isTapTarget(el) {
     return false;
 }
 
+// A box can be selected while it is on screen and then be pushed under a pinned bar or below the
+// fold as the page settles (fonts, a late re-fit, a legacy visual scaling itself). For its first 4 s,
+// and only while the pupil has not tapped or scrolled, the focused box is kept in view.
+let activeEl = null;
+let activeSig = '';
+let activeSince = 0;
+let lastUserScroll = 0;
+function revealSettled(active) {
+    if (Date.now() - activeSince > 4000) return;
+    if (lastTap.t > activeSince || lastUserScroll > activeSince) return;
+    if (onScreen(active) && !underPinnedBar(active)) return;
+    try { active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
+}
+
 function selectIfLoose(active) {
+    // a new box, or the same box under a new question (#answerInput is reused from item to item)
+    const paper = active.closest('#questionPaper, .mq-qtpaper, .mq-wspaper, ' + HOSTS);
+    const sig = paper ? paper.textContent : '';
+    if (active !== activeEl || sig !== activeSig) { activeEl = active; activeSig = sig; activeSince = Date.now(); }
+    if (document.activeElement === active) { revealSettled(active); return; }
     const sinceTap = Date.now() - lastTap.t;
-    if (sinceTap < 800 && lastTap.target && isTapTarget(lastTap.target)) return;
+    // a tap on a widget IN the problem keeps the pupil there; a tap on chrome outside it (the quiz's
+    // Next, a nav button that re-rendered the question) does not hold the new box back (critic CF-D3)
+    const tapIn = lastTap.target && lastTap.target.isConnected && lastTap.target.closest && lastTap.target.closest(HOSTS + ', ' + POPUP);
+    if (sinceTap < 800 && tapIn && isTapTarget(lastTap.target)) return;
     const ae = document.activeElement;
     // the box the pupil has just filled RIGHT (it turned green as they typed) hands the caret on to the
     // next box, so the next number goes where it belongs (owner 2026-10-04: "move to the blank box")
@@ -143,11 +178,11 @@ function selectIfLoose(active) {
         return;
     }
     // a box below the fold is scrolled to (gently, to its nearest edge); one on screen must not be covered
-    if (onScreen(active)) {
+    if (onScreen(active) && !underPinnedBar(active)) {
         if (!uncovered(active)) return;
         try { active.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
     } else {
-        if (sinceTap < 1500) return;   // the pupil scrolled away and tapped: leave the page where they put it
+        if (sinceTap < 1500 && tapIn) return;   // the pupil scrolled away and tapped in the problem: leave the page where they put it
         try { active.focus({ preventScroll: true }); active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
     }
 }
@@ -202,6 +237,8 @@ export function installActiveBox() {
     if (typeof document === 'undefined' || window.__mqActiveBoxInstalled) return;
     window.__mqActiveBoxInstalled = true;
     for (const ev of ['pointerdown', 'mousedown', 'touchstart', 'click']) document.addEventListener(ev, (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
+    for (const ev of ['wheel', 'touchmove']) document.addEventListener(ev, () => { lastUserScroll = Date.now(); }, { capture: true, passive: true });
+    document.addEventListener('keydown', (e) => { if (/^(PageUp|PageDown|Home|End|ArrowUp|ArrowDown)$/.test(e.key)) lastUserScroll = Date.now(); }, true);
     // only the box the pupil is typing in (widgets re-fire input on a hidden combined box afterwards)
     document.addEventListener('input', (e) => {
         if (e.target !== document.activeElement) return;

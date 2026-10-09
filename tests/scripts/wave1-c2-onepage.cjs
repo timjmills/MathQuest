@@ -3,8 +3,11 @@
 // with the default blanks and with every missing-number choice. This is a REAL assertion: it builds those sheets on this
 // tree and on a base checkout and fails unless every pupil page and key page is byte-identical.
 //
-//   git archive 4911898 | tar -x -C /tmp/base-4911898
-//   MQ_BASE_ROOT=/tmp/base-4911898 /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-onepage.cjs
+// RE-PINNED (critic countby-arrows r1 D4, 2026-10-09): the owner approved short arrows replacing the arcs (narrow boxes, the
+// same 12 numbers, 3-digit rows at 14.7 pt), so the base is now the lane commit that made those fixes, PINNED at efeb910, and the
+// new rules are asserted directly by invariants(). Never drop the check; re-pin only to an owner-approved commit.
+//   git archive efeb910 | tar -x -C /tmp/base-efeb910
+//   MQ_BASE_ROOT=/tmp/base-efeb910 /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-onepage.cjs
 // (internally it re-runs itself with MQ_ROOT=<base> and `--digest` to read the base's digest)
 const { spawnSync } = require('child_process');
 const crypto = require('crypto');
@@ -51,6 +54,34 @@ const ROW_CASES = [
   { name: 'wide and plain mixed (cut)', rows: [R(100000, 'custom', 1000000), R(3), R(1000, 'custom', 14000), R(7), R(2000, 'custom', 14000), R(9), R(3000, 'custom', 14000), R(11), R(4000, 'custom', 14000), R(6), R(5000, 'custom', 14000), R(8)] },
   { name: 'wide row in the middle', rows: [R(3), R(7), R(25, 'zero'), R(100, 'custom', 2300), R(12, undefined, undefined, 'down'), R(1000, 'custom', 14000), R(5, 'custom', 3)] },
 ];
+// INVARIANTS of the re-pinned sheet (owner 2026-10-03 arrows, critic countby-arrows r1 D3-D5, 2026-10-09): every default sheet is
+// 12 rows on ONE line each; 1-2 digit rows print at the working 16 pt, 3-digit rows no smaller than 14.7 pt (owner-accepted);
+// the columns of every 1-2 digit row line up row to row (D5); with Lines every row keeps ONE digit size (no shrunk rows 9-12).
+async function invariants() {
+  const app = await open({ seed: 1 });
+  const res = await app.page.evaluate(async (PAPERS) => {
+    const out = [];
+    for (const paper of PAPERS) for (const spaces of ['box', 'line']) {
+      const opts = spaces === 'line' ? { onePage: true, spaces } : { onePage: true };
+      const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts }], count: 12, pages: 1, columns: 1 }], size: 'S', paper, seed: 4242, key: true });
+      const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0;width:900px;'; host.innerHTML = r.pupilHtml; document.body.appendChild(host);
+      await document.fonts.ready;
+      const rows = [...host.querySelectorAll('.k2-countrow-body')].map((b) => {
+        const cells = [...b.querySelectorAll('.k2-countrow-line [style*="display:flex;align-items:flex-start"] > *')];
+        const centres = cells.map((c) => { const e = c.querySelector('.k2-given, .k2-tile, [data-ws-shape]') || c; const q = e.getBoundingClientRect(); return Math.round((q.left + q.right) / 2); });
+        const pts = [...b.querySelectorAll('.k2-given, [data-ws-slot]')].map((e) => parseFloat(getComputedStyle(e).fontSize) * 0.75);
+        const digits = Math.max(...cells.map((c) => (c.textContent || '').replace(/\D/g, '').length));
+        return { lines: b.querySelectorAll('.k2-countrow-line').length, centres, minPt: Math.min(...pts), maxPt: Math.max(...pts) };
+      });
+      host.remove();
+      out.push({ paper, spaces, pages: r.pageCount, keyPages: r.keyPageCount, items: r.items.length, rows });
+    }
+    return out;
+  }, PAPERS);
+  await app.close();
+  return res;
+}
+
 async function rowsCheck() {
   const app = await open({ seed: 1 });
   const res = await app.page.evaluate(async (ROW_CASES, PAPERS) => {
@@ -81,7 +112,7 @@ async function rowsCheck() {
 (async () => {
   if (process.argv.includes('--digest')) { console.log('DIGEST ' + JSON.stringify(await digest())); return; }
   const base = process.env.MQ_BASE_ROOT;
-  if (!base) { console.error('set MQ_BASE_ROOT to a checkout of the base commit (git archive 4911898 | tar -x -C <dir>)'); process.exit(2); }
+  if (!base) { console.error('set MQ_BASE_ROOT to a checkout of the base commit (git archive efeb910 | tar -x -C <dir>)'); process.exit(2); }
   const now = await digest();
   const r = spawnSync(process.execPath, [__filename, '--digest'], { env: Object.assign({}, process.env, { MQ_ROOT: base }), encoding: 'utf8', maxBuffer: 1 << 26 });
   const line = (r.stdout || '').split('\n').find((l) => l.startsWith('DIGEST '));
@@ -93,6 +124,27 @@ async function rowsCheck() {
     const one = now[k].pages === 1 && now[k].keyPages === 1 && now[k].items === 12;
     if (!same || !one) fail++;
     console.log(`${same && one ? 'ok  ' : 'FAIL'} ${k.padEnd(44)} ${same ? 'identical to base' : 'DIFFERS from base'}; ${now[k].pages} page + ${now[k].keyPages} key page, ${now[k].items} items`);
+  }
+  for (const x of await invariants()) {
+    const tag = `${x.paper} | invariants ${x.spaces === 'line' ? 'Lines' : 'Boxes'}`;
+    const one = x.pages === 1 && x.keyPages === 1 && x.items === 12;
+    const pts = x.rows.map((r) => r.minPt);
+    let ok = one;
+    if (x.spaces === 'box') {
+      const singles = x.rows.every((r) => r.lines === 1);
+      const small = x.rows.filter((r) => r.minPt >= 16 - 0.1), big = x.rows.filter((r) => r.minPt < 16 - 0.1);
+      const floor = big.every((r) => r.minPt >= 14.7 - 0.1);
+      // D5: the rows at the working size share their column centres (within 1 px)
+      const ref = small[0] ? small[0].centres : [];
+      const aligned = small.every((r) => r.centres.length === ref.length && r.centres.every((c, i) => Math.abs(c - ref[i]) <= 1));
+      ok = ok && singles && floor && aligned && small.length >= 8;
+      console.log(`${ok ? 'ok  ' : 'FAIL'} ${tag}: 1 page + 1 key, ${x.items} rows, one line each ${singles}; ${small.length} rows at 16 pt with columns aligned ${aligned}; 3-digit rows >= ${Math.min(...pts).toFixed(1)} pt`);
+    } else {
+      const uni = Math.max(...x.rows.map((r) => r.maxPt)) - Math.min(...pts) < 0.15;
+      ok = ok && uni;
+      console.log(`${ok ? 'ok  ' : 'FAIL'} ${tag}: 1 page + 1 key, ${x.items} rows, one digit size on every row ${uni} (${Math.min(...pts).toFixed(1)}-${Math.max(...x.rows.map((r) => r.maxPt)).toFixed(1)} pt)`);
+    }
+    if (!ok) fail++;
   }
   for (const x of await rowsCheck()) {
     // printed order: the tabs read in the order the rows were chosen (the one-line rows keep their heights within 1.6x, so nothing is regrouped)
