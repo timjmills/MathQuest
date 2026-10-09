@@ -27,8 +27,9 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
     withSupports, supportOpKey as opKey,
@@ -520,6 +521,8 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
  * neutral whatever is typed. The expected values live in a WeakMap, never in the page's markup.
  */
 const LIVE_EXPECT = new WeakMap();
+// test hook (read-only): the answers a live box accepts — lets the browser sweeps type a right answer
+if (typeof window !== 'undefined') window.__mqLiveExpect = (el) => (LIVE_EXPECT.get(el) || null);
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
 /*
@@ -758,6 +761,8 @@ function _badgeTrack(el) {
  * empty mq-wd-miss box, the right digits stay black. The input's own text goes clear under the mirror,
  * so typing is untouched (the mirror goes on the next keystroke or the tap that empties the box). */
 const MIRRORS = new Map();
+// the expected value of a box bound by a judge (mixed / improper fractions): its digits can still be compared
+const LIVE_WANT = new WeakMap();
 const _inQuiz = (el) => !!(el && el.closest && el.closest('#quizTakeView'));
 function _mirrorDrop(el) {
     const m = MIRRORS.get(el);
@@ -942,7 +947,7 @@ function _liveSet(el, ok, bad) {
     el.classList.toggle('mq-live-wrong', bad);
     if (ok || bad) _badgeTrack(el);
     el.classList.remove('mq-wd-empty');
-    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
+    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_WANT.get(el) || LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
     if (bad) {
         el.setAttribute('aria-invalid', 'true');
         // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
@@ -967,6 +972,9 @@ function _liveMark(el, final) {
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
+    // a missing digit marked at Check stays marked while the box is still empty: a blur or a move (the
+    // ladder redraws the stack around the box the caret is in) is not the pupil answering it
+    if (v === '' && el.classList.contains('mq-wd-empty')) return;
     const num = LIVE_NUM.has(el);
     const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
     const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
@@ -999,9 +1007,10 @@ function _liveBind(el, expected, { single = false, numeric = false } = {}) {
  * the other boxes the verdict depends on (a rule table's Out box depends on its In box): when one
  * of them changes, the rest are judged again - a box the pupil has left is judged as final.
  */
-function _liveBindFn(el, fn, group = []) {
+function _liveBindFn(el, fn, group = [], want = null) {
     if (!el || typeof fn !== 'function') return false;
     LIVE_FN.set(el, fn);
+    if (want != null && want !== '') LIVE_WANT.set(el, [String(want)]); else LIVE_WANT.delete(el);
     LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
@@ -1035,7 +1044,7 @@ export function markBoxSubmitted(el, ok) {
     el.classList.toggle('mq-live-correct', !!ok);
     el.classList.toggle('mq-live-wrong', !ok);
     _badgeTrack(el);
-    if (!ok) { _wireClear(); const w = LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
+    if (!ok) { _wireClear(); const w = LIVE_WANT.get(el) || LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
     else _mirrorDrop(el);
     if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     if (el.dataset.mqSubmitMark !== '1') {
@@ -1153,6 +1162,21 @@ const _fracNorm = (s) => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').
 function _bindOwnBoxes(root, q) {
     let n = 0;
     const bind = (el, expected, opts) => { if (el && el.dataset.mqLive !== '1' && _liveBind(el, expected, opts)) n++; };
+    // A number family is right in ANY order (owner 2026-10-04): each row may hold any fact its sign
+    // makes, no fact twice. A box's verdict depends on the other rows, so they are one group.
+    if (isOrderFreeFamily(q)) {
+        const fam = Array.from(root.querySelectorAll('input.number-family-input[data-eq][data-pos]'));
+        fam.forEach((el) => {
+            if (el.dataset.mqLive === '1') return;
+            const r = Number(el.getAttribute('data-eq')), p = Number(el.getAttribute('data-pos'));
+            const fn = () => {
+                const w = familyWant(q.numberFamilyData, familyValuesFromInputs(fam), r, p);
+                if (w != null) LIVE_WANT.set(el, [String(w)]);
+                return familyBoxVerdict(q.numberFamilyData, fam, el);
+            };
+            if (_liveBindFn(el, fn, fam)) n++;
+        });
+    }
     // data-answer, compared exactly (the older checkers compare the trimmed text)
     root.querySelectorAll('input.fact-family-input[data-answer], input.number-family-input[data-answer], input.area-model-input[data-answer], input.area-model-total[data-answer], input.fp-input[data-answer]')
         .forEach((el) => bind(el, String(el.dataset.answer).replace(/,/g, '')));
@@ -1180,7 +1204,7 @@ function _bindOwnBoxes(root, q) {
     if (q && q.dualFractionAnswers) {
         [['#mixedInput', q.dualFractionAnswers.mixed], ['#improperInput', q.dualFractionAnswers.improper]].forEach(([sel, want]) => {
             const el = root.querySelector(sel);
-            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want))) n++;
+            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want), [], want)) n++;
         });
     }
     // ordering boxes: the n-th item of the answer (text, else the same number)
@@ -1189,7 +1213,7 @@ function _bindOwnBoxes(root, q) {
         root.querySelectorAll('input.order-input-box, input.ws-order-input').forEach((el) => {
             const want = parts[Number(el.getAttribute('data-order-idx'))];
             if (want !== undefined && el.dataset.mqLive !== '1') {
-                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); })) n++;
+                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); }, [], want)) n++;
             }
         });
     }
@@ -1573,9 +1597,23 @@ function wireSwipeRows(cellEl) {
             const v = w.getBoundingClientRect();
             return [...w.querySelectorAll('.k2-countrow-body .k2-given, .k2-countrow-body input')].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > v.right + 1; });
         };
+        // the cue stays on ONE line inside a narrow window (29 px digits on a phone, TY-10b): its type shrinks to fit, never under 14 px
+        const fitCue = (win) => {
+            const cues = w.querySelector('.k2-swipe-cues');
+            if (!cues) return;
+            cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((c) => { c.style.fontSize = ''; });
+            const c = cues.querySelector('.k2-swipe-cue');
+            if (!c || getComputedStyle(c).display === 'none') return;
+            const need = c.scrollWidth, have = Math.max(0, win - 8);
+            if (need > have && have > 0) {
+                const fs = parseFloat(getComputedStyle(c).fontSize) || 18;
+                const nf = `${Math.max(14, Math.floor(fs * have / need))}px`;
+                cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
+            }
+        };
         const mode = () => {
             if (!frame || !body) return;
-            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
+            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
@@ -1583,14 +1621,26 @@ function wireSwipeRows(cellEl) {
             level();
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
-            const avail = frame.getBoundingClientRect().width;
+            // critic C2 r8 (a): the room is measured from the CELL's inner box (from the frame's left edge to the cell's inner right
+            // edge), not from the frame, which may hug a narrower drawing; as many whole columns as fit there
+            const fr = frame.getBoundingClientRect();
+            let avail = fr.width;
+            const cellEl2 = frame.closest('.mq-scell');
+            if (cellEl2) {
+                const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2);
+                // the drawing is centred in the cell, so the room is the cell's whole inner width (it widens, still centred)
+                const inner = cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
+                if (inner > avail) avail = inner;
+            }
             const n = Math.max(1, Math.floor((avail + gap + 0.5) / pitch));
             // critic C2 r7: when every column of a line fits, the window takes the full width and the row does not scroll at all
             // (a line's turn arrow may reach past the last column; it is drawn, never scrolled to)
             if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
             const win = Math.min(avail, n * pitch - gap + 3);
-            w.style.width = `${win}px`; w.style.maxWidth = '100%';
+            w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
+            frame.style.minWidth = `${Math.ceil(win)}px`;     // the drawing around the window widens with it (it stays centred in the cell)
             padEnd();
+            fitCue(win);
         };
         mode();
         window.addEventListener('resize', mode);
@@ -1602,6 +1652,18 @@ function wireSwipeRows(cellEl) {
         w.addEventListener('pointerdown', () => { tapAt = Date.now(); }, { capture: true, passive: true });
         const tappedNow = () => Date.now() - tapAt < 1500;
         watchTabKey();
+        // critic C2 r8 (b): when the card held its focus back (a first box the start does not show), the first digit key typed
+        // with nothing focused goes to that box under the same rule as the pupil's Tab (the row moves to show it whole)
+        const digitKey = (e) => {
+            if (!w.isConnected) { document.removeEventListener('keydown', digitKey, true); return; }
+            if (!held || !held.isConnected || !/^[0-9]$/.test(e.key) || e.ctrlKey || e.metaKey || e.altKey || !w.offsetParent) return;
+            const a = document.activeElement;
+            if (a && a !== document.body && a !== document.documentElement) return;
+            const t = held;
+            tabKeyNow = true; setTimeout(() => { tabKeyNow = false; }, 0);
+            try { t.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
+        };
+        document.addEventListener('keydown', digitKey, true);
         // is the box fully inside the window when the row rests at its start?
         const shownAtStart = (t) => {
             const v = w.getBoundingClientRect(), r = t.getBoundingClientRect(), sl = w.scrollLeft;
@@ -2714,6 +2776,8 @@ const _normFrac = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().
 export function cellInputVerdict(value, q) {
     if (!q) return null;
     const v = String(value == null ? '' : value);
+    // a number family's boxes, joined in reading order: right in any order, no fact twice
+    if (q.answerType === 'number-family' && isOrderFreeFamily(q) && v.includes(',')) return familyComposedRight(q.numberFamilyData, v);
     if ((q.answerType === 'tchart-cells' || q.answerType === 'factor-links') && typeof q.ans === 'string' && /[×x*]/.test(v)) {
         const want = q.ans.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
         const got = v.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
@@ -2853,6 +2917,12 @@ export function cellDigitTarget(cellEl) {
  */
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
+    // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
+    // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
+    if (q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
+        && /class="k2-twin"/.test(String(q.visual || ''))) {
+        try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
+    }
     const kt = kitCellTwin(q, { categoryId, typedOrder });
     if (kt) return kt;
     const t = q.answerType;
@@ -2989,6 +3059,20 @@ export function fitTwinRows(root) {
             // shrink the millimetre only as far as keeps every box a 44 px touch target, then it swipes (SP-10, SP-11a)
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = sw.scrollWidth, have = sw.clientWidth;
+            // owner ruling 2026-10-03 (TY-10b): on a phone the row is drawn at about 29 px digits (boxes scale with them) and swipes;
+            // a row whose numbers TY-10a already shrank (wider than six boxes hold) keeps that shrink, scaled by the same factor
+            if (typeof window !== 'undefined' && window.innerWidth <= 480 && have > 0) {
+                const dg = twin.querySelector('.k2-countrow-body .k2-given, .k2-countrow-body input.mq-cellslot');
+                const fs = dg ? parseFloat(getComputedStyle(dg).fontSize) : 0;
+                const base = parseFloat(twin.dataset.mqK2Base || '') || cur;
+                if (!twin.dataset.mqK2Base) twin.dataset.mqK2Base = String(cur);
+                const fs0 = cur > 0 ? fs * base / cur : 0;                    // the digit size at the drawing's own scale
+                // a full row grows to 29 px digits; a TY-10a-shrunk row (digits under 20 px) grows by the factor a full row of the
+                // card / quiz takes (29 / 24), so its long numbers grow with the rest and never pass 29 px
+                const k = fs0 >= 20 ? base * Math.max(1, 29 / fs0) : base * 29 / 24;
+                if (Math.abs(k - cur) > 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+                return;
+            }
             if (need > have + 1 && have > 0) {
                 const slot = twin.querySelector('.k2-tile-slot');
                 const r = slot ? slot.getBoundingClientRect() : null;

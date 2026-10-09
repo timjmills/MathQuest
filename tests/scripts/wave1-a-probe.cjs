@@ -124,7 +124,11 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       };
     });
     console.log('practice', JSON.stringify(info));
-    check(/mq-active-pulse/.test(info.boxAnim || ''), `[${w}] practice answer box pulses (${info.boxAnim} ${info.boxBg})`);
+    // The next answer box carries .mq-active-box (js/modules/active-box.js) and its glow MOVES: the
+    // earlier check only read an animation name, and that animation was frozen by !important values.
+    const glow = () => page.evaluate(() => { const b = document.querySelector('#questionCard .mq-active-box'); return b ? { anim: getComputedStyle(b).animationName, shadow: getComputedStyle(b).boxShadow, bg: getComputedStyle(b).backgroundColor } : null; });
+    const g1 = await glow(); await sleep(450); const g2 = await glow();
+    check(!!g1 && /mq-next-glow/.test(g1.anim) && g1.shadow !== g2.shadow, `[${w}] practice answer box pulses (${g1 && g1.anim}; glow ${g1 && g1.shadow} -> ${g2 && g2.shadow})`);
     check(info.calc === false, `[${w}] calculator hidden by default`);
     await page.evaluate(() => {
       document.querySelectorAll('.toast-notification, .toast, #toast, [class*="toast"]').forEach((t) => { t.style.display = 'none'; });
