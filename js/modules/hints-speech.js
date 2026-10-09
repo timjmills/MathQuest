@@ -8,7 +8,82 @@ import { applyVoice } from './voice-picker.js';
 //   - Click on the dark backdrop (anywhere outside the card)
 //   - Escape key
 // Auto-cleared when the next question loads (nextQuestion calls closeHintPopup).
+// ===== Word-problem hint: in flow, BELOW the story (owner ruling) =====
+// On the practice card a word problem's hint must never cover the story. When the
+// current question shows a story on the live card, the hint is placed in the page
+// flow directly under the story block instead of in a modal. It keeps the
+// #hintModal id and inner classes so speakHint(), closeHintPopup() and ESC work
+// unchanged, and the same Hint button toggles it open and closed.
+const _STORY_SEL = '.mq-wwstory, .k2-story, .mq-story, .word-problem-text';
+
+function _wordProblemStoryAnchor() {
+    const game = document.getElementById('gameView');
+    if (!game || !game.classList.contains('active')) return null;
+    const card = document.getElementById('questionCard');
+    if (!card || card.offsetParent === null) return null;
+    const q = state.currentQ || {};
+    const isWord = /word|story/i.test(String(q.skillId || state.skill || '')) || /word|story/i.test(String(q.printFormat || ''));
+    let story = card.querySelector(_STORY_SEL);
+    if (story && story.getClientRects().length === 0) story = null;
+    if (!story && isWord) {
+        const va = document.getElementById('visualAid');
+        const qt = document.getElementById('questionText');
+        if (va && va.getClientRects().length && va.textContent.trim()) story = va;
+        else if (qt && qt.getClientRects().length && qt.textContent.trim()) story = qt;
+    }
+    if (!story) return null;
+    // Climb out of side-by-side rows (story beside a picture or word bank) so the
+    // hint lands under the whole row, never beside the story.
+    let el = story;
+    while (el.parentElement && el !== card && el.parentElement !== card) {
+        const cs = window.getComputedStyle(el.parentElement);
+        const rowish = (/flex/.test(cs.display) && !/column/.test(cs.flexDirection)) || /grid/.test(cs.display) || cs.display === 'contents';
+        if (!rowish) break;
+        el = el.parentElement;
+    }
+    return el;
+}
+
+function _renderHintInline(anchor, titleHTML, bodyHTML) {
+    closeHintPopup();
+    const title = String(titleHTML).replace(/^[^A-Za-z<]+/, '');
+    const box = document.createElement('div');
+    box.id = 'hintModal';
+    box.className = 'mq-hint-inline';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Hint');
+    box.innerHTML =
+        '<div class="mq-hint-inline-head">' +
+            '<h3>' + title + '</h3>' +
+            '<button type="button" id="hintSpeakBtn" class="hint-speak-btn mq-hint-inline-btn" aria-label="Read the hint aloud" title="Read the hint aloud" onclick="speakHint()">🔊</button>' +
+            '<button type="button" class="mq-hint-inline-btn" aria-label="Close hint" onclick="closeHintPopup()">×</button>' +
+        '</div>' +
+        '<div class="hint-modal-body">' + bodyHTML + '</div>' +
+        '<button type="button" class="mq-hint-inline-got" onclick="closeHintPopup()">Got it!</button>';
+    anchor.insertAdjacentElement('afterend', box);
+    const onKey = (ev) => { if (ev.key === 'Escape' || ev.key === 'Esc') closeHintPopup(); };
+    box._hintKeyHandler = onKey;
+    document.addEventListener('keydown', onKey);
+    // Show the story and its hint together: story top just under the play bar,
+    // unless the pair is taller than the screen, then the hint wins.
+    try {
+        const sr = anchor.getBoundingClientRect(), hr = box.getBoundingClientRect();
+        const bar = 80;
+        const fits = hr.bottom - sr.top <= window.innerHeight - bar;
+        const dy = fits ? sr.top - bar : (hr.bottom > window.innerHeight ? hr.bottom - window.innerHeight + 8 : (hr.top < bar ? hr.top - bar : 0));
+        if (dy) window.scrollBy(0, dy);
+    } catch (_) {}
+}
+
 function _renderHintModal(titleHTML, bodyHTML) {
+    const existing = document.getElementById('hintModal');
+    if (existing && existing.classList.contains('mq-hint-inline')) {
+        // Same Hint button closes the in-flow hint (toggle).
+        closeHintPopup();
+        return;
+    }
+    const anchor = _wordProblemStoryAnchor();
+    if (anchor) { _renderHintInline(anchor, titleHTML, bodyHTML); return; }
     // Replace any existing hint modal so a second click doesn't stack popups.
     closeHintPopup();
     const modal = document.createElement('div');
