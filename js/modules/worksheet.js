@@ -1,6 +1,7 @@
 import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
+import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText, stackSlashFractions } from './utils.js';
@@ -3235,14 +3236,18 @@ export function checkWorksheetNumberFamily(idx) {
     // Update feedback div if it exists
     const feedbackDiv = card.querySelector(`[id^="ws_numberFamilyFeedback"]`);
 
+    // A number family is right in any order (each row any fact its sign makes, no fact twice).
+    const anyOrder = isOrderFreeFamily(q);
+    const isRight = (input) => anyOrder ? familyBoxVerdict(q.numberFamilyData, inputs, input) === true
+        : input.value.trim() === input.dataset.answer;
+
     // Give per-cell green feedback immediately for correct answers
     inputs.forEach(input => {
         const val = input.value.trim();
-        const correct = input.dataset.answer;
         if (val === '') {
             input.style.borderColor = 'var(--accent-cyan)';
             input.style.background = 'var(--bg-card-light)';
-        } else if (val === correct) {
+        } else if (isRight(input)) {
             input.style.borderColor = 'var(--correct)';
             input.style.background = 'rgba(6,214,160,0.2)';
         } else {
@@ -3269,10 +3274,7 @@ export function checkWorksheetNumberFamily(idx) {
     let correctCount = 0;
 
     inputs.forEach(input => {
-        const userVal = input.value.trim();
-        const correctVal = input.dataset.answer;
-
-        if (userVal === correctVal) {
+        if (isRight(input)) {
             correctCount++;
             input.style.borderColor = 'var(--correct)';
             input.style.background = 'rgba(6,214,160,0.2)';
