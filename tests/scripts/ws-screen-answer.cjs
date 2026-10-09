@@ -495,6 +495,32 @@ else (async () => {
                     }).join(' '));
                     fails.push(`${s} worksheet: ${res} [${per}]`);
                 }
+                // A fraction sentence is judged by VALUE (owner ruling 2026-10-03; critic fractions-key
+                // N1): every frac-model card is answered again in an unsimplified form - a sum of 1 as
+                // d/d, 3/4 as 6/8, 1 2/5 as 7/5 - and CHECK ALL must still mark all of them right.
+                const eq = await page.evaluate(() => {
+                    const rd = (t) => { const s = String(t).trim(); let m = /^(\d+)\s+(\d+)\/(\d+)$/.exec(s); if (m) return [+m[1] * +m[3] + +m[2], +m[3]]; m = /^(\d+)\/(\d+)$/.exec(s); if (m) return [+m[1], +m[2]]; m = /^(\d+)$/.exec(s); return m ? [+m[1], 1] : null; };
+                    const out = [];
+                    window.state.worksheetQs.forEach((q, i) => {
+                        if (!q || !q.cell || q.cell.template !== 'frac-model') return;
+                        const v = rd(q.ans); const inp = document.getElementById(`ws_input_${i}`);
+                        if (!v || !inp) return;
+                        const d = v[1] === 1 ? 5 : v[1] * 2;
+                        const typed = `${v[0] * (d / v[1])}/${d}`;
+                        inp.value = typed;
+                        out.push({ i, typed });
+                    });
+                    if (!out.length) return null;
+                    window.checkAllWorksheet();
+                    const res = document.getElementById('worksheetResult').textContent.replace(/\s+/g, ' ').trim();
+                    return { typed: out.map(o => o.typed).join(' '), res };
+                });
+                if (eq) {
+                    const m2 = eq.res.match(/Score:\s*(\d+)\/(\d+)/);
+                    const ok2 = m2 && m2[1] === m2[2];
+                    line.push(`by-value ${ok2 ? 'ok' : 'WRONG'} (${eq.typed})`);
+                    if (!ok2) fails.push(`${s} worksheet by value: ${eq.typed} -> ${eq.res}`);
+                }
             }
             // the score pop-up and a level/badge celebration (OK button) cover the page; a pupil closes them before the next task
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); document.querySelectorAll('.mq-celebration-modal').forEach(m => { const ok = m.querySelector('button'); if (ok) ok.click(); else m.remove(); }); });

@@ -895,7 +895,10 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             });
             if (input.stepStrip) used = Infinity;            // a lesson strip's height is not known here
             const spare = bodyMm - used - 4;
-            if (rowsAll && spare > 0.05 * bodyMm) extraPerRow = Math.floor((spare / rowsAll) * 100) / 100;
+            // ... as whitespace between the rows and between the parts, never inside a cell
+            // (critic fractions-key r2: the stretched cells were 30 % empty, H13).
+            const gaps = pg.parts.reduce((n, pp) => n + Math.max(0, pp.chunk.rows - 1), 0) + (pg.parts.length - 1);
+            if (gaps && spare > 0.05 * bodyMm) extraPerRow = Math.floor((spare / gaps) * 100) / 100;
         }
         for (const part of pg.parts) {
             const L = layouts[part.section];
@@ -912,6 +915,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const prevPart = pg.parts[pg.parts.indexOf(part) - 1];
             const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf
                 && instr[sec.splitOf] && instr[sec.splitOf].key === instr[part.section].key;
+            // a split page's spare height: whitespace above every part after the first
+            if (extraPerRow && pg.parts.indexOf(part) > 0) sections.push({ kind: 'html', html: `<div class="ws-part-gap" aria-hidden="true" style="height:${extraPerRow}mm;flex:none;"></div>` });
             if (!shares) sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
             if (L.blocks && part.chunk.blocks) {
                 // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
@@ -938,13 +943,16 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : extraPerRow ? { heightMm: Math.round(part.chunk.rows * (L.cellH + extraPerRow) * 1000) / 1000, rowsTpl: '' }
-                    : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
-            const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            let gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            if (extraPerRow && baseMm) {
+                // a split page: the spare height between the rows of this part, and above it
+                if (part.chunk.rows > 1) gap = { gap: extraPerRow, heightMm: Math.round((baseMm + extraPerRow * (part.chunk.rows - 1)) * 100) / 100 };
+            }
             sections.push({
                 kind: 'grid',
                 cols: L.cols,

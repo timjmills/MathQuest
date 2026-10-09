@@ -55,6 +55,7 @@ export const SHEET_ROLES = Object.freeze(['independent', 'more-practice', ...Obj
 const ROLES = new Set(SHEET_ROLES);
 const LETTERS = 'ABCDEFGHIJ';
 const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol items
+const LIST_FREE_ROLES = new Set(['test', 'mixed-practice', 'scripted-model', 'opener']);
 const RETRIES = 12;               // duplicate retries per item before a duplicate is accepted
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
@@ -231,7 +232,7 @@ const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'ob
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
+function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, maxLists = 1 } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
     // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
@@ -260,7 +261,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // test of comparisons). A skill that only deals lists is never held to it.
             const isList = cand.printFormat === 'multi-select';
             if (!isList) seen.add(`prod:${key}`);
-            if (isList && k < tries && (kept.get(`list:${key}`) || 0) >= 1 && seen.has(`prod:${key}`)) continue;
+            if (isList && k < tries && (kept.get(`list:${key}`) || 0) >= maxLists && (seen.has(`prod:${key}`) || (maxLists === 0 && k < 6))) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -2002,7 +2003,10 @@ async function buildRoleSheet(n, metaOf) {
         for (let pass = 0; pass < 4 && out.length < want; pass++) {
             const need = want - out.length;
             const batch = pass === 0 ? need : need * 2 + 2;
-            const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
+            // A test, a mixed page and a model page deal the skill's production items only: a
+            // choose-all list is practice, not the operation the page tests or models (critic
+            // fractions-key N2, N7). A skill that deals nothing but lists keeps them.
+            const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept, maxLists: LIST_FREE_ROLES.has(mod.ROLE_ID) ? 0 : 1 });
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
