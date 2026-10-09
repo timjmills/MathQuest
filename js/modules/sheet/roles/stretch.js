@@ -79,6 +79,10 @@ export function stretchWhy(q, size = 'L') {
     return task ? '' : NO_STRETCH_REASON;
 }
 
+// div_facts `divForm` (Standard / Long division / Fraction / Vertical / Mix) does not change this
+// page, by design: Stretch REWRITES the item into an open task ("Two numbers divide to make 9.
+// Find different pairs.") with a results table, so there is no single fact left to draw in a form.
+// The table's own "First number / Second number / quotient" columns are the same for every form.
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
 

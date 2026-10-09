@@ -16,7 +16,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP } from '../layout.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -24,6 +24,32 @@ const DENSE = CEILING;          // 12.1 is law: 20 / 16 / 12 (L-DENSITY holds it
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
+
+/**
+ * 12.1: a Test of one-line items holds its ceiling (20 / 16 / 12) when that many rows of them fit
+ * the grid (critic R2 D-B: div_facts Standard printed 18 of 20 at S - 3 x 6 - and 10 of 12 at L,
+ * the two-column row step-down, leaving 32-41 % of the page blank). The last row may be short
+ * (PG-15's unruled blank run closes it). The rows then take the grid's height up to the point
+ * where the page strip under them is under a fifth (PG-14), each cell at least its measured
+ * height; an explicit column count from the teacher is left alone (DN-12).
+ */
+function fillToCeiling(L, size, columns) {
+    const ceil = CEILING[size] || CEILING.L;
+    if (!L || (columns && columns !== 'auto') || !(L.hMin > 0) || L.cols < 2) return L;
+    const G = L.gridH;
+    let rows = L.rows, perPage = L.perPage, note = '';
+    if (perPage < ceil && Math.ceil(ceil / L.cols) * L.hMin * 1.05 <= G - SAFETY_H_MM) {
+        rows = Math.ceil(ceil / L.cols);
+        perPage = ceil;
+        note = `Test: ${ceil} problems, ${L.cols} x ${rows} (12.1).`;
+    }
+    // PG-14: the rows take the grid down to a strip of under a fifth of it - never past the even
+    // share, and never shorter than the layout made them.
+    const even = (G - SAFETY_H_MM) / rows;
+    const cellH = Math.round(Math.min(even, Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
+    if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
+    return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
+}
 
 function layout(items, input, count) {
     const ctx = ctxOf(input);
@@ -37,12 +63,12 @@ function layout(items, input, count) {
     const oneLine = items.length && items.every((it) => it.fclass === 'short' || it.template === 'fact' || it.template === 'equation'
         || (it.footprint && it.footprint.factLike));
     if (oneLine && !long) {
-        return resolveSectionLayout({
+        return fillToCeiling(resolveSectionLayout({
             role: 'test', columns: input.columns || 'auto', count: count || items.length,
             target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
-        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns);
     }
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
@@ -83,7 +109,8 @@ export function plan(input = {}) {
     ];
     // Rows sized to what they hold (H13); else the layout's grid height is the page's (one
     // instruction) and a lone full grid fills by flex.
-    const shape = rowShape(items, L.cols, rows, L.cellH);
+    // (a Test filled to its ceiling keeps one cell height, its rows taking the grid: fillToCeiling)
+    const shape = L.filledTest ? null : rowShape(items, L.cols, rows, L.cellH);
     if (shape) { sections[1].rowsTpl = shape.rowsTpl; sections[1].height = `${shape.heightMm}mm`; }
     else if (rows === L.rows && L.fill !== false) { sections[1].cls = ''; sections[1].height = ''; }
     // A Test's count is fixed (12.1): spare page height goes between the rows, not into them.

@@ -1,0 +1,39 @@
+{
+ "earn": [
+  {
+   "schema": "change",
+   "story": [
+    "Zara has 24 dollars.",
+    "Zara wants 98 dollars.",
+    "How many more dollars does Zara need?"
+   ]
+  },
+  {
+   "schema": "change",
+   "story": [
+    "Zara has 24 dollars.",
+    "Zara wants 98 dollars.",
+    "How many more dollars does Zara need?"
+   ]
+  }
+ ],
+ "speak": {
+  "said": [
+   "Step 1: Subtract 28 from 49. Step 2: Add 15 to your Step 1 answer."
+  ],
+  "hint": "Step 1: Subtract 28 from 49.<br>Step 2: Add 15 to your Step 1 answer."
+ },
+ "ws": {
+  "bulbs": 1,
+  "text": "×\n💡 Hint\nThis problem has two steps: do the first operation, then use the result in the second.\nStep 1: Add 48 and 37.\nStep 2: Subtract 28 from your Step 1 answer."
+ },
+ "tick": {
+  "ans": 57,
+  "hintOpen": true,
+  "badges": [
+   "ok:block"
+  ],
+  "boxOk": true
+ }
+}
+[]
