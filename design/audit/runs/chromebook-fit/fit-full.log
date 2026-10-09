@@ -1,0 +1,179 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+counting:count_objects 1366x650              card ok box 355/650 go 421 | boss ok box 504/650 go 634 | race ok box 496/650 go 626 | worksheet ok box 385/650 go 116 cards 3 | quiz ok box 425/650 go 579
+comparing:compare_groups 1366x650            card ok box 534/595 go 645 | worksheet ok box 494/650 go 116 cards 3 | quiz ok box 538/584 go 640
+composing:number_bonds 1366x650              card ok box 543/650 go 613 | worksheet ok box 318/650 go 116 cards 3 | quiz ok box 550/584 go 640
+counting_mixed:counting_all 1366x650         card ok box 292/650 go 421 | worksheet tall box 697(paper)/650 go 116 cards 0 | quiz ok box 581/584 go 640
+addition:add_facts 1366x650                  card ok box 443/650 go 515 | boss ok box 528/650 go 600 | race ok box 520/650 go 592 | worksheet ok box 371/650 go 116 cards 3 | quiz ok box 444/650 go 535
+subtraction:sub_facts 1366x650               card ok box 443/650 go 515 | worksheet ok box 371/650 go 116 cards 3 | quiz ok box 444/650 go 535
+multiplication:mult_facts 1366x650           card ok box 443/650 go 515 | worksheet ok box 371/650 go 116 cards 3 | quiz ok box 444/650 go 535
+division:div_facts 1366x650                  card ok box 306/650 go 384 | worksheet ok box 296/650 go 116 cards 6 | quiz ok box 307/650 go 404
+integers:number_line_int 1366x650            card ok box 506/650 go 572 | worksheet ok box 590/650 go 116 cards 1 | quiz ok box 557/584 go 640
+number_ops_mixed:word_problems_mixed 1366x650 card ok box 507/595 go 645 | worksheet ok box 611/650 go 116 cards 0 | quiz tall box 608/584 go 640
+fractions:identify 1366x650                  card ok box 445/650 go 511 | worksheet ok box 470/650 go 116 cards 3 | quiz ok box 541/650 go 632
+fraction_operations:add_fractions_like 1366x650 card ok box 442(paper)/650 go 430 | worksheet ok box 531/650 go 116 cards 3 | quiz ok box 554/584 go 640
+decimals:add_decimal 1366x650                card tall box 787/595 go 645 | worksheet ok box 290/650 go 116 cards 6 | quiz ok box 301/650 go 392
+conversions:f_to_d 1366x650                  card ok box 484(paper)/650 go 538 | worksheet ok box 584/650 go 116 cards 0 | quiz ok box 517/650 go 608
+frac_dec_mixed:fractions_all 1366x650        card ok box 563/650 go 626 | worksheet ok box 515(paper)/650 go 116 cards 2 | quiz ok box 301/650 go 392
+shapes_early:name_2d_shapes 1366x650         card ok box 578/650 go 578 | worksheet tall box 689(paper)/650 go 116 cards 0 | quiz tall box 591/584 go 640
+area_perimeter:perimeter_intro 1366x650      card ok box 566/650 go 632 | worksheet ok box 552/650 go 116 cards 3 | quiz tall box 633/584 go 640
+angles_lines:identify_angles 1366x650        card ok box 619/650 go 619 | worksheet tall box 812(paper)/650 go 116 cards 0 | quiz ok box 517/650 go 608
+shapes_classify:classify_triangles 1366x650  card ok box 604/650 go 604 | worksheet ok box 626(paper)/650 go 116 cards 3 | quiz ok box 301/650 go 392
+coordinates:coordinate_q1 1366x650           card tall box 659/650 go 861 | worksheet ok box 290/650 go 116 cards 2 | quiz ok box 301/650 go 392
+measurement:time_hour 1366x650               card ok box 579/595 go 645 | worksheet ok box 519/650 go 116 cards 3 | quiz ok box 579/584 go 640
+geo_mixed:geometry_all 1366x650              card tall box 620/650 go 694 | worksheet ok box 290/650 go 116 cards 2 | quiz ok box 528/650 go 619
+graphs:bar_graph 1366x650                    card ok box 331/650 go 558 | boss ok box 518/595 go 645 | race ok box 478/650 go 635 | worksheet tall box 808/650 go 116 cards 0 | quiz tall box 1086/584 go 640
+data_analysis:mean 1366x650                  card tall box 602/595 go 645 | worksheet tall box 671(paper)/650 go 116 cards 0 | quiz tall box 757/584 go 640
+probability:probability_basic 1366x650       card tall box 602/650 go 742 | worksheet tall box 930/650 go 116 cards 0 | quiz tall box 613/584 go 640
+data_mixed:data_stats_all 1366x650           card tall box 654/595 go 645 | worksheet ok box 460/650 go 116 cards 1 | quiz ok box 301/650 go 392
+patterns:seq_2 1366x650                      card ok box 469(paper)/650 go 523 | worksheet ok box 461/650 go 116 cards 0 | quiz ok box 301/650 go 392
+algebra:tape_diagram 1366x650                card ok box 537/650 go 603 | worksheet ok box 644/650 go 116 cards 0 | quiz ok box 579/584 go 640
+order_of_operations:oop_easy 1366x650        card ok box 306/650 go 372 | worksheet ok box 581(paper)/650 go 116 cards 3 | quiz ok box 301/650 go 392
+placevalue:more_less_10 1366x650             card ok box 296/650 go 366 | worksheet ok box 294/650 go 116 cards 6 | quiz ok box 303/650 go 398
+number_sense:rounding_visual 1366x650        card ok box 458/650 go 524 | worksheet ok box 429/650 go 116 cards 1 | quiz ok box 479/650 go 570
+number_theory:prime_composite 1366x650       card ok box 523(paper)/650 go 511 | worksheet tall box 769(paper)/650 go 116 cards 0 | quiz tall box 692/584 go 640
+algebra_mixed:patterns_all 1366x650          card ok box 520/650 go 586 | worksheet ok box 293/650 go 116 cards 1 | quiz ok box 351/650 go 442
+all_mixed:all_domains_mixed 1366x650         card tall box 645/595 go 645 | worksheet ok box 343/650 go 116 cards 1 | quiz ok box 514/584 go 640
+vocabulary:vocab_grade_K 1366x650            card ok box 509/650 go 509 | worksheet ok box 506(paper)/650 go 116 cards 3 | quiz ok box 401/650 go 492
+addition:add_column_multi 1366x650           card ok box 564/595 go 645 | boss tall box 715/595 go 645 | race tall box 707/595 go 645 | worksheet ok box 492/650 go 116 cards 3 | quiz tall box 631/584 go 640
+addition:add 1366x650                        card ok box 443/650 go 515 | boss ok box 528/650 go 600 | race ok box 520/650 go 592 | worksheet ok box 371/650 go 116 cards 3 | quiz ok box 444/650 go 535
+subtraction:subtract 1366x650                card ok box 443/650 go 515 | worksheet ok box 371/650 go 116 cards 3 | quiz ok box 444/650 go 535
+division:long_div_2digit 1366x650            card ok box 295/595 go 645 | boss ok box 381/595 go 645 | race ok box 373/595 go 645 | worksheet ok box 311/650 go 116 cards 0 | quiz ok box 302/584 go 640
+addition:add_wp_10 1366x650                  card tall box 758/595 go 645 | boss tall box 843/595 go 645 | race tall box 835/595 go 645 | worksheet tall box 657/650 go 116 cards 0 | quiz tall box 629/584 go 640
+addition:number_line_add 1366x650            card ok box 498/650 go 574 | worksheet ok box 468/650 go 116 cards 1 | quiz ok box 505/650 go 606
+multiplication:area_model_mult 1366x650      card ok box 389/650 go 572 | worksheet ok box 333/650 go 116 cards 2 | quiz ok box 396/650 go 604
+multiplication:arrays_groups 1366x650        card ok box 285/650 go 600 | worksheet ok box 313/650 go 116 cards 3 | quiz ok box 287/650 go 627
+division:div_remainders 1366x650             card ok box 397/650 go 464 | worksheet ok box 575/650 go 116 cards 3 | quiz ok box 500/650 go 598
+composing:ten_frame_build 1366x650           card ok box 398(paper)/650 go 452 | worksheet ok box 413(paper)/650 go 116 cards 3 | quiz ok box 405(paper)/650 go 483
+composing:base10_build 1366x650              card tall box 665(paper)/595 go 645 | worksheet ok box 610(paper)/650 go 116 cards 2 | quiz tall box 670(paper)/584 go 640
+measurement:time_quarter 1366x650            card ok box 579/595 go 645 | worksheet ok box 519/650 go 116 cards 3 | quiz ok box 579/584 go 640
+counting:count_objects 1280x600              card ok box 355/600 go 421 | boss ok box 504/545 go 595 | race ok box 496/545 go 595 | worksheet ok box 385/600 go 116 cards 3 | quiz ok box 425/600 go 579
+comparing:compare_groups 1280x600            card ok box 534/545 go 595 | worksheet ok box 494/600 go 116 cards 3 | quiz tall box 538/534 go 590
+composing:number_bonds 1280x600              card ok box 543/545 go 595 | worksheet ok box 318/600 go 116 cards 3 | quiz tall box 550/534 go 590
+counting_mixed:counting_all 1280x600         card ok box 292/600 go 421 | worksheet tall box 697(paper)/600 go 116 cards 0 | quiz tall box 581/534 go 590
+addition:add_facts 1280x600                  card ok box 443/600 go 515 | boss ok box 528/545 go 595 | race ok box 520/600 go 592 | worksheet ok box 371/600 go 116 cards 3 | quiz ok box 444/600 go 535
+subtraction:sub_facts 1280x600               card ok box 443/600 go 515 | worksheet ok box 371/600 go 116 cards 3 | quiz ok box 444/600 go 535
+multiplication:mult_facts 1280x600           card ok box 443/600 go 515 | worksheet ok box 371/600 go 116 cards 3 | quiz ok box 444/600 go 535
+division:div_facts 1280x600                  card ok box 306/600 go 384 | worksheet ok box 296/600 go 116 cards 6 | quiz ok box 307/600 go 404
+integers:number_line_int 1280x600            card ok box 506/600 go 572 | worksheet ok box 590/600 go 116 cards 0 | quiz tall box 557/534 go 590
+number_ops_mixed:word_problems_mixed 1280x600 card ok box 507/545 go 595 | worksheet tall box 611/600 go 116 cards 0 | quiz tall box 608/534 go 590
+fractions:identify 1280x600                  card ok box 445/600 go 511 | worksheet ok box 470/600 go 116 cards 3 | quiz tall box 541/534 go 590
+fraction_operations:add_fractions_like 1280x600 card ok box 442(paper)/600 go 430 | worksheet ok box 531/600 go 116 cards 3 | quiz tall box 554/534 go 590
+decimals:add_decimal 1280x600                card tall box 787/545 go 595 | worksheet ok box 290/600 go 116 cards 6 | quiz ok box 301/600 go 392
+conversions:f_to_d 1280x600                  card ok box 484(paper)/600 go 538 | worksheet ok box 584/600 go 116 cards 0 | quiz ok box 517/534 go 590
+frac_dec_mixed:fractions_all 1280x600        card tall box 563/600 go 626 | worksheet ok box 515(paper)/600 go 116 cards 2 | quiz ok box 301/600 go 392
+shapes_early:name_2d_shapes 1280x600         card ok box 559/600 go 559 | worksheet tall box 689(paper)/600 go 116 cards 0 | quiz tall box 591/534 go 590
+area_perimeter:perimeter_intro 1280x600      card tall box 566/545 go 595 | worksheet ok box 552/600 go 116 cards 0 | quiz tall box 633/534 go 590
+angles_lines:identify_angles 1280x600        card ok box 600/600 go 600 | worksheet tall box 812(paper)/600 go 116 cards 0 | quiz ok box 517/534 go 590
+shapes_classify:classify_triangles 1280x600  card ok box 585/600 go 585 | worksheet tall box 626(paper)/600 go 116 cards 0 | quiz ok box 301/600 go 392
+coordinates:coordinate_q1 1280x600           card tall box 634/600 go 836 | worksheet ok box 290/600 go 116 cards 2 | quiz ok box 301/600 go 392
+measurement:time_hour 1280x600               card tall box 579/545 go 595 | worksheet ok box 519/600 go 116 cards 3 | quiz tall box 579/534 go 590
+geo_mixed:geometry_all 1280x600              card tall box 598/600 go 672 | worksheet ok box 290/600 go 116 cards 2 | quiz ok box 528/534 go 590
+graphs:bar_graph 1280x600                    card ok box 342/600 go 575 | boss ok box 540/545 go 595 | race ok box 488/545 go 595 | worksheet tall box 808/600 go 116 cards 0 | quiz tall box 1086/534 go 590
+data_analysis:mean 1280x600                  card tall box 602/545 go 595 | worksheet tall box 671(paper)/600 go 116 cards 0 | quiz tall box 757/534 go 590
+probability:probability_basic 1280x600       card tall box 602/600 go 742 | worksheet tall box 930/600 go 116 cards 0 | quiz tall box 613/534 go 590
+data_mixed:data_stats_all 1280x600           card tall box 654/545 go 595 | worksheet ok box 460/600 go 116 cards 1 | quiz ok box 301/600 go 392
+patterns:seq_2 1280x600                      card ok box 469(paper)/600 go 523 | worksheet ok box 461/600 go 116 cards 0 | quiz ok box 301/600 go 392
+algebra:tape_diagram 1280x600                card ok box 537/545 go 595 | worksheet tall box 644/600 go 116 cards 0 | quiz tall box 579/534 go 590
+order_of_operations:oop_easy 1280x600        card ok box 306/600 go 372 | worksheet ok box 581(paper)/600 go 116 cards 3 | quiz ok box 301/600 go 392
+placevalue:more_less_10 1280x600             card ok box 296/600 go 366 | worksheet ok box 294/600 go 116 cards 6 | quiz ok box 303/600 go 398
+number_sense:rounding_visual 1280x600        card ok box 458/600 go 524 | worksheet ok box 429/600 go 116 cards 1 | quiz ok box 479/600 go 570
+number_theory:prime_composite 1280x600       card ok box 523(paper)/600 go 511 | worksheet tall box 769(paper)/600 go 116 cards 0 | quiz tall box 692/534 go 590
+algebra_mixed:patterns_all 1280x600          card ok box 520/600 go 586 | worksheet ok box 293/600 go 116 cards 1 | quiz ok box 351/600 go 442
+all_mixed:all_domains_mixed 1280x600         card tall box 645/545 go 595 | worksheet ok box 343/600 go 116 cards 1 | quiz ok box 514/534 go 590
+vocabulary:vocab_grade_K 1280x600            card ok box 509/600 go 509 | worksheet ok box 506(paper)/600 go 116 cards 3 | quiz ok box 401/600 go 492
+addition:add_column_multi 1280x600           card tall box 564/545 go 595 | boss tall box 715/545 go 595 | race tall box 707/545 go 595 | worksheet ok box 492/600 go 116 cards 3 | quiz tall box 631/534 go 590
+addition:add 1280x600                        card ok box 443/600 go 515 | boss ok box 528/545 go 595 | race ok box 520/600 go 592 | worksheet ok box 371/600 go 116 cards 3 | quiz ok box 444/600 go 535
+subtraction:subtract 1280x600                card ok box 443/600 go 515 | worksheet ok box 371/600 go 116 cards 3 | quiz ok box 444/600 go 535
+division:long_div_2digit 1280x600            card ok box 295/545 go 595 | boss ok box 381/545 go 595 | race ok box 373/545 go 595 | worksheet ok box 311/600 go 116 cards 0 | quiz ok box 302/534 go 590
+addition:add_wp_10 1280x600                  card tall box 758/545 go 595 | boss tall box 843/545 go 595 | race tall box 835/545 go 595 | worksheet tall box 657/600 go 116 cards 0 | quiz tall box 629/534 go 590
+addition:number_line_add 1280x600            card ok box 498/600 go 574 | worksheet ok box 468/600 go 116 cards 1 | quiz ok box 505/534 go 590
+multiplication:area_model_mult 1280x600      card ok box 389/600 go 572 | worksheet ok box 333/600 go 116 cards 2 | quiz ok box 396/534 go 590
+multiplication:arrays_groups 1280x600        card ok box 285/600 go 581 | worksheet ok box 313/600 go 116 cards 3 | quiz ok box 287/534 go 590
+division:div_remainders 1280x600             card ok box 397/600 go 464 | worksheet ok box 575/600 go 116 cards 0 | quiz ok box 500/534 go 590
+composing:ten_frame_build 1280x600           card ok box 398(paper)/600 go 452 | worksheet ok box 413(paper)/600 go 116 cards 3 | quiz ok box 405(paper)/600 go 483
+composing:base10_build 1280x600              card tall box 665(paper)/545 go 595 | worksheet tall box 610(paper)/600 go 116 cards 0 | quiz tall box 670(paper)/534 go 590
+measurement:time_quarter 1280x600            card tall box 579/545 go 595 | worksheet ok box 519/600 go 116 cards 3 | quiz tall box 579/534 go 590
+
+Genuinely tall items (may scroll; active-box brings the box into view):
+  counting_mixed:counting_all 1366x650 worksheet: problem 503 px; box 697 > fold 650; on load NOT in view (box 697, fold 650)
+  number_ops_mixed:word_problems_mixed 1366x650 quiz: problem 430 px; box 608 > fold 584; on load in view
+  decimals:add_decimal 1366x650 card: problem 615 px; box 787 > fold 595; on load in view
+  shapes_early:name_2d_shapes 1366x650 worksheet: problem 495 px; box 689 > fold 650; on load NOT in view (box 689, fold 650)
+  shapes_early:name_2d_shapes 1366x650 quiz: problem 413 px; box 591 > fold 584; on load in view
+  area_perimeter:perimeter_intro 1366x650 quiz: problem 455 px; box 633 > fold 584; on load in view
+  angles_lines:identify_angles 1366x650 worksheet: problem 618 px; box 812 > fold 650; on load NOT in view (box 812, fold 650)
+  coordinates:coordinate_q1 1366x650 card: problem 689 px; box 659 > fold 650; on load in view
+  geo_mixed:geometry_all 1366x650 card: problem 522 px; its own Submit 694 > 650 (the answer box 620 shows)
+  graphs:bar_graph 1366x650 worksheet: problem 614 px; box 808 > fold 650; on load in view
+  graphs:bar_graph 1366x650 quiz: problem 908 px; box 1086 > fold 584; on load NOT in view (box 1086, fold 584)
+  data_analysis:mean 1366x650 card: problem 430 px; box 602 > fold 595; on load in view
+  data_analysis:mean 1366x650 worksheet: problem 477 px; box 671 > fold 650; on load NOT in view (box 671, fold 650)
+  data_analysis:mean 1366x650 quiz: problem 579 px; box 757 > fold 584; on load in view
+  probability:probability_basic 1366x650 card: problem 570 px; its own Submit 742 > 650 (the answer box 602 shows)
+  probability:probability_basic 1366x650 worksheet: problem 736 px; box 930 > fold 650; on load in view
+  probability:probability_basic 1366x650 quiz: problem 435 px; box 613 > fold 584; on load in view
+  data_mixed:data_stats_all 1366x650 card: problem 482 px; box 654 > fold 595; on load in view
+  number_theory:prime_composite 1366x650 worksheet: problem 575 px; box 769 > fold 650; on load NOT in view (box 769, fold 650)
+  number_theory:prime_composite 1366x650 quiz: problem 514 px; box 692 > fold 584; on load in view
+  all_mixed:all_domains_mixed 1366x650 card: problem 473 px; box 645 > fold 595; on load in view
+  addition:add_column_multi 1366x650 boss: problem 458 px; box 715 > fold 595; on load in view
+  addition:add_column_multi 1366x650 race: problem 458 px; box 707 > fold 595; on load in view
+  addition:add_column_multi 1366x650 quiz: problem 453 px; box 631 > fold 584; on load in view
+  addition:add_wp_10 1366x650 card: problem 586 px; box 758 > fold 595; on load in view
+  addition:add_wp_10 1366x650 boss: problem 586 px; box 843 > fold 595; on load in view
+  addition:add_wp_10 1366x650 race: problem 586 px; box 835 > fold 595; on load in view
+  addition:add_wp_10 1366x650 worksheet: problem 463 px; box 657 > fold 650; on load in view
+  addition:add_wp_10 1366x650 quiz: problem 451 px; box 629 > fold 584; on load in view
+  composing:base10_build 1366x650 card: problem 493 px; box 665 > fold 595; on load NOT in view (box 665, fold 595)
+  composing:base10_build 1366x650 quiz: problem 492 px; box 670 > fold 584; on load NOT in view (box 670, fold 584)
+  comparing:compare_groups 1280x600 quiz: problem 360 px; box 538 > fold 534; on load NOT in view (box 538, fold 534)
+  composing:number_bonds 1280x600 quiz: problem 372 px; box 550 > fold 534; on load in view
+  counting_mixed:counting_all 1280x600 worksheet: problem 503 px; box 697 > fold 600; on load NOT in view (box 697, fold 600)
+  counting_mixed:counting_all 1280x600 quiz: problem 403 px; box 581 > fold 534; on load in view
+  integers:number_line_int 1280x600 quiz: problem 379 px; box 557 > fold 534; on load in view
+  number_ops_mixed:word_problems_mixed 1280x600 worksheet: problem 417 px; box 611 > fold 600; on load in view
+  number_ops_mixed:word_problems_mixed 1280x600 quiz: problem 430 px; box 608 > fold 534; on load in view
+  fractions:identify 1280x600 quiz: problem 363 px; box 541 > fold 534; on load in view
+  fraction_operations:add_fractions_like 1280x600 quiz: problem 376 px; box 554 > fold 534; on load in view
+  decimals:add_decimal 1280x600 card: problem 615 px; box 787 > fold 545; on load in view
+  frac_dec_mixed:fractions_all 1280x600 card: problem 454 px; its own Submit 626 > 600 (the answer box 563 shows)
+  shapes_early:name_2d_shapes 1280x600 worksheet: problem 495 px; box 689 > fold 600; on load NOT in view (box 689, fold 600)
+  shapes_early:name_2d_shapes 1280x600 quiz: problem 413 px; box 591 > fold 534; on load in view
+  area_perimeter:perimeter_intro 1280x600 card: problem 394 px; box 566 > fold 545; on load in view
+  area_perimeter:perimeter_intro 1280x600 quiz: problem 455 px; box 633 > fold 534; on load in view
+  angles_lines:identify_angles 1280x600 worksheet: problem 618 px; box 812 > fold 600; on load NOT in view (box 812, fold 600)
+  shapes_classify:classify_triangles 1280x600 worksheet: problem 432 px; box 626 > fold 600; on load NOT in view (box 626, fold 600)
+  coordinates:coordinate_q1 1280x600 card: problem 664 px; box 634 > fold 600; on load in view
+  measurement:time_hour 1280x600 card: problem 407 px; box 579 > fold 545; on load in view
+  measurement:time_hour 1280x600 quiz: problem 401 px; box 579 > fold 534; on load in view
+  geo_mixed:geometry_all 1280x600 card: problem 500 px; its own Submit 672 > 600 (the answer box 598 shows)
+  graphs:bar_graph 1280x600 worksheet: problem 614 px; box 808 > fold 600; on load in view
+  graphs:bar_graph 1280x600 quiz: problem 908 px; box 1086 > fold 534; on load NOT in view (box 1086, fold 534)
+  data_analysis:mean 1280x600 card: problem 430 px; box 602 > fold 545; on load in view
+  data_analysis:mean 1280x600 worksheet: problem 477 px; box 671 > fold 600; on load NOT in view (box 671, fold 600)
+  data_analysis:mean 1280x600 quiz: problem 579 px; box 757 > fold 534; on load in view
+  probability:probability_basic 1280x600 card: problem 570 px; box 602 > fold 600; on load in view
+  probability:probability_basic 1280x600 worksheet: problem 736 px; box 930 > fold 600; on load in view
+  probability:probability_basic 1280x600 quiz: problem 435 px; box 613 > fold 534; on load in view
+  data_mixed:data_stats_all 1280x600 card: problem 482 px; box 654 > fold 545; on load in view
+  algebra:tape_diagram 1280x600 worksheet: problem 450 px; box 644 > fold 600; on load in view
+  algebra:tape_diagram 1280x600 quiz: problem 401 px; box 579 > fold 534; on load in view
+  number_theory:prime_composite 1280x600 worksheet: problem 575 px; box 769 > fold 600; on load NOT in view (box 769, fold 600)
+  number_theory:prime_composite 1280x600 quiz: problem 514 px; box 692 > fold 534; on load in view
+  all_mixed:all_domains_mixed 1280x600 card: problem 473 px; box 645 > fold 545; on load in view
+  addition:add_column_multi 1280x600 card: problem 392 px; box 564 > fold 545; on load in view
+  addition:add_column_multi 1280x600 boss: problem 458 px; box 715 > fold 545; on load in view
+  addition:add_column_multi 1280x600 race: problem 458 px; box 707 > fold 545; on load in view
+  addition:add_column_multi 1280x600 quiz: problem 453 px; box 631 > fold 534; on load in view
+  addition:add_wp_10 1280x600 card: problem 586 px; box 758 > fold 545; on load in view
+  addition:add_wp_10 1280x600 boss: problem 586 px; box 843 > fold 545; on load in view
+  addition:add_wp_10 1280x600 race: problem 586 px; box 835 > fold 545; on load in view
+  addition:add_wp_10 1280x600 worksheet: problem 463 px; box 657 > fold 600; on load in view
+  addition:add_wp_10 1280x600 quiz: problem 451 px; box 629 > fold 534; on load in view
+  composing:base10_build 1280x600 card: problem 493 px; box 665 > fold 545; on load NOT in view (box 665, fold 545)
+  composing:base10_build 1280x600 worksheet: problem 416 px; box 610 > fold 600; on load NOT in view (box 610, fold 600)
+  composing:base10_build 1280x600 quiz: problem 492 px; box 670 > fold 534; on load NOT in view (box 670, fold 534)
+  measurement:time_quarter 1280x600 card: problem 407 px; box 579 > fold 545; on load in view
+  measurement:time_quarter 1280x600 quiz: problem 401 px; box 579 > fold 534; on load in view
+ws-chromebook-fit: OK
