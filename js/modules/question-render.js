@@ -1667,6 +1667,10 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.querySelectorAll('[data-mq-cell]').forEach((slot, k) => {
             if (!ib[k]) return;
             ib[k].classList.add('mq-cellslot');
+            // Critic r2 N2: a fixed-width kit slot (a unit-form place) takes exactly its width, so a
+            // wrong digit fills the box and advanceIfFull hands the caret on as on the other hosts.
+            const sw = parseInt(slot.getAttribute('data-mq-w'), 10);
+            if (slot.getAttribute('data-mq-fixed') === '1' && sw > 0) ib[k].setAttribute('maxlength', String(sw));
             slot.appendChild(ib[k]);
             slot.removeAttribute('data-mq-cell');      // wired here: the generic slot pass leaves it
         });
