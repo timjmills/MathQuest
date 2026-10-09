@@ -167,6 +167,10 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
 - Keyboard: Tab to a number; Space / Enter counts the next mark in counting order
   (`touchDotOrder`). The number's button has an `aria-label` ("7: 7 touch dots. Tap to count."),
   and the count is in an `aria-live` region.
+- **Built in** `js/modules/touch-tap.js` (installed from `globals.js`) for every touch numeral on the
+  practice card, the online worksheet and the quiz; CSS at the end of `css/screen-cell.css`
+  (`.mq-tn-hit`, `.mq-tn-count`); gate `node tests/scripts/ws-touch-tap.cjs`. The count line says
+  "Touched N" (the count-by running total "· 30" is not drawn yet). The ÷ tally row is not tappable.
 
 ### S1.9 API (`js/modules/sheet/touchdots.js`, pure, SCC-01)
 

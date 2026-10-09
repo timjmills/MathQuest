@@ -1619,8 +1619,7 @@ html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-
 
 /* Touch numerals floor (WORKSHEET_DESIGN_STANDARD SF-34, 2026-10-03): a grid cell holding touch
    numerals draws its digits at 40 px, never the 29 px grid size. Additive. */
-.mq-scell.mq-grid-cell:has(.ws-tn) { --mq-digit: 40px; }
-.mq-scell.mq-grid-cell[data-mq-touch-floor] { --mq-digit: 40px; }   /* kept for the rest of the ladder */
+/* (one rule with the touch-dots floor at the end of this file) */
 /* ---- Wave 1 / A3 (owner 2026-10-03): the WRONG DIGITS blink red, 3 cycles of 1.2 s, then hold steady red.
    Practice card and online worksheet only; the A2 dashed edge and cross stay (colour is never the only cue).
    Reduced motion: no blink, the steady red only. Additive: older saved HTML never carries these classes. */
@@ -1708,4 +1707,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* Touch dots floor (design/SUPPORTS.md S1.6, owner 2026-10-04: "worksheet mode touchpoints might be too small"): a grid
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
-.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
+.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td),
+.mq-scell.mq-grid-cell[data-mq-touch-floor] { --mq-digit: 40px; }   /* touch floor: also set from the start when the item's ladder has a touch rung, so no cell grows mid-ladder */
+
+/* Touch numerals are tappable on screen (SUPPORTS S1.8): each number is a target of at least 44 x 44 px,
+   centred on it; the running count sits under the cell, outside the B&W cell. Additive. */
+.ws-tn.mq-tn-hit { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.ws-tn.mq-tn-hit::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+.ws-tn.mq-tn-hit:focus-visible { outline: 3px solid var(--mq-focus, #1a73e8); outline-offset: 2px; border-radius: 4px; }
+.mq-tn-count { font-family: Andika, sans-serif; font-size: 16px; color: #595959; margin: 6px 0 0; display: flex; gap: 12px; align-items: center; justify-content: center; }
+.mq-tn-count .mq-tn-reset { min-height: 44px; padding: 0 14px; font: inherit; border: 1px solid #949494; border-radius: 8px; background: #fff; color: #222; cursor: pointer; }
