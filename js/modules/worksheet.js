@@ -14,7 +14,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
+    fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
@@ -974,6 +974,7 @@ function _wsFitCard(card) {
             if (kids[0].dataset.mqFitShort === '1') return false;
         }
     }
+    capDotArrays(cellEl);
     // a drawing that scrolls inside itself (a long number line) does not fit this column either
     if (Array.from(cellEl.querySelectorAll('[data-mq-scroll]')).some(s => s.scrollWidth > s.clientWidth + 1)) return false;
     return cellEl.scrollWidth <= cellEl.clientWidth + 1;

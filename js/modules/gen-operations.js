@@ -2823,7 +2823,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     window.tagDistractor(q, String(rows * (cols - 1)), "Off by one column \u2014 re-count how many DOTS are in each row.");
                 }
                 q.visual = `<div style="text-align:center;">
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
+                    <svg class="mq-dotarray" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
                         ${dots}
                     </svg>
                     <div style="margin-top:6px;font-size:0.95rem;color:${COLORS.text};font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
