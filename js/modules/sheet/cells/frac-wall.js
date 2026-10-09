@@ -66,15 +66,20 @@ register('frac-wall', {
             parts.push(unitSlot(ctx, i, shown[i] || '', dp));
         });
         parts.push(`<span style="flex:none;font-size:${P(ctx, dp)};font-weight:700;">=</span><span style="flex:none;font-size:${P(ctx, dp)};font-weight:700;">1</span>`);
-        const answer = `<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:${L(ctx, 1.6 * k)};max-width:${L(ctx, w + 12)};margin:${L(ctx, 5 * k)} auto 0;">${parts.join('')}</div>`;
+        // the key says the pieces are order-free (critic r4 D-H4): a note under the sentence, out of
+        // the flow so the key cell keeps the pupil cell's height
+        const keyed = !isTwin(ctx) && combo.length > 1 && shown.some((x) => x !== '');
+        const note = keyed ? `<span style="position:absolute;left:0;right:0;top:100%;text-align:center;font-size:${P(ctx, pt - 1)};font-weight:400;line-height:1.1;color:${INK};">(any order)</span>` : '';
+        const answer = `<div style="position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:${L(ctx, 1.6 * k)};max-width:${L(ctx, w + 12)};margin:${L(ctx, 5 * k)} auto 0;">${parts.join('')}${note}</div>`;
         return root(ctx, 'k2-fracwall', `<div style="display:inline-block;">${whole}<div style="margin-top:${L(ctx, 2 * k)};display:flex;flex-direction:column;gap:${L(ctx, 1.2 * k)};">${wall}</div>${answer}</div>`);
     },
     answerKey(p) {
         const combo = (p.combo || []).map(Number);
         const v = combo.map((d) => `1/${d}`).join(' + ');
         const slots = {};
+        const display = combo.length > 1 ? `${v} (any order)` : v;
         combo.forEach((d, i) => { slots[`b${i}`] = { value: String(d), graded: true }; });
-        return { value: v, display: v, slots };
+        return { value: v, display, slots };
     },
     footprint(p, ctx) {
         const w = wholeMm(ctx || {}) + 8;

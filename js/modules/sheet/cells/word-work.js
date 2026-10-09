@@ -132,7 +132,8 @@ export function solveStory(q, { divFirst = false } = {}) {
     if (Number.isInteger(a) && Number.isInteger(b)) pool.push([a, b], [b, a]);
     for (let i = 0; i < nums.length; i++) for (let j = 0; j < nums.length; j++) if (i !== j) pool.push([nums[i], nums[j]]);
     const order = op0 ? [op0, INVERSE[op0], ...OPS] : OPS;
-    const ops = order.filter((o, i) => order.indexOf(o) === i);
+    const allowed = Array.isArray(q.storyOps) && q.storyOps.length ? q.storyOps.map(opKey) : OPS;
+    const ops = order.filter((o, i) => order.indexOf(o) === i && allowed.includes(o));
     const inText = (n) => nums.includes(n);
     if (divFirst) {
         for (const [x, y] of pool) if (inText(x) && inText(y) && fits(x, '/', y, ans, true)) return makeStep(x, '/', y, ans);
@@ -954,7 +955,9 @@ function renderWork(p, ctx) {
             + `<div style="display:flex;flex-direction:column;align-items:stretch;">${storyHTML(ctx, p, true)}</div>`
             + `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 2.5)};margin-top:${L(ctx, 2)};">${p.signRow === false ? '' : signRow(ctx, st.op, put ? sh.picks[0] : null, 0)}${ansB}</div></div>`;
     }
-    const noSigns = p.signs === false;
+    // `signRow: false` (a story on a pool page, critic r4 D-C): the column frame's sign box is the
+    // ONE place the sign is answered, so no + − × ÷ row to circle as well (H8).
+    const noSigns = p.signs === false || p.signRow === false;
     const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
     const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
     const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');

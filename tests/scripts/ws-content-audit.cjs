@@ -2608,6 +2608,25 @@ function selfTest() {
         }
         out.push({ ...skill, ...res });
     }
+    // TIMES-AS-MANY STORIES (wave 1 lane D critic r4 D-A): a mult_comparison story is retold by the
+    // word-work cell from the step it is SOLVED with. 200 seeds; any + or - step is a take-away or
+    // join story on a times-as-many page, which contradicts the name.
+    for (const s of out) {
+        if (!/^mult_comparison/.test(s.skillId)) continue;
+        const r = await app.page.evaluate(async ({ categoryId, skillId, baseSeed }) => {
+            const ww = await import('/js/modules/sheet/cells/word-work.js');
+            const badItems = [];
+            for (let i = 0; i < 200; i++) {
+                try {
+                    const q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, seed: baseSeed + 5000 + i, itemIndex: i });
+                    const p = ww.wordWorkPayload(q, {});
+                    if (p && p.steps.some(st => st.op === '+' || st.op === '-')) badItems.push(`${p.steps.map(st => `${st.a}${st.op}${st.b}`).join(';')} "${String(q.text).slice(0, 50)}"`);
+                } catch (e) { /* not a story */ }
+            }
+            return badItems;
+        }, { categoryId: s.categoryId, skillId: s.skillId, baseSeed: seedFor(`${s.categoryId}:${s.skillId}`) });
+        if (r.length) s.fails.push({ cls: 'times-story-addsub', msg: `${r.length}/200 times-as-many stories solve by + or -: ${r.slice(0, 2).join(' | ')}` });
+    }
     await app.close();
 
     for (const s of out) {

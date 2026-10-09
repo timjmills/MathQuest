@@ -1367,7 +1367,9 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     // partner!" answered the question).
                     const num = rng(1, Math.min(maxNum, 20));
                     const isEven = num % 2 === 0;
-                    q.text = `Is ${num} odd or even?`;
+                    // the screen reads the paper's own instruction (critic r4 D-H5); the cell shows the number
+                    q.text = 'Odd or even? Tap one box.';
+                    q.screenInstr = 'Odd or even? Tap one box.';
                     q.ans = isEven ? "Even" : "Odd";
                     q.printAnswer = q.ans;
                     q.acceptedAnswers = [q.ans, q.ans.toLowerCase()];

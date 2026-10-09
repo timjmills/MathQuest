@@ -14,7 +14,7 @@ import { registerSkill } from '../contract.js';
 import { defaultStrings } from '../adapters.js';
 
 const TITLES = {
-    'division:missing_mult_div': 'I Can find missing factors',
+    'division:missing_mult_div': 'I Can find the missing number (×, ÷)',
     'division:div_zero_in_quotient': 'I Can divide when the quotient has a zero',
     'composing:mixed_composing': 'I Can review number sense',
     'counting_mixed:counting_all': 'I Can review counting and cardinality',

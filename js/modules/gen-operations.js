@@ -2197,6 +2197,21 @@ function _opt(id) {
     const v = o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, id) ? o[id] : undefined;
     return v === undefined ? def.default : v;
 }
+// A number family's two parts, DEALT across a page (critic r4 D-E): the family is the unordered
+// pair {a, b} (2, 8, 10 and 8, 2, 10 are one family), so a page never repeats one while the band
+// has enough; a double / square is one item in six (never three of four), the rest are dealt from
+// the unequal pairs. The order the two parts print in is still free.
+function _familyPair(key, lo, hi) {
+    const vals = [];
+    for (let v = lo; v <= hi; v++) vals.push(v);
+    const uneq = [];
+    for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++) uneq.push([vals[i], vals[j]]);
+    const sq = !uneq.length || dealIndex(`${key}:sq`, 6) === 0;
+    const pair = sq ? (v => [v, v])(dealPick(`${key}:s`, vals)) : dealPick(`${key}:n`, uneq).slice();
+    if (Math.random() < 0.5) pair.reverse();
+    return pair;
+}
+
 // ---- P12 OPTIONS (skill-options.js P12 block: the × / ÷ ladder steps and the number families) ----
 // Same rule as the layer above: each helper returns "not chosen" at the option's default, so the
 // untouched skill takes its old branch and draws the same random numbers as before.
@@ -3487,7 +3502,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _mcSpan = (lo, hi) => Array.from({ length: Math.max(1, hi - lo + 1) }, (_, i) => lo + i);
                 const base = dealPick(`mc-base:${state.skill}`, _mcSpan(2, maxBase));
                 const _mcCap = Math.max(2, Math.min(9, Math.floor(range / base)));
-                const multiplier = Math.min(_mcCap, dealPick(`mc-mult:${state.skill}`, _mcSpan(2, 9)));
+                let multiplier = Math.min(_mcCap, dealPick(`mc-mult:${state.skill}`, _mcSpan(2, 9)));
+                // r5 D-A: 2 x 2 = 4 lets 4 - 2 = 2 read as a take-away story; never deal it.
+                if (base === 2 && multiplier === 2) multiplier = Math.min(Math.max(3, _mcCap), 9);
                 const product = base * multiplier;
 
                 const namePair = pickTwoNames();
@@ -3507,6 +3524,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = base;
                     q.hint = `Divide to find the base amount: ${product} \u00F7 ${multiplier} = ${base}`;
                 }
+                // A times-as-many story is solved by x or / only (never retold as + or -). Not q.op: the
+                // name-audit reads q.op, and this skill legitimately deals both directions.
+                q.storyOps = ['*', '/'];
                 q.answerType = "number";
 
                 // Tape diagram visual: two bars showing multiplier relationship
@@ -3703,8 +3723,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // 20" = each addend to 10, so the sum is at most 20), and the level (the branch)
                 // owns only which boxes are blank. The default, 20, is the old level-2 draw.
                 const maxNum = Math.max(1, Math.floor(_p12FamilyBand('number_families_add', 20, [10, 20, 40, 100]) / 2));
-                const addend1 = rng(1, maxNum);
-                const addend2 = rng(1, maxNum);
+                const [addend1, addend2] = _familyPair(`nfa:${state.skill}`, 1, maxNum);
                 const sum = addend1 + addend2;
                 
                 // Create the four equations with consistent structure
@@ -3816,8 +3835,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // P12 (the P-1 split): `band` is the largest table (5 × 5, 10 × 10, 12 × 12) at every
                 // support level; the level (the branch) owns only which boxes are blank.
                 const maxFactor = { 25: 5, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 100, 144])] || 5;
-                const factor1 = rng(2, maxFactor);
-                const factor2 = rng(2, maxFactor);
+                const [factor1, factor2] = _familyPair(`nfm:${state.skill}`, 2, maxFactor);
                 const product = factor1 * factor2;
                 const isSquare = factor1 === factor2;
                 
@@ -4441,6 +4459,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     a, b, op: position.includes('add') || position === 'sum' ? '+' : '-', result: c,
                     unknown: position === 'first_add' || position === 'minuend' ? 'a' : position === 'second_add' || position === 'subtrahend' ? 'b' : 'result',
                     digits: String(missingMax).length + (useDec ? dp + 1 : 0),
+                    // every unknown is a box, the result too (critic r4 D-G: one slot shape a page)
+                    resultBox: true,
                 } };
                 q.options = buildNumericOptions(ans);
                 return;

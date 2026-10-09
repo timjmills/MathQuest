@@ -18,6 +18,7 @@ import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-op
 import { registerVariantOverride } from './variant-cycler.js';
 // L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
 import { dealIndex, resetPageDeals } from './page-deal.js';
+import { renderCell, wordWorkTwin } from './sheet/index.js';
 // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
 // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
 import { applyWordWork, isWordWorkSkill } from './word-work.js';
@@ -97,7 +98,20 @@ function poolCellInstructions(q, outerSkill) {
     if (!q || !q.poolMember || !q.cell || !q.cell.payload) return;
     const t = q.cell.template;
     const add = (extra) => { q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, extra) }); };
-    if (t === 'word-work' && !q.cell.payload.caption && !isWordWorkSkill(outerSkill) && q.printText) add({ caption: q.printText, captionScreen: q.screenInstr || q.printText });
+    if (t === 'word-work' && !q.cell.payload.caption && !isWordWorkSkill(outerSkill) && q.printText) {
+        // ONE sign place (critic r4 D-C, H8): the column frame's sign box. A neutral ring frame or
+        // a no-sign (remainder) story keeps its own line; every other story drops the sign row.
+        const p0 = q.cell.payload;
+        if (!p0.neutral && p0.signs !== false && Array.isArray(p0.steps) && p0.steps.length === 1 && p0.steps[0].op !== '/') {
+            const unitP = p0.unit ? ' Write the unit word.' : '';
+            const unitS = p0.unit ? ' Tap the unit word.' : '';
+            q.printText = `Write the sign. Solve.${unitP}`;
+            q.screenInstr = `Type the sign. Solve.${unitS}`;
+            add({ signRow: false, caption: q.printText, captionScreen: q.screenInstr });
+            // the screen twin is redrawn from the same payload: no tap-the-sign row there either
+            try { q.visual = wordWorkTwin(renderCell, Object.assign({}, q.cell.payload, { caption: '', captionScreen: '' })); } catch (e) { /* keep the old visual */ }
+        } else add({ caption: q.printText, captionScreen: q.screenInstr || q.printText });
+    }
     else if (t === 'base10' && !q.cell.payload.caption) add({ caption: 'Draw the number.' });
     if (outerSkill === 'mixed_multiplication' && t === 'fact' && q.cell.payload.notation === 'vertical' && q.cell.payload.boxAns !== true) add({ boxAns: true });
 }
