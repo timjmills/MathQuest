@@ -164,7 +164,8 @@ export const MULTI_KEYS = Object.freeze({
     gaps: '2W',          // hundreds_chart_fill, number_chart_fill: which squares are empty (scatter / row / column / pattern)
     grid: '2X',          // hundreds_chart_fill, number_chart_fill: the grid size (window / rows / whole)
     onePage: '2Y',       // count_by_tables: all twelve tables, x 1 to x 12, on one page
-    // Wave 1 lane C2 (sub-range 1W-1Z, count_by_tables). NEXT FREE IN 1W-1Z: 1X.
+    // Wave 1 lane C2 (sub-range 1W-1Z, count_by_tables). NEXT FREE IN 1W-1Z: 1Y.
+    spaces: '1X',        // count_by_tables (owner 2026-10-03): the answer spaces, boxes or bare write-on lines
     rows: '1W',          // count_by_tables: the list of count-by rows (step, start, direction each); written by count-rows.js encodeRows
     times: '1Z',         // count_by_tables: the multiplication fact under each number (none / every number / printed ones)
 
@@ -336,6 +337,7 @@ export const VALUE_TOKENS = Object.freeze({
     fill: Object.freeze({ two: 'T', one: 'O', half: 'H' }),
     // lane C2 (1Z)
     times: Object.freeze({ none: 'N', each: 'E', given: 'G' }),
+    spaces: Object.freeze({ box: 'B', line: 'L' }),
     gaps: Object.freeze({ scatter: 'S', row: 'R', column: 'C', pattern: 'P' }),
     grid: Object.freeze({ window: 'W', rows: 'R', whole: 'F' }),
     // block 3 (2026-09-25)

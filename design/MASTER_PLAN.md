@@ -162,3 +162,11 @@ The intervention lesson library uses the owner's **Atomised Lesson V20** format 
 small step, CCSS standard / part and EE; each lesson is tagged and tied to a skill that practises it the same way.
 It includes the prerequisite check and per-part new numbers, and builds on the paused lessons-engine branch. The
 record is `LESSON_COVERAGE.md`.
+
+## Wave 9 — Stretch and thinking pages (after the lessons are done)
+
+Owner ruling 2026-10-09: "I don't want any stretch or think pages — that is for a wave after the lessons are done."
+Stretch, Reason It, True or False?, Error analysis / Find the mistake and any other thinking page type are not built,
+redone or graded before Wave 8 is finished. Existing code for them stays as it is (nothing is deleted); a lane does
+not add, fix or score them, and a critic does not fail a lane for them. The answer key keeps working for whatever
+page types exist; no new key work is done for these pages.

@@ -65,6 +65,30 @@ const SHORT_HELP = {
     pictures: 'Off gives the same problems as text only.',
     band: 'The biggest number on the page.',
 };
+/**
+ * The option's VERY short explanation (owner 2026-10-03): the schema's `tip` (one line, e.g. "Step: how much each jump
+ * adds"), else its short help line. Every host shows it on mouse-over and behind a "?" that a touch screen can tap.
+ */
+export function optionTip(def) {
+    if (!def) return '';
+    return String(def.tip || def.helpShort || optionHelpLine(def) || '');
+}
+let _tipSeq = 0;
+/**
+ * The "?" beside a control: hover shows the tip (title), a tap or Enter shows it under the control (a touch screen has no
+ * hover). `descId` is the id of the visible line the control is described by (aria-describedby on the row).
+ */
+export function optionTipHTML(def) {
+    const tip = optionTip(def);
+    if (!tip) return { button: '', line: '', id: '' };
+    const id = `skoTip${++_tipSeq}`;
+    return {
+        id,
+        button: `<button type="button" class="sko-tip" aria-label="What is ${escHTML(def.label || def.id)}?" aria-expanded="false" aria-controls="${id}" title="${escHTML(tip)}" `
+            + `onclick="event.stopPropagation();var t=document.getElementById('${id}');if(t){t.hidden=!t.hidden;this.setAttribute('aria-expanded',String(!t.hidden));}">?</button>`,
+        line: `<span class="sko-tip-text" id="${id}" role="note" hidden>${escHTML(tip)}</span>`,
+    };
+}
 export function optionHelpLine(def) {
     if (!def) return '';
     if (def.helpShort) return String(def.helpShort);
@@ -248,7 +272,7 @@ export function optionControlHTML(def, cur, color, h) {
     }
     // enum — the option index is the control value so numeric, string and null values behave alike
     const opts = (def.values || []).map((x, i) =>
-        `<option value="${i}"${x.v === v ? ' selected' : ''}>${escHTML(x.l)}</option>`
+        `<option value="${i}"${x.v === v ? ' selected' : ''}${x.tip ? ` title="${escHTML(x.tip)}"` : ''}>${escHTML(x.l)}</option>`
     ).join('');
     // The label sits ABOVE a full-width drop-down, so a long value ("Place-value chart (place names
     // over the digits)") never pushes the label off a 420 px panel or is cut off itself.
@@ -273,11 +297,22 @@ export function mqRows(json, op, i, val) {
     let rows = normalizeRows(json);
     const at = Number(i);
     const num = Math.round(Number(val));
+    // Owner 2026-10-03: the rows stand smallest step to biggest automatically. A new row goes in at its place while the list
+    // is still in step order; once the teacher has moved rows by hand (Up / Down), a new row joins at the end, so the
+    // hand-made order is kept.
+    const sorted = rowsInStepOrder(rows);
+    const put = (list, r) => (sorted ? rowsSorted(list.concat([r])) : list.concat([r]));
     if (op === 'chip') {
         const n = Number(val);
-        rows = rows.some((r) => r.step === n) ? rows.filter((r) => r.step !== n) : rows.concat([{ step: n, start: 'step', dir: 'up' }]);
+        rows = rows.some((r) => r.step === n) ? rows.filter((r) => r.step !== n) : put(rows, { step: n, start: 'step', dir: 'up' });
     } else if (op === 'add') {
-        if (Number.isFinite(num) && num >= 1) rows = rows.concat([{ step: Math.min(STEP_MAX, num), start: 'step', dir: 'up' }]);
+        if (Number.isFinite(num) && num >= 1) rows = put(rows, { step: Math.min(STEP_MAX, num), start: 'step', dir: 'up' });
+    } else if (op === 'all') {
+        for (let n = 1; n <= 12 && rows.length < ROW_MAX; n++) if (!rows.some((r) => r.step === n)) rows = put(rows, { step: n, start: 'step', dir: 'up' });
+    } else if (op === 'none') rows = rows.filter((r) => r.step > 12);
+    else if ((op === 'up' || op === 'down') && rows[at]) {
+        const to = op === 'up' ? at - 1 : at + 1;
+        if (to >= 0 && to < rows.length) { rows = rows.slice(); [rows[at], rows[to]] = [rows[to], rows[at]]; }
     } else if (op === 'remove') rows = rows.filter((_, k) => k !== at);
     else if (op === 'clear') rows = [];
     else if (rows[at]) {
@@ -291,6 +326,16 @@ export function mqRows(json, op, i, val) {
     return JSON.stringify(normalizeRows(rows));
 }
 
+/** True when the rows stand in step order (smallest first): the automatic order, not one the teacher made by hand. */
+export function rowsInStepOrder(rows) {
+    for (let k = 1; k < rows.length; k++) if (rows[k].step < rows[k - 1].step) return false;
+    return true;
+}
+/** The rows sorted by step, smallest first (a stable sort: equal steps keep their order). */
+export function rowsSorted(rows) {
+    return rows.map((r, k) => [r, k]).sort((a, b) => a[0].step - b[0].step || a[1] - b[1]).map((x) => x[0]);
+}
+
 function _rowsControlHTML(def, rows, color, h, tip, cur) {
     const list = normalizeRows(rows);
     const id = escHTML(def.id);
@@ -299,36 +344,48 @@ function _rowsControlHTML(def, rows, color, h, tip, cur) {
     const field = 'padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;min-height:40px;box-sizing:border-box;';
     const chips = Array.from({ length: 12 }, (_, k) => k + 1).map((n) => {
         const on = list.some((r) => r.step === n);
-        return `<button type="button" aria-pressed="${on}" aria-label="Count by ${n}" onclick="${call('chip', -1, String(n))}" `
+        return `<button type="button" aria-pressed="${on}" aria-label="Count by ${n}" title="Count by ${n}: tap to add or take off this table" onclick="${call('chip', -1, String(n))}" `
             + `style="min-width:40px;min-height:40px;padding:0 6px;border:1px solid ${on ? color : 'var(--border)'};border-radius:7px;cursor:pointer;font-size:0.85rem;font-weight:${on ? 700 : 400};`
             + `background:${on ? color + '22' : 'transparent'};color:var(--text);">${n}</button>`;
     }).join('');
     const nNum = Number((cur && cur.jumps) || 12) === 15 ? 15 : 12;
+    const TIP = (def.parts || {});
+    const t = (k) => (TIP[k] ? ` title="${escHTML(TIP[k])}"` : '');
+    const small = 'min-width:40px;min-height:40px;flex:none;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;';
+    const word = 'flex:none;font-size:0.8rem;color:var(--text);white-space:nowrap;';
     const rowsHtml = list.map((r, i) => {
-        const startSel = `<select aria-label="Row ${i + 1} starts at" onchange="${call('start', i, 'this.value')}" style="${field}width:100%;padding:6px 4px;">`
-            + [['step', 'Step'], ['zero', '0'], ['custom', 'Number']]
-                .map(([v, l]) => `<option value="${v}"${r.start === v ? ' selected' : ''}>${l}</option>`).join('') + '</select>';
+        // Owner 2026-10-03: each row reads as a sentence - "Count by [3] starting at [the step] [counting on] [Up Down x]".
+        const startSel = `<select aria-label="Row ${i + 1} starts at"${t('start')} onchange="${call('start', i, 'this.value')}" style="${field}flex:1 1 92px;min-width:84px;padding:6px 4px;">`
+            + [['step', `${r.step.toLocaleString('en-US')} (the step)`], ['zero', '0'], ['custom', 'a number…']]
+                .map(([v, l]) => `<option value="${v}"${r.start === v ? ' selected' : ''}>${escHTML(l)}</option>`).join('') + '</select>';
         const atInput = r.start === 'custom'
-            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:68px;flex:none;padding:6px 4px;">` : '';
+            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number"${t('at')} onchange="${call('at', i, 'this.value')}" style="${field}width:76px;flex:none;padding:6px 4px;">` : '';
         const down = r.dir === 'down';
-        const dirBtn = `<button type="button" aria-label="Row ${i + 1} direction: ${down ? 'counting back' : 'counting on'}. Tap to change" onclick="${call('dir', i, `'${down ? 'up' : 'down'}'`)}" `
-            + `style="${field}flex:none;width:60px;padding:6px 2px;cursor:pointer;font-weight:600;font-size:0.76rem;">${down ? '&darr; Back' : '&uarr; On'}</button>`;
+        const dirSel = `<select aria-label="Row ${i + 1} counts"${t('dir')} onchange="${call('dir', i, 'this.value')}" style="${field}flex:none;width:auto;padding:6px 4px;">`
+            + `<option value="up"${down ? '' : ' selected'}>up &uarr;</option><option value="down"${down ? ' selected' : ''}>down &darr;</option></select>`;
         const lifted = down && r.start === 'custom' ? downStart(r, nNum) : null;
         const note = lifted !== null && lifted !== r.at
             ? `<div class="sko-row-note" style="font-size:0.7rem;color:var(--text-dim);padding:0 0 4px 0;">Starts at ${lifted.toLocaleString('en-US')} so the row has ${nNum} numbers.</div>` : '';
+        const move = list.length > 1
+            ? `<button type="button" aria-label="Move row ${i + 1} up"${t('move')}${i === 0 ? ' disabled' : ''} onclick="${call('up', i, '0')}" style="${small}min-width:34px;">&#9650;</button>`
+                + `<button type="button" aria-label="Move row ${i + 1} down"${t('move')}${i === list.length - 1 ? ' disabled' : ''} onclick="${call('down', i, '0')}" style="${small}min-width:34px;">&#9660;</button>` : '';
         return `<div class="sko-row-line" style="padding:6px 0;border-top:1px solid var(--border);">`
-            + `<div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;">`
-            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:66px;flex:none;padding:6px 4px;">`
-            + `<span style="flex:1 1 96px;min-width:92px;">${startSel}</span>${atInput}${dirBtn}`
-            + `<button type="button" aria-label="Remove row ${i + 1}" onclick="${call('remove', i, '0')}" style="min-width:36px;min-height:40px;flex:none;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem;">&times;</button></div>${note}</div>`;
+            + `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;">`
+            + `<span style="${word}">Count by</span>`
+            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by"${t('step')} onchange="${call('step', i, 'this.value')}" style="${field}width:70px;flex:none;padding:6px 4px;">`
+            + `<span style="${word}">starting at</span>${startSel}${atInput}${dirSel}`
+            + `<span style="flex:1 0 0;"></span>${move}`
+            + `<button type="button" aria-label="Remove row ${i + 1}" title="Remove this row" onclick="${call('remove', i, '0')}" style="${small}min-width:36px;font-size:1rem;">&times;</button></div>${note}</div>`;
     }).join('');
     const full = list.length >= ROW_MAX;
     return `<div class="sko-rows"${tip} style="font-size:0.82rem;color:var(--text);">`
         + `<div style="font-weight:600;margin-bottom:6px;">${escHTML(def.label)}</div>`
-        + `<div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px;">Tap the tables to use</div>`
+        + `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="flex:1;min-width:0;font-size:0.72rem;color:var(--text-dim);">Tap the tables to use</span>`
+        + `<button type="button" class="sko-rows-all" title="Add every table, 1 to 12" onclick="${call('all', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:0.76rem;">Select all</button>`
+        + `<button type="button" class="sko-rows-none" title="Take off every table 1 to 12 (typed steps stay)" onclick="${call('none', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:0.76rem;">Select none</button></div>`
         + `<div class="sko-rows-chips" style="display:flex;flex-wrap:wrap;gap:5px;">${chips}</div>`
         + `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;"><span style="font-size:0.72rem;color:var(--text-dim);">Or type a step</span>`
-        + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" placeholder="25" aria-label="Count by (type a number)"${full ? ' disabled' : ''} style="${field}width:96px;">`
+        + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" placeholder="25" aria-label="Count by (type a number)"${t('custom')}${full ? ' disabled' : ''} style="${field}width:96px;">`
         + `<button type="button"${full ? ' disabled' : ''} onclick="${call('add', -1, 'this.previousElementSibling.value')}" style="min-height:40px;padding:0 12px;border:1px solid ${color};border-radius:7px;background:${color}22;color:var(--text);cursor:pointer;font-weight:700;">Add</button>`
         + (list.length ? `<button type="button" onclick="${call('clear', -1, '0')}" style="min-height:40px;padding:0 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text-dim);cursor:pointer;">Clear</button>` : '')
         + `</div>`
@@ -503,7 +560,8 @@ export function skillOptionsPanelHTML(hostId, idx, categoryId, skillId, color = 
     const rows = groupedOptionRowsHTML(defs, cur, def => {
         const line = optionHelpLine(def);
         const help = line ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;line-height:1.35;">${escHTML(line)}</div>` : '';
-        return `<div style="padding:7px 0;border-bottom:1px solid var(--border);">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
+        const tp = optionTipHTML(def);
+        return `<div class="sko-has-tip" role="group" aria-label="${escHTML(def.label || def.id)}"${tp.id ? ` aria-describedby="${tp.id}"` : ''} style="position:relative;padding:7px 0;border-bottom:1px solid var(--border);">${tp.button}${optionControlHTML(def, cur, color, handlers)}${tp.line}${help}</div>`;
     });
     return `<div class="sko-panel" data-sko-host="${escHTML(hostId)}" data-sko-idx="${idx}" onclick="event.stopPropagation()"
          style="margin:4px 0 6px 0;padding:8px 12px;border-left:3px solid ${color};background:var(--bg-card-light, #f7f7fb);border-radius:0 8px 8px 0;color:var(--text);text-align:left;width:100%;box-sizing:border-box;">
@@ -618,8 +676,9 @@ function _renderTeacherPopover(el) {
     };
     const rows = groupedOptionRowsHTML(defs, cur, def => {
         const line = optionHelpLine(def);
+        const tp = optionTipHTML(def);
         const help = line ? `<p class="tv-sko-help">${escHTML(line)}</p>` : '';
-        return `<div class="tv-sko-row">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
+        return `<div class="tv-sko-row sko-has-tip" role="group" aria-label="${escHTML(def.label || def.id)}"${tp.id ? ` aria-describedby="${tp.id}"` : ''}>${tp.button}${optionControlHTML(def, cur, color, handlers)}${tp.line}${help}</div>`;
     }, 'font-size:13px;line-height:18px;font-weight:700;color:var(--tv-text);margin:16px 0 0;');
     const chosen = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : '';
     const summary = !defs.length ? 'No options to set' : (chosen || 'Standard settings');
@@ -671,7 +730,8 @@ function _placeTeacherPopover(el) {
     const vh = window.innerHeight;
     const r = _pop.rect;
     el.style.cssText = '';
-    if (vw < 600 || !r || (!r.width && !r.height)) {
+    const hasPreview = !!document.querySelector('#teacherApp .tv-preview-card');
+    if ((vw < 600 && !hasPreview) || !r || (!r.width && !r.height)) {
         el.classList.add('is-sheet');
         el.style.maxHeight = Math.round(vh * 0.85) + 'px';
         return;
@@ -680,6 +740,30 @@ function _placeTeacherPopover(el) {
     const side = document.querySelector('#teacherApp .tv-side');
     const sr = side ? side.getBoundingClientRect() : null;
     const minLeft = (sr && sr.width && getComputedStyle(side).display !== 'none' ? sr.right : 0) + 12;
+    // Owner 2026-10-03: never over the print PREVIEW. On a screen with a live preview the popover docks over the column
+    // beside it (the full height of the window), so the page stays in view and redraws as options change; where the
+    // two columns are stacked it is a bottom sheet over the lower half, leaving the preview's top half visible.
+    const prev = document.querySelector('#teacherApp .tv-preview-card');
+    const pr = prev && prev.offsetParent !== null ? prev.getBoundingClientRect() : null;
+    if (pr && pr.width > 0) {
+        const room = pr.left - minLeft - 12;
+        if (room >= 320 && pr.left > minLeft) {
+            el.classList.add('is-docked');
+            el.style.left = Math.round(minLeft) + 'px';
+            el.style.top = '12px';
+            el.style.width = Math.round(Math.min(480, room)) + 'px';
+            el.style.height = (vh - 24) + 'px';
+            el.style.maxHeight = (vh - 24) + 'px';
+            return;
+        }
+        el.classList.add('is-halfsheet');
+        // the preview's top half must show above the sheet: bring it into view when it has scrolled away
+        if (pr.top < 0 || pr.top > vh * 0.25) { try { prev.scrollIntoView({ block: 'start' }); } catch (e) { /* */ } }
+        el.style.maxHeight = Math.round(vh * 0.5) + 'px';
+        el.style.height = Math.round(vh * 0.5) + 'px';
+        if (sr && sr.width && getComputedStyle(side).display !== 'none') el.style.left = Math.round(sr.right) + 'px';
+        return;
+    }
     const w = Math.min(440, vw - minLeft - 12);
     el.style.width = w + 'px';
     el.style.maxHeight = (vh - 24) + 'px';
@@ -718,7 +802,8 @@ function _renderPopover() {
     const rows = defs.length ? groupedOptionRowsHTML(defs, cur, def => {
         const line = optionHelpLine(def);
         const help = line ? `<div style="font-size:0.72rem;color:var(--text-dim,#666);margin-top:3px;line-height:1.35;">${escHTML(line)}</div>` : '';
-        return `<div style="padding:8px 0;border-bottom:1px solid var(--border,#e5e7eb);">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
+        const tp = optionTipHTML(def);
+        return `<div class="sko-has-tip" role="group" aria-label="${escHTML(def.label || def.id)}"${tp.id ? ` aria-describedby="${tp.id}"` : ''} style="position:relative;padding:8px 0;border-bottom:1px solid var(--border,#e5e7eb);">${tp.button}${optionControlHTML(def, cur, color, handlers)}${tp.line}${help}</div>`;
     }, 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim,#666);margin:12px 0 0;')
         : '<p style="font-size:0.85rem;margin:8px 0;">This skill has nothing to choose: its generator reads none of the settings an option could change.</p>';
     // The header names the SKILL (owner, 2026-09-25); what is chosen sits under it.

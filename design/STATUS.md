@@ -7,11 +7,24 @@ Pupils mostly use **Chromebooks**; phones are rare for now. Screen work is teste
 Check/Next must be reachable at that height. Phones (390 px) get a basic check only (no page overflow, boxes tappable,
 typing works); phone-only polish is deferred to a later phone pass and listed below, never blocking a lane.
 
+**Stretch / thinking pages (owner 2026-10-09):** not built, fixed or graded until after Wave 8 (lessons) — `MASTER_PLAN.md` Wave 9. Lanes and critics skip them.
+
+**Owner answers 2026-10-09 (evening):** count-by Lines at M and L — every row two lines of 6 with ~14 mm writing lines (one rhythm);
+ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; one-page Boxes 9s–12s rows may stay slightly uneven at
+14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
+the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
+
 ### Phone pass (deferred)
+- Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
+  ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
+  unbreakable and "=" with its box (sheet/cells/pv.js frameHTML), so no line starts with "=" and no number
+  parts from its unit; any remaining 390-only line-wrap polish is deferred to the phone pass.
+- place-value "7,330 = [ ] tens 0 ones" is CLIPPED at both edges on the 390 quiz/card (critic pv-r3 P1)
 - place-value rename sentences wrapping at 390 ("=" at a line start, number split from its unit)
 - four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
 - count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
 - add_three overflow at 390 (Lane B R5) unless the page itself overflows
+- count rows, Answer spaces: Lines, card at 390 (critic countby-arrows r1 D1/D7): check the next-box yellow and right/wrong tints never cover a jump arrow at phone width (the input is now clamped to its drawn line; Chromebook hosts measure 0 overlaps)
 
 ## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
 
@@ -94,6 +107,10 @@ below; this file only points to them.
 | Per-part "New numbers" for the built lessons; per-section refresh noted as a later option | `LESSON_LIBRARY_PLAN.md` §8e |
 | **2026-09-27, recorded, not built:** answers on every printed key are reddish orange (owner 2026-10-02; was red) (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
 | **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker; several skills can be selected in one go in thumbnail or list view | `design/TEACHER_SCREENS.md` "Selecting skills" |
+
+| **2026-10-09, provisional (lead):** the four-zone place-value disk mat swipes inside its cell on a 390 px phone (SP-11a extended to disk mats) until the owner rules | `WORKSHEET_DESIGN_STANDARD.md` SP-11a |
+
+Open question (place-value disks lane): on a phone, keep the four-zone disk mat as a swipe, or draw it 2 × 2 (Th H over T O)?
 
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
@@ -215,3 +232,4 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - **mult lesson Warm-up**: `mult_properties` arrays overflow the sheet; a 2-digit by 2-digit stack spills a 4-column
   half cell; the key's answer digits need about 4 mm more row height than the pupil page.
 - 2026-10-09 div_facts forms fix round 3: builder escalated to Opus medium (the ceiling) - Mix at size L wasted space (critic R1 D14, R2 D-A) survived two Opus-low rounds.
+
