@@ -12,6 +12,9 @@ import { storiesFor } from './stories.js';
 
 /* ============================================================================ div_facts */
 
+/** An expression kept on one line: its spaces made non-breaking. */
+const nb = (t) => String(t).replace(/ /g, '\u00a0');
+
 registerSkill('division:div_facts', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['touch', 'skip', 'array', 'think', 'boxsign']),
@@ -20,15 +23,17 @@ registerSkill('division:div_facts', {
         instructionKey: 'divide',
         // Critic round 2: a missing-factor frame is easier to read than a "times what" question,
         // and skip counting to 121 by 11 is not practical - the times fact is the strategy.
+        // Critic R1 D12: the page-wide steps carry no numbers of their own (they printed "24 ÷ 6"
+        // beside a Model of 12)24); an expression never breaks across lines (NBSP inside it).
         steps: [
-            'Read the division: 24 ÷ 6.',
-            'Write the times fact with a gap: 6 × __ = 24.',
+            'Read the division.',
+            'Write the times fact with a gap.',
             'Find the missing factor. It is the answer.',
         ],
         stepsFor: (q) => {
             const [a, b] = operands(q);
             if (!Number.isInteger(a) || !Number.isInteger(b) || !b || a % b) return null;
-            return [`Read the division: ${a} ÷ ${b}.`, `Write the times fact with a gap: ${b} × __ = ${a}.`,
+            return [`Read the division: ${nb(`${a} ÷ ${b}`)}.`, `Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`,
                 'Find the missing factor. It is the answer.'];
         },
         say: '__ divided by __ equals __.',
@@ -39,9 +44,9 @@ registerSkill('division:div_facts', {
         if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return [];
         const quo = a / b;
         return [
-            step(`Read the division: ${a} ÷ ${b}.`),
-            step(`Write the times fact with a gap: ${b} × __ = ${a}.`),
-            step(`${b} × ${quo} = ${a}, so the missing factor is ${quo}.`),
+            step(`Read the division: ${nb(`${a} ÷ ${b}`)}.`),
+            step(`Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`),
+            step(`${nb(`${b} × ${quo} = ${a}`)}, so the missing factor is ${quo}.`),
             step(`Write ${quo}.`, [{ slot: 'ans', value: String(quo) }]),
         ];
     },

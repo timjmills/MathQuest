@@ -26,6 +26,7 @@ import {
 import { factRowsCapacity, gridHeightMm, cellWidthMm, SAFETY_H_MM } from '../layout.js';
 import {
     renderCell, cellAnswerKey, factDigitPt, factPadTop, EM_MM, FACT_TRACK_EM, FACT_OP_TRACK_EM, blankWidth,
+    metricsFor, SIZES,
 } from '../index.js';
 
 export const ROLE_ID = 'fact-rows';
@@ -119,10 +120,127 @@ export function factTitle(items) {
 const OP_SIGN = { add: '+', subtract: '-', multiply: 'x', divide: '/' };
 const LADDER_PTS = [28, 24, 20, 18, 16];
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
+/**
+ * A bracket's digit track on a fact-rows page, in em of the rung's digit: 1 em leaves 0.44 em
+ * between two dividend digits (under one digit's width, so "72" reads as one number) and room to
+ * write the quotient digit over its track.
+ */
+const FACT_ROW_TRACK_EM = 1;
 
 /** A division fact prints ACROSS ("24 ÷ 6 = ___", PT-FRW-6/7): vertical division is not a fact form. */
-const isAcross = (items) => items.some((it) => opOf(it.q || {}) === 'divide'
-    || /horiz/.test(String((((it.q || {}).cell || {}).payload || {}).notation || '')));
+// A division fact the teacher asked for Vertical (div_facts `divForm`) is stacked in the vertical
+// rows (up to 10 columns), like + - x; every other division fact prints across.
+// Long division and Fraction (and Mix, which deals them with Standard) are drawn in their own
+// forms too (critic R1 D5; PT-FRW-5/6): see `formRows` below.
+const notationOfItem = (it) => String((((it.q || {}).cell || {}).payload || {}).notation || '');
+const isAcross = (items) => items.some((it) => (opOf(it.q || {}) === 'divide' && notationOfItem(it) !== 'vertical')
+    || /horiz/.test(notationOfItem(it)));
+
+/* ------------------------------------------- div_facts forms on fact rows (divForm, critic R1 D5) */
+
+/** The div_facts form of an item: 'long' | 'fraction' | 'standard' | 'vertical' | ''. */
+const formOf = (it) => String(((it.q || {}).divForm) || '');
+/** The section's written forms when it is a division section with a bracket or a fraction in it, else null. */
+export function divForms(items) {
+    if (!items.length || !items.every((it) => opOf(it.q || {}) === 'divide' && formOf(it))) return null;
+    const f = new Set(items.map(formOf));
+    return f.has('long') || f.has('fraction') ? f : null;
+}
+/** Width (mm) of the widest item of `forms` at `pt` (the templates' own geometry, + the cell pads). */
+function formWidthMm(items, forms, pt, size) {
+    const em = EM_MM[pt] || (pt / 72) * 25.4;
+    // A bracket on a fact-rows page is drawn at the rung's digit with tracks from THAT digit
+    // (formCell's factRowTrack; critic R2 D-C: tracks from the size's writing height spread
+    // "72" into "7  2").
+    // (a page of one form keeps the size's writing-height track: critic R2 passed those pages)
+    const mixed = forms.size > 1;
+    const track = mixed ? em * FACT_ROW_TRACK_EM : Math.max(em * FACT_TRACK_EM, (SIZES[size] || SIZES.L).writeMm * (size === 'S' ? 1 : 0.8));
+    let w = 0;
+    for (const it of items) {
+        const o = operandsOf(it.q || {});
+        const A = String(o[0] || '').length, B = String(o[1] || '').length;
+        const f = formOf(it);
+        if (f === 'long') w = Math.max(w, (A + B + 1.1) * track + 6);
+        // the bar (digits + 0.4 em pad), two .28 em gaps, "=" (1 em), the line; + the cell's pads
+        else if (f === 'fraction') w = Math.max(w, em * (0.6 * Math.max(A, B) + 0.4 + 1 + 0.56) + blankWidth(2, size) + 10);
+        // Mix: the across sentence with its line under it (the equation template's narrow form,
+        // so every form of a Mix page is a two-line cell of one height); else the line beside it
+        else if (mixed) w = Math.max(w, Math.max(em * (0.56 * (A + B) + 2 * 0.8 + 3 * 0.18), blankWidth(2, size)) + 10);
+        // the equation template's across sentence: digits, tight "÷" and "=" tracks, the line beside
+        else w = Math.max(w, em * (0.56 * (A + B) + 2 * 0.8 + 4 * 0.18) + blankWidth(2, size) + 10);
+    }
+    return w;
+}
+/** Height (mm) of the tallest form in the section at `pt`: a bracket under its answer strip, a bar. */
+function formHeightMm(forms, pt, size, cols) {
+    const em = EM_MM[pt] || (pt / 72) * 25.4;
+    const sz = SIZES[size] || SIZES.L;
+    let h = 0;
+    // A Mix page's pads follow the size (S is the denser page, LESSONS L1); a page of one form
+    // keeps its own.
+    const pad = forms.size > 1 ? { S: 5, M: 6, L: 7 }[size] || 7 : 7;
+    if (forms.has('long')) h = Math.max(h, (sz.stripMm || sz.writeMm) + 1.3 * em + pad + 2);
+    if (forms.has('fraction')) h = Math.max(h, 2.45 * em + pad);
+    // (Mix: the across fact two lines, the sentence over its line, as tall as the other forms)
+    if (forms.has('standard')) h = Math.max(h, forms.size > 1 ? 1.3 * em + sz.writeMm + pad : ACROSS_ROW[size]);
+    // (a Mix page's cells are its forms' own height: the vertical-fact table's cell is not a floor)
+    return forms.size > 1 ? h : Math.max(h, factCellHMmSafe(cols, size));
+}
+const factCellHMmSafe = (cols, size) => { try { return factRowsCapacity(cols, size).cellH * 0.8; } catch (e) { return 0; } };
+
+/**
+ * The page for a section of bracket / fraction division facts (or Mix): every fact in its own
+ * form, one uniform cell. Columns from the Auto count down, clamped at 8 for bracket facts and 6
+ * for a 3-digit dividend (PT-FRW-5); the ladder's point size for the column count, stepped down
+ * (never below 16 pt) only when the widest fact would not fit; rows as the cell height allows.
+ * Mix keeps one third of each form: its count is a multiple of 3 where the grid allows.
+ */
+function formRows(items, input, ctx, G, labels, forms) {
+    let cols = input.columns && input.columns !== 'auto' ? Math.max(2, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
+    const notes = [];
+    if (forms.has('long')) {
+        const wide = items.some((it) => formOf(it) === 'long' && String(operandsOf(it.q || {})[0] || '').length >= 3);
+        const cap = wide ? 6 : 8;
+        if (cols > cap) { cols = cap; notes.push(`Bracket division: at most ${cap} columns (PT-FRW-5).`); }
+    }
+    let pt = 0;
+    // Mix (critic R2 D-C): every form at the Standard fact rows' rung (MIX_RUNG_PT), in the most
+    // columns at which the widest fact of each form fits at it - never a smaller rung to squeeze a
+    // fourth column in. A page whose facts do not fit the rung in 2 columns falls back below.
+    const mixPick = forms.size > 1 && !(input.columns && input.columns !== 'auto') ? pickMixRung(items, forms, ctx, Math.min(cols, 4)) : null;
+    if (mixPick) ({ cols, pt } = mixPick);
+    for (; !mixPick && cols >= 2; cols--) {
+        const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+        pt = LADDER_PTS.filter((p) => p <= factDigitPt(cols)).find((p) => formWidthMm(items, forms, p, ctx.size) <= inner) || 0;
+        if (pt) break;
+    }
+    cols = Math.max(2, cols);
+    pt = pt || 16;
+    const h = formHeightMm(forms, pt, ctx.size, cols) + (labels === 'tab' ? 2 : 0);
+    let rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / h));
+    let perPage = cols * rows;
+    if (forms.size > 1) perPage -= perPage % 3;
+    const names = [...forms].map((f) => ({ long: 'bracket', fraction: 'fraction', standard: 'across', vertical: 'vertical' }[f] || f)).join(' + ');
+    notes.unshift(`Division facts as written (${names}): ${cols} columns x ${rows} rows.`);
+    return { across: false, forms, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: tracksOf(items), gridH: G, labels, note: notes.join(' ') };
+}
+
+/** The rung every form of a Mix page is drawn at: the Standard fact rows' across rung (20 pt). */
+const MIX_RUNG_PT = 20;
+/**
+ * A Mix page's columns and rung: the most columns (from `maxCols` down to 2) at which every
+ * fact fits at MIX_RUNG_PT - the across facts on one line over their answer line, the brackets
+ * tracked from the rung's digit - so the three forms share one cell size and the across digits
+ * are the Standard rows' digits (critic R2 D-C: 15 px digits against 19 px). null when even 2
+ * columns cannot hold them at the rung.
+ */
+export function pickMixRung(items, forms, ctx, maxCols = 4) {
+    for (let cols = maxCols; cols >= 2; cols--) {
+        const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+        if (formWidthMm(items, forms, MIX_RUNG_PT, ctx.size) <= inner) return { cols, pt: MIX_RUNG_PT };
+    }
+    return null;
+}
 
 /** Digit tracks of the widest fact in the section (operands and answer, TY-22, at least 2). */
 const tracksOf = (items) => Math.max(2, ...items.map((it) => {
@@ -166,6 +284,8 @@ export function factRowsLayout(items, input) {
     const G = gridHeightMm(ctx.paper, ctx.size, header);
     const n = tracksOf(items);
     const labels = labelStyleOf(ctx.look, input.labels);
+    const forms = divForms(items);
+    if (forms) return formRows(items, input, ctx, G, labels, forms);
     if (isAcross(items)) {
         let cols = 3;
         let pt = 24;
@@ -186,12 +306,58 @@ export function factRowsLayout(items, input) {
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     if (big && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
-    const pt = verticalPt(cols, n, ctx.look);
+    // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the
+    // page drops columns until the ladder's own digit size fits, rather than shrink the digits
+    // (PG-20: content never shrinks to fit).
+    const askedCols = cols;
+    const divide = items.some((it) => opOf(it.q || {}) === 'divide');
+    // The drawn width: a 3-track division fact's divisor is shorter than its dividend, so the
+    // operator takes the tight track (cells/fact.js factOpTrackEm): n + 1 tracks of 0.72 em, inside
+    // the cell's side pads (about 4 mm).
+    const tightDiv = divide && n >= 3;
+    const fitsAt = (c) => { const pt = factDigitPt(c); return (n + 1) * FACT_TRACK_EM * (EM_MM[pt] || (pt / 72) * 25.4) <= cellWidthMm(c, LIVE_W_MM, ctx.look).inner - 4.5; };
+    while (tightDiv && cols > 5 && !fitsAt(cols)) cols--;
+    if (cols < askedCols) note = [note, `${n}-digit numbers: ${cols} columns so the digits keep their size.`].filter(Boolean).join(' ');
+    const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols) : verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
     const rows = cap.rows;
     return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, cap.cellH * 1.3), hMin: cap.cellH, digitPt: pt, tracks: n, gridH: G, labels, note };
 }
+
+
+/**
+ * A fixed count of form cells on ONE page (the fact probe, PT-FPR-6: 20 facts, one sheet): the
+ * most columns (from `maxCols` down) and the largest ladder size at which the widest fact fits its
+ * column AND ceil(count / cols) rows of the form's height fit the grid. The rows then take the
+ * grid's whole height (PG-14), so S is not left a third empty. null when even 2 columns at 16 pt
+ * cannot hold them.
+ */
+export function formGrid(items, ctx, G, forms, count, maxCols = 5) {
+    // Mix: the rung of the Standard rows, in the most columns that hold it (pickMixRung).
+    if (forms.size > 1) {
+        for (let cols = Math.min(maxCols, 4); cols >= 2; cols--) {
+            const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+            const rows = Math.ceil(count / cols);
+            const h = formHeightMm(forms, MIX_RUNG_PT, ctx.size, cols);
+            if (formWidthMm(items, forms, MIX_RUNG_PT, ctx.size) > inner || rows * h > G - SAFETY_H_MM) continue;
+            return { forms, cols, rows, perPage: cols * rows, cellH: (G - SAFETY_H_MM) / rows, hMin: h, digitPt: MIX_RUNG_PT, size: ctx.size, look: ctx.look };
+        }
+    }
+    for (let cols = maxCols; cols >= 2; cols--) {
+        const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+        const rows = Math.ceil(count / cols);
+        for (const pt of LADDER_PTS.filter((p) => p <= factDigitPt(Math.max(cols, 5)))) {
+            if (formWidthMm(items, forms, pt, ctx.size) > inner) continue;
+            const h = formHeightMm(forms, pt, ctx.size, cols);
+            if (rows * h > G - SAFETY_H_MM) continue;
+            return { forms, cols, rows, perPage: cols * rows, cellH: (G - SAFETY_H_MM) / rows, hMin: h, digitPt: pt, size: ctx.size, look: ctx.look };
+        }
+    }
+    return null;
+}
+/** One item drawn in its own form at a form grid's size (see factCell). */
+export const formCell = (it, L) => factCell(it, L);
 
 export const counts = (pools, input) => ({ main: factRowsLayout(pools.main || [], input).perPage });
 
@@ -206,6 +372,16 @@ function factCell(it, L) {
     const op = OP_SIGN[opOf(q)];
     if (o.length < 2 || !op) return it;
     const ans = answerOf(it);
+    if (L.forms) {
+        // the item's OWN cell (bracket, fraction or across), at the page's point size and tracks
+        const metrics = Object.assign({}, metricsFor(L.size || 'L', L.look || DEFAULT_LOOK, { factColumns: L.cols }),
+            { digitPt: L.digitPt, ...(L.forms.size > 1 ? { factRowTrack: (EM_MM[L.digitPt] || (L.digitPt / 72) * 25.4) * FACT_ROW_TRACK_EM } : {}) });
+        return Object.assign({}, it, {
+            // (the equation template's digits follow the page's --ws-digit: set it to the row's size)
+            render: (c) => `<div style="--ws-digit:${L.digitPt}pt">${renderCell(q, Object.assign({}, c, { columns: L.cols, metrics: Object.assign({}, c.metrics || {}, metrics) }))}</div>`,
+            key: cellAnswerKey(q), drawsAnswer: true, visual: false, cellCls: '',
+        });
+    }
     if (L.across) {
         const key = slotKey({ answer: ans }, ans);
         const digits = Math.max(2, String(ans).length);
@@ -233,7 +409,7 @@ function factCell(it, L) {
 export function plan(input = {}) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const all = poolItems(input, 'main');
-    const L = factRowsLayout(all, input);
+    const L = Object.assign({}, factRowsLayout(all, input), { size: ctx.size, look: ctx.look });
     const items = all.slice(0, L.perPage).map((it) => factCell(it, L));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));

@@ -214,3 +214,4 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   sits beside the Guided cells, under the Steps).
 - **mult lesson Warm-up**: `mult_properties` arrays overflow the sheet; a 2-digit by 2-digit stack spills a 4-column
   half cell; the key's answer digits need about 4 mm more row height than the pupil page.
+- 2026-10-09 div_facts forms fix round 3: builder escalated to Opus medium (the ceiling) - Mix at size L wasted space (critic R1 D14, R2 D-A) survived two Opus-low rounds.
