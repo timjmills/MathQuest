@@ -383,6 +383,11 @@ const TOP1 = [
     ['equivalent fractions no visuals', ['fractions:equiv_frac_nv']],
     ['addition word problems no pictures', ['addition:add_word_problems_plain']],
     ['vertex', ['shapes_early:count_sides_vertices_2d']],
+    // critic r4 R-D / R-E / C-F
+    ['corner', ['shapes_early:shape_corners_count']],
+    ['decimals to fractions', ['conversions:d_to_f']],
+    ['fractions to decimals', ['conversions:f_to_d']],
+    ['commutative property', ['multiplication:mult_properties']],
     ['input output', ['algebra:function_table_easy', 'algebra:function_table_hard']],
     ['clockwise', ['angles_lines:identify_angles']],
     ['midnight', ['measurement:time_sense']],

@@ -452,6 +452,7 @@ export const SKILL_TERMS = {
     'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles', 'clockwise', 'anticlockwise', 'counterclockwise', 'quarter turn', 'half turn', 'turns'],
     // critic r3 C-E
     'shapes_early:count_sides_vertices_2d': ['vertex', 'corner'],
+    'multiplication:mult_properties': ['commutative', 'commutative property', 'associative', 'associative property', 'turnaround facts', 'distributive property'],
     'algebra:function_table_easy': ['input output', 'in out', 'function machine'],
     'algebra:function_table_hard': ['input output', 'in out', 'function machine'],
     'placevalue:place_value_10x': ['10 times bigger', 'ten times bigger', '10 times smaller', 'ten times as much'],
@@ -496,6 +497,12 @@ export const SKILL_TERMS = {
 // The PRIMARY skill for a concept: for these exact queries it ranks first, above every match but an
 // exact label match. Keyed by 'categoryId:skillId' (a union merges cleanly); phrases are normalised.
 export const PRIMARY_SKILLS = {
+    // critic r4 R-D / R-E / C-F
+    'shapes_early:shape_corners_count': ['corner', 'corners', 'count corners'],
+    'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
+    'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
+    'multiplication:mult_properties': ['commutative property', 'commutative', 'associative property', 'associative', 'distributive property',
+        'properties of multiplication'],
     'multiplication:count_by_tables': ['skip counting', 'skip count', 'skipcounting', 'skip countin', 'count by', 'counting by',
         'count in', 'counting in', 'counting in multiples', 'skip counting by 1 to 12'],
     'multiplication:mult_facts': ['times tables', 'times table', 'timestables', 'multiplication tables', 'multiplication facts', 'times', 'multiply', 'multiplication', 'x', 'times x'],

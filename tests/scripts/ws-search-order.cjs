@@ -102,7 +102,17 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
                 el.value = v;
                 el.dispatchEvent(new Event('input', { bubbles: true }));
                 const n = document.getElementById(i + 'Fix');
-                return n && !n.hidden ? n.textContent : null;
+                if (!n || n.hidden) return null;
+                // VISIBLE, not just present (critic r4 U-B): the topmost element at the notice's centre is the notice
+                if (el.offsetParent) {
+                    n.scrollIntoView({ block: 'center' });
+                    const r = n.getBoundingClientRect();
+                    const pe = n.style.pointerEvents; n.style.pointerEvents = 'auto';
+                    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                    n.style.pointerEvents = pe;
+                    if (!r.width || !r.height || !hit || !(hit === n || n.contains(hit))) return `HIDDEN under ${hit ? hit.id || hit.className || hit.tagName : 'nothing'}`;
+                }
+                return n.textContent;
             }, id, q);
             const exp = want ? `Showing results for ${want}` : null;
             if (got !== exp) failures.push(`notice ${id} "${q}": ${JSON.stringify(got)}, want ${JSON.stringify(exp)}`);
@@ -115,6 +125,50 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
         await page.evaluate(() => { const el = document.getElementById('qbSearchInput'); el.value = 'tme'; el.dispatchEvent(new Event('input', { bubbles: true })); });
         const after = await rects();
         if (before.join('|') !== after.join('|')) failures.push(`notice moved the quiz builder filter row: ${before.join('|')} -> ${after.join('|')}`);
+        // critic r4 U-B / U-C: in EVERY box the corrected-search line is VISIBLE at Chromebook size
+        // (the topmost element at its centre is the line, probed with pointer-events on), and in the Sets
+        // picker it does not cover the Level label.
+        for (const [w, h] of [[1366, 650], [1280, 720]]) {
+            await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+            const BOXES = [
+                ['skillSearchInput', async () => { await page.evaluate(() => { window.setUserRole && window.setUserRole('student'); window.goHome && window.goHome(); }); }],
+                ['soSearchInput', async () => { await page.evaluate(() => { window.soInitialize && window.soInitialize(); window.showView('skillsOrganizerView'); }); }],
+                ['qbSearchInput', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.openQuizBuilder(); window.showView('quizBuilderView'); }); }],
+                ['tvlSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('library'); }); }],
+                ['tvSkillSearch', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('sets'); }); }],
+                ['tvPick0', async () => { await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('print'); window.tvOpenPrintWith(window.skillQueue);
+                    const b = document.querySelector('#teacherMain [data-screen="print"] [data-act="pick"]'); if (b && !document.getElementById('tvPick0')) b.click(); }); }],
+            ];
+            for (const [id, go] of BOXES) {
+                await go();
+                await sleep(400);
+                await page.focus('#' + id).catch(() => {});
+                await page.evaluate((i) => { const el = document.getElementById(i); if (el) el.value = ''; }, id);
+                await page.type('#' + id, 'tme').catch(() => {});
+                await sleep(250);
+                const res = await page.evaluate((i) => {
+                    const box = document.getElementById(i);
+                    if (!box || !box.offsetParent) return 'NO BOX';
+                    const n = document.getElementById(i + 'Fix');
+                    if (!n || n.hidden) return 'NO NOTICE';
+                    n.scrollIntoView({ block: 'nearest' });
+                    const r = n.getBoundingClientRect();
+                    const pe = n.style.pointerEvents; n.style.pointerEvents = 'auto';
+                    const pts = [[r.left + 4, r.top + r.height / 2], [r.left + r.width / 2, r.top + r.height / 2], [r.right - 4, r.top + r.height / 2]];
+                    const bad = pts.map(([x, y]) => document.elementFromPoint(x, y)).find((hit) => !hit || !(hit === n || n.contains(hit)));
+                    n.style.pointerEvents = pe;
+                    if (!r.width || !r.height) return 'ZERO SIZE';
+                    if (bad !== undefined) return `HIDDEN under ${bad ? bad.id || bad.className || bad.tagName : 'nothing'}`;
+                    if (i === 'tvSkillSearch') {
+                        const l = document.getElementById('tvLevelL').getBoundingClientRect();
+                        if (l.top < r.bottom && l.bottom > r.top && l.left < r.right && l.right > r.left) return 'COVERS the Level label';
+                    }
+                    return n.textContent;
+                }, id);
+                if (res !== 'Showing results for time') failures.push(`notice visible ${id} at ${w}x${h}: ${res}`);
+                await page.evaluate((i) => { const el = document.getElementById(i); if (el) { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); } }, id);
+            }
+        }
     } catch (e) {
         failures.push(`exception: ${e.message}`);
     } finally {

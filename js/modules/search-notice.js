@@ -9,6 +9,9 @@ import { searchCorrection, onSkillSearchReady } from './skill-finder.js';
 const BOXES = '#skillSearchInput, #quickSkillSearchInput, #mixedSkillSearchInput, #addSkillsSearchInput, #soSearchInput, ' +
     '#qbSearchInput, #tvlSearch, #tvSkillSearch, #tvRunOne, input[data-pick]';
 
+const NOTICE_CSS = 'position:absolute;z-index:30;margin:0;padding:1px 8px;border-radius:6px;white-space:nowrap;' +
+    'font-size:0.85rem;line-height:1.35;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.15);';
+
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /** The notice element for a box, made on first use. It is absolutely positioned just under the box,
@@ -22,8 +25,7 @@ function noticeFor(input, make) {
         el.id = id;
         el.className = 'mq-search-fix';
         el.setAttribute('role', 'status');
-        el.style.cssText = 'position:absolute;z-index:30;margin:0;padding:1px 8px;border-radius:6px;white-space:nowrap;' +
-            'font-size:0.85rem;line-height:1.35;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.15);';
+        el.style.cssText = NOTICE_CSS;
         (input.offsetParent || document.body).appendChild(el);
     }
     return el;
@@ -61,10 +63,26 @@ export function updateSearchNotice(input) {
     const c = searchCorrection(input.value);
     const el = noticeFor(input, !!c);
     if (!el) return;
-    if (!c) { el.hidden = true; el.textContent = ''; return; }
+    if (!c) {
+        el.hidden = true; el.textContent = '';
+        if (input.id === 'tvSkillSearch') input.parentElement.style.marginBottom = '';
+        return;
+    }
     el.hidden = false;
     el.innerHTML = `Showing results for <strong>${esc(c.to)}</strong>`;
+    // the student box: the line is the results dropdown's first row, so the dropdown never hides it (critic r4 U-B)
+    const drop = input.id === 'skillSearchInput' && document.getElementById('skillSearchResults');
+    if (drop && getComputedStyle(drop).display !== 'none') {
+        el.style.cssText = 'position:static;margin:0;padding:8px 15px;font-size:0.9rem;line-height:1.35;pointer-events:none;' +
+            'border-bottom:1px solid var(--accent-cyan);background:var(--bg-card);color:var(--text-bright);white-space:normal;';
+        drop.insertBefore(el, drop.firstChild);
+        return;
+    }
+    if (drop) el.style.cssText = NOTICE_CSS + 'z-index:1001;';
+    else if (el.style.position === 'static') el.style.cssText = NOTICE_CSS;
     place(input, el);
+    // the Sets picker: reserve a line under the box so the notice never covers the Level label (critic r4 U-C)
+    if (input.id === 'tvSkillSearch') input.parentElement.style.marginBottom = `${el.offsetHeight + 4}px`;
 }
 
 export function installSearchNotice() {
@@ -72,11 +90,11 @@ export function installSearchNotice() {
     installSearchNotice.done = true;
     document.addEventListener('input', (e) => { try { updateSearchNotice(e.target); } catch (err) { /* never break a search box */ } });
     // a notice whose box has left the screen (view change) goes with it
-    document.addEventListener('click', () => {
+    document.addEventListener('click', () => setTimeout(() => {
         for (const el of document.querySelectorAll('.mq-search-fix')) {
             const box = document.getElementById(el.id.replace(/Fix$/, '')) || document.querySelector(`input[data-pick="${el.id.replace(/^mqPick|Fix$/g, '')}"]`);
             if (!box || !box.offsetParent) el.hidden = true;
         }
-    }, true);
+    }, 0));
     onSkillSearchReady(() => { try { updateSearchNotice(document.activeElement); } catch (err) { /* ignore */ } });
 }
