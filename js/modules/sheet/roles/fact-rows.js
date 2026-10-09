@@ -160,7 +160,7 @@ function formWidthMm(items, forms, pt, size) {
         const o = operandsOf(it.q || {});
         const A = String(o[0] || '').length, B = String(o[1] || '').length;
         const f = formOf(it);
-        if (f === 'long') w = Math.max(w, (Math.max(A, mixed ? 2 : 1) + B + 1.1) * track + 6);
+        if (f === 'long') w = Math.max(w, (A + B + 1.1) * track + 6);
         // the bar (digits + 0.4 em pad), two .28 em gaps, "=" (1 em), the line; + the cell's pads
         else if (f === 'fraction') w = Math.max(w, em * (0.6 * Math.max(A, B) + 0.4 + 1 + 0.56) + blankWidth(2, size) + 10);
         // Mix: the across sentence with its line under it (the equation template's narrow form,

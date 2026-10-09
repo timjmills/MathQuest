@@ -1,6 +1,6 @@
-# div_facts "How it is written" (`divForm`): render evidence (round 3)
+# div_facts "How it is written" (`divForm`): render evidence (round 4)
 
-Rendered 2026-10-09 after the critic R2 fixes (`CRITIC-R2.md`, D-A, D-B, D-C, D-D, R-1, R-2; the R1 fixes D1-D14 stand) by `node tests/scripts/ws-grade-render.cjs --skills division:div_facts --opts '{"divForm":"<form>"}' --roles independent,lesson,guided,test,error-analysis,fact-rows,fact-probe,true-false,reason-it --size <S|L>` (screen captures with the L runs). Every page was printed by Chrome to an A4 PDF and rasterised at 96 dpi; the renderer's overflow check reported no overflow on any page or key in this set.
+Rendered 2026-10-09 after the critic R3 fixes (`CRITIC-R3.md`: N-1, N-2, N-3, R-3 and the §6 nits; the R2 fixes D-A..D-D, R-1, R-2 and the R1 fixes D1-D14 stand) by `node tests/scripts/ws-grade-render.cjs --skills division:div_facts --opts '{"divForm":"<form>"}' --roles independent,lesson,guided,test,error-analysis,fact-rows,fact-probe,true-false,reason-it --size <S|L>` (screen captures with the L runs). Every page was printed by Chrome to an A4 PDF and rasterised at 96 dpi; the renderer's overflow check reported no overflow on any page or key in this set.
 
 File names: `<form>-<size>-<role>[-key]-p<n>.png` for paper (`-key-` is that page's answer key, a facsimile of the pupil page); `<form>-L-<host>.png` for screen. Notes in brackets name the critic defect the page shows fixed.
 
@@ -27,8 +27,8 @@ Not rendered here, by design (accepted by the critic): Stretch and Word problems
 | [standard-L-lesson-key-p2.png](standard-L-lesson-key-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 2 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-L-lesson-key-p3.png](standard-L-lesson-key-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 3 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-L-lesson-p1.png](standard-L-lesson-p1.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 1 - pupil page |
-| [standard-L-lesson-p2.png](standard-L-lesson-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 2 - pupil page |
-| [standard-L-lesson-p3.png](standard-L-lesson-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 3 - pupil page |
+| [standard-L-lesson-p2.png](standard-L-lesson-p2.png) | Lesson packet, size L, page 2 - pupil page. one across look: Guided and 12 Independent (2 x 6) all with the line beside, as the stand-alone Independent page (N-2) |
+| [standard-L-lesson-p3.png](standard-L-lesson-p3.png) | Lesson packet, size L, page 3 - pupil page. practice 16 in 2 x 8, line beside, as the stand-alone Independent page (N-2) |
 | [standard-L-quiz-1280.png](standard-L-quiz-1280.png) | Screen: quiz-taking view, 1280 px |
 | [standard-L-reason-it-key-p1.png](standard-L-reason-it-key-p1.png) | Reason it, size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-L-reason-it-p1.png](standard-L-reason-it-p1.png) | Reason it, size L, page 1 - pupil page. A over B when the across line is wide |
@@ -51,7 +51,7 @@ Not rendered here, by design (accepted by the critic): Stretch and Word problems
 | [standard-S-lesson-key-p2.png](standard-S-lesson-key-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 2 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-S-lesson-key-p3.png](standard-S-lesson-key-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 3 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-S-lesson-p1.png](standard-S-lesson-p1.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 1 - pupil page |
-| [standard-S-lesson-p2.png](standard-S-lesson-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 2 - pupil page |
+| [standard-S-lesson-p2.png](standard-S-lesson-p2.png) | Lesson packet, size S, page 2 - pupil page. 21 Independent in 3 x 7, page strip 0.18 (N-3); one across look |
 | [standard-S-lesson-p3.png](standard-S-lesson-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 3 - pupil page |
 | [standard-S-reason-it-key-p1.png](standard-S-reason-it-key-p1.png) | Reason it, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [standard-S-reason-it-p1.png](standard-S-reason-it-p1.png) | Reason it, size S, page 1 - pupil page. A over B when the across line is wide |
@@ -234,11 +234,11 @@ Not rendered here, by design (accepted by the critic): Stretch and Word problems
 | [mix-L-fact-probe-key-p1.png](mix-L-fact-probe-key-p1.png) | Fact fluency probe, size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-L-fact-probe-p1.png](mix-L-fact-probe-p1.png) | Fact fluency probe, size L, page 1 - pupil page. 20 facts, one page, 20 pt rung, bottom band <= 0.27 (D-C) |
 | [mix-L-fact-rows-key-p1.png](mix-L-fact-rows-key-p1.png) | Fact rows, size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
-| [mix-L-fact-rows-p1.png](mix-L-fact-rows-p1.png) | Fact rows, size L, page 1 - pupil page. every form at the Standard rows' 20 pt rung, one cell height, bracket tracked from its own digit ("72" reads as one number) (D-C) |
+| [mix-L-fact-rows-p1.png](mix-L-fact-rows-p1.png) | Fact rows, size L, page 1 - pupil page. every form at the 20 pt rung; brackets tight (N-1), no vinculum seam |
 | [mix-L-guided-key-p1.png](mix-L-guided-key-p1.png) | Guided practice, size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-L-guided-p1.png](mix-L-guided-p1.png) | Guided practice, size L, page 1 - pupil page. a Model of each form (3 Models, across included) in row 1, every try in its own box (D-D) |
 | [mix-L-independent-key-p1.png](mix-L-independent-key-p1.png) | Independent practice, size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
-| [mix-L-independent-p1.png](mix-L-independent-p1.png) | Independent practice, size L, page 1 - pupil page. ONE cell size in 3 columns: the across fact over its answer line, the bracket and the fraction are all two-line cells; dealt order, one third each; 15 items, rows 153 px, ink side bands <= 0.26 (D-A) |
+| [mix-L-independent-p1.png](mix-L-independent-p1.png) | Independent practice, size L, page 1 - pupil page. one cell size in 3 columns; every bracket drawn tight, one track per dividend digit, as the Long form (N-1); one unbroken vinculum (no seam) |
 | [mix-L-lesson-key-p1.png](mix-L-lesson-key-p1.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-L-lesson-key-p2.png](mix-L-lesson-key-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 2 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-L-lesson-key-p3.png](mix-L-lesson-key-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size L, page 3 - ANSWER KEY (answers at the digit size, D2) |
@@ -258,11 +258,11 @@ Not rendered here, by design (accepted by the critic): Stretch and Word problems
 | [mix-S-fact-probe-key-p1.png](mix-S-fact-probe-key-p1.png) | Fact fluency probe, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-S-fact-probe-p1.png](mix-S-fact-probe-p1.png) | Fact fluency probe, size S, page 1 - pupil page. 20 facts, one page, 20 pt rung (D-C) |
 | [mix-S-fact-rows-key-p1.png](mix-S-fact-rows-key-p1.png) | Fact rows, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
-| [mix-S-fact-rows-p1.png](mix-S-fact-rows-p1.png) | Fact rows, size S, page 1 - pupil page. 20 pt rung, 27 facts in 3 x 9 (S denser than L), bracket tracked from its digit (D-C) |
+| [mix-S-fact-rows-p1.png](mix-S-fact-rows-p1.png) | Fact rows, size S, page 1 - pupil page. 20 pt rung, 27 facts in 3 x 9; brackets tight (N-1) |
 | [mix-S-guided-key-p1.png](mix-S-guided-key-p1.png) | Guided practice, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-S-guided-p1.png](mix-S-guided-p1.png) | Guided practice, size S, page 1 - pupil page. 3 Models in row 1, every try in its own box (D-D) |
 | [mix-S-independent-key-p1.png](mix-S-independent-key-p1.png) | Independent practice, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
-| [mix-S-independent-p1.png](mix-S-independent-p1.png) | Independent practice, size S, page 1 - pupil page. one cell size in 4 columns, 28 items, dealt order (D-A) |
+| [mix-S-independent-p1.png](mix-S-independent-p1.png) | Independent practice, size S, page 1 - pupil page. one cell size in 4 columns; brackets tight (N-1) |
 | [mix-S-lesson-key-p1.png](mix-S-lesson-key-p1.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-S-lesson-key-p2.png](mix-S-lesson-key-p2.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 2 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-S-lesson-key-p3.png](mix-S-lesson-key-p3.png) | Lesson packet (p1 anchor chart, p2 lesson: Guided beside the Steps + Independent, p3 practice), size S, page 3 - ANSWER KEY (answers at the digit size, D2) |
@@ -276,7 +276,7 @@ Not rendered here, by design (accepted by the critic): Stretch and Word problems
 | [mix-S-true-false-key-p1.png](mix-S-true-false-key-p1.png) | True or False, size S, page 1 - ANSWER KEY (answers at the digit size, D2) |
 | [mix-S-true-false-p1.png](mix-S-true-false-p1.png) | True or False, size S, page 1 - pupil page |
 
-## Regression comparison (round 3)
+## Regression comparison (round 4)
 
 Lesson and Independent pages of five other skills, rendered by `ws-grade-render --roles lesson,independent` at S and L from the parent `50dbfa6` (served with `MQ_ROOT`) and from this tree, then pixel-diffed (difference > 40 grey levels):
 
@@ -284,6 +284,8 @@ Lesson and Independent pages of five other skills, rendered by `ws-grade-render 
 |---|---|
 | `addition:add_facts` | Pixel-identical, every page and key, S and L |
 | `multiplication:mult_facts` | Pixel-identical, every page and key, S and L |
-| `division:long_div_2digit` | Only the bracket arc's half-stroke drop at the vinculum (R1 lane change, accepted by critic R2): 161-768 px per page |
-| `division:divide` | Lesson p2 changed on purpose (R-2): the warm-up holds 3 across facts in the one tight across look (S and L), the Independent rows hold 12 one-number division facts (12.1) instead of 6, page strip 0.31 (S) / 0.24 (L) against the parent's 0.37; p1 differs only in the Score (/9 -> /15). Independent pages identical |
-| `division:div_remainders` | Lesson p2 changed: no page runs into its footer at S or L (the parent overflowed at S; critic R2's 4.5 mm at L is gone). S: 4 warm-up + 4 Independent (/8, parent /7). L: 2 warm-up + 2 Independent (/4, parent /5) - the div_facts warm-up cell is no longer the VA-70 tall cell that let the other half stack two. Independent pages identical |
+| `division:long_div_2digit` | Only the bracket arc's join with the vinculum (161-774 px a page): the arc meets one continuous bar |
+| `division:divide` | Lesson p2 changed on purpose (R-2): warm-up 3, Independent 12, strip 0.34 (S) / 0.25 (L) against the parent's 0.37; p1 only its Score. Independent identical |
+| `division:div_remainders` | Lesson p2 changed: no overflow at S or L (the parent overflowed at S); the warm-up band is one look and one digit size (R-3: the kit cell drawn at the legacy cell's 28 pt, line beside). Independent identical |
+
+Round-4 lesson pages of the two other division skills: [cmp-r4-div_remainders-lesson-p2-S.png](cmp-r4-div_remainders-lesson-p2-S.png), [cmp-r4-div_remainders-lesson-p2-L.png](cmp-r4-div_remainders-lesson-p2-L.png), [cmp-r4-divide-lesson-p2-S.png](cmp-r4-divide-lesson-p2-S.png), [cmp-r4-divide-lesson-p2-L.png](cmp-r4-divide-lesson-p2-L.png).

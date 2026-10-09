@@ -28,7 +28,14 @@ async function inkScan(page, docHtml, { dark = 140 } = {}) {
             const R = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; };
             return Array.from(document.querySelectorAll('.ws-page')).map((pg) => {
                 const grids = Array.from(pg.querySelectorAll('.ws-grid'));
-                const cells = grids.flatMap((g) => Array.from(g.children).filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun')).map(R));
+                // `brk`: a cell holding a bracket division - the count of its dividend digits (its kind
+                // matters to a band check: a one-digit bracket is the narrowest drawing there is)
+                const brkOf = (c) => {
+                    const d = c.querySelector('[data-ws-ops="division"] [role="group"]');
+                    if (!d) return 0;
+                    return Array.from(d.children).filter((x) => /grid-row:\s*2\b/.test(x.getAttribute('style') || '') && /border-top/.test(x.getAttribute('style') || '') && /^\d$/.test(x.textContent.trim())).length;
+                };
+                const cells = grids.flatMap((g) => Array.from(g.children).filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun')).map((c) => Object.assign(R(c), { brk: brkOf(c) })));
                 const foot = pg.querySelector('.ws-foot');
                 const instr = pg.querySelector('.ws-instr, .ws-instruction, [data-ws-instr]');
                 const gr = grids.map(R);

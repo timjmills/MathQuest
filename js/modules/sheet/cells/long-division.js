@@ -32,9 +32,6 @@ import { stepMarks, WHOLE_SLOTS } from '../steps.js';
 // boxes only - a fact is recalled, not worked, so no work rows.
 const rowsOf = (p) => (p.fact ? 0 : Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
 
-/** Empty vinculum tracks before a Mix bracket fact's dividend on paper (see render): at least 2 tracks. */
-const padOf = (p, ctx) => (p.fact && p.mix && !p.rbox && !rowsOf(p) && ctx && ctx.mode !== 'screen' ? Math.max(0, 2 - String(p.dividend).length) : 0);
-
 /** The steps of the standard algorithm: where each quotient digit sits and what is written. */
 export function divisionSteps(dividend, divisor) {
     const D = String(dividend);
@@ -118,12 +115,8 @@ register('division', {
             for (let i = 0; i < n; i++) o[`q-${i}`] = s[i] === ' ' ? '' : s[i];
             return o;
         });
-        // A Mix page's bracket fact (`mix`) keeps a vinculum at least two tracks long on paper, the
-        // dividend in the ones track: "4)8" is not a third of the width of "12)108" in a row of one
-        // cell size (critic R2 D-A / D-C: 34-38 % side bands round the one-digit brackets).
-        const pad = padOf(p, ctx);
-        const o = dv + 2 + pad;
-        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n + pad}, ${g.em(trackMm)})`
+        const o = dv + 2;
+        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
             + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
         // S5 step state: {slot: {value, ink}} and one ink per work row (stepState below).
         const sv = ctx.stepVals || null;
@@ -153,8 +146,13 @@ register('division', {
         // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
         // inside its row: the arc drops half a stroke so the two meet in one line.
         html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
-        for (let i = 0; i < pad; i++) html += cell('', dv + 2 + i, 2, `border-top:${HEAVY} solid ${INK.ink};`);
-        for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid ${INK.ink};`);
+        // The vinculum is ONE rule over every dividend track (critic R3: per-track top borders showed
+        // seams at the track joins); each digit keeps the rule's place above it (a clear border, which
+        // the screen's work-row wiring still reads as "a dividend track").
+        for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid transparent;`);
+        // (it starts over the arc's own top stroke - 15 % into the arc's track, where the path starts -
+        // so the arc and the bar meet in one unbroken line, no step at the join)
+        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span>`;
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;
@@ -203,7 +201,7 @@ register('division', {
         const trackMm = rowTrack || Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
         const rows = rowsOf(p);
         return {
-            wMm: Math.ceil((n + padOf(p, ctx) + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
+            wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
             measure: !p.fact, factLike: !!p.fact, maxCols: p.fact ? 4 : 2, tracks: n + dv + 1,
         };

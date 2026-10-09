@@ -139,6 +139,10 @@ export function cellKindFor(q) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
     }
+    // div_facts' Standard form (an across division FACT): the paper's tight tracks, and on a Mix
+    // page the slot under the sentence as paper prints it (critic R3 §6: 0.7 em on screen against
+    // 0.29 em on paper; the Mix slot beside on screen, under on paper).
+    if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
     if (!v.trim()) return { kind: 'eq', ...p };
     return null;
 }
@@ -260,6 +264,17 @@ export function equationHTML(k, slotHtml) {
             + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
             + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
             + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
+    if (k.divFact) {
+        // the kit equation cell's division-fact tracks (cells/equation.js ACROSS_OP_EM / ACROSS_GAP_EM)
+        const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
+        const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
+        const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
+        if (k.mix) {
+            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
+                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+        }
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
     }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`

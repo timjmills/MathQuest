@@ -84,6 +84,18 @@ const EXAMPLE_KEYS = ['second', 'third', 'fourth'];
 
 export const measureCols = () => [1, 2, 3, 4];
 
+/**
+ * Does this across equation cell change form at `cols` - its answer line going under the sentence
+ * (cells/equation.js, a column too narrow for the line beside)? Read from its measurement: the
+ * cell is markedly taller at `cols` than at one column. A page that keeps one across look (critic
+ * R3 N-2 / R-3) does not take that column count.
+ */
+export const reflowsAt = (it, cols) => {
+    const m = (it && it.measured) || {};
+    const a = m[1], b = m[cols];
+    return !!it && it.template === 'equation' && !!a && !!b && Number.isFinite(a.hMm) && Number.isFinite(b.hMm) && b.hMm > a.hMm * 1.25;
+};
+
 const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));
 
 /** How many cells each prerequisite gets in its share of the width. */
@@ -93,9 +105,14 @@ function warmShape(pools, input) {
     const out = {};
     // A cell in a half of the width is as wide as a cell of a 4-column page: the measurement at 4
     // columns says whether it fits there (a template's own column cap is for a whole page of it).
+    // Two skills sharing the band (critic R3 R-3): a cell's hard column cap holds too - a division
+    // fact keeps its line beside the sentence, as the other skill's across cells do, so the band
+    // has one look. (One skill alone may stack its own line: every cell of the band then does.)
+    const shared = ids.length > 1;
     const fitsWidth = (its, c) => its.every((it) => {
         const m = it.measured && it.measured[c];
-        return (m ? m.fits !== false : true) && !(c > 1 && (it.fclass === 'word' || it.fclass === 'wide'));
+        return (m ? m.fits !== false : true) && !(c > 1 && (it.fclass === 'word' || it.fclass === 'wide'))
+            && !(shared && reflowsAt(it, c));
     });
     for (const id of ids) {
         const its = pools[id].slice(0, 3);
@@ -126,7 +143,11 @@ function warmShape(pools, input) {
 
 export function counts(pools, input) {
     const shape = warmShape(pools, input);
-    const out = { main: PROBE };
+    // div_facts (one-number facts): the lesson sheet's Independent rows reach 18 at S (critic R3
+    // N-3), so the main pool deals enough for the example, the Guided set and 18 more.
+    const mainPool = pools.main || [];
+    const divFacts = mainPool.length > 0 && mainPool.every((it) => it.q && it.q.divForm);
+    const out = { main: divFacts ? PROBE + 12 : PROBE };
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
     for (const id of Object.keys(pools)) if (/^x/.test(id)) out[id] = 3;
     return out;
@@ -1106,8 +1127,21 @@ export function plan(input = {}) {
         const rowsOf = (id) => shape[id].rows || 1;
         const hOwn = (id) => Math.max(20, hAt(wPools[id].slice(0, shape[id].k * rowsOf(id)), shape[id].cols)) * rowsOf(id);
         const hW = Math.max(...halves.map(hOwn));
+        // One digit size per band (critic R3 R-3): when a legacy-drawn skill (its own type size,
+        // `data-ws-pt`) shares the band with a kit cell, the kit cell is drawn at the legacy cell's
+        // size, so "8 ÷ 2 = __" and "110 ÷ 10 = __" read as one routine.
+        const bandIts = halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id)));
+        const legacyIt = bandIts.find((it) => it.template === 'legacy' && typeof it.render === 'function');
+        const sameSize = (it) => (!legacyIt || it.template === 'legacy' || typeof it.render !== 'function' ? it : Object.assign({}, it, {
+            render: (c, o) => {
+                let pt = '';
+                try { pt = (/data-ws-pt="(\d+(?:\.\d+)?)"/.exec(String(legacyIt.render(c, o))) || [])[1] || ''; } catch (e) { pt = ''; }
+                const h = it.render(c, o);
+                return pt ? `<div style="--ws-digit:${pt}pt;display:contents">${h}</div>` : h;
+            },
+        }));
         const parts = halves.map((id) => {
-            const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
+            const its = wPools[id].slice(0, shape[id].k * rowsOf(id)).map(sameSize);
             // Every Warm-up problem is centred in its cell (a short one, or a cell given spare height).
             const short = true;
             const part = {
@@ -1245,7 +1279,11 @@ export function plan(input = {}) {
     const used = new Set([example, example2, example3, example4, ...weDo]);
     const indepPool = main.filter((it) => !used.has(it));
     const icWanted = AUTO_COLS[ctx.size];
-    const ic = bestCols(indepPool.slice(0, 6), [icWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= icWanted), ctx);
+    // One across look on the page (critic R3 N-2): the Guided cells keep a division fact's line
+    // beside the sentence, so the Independent band takes only columns where it stays beside.
+    const icOpts = [icWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= icWanted);
+    const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 6).some((it) => reflowsAt(it, c)));
+    const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
     let indep = [];
@@ -1254,16 +1292,28 @@ export function plan(input = {}) {
         // "Circle groups of the second number. Write the quotient and the remainder." ran the
         // div_remainders lesson 4.5 mm past its page at L).
         const iText = instructionText(instructionKeyOf(indepPool.slice(0, ic), input.skills), indepPool.slice(0, ic));
-        const room = cur.budget - cur.used - m.strip - stripExtraMm(ctx, 'Independent Practice:', iText);
+        const room0 = cur.budget - cur.used - m.strip - stripExtraMm(ctx, 'Independent Practice:', iText);
         // 12.1: an Independent page holds 6 at most; a page of rows fills its height like one.
         // div_facts facts (any written form, critic R1 D8): one-number answers, so the rows fill the
         // room left on the page up to 12.1's one-symbol ceiling of 12, not the 6 of taller problems.
         // (any division FACT cell: `divide`'s "12 ÷ 4 = __" is the same one-number answer - critic
         // R2 R-2: its lesson page was left 44-48 % blank under 6 of them)
-        const divFact = (it) => !!it.q && opOf(it.q) === 'divide' && /^\s*\d+\s*÷\s*\d+\s*=\s*\?\s*$/.test(String(it.q.text || ''))
-            && /^\d+$/.test(String(answerOf(it)));
+        // (a FACT: within the 12 x 12 table - long division "2134 ÷ 22" is worked, not recalled)
+        const divFact = (it) => {
+            if (!it.q || opOf(it.q) !== 'divide') return false;
+            const m = /^\s*(\d+)\s*÷\s*(\d+)\s*=\s*\?\s*$/.exec(String(it.q.text || ''));
+            return !!m && Number(m[1]) <= 144 && Number(m[2]) <= 12 && /^\d+$/.test(String(answerOf(it)));
+        };
         const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it)));
-        let rows = Math.min(Math.max(1, Math.floor((oneNum ? 12 : 6) / ic)), Math.floor(room / hI));
+        // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
+        // six rows of bracket facts ran 2 mm past at S; taller problems keep the room they had.
+        const safety = oneNum ? 3 : 0;
+        const room = room0 - safety;
+        // (S holds more than L, LESSONS L1 - critic R3 N-3: 12 at S left 41 % of p2 blank - and the
+        // rows are whole rows of the pool the lesson dealt, never a last row of one)
+        const oneCeil = ctx.size === 'L' ? 12 : 21;   // (an S packet draws its lesson sheet at M type)
+        let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : 6) / ic)), Math.floor(room / hI));
+        if (oneNum && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
         const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));
         while (rows > 1 && rows * hRows(rows) > room) rows--;
@@ -1278,7 +1328,7 @@ export function plan(input = {}) {
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
                 content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),
             });
-            cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH;
+            cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH + safety;
         }
     }
 

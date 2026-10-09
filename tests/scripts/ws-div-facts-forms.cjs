@@ -353,6 +353,9 @@ const MARK = {
         // (tests/lib/ws-ink.cjs: the rendered page's dark pixels per cell), not on element boxes.
         // Bands: the critic's calibration reads up to 0.33 as normal (a passed Standard fact-rows page
         // measures 0.30-0.31); H13 is 0.30 of a cell with its label.
+        // The evidence pages are built with no stored option (the screen sections above store a
+        // div_facts form, which would deal another skill's warm-up in it).
+        await page.evaluate(() => { try { window.clearSetOptions({ silent: true }); } catch (e) { /* none stored */ } });
         const hashS = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
         const evSeed = (role, sk = 'division__div_facts') => hashS(`${sk}:${role}`) % 1000000;
         const evBuild = (role, size, opts, { skill = ['division', 'div_facts'], seed } = {}) => page.evaluate(async (a) => {
@@ -366,6 +369,11 @@ const MARK = {
         const BAND = 0.33;
         // (bands are compared at the critic's reporting precision, two decimals)
         const r2 = (x) => Math.round(x * 100) / 100;
+        // Side bands (critic R3 N-1): a bracket with a ONE-digit dividend is drawn tight, as the Long
+        // form draws it, and keeps its cell's own side margin - it is held to being centred, never to
+        // the band (a drawing is never stretched to pass it). Every other cell is held to the band.
+        const sideOf = (cells) => Math.max(0, ...cells.filter((c) => !c.empty && c.brk !== 1).map((c) => Math.max(c.left, c.right)));
+        const offCentre = (cells) => Math.max(0, ...cells.filter((c) => !c.empty && c.brk === 1).map((c) => Math.abs(c.left - c.right)));
         const rowsEven = (pg) => { const hs = pg.cells.map((c) => c.h); return Math.max(...hs) / Math.min(...hs) <= 1.05; };
         // D-A: Mix at L (and S) - one cell size, no wide side bands, the page full
         for (const size of ['L', 'S']) {
@@ -374,7 +382,7 @@ const MARK = {
                 const ink = await inkScan(page, r.doc);
                 const pg = ink.pages[0], w = worst(pg);
                 check(r.pages === 1 && rowsEven(pg), `D-A mix ${role} ${size}: one page, every row one height (${w.rowsH.join('/')} px)`);
-                check(r2(w.side) <= BAND && r2(w.bottom) <= 0.35, `D-A mix ${role} ${size}: ink side band ${f2(w.side)} <= ${BAND}, bottom ${f2(w.bottom)} <= 0.35`);
+                check(r2(sideOf(pg.cells)) <= BAND && r2(w.bottom) <= 0.35 && offCentre(pg.cells) <= 0.06, `D-A mix ${role} ${size}: ink side band ${f2(sideOf(pg.cells))} <= ${BAND} (one-digit brackets centred, off by ${f2(offCentre(pg.cells))}), bottom ${f2(w.bottom)} <= 0.35`);
                 check(w.strip < 0.2, `D-A mix ${role} ${size}: page strip under the grid ${f2(w.strip)} < 0.20`);
                 if (role === 'independent') check(r.n >= (size === 'L' ? 15 : 27), `D-A mix independent ${size}: ${r.n} items (>= ${size === 'L' ? 15 : 27})`);
                 if (role === 'test') check(r.n === (size === 'L' ? 12 : 20), `D-A mix test ${size}: the Test's ceiling, ${r.n}`);
@@ -391,7 +399,7 @@ const MARK = {
                 grids.forEach((c) => tally.set(Math.round(c.h), (tally.get(Math.round(c.h)) || 0) + 1));
                 const hMain = [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
                 const prac = grids.filter((c) => Math.abs(c.h - hMain) <= 3);
-                const side = Math.max(...prac.map((c) => Math.max(c.left, c.right))), bottom = Math.max(...prac.map((c) => c.bottom));
+                const side = sideOf(prac), bottom = Math.max(...prac.map((c) => c.bottom));
                 const wide = prac.filter((c) => c.w > 300).length;
                 check(prac.length >= 9 && wide === 0 && r2(side) <= BAND && r2(bottom) <= 0.35, `D-A mix lesson ${size} p${k + 1}: ${prac.length} practice cells of one height, none a half-page cell (${wide}), side ${f2(side)}, bottom ${f2(bottom)}`);
             }
@@ -413,7 +421,7 @@ const MARK = {
                 const ink = await inkScan(page, r.doc);
                 const w = worst(ink.pages[0]);
                 check(r.pages === 1 && (role === 'fact-rows' || r.n === 20), `D-C mix ${role} ${size}: one page (${r.n} facts)`);
-                check(r2(w.bottom) <= 0.32 && r2(w.side) <= BAND && rowsEven(ink.pages[0]), `D-C mix ${role} ${size}: ink bottom ${f2(w.bottom)} <= 0.32, side ${f2(w.side)} <= ${BAND}, rows one height (${w.rowsH.join('/')} px)`);
+                check(r2(w.bottom) <= 0.32 && r2(sideOf(ink.pages[0].cells)) <= BAND && offCentre(ink.pages[0].cells) <= 0.06 && rowsEven(ink.pages[0]), `D-C mix ${role} ${size}: ink bottom ${f2(w.bottom)} <= 0.32, side ${f2(sideOf(ink.pages[0].cells))} <= ${BAND}, one-digit brackets centred, rows one height (${w.rowsH.join('/')} px)`);
                 const pts = [...new Set((r.pupil.match(/--ws-digit:(\d+)pt/g) || []).map((m) => Number(m.replace(/\D/g, ''))))];
                 check(pts.length === 1 && pts[0] >= stdPt, `D-C mix ${role} ${size}: every form at ${pts.join('/')} pt (Standard rows ${stdPt} pt)`);
                 const gaps = await page.evaluate((html) => {
@@ -513,6 +521,113 @@ const MARK = {
             };
             const a = await adv('independent'), b = await adv('fact-rows');
             check(a !== null && b !== null && Math.abs(a - b) <= 0.1 * Math.max(a, b) + 0.02, `R-2 one across look: digit-to-"÷" space ${f2(a)} em on Independent, ${f2(b)} em on fact rows`);
+        }
+
+        // ---------------------------------------------------------------- critic R3 defects (N-1 ... R-3)
+        // A page's drawn geometry, measured in a frame the size of the printed page.
+        const inFrame = (doc, fnSrc) => page.evaluate(async (doc, fnSrc) => {
+            const fr = document.createElement('iframe');
+            fr.style.cssText = 'position:absolute;left:-3000px;top:0;width:900px;height:1300px';
+            document.body.appendChild(fr);
+            fr.srcdoc = doc;
+            await new Promise((ok) => { fr.onload = ok; });
+            // the sheet's fonts loaded and laid out (a measure taken before Andika arrives is a
+            // fallback face's geometry)
+            for (let i = 0; i < 100 && fr.contentDocument.documentElement.getAttribute('data-ws-fonts') !== 'ready'; i++) await new Promise((ok) => setTimeout(ok, 50));
+            await fr.contentDocument.fonts.ready;
+            await new Promise((ok) => setTimeout(ok, 150));
+            const out = (new Function('doc', 'win', fnSrc))(fr.contentDocument, fr.contentWindow);
+            fr.remove();
+            return out;
+        }, doc, fnSrc);
+        // N-1: every bracket on a Mix page is the Long form's drawing - its vinculum no longer than its
+        // dividend's own tracks, the first dividend digit next to the bracket.
+        const BRACKETS = `
+            const out = [];
+            for (const g of doc.querySelectorAll('[data-ws-ops="division"] [role="group"]')) {
+                const kids = Array.from(g.children);
+                const st = (x) => x.getAttribute('style') || '';
+                const digits = kids.filter((x) => /grid-row:\\s*2\\b/.test(st(x)) && /border-top/.test(st(x)) && /^\\d$/.test(x.textContent.trim()));
+                const arc = kids.find((x) => x.querySelector('svg'));
+                const rule = kids.find((x) => /border-top:[^;]*solid (#000|rgb\\(0, 0, 0\\)|black)/.test(st(x)) && !x.textContent.trim()) ;
+                if (!digits.length || !arc) continue;
+                const rg = (el) => { const r = doc.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect(); };
+                const first = rg(digits[0]);
+                const tracks = digits.reduce((a, d) => a + d.getBoundingClientRect().width, 0);
+                out.push({ n: digits.length, gap: (first.left - arc.getBoundingClientRect().right) / first.width,
+                    // the bar runs from the arc's top stroke (15 % into its track) over the dividend tracks
+                    over: rule ? rule.getBoundingClientRect().width - tracks - 0.85 * arc.getBoundingClientRect().width : 0 });
+            }
+            return out;`;
+        for (const size of ['S', 'L']) {
+            for (const role of ['independent', 'test', 'fact-rows', 'fact-probe', 'guided']) {
+                const r = await evBuild(role, size, { divForm: 'mix' });
+                const b = await inFrame(r.doc, BRACKETS);
+                const worstGap = Math.max(...b.map((x) => x.gap)), worstOver = Math.max(...b.map((x) => x.over));
+                check(b.length > 0 && worstGap <= 0.5 && worstOver <= 1, `N-1 mix ${role} ${size}: ${b.length} brackets drawn tight - bracket to first digit ${f2(worstGap)} digit (<= 0.5), vinculum past the dividend tracks ${f2(worstOver)} px (<= 1)`);
+            }
+            const lr = await evBuild('independent', size, { divForm: 'long' });
+            const lb = await inFrame(lr.doc, BRACKETS);
+            check(lb.length > 0 && Math.max(...lb.map((x) => x.gap)) <= 0.5, `N-1 long independent ${size}: the Long form's bracket the same tight drawing`);
+        }
+        // N-2: one across look on every page of the Standard lesson, and the line where the stand-alone
+        // Independent page puts it (beside). N-3: the lesson sheet at S is full and holds at least L's.
+        {
+            const indepAt = {};
+            for (const size of ['S', 'L']) {
+                const r = await evBuild('lesson', size, { divForm: 'standard' });
+                const pages = r.pupil.split(/class="ws-page\b/).slice(1);
+                const looks = pages.map((pg) => ({ below: (pg.match(/class="ws-eq ws-eq-below"/g) || []).length, beside: (pg.match(/class="ws-eq" style="gap:0\.18em"/g) || []).length }));
+                check(looks.every((l) => l.below === 0 || l.beside === 0), `N-2 standard lesson ${size}: one across look per page (${looks.map((l) => `${l.beside} beside / ${l.below} under`).join(', ')})`);
+                const ind = await evBuild('independent', size, { divForm: 'standard' });
+                const indBelow = /class="ws-eq ws-eq-below"/.test(ind.pupil);
+                check(looks.slice(1).every((l) => (indBelow ? l.beside === 0 : l.below === 0)), `N-2 standard lesson ${size}: pages 2-3 put the line where the Independent page does (${indBelow ? 'under' : 'beside'})`);
+                const m = /(\d+) independent/.exec(r.note) || [];
+                indepAt[size] = Number(m[1]) || 0;
+                const strip = (await inkScan(page, r.doc)).pages[1].strip;
+                check(strip < 0.2, `N-3 standard lesson ${size} p2: page strip ${f2(strip)} < 0.20 (${indepAt[size]} Independent)`);
+            }
+            check(indepAt.S >= indepAt.L, `N-3 standard lesson: S holds at least L's Independent (${indepAt.S} >= ${indepAt.L})`);
+        }
+        // No lesson page of any form runs into its footer (the 18-21 Independent rows at S, N-3).
+        for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) for (const size of ['S', 'L']) {
+            const r = await evBuild('lesson', size, { divForm: form });
+            const ink = await inkScan(page, r.doc);
+            const over = ink.pages.map((pg, i) => (pg.gridBottom !== null && pg.footTop !== null && pg.gridBottom > pg.footTop - 2 ? i + 1 : 0)).filter(Boolean);
+            check(over.length === 0, `N-3 ${form} lesson ${size}: no page runs into its footer (${over.join(',') || 'none'})`);
+        }
+        // R-3: a lesson's warm-up band - one digit size, one answer place, labels clear of the ink.
+        const WARM = `
+            const band = Array.from(doc.querySelectorAll('.ws-band')).find((b) => /Warm-up:/.test(b.textContent));
+            if (!band) return null;
+            const cells = Array.from(band.querySelectorAll('.ws-cell')).filter((c) => !c.classList.contains('blankrun'));
+            return cells.map((c) => {
+                const eq = c.querySelector('.ws-eq');
+                if (!eq) return null;
+                const tw = doc.createTreeWalker(eq, NodeFilter.SHOW_TEXT);
+                let first = null;
+                for (let n = tw.nextNode(); n; n = tw.nextNode()) if (/\\d/.test(n.textContent)) { first = n; break; }
+                if (!first) return null;
+                const k = first.textContent.search(/\\d/);
+                const r = doc.createRange(); r.setStart(first, k); r.setEnd(first, k + 1);
+                const d = r.getBoundingClientRect();
+                const slot = eq.querySelector('.ws-line, .ws-slot, [data-ws-slot]');
+                const sr = slot ? slot.getBoundingClientRect() : null;
+                const lab = c.querySelector('.ws-letter');
+                const lr = lab ? lab.getBoundingClientRect() : null;
+                return { fs: parseFloat(win.getComputedStyle(first.parentElement).fontSize), under: sr ? sr.top >= d.bottom - 0.1 * d.height : null,
+                    clear: lr ? (d.left >= lr.right + 3.7 || d.top >= lr.bottom + 3.7) : true };
+            }).filter(Boolean);`;
+        // (the screen sections above left a div_facts form in the option store: a teacher's stored
+        // form deals a warm-up in it. These pages are the evidence's, built with no stored option.)
+        await page.evaluate(() => { try { window.clearSetOptions({ silent: true }); } catch (e) { /* none stored */ } });
+        for (const [cat, sk] of [['division', 'div_remainders'], ['division', 'divide'], ['division', 'div_facts']]) for (const size of ['S', 'L']) {
+            const r = await evBuild('lesson', size, {}, { skill: [cat, sk] });
+            const w = await inFrame(r.doc, WARM);
+            if (!w || !w.length) { check(true, `R-3 ${sk} lesson ${size}: no across warm-up band`); continue; }
+            const fs = w.map((x) => x.fs);
+            check(Math.max(...fs) - Math.min(...fs) <= 1.4 && new Set(w.map((x) => x.under)).size === 1 && w.every((x) => x.clear),
+                `R-3 ${sk} lesson ${size} warm-up: one digit size (${[...new Set(fs.map((x) => Math.round(x)))].join('/')} px), one answer place (${[...new Set(w.map((x) => (x.under ? 'under' : 'beside')))].join('/')}), labels clear (${w.filter((x) => !x.clear).length} touch)`);
         }
 
         check(app.problems.filter((p) => p.type !== 'requestfailed').length === 0, `no console errors (${app.problems.map((p) => p.text).slice(0, 3).join(' | ')})`);

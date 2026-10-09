@@ -2176,7 +2176,16 @@ async function buildLesson(n, metaOf) {
     // Lessons r2-r3: a rounding cell ("27 -> ___") is short and narrow: M prints three across like
     // L, and the lesson's own 15 at every size (never 12.1's 16 ceiling passed).
     const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    // div_facts: a practice page of one-number facts holds what its stand-alone Independent page
+    // does at L (16, 2 x 8 for the across facts - critic R3 N-2: 15 printed 2 x 5 of tall cells)
+    const divFactsOnly = (teach.items || []).filter((it) => it.pool === 'main').every((it) => /div_facts/.test(String(it.skill || '')));
+    // ... and keeps the lesson's one across look (critic R3 N-2): no column count at which a
+    // division fact's line would go under its sentence (a cell markedly taller there than in one column).
+    const mainIts = (teach.items || []).filter((it) => it.pool === 'main');
+    const reflow = (c) => mainIts.some((it) => it.template === 'equation' && it.measured && it.measured[1] && it.measured[c]
+        && Number.isFinite(it.measured[1].hMm) && Number.isFinite(it.measured[c].hMm) && it.measured[c].hMm > it.measured[1].hMm * 1.25);
+    const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: divFactsOnly ? 16 : 15 }, ...(besideCap < 4 ? { maxCols: besideCap } : {}) } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
     // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     const stackShapes = [[6, 2]];
