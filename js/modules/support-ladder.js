@@ -42,7 +42,7 @@ import {
 } from './sheet/index.js';
 import { declaredSupports } from './sheet/providers/util.js';
 import { renderPane, PANES } from './sheet/cells/panes/index.js';
-import { cellKindFor, kindHTML, binaryParts, regroupFor } from './screen-cell.js';
+import { cellKindFor, kindHTML, binaryParts, regroupFor, screenSupportsFor } from './screen-cell.js';
 
 /* ------------------------------------------------------------------ the teacher's setting */
 
@@ -220,6 +220,17 @@ export function candidatesFor(q, ctx = {}) {
     return [];
 }
 
+/** Does the teacher's support option already draw touch marks on this item? */
+function teacherTouches(q, ctx = {}) {
+    try {
+        const kind = ctx.kind !== undefined ? ctx.kind : cellKindFor(Object.assign({}, q, { options: [] }));
+        if (!kind) return false;
+        const { cat, skill } = whereFrom(q, ctx);
+        const s = screenSupportsFor(q, kind, { index: ctx.index || 0, total: ctx.total || 1, categoryId: cat, skillId: skill, options: ctx.options || null });
+        return !!(s && s.on.some((id) => TOUCH_IDS.includes(id)));
+    } catch (e) { return false; }
+}
+
 const clashes = (x, y) => {
     if (x === y) return true;
     if (!SUPPORT_IDS.includes(x) || !SUPPORT_IDS.includes(y)) return false;
@@ -234,7 +245,11 @@ export function rungsFor(q, ctx = {}) {
     const mode = modeFor(q, ctx);
     if (mode === 'none') return [];
     if (mode === 'worked') return [{ id: 'worked', how: 'worked' }];
-    const c = candidatesFor(q, ctx);
+    let c = candidatesFor(q, ctx);
+    // Owner 2026-10-09 (R3-6): when the teacher's own touch marks are already on this item, the
+    // touch rung is spent: the ladder KEEPS those marks and moves on to the next support, never
+    // swapping count-all for count-on.
+    if (teacherTouches(q, ctx)) c = c.filter((r) => !TOUCH_IDS.includes(r.id));
     const out = [];
     if (c.length) {
         const r1 = c[0];
@@ -661,7 +676,7 @@ export function drawLadder(root, q, ctx = {}) {
     // Touch numerals need a 40 px digit (SF-34): once they appear, the cell keeps that size for
     // the rest of the ladder, so the problem never changes size again.
     if (root.querySelector('.ws-tn')) {
-        const sc = root.closest ? (root.closest('.mq-scell') || root.querySelector('.mq-scell')) : null;
+        const sc = (root.querySelector && root.querySelector('.ws-card-visual.mq-scell')) || (root.closest ? root.closest('.mq-scell') : null) || (root.querySelector && root.querySelector('.mq-scell'));
         if (sc) sc.setAttribute('data-mq-touch-floor', '1');
     }
     const e = _entries.get(q);

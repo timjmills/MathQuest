@@ -51,13 +51,15 @@ function enhance(root) {
             if (i === 0) {
                 s.setAttribute('role', 'button');
                 s.setAttribute('tabindex', '0');
-                s.setAttribute('aria-label', `${value}: ${total} touch dots. Tap to count.`);
+                s.setAttribute('aria-label', `${value}: ${total} touch ${total === 1 ? 'dot' : 'dots'}. Tap to count.`);
             } else s.setAttribute('aria-hidden', 'true');
         });
     });
 }
 
 function cellOf(el) { return el.closest('.mq-scell') || el.closest('.ws-cell') || el.parentElement; }
+
+const tnIn = (cell) => !!(cell && cell.querySelector && cell.querySelector('.ws-tn[data-mq-tn]'));
 
 /** All touched counts in this cell. */
 function cellCount(cell) {
@@ -82,7 +84,63 @@ function paint(span, counted) {
     });
 }
 
-function status(cell) {
+/* ---- what the count line says (SUPPORTS S1.8, owner rulings 2026-10-09) ---- */
+
+const PLURAL = ['zeros', 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves'];
+const ANSWERED = '.mq-ladder-extra, [data-mq-ladder], .correct-bg, .incorrect-bg, .locked-correct, input.correct, input.wrong';
+
+function hostOf(cell) { return cell.closest('.problem-card, .qt-question-card, .ws-card') || cell.closest(HOSTS) || cell.parentElement || cell; }
+
+/** Count all: every number of the problem is a touch numeral (count on / back leaves one plain). */
+function allTouch(cell) {
+    const c = (cell.querySelector('.ws-sheet, .mq-kit') || cell).cloneNode(true);
+    c.querySelectorAll('.ws-tn, input, select, textarea, .ws-factans, .mq-factans, .mq-ladder-extra, .mq-tn-count, .mq-instr, .ws-regroup, [aria-hidden="true"]').forEach((e) => e.remove());
+    return !/\d/.test(c.textContent || '');
+}
+
+/** How this cell counts: {kind: 'times', n, step} | {kind: 'all'} | {kind: 'on'}. */
+function modeOf(cell) {
+    const sup = Array.from(cell.querySelectorAll('[data-ws-supports], [data-mq-ladder]'))
+        .concat(cell.matches('[data-ws-supports], [data-mq-ladder]') ? [cell] : [])
+        .map((e) => `${e.getAttribute('data-ws-supports') || ''} ${e.getAttribute('data-mq-ladder') || ''}`).join(' ');
+    const stack = !!cell.querySelector('.ws-stack, [data-ws-cell="stack"], table');
+    const txt = (cell.textContent || '').replace(/\s+/g, ' ');
+    const m = txt.match(/(\d+)\s*[×x*]\s*(\d+)/);
+    if (m && !stack) {
+        const tn = cell.querySelector('.ws-tn[data-mq-tn][role="button"]');
+        const g = tn && groups.get(tn);
+        const v = g ? Number(g.run.map((x) => x.getAttribute('data-digit')).join('')) : NaN;
+        const a = Number(m[1]), b = Number(m[2]);
+        if (v === a || v === b) return { kind: 'times', n: v, step: v === a ? b : a };
+    }
+    if (/\btouchall\b/.test(sup) || allTouch(cell)) return { kind: 'all' };
+    return { kind: 'on' };
+}
+
+/** The line's words for this cell now: [said, showReset]. */
+function words(cell) {
+    const k = cellCount(cell);
+    const md = modeOf(cell);
+    if (md.kind === 'times') {
+        const name = PLURAL[md.step] || `${md.step}s`;
+        const ask = `How much is ${md.n} ${md.n === 1 ? name.replace(/s$/, '') : name}?`;
+        if (!k) return [ask, false];
+        const seq = Array.from({ length: k }, (_, i) => md.step * (i + 1)).join(', ');
+        return [`${seq} (counting by ${name})`, true];
+    }
+    if (md.kind === 'all') {
+        // count all: the last count IS the answer, so it shows only once the pupil has answered
+        const h = hostOf(cell);
+        const view = cell.closest(HOSTS);
+        const answered = !!(h.querySelector(ANSWERED) || h.matches('.mq-ladder-card')
+            || (view && view.querySelector('#feedbackArea.mq-ladder-feedback')));
+        return [k && answered ? `Touched ${k}` : '', k > 0];
+    }
+    return [k ? `Touched ${k}` : '', k > 0];
+}
+
+/** The count line under a cell: made with the numerals, its space reserved from the start (R3-4). */
+function lineFor(cell) {
     const host = cell.parentNode;
     if (!host) return null;
     let bar = cell.nextElementSibling;
@@ -91,23 +149,47 @@ function status(cell) {
         bar.className = 'mq-tn-count';
         bar.innerHTML = '<span class="mq-tn-said" aria-live="polite"></span> <button type="button" class="mq-tn-reset">Start again</button>';
         host.insertBefore(bar, cell.nextSibling);
-        bar.querySelector('.mq-tn-reset').addEventListener('click', () => reset(cell, bar));
+        // Start again acts on the LIVE cell before the line (a ladder redraw may replace it, R3-5)
+        bar.querySelector('.mq-tn-reset').addEventListener('click', () => { const c = bar.previousElementSibling; if (c) reset(c); });
     }
     return bar;
 }
 
-function reset(cell, bar) {
+function show(cell) {
+    const bar = lineFor(cell);
+    if (!bar) return;
+    const [said, again] = words(cell);
+    const sp = bar.querySelector('.mq-tn-said');
+    if (sp.textContent !== said) sp.textContent = said;
+    const btn = bar.querySelector('.mq-tn-reset');
+    const vis = again ? 'visible' : 'hidden';
+    if (btn.style.visibility !== vis) btn.style.visibility = vis;
+}
+
+function reset(cell) {
     cell.querySelectorAll('.ws-tn[data-mq-tn]').forEach((s) => {
         const g = groups.get(s); if (!g) return;
         g.counted = g.run.map(() => []);
         paint(s, []);
     });
-    if (bar) bar.remove();
+    show(cell);
 }
 
-function show(cell) {
-    const bar = status(cell);
-    if (bar) bar.querySelector('.mq-tn-said').textContent = `Touched ${cellCount(cell)}`;
+/** Keep every line true to its cell: a line whose cell lost its numerals goes, a new cell gets one. */
+function sync() {
+    const keep = (c) => tnIn(c) || !!(c && c.matches && c.matches('[data-mq-touch-floor]'));
+    document.querySelectorAll('.mq-tn-count').forEach((bar) => { if (!keep(bar.previousElementSibling)) bar.remove(); });
+    const seen = new Set();
+    // a cell whose ladder can draw touch numerals keeps the line's space from the start, so nothing
+    // grows when the numerals arrive mid-ladder (R3-3, R3-4)
+    document.querySelectorAll(HOSTS).forEach((h) => h.querySelectorAll('[data-mq-touch-floor]').forEach((c) => {
+        if (!tnIn(c) && !seen.has(c)) { seen.add(c); show(c); }
+    }));
+    document.querySelectorAll(HOSTS).forEach((h) => h.querySelectorAll('.ws-tn[data-mq-tn][role="button"]').forEach((s) => {
+        if (s.closest('.zoom-overlay, .print-preview')) return;
+        const c = cellOf(s);
+        if (c && !seen.has(c)) { seen.add(c); show(c); }
+    }));
 }
 
 function left(d, counted, i) { const p = touchDots(d)[i]; return p ? (p.double ? 2 : 1) - (counted[i] || 0) : 0; }
@@ -153,10 +235,18 @@ function count(g, hit) {
 export function installTouchTap() {
     if (typeof document === 'undefined' || window.__mqTouchTapInstalled) return;
     window.__mqTouchTapInstalled = true;
-    const scan = () => { document.querySelectorAll(HOSTS).forEach((h) => { if (h.querySelector('.ws-tn:not([data-mq-tn])')) enhance(h); }); };
+    const scan = () => { document.querySelectorAll(HOSTS).forEach((h) => { if (h.querySelector('.ws-tn:not([data-mq-tn])')) enhance(h); }); sync(); };
     let pending = false;
     const schedule = () => { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; scan(); }); };
     new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    // A pointer tap counts WITHOUT taking the focus (R3-2): the caret stays in the answer box, so a
+    // digit typed next still lands there. Keyboard users still Tab to the number (tabindex 0).
+    const keepFocus = (e) => {
+        const s = e.target && e.target.closest && e.target.closest('.ws-tn[data-mq-tn]');
+        if (s && s.closest(HOSTS)) e.preventDefault();
+    };
+    document.addEventListener('pointerdown', keepFocus, true);
+    document.addEventListener('mousedown', keepFocus, true);
     document.addEventListener('click', (e) => {
         const s = e.target && e.target.closest && e.target.closest('.ws-tn[data-mq-tn]');
         if (!s || !s.closest(HOSTS)) return;

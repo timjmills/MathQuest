@@ -160,17 +160,38 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
   number (on a multi-digit number, one target per NUMBER, not per digit, because at 40 px two 44 px
   targets would overlap). A tap counts the **nearest mark that still has a touch left**
   (`touchDotNearest`), so a tap never misses and a pupil who touches a dot gets that dot.
+  **Column stacks are the exception: one target per DIGIT**, because column work counts each column
+  separately (the label reads "1: 1 touch dot. Tap to count.").
+- A pointer tap counts **without taking the focus** (`preventDefault` on `pointerdown` /
+  `mousedown`), so the caret stays in the answer box and a digit typed next lands there. The active
+  box never pulls the focus off a touch numeral a keyboard user is counting on.
 - **Touched marks turn the one grey**: black = still to touch, grey = counted. A double takes two
-  taps: the first greys its centre dot, the second its ring. Nothing grows or moves.
-- The running count is shown quietly under the cell ("Touched 5 · 30" for count-by-6), outside the
-  B&W cell. **"Start again"** clears. **No timer.**
+  taps: the first greys its centre dot, the second its ring. **Nothing grows or moves**: the count
+  line's space is reserved from the start in every cell that has touch numerals, or whose ladder can
+  draw them (`data-mq-touch-floor`); on the online worksheet every such card draws at 40 px from the
+  start.
+- **The count line** (quietly under the cell, outside the B&W cell; **"Start again"** clears the live
+  cell; **no timer**). Owner rulings 2026-10-09:
+  - **×**: count-by language as the pupil touches. Before the first touch it asks "How much is
+    4 threes?"; then "3, 6, 9 (counting by threes)". The owner wants this even though the last count
+    equals the product.
+  - **+ / − count all** (every number dotted): the greys and Start again only. "Touched N" appears
+    **only after the pupil has answered** (a check or a ladder rung on that item), never before,
+    because the last count is the sum.
+  - **count on / count back** (one number dotted): "Touched N".
+  - The count follows the cell: a ladder redraw that resets the marks resets the line.
 - Keyboard: Tab to a number; Space / Enter counts the next mark in counting order
   (`touchDotOrder`). The number's button has an `aria-label` ("7: 7 touch dots. Tap to count."),
   and the count is in an `aria-live` region.
+- **Ladder over a teacher touch option** (owner 2026-10-09): when the item already shows the
+  teacher's touch marks, a wrong answer **keeps them** and adds the next support; the ladder never
+  swaps count-all for count-on.
 - **Built in** `js/modules/touch-tap.js` (installed from `globals.js`) for every touch numeral on the
   practice card, the online worksheet and the quiz; CSS at the end of `css/screen-cell.css`
-  (`.mq-tn-hit`, `.mq-tn-count`); gate `node tests/scripts/ws-touch-tap.cjs`. The count line says
-  "Touched N" (the count-by running total "· 30" is not drawn yet). The ÷ tally row is not tappable.
+  (`.mq-tn-hit`, `.mq-tn-count`); gate `node tests/scripts/ws-touch-tap.cjs` (a synthetic cell plus
+  the real card, worksheet and quiz at 1366 × 650 with touch).
+- **Follow-up (owner 2026-10-09, not built yet):** the ÷ tally dots become tappable later (44 px
+  targets, greys only). Today the ÷ tally row is not tappable.
 
 ### S1.9 API (`js/modules/sheet/touchdots.js`, pure, SCC-01)
 

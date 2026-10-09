@@ -1513,7 +1513,7 @@ function _wsRenderCard(grid, q, i) {
     // 40 px touch digit from the start, so no cell grows mid-ladder.
     try {
         if (kind && rungsFor(q, { categoryId: state.category, skillId: state.skill }).some((r) => r.id === 'touch' || r.id === 'touchall')) {
-            const sc = grid.closest('.mq-scell') || grid.querySelector('.mq-scell');
+            const sc = card.querySelector('.ws-card-visual.mq-scell');   // R3-3: THIS card's own cell
             if (sc) sc.setAttribute('data-mq-touch-floor', '1');
         }
     } catch (e) { /* optional */ }
