@@ -100,7 +100,7 @@ function _renderHintInline(where, titleHTML, bodyHTML) {
     box.innerHTML =
         '<div class="mq-hint-inline-head">' +
             '<h3>' + title + '</h3>' +
-            '<button type="button" id="hintSpeakBtn" class="hint-speak-btn mq-hint-inline-btn" aria-label="Read the hint aloud" title="Read the hint aloud" onclick="speakHint()">🔊</button>' +
+            '<button type="button" id="hintSpeakBtn" class="hint-speak-btn mq-hint-inline-btn mq-hint-inline-listen" aria-label="Read the hint aloud" title="Read the hint aloud" onclick="speakHint()">Listen</button>' +
             '<button type="button" class="mq-hint-inline-btn" aria-label="Close hint" onclick="closeHintPopup()">×</button>' +
         '</div>' +
         '<div class="hint-modal-body">' + bodyHTML + '</div>' +

@@ -8073,6 +8073,10 @@ html.dark .student-def strong {
     min-width: 44px; min-height: 44px; background: #fff; color: #000;
     border: 2px solid #000; border-radius: 10px; font-size: 1.3rem; line-height: 1; cursor: pointer;
 }
+.mq-hint-inline .mq-hint-inline-listen {
+    padding: 0 16px; font-family: 'Andika', 'Open Sans', sans-serif; font-size: 1.05rem; font-weight: 700;
+    background: #fff !important; color: #000 !important; border: 2px solid #000 !important;
+}
 .mq-hint-inline .hint-modal-body { font-size: 1.15rem; line-height: 1.6; color: #000; }
 .mq-hint-inline .hint-modal-body * { color: #000 !important; }
 .mq-hint-inline-got {
