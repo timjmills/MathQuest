@@ -86,7 +86,8 @@
 //              explain / describe / justify / discuss / prove; BD-10 one instruction line of <= 12 words
 //              above the cells; BD-1 no "Part NN" section headings.
 //   L-ANSAREA  SL-1 answer lines >= 14 mm; SL-6 no underscore blanks; H12 an item that says draw / build /
-//              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported).
+//              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported);
+//              H8 no cell with both an "Answer:" row and its own option list / check boxes.
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
@@ -1037,6 +1038,9 @@ function wsLintPage(cfg) {
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
                 footRect, cells, items: items.length, gridBottom, gridTop,
+                // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
+                // option list / check boxes (two answer places, H8)
+                doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
                 oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
                     // a page of one-line facts is a page of one-number answers on the Independent
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
@@ -1436,6 +1440,8 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const strip = p.footRect[1] - p.gridBottom;
                 if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
+            // L-ANSAREA DOUBLE (wave 1 lane D round 4, critic r3 D1, H8): one problem, one answer place.
+            if (p.doubled > 0) F('L-ANSAREA', 'H8', 'critical', { page: p.idx }, `page ${p.idx}: ${p.doubled} cell(s) carry an "Answer:" row under their own option list or check boxes: two answer places (H8)`, 'doubled answer place');
             // L-DENSITY PG-23 ORPHAN (wave 1 lane D, critic 2026-10-02: dot_array_mult dealt 4 + 1, the
             // last page three quarters empty; the item-count check above reads 1 of 4 as a quarter
             // of the page but not when the items differ in height). With the problem count on Auto,

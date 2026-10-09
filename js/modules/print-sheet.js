@@ -27,7 +27,7 @@ import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, hasCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
@@ -607,6 +607,47 @@ function sentenceHtml(sf, c, ink) {
     }).join('')}</div>`;
 }
 
+/**
+ * D1 (wave 1 lane D round 4): a legacy cell that answers in its own option list - the
+ * multi-select print branch's `.opt-list` ("Circle ALL sums that equal 1") - when the question
+ * says which options are right, so its key can ring them.
+ */
+function selfAnswering(html, q) {
+    return /<div class="opt-list[^"]*">/.test(html) && Array.isArray(q && q.options) && q.options.some((o) => o && o.correct);
+}
+
+/** The option list as the cell's one slot; `ink` rings the right options (the key, or traced). */
+function markOptions(html, q, ink) {
+    const out = html.replace(/<div class="(opt-list[^"]*)">/, '<div class="$1" data-ws-slot="answer" data-ws-shape="open">');
+    if (!ink) return out;
+    const style = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
+    let i = 0;
+    return out.replace(/<span class="opt">([\s\S]*?)<\/span>(?=<span class="opt">|<\/div>)/g, (m, inner) => {
+        const o = q.options[i++];
+        if (!o || !o.correct) return m;
+        return `<span class="opt" data-ws-ink="${ink}" style="outline:0.6mm solid currentColor;outline-offset:0.8mm;border-radius:999px;${style}"><b style="${style}">${inner}</b></span>`;
+    });
+}
+
+/**
+ * D10 (wave 1 lane D round 4, LESSONS L1): a number family (+/- or x/÷) is drawn on paper by the
+ * kit's `number-family` cell, sized from the sheet's metrics, instead of the legacy branch's fixed
+ * px (which printed the same 2 x 2 at S as at L). The screen hosts are not affected.
+ */
+function numberFamilySpec(q) {
+    const d = q && q.numberFamilyData;
+    if (!d || !/^number-family-(add-sub|mult-div)$/.test(String(q.printFormat || '')) || !hasCell('number-family')) return null;
+    if (!Array.isArray(d.equations) || !Array.isArray(d.missingPositions) || d.equations.some((e) => !e || !Array.isArray(e.nums) || e.nums.length !== 3)) return null;
+    return {
+        template: 'number-family',
+        payload: {
+            nums: [d.a, d.b, d.c].filter((v) => v !== undefined && v !== null),
+            eqs: d.equations.map((e) => ({ nums: e.nums.slice(), op: e.op })),
+            miss: d.equations.map((_, i) => (Array.isArray(d.missingPositions[i]) ? d.missingPositions[i].slice() : [])),
+        },
+    };
+}
+
 /* ============================================================= S2 · the supports model */
 
 /**
@@ -747,7 +788,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const q0 = g.q;
     // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
     // fact template, which can draw them - the same upgrade the old fact cue made in the generator.
-    const resolved = kitCellSpec(q0) || (withSupports ? supportFactSpec(g.skill, q0) : null);
+    const resolved = kitCellSpec(q0) || numberFamilySpec(q0) || (withSupports ? supportFactSpec(g.skill, q0) : null);
     const q = Object.assign({}, q0);
     let template;
     if (resolved) {
@@ -834,6 +875,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
+        }
+        // Wave 1 lane D round 4 (D1, H8): a legacy "Circle ALL ..." item answers in its own option
+        // list, so it never also carries the adapter's "Answer: ____" row (two answer places). The
+        // list is the item's one slot on the pupil page and the key; the key rings the right options.
+        if (legacy && STAMP_RE.test(html) && selfAnswering(html, q0)) {
+            const ink = ctx.state === 'answered' ? 'solid' : ctx.state === 'traced' ? 'trace' : '';
+            return markOptions(html.replace(STAMP_RE, ''), q0, ink);
         }
         // 2026-10-02 (L-KEY AK-4): the pupil page draws the adapter's writing row only where the key
         // cannot write into the cell's own slot - the very test the key applies below - so a key and
@@ -1761,12 +1809,16 @@ async function buildSheetOnce(req = {}) {
                     if (cap <= more.length) { sec.floor = floorWith(si, items); break; }
                     items = more;
                 }
-                // whole rows: a pool page never leaves a bordered empty cell after its last problem
-                // (critic 2026-10-03: counting_all S, 7 problems in 2 columns; mixed_multiplication L,
-                // a lone area model beside an empty cell). Only the problems that share the column
-                // grid count (a full-width problem has its own row). The row is filled when the page
-                // still holds it (up to four more problems are tried); else buildSheet deals the page
-                // again from a derived seed (dropping the problem would leave a strip, PAGEFILL).
+            }
+            // whole rows: a page never leaves a bordered empty cell after its last problem
+            // (critic 2026-10-03: counting_all S, 7 problems in 2 columns; mixed_multiplication L,
+            // a lone area model beside an empty cell; round 3 D2: dot_array_mult S, a single-skill
+            // page, 7 in 2 x 4). Only the problems that share the column grid count (a full-width
+            // problem has its own row). The row is filled when the page still holds it (up to four
+            // more problems are tried); else a single-skill page drops back to whole rows, and a
+            // pool page is dealt again from a derived seed (buildSheet's reseat).
+            const single = !pool && !sec.count && shared[si] === null && sec.skills.length === 1 && pagesWanted === 1 && anchorMode === 'off';
+            if ((pool && fitBest > 0) || single) {
                 try {
                     const ceilF = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
                     const holeOf = (its) => {
@@ -1780,17 +1832,37 @@ async function buildSheetOnce(req = {}) {
                         const narrowN = fineN >= 2 && fineN < narrow.length ? narrow.length - fineN : narrow.length;
                         return { cols, rem: cols > 1 ? narrowN % cols : 0, cap: capFromL(sec, si, Lr) * pagesWanted };
                     };
+                    const floorFor = (its) => floorWith(si, pool ? its : probe.items.concat(its));
                     let h = holeOf(items);
                     if (h.rem) {
                         let done = false;
                         for (let add = 1; add <= 4 && !done; add++) {
                             const more = finalRun(sec, si, base, items.length + add, probe);
-                            sec.floor = floorWith(si, more);
+                            sec.floor = floorFor(more);
                             const hm = holeOf(more);
                             if (hm.cap < more.length || more.length > ceilF * pagesWanted) break;
                             if (!hm.rem) { items = more; done = true; }
                         }
-                        sec.floor = floorWith(si, items);
+                        // a single-skill page that cannot take the row's last problems drops back to
+                        // whole rows (its rows then share the page, practice.js spreadRows)
+                        if (!done && single && items.length - h.rem >= h.cols) {
+                            const fewer = items.slice(0, items.length - h.rem);
+                            sec.floor = floorFor(fewer);
+                            if (!holeOf(fewer).rem) { items = fewer; done = true; }
+                        }
+                        sec.floor = floorFor(items);
+                    }
+                    // A single-skill page never prints the same problem twice to fill its grid
+                    // (round 4: add_sub_10s S filled 3 x 10 from a pool of about 20 facts, so 30 + 10
+                    // printed three times). It holds the skill's distinct problems, in whole rows.
+                    if (single) {
+                        const met = new Set();
+                        const uniq = items.filter((it) => { const s = signature(it.q); if (met.has(s)) return false; met.add(s); return true; });
+                        if (uniq.length < items.length) {
+                            const c = holeOf(uniq).cols;
+                            const k = c > 1 ? uniq.length - (uniq.length % c) : uniq.length;
+                            if (k >= Math.max(2, c)) { items = uniq.slice(0, k); sec.floor = floorFor(items); }
+                        }
                     }
                 } catch (e) { /* keep the count */ }
             }

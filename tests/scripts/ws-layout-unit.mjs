@@ -1224,6 +1224,34 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(fineSplit(base, [col(1), col(2), col(3)], 'A4', 186, opts) === null, 'fineSplit: a section of column facts only is not split');
 }
 
+/* ============================================== wave 1 lane D round 4 (print layout / density) */
+{
+    const T = (template, payload) => ({ cell: { template, v: 1, payload } });
+    const at = (size, state = 'blank') => ({ mode: 'print', size, look: 'ican', state });
+    // D3 / L1: the one-line add_sub_10s fact follows the sheet size below its 24 pt ceiling
+    const beside = T('fact', { a: 100, b: 10, op: '-', notation: 'horiz', digits: 3, across: 'beside', pt: 24 });
+    const fS = cellFootprint(beside, resolveCtx(at('S'))), fL = cellFootprint(beside, resolveCtx(at('L')));
+    ok(fS.wMm < fL.wMm && fS.hMm < fL.hMm, `D3: the beside fact is smaller at S than at L (${fS.wMm}x${fS.hMm} vs ${fL.wMm}x${fL.hMm})`);
+    ok(/--ws-digit:16pt/.test(renderCell(beside, resolveCtx(at('S')))), 'D3: the beside fact draws 16 pt digits at S');
+    ok(/--ws-digit:24pt/.test(renderCell(beside, resolveCtx(at('L')))), 'D3: the beside fact keeps its 24 pt at L');
+    // D10: the number family is a kit cell sized by the sheet, one box per missing number, keyed
+    const nf = T('number-family', { nums: [5, 4, 9], eqs: [{ nums: [5, 4, 9], op: '+' }, { nums: [4, 5, 9], op: '+' }, { nums: [9, 5, 4], op: '-' }, { nums: [9, 4, 5], op: '-' }], miss: [[2], [2], [2], [2]] });
+    const nk = cellAnswerKey(nf);
+    eq(nk.display, '9, 9, 4, 5', 'D10: the number family keys its four boxes in reading order');
+    const nB = renderCell(nf, resolveCtx(at('S'))), nA = renderCell(nf, resolveCtx(at('S', 'answered')));
+    eq((nB.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: one box per missing number on the pupil page');
+    eq((nA.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: the key has the same four boxes (AK-4)');
+    ok(!/Number Family/.test(nB), 'D10: no heading inside the cell (L7)');
+    ok(cellFootprint(nf, resolveCtx(at('S'))).wMm < cellFootprint(nf, resolveCtx(at('L'))).wMm, 'D10: the family is narrower at S than at L');
+    // D2: a 3 x 10 dot array fits a 2-column cell at L (the drawing is as wide as its dots)
+    const arr = T('arrays', { kind: 'frame', rows: 3, cols: 10 });
+    ok(cellFootprint(arr, resolveCtx(at('L'))).wMm <= 93, `D2: a 3 x 10 array is at most a half page wide at L (${cellFootprint(arr, resolveCtx(at('L'))).wMm} mm)`);
+    // D6: long division at S may take 3 x 3 (dense ceiling 9)
+    const ld = (i) => ({ id: `ld${i}`, template: 'long-division', fclass: 'long', measured: { 1: { hMm: 49, fits: true }, 2: { hMm: 49, fits: true }, 3: { hMm: 49, fits: true }, 4: { hMm: 49, fits: true } }, footprint: { wMm: 40, hMm: null, measure: true, maxCols: 2 } });
+    const Ld = resolveSectionLayout({ role: 'independent', columns: 'auto', dense: true }, Array.from({ length: 9 }, (_, i) => ld(i)), 'A4', 186, { size: 'S', look: 'ican', header: FULL_HEADER });
+    ok(Ld.cols === 3 && Ld.perPage === 9, `D6: long division at S prints 3 x 3 (${Ld.cols} x ${Ld.rows})`);
+}
+
 /* ======================================================================= report */
 
 if (fails.length) {

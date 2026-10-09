@@ -245,6 +245,17 @@ const belowMm = (p, pt, size) => {
     const glyphs = DIGIT_EM * (String(p.a).length + String(p.b).length) + 2 * ACROSS_TIGHT_OP_EM + 3 * ACROSS_TIGHT_GAP_EM;
     return Math.max(em * glyphs, blankWidth(Math.max(2, Number(p.digits) || 3), size));
 };
+/**
+ * The digit size of an across fact. `across: 'beside'` (one line, its answer on it) follows the
+ * sheet's SIZE on paper: the payload's point size (or the ladder's) is its ceiling, the preset's
+ * digit size its value below that (wave 1 lane D round 4, D3 / LESSONS L1: at S the ladder grew
+ * the line back to 24 pt, so S printed the same 2 x 8 page as L). Other facts keep TY-30.
+ */
+const acrossPt = (p, ctx, base) => {
+    if (p.across !== 'beside' || !ctx || ctx.mode === 'screen') return base;
+    const s = SIZES[ctx.size];
+    return s && s.digitPt ? Math.min(base, s.digitPt) : base;
+};
 /** 'beside' when the answer fits beside the sentence at this column count, else 'below'. */
 const acrossForm = (p, ctx, pt) => {
     // `across: 'beside'` (add_sub_10s / add_sub_100s, wave 1 lane D, critic 2026-10-02): the answer
@@ -295,7 +306,7 @@ register('fact', {
     renderFact(p, ctx) {
         const value = p.ans !== undefined ? p.ans : compute(p);
         const cols = columnsOf(p, ctx);
-        const pt = p.pt || factDigitPt(cols);
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || factDigitPt(cols));
         // VA-71 / the notation option: vertical rows first, then a horizontal block. An across
         // fact on a page of more than 4 columns (a fact-rows page) is drawn vertical (VA-65).
         const tn = touchNumbers(p);
@@ -384,7 +395,7 @@ register('fact', {
             // With no column count yet, the footprint is the narrowest of them (the host
             // measures each count it may choose, DN-10); with one, it is the form drawn there.
             const cAt = explicitCols(p, ctx);
-            const ptA = p.pt || factDigitPt(Math.min(cAt || ACROSS_MAX_COLS, ACROSS_MAX_COLS));
+            const ptA = acrossPt(p, ctx, p.pt || factDigitPt(Math.min(cAt || ACROSS_MAX_COLS, ACROSS_MAX_COLS)));
             const across = Math.ceil((p.across === 'beside' || (cAt && acrossForm(p, ctx, ptA) === 'beside') ? besideMm(p, ptA, ctx.size) : belowMm(p, ptA, ctx.size)) + 4);
             if (p.across === 'beside') {
                 // One line tall (BESIDE_FACT_EM) with the label keep-out above and a pad below: the
@@ -447,7 +458,7 @@ register('fact', {
     gridItem(p, ctx) {
         if (drawsStack(p, ctx)) return { cls: '', style: '' };
         const cols = columnsOf(p, ctx);
-        const pt = p.pt || factDigitPt(cols);
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || factDigitPt(cols));
         return { cls: 'fact', style: `--fd:${pt}pt;--fp:${p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols)}mm` };
     },
 });
