@@ -161,7 +161,8 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
   targets would overlap). A tap counts the **nearest mark that still has a touch left**
   (`touchDotNearest`), so a tap never misses and a pupil who touches a dot gets that dot.
   **Column stacks are the exception: one target per DIGIT**, because column work counts each column
-  separately (the label reads "1: 1 touch dot. Tap to count.").
+  separately (the label reads "1: 1 touch dot. Tap to count."). **A 0 is no target** (it has no
+  marks to count).
 - A pointer tap counts **without taking the focus** (`preventDefault` on `pointerdown` /
   `mousedown`), so the caret stays in the answer box and a digit typed next lands there. The active
   box never pulls the focus off a touch numeral a keyboard user is counting on.
@@ -179,13 +180,27 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
     **only after the pupil has answered** (a check or a ladder rung on that item), never before,
     because the last count is the sum.
   - **count on / count back** (one number dotted): "Touched N".
+  - **Column stacks count per column** (critic r4, lead ruling = owner question 1 option a): the line
+    shows only the column being touched ("Touched 4") and starts again when the pupil touches another
+    column; the greys stay. The ladder's touch rung on a stack speaks in column words ("Start with the
+    ones. Say the biggest number. Touch the dots and count on."), never the whole sum's numbers.
+  - × wording: "How much is 1 six?" (a singular list, not a stripped s); past twelve "How much is
+    7 groups of 70?". A long count-by run shows its last three counts ("… 700, 800, 900 (counting
+    by 100s)") so the line keeps to its reserved two lines.
+  - **Where the line sits.** Under the cell (below its lowest answer box, so a stack's answer row
+    never covers it). On the practice card and the quiz, numerals a LADDER rung brings put the line
+    on the ladder message's own row (message, count, Start again), so a wrong answer adds only that
+    row; the teacher's numerals keep the line under the cell from the start. Start again never wraps.
+  - The quiz counts as answered once its feedback line shows (count all then says "Touched N").
   - The count follows the cell: a ladder redraw that resets the marks resets the line.
 - Keyboard: Tab to a number; Space / Enter counts the next mark in counting order
   (`touchDotOrder`). The number's button has an `aria-label` ("7: 7 touch dots. Tap to count."),
   and the count is in an `aria-live` region.
 - **Ladder over a teacher touch option** (owner 2026-10-09): when the item already shows the
   teacher's touch marks, a wrong answer **keeps them** and adds the next support; the ladder never
-  swaps count-all for count-on.
+  swaps count-all for count-on. This holds on **every** skill (ruling (b), critic r4): the redraw
+  reads the teacher's touch ids from the first drawing (`data-mq-teacher`) and unions them into what
+  it draws, and the message says the "too" form: "Not yet. Now use the arrow too." 
 - **Built in** `js/modules/touch-tap.js` (installed from `globals.js`) for every touch numeral on the
   practice card, the online worksheet and the quiz; CSS at the end of `css/screen-cell.css`
   (`.mq-tn-hit`, `.mq-tn-count`); gate `node tests/scripts/ws-touch-tap.cjs` (a synthetic cell plus

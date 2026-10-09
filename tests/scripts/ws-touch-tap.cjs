@@ -171,8 +171,196 @@ async function realQuiz(fails) {
         await sleep(1200);
         ok(await aeIsTn(page), 'R3-1: focus stays on the number while counting with Enter');
         ok((await page.evaluate(GREYS('#quizTakeView'))) === 3, `R3-1: 3 Enters grey 3 touches: ${await page.evaluate(GREYS('#quizTakeView'))}`);
+        // R4-4, ruling (c): once the question is answered, count all says "Touched N" in the quiz too
+        await wrongQuiz(page); await sleep(1200);
+        const c2 = await centre(page, B, 0);
+        if (c2) { await page.touchscreen.tap(c2.x, c2.y); await sleep(300); }
+        ok(/^Touched \d+$/.test((await said(page, '#quizTakeView')) || ''), `R4-4: count all says "Touched N" after the quiz answer: "${await said(page, '#quizTakeView')}"`);
     } finally {
         if (problems.length) fails.push('quiz console: ' + JSON.stringify(problems.slice(0, 3)));
+        await close();
+    }
+}
+
+/* ---- critic r4 cases (R4-6) ---- */
+
+const TN = (root) => `[...document.querySelectorAll('${root} .ws-tn')].length`;
+/** A wrong answer on the practice card: the answer + 1, typed into the stack's digit boxes or the answer box. */
+const wrongCard = (page) => page.evaluate(() => {
+    const st = window.state; st.hasAnswered = false;
+    const v = String(Number(String(st.currentQ.ans).replace(/,/g, '')) + 1);
+    const boxes = [...document.querySelectorAll('#visualAid input.mq-digit')];
+    if (boxes.length) { const pad = boxes.length - v.length; boxes.forEach((b, i) => { b.value = i >= pad ? v.charAt(i - pad) : ''; }); }
+    const i = document.getElementById('answerInput'); if (i) i.value = v;
+    window.submitAnswer();
+});
+const wrongWorksheet = (page, i) => page.evaluate((i) => {
+    const q = window.state.worksheetQs[i];
+    const v = String(Number(String(q.ans).replace(/,/g, '')) + 1);
+    const card = document.getElementById(`ws_card_${i}`);
+    const cols = [...card.querySelectorAll('.column-answer-input')].filter((c) => c.offsetParent);
+    if (cols.length) { const pad = cols.length - v.length; cols.forEach((c, k) => { c.value = k >= pad ? v.charAt(k - pad) : ''; }); window.checkWorksheetAnswerFromColumns(i); return; }
+    const digits = [...card.querySelectorAll('input.mq-digit')];
+    if (digits.length) { const pad = digits.length - v.length; digits.forEach((b, k) => { b.value = k >= pad ? v.charAt(k - pad) : ''; b.dispatchEvent(new Event('input', { bubbles: true })); }); }
+    const inp = document.getElementById(`ws_input_${i}`); inp.value = v;
+    window.checkWorksheetAnswer(i);
+}, i);
+const startQuiz = (page, c, k, seed = 301) => page.evaluate((c, k, seed) => {
+    const questions = [];
+    for (let i = 0; i < 2; i++) {
+        const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i });
+        questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
+    }
+    const test = { id: null, name: 'Q', createdAt: null, updatedAt: null, sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
+        settings: { timeLimit: null, randomOrder: false, showFeedback: 'instant', allowRetry: true, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+    window.handleQuizURL(window.compressTestForURL(test));
+    const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+    window.startQuizTest(); window.scrollTo(0, 0);
+}, c, k, seed);
+/** A wrong answer in the quiz, then the question drawn again (the quiz shows its feedback on a redraw). */
+const wrongQuiz = (page) => page.evaluate(() => {
+    const st = window.state; const flat = st.quizOrder[st.quizQuestionIndex];
+    const q = st.quizAllQuestions[flat].question.questionData;
+    window.submitQuizTextAnswer(flat, String(Number(String(q.ans).replace(/,/g, '')) + 1));
+    window.navigateQuizQuestion(1); window.navigateQuizQuestion(-1); window.scrollTo(0, 0);
+});
+
+/** R4-1, owner ruling (b): a wrong answer keeps the teacher's touch marks and ADDS the next support, on every host. */
+async function realKeep(fails) {
+    const { page, problems, close } = await open({ seed: 21, viewport: VP });
+    try {
+        await READY(page);
+        for (const [c, k, sup] of [['subtraction', 'subtract', 'touch'], ['subtraction', 'subtract', 'touchall'], ['addition', 'add_column_multi', 'touch'], ['addition', 'add_column_multi', 'touchall'], ['addition', 'add_facts', 'touch']]) {
+            const tag = `keep ${k} ${sup}`;
+            await setSkill(page, c, k, sup);
+            // card
+            // an item the teacher's option can draw on (count back needs a one-digit number to dot)
+            let n0 = 0;
+            for (let t = 0; t < 10 && !n0; t++) { await startCard(page, c, k); await sleep(700); n0 = await page.evaluate(TN('#visualAid')); }
+            if (!n0) { fails.push(`${tag} card: no teacher numerals to keep`); continue; }
+            await wrongCard(page); await sleep(900);
+            const n1 = await page.evaluate(TN('#visualAid'));
+            const look = await page.evaluate(() => ({ fb: (document.getElementById('feedbackArea') || {}).textContent || '', arrow: !!document.querySelector('#visualAid [data-ws-support-on="startarrow"]'), lad: (document.querySelector('#visualAid [data-mq-ladder]') || { getAttribute: () => '' }).getAttribute('data-mq-ladder') }));
+            if (n1 !== n0) fails.push(`${tag} card: wrong 1 changed the numerals ${n0} -> ${n1} ("${look.fb}")`);
+            if (look.arrow && !/Now use the arrow too\./.test(look.fb)) fails.push(`${tag} card: the arrow is added but the message is "${look.fb}"`);
+            if (/^Not yet\. Use /.test(look.fb.trim())) fails.push(`${tag} card: the message drops the teacher's dots: "${look.fb}"`);
+            if (k === 'add_facts') continue;
+            // worksheet
+            await page.evaluate((c, k) => { const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 4; window.initWorksheet(); window.scrollTo(0, 0); }, c, k);
+            await sleep(1200);
+            const w0 = await page.evaluate(TN('#ws_card_0'));
+            await wrongWorksheet(page, 0); await sleep(900);
+            const w1 = await page.evaluate(TN('#ws_card_0'));
+            const wl = await page.evaluate(() => !!document.querySelector('#ws_card_0 [data-mq-ladder]'));
+            if (!wl) fails.push(`${tag} worksheet: the wrong answer did not climb the ladder`);
+            if (w1 !== w0 || !w0) fails.push(`${tag} worksheet: wrong 1 changed the numerals ${w0} -> ${w1}`);
+            await page.evaluate(() => { document.querySelectorAll('body > .modal-overlay, body > [style*="z-index: 9999"]').forEach((e) => e.remove()); });
+            // quiz
+            let q0 = 0;
+            for (let t = 0; t < 10 && !q0; t++) { await startQuiz(page, c, k, 301 + 7 * t); await sleep(900); q0 = await page.evaluate(TN('#quizTakeView .qt-cell')); }
+            await wrongQuiz(page); await sleep(1200);
+            const q1 = await page.evaluate(TN('#quizTakeView .qt-cell'));
+            const qfb = await page.evaluate(() => (document.querySelector('#quizTakeView .qt-feedback') || {}).textContent || '');
+            if (q1 !== q0 || !q0) fails.push(`${tag} quiz: wrong 1 changed the numerals ${q0} -> ${q1} ("${qfb}")`);
+            await page.evaluate(() => { window.state.quizMode = false; });
+        }
+    } finally {
+        if (problems.length) fails.push('keep console: ' + JSON.stringify(problems.slice(0, 3)));
+        await close();
+    }
+}
+
+/** R4-2, R4-3: a column stack counts per column, a 0 is no target, Start again is never under a box. */
+async function realStack(fails) {
+    const ok = (c, m) => { if (!c) fails.push('stack: ' + m); };
+    for (const vp of [VP, { width: 1280, height: 600, deviceScaleFactor: 1, hasTouch: true }]) {
+        const { page, problems, close } = await open({ seed: 33, viewport: vp });
+        const at = `@${vp.width}x${vp.height}`;
+        try {
+            await READY(page);
+            await setSkill(page, 'addition', 'add_column_multi', 'touch');
+            let tries = 0;
+            do { await startCard(page, 'addition', 'add_column_multi'); await sleep(800); tries++; }
+            while (tries < 6 && (await page.evaluate(() => document.querySelectorAll('#gameView .ws-tn[role="button"]').length)) < 2);
+            const labels = await page.evaluate(() => [...document.querySelectorAll('#gameView .ws-tn[role="button"]')].map((b) => b.getAttribute('aria-label')));
+            ok(labels.length >= 2, `${at} numerals on the stack: ${labels.length}`);
+            ok(labels.every((l) => !/^0:/.test(l)), `${at} R4-3: no target on a 0: ${JSON.stringify(labels)}`);
+            for (const phase of ['start', 'wrong1']) {
+                if (phase === 'wrong1') { await wrongCard(page); await sleep(1000); }
+                const fb = await page.evaluate(() => (document.getElementById('feedbackArea') || {}).textContent || '');
+                if (phase === 'wrong1') ok(!/Say \d+\. Touch the dots on \d+/.test(fb), `${at} R4-3: column words, not the whole sum: "${fb}"`);
+                // two numerals in different columns: x centres differ
+                const pts = await page.evaluate(() => [...document.querySelectorAll('#gameView .ws-tn[role="button"]')].map((b) => { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, n: Number((/: (\d+) touch/.exec(b.getAttribute('aria-label')) || [])[1]) }; }));
+                pts.sort((a, b) => b.x - a.x);
+                const ones = pts[0];
+                const other = pts.find((p) => Math.abs(p.x - ones.x) > 20);
+                await page.click('#gameView .mq-tn-reset').catch(() => {});
+                await page.touchscreen.tap(ones.x, ones.y); await sleep(200);
+                if (ones.n >= 2) { await page.touchscreen.tap(ones.x, ones.y); await sleep(200); }
+                const want = Math.min(2, ones.n);
+                ok((await said(page, '#gameView')) === `Touched ${want}`, `${at} ${phase} R4-3: the ones column counts alone: "${await said(page, '#gameView')}" (want Touched ${want})`);
+                if (other) {
+                    await page.touchscreen.tap(other.x, other.y); await sleep(200);
+                    ok((await said(page, '#gameView')) === 'Touched 1', `${at} ${phase} R4-3: another column starts its own count: "${await said(page, '#gameView')}"`);
+                }
+                // R4-2: Start again is hit-testable at its centre and clears
+                const hit = await page.evaluate(() => {
+                    const b = document.querySelector('#gameView .mq-tn-reset'); if (!b) return { err: 'no button' };
+                    b.scrollIntoView({ block: 'center' });
+                    const r = b.getBoundingClientRect();
+                    const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                    const said = document.querySelector('#gameView .mq-tn-said').getBoundingClientRect();
+                    const boxes = [...document.querySelectorAll('#visualAid input')].map((i) => i.getBoundingClientRect()).filter((q) => q.height);
+                    const under = boxes.some((q) => q.bottom > Math.min(r.top, said.top) + 1 && q.top < Math.max(r.bottom, said.bottom) && q.right > Math.min(r.left, said.left) && q.left < Math.max(r.right, said.right));
+                    return { x: r.left + r.width / 2, y: r.top + r.height / 2, me: e === b, h: Math.round(r.height), lines: Math.round(r.height / parseFloat(getComputedStyle(b).lineHeight || '20')), under };
+                });
+                ok(hit.me, `${at} ${phase} R4-2: Start again is the element at its own centre`);
+                ok(!hit.under, `${at} ${phase} R4-2: no answer box overlaps the count line`);
+                ok(hit.h >= 44, `${at} ${phase} Start again is at least 44 px tall: ${hit.h}`);
+                await page.touchscreen.tap(hit.x, hit.y); await sleep(250);
+                ok((await page.evaluate(GREYS('#gameView'))) === 0, `${at} ${phase} R4-2: a tap on Start again clears the stack`);
+            }
+        } finally {
+            if (problems.length) fails.push('stack console: ' + JSON.stringify(problems.slice(0, 3)));
+            await close();
+        }
+    }
+}
+
+/** R4-5: a ladder rung that brings the numerals (no teacher option) puts the count on the message's row: only that row appears. */
+async function realRow(fails) {
+    const ok = (c, m) => { if (!c) fails.push('row: ' + m); };
+    const { page, problems, close } = await open({ seed: 41, viewport: VP });
+    try {
+        await READY(page);
+        await setSkill(page, 'addition', 'add_facts', null);
+        await startCard(page, 'addition', 'add_facts'); await sleep(900);
+        const checkSel = await page.evaluate(() => { const b = [...document.querySelectorAll('#gameView button')].find((x) => /check|submit/i.test(x.textContent) && x.offsetParent); if (b && !b.id) b.id = 'tt-check2'; return b ? '#' + b.id : null; });
+        const t0 = await top(page, checkSel);
+        const cellH = () => page.evaluate(() => Math.round(document.querySelector('#visualAid .mq-scell, #visualAid').getBoundingClientRect().height));
+        const h0 = await cellH();
+        await wrongCard(page); await sleep(1000);
+        const r = await page.evaluate(() => {
+            const fb = document.getElementById('feedbackArea');
+            const bar = document.querySelector('#gameView .mq-tn-count');
+            return { tn: document.querySelectorAll('#visualAid .ws-tn').length, inRow: !!(bar && fb && fb.contains(bar)), bars: document.querySelectorAll('#gameView .mq-tn-count').length, fbH: fb ? Math.round(fb.getBoundingClientRect().height + parseFloat(getComputedStyle(fb).marginTop) + parseFloat(getComputedStyle(fb).marginBottom)) : 0 };
+        });
+        if (!r.tn) { fails.push('row: the add_facts ladder drew no touch numerals at wrong 1'); return; }
+        ok(r.bars === 1 && r.inRow, `card: the count line sits in the ladder message's row: ${JSON.stringify(r)}`);
+        const c = await centre(page, '#gameView .ws-tn[role="button"]', 0);
+        await page.touchscreen.tap(c.x, c.y); await sleep(300);
+        ok(/^Touched 1$/.test((await said(page, '#gameView')) || ''), `card: the row counts: "${await said(page, '#gameView')}"`);
+        const t1 = await top(page, checkSel);
+        // the numerals themselves may draw a little taller than the plain digits; nothing else may grow
+        const grow = Math.max(0, (await cellH()) - h0);
+        ok(t1 - t0 <= r.fbH + grow + 2, `card: only the message row is added (${t0} -> ${t1}, row ${r.fbH}, numerals ${grow})`);
+        // the quiz: the same, after its redraw
+        await startQuiz(page, 'addition', 'add_facts'); await sleep(1200);
+        await wrongQuiz(page); await sleep(1200);
+        const q = await page.evaluate(() => { const fb = document.querySelector('#quizTakeView .qt-feedback'); const bar = document.querySelector('#quizTakeView .mq-tn-count'); return { tn: document.querySelectorAll('#quizTakeView .ws-tn').length, inRow: !!(bar && fb && fb.contains(bar)), bars: document.querySelectorAll('#quizTakeView .mq-tn-count').length }; });
+        if (q.tn) ok(q.bars === 1 && q.inRow, `quiz: the count line sits in the ladder message's row: ${JSON.stringify(q)}`);
+    } finally {
+        if (problems.length) fails.push('row console: ' + JSON.stringify(problems.slice(0, 3)));
         await close();
     }
 }
@@ -235,7 +423,7 @@ async function realQuiz(fails) {
         await close();
     }
     // R3-8: the REAL hosts (practice card, online worksheet, quiz) at Chromebook size, touch screen
-    for (const run of [realCard, realTimes, realWorksheet, realQuiz]) {
+    for (const run of [realCard, realTimes, realWorksheet, realQuiz, realKeep, realStack, realRow]) {
         try { await run(fails); } catch (e) { fails.push(`${run.name}: ${String(e && e.stack || e)}`); }
     }
     if (problems.length) fails.push('console: ' + JSON.stringify(problems.slice(0, 3)));

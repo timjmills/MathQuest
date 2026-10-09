@@ -391,8 +391,9 @@ function messageFor(e) {
     const name = NAMES[r.id] || 'the help';
     const how = TOUCH_IDS.includes(r.id) ? touchHow(e, r.id) : '';
     if (how) return `Not yet. ${how}`;
-    // Owner ruling (b), 2026-10-09: the teacher's touch dots stay, and this support is ADDED to them.
-    const kept = (e.teacher || []).length && !(e.teacher || []).some((t) => clashes(t, r.id));
+    // Owner ruling (b), 2026-10-09: the teacher's touch dots always stay (a picture is drawn beside
+    // them, a mark in the kit with them), so this support is ADDED to them: the "too" form.
+    const kept = (e.teacher || []).length > 0;
     if (e.n === 1) return kept ? `Not yet. Now use ${name} too.` : `Not yet. Use ${name}, then try again.`;
     return clashes(e.rungs[0].id, r.id) ? `Not yet. Now try ${name}.` : `Not yet. Now use ${name} too.`;
 }
