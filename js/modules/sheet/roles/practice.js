@@ -727,6 +727,27 @@ export function circleAllCriterion(html) {
     return String(html).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Select|Tap|Check|Choose)\s+(?:ALL|all)\s+(?:of\s+)?(?:the\s+)?([a-z])/, (m, open, c) => `${open}${c.toUpperCase()}`);
 }
 
+/**
+ * One instruction per section (P-LG-5, RM-08): a choose-all cell under a section line that
+ * already says its task drops its own verb or prompt. Shared by every role that prints a section
+ * line over choose-all cells (practice, review). Mutates and returns the plan item.
+ */
+export function underSectionLine(pi, key) {
+    if (!pi || typeof pi.render !== 'function') return pi;
+    const draw = pi.render;
+    if (key === 'circle-part-of-set') {
+        // "Circle 2/3 of the stars." under "Circle the fraction of the set." -> "2/3 of the stars."
+        pi.render = (c, o) => String(draw(c, o)).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Tap)\s+/, '$1');
+    } else if (key === 'default-circle-all') {
+        pi.render = (c, o) => circleAllCriterion(draw(c, o));
+    } else if (PAPER_TASK_KEYS.has(key)) {
+        // the section line says the paper task: the cell does not say it again (P-LG-5)
+        const line = INSTRUCTION_LIBRARY[key];
+        pi.render = (c, o) => dropSamePrompt(draw(c, o), line);
+    }
+    return pi;
+}
+
 export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM } = {}) {
     const { size, look, paper } = norm;
     const sections = [];
@@ -971,19 +992,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     // RM-08: under the section line "Circle all the correct answers." a choose-all
                     // cell keeps only its criterion ("Sums that equal 1."), never a second verb
                     // (P-LG-2, P-LG-5); under any other line it keeps its own "Circle all ...".
-                    if (instr[part.section].key === 'circle-part-of-set' && typeof pi.render === 'function') {
-                        // "Circle 2/3 of the stars." under "Circle the fraction of the set." -> "2/3 of the stars."
-                        const draw = pi.render;
-                        pi.render = (c) => String(draw(c)).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Tap)\s+/, '$1');
-                    } else if (instr[part.section].key === 'default-circle-all' && typeof pi.render === 'function') {
-                        const draw = pi.render;
-                        pi.render = (c) => circleAllCriterion(draw(c));
-                    } else if (PAPER_TASK_KEYS.has(instr[part.section].key) && typeof pi.render === 'function') {
-                        // the section line says the paper task: the cell does not say it again (P-LG-5)
-                        const draw = pi.render;
-                        const line = INSTRUCTION_LIBRARY[instr[part.section].key];
-                        pi.render = (c) => dropSamePrompt(draw(c), line);
-                    }
+                    underSectionLine(pi, instr[part.section].key);
                     return pi;
                 }),
             });

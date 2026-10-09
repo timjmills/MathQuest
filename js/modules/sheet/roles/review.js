@@ -18,7 +18,7 @@ import {
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm,
 } from './compose.js';
 import { FILL_CAP, rowShape, groupByHeight, fillLimit } from '../layout.js';
-import { itemInstructionKey, neutralForKinds, itemKindSig } from './practice.js';
+import { itemInstructionKey, neutralForKinds, itemKindSig, underSectionLine } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
 const rowLimit = (m) => fillLimit(m);
@@ -252,13 +252,17 @@ export function plan(input = {}) {
     const sections = [];
     let start = 1;
     groups.forEach((gr, gi) => {
-        sections.push({ kind: 'band', label: '', instr: instructionText(gr.kindKey || neutralForKinds(instructionKeyOf(gr, input.skills), gr), gr),
-            content: shaped(gridPart(gr.map((it) => planItem(it, { cols: g.cols })), { cols: g.cols, rows: rowsOf[gi], cellH: cellsM[gi], labels, start }), gr, g.cols, rowsOf[gi], cellsM[gi]) });
+        // One instruction per section (critic fractions-key r3 R6): a choose-all cell under a line
+        // that already says "Circle all ..." keeps only its criterion.
+        const keyM = gr.kindKey || neutralForKinds(instructionKeyOf(gr, input.skills), gr);
+        sections.push({ kind: 'band', label: '', instr: instructionText(keyM, gr),
+            content: shaped(gridPart(gr.map((it) => underSectionLine(planItem(it, { cols: g.cols }), keyM)), { cols: g.cols, rows: rowsOf[gi], cellH: cellsM[gi], labels, start }), gr, g.cols, rowsOf[gi], cellsM[gi]) });
         start += gr.length;
     });
     if (useE.length) {
-        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(instructionKeyOf(useE, input.skills), useE),
-            content: shaped(gridPart(useE.map((it) => planItem(it, { cols: eCols })), { cols: eCols, rows: rowsE, cellH: cellE, labels, start: useM.length + 1 }), useE, eCols, rowsE, cellE) });
+        const keyE = instructionKeyOf(useE, input.skills);
+        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(keyE, useE),
+            content: shaped(gridPart(useE.map((it) => underSectionLine(planItem(it, { cols: eCols }), keyE)), { cols: eCols, rows: rowsE, cellH: cellE, labels, start: useM.length + 1 }), useE, eCols, rowsE, cellE) });
     }
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: { items: n, scoreOutOf: n, earlierShare: n ? useE.length / n : 0,

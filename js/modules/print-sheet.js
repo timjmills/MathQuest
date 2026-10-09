@@ -232,6 +232,8 @@ const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'ob
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
+const LIST_PROBE = 8;
+
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, maxLists = 1 } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -259,9 +261,16 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // At most one choose-all list per run of a skill that also deals production items
             // (critic fractions-key N2 / N3: a "Subtract" page of two "less than 1/2" lists, a
             // test of comparisons). A skill that only deals lists is never held to it.
+            // The cap holds from the FIRST deal (critic fractions-key r3 R1): a run never opens
+            // with a list, and a list over the cap is skipped. Until a production item has been
+            // seen, LIST_PROBE more seeds are tried before a list is taken, so a skill that deals
+            // only lists still keeps them.
             const isList = cand.printFormat === 'multi-select';
             if (!isList) seen.add(`prod:${key}`);
-            if (isList && k < tries && (kept.get(`list:${key}`) || 0) >= maxLists && (seen.has(`prod:${key}`) || (maxLists === 0 && k < 6))) continue;
+            if (isList && k < tries) {
+                const overCap = (kept.get(`list:${key}`) || 0) >= maxLists || !(kept.get(key) > 0);
+                if (overCap && (seen.has(`prod:${key}`) || k < LIST_PROBE)) continue;
+            }
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -1167,6 +1176,11 @@ function measureItems(items, { size, look, colsList }) {
             // A template that re-stacks its zones by width on purpose (the word-work cell puts
             // its answer beside the columns at full width, under them in a column) is not a collapse.
             if (it.footprint && it.footprint.restacks) continue;
+            // A choose-all list of printed numerals wraps its options onto a second line in a
+            // narrower column: wrapped text, not a collapse (critic fractions-key r3 R2: at L the
+            // list took a full-width row of its own and left a fifth of the page blank).
+            if (it.q && it.q.printFormat === 'multi-select' && !it.q.printText && Array.isArray(it.q.options)
+                && !it.q.options.some((o) => o && (o.svg || o.image))) continue;
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;

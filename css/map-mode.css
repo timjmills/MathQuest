@@ -2104,3 +2104,17 @@ body.map-immersive #mapSessionView .map-session-banner:not(.has-controls) {
 }
 .msc-grid.msc-ring .msc-opt.missed-correct::after { content: 'missed'; color: #6d4c00; background: #fff3cd; }
 .msc-grid.msc-ring .msc-opt.wrong-persistent::after { content: 'not this'; color: #b71c1c; background: #ffebee; }
+
+/* Critic fractions-key r3 R3 (additive): the ring list keeps answer-digit type and 44 px+ targets at
+   every window height. The Chromebook rule above (max-height: 760px) shrank every .msc-opt to
+   0.92rem / 36 px with !important and capped the grid at 200 px, so at 1366x650 the ringed
+   numerals fell to ~11 px. A ring option is a printed numeral, not a label: it takes the cell's
+   answer-digit size (--mq-digit, 40-48 px), never the chip size, and its list never scrolls. */
+.msc-grid.msc-ring { max-height: none !important; overflow: visible !important; gap: 12px 18px !important; padding: 8px 0 !important; }
+.msc-grid.msc-ring .msc-opt,
+.msc-grid.msc-ring .msc-opt.large {
+    font-size: clamp(36px, var(--mq-digit, 40px), 46px) !important;
+    min-height: 56px !important; min-width: 64px !important;
+    padding: 4px 16px !important; line-height: 1.1 !important;
+}
+.msc-grid.msc-ring .msc-opt .msc-frac { font-size: 0.9em !important; }

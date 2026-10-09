@@ -15,7 +15,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
-    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
+    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, stackedFracs,
 } from './compose.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -59,7 +59,7 @@ export function plan(input = {}) {
     const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
     const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const ans = answerOf(it);
-    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${stackedFracs(esc(steps[i]))}</span></div>`;
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
         render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')

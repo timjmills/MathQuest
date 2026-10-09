@@ -126,13 +126,17 @@ export const band = (labelText, instr, content, { grow = false, extra = '' } = {
  * @param {string} frame  an oral frame using `__` for each blank, e.g. '__ plus __ equals __.'
  * @param {{size?: string, digits?: number}} [opts]
  */
+/** TY-7: a fraction in the Say line is stacked over its bar, as in the steps (compose.js stackedFracs). */
+const sayFracs = (html) => String(html).replace(/(^|[^\w/.:])(\d{1,3})\/(\d{1,3})(?![\w/])/g, (m, pre, n, d) => `${pre}<span class="ws-ifrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;font-size:0.8em;margin:0 0.08em;">`
+    + `<span>${n}</span><span style="border-top:0.75pt solid currentColor;align-self:stretch;text-align:center;">${d}</span></span>`);
+
 export function sayBand(frame, { size = DEFAULT_SIZE, digits = 2 } = {}) {
     const w = blankWidth(digits, size);
     const parts = String(frame).split('__');
     let inner = '';
     parts.forEach((part, i) => {
         if (i) inner += `<span class="ws-line" style="--w:${w}mm" data-ws-slot="say-${i}" data-ws-shape="line" data-ws-graded="0"></span>`;
-        if (part) inner += `<span>${esc(part)}</span>`;
+        if (part) inner += `<span>${sayFracs(esc(part))}</span>`;
     });
     return `<div class="ws-band ws-band--say" data-ws-band="say"><div class="ws-strip ws-strip--say">`
         + `<b>Say:</b><span class="ws-sayframe"><span class="ws-q">“</span>${inner}<span class="ws-q">”</span></span>`

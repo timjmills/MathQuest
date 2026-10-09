@@ -924,30 +924,31 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_frac_unlike" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 1
+                // Critic fractions-key r3 R9: a list that discriminates - 1 to 3 of the 5 sums are
+                // greater than 1 (never all), and one wrong option is a near miss just under 1.
                 const dPool = [2, 3, 4, 5, 6, 8];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    const dx = pick(dPool);
-                    let dy = pick(dPool);
-                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
-                    const a = rng(1, dx - 1);
-                    const b = rng(1, dy - 1);
-                    const key = `${a}/${dx}+${b}/${dy}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, dx, b, dy, sum: a / dx + b / dy });
+                const all = [];
+                for (const dx of dPool) for (const dy of dPool) {
+                    if (dx >= dy) continue;
+                    for (let a = 1; a < dx; a++) for (let b = 1; b < dy; b++) {
+                        const g = (m, n) => (n ? g(n, m % n) : m);
+                        if (g(a, dx) === 1 && g(b, dy) === 1) all.push({ a, dx, b, dy, sum: a / dx + b / dy });   // simplest form
+                    }
                 }
+                const over = shuffle(all.filter(it => it.sum > 1 + 1e-9));
+                const under = shuffle(all.filter(it => it.sum < 1 - 1e-9));
+                // (two unlike fractions in simplest form never make exactly 1: the near miss is a
+                // sum just under 1, such as 2/3 + 1/4)
+                const near = under.filter(it => it.sum >= 0.8).slice(0, 1);
+                const nCorrect = pick([1, 2, 2, 3, 3]);
+                const items = over.slice(0, nCorrect).concat(near, under.filter(it => !near.includes(it))).slice(0, 5)
+                    // either order on the page: 1/2 + 2/3 or 2/3 + 1/2
+                    .map((it) => (Math.random() < 0.5 ? it : { a: it.b, dx: it.dy, b: it.a, dy: it.dx, sum: it.sum }));
                 let opts = items.map((it, i) => ({
                     id: 'opt' + i,
                     label: `${it.a}/${it.dx} + ${it.b}/${it.dy}`,
                     correct: it.sum > 1 + 1e-9
                 }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `2/3 + 3/4`, correct: true };
-                }
                 opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
                 const ans = opts.filter(o => o.correct).map(o => o.id);
                 q.text = 'Click ALL sums greater than 1.';

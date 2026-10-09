@@ -35,7 +35,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
-    providerWorkedSteps, esc, stripExtraMm,
+    providerWorkedSteps, esc, stripExtraMm, stackedFracs,
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
@@ -684,7 +684,7 @@ function workLinesMm(lines, cols, m) {
 }
 
 const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${stackedFracs(esc(t))}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
@@ -864,7 +864,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
     const hintLine = stage === 'partial' && hint && it.template !== 'stack' ? hintOf(it) : '';
     // A framed hint's gap ("The short hand has passed ___.") is a short grey rule, never
     // underscore characters (SL-6).
-    const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
+    const hintHtml = stackedFracs(esc(hintLine)).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
     return (c, o) => {
         if (c.state !== 'blank') {

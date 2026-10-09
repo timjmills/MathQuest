@@ -249,6 +249,18 @@ export function screenTextLine(el) {
     }
     // TY-7 (critic fractions-key N6): a plain line that writes a fraction sum or difference
     // ("Calculate: 1/2 + 1/3 = ?") stacks each fraction over its bar, as the cell draws it.
+    // Critic fractions-key r3 R4: when the line sits over a fraction-sentence cell that already
+    // draws the sentence ("Calculate: 1/2 + 1/2 = ?" above 1/2 + 1/2 = [ ]), the item is said
+    // once: the line becomes the operation's verb, as the sheet's section line reads.
+    const calc = !el.children.length && String(el.textContent || '').trim().match(/^Calculate:\s*[\d\s/]+([+\u2212\-\u00d7\u00f7])\s*[\d\s/]+=\s*\?$/);
+    if (calc) {
+        let host = el.parentElement;
+        for (let up = 0; host && up < 3 && !host.querySelector('[data-fm-term]'); up++) host = host.parentElement;
+        if (host && host.querySelector('[data-fm-term]')) {
+            el.textContent = { '+': 'Add.', '\u2212': 'Subtract.', '-': 'Subtract.', '\u00d7': 'Multiply.', '\u00f7': 'Divide.' }[calc[1]] || el.textContent;
+            return;
+        }
+    }
     if (!el.children.length && /\b\d+\/\d+\s*[+\u2212\-\u00d7\u00f7]\s*\d+\/\d+\b/.test(el.textContent || '')) {
         el.innerHTML = stackSlashFractions(String(el.textContent).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
     }
