@@ -3682,7 +3682,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.options = [];
                 if (_wfKind === 0) {
                     const whole = rng(2, 9);
-                    q.text = `Write ${whole} as a fraction with denominator 1.`;
+                    // the paper instruction, not a restatement of the frame that names the
+                    // denominator (critic r3 D11): the "= [ ]/1" sentence already shows it
+                    q.text = 'Write the whole number as a fraction.';
+                    q.screenInstr = 'Type the whole number as a fraction.';
                     q.ans = String(whole);
                     q.acceptedAnswers = [String(whole), `${whole}/1`];
                     q.hint = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
@@ -3690,7 +3693,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         wholeMm: 11, barH: 11, perRow: 3 });
                 } else {
                     const den = pick([2, 3, 4, 5, 6, 8]);
-                    q.text = `Write 1 as a fraction with denominator ${den}.`;
+                    q.text = 'Write 1 as a fraction.';
+                    q.screenInstr = 'Type 1 as a fraction.';
                     q.ans = String(den);
                     q.acceptedAnswers = [String(den), `${den}/${den}`];
                     q.hint = `1 whole = ${den}/${den}. When the numerator equals the denominator, the fraction equals 1.`;

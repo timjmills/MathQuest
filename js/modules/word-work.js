@@ -107,7 +107,9 @@ export function applyWordWork(q) {
             }
             // the pupil CHOOSES × or ÷ here: the work is the neutral [ ] ( ) [ ] = [ ] row, never a
             // ÷ bracket that prints the answer to "Circle the sign" (wave 1 lane D, critic 2026-10-03)
-            if (payload.steps.length === 1) { payload.neutral = true; payload.inRow = false; }
+            // ONE answer place for the sign (critic r3 D4): the pupil writes it in the ring, so
+            // the frame carries no sign row to circle as well (`signRow: false`).
+            if (payload.steps.length === 1) { payload.neutral = true; payload.inRow = false; payload.signRow = false; }
         }
         // A remainder story is division by its name: there is no sign to choose, so no sign row and
         // no "Circle the sign" (the frame's ÷ bracket would give the choice away).
@@ -123,9 +125,14 @@ export function applyWordWork(q) {
     q.selfAnswering = true;
     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
     q.printFormat = 'story-work';
-    q.printText = payload.signs === false ? 'Write the numbers in the boxes. Divide. Answer the question.' : 'Circle the sign. Write the numbers in the boxes. Solve.';
+    const ring = payload.neutral && payload.signRow === false;
+    q.printText = payload.signs === false ? 'Write the numbers in the boxes. Divide. Answer the question.'
+        : ring ? 'Write the sign in the circle. Write the numbers. Solve.'
+        : 'Circle the sign. Write the numbers in the boxes. Solve.';
     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
-    q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.' : 'Tap the sign. Type the numbers in the boxes. Solve.';
+    q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.'
+        : ring ? 'Type the sign in the circle. Type the numbers. Solve.'
+        : 'Tap the sign. Type the numbers in the boxes. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;

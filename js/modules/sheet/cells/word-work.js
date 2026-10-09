@@ -241,7 +241,7 @@ const CUES = {
     '+': ['altogether', 'in all', 'in total', 'total', 'together', 'combined', 'sum', 'more'],
     '-': ['how many more', 'how many fewer', 'how much more', 'fewer than', 'less than', 'more than', 'left over', 'left', 'remain', 'fewer', 'difference', 'gave away', 'gave', 'lost', 'ate', 'spent', 'used', 'took'],
     '*': ['groups of', 'rows of', 'in each row', 'times as many', 'times', 'each', 'every', 'per'],
-    '/': ['share equally', 'shared equally', 'equally', 'each get', 'split', 'in each', 'each', 'per', 'left over', 'fewest'],
+    '/': ['share equally', 'shared equally', 'equally', 'each get', 'split', 'in each', 'on each', 'each', 'per', 'left over', 'fewest'],
 };
 
 /** The key phrases of one sentence for the solving signs, as [start, end) ranges. */
@@ -382,13 +382,13 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
                 ? S([`${n1} has ${countOf(a, T)}.`, `${n1} puts them into ${num(b)} equal groups.`, `How many ${T.many} are in each group?`], T)
                 : S([`${n1} has ${countOf(a, T)}.`, `${n1} shares them equally among ${num(b)} friends.`, `How many ${T.many} does each friend get?`], T);
         case 'grouping':
-            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} in each ${C.one}.`, `How many ${C.many} does ${n1} fill?`], C);
+            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} ${C.one === 'plate' ? 'on' : 'in'} each ${C.one}.`, `How many ${C.many} does ${n1} fill?`], C);
         case 'times-inverse':
             return S([`${n1} has ${countOf(a, T)}.`, `That is ${num(b)} times as many as ${n2} has.`, `How many ${T.many} does ${n2} have?`], T);
         case 'times-howmany':
             return S([`${n1} has ${countOf(b, T)}.`, `${n2} has ${countOf(a, T)}.`, `How many times as many ${T.many} does ${n2} have?`], null);
         case 'rem-left':
-            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} in each ${C.one}.`, `How many ${T.many} are left over?`], T);
+            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} ${C.one === 'plate' ? 'on' : 'in'} each ${C.one}.`, `How many ${T.many} are left over?`], T);
         case 'rem-up':
             return a >= 2 && b >= 2
                 ? S([`${countOf(a, CHILD)} go on a trip.`, `Each car holds ${countOf(b, CHILD)}.`, `How many cars do they need?`], CAR)
@@ -918,72 +918,86 @@ function shownSteps(p, ctx) {
     return { steps: out, picks: out.map((s) => s.op), ans: w.value !== undefined && w.value !== null ? String(w.value) : String(last.op === '/' ? last.q : last.ans) };
 }
 
+/** The cell body (everything but a pool caption). */
+function renderWork(p, ctx) {
+    if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+    const twin = isTwin(ctx);
+    // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
+    // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
+    // at L still holds two or three stories (the page measures which fits, DN-10).
+    const narrow = twin || Number(ctx.columns || 1) >= 2;
+    const put = filled(ctx);
+    const sh = shownSteps(p, ctx);
+    const two = p.steps.length > 1;
+    const inRow = p.inRow !== false;
+    const lastI = p.steps.length - 1;
+    // NEUTRAL FRAME (`p.neutral`, a story that chooses between × and ÷): the work is one
+    // equation row of equal boxes, [ ] ( ) [ ] = [ ], so neither the frame (a ÷ bracket, a
+    // partial-product row) nor the box counts give the sign away (wave 1 lane D, critic
+    // 2026-10-03). The pupil writes the sign in the ring; the key fills it.
+    if (p.neutral && !two) {
+        const st = p.steps[0], s = sh.steps[0];
+        const xy = (z) => (z.op === '/' ? [z.top, z.bottom] : [z.a, z.b]);
+        const [ea, eb] = xy(st), [va, vb] = xy(s);
+        const digits = Math.max(2, ...[st.top, st.bottom, p.ans].map((v) => digitsOf(v).length));
+        const bx = boxMm(ctx), pt = digitPt(ctx);
+        const w = Math.max(blankWidth(digits, sizeOf(ctx)), bx * 1.4);
+        const nb = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w, h: bx + 1, pt, kind: 'number' });
+        const ring = wbox(ctx, { id: 'w0-sign', value: put ? GLYPH[sh.picks[0]] : '', expect: GLYPH[st.op], w: bx, h: bx, pt, kind: 'sign', round: true });
+        const glyph = (g) => `<span aria-hidden="true" style="align-self:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${g}</span>`;
+        const eq = `<span class="mq-wwcols mq-wwneutral" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};">${nb('w0-a', va, ea)}${ring}${nb('w0-b', vb, eb)}${glyph('=')}</span>`;
+        const ansB = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', false, eq);
+        return `<div class="mq-ww" data-ww-ops="${st.op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">`
+            + `<div style="display:flex;flex-direction:column;align-items:stretch;">${storyHTML(ctx, p, true)}</div>`
+            + `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 2.5)};margin-top:${L(ctx, 2)};">${p.signRow === false ? '' : signRow(ctx, st.op, put ? sh.picks[0] : null, 0)}${ansB}</div></div>`;
+    }
+    const noSigns = p.signs === false;
+    const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
+    const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
+    const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
+    // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
+    // (or a two-step story) makes the cell a full-width one (see fullW below).
+    const cols = Math.max(1, Number(ctx.columns || 1));
+    const innerW = 186 / cols - (cols > 1 ? 9 : 10);
+    const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
+    const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
+    const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
+        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
+    // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
+    // under it on the left, the columns and the answer on the right. The page then holds three
+    // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).
+    const workW = blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 44);
+    if (!twin && !narrow && !two && !p.kb && workW <= 88) {
+        const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
+        const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
+        const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
+        return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
+    }
+    const body = side
+        ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
+        : narrow
+        ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
+        : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};margin-top:${L(ctx, 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
+    // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
+    // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
+    // it as not fitting the column and prints it in the full-width group at the bottom
+    // (practice.js splitWide) instead of a tall, half-empty column cell (RUBRIC H13).
+    const fullW = !twin && narrow && !side ? `min-width:${L(ctx, 120)};` : '';
+    return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
+}
+
 register(WW_TEMPLATE, {
     render(p, ctx) {
-        if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
-        const twin = isTwin(ctx);
-        // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
-        // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
-        // at L still holds two or three stories (the page measures which fits, DN-10).
-        const narrow = twin || Number(ctx.columns || 1) >= 2;
-        const put = filled(ctx);
-        const sh = shownSteps(p, ctx);
-        const two = p.steps.length > 1;
-        const inRow = p.inRow !== false;
-        const lastI = p.steps.length - 1;
-        // NEUTRAL FRAME (`p.neutral`, a story that chooses between × and ÷): the work is one
-        // equation row of equal boxes, [ ] ( ) [ ] = [ ], so neither the frame (a ÷ bracket, a
-        // partial-product row) nor the box counts give the sign away (wave 1 lane D, critic
-        // 2026-10-03). The pupil writes the sign in the ring; the key fills it.
-        if (p.neutral && !two) {
-            const st = p.steps[0], s = sh.steps[0];
-            const xy = (z) => (z.op === '/' ? [z.top, z.bottom] : [z.a, z.b]);
-            const [ea, eb] = xy(st), [va, vb] = xy(s);
-            const digits = Math.max(2, ...[st.top, st.bottom, p.ans].map((v) => digitsOf(v).length));
-            const bx = boxMm(ctx), pt = digitPt(ctx);
-            const w = Math.max(blankWidth(digits, sizeOf(ctx)), bx * 1.4);
-            const nb = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w, h: bx + 1, pt, kind: 'number' });
-            const ring = wbox(ctx, { id: 'w0-sign', value: put ? GLYPH[sh.picks[0]] : '', expect: GLYPH[st.op], w: bx, h: bx, pt, kind: 'sign', round: true });
-            const glyph = (g) => `<span aria-hidden="true" style="align-self:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${g}</span>`;
-            const eq = `<span class="mq-wwcols mq-wwneutral" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};">${nb('w0-a', va, ea)}${ring}${nb('w0-b', vb, eb)}${glyph('=')}</span>`;
-            const ansB = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', false, eq);
-            return `<div class="mq-ww" data-ww-ops="${st.op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">`
-                + `<div style="display:flex;flex-direction:column;align-items:stretch;">${storyHTML(ctx, p, true)}</div>`
-                + `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 2.5)};margin-top:${L(ctx, 2)};">${signRow(ctx, st.op, put ? sh.picks[0] : null, 0)}${ansB}</div></div>`;
+        const html = renderWork(p, ctx);
+        // `caption` (a story dealt onto a pool page whose one instruction is "Solve."): the
+        // story's own instruction line, in the cell (as parity.js does; critic r3 D5).
+        if (!html || !p.caption) return html;
+        // On paper the verb sits BESIDE the sign row it names ("Circle the sign:" + − × ÷), so the
+        // cell gains no height and the page keeps its count; elsewhere it is a line on top.
+        if (!isTwin(ctx) && html.includes('class="mq-wwsigns"')) {
+            return html.replace(/(<div class="mq-wwsigns"[^>]*style=")([^"]*)(">)/, (m, a, st, c) => `${a}${st}align-items:center;${c}<span class="mq-wwcap" style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.2;white-space:nowrap;">Circle the sign:</span>`);
         }
-        const noSigns = p.signs === false;
-        const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
-        const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
-        const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
-        // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
-        // (or a two-step story) makes the cell a full-width one (see fullW below).
-        const cols = Math.max(1, Number(ctx.columns || 1));
-        const innerW = 186 / cols - (cols > 1 ? 9 : 10);
-        const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
-        const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
-        const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
-            + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
-        // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
-        // under it on the left, the columns and the answer on the right. The page then holds three
-        // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).
-        const workW = blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 44);
-        if (!twin && !narrow && !two && !p.kb && workW <= 88) {
-            const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
-            const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
-            const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
-            return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
-        }
-        const body = side
-            ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
-            : narrow
-            ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
-            : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};margin-top:${L(ctx, 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
-        // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
-        // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
-        // it as not fitting the column and prints it in the full-width group at the bottom
-        // (practice.js splitWide) instead of a tall, half-empty column cell (RUBRIC H13).
-        const fullW = !twin && narrow && !side ? `min-width:${L(ctx, 120)};` : '';
-        return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
+        return `<div class="mq-wwcap" style="font-family:'Andika','Open Sans',sans-serif;color:${INK};font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 1)};padding-left:${isTwin(ctx) ? '0' : L(ctx, 2.5)};${isTwin(ctx) ? 'text-align:center;' : ''}">${esc(String((isTwin(ctx) && p.captionScreen) || p.caption))}</div>${html}`;
     },
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };

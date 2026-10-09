@@ -2754,7 +2754,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
 
-                q.text = `Multiply the array: ${rows} rows \u00d7 ${cols} columns = ?`;
+                // the paper instruction (contract 'multiply-array'), never the frame restated
+                // ("2 rows × 4 columns") above a cell that already prints it (critic r3 D11)
+                q.text = 'Multiply the rows by the columns. Write the answer.';
+                q.screenInstr = 'Multiply the rows by the columns. Type the answer.';
                 q.ans = product;
                 q.a = rows; q.b = cols;
                 q.answerType = 'number';
@@ -2776,6 +2779,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 if (_daBare) {
                     // P12 support 'none': the pupil counts the rows and the columns himself.
                     q.text = 'How many dots are in the array? Write the multiplication.';
+                    q.screenInstr = 'How many dots are in the array? Type the multiplication.';
                     q.hint = 'Count the rows, then the dots in one row. Multiply rows by dots in a row.';
                     q.visual = q.visual.replace(/<div style="margin-top:6px;[^>]*>[^<]*<\/div>/, '');
                 }
@@ -3477,15 +3481,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with state.range
                 const maxBase = Math.max(5, Math.min(Math.floor(Math.sqrt(range)), 20));
-                const base = rng(2, maxBase);
-                const multiplier = rng(2, Math.min(9, Math.floor(range / base)));
+                // L10 (critic r3 D4: all four answers on one L page were 2): the base, the
+                // multiplier and the story form are DEALT across the page (page-deal.js), so the
+                // answers spread over the whole table instead of clustering on the smallest value.
+                const _mcSpan = (lo, hi) => Array.from({ length: Math.max(1, hi - lo + 1) }, (_, i) => lo + i);
+                const base = dealPick(`mc-base:${state.skill}`, _mcSpan(2, maxBase));
+                const _mcCap = Math.max(2, Math.min(9, Math.floor(range / base)));
+                const multiplier = Math.min(_mcCap, dealPick(`mc-mult:${state.skill}`, _mcSpan(2, 9)));
                 const product = base * multiplier;
 
                 const namePair = pickTwoNames();
                 const item = pickNoun();
 
-                // Randomly decide format
-                const format = rng(0, 2);
+                const format = dealIndex(`mc-form:${state.skill}`, 3);
                 if (format === 0) {
                     q.text = `${namePair[0]} has ${base} ${item}. ${namePair[1]} has ${multiplier} times as many. How many ${item} does ${namePair[1]} have?`;
                     q.ans = product;
@@ -3701,11 +3709,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 
                 // Create the four equations with consistent structure
                 // Each equation: [num1, op, num2, equals, result]
+                // A DOUBLE (3 + 3 = 6) has two facts, not four: "3 + 3" and "6 − 3" would each
+                // print twice. Collapse it the way the × family collapses a square (critic r3 D10).
+                const isDouble = addend1 === addend2;
                 const familyData = {
                     a: addend1,
                     b: addend2,
                     c: sum,
-                    equations: [
+                    isSquare: isDouble,
+                    equations: isDouble ? [
+                        { nums: [addend1, addend2, sum], op: '+', type: 'add' },
+                        { nums: [sum, addend1, addend2], op: '−', type: 'sub' }
+                    ] : [
                         { nums: [addend1, addend2, sum], op: '+', type: 'add' },
                         { nums: [addend2, addend1, sum], op: '+', type: 'add' },
                         { nums: [sum, addend1, addend2], op: '−', type: 'sub' },
@@ -4491,7 +4506,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             if (mappedSkill === "missing_mult_div") {
                 // Missing Factors - Multiplication/Division
-                const positions = ['first_factor', 'second_factor', 'product', 'dividend', 'divisor', 'quotient'];
+                // The NAME is the declaration: every item hides a factor (or, in a ÷ fact, the
+                // dividend, divisor or quotient). A bare product "4 × 5 = ___" is plain
+                // multiplication, so 'product' is never dealt (critic r3 D9).
+                const positions = ['first_factor', 'second_factor', 'dividend', 'divisor', 'quotient'];
                 // P11: when the teacher ticks a ÷ notation other than Across alone, the ÷ items are
                 // DEALT on alternate cells and the ticked notations are dealt over those ÷ cells
                 // only, so every ticked notation reaches the page (three ticked: all three). The
@@ -4509,7 +4527,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // balanced but in a random order, never × ÷ × ÷.
                 const _mmDiv = _mmDeal && dealIndex(`mm-op:${state.skill}`, 2) === 0;
                 const position = !_mmDeal ? pick(positions)
-                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
+                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor']));
                 const _mmNotation = _mmDeal ? dealPick(`mm-notation:${state.skill}`, _mmTicked) : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);

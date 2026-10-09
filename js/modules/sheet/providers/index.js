@@ -26,6 +26,8 @@ import './fractions.js';
 import './nl-place.js';
 // O6 lane AP2 round 3: thermometer, ruler, bar graph and perimeter (sheet/cells/figures.js).
 import './figures.js';
+// wave 1 lane D r4: titles of skills without a family provider (strings.iCan only).
+import './titles.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';

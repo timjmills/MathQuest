@@ -2120,6 +2120,25 @@ function audit(skill, items) {
     // because that is how a quotient-and-remainder cell reads. Today every such cell ships the
     // remainder in the answer itself ("59 R 5"), so this never fires; if it starts firing, a
     // generator has begun dropping remainders silently and the owner should see it.
+    // A name that promises a MISSING number (Missing Factors, Missing Addends) holds every item to
+    // it: a bare `4 × 5 = ___` or `3 + 4 = ___` is the plain operation, not a missing factor or
+    // addend (critic wave 1 lane D r3 D9: 9 of 30 Missing Factors items asked for the product).
+    // Read off the item's own printed equation, so it reports only what it can prove. The result
+    // of − or ÷ is itself a missing part (12 − 5 = ? is 5 + ? = 12), so only + and × are held.
+    // Only a name that says WHICH number is missing (a factor, an addend) is read: "Missing
+    // Numbers (+/−)" promises any number of the fact, the sum included.
+    if (isOps && !skill.pool && /\bmissing\s+(?:factors?|addends?)\b/i.test(label)) {
+        const plain = [];
+        for (const it of items) {
+            if (it.error || it.empty) continue;
+            const m = String(it.text || '').trim().match(EQUATION);
+            if (!m) continue;
+            const blanks = [m[1], m[3], m[4]].map(x => BLANK_SLOT.test(x));
+            const o = norm(m[2]);
+            if (blanks[2] && !blanks[0] && !blanks[1] && (o === '+' || o === '×')) plain.push(String(it.text).trim());
+        }
+        if (plain.length) F('missing-unknown', `its name promises a missing factor or addend, but ${plain.length} items ask only for the ${plain[0].includes('+') ? 'sum' : 'product'}: ${plain.slice(0, 4).join('; ')}`);
+    }
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);

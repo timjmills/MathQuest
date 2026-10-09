@@ -20,7 +20,7 @@ import { registerVariantOverride } from './variant-cycler.js';
 import { dealIndex, resetPageDeals } from './page-deal.js';
 // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
 // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
-import { applyWordWork } from './word-work.js';
+import { applyWordWork, isWordWorkSkill } from './word-work.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
@@ -77,13 +77,29 @@ function tunedPoolMember(memberCat, member) {
     state.skillOptions = tuned;
     try {
         const q = generateQuestion();
-        if (q) { q.poolMember = member; q.skillId = q.skillId || member; }
+        if (q) { q.poolMember = member; q.skillId = q.skillId || member; poolCellInstructions(q, saved.skill); }
         return q || null;
     } finally {
         state.category = saved.category;
         state.skill = saved.skill;
         state.skillOptions = saved.skillOptions;
     }
+}
+
+// A pool page prints one generic instruction ("Solve."), so a member that needs its own verb
+// carries it inside its cell, as the parity sort does (critic r3 D5, D13):
+//   - a word-work story dealt into a pool that is not itself a story pool: its own instruction
+//     line ("Circle the sign. Write the numbers in the boxes. Solve.");
+//   - a base-ten draw task: "Draw the number."
+// And mixed_multiplication prints ONE answer shape for its vertical facts: the box its column
+// work uses (boxAns), whatever member dealt the fact (critic r3 D5, L: open zone beside a box).
+function poolCellInstructions(q, outerSkill) {
+    if (!q || !q.poolMember || !q.cell || !q.cell.payload) return;
+    const t = q.cell.template;
+    const add = (extra) => { q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, extra) }); };
+    if (t === 'word-work' && !q.cell.payload.caption && !isWordWorkSkill(outerSkill) && q.printText) add({ caption: q.printText, captionScreen: q.screenInstr || q.printText });
+    else if (t === 'base10' && !q.cell.payload.caption) add({ caption: 'Draw the number.' });
+    if (outerSkill === 'mixed_multiplication' && t === 'fact' && q.cell.payload.notation === 'vertical' && q.cell.payload.boxAns !== true) add({ boxAns: true });
 }
 
 // Plain (no-picture) word problem variants - map to base skill for generation
@@ -279,9 +295,12 @@ export function generateQuestion() {
         }
     }
     const restoreSettings = applySkillSettings();
+    const outerSkill = state.skill;
+    // the word-work cell is made here, after the dispatch: a pool's in-cell instruction follows it
+    const finish = (q) => { const r = applyWordWork(p12Post(q)); poolCellInstructions(r, outerSkill); return r; };
     try {
         const accept = p12Acceptor();
-        if (!accept) return applyWordWork(p12Post(generateAliasedQuestion()));
+        if (!accept) return finish(generateAliasedQuestion());
         // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
         // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
         // all have those denominators). The item is simply drawn again, so the generator needs
@@ -292,7 +311,7 @@ export function generateQuestion() {
             q = generateAliasedQuestion();
             if (!q || accept(q)) break;
         }
-        return applyWordWork(p12Post(q));
+        return finish(q);
     } finally {
         if (restoreSettings) restoreSettings();
     }
@@ -610,6 +629,7 @@ function generateResolvedQuestion() {
 
     // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;
+    const outerSkill = state.skill;   // the pool (or skill) the page asked for, before it resolves
     let forcedMappedCategory = null;
     let poolPlainSkill = null;
     let poolMember = null;     // P12: the pool member drawn (a word pool's own id, before it resolves)
@@ -1020,6 +1040,7 @@ function generateResolvedQuestion() {
     if (q.poolMember && q.cell && q.cell.template === 'parity' && q.cell.payload && q.cell.payload.task === 'sort' && !q.cell.payload.caption) {
         q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { caption: true }) });
     }
+    poolCellInstructions(q, outerSkill);
     if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
     if (poolPlainSkill && !isPlainWord) {

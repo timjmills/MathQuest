@@ -53,7 +53,8 @@ export function wordWorkSteps(q) {
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
     p.steps.forEach((st, i) => {
         const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
-        out.push(p.signs === false ? step(`${pre}${VERB[st.op]}.`) : step(`${pre}Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
+        const mv = p.neutral && p.signRow === false ? `Write ${GLYPH[st.op]} in the circle.` : `Circle ${GLYPH[st.op]}.`;
+        out.push(p.signs === false ? step(`${pre}${VERB[st.op]}.`) : step(`${pre}${mv} ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
         out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`));
         out.push(step(workLine(st)));
     });
@@ -112,7 +113,18 @@ const OWN = {
 };
 for (const [key, iCan] of Object.entries(OWN)) {
     // a remainder story is division by its name: its page never asks for a sign (no sign row)
-    const def = /remainder_/.test(key)
+    // a times-as-many story writes its sign in the neutral sentence's ring: one sign place
+    const def = /mult_comparison/.test(key)
+        ? wordWorkProvider(iCan, {
+            strings: strings({
+                iCan,
+                instructionKey: 'story-work-ring',
+                steps: ['Read the story two times.', 'Write the sign that fits the story in the circle.', 'Write the numbers in the boxes. Solve.', 'Write the answer and its label word.'],
+                say: 'The answer is __ __.',
+                sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            }),
+        })
+        : /remainder_/.test(key)
         ? wordWorkProvider(iCan, {
             strings: strings({
                 iCan,

@@ -140,6 +140,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-k2': 'Solve. Write the number.',
     // Every whole-number word problem (owner ruling 2026-09-25): the word-work cell.
     'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
+    // a story that chooses x or / in a neutral sentence: ONE sign place, the ring (critic r3 D4)
+    'story-work-ring': 'Write the sign in the circle. Write the numbers. Solve.',
     // a division story by its name (remainder_*): no sign to choose, so none to circle
     'story-work-div': 'Write the numbers in the boxes. Divide. Answer the question.',
     'pick-parts': 'Write one number from each list to make the sum.',
