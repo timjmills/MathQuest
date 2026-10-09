@@ -182,6 +182,8 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
 
+- 2026-10-09 Wave 1 Lane D fix round 7: builder escalated to Opus medium (the ceiling) - mixed_multiplication S layout (column problems leaving a part-filled row / H13 bands) failed critic rounds 2 and 3 and the round-6 Opus-low builder's full S lint.
+
 ## 10. Known pre-existing gate failure (2026-10-03, Wave 1 Lane D)
 
 - `ws-screen-answer --skills addition:number_families_add` FAILS on main (claude/sweet-newton-c8wrv1) exactly as on Lane D: card ok, worksheet 0/3 and quiz 0/3 (the `number-family` answer type is not entered by the gate's answering path). Lane D did not touch the screen path of this skill (only its print boxes); it needs its own fix.
