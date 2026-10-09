@@ -242,3 +242,179 @@ The quiz fails: the teacher's touch option never reaches it. Paper (S and L, pup
 - **C2.** Fix R2-1 (teacher-on touch in the quiz) and R2-2 (the ladder's × follows the fact set). Deal single-digit pairs only on count-all pages.
 - **C3.** Fix R2-5, so a worksheet cell never changes size.
 - **C4.** Fix R2-1 so SUPPORTS.md's quiz sentence becomes true, or else correct that sentence. Add an owner ruling on the screen keyline (R2-4).
+
+---
+
+# Round 3 (commit e9f6516: touch-tap.js, one touch-floor rule, R2 fixes)
+
+Critic: Opus 5.5, medium effort, fresh start. Date: 2026-10-09. I ran every browser check one at a time through
+`/tmp/mq-browser-run.sh`. Evidence is in the session scratchpad under `tn-r3/` (`logs/`, `probe/out/`, `print/S|M|L/`,
+`ladder3/`). The worktree is unchanged apart from this file.
+
+## Verdict: FAIL
+
+Paper passes at S, M and L (every page type, pupil and key, photocopy-safe). R2-1 to R2-4 are closed. R2-5 is
+**not** closed.
+
+The new tapping layer (`touch-tap.js`) works in the synthetic gate, but it breaks or shifts things in the three
+real hosts:
+- keyboard counting is taken over by the active-box after about a second;
+- a tap moves the caret out of the answer box, so at Chromebook height the next digit typed is lost;
+- the count line pushes Check down, and on the worksheet it grows the whole row;
+- after a ladder redraw the count is stale;
+- the ladder's touch rung swaps the teacher's count-all for count-on.
+
+## Gates (head e9f6516)
+
+| Gate | Result |
+|---|---|
+| ws-boot-smoke | OK |
+| ws-touch-tap | OK (but see R3-8: its host is synthetic, outside the three real hosts) |
+| ws-touchdots | OK, 2289 / 2289 |
+| ws-support-ladder | OK (add_facts, subtract, mult_facts, div_facts, …; card, worksheet, quiz instant / end) |
+| ws-support-ladder `mult_facts\|{"constant":[3]}` --shots | OK. "Count by 3s. Touch a dot on 1 for each count.": R2-2 closed |
+| ws-screen-answer | OK |
+| ws-screen-slots | OK (609 skills, 2436 renders, 0 doubled) |
+| ws-content-audit | OK |
+| ws-print-lint --source kit | 463 findings in 33 documents = baseline (not raised) |
+| ws-code-snapshot | OK (608 / 35) |
+| node --check, every changed JS | OK |
+| ws-grade-render touchall, S / M / L, 10 roles (independent, more-practice, guided, review, test, error-analysis, reason-it, stretch, lesson, true-false) for add_facts, add_column_multi, subtract, mult_facts, div_facts | renders, console clean. Lesson role OVERFLOW on add_column_multi and subtract (S/M/L) and div_facts (S/M): the anchor chart's model cell. It draws no touch marks, so it is not this lane (see Out of lane). |
+| Merge into claude/sweet-newton-c8wrv1 (4970e4b), `git merge-tree` | **Not clean.** `css/screen-cell.css`: the touch block conflicts with main's Steps-box hint rule at the file's end. Keep both. `design/audit/runs/wave1-A2/card-function_table_easy-green-red-empty-1280.png`: binary; take main's copy or re-shoot. `worksheet.js` auto-merges. |
+
+## Round-2 defects
+
+| Id | Status | Proof |
+|---|---|---|
+| R2-1 quiz ignores the teacher option | **closed** | Quiz with touchall on add_facts: 2 touch numerals drawn and tappable (`probe/out/*-quiz0.png`) |
+| R2-2 × ladder ignores the fact set | **closed** | `ladder3/ladder-multiplication-mult_facts-card-wrong1-1280.png` reads "Count by 3s", dot on the 1 |
+| R2-3 S fit line | **closed** | S meta: "Digits 16 pt; touch-dot facts 24 pt or more." and "touch-dot cells 28 pt." (M likewise) |
+| R2-4 keylines break the 4 and 5 at 1× | **closed** | `probe/out/grey-dpr1.png`: the 4 and 5 are whole at 40 and 56 px, DPR 1. Owner exception recorded in SUPPORTS §S1.9. |
+| R2-5 worksheet cell grows mid-ladder | **open** (R3-3) | see below |
+
+## Score table (round 3)
+
+| Version | C1 | C2 | C3 | C4 | Pass |
+|---|---|---|---|---|---|
+| Print S / M / L, all 10 roles, pupil + key (touch cells raised to 24 / 28 pt) | 9 | 9 | 9 | 9 | yes |
+| Print photocopy-safe (unchanged since r2, gate OK) | 9 | 9 | 9 | 9 | yes |
+| Practice card 1366x768 (650 visible) and 1280x720, mouse + touch | 7 | 7 | 7 | 7 | **no** |
+| Online worksheet 1366x650, mouse + touch | 7 | 7 | 6 | 7 | **no** |
+| Quiz 1366x650, mouse + touch | 7 | 8 | 7 | 7 | **no** |
+| Basic 390 (card, worksheet, quiz) | no h-scroll, targets ≥ 44, typing works in a focused box | | | | basic OK (phone polish deferred) |
+
+## Defects (round 3)
+
+**R3-1 · Major · C1 −1, C4 −2 · card, worksheet, quiz. Keyboard counting is taken over by the active-box.**
+- **Measured** (`probe/card.cjs`, 1280x720 touch and 1366x650):
+  - focus the 7 of "2 + 7" and press Enter / Space;
+  - the count runs 3, 4, 5, 6; then, about 1 s in, `document.activeElement` becomes the answer box;
+  - every later Enter goes to the box ("Touched 7" stops; ×: "Touched 9" stops after 4 presses; column stack after 2).
+- **Cause:**
+  - `active-box.js` `selectIfLoose` treats a focused `[role="button"]` *inside* a problem host as a blank part of the problem (`if (… [role="button"]) && !inProblem) return;` only spares ones outside);
+  - once the last tap is over 800 ms old, it pulls focus to the pulsing box;
+  - each count mutates the DOM (the count line text), which reschedules that check.
+- **Fix:**
+  - in `selectIfLoose`, return when the focused element is a touch numeral (`ae.matches('.ws-tn[data-mq-tn]')`), the same as a button or link the pupil chose;
+  - keep the digit-key redirect, so a digit typed while on a numeral still lands in the box.
+- **Proof:** in the real card, worksheet and quiz, 7 Enters on a 7 give "Touched 7", with focus on the 7 throughout.
+
+**R3-2 · Major · C1 −1 · card and quiz at Chromebook height. A tap on a number takes the caret out of the answer box.**
+- **Measured:**
+  - the number is `tabindex="0"`, so a mouse or touch tap focuses it;
+  - at 1366x650 and 1280x720 the card's box (top 688) and the quiz box (638–705) are not fully on screen, so the active-box digit redirect (`onScreen(box)`) does not fire;
+  - typing "1" after a tap was lost on the card and in the quiz (`afterType.val = ""`);
+  - with the box on screen (1366x900) and on the worksheet, the digit landed.
+- **Fix:**
+  - on `pointerdown` / `mousedown` over `.mq-tn-hit`, call `preventDefault()`, so a pointer tap counts without moving focus;
+  - keep `tabindex` for keyboard users;
+  - a pupil who taps the 7 and then types then always types into the box, as before this lane.
+- **Proof:** on the card and the quiz at 1366x650, tap a number, type a digit, and the box holds it.
+- (The box sitting partly below a 650 px fold is a pre-existing app layout matter; see Out of lane.)
+
+**R3-3 · Major · C3 −2 · online worksheet. R2-5 is not fixed: the floor attribute lands on the wrong element and the wrong card.**
+- **Where:** `worksheet.js` `_wsRenderCard`: `grid.closest('.mq-scell') || grid.querySelector('.mq-scell')`.
+  - `grid` is the whole worksheet grid, so this is always **card 0's** outer `.mq-wspaper`, for every card.
+  - The inner `.ws-card-visual.mq-scell.mq-grid-cell` sets its own `--mq-digit: 29px`, so even card 0 stays at 29 px.
+- **Measured** (`probe/wsfloor.cjs`, add_facts, ladder only):
+  - before: cards 0 to 3 at 29 px (card 0 has the attribute, cards 1 to 3 do not);
+  - after one wrong answer on card 1: card 1 at 40 px, and its row grows from 270 to 359 px.
+- **Fix:**
+  - set the attribute on this card's own cell (`card.querySelector('.ws-card-visual')`, or on `card`, with the CSS keyed `[data-mq-touch-floor] .mq-grid-cell`);
+  - better: raise every card whose skill has a touch rung (or a teacher touch option), so a grid never mixes 29 and 40 px.
+- **Proof:** the same probe shows 40 px on every add_facts card before and after the wrong answer, and an unchanged row height.
+
+**R3-4 · Major · C3 −1 (card, quiz), −2 (worksheet). The count line appears on the first tap and pushes the page.**
+- S1.8 says "Nothing grows or moves".
+- **Measured:**
+  - card: Check moves from 787 to 837 px (+50) on the first tap, further below a 650 px fold;
+  - quiz: Next moves from 744 to 794;
+  - worksheet at 1366: the whole row of three cards grows from 295 to 345 px, and the neighbours' problems re-centre about 25 px lower (`probe/out/*-ws1.png`).
+- **Fix:**
+  - reserve the line's height from the start in any cell that has touch numerals (an empty line with `visibility:hidden`, filled on the first tap);
+  - or place it where it takes no new height: beside the Hint / Read row on the card, or inside the card's existing bottom padding on the worksheet;
+  - keep the Start again button ≥ 44 px.
+- **Proof:** card Check, quiz Next and worksheet row heights are equal before and after the first tap.
+
+**R3-5 · Minor · C2 −1 · card, worksheet, quiz. The count goes stale after a ladder redraw.**
+- **Measured:**
+  - after 7 taps then a wrong answer, the ladder redraws the cell;
+  - the marks are all black again (0 greys), but "Touched 7 · Start again" still shows (`probe/out/*-3wrong.png`);
+  - Start again then resets the detached old cell.
+- **Fix:** when `enhance` adds numerals to a cell, or the cell is replaced, drop a count line whose cell is gone. For example, key the line to the cell with an id, and in `scan()` remove lines whose `previousElementSibling` has no counted marks.
+- **Proof:** after a wrong answer the line is gone, or reads 0.
+
+**R3-6 · Major · C2 −2 · card, worksheet, quiz (add / subtract with a teacher count-all option). The ladder's first rung takes support away.**
+- **Measured:** teacher touchall on "2 + 7". After one wrong answer the 7 loses its dots, and the message is "Not yet. Say 7. Touch the dots on 2 and count on." (`probe/out/addition-add_facts-touchall-1280x720-touch-3wrong.png`; column stack: 6 buttons become 4).
+- **Cause:** `support-ladder.js` `redrawKit`: `clashes(touch, touchall)` drops the teacher's touchall for the rung's touch.
+- **Effect:** a pupil who struggles is moved from count-all to the harder count-on. That is the opposite of the owner's "when the pupil struggles".
+- **Fix:** when the item already shows touchall (or touch), the touch rung is spent. Skip to the next rung (tile / start arrow), keeping the teacher's marks.
+- **Proof:** a ws-support-ladder case with `{"support":["touchall"]}` on add_facts shows both numbers still dotted at wrong 1, plus the next support.
+
+**R3-7 · Minor · C4 −1 · column stacks. Each digit is its own target, and the label is ungrammatical.**
+- In "17 + 92 + 34" each digit is its own button: "1: 1 touch dots. Tap to count.", "7: …".
+- Column work counts column by column, so per-digit targets are right in a stack. But S1.8 says one target per NUMBER, so the rule should name the stack case.
+- **Fix:**
+  - document "stacks: one target per digit (columns are counted separately)" in S1.8;
+  - write "1 touch dot".
+
+**R3-8 · Minor · C4 −1 · the gate.**
+- `ws-touch-tap.cjs` builds `#tt-host` inside `#gameView` but outside `#questionCard`, `.problem-card` and `.qt-question-card`. The active-box never sees it, which is why R3-1, R3-2 and R3-5 pass the gate.
+- **Fix:** add real-host cases:
+  - card, worksheet and quiz at 1366x650;
+  - tap then type a digit;
+  - 7 Enters on a 7;
+  - first-tap layout delta = 0;
+  - wrong answer then the count line.
+
+**Nit (not scored):** the ÷ tally for "90 ÷ 9" is 12 dots in rows of 5 / 5 / 2 (S1.7: "two lines of five", or 12 for a ×12 set). Twelve reads better as 6 / 6.
+
+## Requested views
+
+- **"Touched 5 · 30" (× running total): do not draw the "· 30".**
+  - After the pupil has touched every dot on the factor, the running total *is* the product (6 × 5 = 30 on screen). That breaks S8 (a support never shows the answer), and it does the count-by for the pupil.
+  - "Touched N" alone is right for ×: it tells the pupil how many counts they have made, not the answer.
+  - Correct S1.8's example line.
+- **Tappable ÷ tally dots: keep them not tappable (or tappable with grey only, no number).**
+  - A tappable tally with a count line would read "Touched 10" for 90 ÷ 9, which is the quotient.
+  - If the owner wants them tappable for the greying, give them the same 44 px targets (the dots are about 11 px at a 20 px pitch at 1366) and no count line.
+- **The same leak exists today on count-all.** On a touchall "2 + 7", touching every dot shows "Touched 9", the sum. Owner question below.
+
+## Owner questions
+
+1. **Count-all shows the sum.** On a count-all item, "Touched N" ends at the answer. Should the count line:
+   - (a) show no number, only the greys and Start again (recommended for ELL/SPED: the pupil says the count aloud);
+   - (b) show the number only on count-on, × and ÷ rungs, where it is not the answer; or
+   - (c) stay as built?
+2. **Ladder over a teacher touch option (R3-6).** Should a wrong answer:
+   - (a) keep the teacher's marks and add the next rung (recommended); or
+   - (b) switch count-all to count-on?
+
+## Out of lane (recorded, not scored)
+
+- At 1366x650 and 1280x720 the practice card's answer box (top 688) and Check (787) sit below the fold even with no support on. The quiz box is at 638 to 705. This conflicts with the owner's Chromebook priority. It is pre-existing app layout, not this lane, and it makes R3-2 bite.
+- Lesson role (anchor chart): model cell overflow on add_column_multi, subtract and div_facts, and coloured (purple) step icons on the anchor chart. No touch marks are involved.
+
+## What would raise each screen host to 8+
+
+Fix R3-1 to R3-6, extend the gate (R3-8), and resolve the CSS merge conflict. Paper needs nothing.
