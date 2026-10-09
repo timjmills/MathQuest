@@ -344,7 +344,7 @@
 .ws-skey { display: flex; flex-direction: column; gap: 2mm; font-family: 'Andika', sans-serif; line-height: 1.25; }
 .ws-skey-h { font-weight: 700; font-size: 1.05em; border-bottom: var(--ws-hair) solid var(--ws-ink); padding-bottom: .5mm; margin-bottom: 1mm; }
 .ws-skey-grid { display: grid; gap: 1mm 3mm; align-items: center; }
-.ws-skey-it { display: flex; align-items: center; gap: 1.5mm; min-width: 0; break-inside: avoid; }
+.ws-skey-it { display: flex; align-items: baseline; gap: 1.5mm; min-width: 0; break-inside: avoid; }
 .ws-skey-lab { flex: none; font-weight: 400; color: var(--ws-ink); }
 .ws-skey-ans { font-weight: 700; overflow-wrap: anywhere; }
 .ws-skey-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1; font-size: .85em; margin: 0 .3mm; }
