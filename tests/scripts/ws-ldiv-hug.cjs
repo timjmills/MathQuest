@@ -13,7 +13,10 @@
 //   space  the widest space between two dividend digits
 // and holds each to the PAPER drawing of the same skill (the kit's Independent page at L, measured
 // the same way in a printed sheetDocument): no more than paper + TOL. Every quotient input is a
-// touch target (>= 40 x 40 px), and 1-, 2- and 3-digit dividends were all seen in a bracket.
+// touch target (>= 44 x 44 px) sitting above the bar, clear of the divisor and inside the cell;
+// the one-line brackets also stay within the CEIL the hug fix reaches, and the remainder bracket's bar
+// runs unbroken from the arc. A skill x host that measures no bracket FAILS (it would pass unseen).
+// 1-, 2- and 3-digit dividends must all be seen in a bracket.
 //
 //   node tests/scripts/ws-ldiv-hug.cjs                 # prints one line per bracket, then OK / FAIL
 //   node tests/scripts/ws-ldiv-hug.cjs --shots <dir>   # also screenshots each host
@@ -25,7 +28,10 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 
 const SHOTS = arg('shots', null);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const TOL = { gap: 0.1, over: 0.1, space: 0.05 }, BOX_MIN = 40;
+const TOL = { gap: 0.1, over: 0.1, space: 0.05 }, BOX_MIN = 44;
+// The one-line brackets (fact, remainder) are held to what the hug fix reaches as well (critic
+// ldiv-hug R1 G-1: paper + TOL alone would let a partial regression back to 0.6 em pass).
+const CEIL = { fact: { gap: 0.43, over: 0.22 }, remainder: { gap: 0.43, over: 0.22 } };
 
 const SKILLS = [
     { categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'long' }, tag: 'div_facts-long' },
@@ -36,6 +42,8 @@ const SKILLS = [
     { categoryId: 'division', skillId: 'divide', opts: { notation: ['bracket'], tiles: 21 }, tag: 'divide-21' },
     { categoryId: 'division', skillId: 'divide', opts: { notation: ['bracket'], tiles: 31 }, tag: 'divide-31' },
     { categoryId: 'division', skillId: 'divide', opts: { notation: ['bracket'], tiles: 31, regroup: 'always' }, tag: 'divide-31-R' },
+    { categoryId: 'division', skillId: 'div_remainders', opts: { notation: ['bracket'] }, tag: 'div_remainders-bracket',
+        paperAs: { categoryId: 'division', skillId: 'divide', opts: { notation: ['bracket'], tiles: 21, regroup: 'always' } } },
 ];
 
 // In the page: measure every bracket under `rootSel`.
@@ -53,6 +61,19 @@ function MEASURE(rootSel, frameSel) {
         return { left: Math.min(...rs.map((r) => r.left)), right: Math.max(...rs.map((r) => r.right)) };
     };
     const out = [];
+    // Where the answer boxes sit: above the bar, clear of the divisor's digits, inside the cell.
+    const placeOf = (boxes, barTop, dsrEl, g) => {
+        const bad = [];
+        const ds = dsrEl ? textRect(dsrEl) : null;
+        const cell = g.closest('.mq-scell') || g.parentElement;
+        const c = cell.getBoundingClientRect();
+        boxes.forEach((r) => {
+            if (r.bottom > barTop + 1) bad.push('box below the bar');
+            if (ds && r.left < ds.right - 1 && r.bottom > barTop - 2) bad.push('box over the divisor');
+            if (r.left < c.left - 1 || r.right > c.right + 1) bad.push('box outside the cell');
+        });
+        return bad.join(', ');
+    };
     root.querySelectorAll('.mq-ldiv').forEach((g) => {
         if (!vis(g)) return;
         const em = parseFloat(getComputedStyle(g).fontSize);
@@ -65,7 +86,34 @@ function MEASURE(rootSel, frameSel) {
         out.push({ kind: 'fact', text: (dvd.textContent || '').trim(), em,
             gap: (t.left - (a.left + a.width * 0.5)) / em, over: (d.right - t.right) / em, space: 0,
             box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0,
-            boxOffset: boxes.length ? ((boxes[0].left + boxes[0].right) / 2 - (t.left + t.right) / 2) / em : 0 });
+            boxOffset: boxes.length ? ((boxes[0].left + boxes[0].right) / 2 - (t.left + t.right) / 2) / em : 0,
+            place: placeOf(boxes, d.top, g.querySelector('.mq-ldiv-dsr'), g), join: '' });
+    });
+    // The remainder bracket of the ring twin (div_remainders / divide with remainders, bracket
+    // notation): divisor | arc | dividend under the vinculum, "[ ] R [ ]" above.
+    root.querySelectorAll('.mq-remeq').forEach((g) => {
+        if (!vis(g)) return;
+        const kids = Array.from(g.children);
+        const arcSpan = kids.find((el) => el.querySelector('svg'));
+        if (!arcSpan) return;                                   // the across form, no bracket
+        const em = parseFloat(getComputedStyle(g).fontSize);
+        const col = (el) => { const m = (el.getAttribute('style') || '').match(/grid-column:\s*(\d+)/); return m ? Number(m[1]) : 0; };
+        const row = (el) => { const m = (el.getAttribute('style') || '').match(/grid-row:\s*(\d+)/); return m ? Number(m[1]) : 0; };
+        const dvd = kids.find((el) => col(el) === 3 && row(el) === 2);
+        const dsr = kids.find((el) => col(el) === 1 && row(el) === 2);
+        const t = dvd ? textRect(dvd) : null;
+        if (!t) return;
+        const a = arcSpan.getBoundingClientRect(), d = dvd.getBoundingClientRect();
+        const boxes = Array.from(g.querySelectorAll('input')).filter(vis).map((i) => i.getBoundingClientRect());
+        const bw = parseFloat(getComputedStyle(dvd).borderTopWidth) || 0;
+        // the arc's top stroke (centred on the svg's top edge) must run into the dividend's bar
+        const join = [];
+        if (d.left - a.right > 1) join.push(`bar broken ${(d.left - a.right).toFixed(1)} px at the arc`);
+        if (Math.abs(a.top - (d.top + bw / 2)) > 1) join.push(`bar steps ${(a.top - (d.top + bw / 2)).toFixed(1)} px at the arc`);
+        out.push({ kind: 'remainder', text: (dvd.textContent || '').trim(), em,
+            gap: (t.left - (a.left + a.width * 0.525)) / em, over: (d.right - t.right) / em, space: 0,
+            box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0, boxOffset: 0,
+            place: placeOf(boxes, d.top, dsr, g), join: join.join(', ') });
     });
     root.querySelectorAll('.ws-ops-division [role="group"]').forEach((g) => {
         if (!vis(g)) return;
@@ -88,7 +136,8 @@ function MEASURE(rootSel, frameSel) {
         out.push({ kind: 'worked', text: digits.map((x) => x.el.textContent.trim()).join(''), em,
             gap: (ts[0].left - (a.left + a.width * 0.525)) / em, over: (bar.getBoundingClientRect().right - ts[ts.length - 1].right) / em,
             space: spaces.length ? Math.max(...spaces) : 0,
-            box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0, boxOffset: 0 });
+            box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0, boxOffset: 0,
+            place: placeOf(boxes, bar.getBoundingClientRect().top, null, g), join: '' });
     });
     return { brackets: out };
 }
@@ -192,13 +241,19 @@ async function shot(page, sel, file) {
     let fails = 0, n = 0;
     const lens = new Set();
     let ref = null;
+    const seen = new Map();          // brackets measured per host x skill (a Mix card may deal another form)
     const judge = (host, tag, res) => {
         if (!res || res.error) { console.log(`FAIL ${host} ${tag}: ${res ? res.error : 'no result'}`); fails++; return; }
+        seen.set(`${host} ${tag}`, (seen.get(`${host} ${tag}`) || 0) + res.brackets.length);
         for (const b of res.brackets) {
             n++;
             lens.add(b.text.length);
             const bad = [];
             for (const k of ['gap', 'over', 'space']) if (b[k] > ref[k] + TOL[k]) bad.push(`${k} ${b[k].toFixed(2)} > paper ${ref[k].toFixed(2)} + ${TOL[k]}`);
+            const ceil = CEIL[b.kind] || {};
+            for (const k of Object.keys(ceil)) if (b[k] > ceil[k]) bad.push(`${k} ${b[k].toFixed(2)} > ${ceil[k]}`);
+            if (b.place) bad.push(b.place);
+            if (b.join) bad.push(b.join);
             if (b.box < BOX_MIN) bad.push(`box ${b.box.toFixed(0)}px`);
             if (bad.length) fails++;
             console.log(`${bad.length ? 'FAIL' : 'PASS'} ${host} ${tag} ${b.kind} ${b.text} @${b.em.toFixed(0)}px: gap ${b.gap.toFixed(2)} over ${b.over.toFixed(2)} space ${b.space.toFixed(2)} box ${b.box.toFixed(0)}px centre ${b.boxOffset.toFixed(2)}${bad.length ? '  <- ' + bad.join(', ') : ''}`);
@@ -221,6 +276,7 @@ async function shot(page, sel, file) {
             judge('quiz-1280', s.tag, await quiz(page, s));
             await shot(page, '#quizTakeView', `${s.tag}-quiz-1280.png`);
         }
+        for (const [k, c] of seen) if (!c) { fails++; console.log(`FAIL ${k}: no bracket measured`); }
         for (const L of [1, 2, 3]) {
             const ok = lens.has(L);
             if (!ok) fails++;

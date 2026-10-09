@@ -1722,3 +1722,7 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    floor of `.mq-ldiv-q .mq-slot` above. */
 .mq-scell .mq-ldiv > .mq-ldiv-q { contain: inline-size; justify-content: center; }
 .mq-scell .mq-ldiv > .mq-ldiv-q .mq-slot { min-width: max(100%, 48px, var(--ws-hw, 48px)) !important; }
+/* the remainder bracket (screen-cell.js ringCellHTML, `.mq-rembrk`): its quotient box keeps its own
+   width over the dividend's column (that column no longer stretches to the box), never shrinking
+   below the touch target (critic ldiv-hug R1 D-1). */
+.mq-scell .mq-rembrk .mq-cellbox { flex: none; }

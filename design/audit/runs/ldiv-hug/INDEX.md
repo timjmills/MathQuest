@@ -39,3 +39,26 @@ critic's own set: 11)132, 7)28, 3)21, 10)110, 6)66, 2)8). The paper references a
 
 Gates run after the fix: ws-boot-smoke OK, ws-screen-answer OK (default set, the division skills, and div_facts
 Long), ws-screen-slots --category division OK, ws-div-facts-forms OK, ws-ldiv-hug OK.
+
+## Round 2 (after CRITIC-R1: FAIL on D-1, D-2)
+
+- **D-1, the remainder bracket** (`ringCellHTML` in `js/modules/screen-cell.js`, used by divide with remainders and div_remainders with bracket notation):
+  - Fixed the same way as the fact bracket. The quotient box's span has `contain: inline-size`, and its cell box is
+    `flex: none` (one additive CSS rule), so the box no longer widens the dividend's column.
+  - `column-gap: 0`, so the arc's top stroke runs straight into the bar.
+  - The arc drops half its stroke, and the dividend stretches to the row, so the bar no longer steps at the arc.
+  - "R" is padded clear of the box's overhang.
+  - The boxes are now sized from the dividend and divisor, not the answer (SL-2).
+  - Result: gap 0.38 / over 0.12 em on every host, bar unbroken. Before: 0.56–1.05 / 0.15–0.64, with the bar broken
+    by 4–8 px and stepped by 1–3 px.
+- **D-2, G-1, G-2, the gate**:
+  - The test now measures `.mq-remeq` brackets and checks the bar join, both its horizontal gap and its vertical step.
+  - It fails any skill × host that measured no bracket.
+  - It holds the one-line brackets to a ceiling of gap 0.43 / over 0.22.
+  - It requires boxes of at least 44 px that sit above the bar, clear of the divisor and inside the cell.
+  - `div_remainders` (bracket notation) is in the skill list.
+  - On the R1 tree it reports `FAIL (48)` (`r2/ws-ldiv-hug-on-R1-tree.log`). After the fix it reports `OK`, with 154
+    brackets measured (`r2/ws-ldiv-hug.log`).
+- Evidence: `r2/*.png`, the same hosts and skills as `after/`, plus `div_remainders-bracket-*` and `divide-31-R-*`.
+- N-1 (the screen fact bracket is tighter than paper) and O-1 (rounded input corners, which predate this lane) are not
+  changed.
