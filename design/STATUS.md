@@ -1,5 +1,18 @@
 # Status and handover — paused 2026-09-26 (owner: "stop our work for now, keep track of what is done")
 
+## 00. Device priority (owner, 2026-10-09)
+
+Pupils mostly use **Chromebooks**; phones are rare for now. Screen work is tested first at Chromebook size —
+1366 x 768 window (~650 px visible height), 1280 x 720, mouse/trackpad and touch. The answer box, its problem and
+Check/Next must be reachable at that height. Phones (390 px) get a basic check only (no page overflow, boxes tappable,
+typing works); phone-only polish is deferred to a later phone pass and listed below, never blocking a lane.
+
+### Phone pass (deferred)
+- place-value rename sentences wrapping at 390 ("=" at a line start, number split from its unit)
+- four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
+- count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
+- add_three overflow at 390 (Lane B R5) unless the page itself overflows
+
 ## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
 
 **Live (master = `71c600a`):** Lane A (pulse, Skip after N, per-skill calculator, hint audio, four Start buttons),
