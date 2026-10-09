@@ -6,7 +6,7 @@
 // division, word problems, graphs, count rows, number lines) it opens each host the way a pupil
 // does, at each size, and measures with the page at the top (scrollY = 0):
 //   box     the bottom of the first answer box (the pulsing active box; else the first answer input
-//           or answer choice in the host)
+//           or answer choice in the host; else the whole question paper)
 //   go      the bottom of Check / Next (card: Check or Next; quiz: Next / Review; worksheet: Check All)
 //   fold    the viewport height less any bar pinned to the bottom edge that covers content
 // A TYPICAL item FAILS when its answer box ends below the fold. A GENUINELY TALL item (its own
@@ -20,7 +20,8 @@
 //
 //   node tests/scripts/ws-chromebook-fit.cjs                    # the default sample, both sizes
 //   node tests/scripts/ws-chromebook-fit.cjs --skills addition:add,division:long_div_2digit
-//   node tests/scripts/ws-chromebook-fit.cjs --hosts card --sizes 1366x650
+//   node tests/scripts/ws-chromebook-fit.cjs --hosts card --sizes 1366x650   (hosts: card, boss, race,
+//        worksheet, quiz; boss and race run on a fixed sample in a full run, on every --skills skill)
 //   node tests/scripts/ws-chromebook-fit.cjs --shots <dir>     # a screenshot per skill, host and size
 //
 // Prints one line per skill, size and host, then `ws-chromebook-fit: OK` or `FAIL` (exit 1).
@@ -31,7 +32,9 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const SIZES = (arg('sizes', '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
-const HOSTS = (arg('hosts', 'card,worksheet,quiz')).split(',');
+const HOSTS = (arg('hosts', 'card,boss,race,worksheet,quiz')).split(',');
+// boss and race are the card plus an arena / a track: in a full run they are sampled on these
+const ARENA_SAMPLE = ['addition:add_facts', 'addition:add', 'addition:add_column_multi', 'counting:count_objects', 'addition:add_wp_10', 'graphs:bar_graph', 'division:long_div_2digit'];
 const SHOTS = arg('shots', null);
 // The compact chrome's budget: the most a short screen may spend above the question paper
 // (header row + play bar + the card's own top line). An item whose problem is taller than what is
@@ -50,6 +53,7 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
 function MEASURE(host) {
     const H = innerHeight;
     const vis = el => { if (!el) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    if (host === 'boss' || host === 'race') host = 'card';
     const root = host === 'card' ? document.getElementById('questionCard')
         : host === 'worksheet' ? (document.querySelector('#worksheetGrid .problem-card.mq-active-problem') || document.querySelector('#worksheetGrid .problem-card'))
             : document.querySelector('#quizTakeView .qt-question-card');
@@ -61,22 +65,28 @@ function MEASURE(host) {
     const active = Array.from(root.querySelectorAll('.mq-active-box')).find(vis);
     const choice = Array.from(root.querySelectorAll('#answerOptions button, .answer-options button, .option-btn, .mq-choice, .qt-option, [data-choice], .mq-tap, .mq-target'))
         .find(vis);
-    const box = active || inputs[0] || choice || null;
+    // no typing box or choice found (a tick-one table, a drawing): the whole problem must show
+    const box = active || inputs[0] || choice || paper || null;
     const go = host === 'card'
         ? [document.getElementById('nextBtn'), document.getElementById('qcCheckBtn'), document.querySelector('#answerInputArea .mq-inline-check')].find(vis)
         : host === 'worksheet' ? Array.from(document.querySelectorAll('#worksheetView .game-header .btn')).find(b => /check all/i.test(b.textContent) && vis(b))
             : Array.from(document.querySelectorAll('#quizTakeView .qt-nav .qt-nav-btn, #quizTakeView .qt-nav button')).filter(vis).pop();
+    // no Check / Next of the host's own: the item submits itself (a Submit inside the cell), or a tap
+    // on a choice is the answer, so the choice is the control that must show
+    let goEl = go;
+    if (!goEl) goEl = Array.from(root.querySelectorAll('button')).filter(vis).find(b => /^\s*(submit|check|done)\b/i.test(b.textContent) && (paper || root).contains(b))
+        || ((choice || (!active && !inputs[0])) ? box : null);
     // a bar pinned to the bottom edge covers what scrolls under it
     const pinned = Array.from(document.querySelectorAll('#questionCard > .mq-qactions, #questionCard > .next-btn-container, #quizTakeView .qt-nav'))
         .filter(vis).filter(el => getComputedStyle(el).position === 'sticky').map(el => el.getBoundingClientRect()).filter(r => r.bottom >= H - 1 && r.top < H);
     const fold = pinned.length ? Math.min(...pinned.map(r => r.top)) : H;
     const r = el => el ? el.getBoundingClientRect() : null;
-    const bR = r(box), gR = r(go), pR = r(paper || root);
+    const bR = r(box), gR = r(goEl), pR = r(paper || root);
     let cardsFull = 0;
     if (host === 'worksheet') cardsFull = Array.from(document.querySelectorAll('#worksheetGrid .problem-card')).filter(c => { const q = c.getBoundingClientRect(); return q.top >= 0 && q.bottom <= H + 0.5; }).length;
     return {
         H, fold: Math.round(fold), scrollY: Math.round(scrollY),
-        box: bR ? Math.round(bR.bottom) : null, boxTop: bR ? Math.round(bR.top) : null, boxKind: active ? 'active' : inputs[0] ? 'input' : choice ? 'choice' : 'none',
+        box: bR ? Math.round(bR.bottom) : null, boxTop: bR ? Math.round(bR.top) : null, boxKind: active ? 'active' : inputs[0] ? 'input' : choice ? 'choice' : paper ? 'paper' : 'none',
         go: gR ? Math.round(gR.bottom) : null, goTop: gR ? Math.round(gR.top) : null,
         paperTop: Math.round(pR.top), cardsFull,
     };
@@ -93,14 +103,14 @@ async function settle(page) {
 }
 
 async function startHost(page, host, c, k, seed) {
-    if (host === 'card' || host === 'worksheet') {
+    if (host === 'card' || host === 'worksheet' || host === 'boss' || host === 'race') {
         await page.evaluate((c, k, mode, seed) => {
             if (window.__wsReseed) window.__wsReseed(seed);
             window.state.quizMode = false;
             window.skillQueue.length = 0;
             window.skillQueue.push({ categoryId: c, skillId: k, skillLabel: k });
             window.playSelectedSkills(mode);
-        }, c, k, host === 'card' ? 'practice' : 'worksheet', seed);
+        }, c, k, host === 'card' ? 'practice' : host, seed);
         if (host === 'worksheet') {
             try { await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 20000 }); } catch (e) { /* measured anyway */ }
         }
@@ -141,7 +151,7 @@ async function startHost(page, host, c, k, seed) {
             }
             return out;
         });
-        LIST = Array.from(new Set([...per, ...TALL]));
+        LIST = Array.from(new Set([...per, ...TALL, ...ARENA_SAMPLE]));
         const known = await page.evaluate(() => { const s = new Set(); for (const [c, a] of Object.entries(window.SKILLS)) if (Array.isArray(a)) a.forEach(x => x && s.add(`${c}:${x.v}`)); return Array.from(s); });
         LIST = LIST.filter(s => known.includes(s));
     }
@@ -173,6 +183,7 @@ async function startHost(page, host, c, k, seed) {
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
             const line = [];
             for (const host of HOSTS) {
+                if ((host === 'boss' || host === 'race') && !arg('skills', '') && !ARENA_SAMPLE.includes(s)) continue;
                 let m;
                 try {
                     await startHost(page, host, c, k, hash(`${s}:${host}`));
@@ -203,7 +214,7 @@ async function startHost(page, host, c, k, seed) {
                     } else { verdict = 'FAIL'; fails.push(`${tag}: answer box bottom ${m.box} > fold ${m.fold} (paper top ${m.paperTop})`); }
                 }
                 rows.push({ skill: s, size: `${size.w}x${size.h}`, host, ...m, load: undefined, verdict });
-                line.push(`${host} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' ? '(none)' : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);
+                line.push(`${host} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' || m.boxKind === 'paper' ? `(${m.boxKind})` : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);
             }
             console.log(`${(s + ' ' + size.w + 'x' + size.h).padEnd(44)} ${line.join(' | ')}`);
         }

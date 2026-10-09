@@ -96,12 +96,13 @@ function uncovered(el) {
 // Chromebook fit (css/play-compact.css): on a short screen Check / Next stay pinned to the bottom
 // edge (position: sticky) and the worksheet's bar to the top. A box that has scrolled under such a
 // bar is not covered by a pop-up: it is off screen in all but name, so it is scrolled to like one.
+const PINNED = '#questionCard > .mq-qactions, #questionCard > .next-btn-container, #quizTakeView .qt-nav, #worksheetView > .game-header';
 function underPinnedBar(el) {
     const b = el.getBoundingClientRect();
-    const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
-    for (let n = top; n && n !== document.body; n = n.parentElement) {
-        if (n === el || n.contains(el)) return false;
-        if (getComputedStyle(n).position === 'sticky') return true;
+    for (const bar of document.querySelectorAll(PINNED)) {
+        if (bar.contains(el) || getComputedStyle(bar).position !== 'sticky') continue;
+        const r = bar.getBoundingClientRect();
+        if (r.height > 0 && b.bottom > r.top + 1 && b.top < r.bottom - 1 && b.right > r.left && b.left < r.right) return true;
     }
     return false;
 }
@@ -128,17 +129,15 @@ function isTapTarget(el) {
 }
 
 // A box can be selected while it is on screen and then be pushed under a pinned bar or below the
-// fold as the page settles (fonts, a late re-fit). Once per box, within its first 3 s, and only if
-// the pupil has not tapped or scrolled since, the focused box is brought back into view.
+// fold as the page settles (fonts, a late re-fit, a legacy visual scaling itself). For its first 4 s,
+// and only while the pupil has not tapped or scrolled, the focused box is kept in view.
 let activeEl = null;
 let activeSince = 0;
 let lastUserScroll = 0;
-const brought = new WeakSet();
 function revealSettled(active) {
-    if (brought.has(active) || Date.now() - activeSince > 3000) return;
+    if (Date.now() - activeSince > 4000) return;
     if (lastTap.t > activeSince || lastUserScroll > activeSince) return;
     if (onScreen(active) && !underPinnedBar(active)) return;
-    brought.add(active);
     try { active.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
 }
 
@@ -208,6 +207,7 @@ export function installActiveBox() {
     window.__mqActiveBoxInstalled = true;
     for (const ev of ['pointerdown', 'mousedown', 'touchstart', 'click']) document.addEventListener(ev, (e) => { lastTap = { t: Date.now(), target: e.target }; }, true);
     for (const ev of ['wheel', 'touchmove']) document.addEventListener(ev, () => { lastUserScroll = Date.now(); }, { capture: true, passive: true });
+    document.addEventListener('keydown', (e) => { if (/^(PageUp|PageDown|Home|End|ArrowUp|ArrowDown)$/.test(e.key)) lastUserScroll = Date.now(); }, true);
     // only the box the pupil is typing in (widgets re-fire input on a hidden combined box afterwards)
     document.addEventListener('input', (e) => { if (e.target === document.activeElement) lastInput = { t: Date.now(), el: e.target }; }, true);
     // A key typed while no typing place has the focus (after a hint pop-up closes, after a tap on a

@@ -33,10 +33,6 @@ function sync() {
 export function togglePlayMenu(force) {
     const open = typeof force === 'boolean' ? force : !document.documentElement.classList.contains('mq-navopen');
     setMenu(open);
-    if (open) {
-        const first = document.querySelector('#navStats button, #navStats input');
-        if (first && typeof first.focus === 'function') { try { first.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
-    }
 }
 
 export function installPlayCompact() {

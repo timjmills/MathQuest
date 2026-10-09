@@ -126,8 +126,14 @@
        scrolled it inside the card, which hid a tall cell's answer row in a nested scroll box. The
        chrome is folded now and Check / Next are pinned, so the cell keeps its full height here. */
     html.mq-play body.student-mode #gameView .visual-aid { max-height: none; }
+    /* Boss and race: the arena and the track keep their characters, on a lower stage */
     html.mq-play body.student-mode #gameView > .boss-status,
-    html.mq-play body.student-mode #gameView > .race-status { margin: 4px 0 0; }
+    html.mq-play body.student-mode #gameView > .race-status { margin: 0; font-size: 0.9rem; line-height: 1.2; }
+    html.mq-play body.student-mode #gameView > .boss-arena { height: 76px; margin: 0; border-width: 3px; }
+    html.mq-play body.student-mode #gameView > .boss-arena .char-sprite { bottom: 14px; font-size: 2.2rem; }
+    html.mq-play body.student-mode #gameView > .race-track-container { padding: 4px 16px; margin: 0; }
+    html.mq-play body.student-mode #gameView > .race-track-container .race-lane { height: 30px; margin-bottom: 2px; }
+    html.mq-play body.student-mode #gameView > .race-track-container .race-car { bottom: 2px; font-size: 1.5rem; }
 
     /* Check / Hint / Read / Skip and Next stay on screen, pinned to the bottom edge while the card
        runs past it (sticky: on a short item they sit in place, under the problem, as before). */
@@ -141,7 +147,7 @@
     html.mq-play body.student-mode #questionCard > .next-btn-container {
         position: sticky;
         bottom: 0;
-        z-index: 5;
+        z-index: 30;
         margin-top: 6px !important;
         padding: 6px 0 8px;
         background: var(--mq-paper, #fff);
@@ -152,7 +158,7 @@
 
     /* ---- Online worksheet: the bar with Check All stays at the top while the pupil scrolls ---- */
     html.mq-play body.student-mode #worksheetView > .game-header {
-        position: sticky; top: 0; z-index: 6;
+        position: sticky; top: 0; z-index: 30;
         padding: 4px 12px; margin-bottom: 8px; min-height: 52px;
     }
     html.mq-play body.student-mode #worksheetView > .game-header .btn { min-height: 44px; }
@@ -162,7 +168,7 @@
     html.mq-play body.student-mode #quizTakeView .qt-progress { margin-bottom: 6px; }
     html.mq-play body.student-mode #quizTakeView .qt-question-card { padding-top: 10px; margin-bottom: 0; }
     html.mq-play body.student-mode #quizTakeView .qt-nav {
-        position: sticky; bottom: 0; z-index: 5;
+        position: sticky; bottom: 0; z-index: 30;
         margin-top: 6px; padding: 8px 0 10px;
         background: var(--bg-world, #e6f2f2);
     }
