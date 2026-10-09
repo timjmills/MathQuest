@@ -187,6 +187,8 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 
 - 2026-10-09 Wave 1 Lane D fix round 7: builder escalated to Opus medium (the ceiling) - mixed_multiplication S layout (column problems leaving a part-filled row / H13 bands) failed critic rounds 2 and 3 and the round-6 Opus-low builder's full S lint.
 
+- 2026-10-09 Wave 1 Lane D PAUSED (owner) after fix round 10, before critic round 9: see `design/audit/runs/wave1-D/HANDOFF.md` for state, gates and next steps.
+
 ## 10. Known pre-existing gate failure (2026-10-03, Wave 1 Lane D)
 
 - `ws-screen-answer --skills addition:number_families_add` FAILS on main (claude/sweet-newton-c8wrv1) exactly as on Lane D: card ok, worksheet 0/3 and quiz 0/3 (the `number-family` answer type is not entered by the gate's answering path). Lane D did not touch the screen path of this skill (only its print boxes); it needs its own fix.
