@@ -1712,3 +1712,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     position: relative; top: auto; bottom: auto; left: auto; right: auto;
     margin: 0 0 8px; box-shadow: none;
 }
+
+/* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
+   dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
+   The quotient box no longer sizes that column (`contain: inline-size` keeps it out of the grid's
+   track sizing); it spans the dividend's width or its own height (a square, >= 48 px), whichever
+   is wider, and sits centred over the bar, overhanging both ends equally when the dividend is one narrow digit.
+   Its width still follows the dividend, never the quotient (SL-2). Additive: overrides the 64 px
+   floor of `.mq-ldiv-q .mq-slot` above. */
+.mq-scell .mq-ldiv > .mq-ldiv-q { contain: inline-size; justify-content: center; }
+.mq-scell .mq-ldiv > .mq-ldiv-q .mq-slot { min-width: max(100%, 48px, var(--ws-hw, 48px)) !important; }
