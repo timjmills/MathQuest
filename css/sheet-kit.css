@@ -329,9 +329,9 @@
    pupil's work, a worked example and every printed number keep their ink. A slot that WRAPS
    printed content (a choice of pictures, a drawing zone, a row of clock faces) colours only its
    own mark, never the printed content inside it. */
-.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*)),
-.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*)) :not(svg):not(svg *):not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; }
-.ws-page.ws-key svg [data-ws-key-ans]:not([stroke="none"]),
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*), [data-ws-key-mark]),
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*), [data-ws-key-mark]) :not(svg):not(svg *):not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-ans]:not([stroke="none"]):not([data-ws-key-fill]),
 .ws-page.ws-key svg[data-ws-key-ans] :is(line, path, polyline, circle):not([stroke="none"]):not([stroke="#fff"]) { stroke: var(--ws-key-ink) !important; }
 .ws-page.ws-key svg :is(text, tspan)[data-ws-key-ans],
 .ws-page.ws-key svg[data-ws-key-ans] :is(text, tspan) { fill: var(--ws-key-ink) !important; }
@@ -351,3 +351,24 @@
 .ws-skey-frac > span:first-child { border-bottom: var(--ws-hair) solid currentColor; padding: 0 .6mm .2mm; }
 .ws-skey-frac > span:last-child { padding-top: .2mm; }
 .ws-skey-none { margin: 0; }
+
+/* Critic r2 (R2-1, owner ruling 2026-10-09: a drawn answer is fully orange): a mark the key ADDS that
+   its pupil twin lacks (`data-ws-key-add`: a counter, a block, a disk, a tick, a ring, a jump and its
+   label, a placed dot) is the answer: its strokes, its solid fills and its text take the key ink, the
+   whole mark. Given content is never tagged and stays black. Additive. */
+.ws-page.ws-key [data-ws-key-add],
+.ws-page.ws-key [data-ws-key-add] :not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; outline-color: var(--ws-key-ink) !important; border-color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-add]:not([stroke="none"]):not(text):not(tspan),
+.ws-page.ws-key svg[data-ws-key-add] :not([stroke="none"]):not(text):not(tspan),
+.ws-page.ws-key svg [data-ws-key-add] :not([stroke="none"]):not(text):not(tspan) { stroke: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-add]:not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g),
+.ws-page.ws-key svg[data-ws-key-add] :not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g),
+.ws-page.ws-key svg [data-ws-key-add] :not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g) { fill: var(--ws-key-ink) !important; }
+/* the answer dot / ring of a number line (R2-6): the whole dot, centre too */
+.ws-page.ws-key svg [data-ws-key-ans]:is(circle, ellipse):not([fill="none"]):not([fill="#fff"]):not([fill="white"]) { fill: var(--ws-key-ink) !important; }
+/* critic r2 (R2-2): the short key's Guided Practice / Practice sub-headings. Additive. */
+.ws-skey-sub { font-style: italic; margin: .5mm 0 .5mm; }
+/* the same given restyled on the key: only the new paint is the answer - a shaded part's fill, a
+   ringed choice's border - its content stays black (critic r2, R2-1). Additive. */
+.ws-page.ws-key svg [data-ws-key-fill] { fill: var(--ws-key-ink) !important; }
+.ws-page.ws-key [data-ws-key-mark] { border-color: var(--ws-key-ink) !important; outline-color: var(--ws-key-ink) !important; }

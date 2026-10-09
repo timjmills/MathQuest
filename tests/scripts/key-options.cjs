@@ -50,6 +50,76 @@ function lum(hex) {
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 }
 
+// Runs in the page: build each skill's copy and short key, align every key cell with its pupil twin.
+async function alignProbe({ role, FAM }) {
+    const out = [];
+    const f = document.createElement('iframe'); f.style.cssText = 'position:absolute;left:-3000px;width:900px;height:1200px'; document.body.appendChild(f);
+    const ORANGE = 'rgb(194, 65, 12)';
+    const lcs = (a, b) => {
+        const n = a.length, m = b.length; const dp = Array.from({ length: n + 1 }, () => new Int16Array(m + 1));
+        for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+        const got = new Set(); let i = 0, j = 0;
+        while (i < n && j < m) { if (a[i] === b[j]) { got.add(j); i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++; }
+        return got;
+    };
+    for (const [categoryId, skillId] of FAM) {
+        const req = { role, sections: [{ skills: [{ categoryId, skillId }] }], size: 'L', paper: 'A4', seed: 4242, key: { on: true, placement: 'end', style: 'copy' } };
+        let res, sres;
+        try { res = await window.buildSheet(req); sres = await window.buildSheet(Object.assign({}, req, { key: { on: true, placement: 'end', style: 'short' } })); } catch (e) { out.push({ skillId, skip: String(e && e.message || e).slice(0, 60) }); continue; }
+        f.srcdoc = window.sheetDocument(res.docHtml, 'x'); await new Promise((ok) => { f.onload = ok; });
+        const d = f.contentDocument, w = f.contentWindow;
+        const pupil = [...d.querySelectorAll('section.ws-page[data-ws-mode="print"]')];
+        const keys = [...d.querySelectorAll('section.ws-page[data-ws-mode="key"]')];
+        const srows = sres.shortRows || [];
+        const issues = [];
+        const vis = (el) => { const cs = w.getComputedStyle(el); return cs.visibility !== 'hidden' && cs.display !== 'none' && el.getClientRects().length; };
+        const texts = (cell) => { const tw = d.createTreeWalker(cell, NodeFilter.SHOW_TEXT); const o = []; let n; while ((n = tw.nextNode())) { const s = n.textContent.replace(/\s+/g, ' ').trim(); if (s && n.parentElement && vis(n.parentElement)) o.push({ s, el: n.parentElement }); } return o; };
+        const svgs = (cell) => [...cell.querySelectorAll('svg line, svg path, svg circle, svg polyline, svg polygon, svg rect, svg ellipse')].filter(vis).map((el) => ({ el, s: [el.tagName, ...['d', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'points', 'x', 'y', 'width', 'height', 'stroke-dasharray', 'transform'].map((a) => el.getAttribute(a) || '')].join('|') }));
+        const top = (pg) => [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+        keys.forEach((kp, ki) => {
+            const pp = pupil[ki]; if (!pp) return;
+            const kc = top(kp), pc = top(pp);
+            kc.forEach((cell, ci) => {
+                const pcell = pc[ci]; if (!pcell) return;
+                const where = `p${ki + 1}c${ci + 1}`;
+                // counted per cell, order-free: every given the pupil page prints must keep its black
+                // copy on the key; whatever the key adds beyond that must be key ink
+                const K = texts(cell), P = texts(pcell);
+                const tally = (list, f) => list.reduce((mp, x) => (f(x) ? mp.set(x.s, (mp.get(x.s) || 0) + 1) : mp), new Map());
+                const pT = tally(P, () => true), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
+                for (const [t, n] of pT) if ((kB.get(t) || 0) < n) issues.push(`${where} given text "${t.slice(0, 24)}" in key ink`);
+                for (const [t, n] of kB) if (n > (pT.get(t) || 0)) issues.push(`${where} answer text "${t.slice(0, 24)}" is black`);
+                const paint = (x) => {
+                    const cs = w.getComputedStyle(x.el);
+                    const st = cs.stroke !== 'none' && parseFloat(cs.strokeWidth) > 0 ? cs.stroke : '';
+                    const fi = cs.fill !== 'none' && !/rgb\(255, 255, 255\)|rgba\(0, 0, 0, 0\)/.test(cs.fill) ? cs.fill : '';
+                    return { st, fi, any: !!(st || fi), or: st === ORANGE || fi === ORANGE, full: (!st || st === ORANGE) && (!fi || fi === ORANGE) };
+                };
+                const KS = svgs(cell).map((x) => Object.assign(x, paint(x))).filter((x) => x.any);
+                const PS = svgs(pcell).map((x) => Object.assign(x, paint(x))).filter((x) => x.any);
+                // shapes paired by geometry: a given keeps its black stroke (only a part's new
+                // shading may take the ink); a shape the key adds is key ink all over
+                const byG = new Map();
+                PS.forEach((y) => byG.set(y.s, (byG.get(y.s) || []).concat(y)));
+                for (const x of KS) {
+                    const twin = (byG.get(x.s) || []).shift();
+                    if (twin) {
+                        if (x.st === ORANGE || (x.fi === ORANGE && twin.fi === 'rgb(0, 0, 0)')) issues.push(`${where} given ${x.el.tagName} in key ink`);
+                    } else if (!x.full) issues.push(`${where} drawn answer ${x.el.tagName} not fully key ink (stroke ${x.st || '-'} fill ${x.fi || '-'})`);
+                }
+                const m = lcs(P.map((x) => x.s), K.map((x) => x.s));
+                const added = K.filter((x, j) => !m.has(j)).map((x) => x.s).filter((t) => /\d/.test(t) && !/^[a-z]\.$/.test(t));
+                const row = srows[ki];
+                const it = row && row.items.find((i) => i.cell === ci + 1);
+                if (added.length && srows.length && !it) issues.push(`${where} the copy key fills ${added.slice(0, 3).join('/')} but the short key lists nothing`);
+            });
+        });
+        out.push({ skillId, issues: issues.slice(0, 6) });
+    }
+    f.remove();
+    return out;
+}
+
 async function printDoc(page, html, pdf) {
     const sheet = await page.browser().newPage();
     try {
@@ -175,7 +245,7 @@ print(len(d))
             const d = f.contentDocument;
             const col = (el) => el && f.contentWindow.getComputedStyle(el).color;
             const out = {
-                keyAns: col(d.querySelector('[data-ws-mode="key"] [data-ws-key-ans]')),
+                keyAns: col(d.querySelector('[data-ws-mode="key"] [data-ws-key-ans]:not([data-ws-key-mark]):not([data-ws-key-fill])')),
                 pupilText: col(d.querySelector('[data-ws-mode="print"] [data-ws-cell]')),
                 keyQuestion: col(d.querySelector('[data-ws-mode="key"] [data-ws-cell]')),
             };
@@ -263,6 +333,57 @@ print(len(d))
         check(/keyPlace: d\.keyPlace === 'after-page'/.test(ui) && /keyStyle: d\.keyStyle === 'short'/.test(ui), 'printDefaults does not carry the key placement and style');
         check(/keyPlace: d\.keyPlace, keyStyle: d\.keyStyle/.test(src0()) && /rememberKeyDefaults\(\)/.test(src0()), 'teacher-print does not remember the key choice');
 
+        // ---- 9. "Start each key on a new sheet" (owner 2026-10-09): every key starts on an odd page
+        //         (the front of a sheet) and every pupil page too; off by default and only after each page
+        const ns = await page.evaluate(async () => {
+            const out = {};
+            for (const style of ['copy', 'short']) for (const newSheet of [false, true]) {
+                const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts' }], pages: 3 }], size: 'L', paper: 'A4', seed: 5, key: { on: true, placement: 'after-page', style, newSheet } });
+                const d = document.createElement('div'); d.innerHTML = r.docHtml;
+                out[`${style}-${newSheet}`] = [...d.querySelectorAll('section.ws-page')].map((x) => ({ blank: 'B', key: 'K', print: 'P' })[x.getAttribute('data-ws-mode')] || '?').join('');
+            }
+            const e = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts' }], pages: 2 }], size: 'L', paper: 'A4', seed: 5, key: { on: true, placement: 'end', style: 'copy', newSheet: true } });
+            out.end = e.keyOptions.newSheet;
+            return out;
+        });
+        check(ns['copy-false'] === 'PKPKPK' && ns['short-false'] === 'PKPKPK', `new sheet off: ${ns['copy-false']} / ${ns['short-false']}`);
+        for (const st of ['copy', 'short']) {
+            const q = ns[`${st}-true`];
+            check(/^(?:PB?K+B?)+$/.test(q) && q.length % 2 === 0 && [...q].every((c, i) => (c === 'P' || (c === 'K' && q[i - 1] !== 'K')) ? i % 2 === 0 : true), `new sheet ${st}: ${q} (every pupil page and key must start a sheet)`);
+        }
+        check(ns.end === false, 'the new-sheet option applies only to "After each page"');
+        log(`  new sheet: copy ${ns['copy-true']} short ${ns['short-true']}`);
+
+        // ---- 10. per-cell alignment (critic r2, R2-1 / R2-2): on the copy key, every mark it ADDS in a
+        //          cell that the pupil twin lacks (text, and SVG strokes / fills) is in the key ink, and
+        //          every mark the pupil page also prints is not; the short key lists every cell the copy
+        //          key fills, Guided Practice too (never an empty list where the copy key has answers).
+        const ALIGN_ROLES = (process.env.KEY_ALIGN_ROLES || 'independent:all,opener:tpl,lesson:tpl').split(',').map((x) => x.split(':'));
+        const pick = await page.evaluate(() => {
+            const by = {};
+            for (const [cat, list] of Object.entries(window.SKILLS)) for (const s of list) {
+                if (!s || !s.v || /^mixed/.test(s.v) || s.retired || s.tombstone) continue;
+                let t = 'none';
+                try { const q = window.generateQuestionFor({ category: cat, skill: s.v, seed: 3 }); t = (q && q.cell && q.cell.template) || 'legacy'; } catch (e) { t = 'err'; }
+                (by[t] = by[t] || []).push([cat, s.v]);
+            }
+            return by;
+        });
+        const ALL = Object.entries(pick).filter(([t]) => t !== 'err' && t !== 'none').flatMap(([, l]) => l);
+        const TPL = Object.entries(pick).filter(([t]) => t !== 'err' && t !== 'none' && t !== 'legacy').map(([, l]) => l[0]);
+        for (const [role, which] of ALIGN_ROLES) {
+            const list = which === 'all' ? ALL : TPL;
+            for (let ch = 0; ch < list.length; ch += 20) {
+                const res = await page.evaluate(alignProbe, { role, FAM: list.slice(ch, ch + 20) });
+                for (const x of res) {
+                    if (x.skip) continue;
+                    const tag = `align ${role} ${x.skillId}`;
+                    x.issues.forEach((b) => check(false, `${tag}: ${b}`));
+                }
+                log(`  align ${role}: ${Math.min(ch + 20, list.length)}/${list.length}`);
+            }
+        }
+
         // ---- 6. the teacher print request and an old saved printout
         const old = await page.evaluate(async () => {
             const r = await window.buildSheet({ role: 'more-practice', letters: ['A', 'B'], sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts' }] }], size: 'M', paper: 'A4', seed: 99, key: true });
@@ -270,7 +391,8 @@ print(len(d))
         });
         check(old.ok && old.opts.placement === 'end' && old.opts.style === 'copy', `old boolean request: ${JSON.stringify(old)}`);
         const src = fs.readFileSync(path.join(ROOT, 'js', 'modules', 'teacher-print.js'), 'utf8');
-        check(/key: \{ on: !!pr\.key, placement: pr\.keyPlace \|\| 'end', style: pr\.keyStyle \|\| 'copy' \}/.test(src), 'teacher-print request does not carry the key options');
+        check(/key: \{ on: !!pr\.key, placement: pr\.keyPlace \|\| 'end', style: pr\.keyStyle \|\| 'copy', newSheet: !!pr\.keyNewSheet \}/.test(src), 'teacher-print request does not carry the key options');
+        check(/keyNewSheet: d\.keyNewSheet === true/.test(ui) && /keyNewSheet: !!pr\.keyNewSheet \}/.test(src), 'the new-sheet choice is not a saved print default (off by default)');
         check(!/keyPlace|keyStyle/.test(fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-codes.js'), 'utf8')), 'skill codes now carry key settings (old codes would move)');
         check(!problems.length, `console errors: ${problems.map((p) => p.text).slice(0, 3).join(' | ')}`);
     } finally { await app.close(); }

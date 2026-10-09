@@ -108,7 +108,7 @@ function initState() {
         key: true,
         // Wave 4.4: where the key prints and what it looks like (default = today's key; the
         // teacher's last choice is remembered in the print defaults).
-        keyPlace: d.keyPlace, keyStyle: d.keyStyle,
+        keyPlace: d.keyPlace, keyStyle: d.keyStyle, keyNewSheet: !!d.keyNewSheet,
         seed: freshSeed(),
         view: 0,          // page index, or 'key'
         versions: 1,
@@ -320,6 +320,7 @@ function onClick(e) {
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
         case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
+        case 'key-newsheet': pr.keyNewSheet = !pr.keyNewSheet; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
         case 'new-numbers': pr.seed = freshSeed(); scheduleBuild(0); break;
@@ -700,7 +701,7 @@ function renderSetup() {
 function rememberKeyDefaults() {
     try {
         const d = readStore(PRINT_DEFAULTS_KEY, {}) || {};
-        writeStore(PRINT_DEFAULTS_KEY, Object.assign({}, d, { keyPlace: pr.keyPlace, keyStyle: pr.keyStyle }));
+        writeStore(PRINT_DEFAULTS_KEY, Object.assign({}, d, { keyPlace: pr.keyPlace, keyStyle: pr.keyStyle, keyNewSheet: !!pr.keyNewSheet }));
     } catch (e) { /* storage blocked: the choice still holds for this session */ }
 }
 
@@ -708,8 +709,10 @@ function rememberKeyDefaults() {
 function keyOptionsHTML() {
     return `
     <div class="tv-keyopts" style="display:flex;flex-direction:column;gap:10px;margin-top:-6px;">
-      <div><span class="tv-label">Key placement</span>${seg('key-place', pr.keyPlace || 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement')}
-        <p class="tv-cap" style="margin-top:6px;">${pr.keyPlace === 'after-page' ? 'Each pupil page is followed by its own key.' : 'All key pages print after all pupil pages.'}</p></div>
+      <div><span class="tv-label">Key placement</span>${seg('key-place', pr.keyPlace || 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement').replace('class="tv-seg"', 'class="tv-seg tv-seg-wrap"')}
+        <p class="tv-cap" style="margin-top:6px;">${pr.keyPlace === 'after-page' ? 'Each pupil page is followed by its own key.' : 'All key pages print after all pupil pages.'}</p>${pr.keyPlace === 'after-page' ? `
+        <button type="button" class="tv-check" role="checkbox" aria-checked="${!!pr.keyNewSheet}" data-act="key-newsheet" style="margin-top:6px;"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>Start each key on a new sheet</span></button>
+        <p class="tv-cap" style="margin-top:4px;">For double-sided printing: a blank back is added so each key has its own sheet.</p>` : ''}</div>
       <div><span class="tv-label">Key style</span>${seg('key-style', pr.keyStyle || 'copy', [['copy', 'Page copy'], ['short', 'Short']], 'Key style')}
         <p class="tv-cap" style="margin-top:6px;">${pr.keyStyle === 'short' ? 'Short: labels and answers only, many pages on one sheet.' : 'Page copy: the pupil page with the answers filled in.'}</p></div>
     </div>`;
@@ -803,7 +806,7 @@ function requestFor(s, i) {
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
-        key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy' },
+        key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
     };
 }
@@ -1076,7 +1079,7 @@ function rememberPrint(title) {
         level: hit ? levelText(hit.level) : '',
         pages: last.pages.length,
         key: !!pr.key,
-        keyPlace: pr.keyPlace || 'end', keyStyle: pr.keyStyle || 'copy',
+        keyPlace: pr.keyPlace || 'end', keyStyle: pr.keyStyle || 'copy', keyNewSheet: !!pr.keyNewSheet,
         columns: (last.parts[0] && last.parts[0].res.fits && last.parts[0].res.fits.cols) || null,
         at: Date.now(),
         req,

@@ -1901,7 +1901,19 @@ export function arrangeKey(res, ko, req = {}) {
             const N = pupil.length;
             const keyed = perPage.map((list, i) => list.map((h, j) => h.replace(/(<footer class="ws-foot"[^>]*><span>[\s\S]*?<\/span><b>)([^<]*)(<\/b>)/,
                 (m, a, c, b) => `${a}${ko.style === 'short' ? `Key ${i + 1}/${N}${list.length > 1 ? ` (${j + 1})` : ''}` : `Key ${c}`}${b}`)));
-            doc = pupil.map((p, i) => [p, ...keyed[i]].join('\n')).join('\n');
+            if (ko.newSheet) {
+                // "Start each key on a new sheet" (owner 2026-10-09, double-sided printing): a blank
+                // back pads the run so every key starts on the front of a sheet, and the key keeps its
+                // sheet whole, so the next pupil page starts on a fresh sheet too.
+                const letter = paperAttr === 'letter' ? ' mq-paper-letter' : '';
+                const blank = `<section class="ws-page ws-blank-back${letter}" data-ws-paper="${paperAttr}" data-ws-mode="blank" aria-label="Blank back of the sheet"></section>`;
+                const out = [];
+                const pad = () => { if (out.length % 2) out.push(blank); };
+                pupil.forEach((p, i) => { pad(); out.push(p); pad(); out.push(...keyed[i]); });
+                pad();
+                doc = out.join('\n');
+                res.blankBacks = out.filter((h) => h === blank).length;
+            } else doc = pupil.map((p, i) => [p, ...keyed[i]].join('\n')).join('\n');
             keyPages = keyed.flat();
         } else {
             res.notes = (res.notes || []).concat('The key prints at the end: its pages do not match the pupil pages one to one.');

@@ -894,3 +894,7 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 @media (max-width: 1023px) {
     .tv-print-grid { grid-template-areas: "preview" "what" "setup"; }
 }
+
+/* critic r2 (R2-5): a segment whose label is longer than its share ("After each page" at 1366) wraps
+   inside its 44 px pill instead of running past it. Additive. */
+.tv-seg.tv-seg-wrap > button { white-space: normal; line-height: 16px; min-height: 44px; height: auto; padding: 2px 6px; }

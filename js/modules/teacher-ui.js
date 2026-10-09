@@ -158,6 +158,8 @@ export function printDefaults() {
         // Wave 4.4: the teacher's last answer-key choice (critic r1, D7). Not in any share code.
         keyPlace: d.keyPlace === 'after-page' ? 'after-page' : 'end',
         keyStyle: d.keyStyle === 'short' ? 'short' : 'copy',
+        // owner 2026-10-09: start each key (after each page) on a new sheet; off by default
+        keyNewSheet: d.keyNewSheet === true,
     };
 }
 
