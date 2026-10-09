@@ -4322,7 +4322,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 1 = that number</div>
                     </div>`;
 
                 } else {
@@ -4348,10 +4347,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 0 = 0</div>
                     </div>`;
                 }
 
+                // Round 8 (critic r6 D6-2): the identity / zero cell no longer prints its rule line
+                // ("Any number × 0 = 0") under the question - it states the answer. The rule stays
+                // in q.hint, which the screen shows only when the pupil asks for help.
                 // P12: `pictures` off prints the question alone, without the arrays and the
                 // property's name (the name is a hint: it tells the pupil which rule to use).
                 if (_opt('pictures') === false) q.visual = '';

@@ -244,6 +244,12 @@ export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' 
 
 /** The counting & cardinality categories whose mixed pools are dealt in the kit look only. */
 const K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
+/** Round 8 (critic r6 D6-2): every mixed pool page is one look, not only the K-2 pools above. */
+const POOL_ONE_LOOK = true;
+/** How many draws a pool slot passes over a legacy-look member before it keeps one. */
+const POOL_LEGACY_TRIES = 16;
+/** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
+const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
 /**
  * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
@@ -284,7 +290,12 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // the legacy look (no kit cell: a long "Answer:" line, a chart with nothing to write)
             // is passed over for another draw while a few tries remain; the last try keeps it.
             // (the K-2 counting & cardinality pools, whose every member has a kit cell)
-            if (k < Math.min(tries, 8) && K2_POOL_CATS.has(sk.categoryId) && isMixedMetaSkill(sk.skillId) && !(cand.cell && cand.cell.template && cand.cell.template !== 'legacy')) { if (!q) q = cand; continue; }
+            // (round 8, critic r6 D6-2) every mixed pool, not only the K-2 ones: a legacy member's
+            // cell prints the generic "Answer: ___" row under its own write lines, box or check
+            // boxes (two answer places, H8), so a pool page deals it only when the pool has
+            // nothing else to give (a member the host redraws as a kit cell - kitCellSpec, a
+            // number family - is a kit cell here).
+            if (k < Math.min(tries, K2_POOL_CATS.has(sk.categoryId) ? 8 : POOL_LEGACY_TRIES) && (K2_POOL_CATS.has(sk.categoryId) || POOL_ONE_LOOK) && isMixedMetaSkill(sk.skillId) && !kitDrawn(cand)) { if (!q) q = cand; continue; }
             if (want && k < tries && !want(cand, sk)) { if (!q) q = cand; continue; }
             q = cand;
             if (!seen.has(signature(cand))) break;
@@ -2638,7 +2649,11 @@ export async function buildSheet(req = {}) {
         const n = r.items.length;
         const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
         const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
-        const ok = (alt, k) => alt && alt.pageCount <= wanted && !holed(alt) && !dupOf(alt) && alt.items.length === k;
+        // (round 8) a pool page's re-deal keeps the PAGEFILL floor and the H13 bands the first deal reached
+        const pool = autoPoolPage(req);
+        const q0 = pool ? poolQuality(r) : null;
+        const kept = (alt) => !pool || (() => { const q = poolQuality(alt); return q.bands <= q0.bands && q.fill >= Math.min(POOL_FILL_FLOOR, q0.fill) - 1e-6; })();
+        const ok = (alt, k) => alt && alt.pageCount <= wanted && !holed(alt) && !dupOf(alt) && alt.items.length === k && kept(alt);
         for (let k = 1; k <= 3; k++) {
             const alt = await buildSheetFilled(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
             if (ok(alt, n)) return alt;
@@ -2653,7 +2668,177 @@ export async function buildSheet(req = {}) {
     return r;
 }
 
+/**
+ * Round 8 (critic r6 D6-2): the share of the problem area a sheet's pages fill - the last grid's
+ * bottom against the page body, as lint PAGEFILL measures it - the least over every page but the
+ * last of a sheet of several (PG-23 lets a last page be short). A lone grid reads its height
+ * against its own page (availMm), a page of several grids (a pool's split-off column work,
+ * practice.js fineSplit) the `fill` the role records for it; a page that fills by flex is full.
+ */
+function pageFillOf(x) {
+    const pages = (x && x.plan && Array.isArray(x.plan.pages)) ? x.plan.pages : [];
+    const judged = pages.length > 1 ? pages.slice(0, -1) : pages;
+    let least = 1;
+    for (const pg of judged) {
+        let f = 1;
+        if (typeof pg.fill === 'number') f = pg.fill;
+        else {
+            const grids = (pg.sections || []).filter((g) => g.kind === 'grid');
+            if (grids.length === 1 && grids[0].availMm > 0 && parseFloat(grids[0].height) > 0) f = parseFloat(grids[0].height) / grids[0].availMm;
+        }
+        least = Math.min(least, f);
+    }
+    return least;
+}
+
+/**
+ * Round 8 (critic r6 D6-2 / D6-6): the printed pupil page itself, measured the way lint PAGEFILL
+ * and H13 measure it - the pages are laid out in an off-screen host of the app document (the kit's
+ * stylesheet is the app's), so a pool deal is judged by what prints, not by the plan's estimate:
+ *   fill   the least share of the problem area (first grid's top to the footer) the grids fill,
+ *          over every page but the last of a sheet of several
+ *   bands  cells whose drawing leaves one empty band of 30 % or more of the cell's height or
+ *          width (H13: a narrow fact alone in a half-page cell, a row sized for a taller problem)
+ *   over   cells something sticks out of (PG-12, lint L-OVERFLOW)
+ * null where there is no DOM (the node unit tests): the plan's fill is used instead.
+ */
+function pageCheck(html) {
+    if (typeof document === 'undefined' || !document.body || !html) return null;
+    ensureEngineStyle(document);
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-30000px;top:0;opacity:0;pointer-events:none;';
+    host.innerHTML = html;
+    document.body.appendChild(host);
+    try {
+        const pages = [...host.querySelectorAll('.ws-page')];
+        if (!pages.length) return null;
+        const shown = (el) => { const cs = getComputedStyle(el); return cs.display !== 'none' && cs.visibility !== 'hidden'; };
+        let fill = 1, bands = 0, over = 0;
+        pages.forEach((pg, i) => {
+            const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter((g) => g.getBoundingClientRect().height > 0);
+            const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
+            if (grids.length && foot && !(pages.length > 1 && i === pages.length - 1)) {
+                const top = Math.min(...grids.map((g) => g.getBoundingClientRect().top));
+                const bot = Math.max(...grids.map((g) => g.getBoundingClientRect().bottom));
+                const ft = foot.getBoundingClientRect().top;
+                if (ft > top) fill = Math.min(fill, (bot - top) / (ft - top));
+            }
+            for (const c of pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')) {
+                if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
+                const cr = c.getBoundingClientRect();
+                // PG-12: nothing sticks out of its cell (lint L-OVERFLOW's 0.75 px)
+                for (const d of c.querySelectorAll('*')) {
+                    if (!shown(d)) continue;
+                    const r = d.getBoundingClientRect();
+                    if (r.width && r.height && Math.max(r.right - cr.right, cr.left - r.left, r.bottom - cr.bottom, cr.top - r.top) > 0.75) { over++; break; }
+                }
+                if (cr.height < 12 * PX_PER_MM || cr.width < 12 * PX_PER_MM) continue;
+                const cs = getComputedStyle(c);
+                const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom), l: cr.left + parseFloat(cs.paddingLeft), r: cr.right - parseFloat(cs.paddingRight) };
+                let box = null;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!shown(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width || !r.height) continue;
+                    if (d.children.length && !(typeof SVGElement !== 'undefined' && d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)
+                        && !(parseFloat(ds.borderTopWidth) || parseFloat(ds.borderBottomWidth))) continue;
+                    box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                }
+                if (!box) continue;
+                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
+                if (vBand >= 0.29 * cr.height || hBand >= 0.29 * cr.width) bands++;
+            }
+        });
+        return { fill, bands, over };
+    } catch (e) {
+        return null;
+    } finally {
+        host.remove();
+    }
+}
+
+/**
+ * A pool page's quality for the fill below: its printed fill and H13 bands (pageCheck), else the
+ * plan's fill with no band count. `ok`: the page reaches the PAGEFILL floor with no band.
+ */
+function poolQuality(x) {
+    const m = x && x.pupilHtml ? pageCheck(x.pupilHtml) : null;
+    const k = m && x.keyHtml ? pageCheck(x.keyHtml) : null;
+    const fill = m ? m.fill : pageFillOf(x) - 0.02;
+    // a band or an overflow on the pupil page, or an overflow on its key (a key's answer drawn
+    // wider than the pupil's empty slot), is a fault of this deal
+    const bands = m ? m.bands + m.over + (k ? k.over : 0) : 0;
+    return { fill, bands, ok: fill >= POOL_FILL_FLOOR && bands === 0 };
+}
+
+/** PAGEFILL (RUBRIC H13): an Auto pool page leaves no strip over a fifth of its problem area. */
+const POOL_FILL_FLOOR = 0.81;   // measured on the printed page (pageCheck): 1 % of margin over the lint's 80 %
+/** A review page deals at least this many problems where a deal on the page allows it: one 12 x 12
+ *  chart alone (or a chart and one fact) is a page of one kind, not a review (LESSONS L2). */
+const POOL_MIN_ITEMS = 3;
+/** How many derived deals (seed + k x 7919) a short pool page tries before it keeps its fullest. */
+const POOL_FILL_DEALS = 24;   // Mixed Addition at S deals a clean page about one time in six (H13: a 2-digit stack beside stories)
+
+/** Is this request an Auto-count Independent page of ONE mixed pool (mixed_*, *_all)? */
+function autoPoolPage(req) {
+    const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+    const secs = Array.isArray(req.sections) ? req.sections : [];
+    const s = secs[0];
+    if (asked !== 'independent' || secs.length !== 1 || !s || (s.skills || []).length !== 1) return false;
+    if (!(s.count === undefined || s.count === null || s.count === 'auto' || s.count === '')) return false;
+    const id = String(s.skills[0].skillId || '');
+    return isMixedMetaSkill(id) || /_all$/.test(id);
+}
+
+/**
+ * Round 8 (critic r6 D6-2: mixed_multiplication held 2-4 problems over a 36-68 % empty strip on
+ * about one page in five). The fill below stops as soon as one more problem spills to a second
+ * page, so a deal whose next problem is a tall one (a story, an area model) kept the page at 2.
+ * A pool page under the PAGEFILL floor is therefore dealt again from derived seeds (seed + k x
+ * 7919, the same derivation as everywhere else, so the same request always prints the same page),
+ * each deal filled the same way, and the first deal that fills its page (and holds at least
+ * POOL_MIN_ITEMS problems) is kept; when none does, the best of them. Only whole pages on the pages
+ * asked, never a hole or a repeat.
+ */
 async function buildSheetFilled(req = {}) {
+    const r = await buildSheetFill0(req);
+    try {
+        if (req._noReseat || req._noFloor || !autoPoolPage(req) || !Array.isArray(r.items)) return r;
+        const q0 = poolQuality(r);
+        const full = (x, q) => q.ok && x.items.length >= POOL_MIN_ITEMS;
+        if (full(r, q0)) return r;
+        const s = req.sections[0];
+        const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
+        const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+        // a bordered empty run is never kept; a re-laid short last row (grid.js `relaid`) is taken
+        // only when no deal gives whole rows that fill the page
+        const blank = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+        const relaid = (x) => /class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+        const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+        // the better of two pages: one that reaches the floor, then no H13 band, then enough
+        // problems for a review, then whole rows, then the fuller
+        const rank = (x, q) => [q.fill >= POOL_FILL_FLOOR ? 1 : 0, -q.bands, Math.min(x.items.length, POOL_MIN_ITEMS), relaid(x) ? 0 : 1, q.fill];
+        const better = (a, b) => { for (let i = 0; i < a.length; i++) { const t = i === a.length - 1 ? 0.01 : 0; if (a[i] > b[i] + t) return true; if (a[i] < b[i] - t) return false; } return false; };
+        let best = r, bestRank = rank(r, q0);
+        for (let k = 1; k <= POOL_FILL_DEALS; k++) {
+            const alt = await buildSheetFill0(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noFloor: true }));
+            if (!alt || !Array.isArray(alt.items) || alt.pageCount > wanted || blank(alt) || dupOf(alt) || alt.items.length < Math.min(r.items.length, POOL_MIN_ITEMS)) continue;
+            const q = poolQuality(alt);
+            if (full(alt, q) && !relaid(alt)) return alt;
+            const rk = rank(alt, q);
+            if (better(rk, bestRank)) { best = alt; bestRank = rk; }
+        }
+        return best;
+    } catch (e) {
+        return r;
+    }
+}
+
+async function buildSheetFill0(req = {}) {
     const r = await buildSheetOnce(req);
     try {
         const asked = ROLE_ALIASES[req.role] || req.role || 'independent';

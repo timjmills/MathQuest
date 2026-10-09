@@ -834,6 +834,21 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const narrow = its.filter((it) => !one(it));
         const fs = !sec.columns || sec.columns === 'auto' ? fineSplit(Object.assign({}, base, { floor: null }), narrow, paper, availableWidthMm, { size, look }) : null;
         if (fs) {
+            // Round 8 (critic r6 D6-1): ONE digit size in the column-work row. A fact dealt beside
+            // stacks (a mixed pool's 4 + 2 among 3117 + 2947) is drawn at the size's digit metric,
+            // the size the stacks use, never the fact ladder's 28 pt beside 16 pt stacks at S. The
+            // item's own question carries it (`pt`), so the pupil page, the key and the screen-free
+            // measurement draw the same fact; never below the metric (content never shrinks).
+            const tplOf = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
+            const metricPt = (SIZES[size] || SIZES[DEFAULT_SIZE]).digitPt;
+            if (fs.fine.some((it) => tplOf(it) === 'stack') && fs.fine.some((it) => tplOf(it) === 'fact')) {
+                for (const it of fs.fine) {
+                    const q = it.q;
+                    const pl = q && q.cell && q.cell.payload;
+                    if (tplOf(it) !== 'fact' || !pl || pl.pt || pl.notation === 'horiz' || pl.notation === 'horizontal') continue;
+                    q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, pl, { pt: metricPt }) });
+                }
+            }
             const at = sections.length;
             sections.push(Object.assign({}, sec));
             items.push(fs.mid);
@@ -1098,8 +1113,25 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 last.style = `${last.style || ''}grid-column:span ${span};`;
             }
         }
+        // Round 8 (critic r6 D6-2): how much of the problem area a page of SEVERAL grids fills (the
+        // first grid's top to the page body's foot, as lint PAGEFILL measures it), so the host's
+        // fill can judge a pool page whose column work is split off (fineSplit) like a lone grid.
+        let fill;
+        {
+            const gs = sections.filter((x) => x.kind === 'grid');
+            const L0 = pg.parts.length ? layouts[pg.parts[0].section] : null;
+            const area = L0 ? (pg.cont ? L0.gridHCont : L0.gridH) : 0;
+            if (gs.length > 1 && area > 0 && gs.every((x) => parseFloat(x.height) > 0)) {
+                // the first grid's own page height (the lone grid's `availMm`), and every grid and
+                // instruction line under its top
+                const at = sections.indexOf(gs[0]);
+                const inner = sections.slice(at).filter((x) => x.kind === 'html' && /ws-instrline/.test(String(x.html || ''))).length;
+                const used = gs.reduce((a, x) => a + parseFloat(x.height), 0) + inner * instructionMm(size);
+                fill = Math.round((used / area) * 1000) / 1000;
+            }
+        }
         for (const x of sections) delete x._its;
-        return { header: pg.cont ? cont : first, sections };
+        return fill !== undefined ? { header: pg.cont ? cont : first, sections, fill } : { header: pg.cont ? cont : first, sections };
     });
 
     const fits = layouts.map((L, si) => ({
