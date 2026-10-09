@@ -1,0 +1,2 @@
+box maxlength 4 {"focus":0,"vals":["2128","",""],"pulse":0} after Tab focus 1
+line maxlength 4 {"focus":0,"vals":["2128","",""],"pulse":0} after Tab focus 1
