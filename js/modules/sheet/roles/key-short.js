@@ -44,7 +44,7 @@ const IGNORED = /\s(?:data-ws-key-ans|data-ws-key-add|data-ws-ink|data-ws-key)(?
 const markSig = (cell, tag, attrs, text) => `${cell}|${tag.toLowerCase()}|${attrs.replace(IGNORED, '').replace(/\s+/g, ' ').trim()}|${text.replace(/\s+/g, ' ').trim()}`;
 // the same element up to its paint: a shape by its geometry, anything else by its class, slot and text
 const SHAPE = /^(rect|circle|ellipse|line|path|polyline|polygon)$/i;
-const GEOM_ATTRS = ['x', 'y', 'width', 'height', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'x1', 'y1', 'x2', 'y2', 'transform', 'stroke-width'];
+const GEOM_ATTRS = ['x', 'y', 'width', 'height', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'x1', 'y1', 'x2', 'y2', 'transform'];
 const looseSig = (cell, tag, attrs, text) => (SHAPE.test(tag)
     ? `${cell}|${tag.toLowerCase()}|${GEOM_ATTRS.map((a) => attrOf(attrs, a)).join(',')}`
     : `${cell}|${tag.toLowerCase()}|${attrOf(attrs, 'data-ws-slot')}|${text.replace(/\s+/g, ' ').trim()}`);

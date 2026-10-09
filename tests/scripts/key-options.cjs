@@ -87,7 +87,9 @@ async function alignProbe({ role, FAM }) {
                 const K = texts(cell), P = texts(pcell);
                 const tally = (list, f) => list.reduce((mp, x) => (f(x) ? mp.set(x.s, (mp.get(x.s) || 0) + 1) : mp), new Map());
                 const pT = tally(P, () => true), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
-                for (const [t, n] of pT) if ((kB.get(t) || 0) < n) issues.push(`${where} given text "${t.slice(0, 24)}" in key ink`);
+                // (a hint the key leaves out, e.g. a model's traced count, is not a given in key ink)
+                const kO = tally(K, (x) => w.getComputedStyle(x.el).color === ORANGE);
+                for (const [t, n] of pT) if ((kB.get(t) || 0) < n && (kO.get(t) || 0) > 0) issues.push(`${where} given text "${t.slice(0, 24)}" in key ink`);
                 for (const [t, n] of kB) if (n > (pT.get(t) || 0)) issues.push(`${where} answer text "${t.slice(0, 24)}" is black`);
                 const paint = (x) => {
                     const cs = w.getComputedStyle(x.el);
@@ -101,8 +103,13 @@ async function alignProbe({ role, FAM }) {
                 // shading may take the ink); a shape the key adds is key ink all over
                 const byG = new Map();
                 PS.forEach((y) => byG.set(y.s, (byG.get(y.s) || []).concat(y)));
+                // a given pairs first (black marks claim their twins), so an added mark of the same
+                // shape as a printed legend is not taken for that legend
+                const twins = new Map();
+                for (const x of KS) if (!x.or) { const l = byG.get(x.s) || []; const i = l.findIndex((y) => !y.or); if (i >= 0) twins.set(x, l.splice(i, 1)[0]); }
+                for (const x of KS) if (!twins.has(x)) { const l = byG.get(x.s) || []; if (l.length) twins.set(x, l.shift()); }
                 for (const x of KS) {
-                    const twin = (byG.get(x.s) || []).shift();
+                    const twin = twins.get(x);
                     if (twin) {
                         if (x.st === ORANGE || (x.fi === ORANGE && twin.fi === 'rgb(0, 0, 0)')) issues.push(`${where} given ${x.el.tagName} in key ink`);
                     } else if (!x.full) issues.push(`${where} drawn answer ${x.el.tagName} not fully key ink (stroke ${x.st || '-'} fill ${x.fi || '-'})`);
