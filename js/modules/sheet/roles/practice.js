@@ -930,7 +930,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH, L.fillRefH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;

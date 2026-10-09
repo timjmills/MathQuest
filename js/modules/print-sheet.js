@@ -1877,7 +1877,7 @@ export async function buildSheet(req = {}) {
     // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
     // group under its grid) gives up its last problems, one at a time, until it is the pages it
     // was asked for. The capacity above counts each section's grid; this counts the whole page.
-    if (nline && !globalThis.__nlNoTrim && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
+    if (nline && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
         const wanted = n.sections.reduce((a, sec) => a + (sec.pages || 1), 0);
         for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
             const bySec = new Map();

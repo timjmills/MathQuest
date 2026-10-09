@@ -488,10 +488,13 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // The same shape is checked below: its rows may still sit on the far side of the fill rule's
     // 0.8 fallback (add_sub_10s @M: 38 mm cells off, 29 mm on), so they take the grid's height too.
     const sameShape = L0.perPage === L1.perPage && L0.cols === L1.cols && L0.rows === L1.rows;
-    if (L0.perPage < L1.perPage || (L0.packed && sameShape)) return L1;
+    // When the band does cost a row (the content leaves no slack to give), the rows that are left
+    // may stretch to the H13 cap (FILL_CAP) to take the row's place, not leave it blank at the foot.
+    const keep = () => Object.assign({}, L1, { fillRefH: sameShape ? L0.cellH : L1.perPage < L0.perPage ? 1e6 : 0 });
+    if (L0.perPage < L1.perPage || (L0.packed && sameShape)) return keep();
     const G = L1.gridH;
     const hMin = Math.max(L0.hMin, L1.hMin);
-    if (!(hMin > 0)) return L1;
+    if (!(hMin > 0)) return keep();
     if (L0.packed) {
         // Rows sized to what they hold: keep as many of the band-less rows as their OWN heights
         // (tallest first, as packByHeight pages them) fit in the shorter grid.
@@ -500,17 +503,17 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         for (let i = 0; i < ord.length; i += L0.cols) rowH.push(Math.max(...ord.slice(i, i + L0.cols).map((it) => measuredH(it, L0.cols))));
         let k = 0, sum = 0;
         while (k < Math.min(L0.rows, rowH.length) && sum + rowH[k] <= G - SAFETY_H_MM) { sum += rowH[k]; k++; }
-        if (k * L0.cols < L1.perPage || (k * L0.cols === L1.perPage && L0.cols === L1.cols)) return L1;
+        if (k * L0.cols < L1.perPage || (k * L0.cols === L1.perPage && L0.cols === L1.cols)) return keep();
         const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
         return Object.assign({}, L0, { rows: k, perPage: k * L0.cols, pages: L0.count ? Math.ceil(L0.count / (k * L0.cols)) : 1, gridH: G, gridHCont: L1.gridHCont,
             cellH: f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / k)), note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
     }
-    if (L0.rows * hMin > G - SAFETY_H_MM) return L1;
+    if (L0.rows * hMin > G - SAFETY_H_MM) return keep();
     const cellH = f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / L0.rows));
-    if (sameShape && !(cellH > L1.cellH + 0.01)) return L1;
+    if (sameShape && !(cellH > L1.cellH + 0.01)) return keep();
     const pages = L0.count ? Math.ceil(L0.count / L0.perPage) : 1;
     const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
-    return Object.assign({}, L0, { gridH: G, gridHCont: L1.gridHCont, cellH, hMin: r2(hMin), pages, fill: L0.fill && cellH >= G / L0.rows - 0.01, note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
+    return Object.assign({}, L0, { gridH: G, gridHCont: L1.gridHCont, cellH, hMin: r2(hMin), pages, fill: L0.fill && cellH >= G / L0.rows - 0.01, note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true, fillRefH: L0.cellH });
 }
 
 function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
@@ -823,7 +826,7 @@ export function groupByHeight(items, cols) {
  *
  * @returns {{rowsTpl: string, heightMm: number} | null}
  */
-export function rowShape(items, cols, rows, cellH) {
+export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     if (!items.length || rows < 1) return null;
     const w = [];
     const mins = [];
@@ -847,7 +850,9 @@ export function rowShape(items, cols, rows, cellH) {
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
     // (critic guided-r1 lint: a compare page at L left an 80 mm strip under 18 short rows).
-    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * cellH) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
+    // (`fillRefH`, Wave 5.2 critic nl-r4 D2: the cell height the grid had without the number-line
+    // band, so the band's 13 mm never tips a page across this threshold and doubles its cost.)
+    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * Math.max(cellH, Number(fillRefH) || 0)) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
     const total = H.reduce((a, b) => a + b, 0);
     return { rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(total * 100) / 100 };
 }
