@@ -1616,3 +1616,92 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 /* count-by rows (critic C2 r7): when both cues show, the back cue says only "Back", so the strip stays one line at 390 */
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
+
+/* ---- Wave 1 / A3 (owner 2026-10-03): the WRONG DIGITS blink red, 3 cycles of 1.2 s, then hold steady red.
+   Practice card and online worksheet only; the A2 dashed edge and cross stay (colour is never the only cue).
+   Reduced motion: no blink, the steady red only. Additive: older saved HTML never carries these classes. */
+@keyframes mqWdBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit {
+    color: var(--mq-box-bad) !important; -webkit-text-fill-color: var(--mq-box-bad);
+    /* the DIGIT blinks (its fill colour), never the box: the dashed edge holds still (critic r1) */
+    animation: mqWdBlinkInk 1.2s ease-in-out 3 !important;   /* beats .mq-scell * { animation: none } */
+}
+/* a red box the pupil is in shows its text cursor (a digit slot's caret is otherwise hidden) */
+html body .mq-scell.mq-scell.mq-scell input.mq-live-wrong.mq-live-wrong:focus,
+html body input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: #000 !important; }
+@keyframes mqWdBlinkInk { 0%, 100% { -webkit-text-fill-color: var(--mq-box-bad); } 50% { -webkit-text-fill-color: rgba(179, 38, 30, 0.2); } }
+/* a kept wrong entry is selected after a wrong try: no browser blue under the red digit (1.26:1) */
+html body input.mq-live-wrong::selection { background: rgba(0, 0, 0, 0.12); color: var(--mq-box-bad); -webkit-text-fill-color: var(--mq-box-bad); }
+html body input.mq-live-wrong.mq-wd-mirrored::selection { background: rgba(0, 0, 0, 0.12); color: transparent; -webkit-text-fill-color: transparent; }
+html body input.mq-live-wrong.mq-wd-empty.mq-wd-empty.mq-wd-empty { outline-width: 4px !important; }
+html body input.mq-live-wrong.mq-wd-mirrored.mq-wd-mirrored.mq-wd-mirrored {
+    color: transparent !important; -webkit-text-fill-color: transparent !important;
+}
+html body .mq-wd-mirror.mq-wd-mirror {
+    position: absolute; z-index: 4; display: flex; align-items: center; box-sizing: border-box; margin: 0;
+    pointer-events: none; color: #000 !important; line-height: 1; white-space: pre; border: 0; background: none;
+}
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd { display: inline-block; color: #000 !important; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad {
+    color: var(--mq-box-bad) !important; animation: mqWdBlink 1.2s ease-in-out 3 !important;
+    /* colour is never the only cue: a 3 px underline that outlasts the blink and reduced motion */
+    text-decoration: underline 3px var(--mq-box-bad) !important; text-underline-offset: 4px; text-decoration-skip-ink: none;
+}
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-sep.mq-wd-miss { min-width: 0.3em; }
+html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss {
+    min-width: 0.62em; height: 1.05em; margin: 0 1px; box-sizing: border-box;
+    border: 2px dashed var(--mq-box-bad); border-radius: 3px; animation: mqWdBlink 1.2s ease-in-out 3 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body input.mq-live-wrong.mq-wrong-digit.mq-wrong-digit.mq-wrong-digit,
+    html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad, html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss { animation: none !important; }
+}
+@media print { .mq-wd-mirror { display: none !important; } }
+
+/* ---- 2026-10-04 (owner): EVERY next answer box pulses yellow, and answer boxes carry no "Type …" text.
+   js/modules/active-box.js puts .mq-active-box on the next answer input on the practice card, the
+   online worksheet's current problem and the quiz, whatever widget drew it.
+   Why the earlier pulse never moved: it animated background-color and box-shadow, and !important
+   declarations (its own, and the .mq-mono scope's box-shadow/filter: none !important) always beat an
+   animation. Here the animation drives two registered custom properties, which nothing pins, and the
+   !important fill and glow READ them — so they pulse. ADDITIVE; screen only. */
+@property --mq-next-ring { syntax: '<length>'; inherits: false; initial-value: 3px; }
+@property --mq-next-fill { syntax: '<color>'; inherits: false; initial-value: #fff3a0; }
+@keyframes mq-next-glow {
+    0%, 100% { --mq-next-ring: 3px; --mq-next-fill: #fff3a0; }
+    50%      { --mq-next-ring: 6px; --mq-next-fill: #ffe14d; }
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: 0 0 0 3px #f2c200, 0 0 0 var(--mq-next-ring) rgba(242, 194, 0, 0.45) !important;
+    animation: mq-next-glow 1.2s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+        animation: none !important; --mq-next-ring: 5px; --mq-next-fill: #fff3a0;
+    }
+}
+html body :is(#questionCard, #worksheetView .problem-card, .qt-question-card) :is(input, textarea)::placeholder { color: transparent !important; }
+
+/* critic D4 (2026-10-04): the next-box glow is drawn INSIDE the box, so a neighbouring box or a row
+   edge can never cover or clip it; and a box still holding a wrong digit keeps its red (no yellow fill). */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    box-shadow: inset 0 0 0 3px #f2c200, inset 0 0 0 var(--mq-next-ring) rgba(242, 194, 0, 0.45) !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg, #fde8e7) !important;
+}
+
+/* critic R4-3 (2026-10-04): a box judged wrong or missing keeps its red mark even while it is the next
+   box (the caret sits in it): the yellow fill, ring and pulse give way to the A2/A3 marks. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit) {
+    animation: none !important;
+    box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
+    border-color: var(--mq-box-bad, #B3261E) !important;
+}
+
+/* Touch dots floor (design/SUPPORTS.md S1.6, owner 2026-10-04: "worksheet mode touchpoints might be too small"): a grid
+   cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
+   size, so each dot is big enough to see and touch. Additive. */
+.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
