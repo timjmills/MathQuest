@@ -3,6 +3,7 @@ import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircle
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
 import { snapshotSetOptions } from './skill-option-store.js';
 import { buildMixedCode } from './skill-codes.js';
+import { searchSkillIndex } from './skill-search.js';
 
 // The mixed settings' skill list is an options host: a skill row gets the ⚙ Options panel (a
 // category or domain row does not — it stands for many skills). The values live in the set's
@@ -378,13 +379,10 @@ export function handleMixedSkillSearch(query) {
         return;
     }
 
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
 
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    }).slice(0, 12);
+    const matches = index.slice(0, 12);
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:#666;text-align:center;font-size:0.85rem;">No skills found.</div>';

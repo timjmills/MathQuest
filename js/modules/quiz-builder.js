@@ -9,6 +9,7 @@
 // of the teacher previews (teacher-preview.js), and the preview column stays visible at tablet
 // widths (it is the only way to add questions). Skills are buttons, so the keyboard reaches them.
 
+import { skillSearchScores, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
 import { shuffle, answerLabelOf } from './utils.js';
@@ -539,6 +540,7 @@ export function qbFilterGrade(grade) {
 
 export function qbSearchInput(value) {
     qb.searchText = (value || '').toLowerCase().trim();
+    qb.searchHits = skillSearchScores(qb.searchText);   // shared thesaurus search (skill-finder.js)
     qbApplyFilters();
 }
 
@@ -558,14 +560,15 @@ function qbApplyFilters() {
             if (!qb.activeGrades.has(String(card.dataset.qbGrade))) show = false;
         }
         if (show && qb.searchText) {
-            const label = card.dataset.qbLabel || '';
-            if (!label.includes(qb.searchText)) show = false;
+            const hits = qb.searchHits || (qb.searchHits = skillSearchScores(qb.searchText));
+            if (!hits || !hits.has(`${card.dataset.qbCat}:${card.dataset.qbSkill}`)) show = false;
         }
 
         card.style.display = show ? '' : 'none';
         if (show) totalVisible++;
     });
 
+    qbOrderByRank(cards, qb.searchText ? (qb.searchHits || null) : null);
     catGroups.forEach(group => {
         const visible = group.querySelectorAll('.qb-skill-card:not([style*="display: none"])');
         group.style.display = visible.length > 0 ? '' : 'none';
@@ -1608,3 +1611,38 @@ export function selectQuizSkill(skillId) {
 export function addSelectedQuestions() {
     qbAddFromPreview();
 }
+
+// While a query is active, groups and cards follow the rank of their best match (top hit first);
+// with no query the original order comes back.
+function qbOrderByRank(cards, hits) {
+    const score = (card) => (hits ? hits.get(`${card.dataset.qbCat}:${card.dataset.qbSkill}`) : undefined);
+    const groups = new Set(), sections = new Set();
+    cards.forEach((card, i) => {
+        if (card.dataset.qbOrig === undefined) card.dataset.qbOrig = String(i);
+        const g = card.parentElement; if (g) groups.add(g);
+    });
+    const best = new Map();
+    const order = (parent, kids, keyOf) => {
+        kids.forEach((k, i) => { if (k.dataset.qbOrig === undefined) k.dataset.qbOrig = String(i); });
+        kids.slice().sort((a, b) => (hits ? (keyOf(b) - keyOf(a)) : 0) || (+a.dataset.qbOrig - +b.dataset.qbOrig))
+            .forEach((k) => parent.appendChild(k));
+    };
+    groups.forEach((g) => {
+        const kids = [...g.children].filter((c) => c.dataset && c.dataset.qbSkill);
+        if (!kids.length) return;
+        order(g, kids, (c) => score(c) ?? -1);
+        const top = Math.max(-1, ...kids.map((c) => score(c) ?? -1));
+        const grp = g.closest('.qb-category-group') || g;
+        best.set(grp, Math.max(best.get(grp) ?? -1, top));
+        const sec = grp.closest('.qb-domain-section');
+        if (sec) { sections.add(sec); best.set(sec, Math.max(best.get(sec) ?? -1, top)); }
+    });
+    const parents = new Map();
+    for (const grp of best.keys()) { if (!grp.parentElement) continue; if (!parents.has(grp.parentElement)) parents.set(grp.parentElement, []); parents.get(grp.parentElement).push(grp); }
+    parents.forEach((kids, parent) => order(parent, kids, (k) => best.get(k) ?? -1));
+}
+
+// The standards / WRM terms load after boot: re-rank a Quiz-builder search that is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try { if (qb.searchText) { qb.searchHits = skillSearchScores(qb.searchText); qbApplyFilters(); } } catch (e) { /* view not built */ }
+});

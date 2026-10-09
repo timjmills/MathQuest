@@ -331,6 +331,16 @@ function renderQuizInterface() {
     try { _mountQuizCell(flatIdx); } catch (e) { console.error('quiz cell:', e); }
 }
 
+/** The instant-feedback line of an answered question. The support ladder (support-ladder.js): while it climbs, a support, not the answer. */
+function quizFeedbackHtml(answer, qd) {
+    const lad = answer.correct ? null : shownOf(qd);
+    return answer.correct
+        ? '<div class="qt-feedback correct">Correct!</div>'
+        : lad && lad.n && !lad.spent
+            ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
+            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+}
+
 function renderQuizQuestion(qItem, flatIdx) {
     const q = qItem.question;
     const qd = q.questionData;
@@ -339,16 +349,7 @@ function renderQuizQuestion(qItem, flatIdx) {
     const test = state.currentQuiz;
     const showInstantFeedback = test.settings.showFeedback === 'instant' && answer.studentAnswer !== '';
 
-    let feedbackHtml = '';
-    if (showInstantFeedback) {
-        // The support ladder (support-ladder.js): while it climbs, a support, not the answer.
-        const lad = answer.correct ? null : shownOf(qd);
-        feedbackHtml = answer.correct
-            ? '<div class="qt-feedback correct">Correct!</div>'
-            : lad && lad.n && !lad.spent
-                ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
-                : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
-    }
+    const feedbackHtml = showInstantFeedback ? quizFeedbackHtml(answer, qd) : '';
 
     // Always use text input — no multiple choice.
     // Screen parity (WORKSHEET_DESIGN_STANDARD.md section 15): the question region is the
@@ -562,6 +563,54 @@ export function submitQuizTextAnswer(flatIdx, value) {
     // then replaced Next under the pupil's click, so the first Next after typing was swallowed and
     // Tab from the box dropped the focus (Chromebook fit critic R2-1).
     refreshQuizChrome();
+    refreshQuizFeedback(flatIdx);
+}
+
+// A pointer press in progress (the blur of a box fires its change on mousedown): the feedback
+// waits for the click to land, so nothing moves under the pupil's pointer.
+let _qtPointerDown = false;
+if (typeof document !== 'undefined') {
+    document.addEventListener('pointerdown', () => { _qtPointerDown = true; }, true);
+    const up = () => { _qtPointerDown = false; };
+    document.addEventListener('pointerup', up, true);
+    document.addEventListener('pointercancel', up, true);
+}
+
+/**
+ * Instant feedback, in place (merge of the touch numerals lane, r5): after the in-place submit the
+ * quiz showed no feedback and its support ladder never drew until the question was drawn again.
+ * The feedback line is replaced and the ladder drawn into the live cell (the pupil's inputs are
+ * moved, never re-created), without rebuilding the screen.
+ */
+function refreshQuizFeedback(flatIdx) {
+    const test = state.currentQuiz;
+    if (!test || !test.settings || test.settings.showFeedback !== 'instant') return;
+    if (_qtPointerDown) {
+        const later = () => { document.removeEventListener('click', later, true); setTimeout(() => refreshQuizFeedback(flatIdx), 0); };
+        document.addEventListener('click', later, true);
+        setTimeout(() => { if (!_qtPointerDown) later(); }, 600);
+        return;
+    }
+    const card = document.querySelector('#quizTakeView .qt-question-card');
+    const cellEl = card && card.querySelector('.qt-cell');
+    if (!cellEl || String(cellEl.dataset.flatIdx) !== String(flatIdx)) return;
+    const answer = quizAnswers[flatIdx];
+    const item = state.quizAllQuestions[flatIdx];
+    if (!answer || !item) return;
+    const qd = item.question.questionData;
+    const old = card.querySelector(':scope > .qt-feedback');
+    if (answer.studentAnswer === '') { if (old) old.remove(); return; }
+    if (!answer.correct) {
+        try { drawLadder(cellEl, qd, { kind: cellKindFor({ ...qd, options: [] }), categoryId: qd.categoryId, skillId: qd.skillId || item.question.skillId }); } catch (e) { /* optional */ }
+    }
+    const tpl = document.createElement('template');
+    tpl.innerHTML = quizFeedbackHtml(answer, qd).trim();
+    const fb = tpl.content.firstElementChild;
+    if (!fb) return;
+    if (old) {
+        if (old.className === fb.className && old.textContent === fb.textContent) return;
+        old.replaceWith(fb);
+    } else card.appendChild(fb);
 }
 
 // The answered count and the page buttons, brought up to date without rebuilding the question.
