@@ -1684,3 +1684,51 @@ html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss {
     html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-bad, html body .mq-wd-mirror.mq-wd-mirror .mq-wd.mq-wd-miss { animation: none !important; }
 }
 @media print { .mq-wd-mirror { display: none !important; } }
+
+/* ---- 2026-10-04 (owner): EVERY next answer box pulses yellow, and answer boxes carry no "Type …" text.
+   js/modules/active-box.js puts .mq-active-box on the next answer input on the practice card, the
+   online worksheet's current problem and the quiz, whatever widget drew it.
+   Why the earlier pulse never moved: it animated background-color and box-shadow, and !important
+   declarations (its own, and the .mq-mono scope's box-shadow/filter: none !important) always beat an
+   animation. Here the animation drives two registered custom properties, which nothing pins, and the
+   !important fill and glow READ them — so they pulse. ADDITIVE; screen only. */
+@property --mq-next-ring { syntax: '<length>'; inherits: false; initial-value: 3px; }
+@property --mq-next-fill { syntax: '<color>'; inherits: false; initial-value: #fff3a0; }
+@keyframes mq-next-glow {
+    0%, 100% { --mq-next-ring: 3px; --mq-next-fill: #fff3a0; }
+    50%      { --mq-next-ring: 6px; --mq-next-fill: #ffe14d; }
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: 0 0 0 3px #f2c200, 0 0 0 var(--mq-next-ring) rgba(242, 194, 0, 0.45) !important;
+    animation: mq-next-glow 1.2s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+        animation: none !important; --mq-next-ring: 5px; --mq-next-fill: #fff3a0;
+    }
+}
+html body :is(#questionCard, #worksheetView .problem-card, .qt-question-card) :is(input, textarea)::placeholder { color: transparent !important; }
+
+/* critic D4 (2026-10-04): the next-box glow is drawn INSIDE the box, so a neighbouring box or a row
+   edge can never cover or clip it; and a box still holding a wrong digit keeps its red (no yellow fill). */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    box-shadow: inset 0 0 0 3px #f2c200, inset 0 0 0 var(--mq-next-ring) rgba(242, 194, 0, 0.45) !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg, #fde8e7) !important;
+}
+
+/* critic R4-3 (2026-10-04): a box judged wrong or missing keeps its red mark even while it is the next
+   box (the caret sits in it): the yellow fill, ring and pulse give way to the A2/A3 marks. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit) {
+    animation: none !important;
+    box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
+    border-color: var(--mq-box-bad, #B3261E) !important;
+}
+
+/* Touch dots floor (design/SUPPORTS.md S1.6, owner 2026-10-04: "worksheet mode touchpoints might be too small"): a grid
+   cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
+   size, so each dot is big enough to see and touch. Additive. */
+.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }

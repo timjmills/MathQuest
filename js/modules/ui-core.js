@@ -2,7 +2,13 @@ import { state } from './state.js';
 import { setCookie, getCookie } from './storage.js';
 
 // Toast notification
+// Pupil play (owner 2026-10-04): nothing may cover the answer box or take the typing focus. During play
+// the only pop-ups are the XP message after a right answer (it leaves by itself) and the idle nudge after
+// 5 minutes without activity.
+const _inPupilPlay = () => typeof document !== 'undefined' && ['gameView', 'worksheetView', 'quizTakeView']
+    .some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); });
 export function showToast(message, type = 'info') {
+    if (_inPupilPlay() && !/\bXP\b/i.test(String(message))) return;
     // Remove existing toast if any
     const existingToast = document.querySelector('.toast-notification');
     if (existingToast) existingToast.remove();
@@ -26,6 +32,7 @@ export function showToast(message, type = 'info') {
         ${type === 'info' ? 'background: var(--accent-purple); color: white;' : ''}
     `;
     toast.textContent = message;
+    toast.style.pointerEvents = 'none';   // never catches a tap meant for the page
     document.body.appendChild(toast);
 
     setTimeout(() => {
