@@ -14,6 +14,9 @@ ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; o
 14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
 the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
 
+**Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
+passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
+
 ### Phone pass (deferred)
 - Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
   ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
