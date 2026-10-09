@@ -91,3 +91,15 @@ The rows marked "forced" are templates the live app cannot deal today (O-A). The
 - **O-A · Four generator story types never deal (gen-operations.js).** `pickVariant` returns the strings `'part_part_whole'` / `'start_unknown'`, but the branches after it test `roll < 0.72` and `roll < 0.86`. A string compared with a number is always false, so `add_word_problems` never deals Type 3 (missing addend, L5104–5125) or Type 4 (start unknown, L5126–5140), and `sub_word_problems` never deals Type 3 (missing subtrahend, L5353–5380) or Type 4 (compare fewer, L5381–5404). The third variant always gives Type 5. Fix: branch on the variant string and split Types 3/4/5 by a seeded draw.
 - **O-B · The "What is missing" option labels do not match what is dealt** (`skill-options.js:2418-2420`). "The start (Sam had some, got 3, now has 8)" maps to `start_unknown`, which deals **compare-more** stories. "A part (8 in all, 5 are red)" maps to `part_part_whole`, which deals change-unknown stories. A teacher who ticks one of them gets something else. Fix together with O-A.
 - **O-C · The active (pulsing) box sometimes renders as two yellow halves** in the − layout (`ws-hint-take-some-sub_word_problems-390.png`, `quiz-sub_word_problems-1280.png`, `worksheet-add_word_problems-1280.png` card 1). The + layout draws one solid box. This commit did not touch it; it is probably the pulse frame or a digit mirror. Not investigated.
+
+## Gates on the passing tree (run by the lane after this critic)
+
+ws-story-lint OK (79,360 stories, 17 schemas) · ws-providers-unit OK (105,162 checks) · ws-code-snapshot OK (608 codes, no MOVED/DELETED) ·
+ws-boot-smoke OK · ws-content-audit OK (270 skills, 0 failing) · ws-share-options OK · ws-screen-slots OK (609 skills, 2,436 renders) ·
+ws-screen-answer OK · ws-print-lint --source kit: 461 findings in 33 documents (baseline 463 in 33 — down 2, not up).
+
+Open (not fixed, below the gate): N6 two-word unit "more … than" retold as join (~1.2% of add items; widen the regex at
+sheet/cells/word-work.js:315); N7 "Y gave X some more" retold as start-unknown (fix together with the change rule, else D6 reopens);
+N8 compare-fewer lacks a thousands comma (unreachable at range 100); N2 neighbour worksheet cards grow when a hint opens.
+Outside the lane: O-A unreachable generator types (gen-operations.js 5104–5140, 5353–5404: variant string compared with a number);
+O-B "What is missing" option labels mismatch what is dealt (skill-options.js:2418-2420); O-C split active-box pulse in the − layout.
