@@ -300,6 +300,13 @@ export function showNotification(message, type = 'info') {
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
+    // shown just before play starts, it must not stay over the first question (owner rule: in play only the XP message)
+    if (!/\bXP\b/i.test(String(message))) {
+        const watch = setInterval(() => {
+            if (!notification.isConnected) { clearInterval(watch); return; }
+            if (['gameView', 'worksheetView', 'quizTakeView'].some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); })) { clearInterval(watch); notification.remove(); }
+        }, 100);
+    }
     
     // Add animation keyframes if not exists
     if (!document.getElementById('notificationStyles')) {

@@ -1822,7 +1822,18 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    const saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    let saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
+    // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
+    if (!mixed && join === '' && slots.length > 1) {
+        const ch = [...String(input.value || '').replace(/\s/g, '')];
+        saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
+    }
+    // the host may keep what each box held (the quiz, quizAnswers[].boxes): that wins, holes and all
+    try {
+        const kept = input.dataset.mqBoxes ? JSON.parse(input.dataset.mqBoxes) : null;
+        if (Array.isArray(kept) && kept.length === slots.length) saved = kept.map((t) => String(t == null ? '' : t).trim());
+    } catch (e) { /* not kept */ }
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -1836,6 +1847,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
         el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
         if (fixedW) el.dataset.mqFixed = '1';
+        if (Number(slot.getAttribute('data-mq-full')) > 0) el.dataset.mqFull = slot.getAttribute('data-mq-full');
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';

@@ -34,6 +34,13 @@ export function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.style.pointerEvents = 'none';   // never catches a tap meant for the page
     document.body.appendChild(toast);
+    // a toast shown just before play starts must not stay over the first question
+    if (!/\bXP\b/i.test(String(message))) {
+        const watch = setInterval(() => {
+            if (!toast.isConnected) { clearInterval(watch); return; }
+            if (_inPupilPlay()) { clearInterval(watch); toast.remove(); }
+        }, 100);
+    }
 
     setTimeout(() => {
         toast.style.animation = 'toastSlideDown 0.3s ease forwards';

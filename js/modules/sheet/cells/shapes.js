@@ -35,9 +35,9 @@ export function tileSize(shape, baseW, baseH) {
  * One tile. `slot` is null for a printed (given) number, or {id, mark} for a writing place:
  * `mark` 'cell' puts the screen hook on it in the twin. `value` is what the tile shows (a given
  * number, or the key's / the pupil's written value); `ink` is 'trace' | 'solid' | null; `maxLen` the
- * most digits the screen box accepts (wave 1 C2: a count by 25,000 writes six-digit numbers).
+ * most digits the screen box accepts (wave 1 C2: a count by 25,000 writes six-digit numbers); `full` the digits that fill it.
  */
-export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, ink = null, heavy = false, shown = false, maxLen = 0 } = {}) {
+export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, ink = null, heavy = false, shown = false, maxLen = 0, full = 0 } = {}) {
     const color = ink === 'trace' ? GREY : INK;
     const bw = B(ctx, heavy ? 1.5 : 0.75);
     const outline = shape === 'hex'
@@ -47,7 +47,8 @@ export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, in
         : '';
     const border = shape === 'hex' ? 'border:0;' : `border:${bw} solid ${INK};border-radius:${shape === 'circle' ? '50%' : L(ctx, 1.25)};`;
     // `maxLen`: the most digits the screen's box may take (its input's maxlength; the host's default is 4 - too few for 25,000).
-    const hook = slot && isTwin(ctx) && slot.mark === 'cell' ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}` : '';
+    // `full`: the digits that fill THIS box (a count row: its number's digits) - typing that many hands the caret on (active-box.js).
+    const hook = slot && isTwin(ctx) && slot.mark === 'cell' ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}${full > 0 ? ` data-mq-full="${full}"` : ''}` : '';
     const slotAttrs = slot
         ? ` data-ws-slot="${esc(slot.id)}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${shown ? ' data-ws-shown="1"' : ''}`
         : (shown ? ' data-ws-shown="1"' : '');

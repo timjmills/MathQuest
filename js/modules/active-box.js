@@ -192,13 +192,19 @@ function selectIfLoose(active) {
 // to the next empty answer box of the same problem, in entry order (ones first in a column). This is
 // on every host and whether the digit is right or wrong: it reveals nothing, it only stops the next
 // digit joining a box that cannot take it. Only boxes with a fixed digit count (maxlength) move on;
-// a box whose answer may be longer never does. A count-by row keeps its own focus rule, and a widget
+// a box whose answer may be longer never does, except a count-by box, which carries its number's digit count. A widget
 // that has already moved the caret itself is left alone.
 function advanceIfFull(el) {
     if (!el || el !== document.activeElement || el.tagName !== 'INPUT' || !isAnswerBox(el)) return;
-    const max = el.maxLength;
-    if (!(max > 0) || String(el.value || '').length < max) return;
-    if (el.closest('[data-mq-swiperow]')) return;
+    // A count-by box knows its own number's digit count (data-mq-full, count-row.js): it is full when that many digits are in it
+    // (small fixes item 1: in the quiz "21" then "28" joined as "2128"). Its maxlength stays wider (a pupil may still write more).
+    const full = Number(el.dataset.mqFull) || 0;
+    const max = full || el.maxLength;
+    const len = full ? String(el.value || '').replace(/\D/g, '').length : String(el.value || '').length;
+    if (!(max > 0) || len < max) return;
+    // other boxes in a count-by row keep the row's own focus rule; a box that knows its count moves on, and the row treats a
+    // focus coming from one of its own boxes as the pupil's move (screen-cell.js wireSwipeRows: it scrolls the next box into view)
+    if (el.closest('[data-mq-swiperow]') && !full) return;
     const host = el.closest(POPUP) || el.closest(HOSTS);
     if (!host) return;
     const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
@@ -208,7 +214,11 @@ function advanceIfFull(el) {
         && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
     const next = boxes.slice(i + 1).find(ok) || boxes.slice(0, i).find(ok);
     if (!next) return;
-    try { next.focus({ preventScroll: onScreen(next) }); } catch (e) { /* ignore */ }
+    // the browser scrolls the box into view unless ALL of it is on screen already (a box 1 px under the fold is scrolled to)
+    const r = next.getBoundingClientRect();
+    const whole = r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth;
+    try { next.focus({ preventScroll: whole && !underPinnedBar(next) }); } catch (e) { /* ignore */ }
+    if (!whole || underPinnedBar(next)) { try { next.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ } }
 }
 
 export function refreshActiveBox() {

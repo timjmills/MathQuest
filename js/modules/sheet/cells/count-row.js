@@ -335,9 +335,9 @@ function jumpArrow(ctx, g, w) {
  * bottom; the key writes its number on the line. On screen the input fills the same place, so it reads as an underlined field,
  * and the per-box marks tint the area above the line.
  */
-function lineSlot(ctx, g, { id, value, ink, shown, maxLen }) {
+function lineSlot(ctx, g, { id, value, ink, shown, maxLen, full = 0 }) {
     const color = ink === 'trace' ? GREY : INK;
-    const hook = isTwin(ctx) ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}` : '';
+    const hook = isTwin(ctx) ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}${full > 0 ? ` data-mq-full="${full}"` : ''}` : '';
     return `<span class="k2-shape k2-shape-line" style="position:relative;display:inline-flex;flex:none;box-sizing:border-box;width:${L(ctx, g.w)};height:${L(ctx, g.h)};vertical-align:middle;">`
         + `<span class="k2-tile k2-tile-slot k2-line-slot" data-ws-slot="${esc(id)}" data-ws-shape="line"${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${shown ? ' data-ws-shown="1"' : ''} `
         + `style="position:relative;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;padding-bottom:${L(ctx, 0.6)};`
@@ -390,9 +390,12 @@ register('count-row', {
                 return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
             }
             const val = over !== undefined ? String(over) : shown[k];
+            // the digits of THIS box's number: once typed, the screen hands the caret to the next box (small fixes item 1:
+            // "21" then "28" no longer join in one box). The row's neighbours already show how long its numbers are.
+            const full = String(v).replace(/\D/g, '').length;
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
-            if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits });
-            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits });
+            if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full });
+            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full });
         });
         if (g.hasLbl) {
             const lblInk = lvlOf(ctx) === 2 ? GREY : INK;
