@@ -29,7 +29,7 @@ const MEASURE = () => {
       const r = el.getBoundingClientRect();
       if (r.left < cr.left - 1 || r.right > cr.right + 1) out.outside.push(`row ${ri} #${i}`);
       for (let a = el.parentElement; a && a !== document.documentElement; a = a.parentElement) {
-        if (a.classList.contains('k2-tile-slot')) continue;   // the input's own field (it sizes the input)
+        if (a.classList.contains('k2-tile-slot') || a.classList.contains('k2-shape-line')) continue;   // the input's own field and line frame (they size the input)
         const cs = getComputedStyle(a);
         if (!/(hidden|auto|scroll|clip)/.test(cs.overflowX + cs.overflowY)) continue;
         const b = a.getBoundingClientRect();
