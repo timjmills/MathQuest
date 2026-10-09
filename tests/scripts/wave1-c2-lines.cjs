@@ -2,7 +2,9 @@
 // jump arrows between neighbours (no arcs over the row).
 //  - every missing number is a write-on LINE (data-ws-shape="line", a bottom rule only), never a box, on the pupil page; the key
 //    writes each answer on its line;
-//  - a table row (1-2 and 3 digits) holds its 12 numbers on ONE line at S, M and L; wide numbers take two lines of 6;
+//  - a table row (1-2 and 3 digits) holds its 12 numbers on ONE line at S; at M and L (owner 2026-10-09, critic r1 D3) a row never
+//    shrinks its digits or its step tab below the size's working size (22 x 0.64 pt at M, 28 x 0.64 at L): a row that does not fit
+//    12 at that size takes two lines of 6; wide numbers take two lines of 6;
 //  - an independent page at S fits MORE rows with Lines than with Boxes; the one-page sheet stays 1 page + 1 key page;
 //  - a jump arrow sits in every gap (n - 1 per line), centred on the row, no arcs anywhere;
 //  - the card and the worksheet at 390 px take an answer in every line.
@@ -32,6 +34,8 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
           perLine: firstRow ? firstRow.querySelector('.k2-countrow-line [style*="display:flex;align-items:flex-start"]').children.length : 0,
           arrows: firstRow ? firstRow.querySelectorAll('.k2-jump').length : 0,
           arcs: d.querySelectorAll('path[d*=" Q"]').length - d.querySelectorAll('.k2-countrow-line > span svg path[d*=" Q"]').length,
+          linePt: Math.min(...[...d.querySelectorAll('[data-ws-shape="line"]')].map((e) => parseFloat(e.style.fontSize))),
+          tabPt: Math.min(...[...d.querySelectorAll('.k2-steptab text')].map((e) => parseFloat(e.getAttribute('font-size')) * 72 / 25.4)),
           keyFilled: [...k.querySelectorAll('[data-ws-shape="line"]')].every((e) => e.textContent.trim() !== ''),
         };
       }
@@ -44,8 +48,19 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
     const t = res[`${size} tables`], b = res[`${size} boxes`];
     check(t.lines > 0 && t.boxes === 0, `${size}: Lines draws ${t.lines} write-on lines and no answer boxes`);
     check(t.keyFilled, `${size}: the key writes every answer on its line`);
-    check(t.firstLines === 1 && t.perLine === 12 && t.arrows === 11, `${size}: a table row is ONE line of 12 with 11 jump arrows (lines ${t.firstLines}, ${t.perLine} per line, ${t.arrows} arrows)`);
-    check(t.perPage > b.perPage, `${size}: Lines fits more rows on a page than Boxes (${t.perPage} vs ${b.perPage})`);
+    if (size === 'S') {
+      check(t.firstLines === 1 && t.perLine === 12 && t.arrows === 11, `${size}: a table row is ONE line of 12 with 11 jump arrows (lines ${t.firstLines}, ${t.perLine} per line, ${t.arrows} arrows)`);
+      check(t.perPage > b.perPage, `${size}: Lines fits more rows on a page than Boxes (${t.perPage} vs ${b.perPage})`);
+    } else {
+      const work = { M: 22, L: 28 }[size] * 0.64;
+      for (const n of ['tables', '3-digit']) {
+        const r = res[`${size} ${n}`];
+        check(r.linePt >= work - 0.15, `${size} ${n}: digits keep the working size (${r.linePt.toFixed(1)} pt >= ${work.toFixed(1)})`);
+        check(r.tabPt >= work * 1.05 - 0.2, `${size} ${n}: the step tab keeps the working size (${r.tabPt.toFixed(1)} pt)`);
+        check((r.firstLines === 1 && r.perLine === 12 && r.arrows === 11) || (r.firstLines === 2 && r.perLine === 6 && r.arrows === 10), `${size} ${n}: one line of 12 or two lines of 6 (${r.firstLines} x ${r.perLine}, ${r.arrows} arrows)`);
+      }
+      check(t.perPage >= b.perPage, `${size}: Lines fits no fewer rows on a page than Boxes (${t.perPage} vs ${b.perPage})`);
+    }
     for (const n of ['3-digit', '5-digit']) console.log(`     ${size} ${n}: ${res[`${size} ${n}`].firstLines} line(s), ${res[`${size} ${n}`].perLine} numbers per line`);
   }
   check(res.onePage.pages === 1 && res.onePage.keyPages === 1 && res.onePage.items === 12, `one-page sheet with Lines: ${res.onePage.items} rows, ${res.onePage.pages} page + ${res.onePage.keyPages} key page`);

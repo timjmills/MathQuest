@@ -156,7 +156,10 @@ export function compactFit(chars, avail, n, digit, nBox = n) {
         if (pt < FLOOR_PT) return null;
     }
     const s = sizes(pt);
-    return { w: s.w, gw: s.gw, gap: (avail - used(pt)) / (n - 1), pt };
+    // critic r1 D5 (2026-10-09): a printed number takes the box's width (centred) whenever the line still holds every arrow at
+    // this digit size, so the columns line up row to row; only a line too full for that (3-digit rows) keeps glyph widths.
+    if (n * s.w <= room + 1e-6) s.gw = s.w;
+    return { w: s.w, gw: s.gw, gap: (avail - (nBox * s.w + (n - nBox) * s.gw)) / (n - 1), pt };
 }
 
 /**
@@ -192,12 +195,17 @@ function linesGeom(p, ctx, c) {
     const minGap = p.compact ? LINE_GAP_MIN.compact : LINE_GAP_MIN.paper;
     const gapFor = (per, w, exit) => (live - tab - (exit ? EXIT_MM : 0) - per * w) / Math.max(1, per - 1);
     let pt = basePt, w = need(basePt), perRow = n;
-    if (gapFor(n, w, false) < minGap && n <= 12) {
-        // owner 2026-10-03: Lines fits 12 numbers on one row - the lines narrow (digits down to FLOOR_PT) before the row splits
+    const twin = isTwin(ctx);
+    // owner 2026-10-09 (critic r1 D2/D3): 12 on ONE line is a PAPER rule at Size S only ("use small to fit more"): there the
+    // lines narrow (digits down to FLOOR_PT) before the row splits. At M and L, and on the one-page sheet, a row never shrinks
+    // its digits or tab below the size's working size - it takes two lines of six. On SCREEN Lines wraps 6 + 6 like Boxes.
+    const mayNarrow = !twin && !p.compact && size === 'S';
+    if (twin) perRow = n >= 13 ? 5 : Math.ceil(n / 2);
+    else if (gapFor(n, w, false) < minGap && n <= 12 && mayNarrow) {
         const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
         if (pt1 >= FLOOR_PT) { w = w1; pt = Math.min(basePt, pt1); }
     }
-    if (gapFor(n, w, false) < minGap - 1e-6) {
+    if (!twin && gapFor(n, w, false) < minGap - 1e-6) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
@@ -207,12 +215,13 @@ function linesGeom(p, ctx, c) {
     // the spare width widens the lines a little (a line up to 8 mm wider than its number), the rest stays as the gaps
     const spare = gapFor(perRow, w, perRow < n);
     if (spare > LINE_GAP_MAX) w = Math.min(w + 8, w + (spare - LINE_GAP_MAX) * (perRow - 1) / perRow);
-    const gap = Math.max(minGap, Math.min(LINE_GAP_MAX, gapFor(perRow, w, perRow < n)));
+    let gap = Math.max(minGap, Math.min(LINE_GAP_MAX, gapFor(perRow, w, perRow < n)));
+    if (twin && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     const rows = Math.ceil(n / perRow);
     const h = S(ctx).writeMm + (p.compact ? 2 : 1);
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (w + gap - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblH = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : 0;
-    return { size, n, look: 'arcs', shape: 'box', w, h, pitch: w + gap, gap, tab, tabBody, perRow, rows, arcH: 0, pt, hasLbl, lblH, lblPt, compact: !!p.compact, lines: true };
+    return { size, n, look: 'arcs', shape: 'box', w, h, pitch: w + gap, gap, tab, tabBody, perRow, rows, arcH: 0, pt, tabPt: basePt, hasLbl, lblH, lblPt, compact: !!p.compact, lines: true };
 }
 
 function arcsGeom(p, ctx, c) {
@@ -286,7 +295,7 @@ const shownAt = (p, i) => {
  * 9 pt beside "+3" at 17 pt; the step is the cue the pupil reads first). geom() already sizes the tab for the size's full digit.
  */
 const TAB_FLOOR_PT = 14;
-const tabPt = (g) => { const pt = Math.min(g.pt * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
+const tabPt = (g) => { const pt = Math.min((g.tabPt || g.pt) * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
 
 /** The step tab: a bold number in a pentagon pointing into the row ("7>"). */
 function stepTab(ctx, g, text) {

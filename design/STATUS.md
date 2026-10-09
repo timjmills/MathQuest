@@ -12,6 +12,7 @@ typing works); phone-only polish is deferred to a later phone pass and listed be
 - four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
 - count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
 - add_three overflow at 390 (Lane B R5) unless the page itself overflows
+- count rows, Answer spaces: Lines, card at 390 (critic countby-arrows r1 D1/D7): check the next-box yellow and right/wrong tints never cover a jump arrow at phone width (the input is now clamped to its drawn line; Chromebook hosts measure 0 overlaps)
 
 ## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
 

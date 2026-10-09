@@ -906,3 +906,7 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tv-sko-frame [data-mq-swiperow] { overflow: visible !important; }
 /* the count-by row reads as one sentence: its drop-downs size to their words, not the panel's width */
 .tv-sko .sko-row-line select.tv-select { width: auto; flex: 0 1 auto; min-width: 0; max-width: 100%; }
+/* critic countby-arrows r1 D6 (2026-10-09): the sample row is never capped at the stage's width, so the stage measures the
+   whole row and fit() scales it inside the frame instead of clipping its last box. Additive. */
+.tv-sko-frame :is(.tvp-visual, .k2-twin, .k2-countrow, .k2-countrow-frame, [data-mq-swiperow]):has(.k2-countrow-body) { max-width: none !important; width: max-content !important; min-width: 0 !important; }
+.tv-sko-frame .k2-countrow-frame [data-mq-swiperow] { flex: none !important; }

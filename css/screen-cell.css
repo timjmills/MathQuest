@@ -1712,3 +1712,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     position: relative; top: auto; bottom: auto; left: auto; right: auto;
     margin: 0 0 8px; box-shadow: none;
 }
+
+/* Count rows, Answer spaces: Lines (critic countby-arrows r1 D1, 2026-10-09): the input stays INSIDE its drawn line, never
+   widened to a touch width past it, so the next-box yellow and the right/wrong tints can never cover a jump arrow. The line
+   itself is wide enough to tap (the screen twin wraps Lines 6 + 6, count-row.js). Additive. */
+html body .mq-scell .k2-shape-line { overflow: hidden; }
+html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
+html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
