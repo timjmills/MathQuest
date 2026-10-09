@@ -179,8 +179,8 @@ const EXIT_MM = 7.5;        // the turn arrow that leaves a line (6 mm + its mar
  * ANSWER SPACES: LINES (owner 2026-10-03, an owner exception to SL-3, count rows only): "____ -> ____ -> ____". Each missing
  * number is a bare write-on line, the row has no box height, and the row takes its numbers on ONE line wherever the width holds
  * them at today's digit size (with a jump arrow and its clearance in every gap); otherwise two even lines (6 + 6, 5 + 5 + 5).
- * Digits are the SAME size as the box rows' and never shrink to make one line: a row that does not fit one line takes two (only
- * a number too wide even for six on a line shrinks, TY-10a, never below FLOOR_PT).
+ * A row of up to 12 narrows its lines (digits down to FLOOR_PT) to stay on ONE line (owner ruling: 12 per row); only a row
+ * whose numbers are too wide even then takes two lines.
  */
 const LINE_GAP_MIN = { paper: 2 * 1.0 + 3, compact: 2 * 1.0 + 3 };   // a 3 mm arrow (head 2.4 mm), 1 mm clear each side
 const LINE_GAP_MAX = 10;
@@ -192,7 +192,12 @@ function linesGeom(p, ctx, c) {
     const minGap = p.compact ? LINE_GAP_MIN.compact : LINE_GAP_MIN.paper;
     const gapFor = (per, w, exit) => (live - tab - (exit ? EXIT_MM : 0) - per * w) / Math.max(1, per - 1);
     let pt = basePt, w = need(basePt), perRow = n;
-    if (gapFor(n, w, false) < minGap) {
+    if (gapFor(n, w, false) < minGap && n <= 12) {
+        // owner 2026-10-03: Lines fits 12 numbers on one row - the lines narrow (digits down to FLOOR_PT) before the row splits
+        const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
+        if (pt1 >= FLOOR_PT) { w = w1; pt = Math.min(basePt, pt1); }
+    }
+    if (gapFor(n, w, false) < minGap - 1e-6) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
@@ -235,7 +240,9 @@ function arcsGeom(p, ctx, c) {
     // the gap is capped at `twinGapPx` px absolute (24, set by the screen host on a phone), never under MIN_GAP
     if (isTwin(ctx) && Number(p.twinGapPx) > 0) {
         const kPhone = 29 / Math.max(1, pt * PT_MM);
-        gap = Math.min(gap, Math.max(MIN_GAP, Number(p.twinGapPx) / kPhone));
+        // the cap wins over the paper's arrow clearance (MIN_GAP): the jump arrow sizes itself to the gap it gets, and the
+        // gap never falls under 14 px (3 mm on the phone) so the arrow still reads (lane a91a01fc, after merging TY-10b)
+        gap = Math.min(gap, Math.max(14 / kPhone, Number(p.twinGapPx) / kPhone));
     }
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
