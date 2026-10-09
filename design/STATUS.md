@@ -205,3 +205,11 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   sits beside the Guided cells, under the Steps).
 - **mult lesson Warm-up**: `mult_properties` arrays overflow the sheet; a 2-digit by 2-digit stack spills a 4-column
   half cell; the key's answer digits need about 4 mm more row height than the pupil page.
+
+## Phone pass (deferred)
+
+- Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
+  ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
+  unbreakable and "=" with its box (sheet/cells/pv.js frameHTML), so no line starts with "=" and no number
+  parts from its unit; any remaining 390-only line-wrap polish is deferred to the phone pass (owner 2026-10-09:
+  Chromebooks first).

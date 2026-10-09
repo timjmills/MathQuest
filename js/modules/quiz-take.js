@@ -562,7 +562,22 @@ function recordAnswer(flatIdx, studentAnswer) {
     let partial = false;
     try {
         const boxes = [...document.querySelectorAll('.qt-question-card input.mq-cellslot')];
-        if (boxes.length > 1 && String(studentAnswer).trim() !== '') partial = boxes.some((b) => !String(b.value || '').trim());
+        // Critic r2 N1: a word-work answer row (.mq-wwans) is right-aligned with spare leading boxes
+        // that stay blank, so a row is partial only when an empty box sits right of a filled one.
+        // Every other box (fixed slots, inline blanks, cloze, unit-form places) must be filled.
+        const filled = (b) => !!String(b.value || '').trim();
+        if (boxes.length > 1 && String(studentAnswer).trim() !== '') {
+            const rows = new Map();
+            partial = boxes.some((b) => {
+                const row = b.closest('.mq-wwans');
+                if (row) { if (!rows.has(row)) rows.set(row, []); rows.get(row).push(b); return false; }
+                return !filled(b);
+            });
+            if (!partial) rows.forEach((rb) => {
+                const first = rb.findIndex(filled);
+                if (first >= 0 && rb.slice(first).some((b) => !filled(b))) partial = true;
+            });
+        }
     } catch (e) { /* no DOM: not partial */ }
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept

@@ -294,9 +294,20 @@ function frameHTML(ctx, text, key, digits) {
     if (parts.length === 2) {
         const pre = parts[0].trim().split(/\s+/).filter(Boolean);
         // a short label ("hundreds disks:") is one piece in the group, so its words share one size and baseline
-        const last = pre.length <= 2 ? pre.splice(0).join(' ') : (pre.pop() || '');
-        const grp = `<span class="pv-slotgroup" style="display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;">${piece(ctx, last)}${slot}${piece(ctx, parts[1])}</span>`;
-        return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${piece(ctx, pre.join(' '))}${grp}</div>`;
+        // Critic r2 N3: a number never parts from its unit word ("12 hundreds"), and "=" never
+        // starts a line: the chunk before "=" goes with "=" and the slot.
+        const chunks = [];
+        for (let i = 0; i < pre.length; i++) {
+            if (/^\d[\d,.]*$/.test(pre[i]) && pre[i + 1] && !/^\d|^[+−×÷=≈→<>-]$/.test(pre[i + 1])) { chunks.push(pre[i] + ' ' + pre[i + 1]); i++; }
+            else chunks.push(pre[i]);
+        }
+        let lastN = pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
+        if (lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
+        const tail = chunks.splice(chunks.length - lastN).join(' ');
+        const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+        const grp = `<span class="pv-slotgroup" style="${nb}">${piece(ctx, tail)}${slot}${piece(ctx, parts[1])}</span>`;
+        const head = chunks.map((c) => (c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
+        return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head}${grp}</div>`;
     }
     const body = parts.length > 1 ? parts.map(s => piece(ctx, s)).join(slot) : `${piece(ctx, text)}${slot}`;
     return `<div class="ws-eq pv-frame" style="font-weight:700;">${body}</div>`;
