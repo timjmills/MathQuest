@@ -318,7 +318,9 @@ export function renderQuestionDots() {
     // otherwise grow with the answered + current count.
     const answered = (state.questionHistory || []).length;
     const current = state.qCount || 0;
-    const fixed = state.problemCount > 0 ? state.problemCount : 0;
+    // "Unlimited" is stored as problemCount 999999 (share-code N0): that is no fixed length — drawing a
+    // dot per question made a 285,000 px row that pushed the card off the screen (owner report 2026-10-04).
+    const fixed = state.problemCount > 0 && state.problemCount < 1000 ? state.problemCount : 0;
     const total = fixed > 0 ? fixed : Math.max(answered, current);
     if (total <= 0) { row.innerHTML = ''; return; }
     const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
@@ -804,7 +806,10 @@ export function nextQuestion() {
     // Show worked-example preview on the very first question of a new skill
     // in this session (gradual release: I do → we do → you do).
     // Only fires in practice/boss/race modes — worksheet/MAP have their own flows.
-    if (typeof window !== 'undefined' && typeof window.shouldShowPreview === 'function') {
+    // Owner 2026-10-04: no pop-up may cover the answer box during play, so the worked preview no longer
+    // opens by itself; the pupil or teacher opens it from "Show me how" (launch-chrome.js).
+    const AUTO_WORKED_PREVIEW = false;
+    if (AUTO_WORKED_PREVIEW && typeof window !== 'undefined' && typeof window.shouldShowPreview === 'function') {
         if (state.qCount === 1
             && state.currentQ
             && ['practice', 'boss', 'race'].includes(state.gameMode)

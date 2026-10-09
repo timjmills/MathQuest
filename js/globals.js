@@ -44,7 +44,7 @@ import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/v
 // Layer 4: Game Logic
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
 import { generateQuestion, generateQuestionFor } from './modules/generate-question.js';
-import { skoPlayOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
+import { skoPlayOpen, skoMoreOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
 import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions } from './modules/skill-option-store.js';
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
 import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
@@ -121,6 +121,8 @@ import { getWordProblemIcon } from './modules/word-problem-icons.js';
 import { tvGo } from './modules/teacher-shell.js';
 // The word-work cell on screen: tap a sign, type in the column boxes, tap a unit word (2026-09-25).
 import './modules/word-work-screen.js';
+// The next answer box pulses yellow on every pupil screen (owner, 2026-10-04).
+import { installActiveBox } from './modules/active-box.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -284,7 +286,7 @@ Object.assign(window, {
     // Question Generation & Rendering
     generateQuestion, generateQuestionFor,
     // Per-skill options that travel with a skill set (owner, 2026-09-24)
-    skoPlayOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
+    skoPlayOpen, skoMoreOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
     parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions,
     getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions,
     encodeOptionPayload, decodeOptionPayload, optionSuffix,
@@ -560,3 +562,4 @@ document.addEventListener('click', function(e) {
 
 // Bootstrap the application
 bootstrap();
+installActiveBox();

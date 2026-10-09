@@ -213,6 +213,8 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'cell', 'skillId', 'categoryId',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
     'dualFractionAnswers',
+    // 2026-10-04: a number family is graded in any order from its rows
+    'numberFamilyData',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
     'screenInstr'];
