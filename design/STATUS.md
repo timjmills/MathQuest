@@ -1,5 +1,42 @@
 # Status and handover — paused 2026-09-26 (owner: "stop our work for now, keep track of what is done")
 
+## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
+
+**Live (master = `71c600a`):** Lane A (pulse, Skip after N, per-skill calculator, hint audio, four Start buttons),
+A2 (per-box green/red), C (count-by + number grid), C2 (skip-count options: custom step/start, up/down, labels, large
+numbers, choose rows, two lines of 6, one-page all-12 sheet, phone swipe), E (load flake + capacity), Start-button fix,
+count-by arrowheads, count rows no longer shrink while typing, A3 (wrong digits blink red then stay underlined, tap
+clears a wrong box, worksheet auto-advance no longer steals focus).
+
+**Merged on `claude/sweet-newton-c8wrv1`, NOT deployed** (the full gates were stopped mid-run; ws-teacher-shell had
+failed once on the known Andika font-abort under load — re-run alone, then stamp + deploy):
+- Count rows on phones at 29 px digits, 24 px gap cap, 3 columns on worksheet/quiz (critic PASS r2).
+- A3 follow-up: digit marks in fraction boxes, cursor in red boxes (critic round-2 notes).
+
+**Unfinished work — every lane is pushed to `claude/sweet-newton-c8wrv1-wip-<worktree id>`** (worktree id below):
+
+| Item | Branch suffix | Stage | Next step |
+|---|---|---|---|
+| Lane B answer boxes + `ansBox` (74 skills) | `af686f163db04a00a` | Critic r5 FAIL (C1 5 / C2 5 / C3 6 / C4 6); builder **escalated to Opus medium**, was mid round 6 (merge of main done; WIP saved) | Finish R5-1..R5-6 in `design/audit/runs/wave1-B/critic.md` (card freeze on right answer at *digit*; per-digit marking; add_three overflow at 390; missing-digit given sums drawn as answer boxes; add_sub_100s overflow at S; one slot shape per section) → critic r6 |
+| Lane D print backlog | `a3256e8dfc9684535` | r3 committed 219c057; full S lint 0, L 1 finding; seeded deal differs between sweep and single run | Root-cause the cross-skill state leak (same seed must give identical pupilHtml), counting_all unlabelled item, lone area model → critic r3 |
+| Touch numerals | `a4f5e3d5dbe19dc18` | Critic r2: PASS everywhere except quiz (C2 7); builder was fixing R2-1..R2-5 + owner hairline-outline-on-screen ruling | Finish, re-run gates → critic r3 |
+| Fraction key (option ids, Check-ALL, whole sums) | `adbb61b8450078736` | Critic r1 FAIL; all 10 defects + 2 follow-ups fixed (1a729f1 …); last two nits (identify_angles section line, select_even_odd I Can title) in progress | Finish nits → critic r2 |
+| Custom number line support (149 skills) | `a84c3e870c715852e` | Critic r1 FAIL; fixes 63d7652; critic r2 was running | Critic r2 |
+| Count-by short arrows, smallest→biggest, select all/none, docked panel, option help, Lines mode (12 per row) | `a91a01fc3e4acb8e8` | Built; owner approved look (narrow boxes, keep count); gates were running | Merge main (phone-29px), gates → critic |
+| skip_count_grid / skip_count_line redo + search label | `a79237e5c40225940` | Built (6d1987c); line keeps arcs (owner); grid takes the short arrows | Merge after the arrows lane; unify its search synonyms into search-terms.js → critic |
+| Search terms for every skill (592) | `a21ec3ef403026c80` | Built (bff19e2), gate ws-search-terms OK | Critic |
+| Answer-key options (end / after page, copy / short, reddish orange #C2410C) | `a4ebafe2c94eb1dcd` | Built (f035a47), lane test OK | Critic |
+| Place-value disks / unit_form on phones | `a5e11bcf3d1414886` | Built; unit_form quiz fails 1/3 — suspected leading-0 lost when boxes join | Reproduce + fix the 0 bug → critic |
+| div_facts forms (standard / long / fraction / vertical / Mix = 1/3 each, Mix only when chosen) | `a8d0b348e044c8890` | Long build, renders/lint in progress | Finish → critic |
+| Word-problem Steps box | `aea16a31534a8fe34` | Owner: lessons/anchor charts wait for Wave 8 — scope back to (1) Steps matches item, (2) hint uses the item's own names, (3) add_word_problems `desc` note; revert the chart/warm-up work | Revert commit, gates → critic |
+
+Owner decisions this session (also in MASTER_PLAN / the lanes): fraction sums use the same whole+fraction boxes on
+every item (1 or 5/5 accepted); touch-dot single-dot outline is a 0.5 px hairline on screen, unchanged on paper;
+skip_count_line keeps arcs, count rows use short arrows; Lines option (“____ → ____”) for count rows; faded supports
+= Faded problems / Faded page / Faded packet (Wave 4.1); custom number line at top of page; keys after each page or at
+the end, copy or short. Search: count_by_tables first for “skip counting”. Stop after Wave 1 — no Wave 2 work.
+Machine note: 4 cores; ~14 agents at once starved the two browser slots — keep to ≤ 8 agents next time.
+
 > **2026-10-02: the work order is now `design/MASTER_PLAN.md`** (8 waves in the owner's order; owner to confirm the order before work starts). Key answer colour changed to **reddish orange**.
 
 

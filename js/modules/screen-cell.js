@@ -29,6 +29,7 @@
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
     withSupports, supportOpKey as opKey,
@@ -520,6 +521,8 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
  * neutral whatever is typed. The expected values live in a WeakMap, never in the page's markup.
  */
 const LIVE_EXPECT = new WeakMap();
+// test hook (read-only): the answers a live box accepts — lets the browser sweeps type a right answer
+if (typeof window !== 'undefined') window.__mqLiveExpect = (el) => (LIVE_EXPECT.get(el) || null);
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
 /*
@@ -969,6 +972,9 @@ function _liveMark(el, final) {
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
+    // a missing digit marked at Check stays marked while the box is still empty: a blur or a move (the
+    // ladder redraws the stack around the box the caret is in) is not the pupil answering it
+    if (v === '' && el.classList.contains('mq-wd-empty')) return;
     const num = LIVE_NUM.has(el);
     const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
     const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
@@ -1156,6 +1162,21 @@ const _fracNorm = (s) => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').
 function _bindOwnBoxes(root, q) {
     let n = 0;
     const bind = (el, expected, opts) => { if (el && el.dataset.mqLive !== '1' && _liveBind(el, expected, opts)) n++; };
+    // A number family is right in ANY order (owner 2026-10-04): each row may hold any fact its sign
+    // makes, no fact twice. A box's verdict depends on the other rows, so they are one group.
+    if (isOrderFreeFamily(q)) {
+        const fam = Array.from(root.querySelectorAll('input.number-family-input[data-eq][data-pos]'));
+        fam.forEach((el) => {
+            if (el.dataset.mqLive === '1') return;
+            const r = Number(el.getAttribute('data-eq')), p = Number(el.getAttribute('data-pos'));
+            const fn = () => {
+                const w = familyWant(q.numberFamilyData, familyValuesFromInputs(fam), r, p);
+                if (w != null) LIVE_WANT.set(el, [String(w)]);
+                return familyBoxVerdict(q.numberFamilyData, fam, el);
+            };
+            if (_liveBindFn(el, fn, fam)) n++;
+        });
+    }
     // data-answer, compared exactly (the older checkers compare the trimmed text)
     root.querySelectorAll('input.fact-family-input[data-answer], input.number-family-input[data-answer], input.area-model-input[data-answer], input.area-model-total[data-answer], input.fp-input[data-answer]')
         .forEach((el) => bind(el, String(el.dataset.answer).replace(/,/g, '')));
@@ -2755,6 +2776,8 @@ const _normFrac = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().
 export function cellInputVerdict(value, q) {
     if (!q) return null;
     const v = String(value == null ? '' : value);
+    // a number family's boxes, joined in reading order: right in any order, no fact twice
+    if (q.answerType === 'number-family' && isOrderFreeFamily(q) && v.includes(',')) return familyComposedRight(q.numberFamilyData, v);
     if ((q.answerType === 'tchart-cells' || q.answerType === 'factor-links') && typeof q.ans === 'string' && /[×x*]/.test(v)) {
         const want = q.ans.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
         const got = v.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
