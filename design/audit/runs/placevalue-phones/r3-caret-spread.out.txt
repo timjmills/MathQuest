@@ -1,0 +1,915 @@
+1366x650 skip expanded_form: no such skill
+1366x650 addition:add_100_regroup card boxes=3 (opt 1) typed=3 ok
+    (c)_|*_|1
+    (c)_|*1|1
+    (c)_|*1|1
+    BS+2: _|*2|1
+1366x650 addition:add_100_regroup worksheet boxes=3 (opt 1) typed=2 ok
+    (c)_|*_|1
+    (c)_|1|1
+1366x650 addition:add_100_regroup quiz boxes=3 (opt 1) typed=3 ok
+    (c)_|*_|1
+    (c)_|*1|1
+    (c)_|*1|1
+    BS+2: _|*2|1
+1366x650 addition:add_1k_regroup card boxes=5 (opt 2) typed=4 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|*1|1|1
+    (c)_|(c)_|*1|1|1
+    BS+2: _|_|*2|1|1
+1366x650 addition:add_1k_regroup worksheet boxes=5 (opt 2) typed=3 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|1|1|1
+1366x650 addition:add_1k_regroup quiz boxes=5 (opt 2) typed=4 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|*1|1|1
+    (c)_|(c)_|*1|1|1
+    BS+2: _|_|*2|1|1
+1366x650 subtraction:sub_100_regroup card boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|*1|1
+    (c)_|(c)_|*1|1
+    BS+2: _|_|*2|1
+1366x650 subtraction:sub_100_regroup worksheet boxes=4 (opt 2) typed=2 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|1|1
+1366x650 subtraction:sub_100_regroup quiz boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|*1|1
+    (c)_|(c)_|*1|1
+    BS+2: _|_|*2|1
+1366x650 subtraction:sub_1k_regroup card boxes=6 (opt 3) typed=4 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    BS+2: _|_|_|*2|1|1
+1366x650 subtraction:sub_1k_regroup worksheet boxes=6 (opt 3) typed=3 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|1|1|1
+1366x650 subtraction:sub_1k_regroup quiz boxes=6 (opt 3) typed=4 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    BS+2: _|_|_|*2|1|1
+1366x650 multiplication:multiply card: 1 box(es), single-box item, skipped
+1366x650 multiplication:multiply worksheet: 1 box(es), single-box item, skipped
+1366x650 multiplication:multiply quiz: 1 box(es), single-box item, skipped
+1366x650 multiplication:area_model_mult card boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    *111|_|_
+    *1111|_|_
+    BS+2: *1112|_|_
+1366x650 multiplication:area_model_mult worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 multiplication:area_model_mult quiz boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    *111|_|_
+    *1111|_|_
+    BS+2: *1112|_|_
+1366x650 addition:add_sub_fact_family card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    11|*_|_|_
+    11|*1|_|_
+    11|11|*_|_
+    11|11|*1|_
+    BS+2: 11|11|2|*_
+1366x650 addition:add_sub_fact_family worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 addition:add_sub_fact_family quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 addition:number_families_add card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 addition:number_families_add worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 addition:number_families_add quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650 multiplication:count_by_tables card boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650 multiplication:count_by_tables worksheet boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650 multiplication:count_by_tables quiz boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650 multiplication:mult_missing_digit card: 1 box(es), single-box item, skipped
+1366x650 multiplication:mult_missing_digit worksheet: 1 box(es), single-box item, skipped
+1366x650 multiplication:mult_missing_digit quiz: 1 box(es), single-box item, skipped
+1366x650 division:long_div_2digit card boxes=15 (opt 0) typed=16 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_
+1366x650 division:long_div_2digit worksheet boxes=20 (opt 0) typed=21 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|1|1|*_|_|_|_|_|_|_|_|_|_|_
+1366x650 division:long_div_2digit quiz boxes=15 (opt 0) typed=16 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_
+1366x650 division:div_remainders card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650 division:div_remainders worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650 division:div_remainders quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650 division:box_division_easy card boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|1|*_|_|_
+    11|111|1|*1|_|_
+    BS+2: 11|111|1|2|*_|_
+1366x650 division:box_division_easy worksheet boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|*1|_|_|_
+    11|111|11|*_|_|_
+1366x650 division:box_division_easy quiz boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|*1|_|_|_
+    11|111|11|*_|_|_
+1366x650 fractions:equivalent card: 0 box(es), single-box item, skipped
+1366x650 fractions:equivalent worksheet: 0 box(es), single-box item, skipped
+1366x650 fractions:equivalent quiz: 1 box(es), single-box item, skipped
+1366x650 fractions:improper_mixed card: 0 box(es), single-box item, skipped
+1366x650 fractions:improper_mixed worksheet: 1 box(es), single-box item, skipped
+1366x650 fractions:improper_mixed quiz: 1 box(es), single-box item, skipped
+1366x650 fraction_operations:add_mixed_like card: 0 box(es), single-box item, skipped
+1366x650 fraction_operations:add_mixed_like worksheet boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    111|*_|_
+    111|*1|_
+    BS+2: 111|*2|_
+1366x650 fraction_operations:add_mixed_like quiz: 1 box(es), single-box item, skipped
+1366x650 decimals:add_decimal card boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|1|*_
+    (c)_|(c)_|1|*1
+    (c)_|(c)_|1|*1
+    BS+2: _|_|1|*2
+1366x650 decimals:add_decimal worksheet: 1 box(es), single-box item, skipped
+1366x650 decimals:add_decimal quiz: 1 box(es), single-box item, skipped
+1366x650 coordinates:coordinate_q1 card boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    *11|_|_|_|_|_
+    *111|_|_|_|_|_
+    1111|*_|_|_|_|_
+    1111|*1|_|_|_|_
+    1111|*11|_|_|_|_
+    1111|*111|_|_|_|_
+    BS+2: 1111|*112|_|_|_|_
+1366x650 coordinates:coordinate_q1 worksheet: 1 box(es), single-box item, skipped
+1366x650 coordinates:coordinate_q1 quiz boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    *11|_|_|_|_|_
+    *111|_|_|_|_|_
+    1111|*_|_|_|_|_
+    1111|*1|_|_|_|_
+    1111|*11|_|_|_|_
+    1111|*111|_|_|_|_
+    BS+2: 1111|*112|_|_|_|_
+1366x650 measurement:elapsed_find_duration card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 measurement:elapsed_find_duration worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 measurement:elapsed_find_duration quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 placevalue:unit_form card boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650 placevalue:unit_form worksheet boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650 placevalue:unit_form quiz boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650 placevalue:place_value_disks card: 1 box(es), single-box item, skipped
+1366x650 placevalue:place_value_disks worksheet: 1 box(es), single-box item, skipped
+1366x650 placevalue:place_value_disks quiz: 1 box(es), single-box item, skipped
+1366x650 addition:cloze_addition card boxes=2 (opt 0) typed=3 ok
+    1|*_
+    1|*1
+    1|*11
+    BS+2: 1|*12
+1366x650 addition:cloze_addition worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 addition:cloze_addition quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 addition:add_wp_100 card boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|_|_|_|_|_|*1|_|_
+    (c)_|(c)_|_|_|_|_|_|_|_|11|*_|_
+    (c)_|(c)_|_|_|*_|_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+1366x650 addition:add_wp_100 worksheet boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+1366x650 addition:add_wp_100 quiz boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+1366x650 subtraction:sub_wp_100 card boxes=9 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|_|_|_|*1|_
+    (c)_|(c)_|_|_|_|_|_|11|*_
+    (c)_|(c)_|_|_|_|_|_|11|*1
+    (c)_|(c)_|*_|_|_|_|_|11|11
+    (c)_|(c)_|1|*_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|11|11
+1366x650 subtraction:sub_wp_100 worksheet boxes=9 (opt 2) typed=7 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+1366x650 subtraction:sub_wp_100 quiz boxes=9 (opt 2) typed=6 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+1366x650 algebra:multi_step_word card boxes=18 (opt 4) typed=11 ok
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|*1|_
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|*_
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|*1
+    (c)_|(c)_|*_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|*_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+1366x650 algebra:multi_step_word worksheet boxes=25 (opt 5) typed=16 ok
+    (c)_|(c)_|_|1|*_|_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+1366x650 algebra:multi_step_word quiz boxes=18 (opt 4) typed=11 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+1366x650 algebra:function_table_easy card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650 algebra:function_table_easy worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650 algebra:function_table_easy quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650 composing:hundreds_chart_fill card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 composing:hundreds_chart_fill worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650 composing:hundreds_chart_fill quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t skip expanded_form: no such skill
+1366x650t addition:add_100_regroup card boxes=3 (opt 1) typed=3 ok
+    (c)_|*_|1
+    (c)_|*1|1
+    (c)_|*1|1
+    BS+2: _|*2|1
+1366x650t addition:add_100_regroup worksheet boxes=3 (opt 1) typed=2 ok
+    (c)_|*_|1
+    (c)_|1|1
+1366x650t addition:add_100_regroup quiz boxes=3 (opt 1) typed=3 ok
+    (c)_|*_|1
+    (c)_|*1|1
+    (c)_|*1|1
+    BS+2: _|*2|1
+1366x650t addition:add_1k_regroup card boxes=5 (opt 2) typed=4 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|*1|1|1
+    (c)_|(c)_|*1|1|1
+    BS+2: _|_|*2|1|1
+1366x650t addition:add_1k_regroup worksheet boxes=5 (opt 2) typed=3 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|1|1|1
+1366x650t addition:add_1k_regroup quiz boxes=5 (opt 2) typed=4 ok
+    (c)_|(c)_|_|*_|1
+    (c)_|(c)_|*_|1|1
+    (c)_|(c)_|*1|1|1
+    (c)_|(c)_|*1|1|1
+    BS+2: _|_|*2|1|1
+1366x650t subtraction:sub_100_regroup card boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|*1|1
+    (c)_|(c)_|*1|1
+    BS+2: _|_|*2|1
+1366x650t subtraction:sub_100_regroup worksheet boxes=4 (opt 2) typed=2 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|1|1
+1366x650t subtraction:sub_100_regroup quiz boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|*_|1
+    (c)_|(c)_|*1|1
+    (c)_|(c)_|*1|1
+    BS+2: _|_|*2|1
+1366x650t subtraction:sub_1k_regroup card boxes=6 (opt 3) typed=4 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    BS+2: _|_|_|*2|1|1
+1366x650t subtraction:sub_1k_regroup worksheet boxes=6 (opt 3) typed=3 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|1|1|1
+1366x650t subtraction:sub_1k_regroup quiz boxes=6 (opt 3) typed=4 ok
+    (c)_|(c)_|(c)_|_|*_|1
+    (c)_|(c)_|(c)_|*_|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    (c)_|(c)_|(c)_|*1|1|1
+    BS+2: _|_|_|*2|1|1
+1366x650t multiplication:multiply card: 1 box(es), single-box item, skipped
+1366x650t multiplication:multiply worksheet: 1 box(es), single-box item, skipped
+1366x650t multiplication:multiply quiz: 1 box(es), single-box item, skipped
+1366x650t multiplication:area_model_mult card boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    *111|_|_
+    *1111|_|_
+    BS+2: *1112|_|_
+1366x650t multiplication:area_model_mult worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t multiplication:area_model_mult quiz boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    *111|_|_
+    *1111|_|_
+    BS+2: *1112|_|_
+1366x650t addition:add_sub_fact_family card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    11|*_|_|_
+    11|*1|_|_
+    11|11|*_|_
+    11|11|*1|_
+    BS+2: 11|11|2|*_
+1366x650t addition:add_sub_fact_family worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t addition:add_sub_fact_family quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t addition:number_families_add card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t addition:number_families_add worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t addition:number_families_add quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    *1111|_|_|_
+    *11111|_|_|_
+    BS+2: *11112|_|_|_
+1366x650t multiplication:count_by_tables card boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650t multiplication:count_by_tables worksheet boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650t multiplication:count_by_tables quiz boxes=5 (opt 0) typed=6 ok
+    *1|_|_|_|_
+    *11|_|_|_|_
+    *111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    *1111|_|_|_|_
+    BS+2: *1112|_|_|_|_
+1366x650t multiplication:mult_missing_digit card: 1 box(es), single-box item, skipped
+1366x650t multiplication:mult_missing_digit worksheet: 1 box(es), single-box item, skipped
+1366x650t multiplication:mult_missing_digit quiz: 1 box(es), single-box item, skipped
+1366x650t division:long_div_2digit card boxes=15 (opt 0) typed=16 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_
+1366x650t division:long_div_2digit worksheet boxes=20 (opt 0) typed=21 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1111|1|1|1|1|1|*_|_|_|_|_|_|_|_|_|_|_
+1366x650t division:long_div_2digit quiz boxes=15 (opt 0) typed=16 ok
+    *1|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *11|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    *111|_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*_|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*1|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*11|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|*111|_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*1|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*11|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|*111|_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|*_|_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|*_|_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|*_|_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|*_|_|_|_|_|_|_|_|_
+    1111|1111|1111|1|1|1|1|*_|_|_|_|_|_|_|_
+1366x650t division:div_remainders card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650t division:div_remainders worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650t division:div_remainders quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    11|*_
+    11|*1
+    BS+2: 11|*2
+1366x650t division:box_division_easy card boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|1|*_|_|_
+    11|111|1|*1|_|_
+    BS+2: 11|111|1|2|*_|_
+1366x650t division:box_division_easy worksheet boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|*1|_|_|_
+    11|111|11|*_|_|_
+1366x650t division:box_division_easy quiz boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    11|*_|_|_|_|_
+    11|*1|_|_|_|_
+    11|*11|_|_|_|_
+    11|111|*_|_|_|_
+    11|111|*1|_|_|_
+    11|111|11|*_|_|_
+1366x650t fractions:equivalent card: 0 box(es), single-box item, skipped
+1366x650t fractions:equivalent worksheet: 0 box(es), single-box item, skipped
+1366x650t fractions:equivalent quiz: 1 box(es), single-box item, skipped
+1366x650t fractions:improper_mixed card: 0 box(es), single-box item, skipped
+1366x650t fractions:improper_mixed worksheet: 1 box(es), single-box item, skipped
+1366x650t fractions:improper_mixed quiz: 1 box(es), single-box item, skipped
+1366x650t fraction_operations:add_mixed_like card: 0 box(es), single-box item, skipped
+1366x650t fraction_operations:add_mixed_like worksheet boxes=3 (opt 0) typed=4 ok
+    *1|_|_
+    *11|_|_
+    111|*_|_
+    111|*1|_
+    BS+2: 111|*2|_
+1366x650t fraction_operations:add_mixed_like quiz: 1 box(es), single-box item, skipped
+1366x650t decimals:add_decimal card boxes=4 (opt 2) typed=3 ok
+    (c)_|(c)_|1|*_
+    (c)_|(c)_|1|*1
+    (c)_|(c)_|1|*1
+    BS+2: _|_|1|*2
+1366x650t decimals:add_decimal worksheet: 1 box(es), single-box item, skipped
+1366x650t decimals:add_decimal quiz: 1 box(es), single-box item, skipped
+1366x650t coordinates:coordinate_q1 card boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    *11|_|_|_|_|_
+    *111|_|_|_|_|_
+    1111|*_|_|_|_|_
+    1111|*1|_|_|_|_
+    1111|*11|_|_|_|_
+    1111|*111|_|_|_|_
+    BS+2: 1111|*112|_|_|_|_
+1366x650t coordinates:coordinate_q1 worksheet: 1 box(es), single-box item, skipped
+1366x650t coordinates:coordinate_q1 quiz boxes=6 (opt 0) typed=7 ok
+    *1|_|_|_|_|_
+    *11|_|_|_|_|_
+    *111|_|_|_|_|_
+    1111|*_|_|_|_|_
+    1111|*1|_|_|_|_
+    1111|*11|_|_|_|_
+    1111|*111|_|_|_|_
+    BS+2: 1111|*112|_|_|_|_
+1366x650t measurement:elapsed_find_duration card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t measurement:elapsed_find_duration worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t measurement:elapsed_find_duration quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t placevalue:unit_form card boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650t placevalue:unit_form worksheet boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650t placevalue:unit_form quiz boxes=3 (opt 0) typed=4 ok
+    1|*_|_
+    1|1|*_
+    1|1|*1
+    1|1|*1
+    BS+2: 1|1|*2
+1366x650t placevalue:place_value_disks card: 1 box(es), single-box item, skipped
+1366x650t placevalue:place_value_disks worksheet: 1 box(es), single-box item, skipped
+1366x650t placevalue:place_value_disks quiz: 1 box(es), single-box item, skipped
+1366x650t addition:cloze_addition card boxes=2 (opt 0) typed=3 ok
+    1|*_
+    1|*1
+    1|*11
+    BS+2: 1|*12
+1366x650t addition:cloze_addition worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t addition:cloze_addition quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t addition:add_wp_100 card boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|_|_|_|_|_|*1|_|_
+    (c)_|(c)_|_|_|_|_|_|_|_|11|*_|_
+    (c)_|(c)_|_|_|*_|_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|11|1|_
+1366x650t addition:add_wp_100 worksheet boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+1366x650t addition:add_wp_100 quiz boxes=12 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+    (c)_|(c)_|_|_|1|*_|_|_|_|_|_|_
+1366x650t subtraction:sub_wp_100 card boxes=9 (opt 2) typed=6 ok
+    (c)_|(c)_|_|_|_|_|_|*1|_
+    (c)_|(c)_|_|_|_|_|_|11|*_
+    (c)_|(c)_|_|_|_|_|_|11|*1
+    (c)_|(c)_|*_|_|_|_|_|11|11
+    (c)_|(c)_|1|*_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|11|11
+1366x650t subtraction:sub_wp_100 worksheet boxes=9 (opt 2) typed=7 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+1366x650t subtraction:sub_wp_100 quiz boxes=9 (opt 2) typed=6 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_
+1366x650t algebra:multi_step_word card boxes=18 (opt 4) typed=11 ok
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|*1|_
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|*_
+    (c)_|(c)_|_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|*1
+    (c)_|(c)_|*_|_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|*_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|11|11
+1366x650t algebra:multi_step_word worksheet boxes=25 (opt 5) typed=16 ok
+    (c)_|(c)_|_|1|*_|_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+    (c)_|(c)_|_|1|1|*_|_|_|_|_|_|_|(c)_|(c)_|(c)_|_|_|_|_|_|_|_|_|_|_
+1366x650t algebra:multi_step_word quiz boxes=18 (opt 4) typed=11 ok
+    (c)_|(c)_|1|*_|_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+    (c)_|(c)_|1|1|*_|_|_|_|_|(c)_|(c)_|_|_|_|_|_|_|_
+1366x650t algebra:function_table_easy card boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650t algebra:function_table_easy worksheet boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650t algebra:function_table_easy quiz boxes=4 (opt 0) typed=5 ok
+    *1|_|_|_
+    *11|_|_|_
+    *111|_|_|_
+    1111|*_|_|_
+    1111|*1|_|_
+    BS+2: 1111|*2|_|_
+1366x650t composing:hundreds_chart_fill card boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t composing:hundreds_chart_fill worksheet boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+1366x650t composing:hundreds_chart_fill quiz boxes=2 (opt 0) typed=3 ok
+    *1|_
+    *11|_
+    *111|_
+    BS+2: *112|_
+caret-spread: OK
