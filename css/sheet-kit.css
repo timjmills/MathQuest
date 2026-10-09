@@ -324,19 +324,21 @@
    it as a dark grey, darker than the trace grey #949494). Pupil pages, the key's copy of the
    question and traced (grey) model answers are unchanged. */
 .ws-page.ws-key { --ws-key-ink: #c2410c; }
-.ws-page.ws-key [data-ws-ink="solid"],
-.ws-page.ws-key [data-ws-ink="solid"] :not(svg):not(svg *),
-.ws-page.ws-key [data-ws-key="words"] { color: var(--ws-key-ink) !important; }
-.ws-page.ws-key svg [data-ws-ink="solid"]:not([stroke="none"]),
-.ws-page.ws-key svg[data-ws-ink="solid"] :is(line, path, polyline, circle):not([stroke="none"]):not([stroke="#fff"]) { stroke: var(--ws-key-ink) !important; }
-.ws-page.ws-key svg :is(text, tspan)[data-ws-ink="solid"],
-.ws-page.ws-key svg [data-ws-ink="solid"] :is(text, tspan) { fill: var(--ws-key-ink) !important; }
-.ws-page.ws-key .ws-choice[data-ws-ink="solid"] { outline-color: var(--ws-key-ink) !important; }
-/* A drawn answer (shade the model, build the blocks): the drawing is the answer, its printed
-   stimulus (the fraction to shade) stays black; the shading the pupil would add is the key ink. */
-.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"],
-.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"] :not(svg):not(svg *) { color: var(--ws-ink) !important; }
-.ws-page.ws-key [data-ws-shape="draw"][data-ws-ink="solid"] svg [fill="#949494"] { fill: var(--ws-key-ink) !important; }
+/* Critic r1 (B1): the ink goes ONLY on marks tagged `data-ws-key-ans` (print-sheet.js arrangeKey ->
+   key-short.js tagKeyAnswers): what the pupil writes, ticks or fills. A given claim, the made-up
+   pupil's work, a worked example and every printed number keep their ink. A slot that WRAPS
+   printed content (a choice of pictures, a drawing zone, a row of clock faces) colours only its
+   own mark, never the printed content inside it. */
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*)),
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*)) :not(svg):not(svg *):not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-ans]:not([stroke="none"]),
+.ws-page.ws-key svg[data-ws-key-ans] :is(line, path, polyline, circle):not([stroke="none"]):not([stroke="#fff"]) { stroke: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg :is(text, tspan)[data-ws-key-ans],
+.ws-page.ws-key svg[data-ws-key-ans] :is(text, tspan) { fill: var(--ws-key-ink) !important; }
+.ws-page.ws-key .ws-choice[data-ws-key-ans] { outline-color: var(--ws-key-ink) !important; }
+/* A drawn answer (shade the model, build the blocks): the shading the pupil would add is the key
+   ink; the printed stimulus inside the zone (the fraction to shade) stays black. */
+.ws-page.ws-key [data-ws-shape="draw"][data-ws-key-ans] svg [fill="#949494"] { fill: var(--ws-key-ink) !important; }
 
 /* ---------- the short answer key (Wave 4.4) ---------- */
 .ws-skey { display: flex; flex-direction: column; gap: 2mm; font-family: 'Andika', sans-serif; line-height: 1.25; }

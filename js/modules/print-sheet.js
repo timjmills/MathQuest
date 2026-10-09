@@ -30,7 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { normKeyOptions, shortKeyRows, renderShortKey } from './sheet/roles/key-short.js';
+import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
@@ -1832,6 +1832,9 @@ export function arrangeKey(res, ko, req = {}) {
         .replace(/<section ([^>]*?)class="ws-page ([^"]*)"/, (m, pre, c) => `<section ${pre}class="ws-page ${c}" data-ws-page="${i}" data-ws-paper="${paperAttr}" data-ws-role="${role}" data-ws-mode="key"`)
         .replace('<footer class="ws-foot">', '<footer class="ws-foot" data-ws-teacher>');
     let keyPages = res.keyPages || (res.keyHtml ? [res.keyHtml] : []);
+    // INK-31 (critic r1, B1): only the answers take the key ink; a given claim, the made-up
+    // pupil's work and every printed number keep their ink. Each key page is matched to its twin.
+    keyPages = keyPages.map((k, i) => tagKeyAnswers(pupil.length === keyPages.length ? pupil[i] : '', k));
     let groupsByPage = null;
     if (ko.style === 'short') {
         const plans = res.keyPlans || (res.plan ? [res.plan] : []);
@@ -1842,9 +1845,40 @@ export function arrangeKey(res, ko, req = {}) {
             header: { tab: head.tab }, footer: { left: (plan0.footer && plan0.footer.left) || '', right: ['Key', res.seed !== undefined ? `seed ${res.seed}` : ''].filter(Boolean).join(' · ') },
         };
         const role = `${res.role || 'sheet'}`;
+        // B3 / B4 (critic r1): a group is headed with the name its pupil page prints - the tab's
+        // own label ("Practice A") and its page number when the sheet runs to several - and, in a
+        // printout of several sections, the section ("Section 2 · Add within 20").
+        const nameOf = (h) => {
+            const tabBox = /<div class="ws-tabbox">([\s\S]*?)<\/div>/.exec(h || '');
+            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean) : [];
+            const foot = /<footer class="ws-foot"[^>]*>[\s\S]*?<b>([^<]*)<\/b>/.exec(h || '');
+            const nn = foot && /^(\d+)\/(\d+)$/.exec(foot[1].trim());
+            const name = spans.length ? spans[spans.length - 1] : '';
+            return { name, n: nn ? +nn[1] : 0, of: nn ? +nn[2] : 0 };
+        };
+        const title0 = /<div class="ws-title">([\s\S]*?)<\/div>/.exec(pupil[0] || '');
+        const titleText = title0 ? title0[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim() : '';
+        const section = req.keySection ? [String(req.keySection), titleText].filter(Boolean).join(': ') : '';
+        let labels = rows.length === pupil.length ? pupil.map((h, i) => {
+            const { name, n, of } = nameOf(h);
+            const pageBit = of > 1 ? `page ${n} of ${of}` : '';
+            return [name, pageBit].filter(Boolean).join(', ') || `Page ${i + 1}`;
+        }) : null;
+        // two pages that print the same name (a lesson's two "Lesson 1" pages) are told apart
+        if (labels) {
+            const seen = {};
+            const total = labels.reduce((m, l) => Object.assign(m, { [l]: (m[l] || 0) + 1 }), {});
+            labels = labels.map((l) => (total[l] > 1 ? `${l}, page ${(seen[l] = (seen[l] || 0) + 1)} of ${total[l]}` : l));
+            if (section) labels = labels.map((l) => `${section} · ${l}`);
+        }
+        opts.pageLabel = (p) => (labels && labels[p - 1]) || (section ? `${section} · Page ${p}` : `Page ${p}`);
+        if (section) opts.footer.left = [String(req.keySection), opts.footer.left].filter(Boolean).join(' · ');
         if (rows.length === pupil.length) groupsByPage = rows.map((r) => renderShortKey([r], opts).map((h, j) => decorateKey(h, j + 1, role)));
         keyPages = renderShortKey(rows, opts).map((h, j) => decorateKey(h, j + 1, role));
-        res.shortRows = rows.map((r) => ({ page: r.page, items: r.items.map((it) => ({ label: it.label, cell: it.cell, skill: it.skill })) }));
+        res.shortRows = rows.map((r) => ({
+            page: r.page, heading: opts.pageLabel(r.page),
+            items: r.items.map((it) => ({ label: it.label, cell: it.cell, skill: it.skill, text: answerText(it), slots: (it.key && typeof it.key === 'object' && it.key.slots) || null })),
+        }));
     }
     let doc;
     if (ko.placement === 'after-page') {

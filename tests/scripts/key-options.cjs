@@ -28,6 +28,7 @@ const SHOTS = process.argv.includes('--shots');
 const OUT = process.env.KEY_SHOTS || path.join(require('os').tmpdir(), 'mq-key-options');
 const fails = [];
 const check = (ok, msg) => { if (!ok) fails.push(msg); };
+const src0 = () => fs.readFileSync(path.join(ROOT, 'js', 'modules', 'teacher-print.js'), 'utf8');
 const log = (...a) => console.log(...a);
 
 const SINGLE = [
@@ -174,7 +175,7 @@ print(len(d))
             const d = f.contentDocument;
             const col = (el) => el && f.contentWindow.getComputedStyle(el).color;
             const out = {
-                keyAns: col(d.querySelector('[data-ws-mode="key"] [data-ws-ink="solid"]')),
+                keyAns: col(d.querySelector('[data-ws-mode="key"] [data-ws-key-ans]')),
                 pupilText: col(d.querySelector('[data-ws-mode="print"] [data-ws-cell]')),
                 keyQuestion: col(d.querySelector('[data-ws-mode="key"] [data-ws-cell]')),
             };
@@ -183,6 +184,84 @@ print(len(d))
         });
         check(ink.keyAns === 'rgb(194, 65, 12)', `key answer colour ${ink.keyAns}`);
         check(ink.pupilText === 'rgb(0, 0, 0)' && ink.keyQuestion === 'rgb(0, 0, 0)', `question ink ${ink.pupilText} / ${ink.keyQuestion}`);
+
+        // ---- 7. every page type x a spread of families (critic r1, B1-B4)
+        //   copy key: the key ink sits on tagged answers only - never on a given claim (True or
+        //             False's statement), the made-up pupil's work (Error Analysis) or a pupil page;
+        //   short key: every entry lists what the copy key fills in - each graded value it writes,
+        //             and the choice (True / False, Correct / Fix it, There are more) as a word;
+        //             group headings are the pupil page's own name and never repeat.
+        const ROLES = ['lesson', 'scripted-model', 'guided', 'independent', 'more-practice', 'mixed-practice', 'review', 'test', 'error-analysis', 'reason-it', 'stretch', 'true-false', 'opener', 'word-problems', 'fact-rows', 'pre-skill-check'];
+        const FAMILIES = [['addition', 'add_facts'], ['addition', 'add_20_regroup'], ['subtraction', 'sub_100_regroup'], ['multiplication', 'mult_facts'], ['fractions', 'shade_fraction'], ['fractions', 'write_fraction'], ['measurement', 'time_half_hour'], ['placevalue', 'more_less_10'], ['placevalue', 'place_value_disks']];
+        const sweep = await page.evaluate(async ({ ROLES, FAMILIES }) => {
+            const out = [];
+            const f = document.createElement('iframe'); f.style.cssText = 'position:absolute;left:-3000px;width:900px;height:1200px'; document.body.appendChild(f);
+            for (const role of ROLES) for (const [categoryId, skillId] of FAMILIES) {
+                const base = { role, sections: [{ skills: [{ categoryId, skillId }] }], letters: role === 'more-practice' ? ['A', 'B'] : undefined, size: 'L', paper: 'A4', seed: 4242 };
+                let copy, short;
+                try {
+                    copy = await window.buildSheet(Object.assign({}, base, { key: { on: true, placement: 'end', style: 'copy' } }));
+                    short = await window.buildSheet(Object.assign({}, base, { key: { on: true, placement: 'end', style: 'short' } }));
+                } catch (e) { out.push({ role, skillId, skip: String(e && e.message || e).slice(0, 80) }); continue; }
+                f.srcdoc = window.sheetDocument(copy.docHtml, 'sweep'); await new Promise((ok) => { f.onload = ok; });
+                const d = f.contentDocument, w = f.contentWindow;
+                const bad = [];
+                const orange = (el) => w.getComputedStyle(el).color === 'rgb(194, 65, 12)';
+                for (const el of d.querySelectorAll('[data-ws-mode="print"] *')) if (orange(el)) { bad.push(`pupil page text in key ink: "${el.textContent.trim().slice(0, 20)}"`); break; }
+                for (const el of d.querySelectorAll('[data-ws-mode="key"] *')) {
+                    if (!orange(el) || !el.childNodes.length || ![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+                    const ans = el.closest('[data-ws-key-ans]');
+                    const given = el.closest('.mq-pupil') || (el.closest('.mq-judge-work') && !el.closest('[data-ws-slot^="x"], [data-ws-slot^="fix"]'))
+                        || el.closest('.mq-abbox');
+                    if (!ans || given) { bad.push(`key ink on a given: "${el.textContent.trim().slice(0, 24)}"`); if (bad.length > 3) break; }
+                }
+                const tagged = d.querySelectorAll('[data-ws-mode="key"] [data-ws-key-ans]').length;
+                const rgEmpty = [...d.querySelectorAll('[data-ws-mode="key"] .rg[data-ws-seg]')].length - [...d.querySelectorAll('[data-ws-mode="key"] .rg[data-ws-seg] .mq-rgink')].length;
+                const rows = short.shortRows || [];
+                const heads = rows.map((r) => r.heading);
+                const items = rows.flatMap((r) => r.items.map((it) => Object.assign({ page: r.page }, it)));
+                out.push({ role, skillId, bad, tagged, heads, items, rgInk: d.querySelectorAll('[data-ws-mode="key"] .mq-rgink').length, rgEmpty, copyKeys: copy.keyPageCount, pages: copy.pageCount });
+            }
+            f.remove();
+            return out;
+        }, { ROLES, FAMILIES });
+        const norm = (v) => String(v).replace(/[\s,]/g, '').replace(/−/g, '-');
+        for (const r of sweep) {
+            if (r.skip) { log(`  sweep ${r.role} ${r.skillId}: skipped (${r.skip})`); continue; }
+            const tag = `sweep ${r.role} ${r.skillId}`;
+            r.bad.forEach((b) => check(false, `${tag}: ${b}`));
+            check(r.tagged > 0 || !r.items.length, `${tag}: the copy key tags no answer`);
+            check(new Set(r.heads).size === r.heads.length, `${tag}: short-key headings repeat (${r.heads.join(' | ')})`);
+            if (r.role === 'more-practice') check(r.heads.some((h) => /Practice A/.test(h)) && r.heads.some((h) => /Practice B/.test(h)), `${tag}: headings ${r.heads.join(' | ')} do not name the sheets`);
+            for (const it of r.items) {
+                const t = String(it.text || '');
+                check(t && t !== '-' && !/answers shown/i.test(t), `${tag} p${it.page} ${it.label}: short entry "${t}"`);
+                const filled = Object.values(it.slots || {}).filter((s) => s && s.graded !== false && s.value !== undefined && s.value !== null && String(s.value) !== '');
+                const ticks = filled.filter((s) => /^[✓✔]$/.test(String(s.value)));
+                if (ticks.length) check(/[A-Za-z]{2}/.test(t), `${tag} p${it.page} ${it.label}: "${t}" names no choice`);
+                if (!/Answers vary/.test(t) && !/ shaded$/.test(t)) {
+                    const miss = filled.filter((s) => !/^[✓✔]$/.test(String(s.value)) && !norm(t).includes(norm(s.value)));
+                    check(!miss.length, `${tag} p${it.page} ${it.label}: "${t}" leaves out ${miss.map((s) => s.value).join(', ')}`);
+                }
+            }
+            log(`  ${tag}: ${r.pages}p, ${r.tagged} answers tagged, carries ${r.rgInk} written / ${r.rgEmpty} empty, short "${r.items.slice(0, 3).map((i) => i.text).join(' | ')}" heads ${r.heads.slice(0, 3).join(' | ')}`);
+        }
+
+        // ---- 8. several sections (critic r1, B4): each short key is named for its section
+        const multi = await page.evaluate(async () => {
+            const one = (skillId, i) => window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId }], pages: 2 }], size: 'L', paper: 'A4', seed: 11 + i, keySection: `Section ${i + 1}`, key: { on: true, placement: 'end', style: 'short' } });
+            const a = await one('add_facts', 0), b = await one('add_20_regroup', 1);
+            const heads = [...a.shortRows, ...b.shortRows].map((r) => r.heading);
+            const foot = (h) => [...h.matchAll(/<footer class="ws-foot"[^>]*><span>([^<]*)<\/span>/g)].map((m) => m[1]);
+            return { heads, feet: [...foot(a.keyHtml), ...foot(b.keyHtml)] };
+        });
+        check(new Set(multi.heads).size === multi.heads.length && multi.heads.every((h) => /^Section [12]: /.test(h)), `two sections: short-key headings ${multi.heads.join(' | ')}`);
+        check(multi.feet.length >= 2 && multi.feet.every((f) => /^Section [12]/.test(f)), `two sections: short-key footers ${multi.feet.join(' | ')}`);
+        log(`  two sections: ${multi.heads.join(' | ')}`);
+        // the teacher's last key choice is a print default (critic r1, D7), outside every code
+        const ui = fs.readFileSync(path.join(ROOT, 'js', 'modules', 'teacher-ui.js'), 'utf8');
+        check(/keyPlace: d\.keyPlace === 'after-page'/.test(ui) && /keyStyle: d\.keyStyle === 'short'/.test(ui), 'printDefaults does not carry the key placement and style');
+        check(/keyPlace: d\.keyPlace, keyStyle: d\.keyStyle/.test(src0()) && /rememberKeyDefaults\(\)/.test(src0()), 'teacher-print does not remember the key choice');
 
         // ---- 6. the teacher print request and an old saved printout
         const old = await page.evaluate(async () => {

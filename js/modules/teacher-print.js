@@ -23,7 +23,7 @@
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
-    optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
+    optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, PRINT_DEFAULTS_KEY, fmtDay,
 } from './teacher-ui.js';
 import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
@@ -106,8 +106,9 @@ function initState() {
         anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
         key: true,
-        // Wave 4.4: where the key prints and what it looks like (defaults = today's key).
-        keyPlace: 'end', keyStyle: 'copy',
+        // Wave 4.4: where the key prints and what it looks like (default = today's key; the
+        // teacher's last choice is remembered in the print defaults).
+        keyPlace: d.keyPlace, keyStyle: d.keyStyle,
         seed: freshSeed(),
         view: 0,          // page index, or 'key'
         versions: 1,
@@ -317,8 +318,8 @@ function onClick(e) {
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
-        case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; renderSetup(); scheduleBuild(); break;
-        case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; renderSetup(); scheduleBuild(); break;
+        case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
+        case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
         case 'new-numbers': pr.seed = freshSeed(); scheduleBuild(0); break;
@@ -695,6 +696,14 @@ function renderSetup() {
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
 }
 
+/** Wave 4.4 (critic r1, D7): the key placement and style are the teacher's print defaults. */
+function rememberKeyDefaults() {
+    try {
+        const d = readStore(PRINT_DEFAULTS_KEY, {}) || {};
+        writeStore(PRINT_DEFAULTS_KEY, Object.assign({}, d, { keyPlace: pr.keyPlace, keyStyle: pr.keyStyle }));
+    } catch (e) { /* storage blocked: the choice still holds for this session */ }
+}
+
 /** Wave 4.4: the key's placement and style, shown only while the key is on. */
 function keyOptionsHTML() {
     return `
@@ -809,7 +818,9 @@ async function buildAll(req) {
     let after = false;
     for (const [ri, r] of req.parts.entries()) {
         let res;
-        try { res = await buildSheet(r); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
+        // B4 (critic r1): in a printout of several sections each short key names its section.
+        const rq = req.parts.length > 1 ? Object.assign({}, r, { keySection: `Section ${(req.idx ? req.idx[ri] : ri) + 1}` }) : r;
+        try { res = await buildSheet(rq); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
         out.parts.push({ res, role: r.role, letters: r.letters });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';

@@ -33,6 +33,49 @@ export function normKeyOptions(key) {
     };
 }
 
+/* ------------------------------------------------------------------ INK-31: which marks are answers */
+
+const OPEN_TAG = /<([a-zA-Z][\w-]*)\b([^>]*)>/g;
+const attrOf = (attrs, name) => { const m = new RegExp(`\\s${name}="([^"]*)"`).exec(attrs); return m ? m[1] : ''; };
+const solidSig = (cell, tag, attrs) => `${cell}|${tag.toLowerCase()}|${attrOf(attrs, 'data-ws-slot')}|${attrOf(attrs, 'class').replace(/\s+/g, ' ').trim()}`;
+
+/**
+ * INK-31 (critic r1, B1): mark the ANSWERS of one facsimile key page with `data-ws-key-ans`, and
+ * nothing else. An element is an answer when it is written in solid ink on the key and the pupil
+ * page does not already print it: a given claim (True or False's "5 + 7 = 2"), the made-up
+ * pupil's work on Error Analysis ("Sam wrote 0", class `mq-pupil`), a worked example, any printed
+ * number keeps its ink. The pupil twin is matched cell by cell (the n-th `data-ws-cell` on both
+ * pages), by the element's tag, slot id and classes. The key's own written words
+ * (`data-ws-key="words"`) are answers. Only the key ink colours `[data-ws-key-ans]`.
+ *
+ * @param {string} pupilHtml  the pupil page the key page copies ('' when there is none)
+ * @param {string} keyHtml    the key page
+ * @returns {string} the key page with its answers tagged
+ */
+export function tagKeyAnswers(pupilHtml, keyHtml) {
+    const pool = new Map();
+    let cell = 0;
+    String(pupilHtml || '').replace(OPEN_TAG, (m, tag, attrs) => {
+        if (/\sdata-ws-cell="/.test(attrs)) cell++;
+        if (/\sdata-ws-ink="solid"/.test(attrs)) { const s = solidSig(cell, tag, attrs); pool.set(s, (pool.get(s) || 0) + 1); }
+        return m;
+    });
+    cell = 0;
+    return String(keyHtml || '').replace(OPEN_TAG, (m, tag, attrs) => {
+        if (/\sdata-ws-cell="/.test(attrs)) cell++;
+        if (/\sdata-ws-key-ans\b/.test(attrs)) return m;
+        const words = /\sdata-ws-key="(?:words|short)"/.test(attrs);
+        if (!words && !/\sdata-ws-ink="solid"/.test(attrs)) return m;
+        if (!words) {
+            const s = solidSig(cell, tag, attrs);
+            const n = pool.get(s) || 0;
+            if (n > 0) { pool.set(s, n - 1); return m; }           // the pupil page prints it: a given
+            if (/\bmq-pupil\b/.test(attrOf(attrs, 'class'))) return m;   // the made-up pupil's work
+        }
+        return `<${tag} data-ws-key-ans${attrs}>`;
+    });
+}
+
 /* ------------------------------------------------------------------ rows (data only) */
 
 const labelText = (style, k) => (style === 'letter' ? `${LETTERS[(k - 1) % 26]}.` : `${k}.`);
@@ -56,7 +99,7 @@ function planPageRows(plan) {
                     const n = k++;
                     if (plan.nothingToAnswer) return;
                     const key = item.key || (item.q ? cellAnswerKey(item.q) : null);
-                    items.push({ label: labelText(part.labels, n), cell: ord, key, words: answerWords(item, key), skill: item.skill || '' });
+                    items.push({ label: labelText(part.labels, n), cell: ord, key, words: answerWords(item, key), skill: item.skill || '', payload: (item.q && item.q.cell && item.q.cell.payload) || null });
                 });
                 if (part.start === undefined) report.label += k - start;
                 return;
@@ -109,6 +152,20 @@ const scalar = (v) => (v === undefined || v === null || typeof v === 'object' ? 
 export function answerText(row) {
     const key = row.key;
     let t = '';
+    // shade the model: how many of how many parts (critic r1, B2: "1 part shaded" had no whole)
+    const p = row.payload;
+    let shade = '';
+    if (p && p.task === 'shade' && p.answer && p.show && Number(p.show.d) > 0) {
+        const n = Number(p.answer.shade), d = Number(p.show.d);
+        shade = n <= d ? `${n} of ${d} ${d === 1 ? 'part' : 'parts'} shaded` : `${p.show.n}/${d} shaded`;
+    }
+    // a role's own short line (True or False, Error Analysis, Stretch: the choice and the value);
+    // a bare shaded count at its end reads as the parts of the whole
+    if (key && typeof key === 'object' && scalar(key.short)) {
+        const s = String(key.short).trim();
+        return shade ? s.replace(new RegExp(`([:;]\\s*)${Number(p.answer.shade)}$`), `$1${shade}`) : s;
+    }
+    if (shade && (!key || typeof key !== 'object' || /^\d+ parts? shaded$/.test(scalar(key.display)) || !scalar(key.display))) return shade;
     if (key && typeof key === 'object') {
         t = scalar(key.display) || scalar(key.value);
         if (!t && Array.isArray(key.value)) t = key.value.map(String).join(', ');
@@ -119,7 +176,9 @@ export function answerText(row) {
         }
     } else if (key !== null && key !== undefined) t = String(key);
     if (!t) t = String(row.words || '').replace(/^Answer:\s*/, '');
-    return t.replace(/^Answer:\s*/, '').replace(/\b1 parts\b/g, '1 part').trim() || '-';
+    t = t.replace(/^Answer:\s*/, '').replace(/\b1 parts\b/g, '1 part').trim();
+    if (shade) t = t.replace(new RegExp(`([:;]\\s*)${Number(p.answer.shade)}$`), `$1${shade}`);
+    return t || '-';
 }
 
 /* ------------------------------------------------------------------ layout */
@@ -134,12 +193,14 @@ const GEOM = {
 const LIVE_W = { A4: 186, Letter: 192 };
 const BODY_H = { A4: 228, Letter: 210 };
 
+const charsOf = (text) => text.replace(/\d+\s*\/\s*\d+/g, 'xx').length + 3;
+const perColOf = (g) => Math.floor(g.col / (g.pt * 0.3528 * 0.55));
 const entrySpan = (text, g) => {
-    // a long answer takes two (or three) columns, never shrinks (DN-10)
-    const chars = text.replace(/\d+\s*\/\s*\d+/g, 'xx').length + 3;
-    const perCol = Math.floor(g.col / (g.pt * 0.3528 * 0.55));
-    return Math.min(3, Math.max(1, Math.ceil(chars / perCol)));
+    // a long answer takes more columns (a Stretch list: the whole row), never shrinks (DN-10)
+    return Math.min(6, Math.max(1, Math.ceil(charsOf(text) / perColOf(g))));
 };
+/** How many lines an entry wraps to at `span` columns (a long list wraps inside its row). */
+const entryLines = (text, g, span) => Math.max(1, Math.ceil(charsOf(text) / (perColOf(g) * span)));
 
 /**
  * Lay the groups out on short-key pages. Returns [[{group, items, cont}]] - each page a list of
@@ -156,14 +217,15 @@ function paginateGroups(groups, size, paper) {
     for (const grp of groups) {
         // pack entries into rows of `cols` units; a row with a fraction is 1.8 lines tall
         const rows = [];
-        let row = { units: 0, tall: false, items: [] };
+        let row = { units: 0, tall: false, items: [], lines: 1 };
         for (const it of grp.items) {
             const span = Math.min(cols, it.span);
-            if (row.units + span > cols) { rows.push(row); row = { units: 0, tall: false, items: [] }; }
+            if (row.units + span > cols) { rows.push(row); row = { units: 0, tall: false, items: [], lines: 1 }; }
             row.units += span; row.items.push(it); row.tall = row.tall || it.tall;
+            row.lines = Math.max(row.lines || 1, entryLines(it.text, g, span));
         }
         if (row.items.length || !rows.length) rows.push(row);
-        const rowH = (r) => (r.tall ? g.line * 1.6 : g.line);
+        const rowH = (r) => (r.tall ? g.line * 1.6 : g.line) * (r.lines || 1);
         let slice = { group: grp, items: [], cont: false };
         let need = g.head;
         if (used + g.head + rowH(rows[0]) > bodyH) flush();
@@ -214,7 +276,7 @@ export function renderShortKey(groups, o = {}) {
                 return `<section class="ws-skey-group">${h}<p class="ws-skey-none">Nothing to mark on this page.</p></section>`;
             }
             const items = sl.items.map((it) => `<div class="ws-skey-it" data-ws-short-page="${grp.page}" data-ws-short-cell="${it.cell}"${it.span > 1 ? ` style="grid-column:span ${Math.min(cols, it.span)}"` : ''}>`
-                + `<b class="ws-skey-lab">${esc(it.label)}</b><span class="ws-skey-ans" data-ws-ink="solid" data-ws-key="short">${answerHtml(it.text)}</span></div>`).join('');
+                + `<b class="ws-skey-lab">${esc(it.label)}</b><span class="ws-skey-ans" data-ws-key-ans data-ws-ink="solid" data-ws-key="short">${answerHtml(it.text)}</span></div>`).join('');
             return `<section class="ws-skey-group">${h}<div class="ws-skey-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${items}</div></section>`;
         }).join('');
         const footer = Object.assign({}, o.footer || {}, { center: `Key ${i + 1}/${pages.length}` });
@@ -228,4 +290,4 @@ export function renderShortKey(groups, o = {}) {
     });
 }
 
-export default { normKeyOptions, shortKeyRows, answerText, answerHtml, renderShortKey };
+export default { normKeyOptions, shortKeyRows, answerText, answerHtml, renderShortKey, tagKeyAnswers };

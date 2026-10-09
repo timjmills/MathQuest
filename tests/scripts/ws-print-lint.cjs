@@ -444,9 +444,12 @@ function wsLintPage(cfg) {
             // circles, step icons). Anywhere else the colour is still an INK-1 defect.
             if (!isAllowed(c) && hex(c).toLowerCase() === '#5b2a86' && el.closest && el.closest('[data-mq-accent]')
                 && el.closest('.mq-lesson, [data-mq-lesson-strip]')) return;
-            // INK-31 (owner 2026-10-03, Wave 4.4): the key ink #c2410c, on a key page, on an answer mark only.
+            // INK-31 (owner 2026-10-03, Wave 4.4): the key ink #c2410c, on a key page, on an ANSWER mark
+            // only - an element the key tagged `data-ws-key-ans` (what the pupil writes, ticks or
+            // fills). A given claim, the made-up pupil's work or any printed number in the key ink is
+            // an INK-1 defect (critic r1, B1: solid ink is not enough - the stimulus is solid too).
             if (!isAllowed(c) && hex(c).toLowerCase() === '#c2410c' && el.closest && el.closest('[data-ws-mode="key"]')
-                && el.closest('[data-ws-ink="solid"], [data-ws-key="words"]')) return;
+                && el.closest('[data-ws-key-ans]') && !(el.closest('.mq-pupil') && el.closest('[data-ws-key-ans]').contains(el.closest('.mq-pupil')))) return;
             if (!isAllowed(c)) F('L-INK', 'INK-1', sevIfBad, el, `${what} ${hex(c)} is not ink #000, paper #fff or grey #949494 (INK-1)${note}`, `${what} ${hex(c)}`);
         };
         if (textBearing && !svg) paint(cs.color, 'text colour');
@@ -1854,6 +1857,19 @@ function ratchet(results, file) {
 const SELF_TESTS = [
     { name: 'coloured fill', expect: ['L-INK', 'INK-1'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').style.background = '#3b82f6'; } },
     { name: 'coloured text', expect: ['L-INK', 'INK-1'], fn: () => { document.querySelector('.ws-page .ws-instrline').style.color = '#7c3aed'; } },
+    // INK-31 (critic r1, B1/D5): the key ink is allowed on a key page's tagged ANSWER marks only.
+    { name: 'key ink on a key page\'s question (a given)', expect: ['L-INK', 'INK-1'], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].pop();
+        if (!k.closest('[data-ws-mode="key"]')) k.setAttribute('data-ws-mode', 'key');
+        const c = k.querySelector('[data-ws-cell]');
+        c.setAttribute('data-ws-ink', 'solid');      // solid ink is not enough: it is not tagged as an answer
+        c.style.color = '#c2410c';
+    } },
+    { name: 'key ink on a pupil page answer', expect: ['L-INK', 'INK-1'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-key-ans', '');
+        c.style.color = '#c2410c';
+    } },
     { name: 'drop shadow on a heading', expect: ['L-INK', 'INK-2'], fn: () => { document.querySelector('.ws-page .ws-title').style.boxShadow = '0 3px 0 0 #000'; } },
     { name: 'greyscale filter', expect: ['L-INK', 'INK-2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').style.filter = 'grayscale(1)'; } },
     { name: 'black 20 mm disk with black text', expect: [['L-INK', 'INK-5'], ['L-INK', 'ILLEGIBLE']], fn: () => {

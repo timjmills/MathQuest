@@ -155,6 +155,9 @@ export function printDefaults() {
         size: ['S', 'M', 'L'].includes(d.size) ? d.size : 'L',
         paper: d.paper === 'Letter' ? 'Letter' : 'A4',
         photocopySafe: !!d.photocopySafe,
+        // Wave 4.4: the teacher's last answer-key choice (critic r1, D7). Not in any share code.
+        keyPlace: d.keyPlace === 'after-page' ? 'after-page' : 'end',
+        keyStyle: d.keyStyle === 'short' ? 'short' : 'copy',
     };
 }
 
