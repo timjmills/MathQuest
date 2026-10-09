@@ -418,3 +418,219 @@ real hosts:
 ## What would raise each screen host to 8+
 
 Fix R3-1 to R3-6, extend the gate (R3-8), and resolve the CSS merge conflict. Paper needs nothing.
+
+# Round 4 (commit 614178a: focus kept, line reserved, count-by line, ladder keeps teacher marks)
+
+Critic: independent, fresh start (an earlier round-4 run was killed by a container restart; nothing of it was
+reused). Date: 2026-10-09. Every browser run went through `/tmp/mq-browser-run.sh`, one at a time. Evidence is in
+the session scratchpad under `tn-r4/` (`logs/`, `out/`, `stackout/`, `ladder/`, `print/S|M|L/`). Hosts were driven
+for real: practice card, online worksheet and quiz at **1366 × 650 and 1280 × 600**, each with **touch taps, mouse
+clicks and the keyboard** (Shift+Tab to a number, Space / Enter to count, a digit typed while on a number). The
+owner rulings of 2026-10-09 are the spec. The worktree is unchanged apart from this section.
+
+## Verdict: FAIL
+
+Most of round 3 is fixed and works on all three hosts with mouse, touch and keyboard:
+- focus is never taken: a tap or click leaves the caret in the box, and the next digit lands there;
+- Enter / Space counting keeps focus on the number;
+- a digit typed while on a number goes to the box, even with the card's box below a 650 px fold;
+- the first tap moves nothing;
+- the × count-by line reads exactly as ruling (a) asks;
+- every worksheet card draws at 40 px from the start.
+
+Paper still passes at S, M and L.
+
+Four defects remain, two of them Major:
+- **Ruling (b) holds only for add_facts.** On subtraction and on column stacks, a wrong answer under the
+  teacher's touch option **drops the teacher's dots** and draws the start arrow instead (R4-1).
+- **On column stacks, the count line sits under the answer row.** Start again cannot be tapped or clicked
+  (R4-2). The column ladder's touch message is wrong for column work, and its "Touched N" adds every column
+  together (R4-3).
+- **The quiz never shows "Touched N" after a count-all item is answered** (ruling (c), R4-4).
+
+## Gates (head 614178a)
+
+| Gate | Result |
+|---|---|
+| node --input-type=module --check, the 4 changed JS | OK |
+| ws-boot-smoke | OK |
+| ws-touch-tap | OK (real card, worksheet and quiz now included; see R4-6 for what it misses) |
+| ws-touchdots | OK, 2289 / 2289 |
+| ws-support-ladder (default set) | OK |
+| ws-support-ladder `add_facts`, `subtract`, `add_column_multi` with `{"support":["touchall"]}` --shots | OK, but the shots show R4-1 (subtract and column: dots gone at wrong 1) |
+| ws-screen-answer | OK |
+| ws-screen-slots | OK (609 skills, 2436 renders, 0 doubled) |
+| wave1-a-probe, wave1-a2-perbox, wave1-a3-wrongdigits | OK, OK, OK |
+| ws-print-lint --source kit | 463 findings in 33 documents = baseline (not raised) |
+| ws-code-snapshot | OK (608 / 35) |
+| ws-grade-render, touch + touchall, S / M / L | independent, more-practice, guided, review, test and lesson for add_facts, subtract, add_column_multi and mult_facts. Console clean. Pupil pages and keys unchanged since r3. The lesson anchor OVERFLOW is the known out-of-lane item. |
+
+## Merge into claude/sweet-newton-c8wrv1 (f1dae55)
+
+`git merge-tree` is not clean. Two files conflict.
+
+**`css/screen-cell.css`** (the file's last hunk):
+- The lane side is a 3-line comment: "Touch numerals floor … (one rule with the touch-dots floor at the end of this file)".
+- Main's side is the SL-3 block: `.mq-cellbox > input.ib-cell` borderless, and the active-box highlight moved to the box.
+- **Resolve by keeping both:** the lane's comment, then main's SL-3 rules, with no line of either changed.
+  - The lane's touch rules (`.mq-tn-hit`, `.mq-tn-count`) sit further down and merge cleanly.
+
+**`design/audit/runs/wave1-A2/worksheet-add_facts-green-1280.png`** (binary):
+- Take main's copy (`git checkout --theirs`), or re-shoot it.
+
+**`js/modules/active-box.js`** auto-merges with no conflict:
+- The lane's one line is in `selectIfLoose`: `if (ae.matches('.ws-tn[data-mq-tn]')) return;`.
+- Main's `advanceIfFull` and its `input` listener are separate code.
+- Keep both as git merges them.
+
+I resolved the merge this way in a scratch checkout (no commit) and ran the following there:
+
+| Check | Result |
+|---|---|
+| ws-touch-tap | OK |
+| ws-boot-smoke | OK |
+| the place-value critic's `r3-caret-spread.cjs` at 1366 × 650 touch (add_2digit_regroup, add_3digit, sub_3digit, multiply_2by1, unit_form, place_value_disks, add_column_multi) | OK |
+| digits and number taps interleaved on add_column_multi with count-all (card and quiz) | each digit fills a box and the caret moves on: ones, tens, hundreds. A tap between digits never stops the caret move. |
+
+**The box-full caret move is unaffected.**
+
+## Round-3 defects
+
+| Id | Status | Proof (1366 × 650 and 1280 × 600, touch and mouse) |
+|---|---|---|
+| R3-1 keyboard counting taken over | **closed** | Enter / Space on a number: after 1.6 s, focus is still on the number, and the greys equal the presses (card, worksheet, quiz, every case). |
+| R3-2 tap takes the caret | **closed** | After a tap or click on a number, focus stays on the box, and "1" typed lands there (card, worksheet, quiz). A digit typed while a number has keyboard focus also lands in the box. |
+| R3-3 floor on the wrong card | **closed** | Worksheet `--mq-digit` is 40 px on all 6 cards from the start. A wrong answer grows only card 0 (345 → 409 px), which is the ladder message: 42 px plus its gap. The count line (44 px) was already reserved. |
+| R3-4 first tap pushes the page | **closed** for the first tap | Layout diff is empty on every host and input after the first tap and after all taps. See R4-5 for the line arriving with a wrong answer on the card and quiz. |
+| R3-5 stale count after a redraw | **closed** | After a redraw, the line matches the live cell (kept marks give "Touched 2" with 2 greys; dropped marks remove the line). Start again resets the live cell. |
+| R3-6 ladder swaps count-all for count-on | **closed for add_facts only** | add_facts count-all, wrong 1: both numbers keep their dots, and the dot tiles are added. **Open on − and column stacks:** see R4-1. |
+| R3-7 stack targets, "1 touch dot" | **closed** | S1.8 names the stack exception. The label reads "1: 1 touch dot. Tap to count." |
+| R3-8 gate on a synthetic host | **closed** | The gate now drives the real card, worksheet and quiz at 1366 × 650 with touch. It misses R4-1, R4-2 and R4-4 (R4-6). |
+
+## Owner rulings, as built
+
+| Ruling | Card | Worksheet | Quiz |
+|---|---|---|---|
+| (a) × "How much is 9 tens?" then "10, 20, … 90 (counting by tens)" | yes | yes. Up to "12, 24, … 96 (counting by twelves)" wraps to 2 lines inside the reserved 44 px. No growth. | yes |
+| (b) wrong answer keeps the teacher's marks and adds the next support | add_facts yes; **− and column stacks no (R4-1)** | same | same |
+| (c) count-all: greys + Start again only until answered, then "Touched N"; count on / back: "Touched N" | yes | yes (only the answered card shows it) | **no: never shows "Touched N" after answering (R4-4)** |
+| (d) ÷ tally taps a recorded follow-up | recorded in S1.8 | | |
+
+ELL / SPED wording:
+- "How much is 4 threes?", "(counting by threes)", "Touched 7", "Start again" and the count-on, count-back and
+  × ladder lines are short and clear, and each says one action.
+- The exceptions are R4-3 and the nits below.
+
+## Score table (round 4)
+
+| Version | C1 | C2 | C3 | C4 | Pass |
+|---|---|---|---|---|---|
+| Print S / M / L, all roles in scope, pupil + key | 9 | 9 | 9 | 9 | yes |
+| Practice card, 1366 × 650 and 1280 × 600, mouse + touch + keyboard | 7 | 7 | 7 | 8 | **no** (R4-1, R4-2, R4-3, R4-5) |
+| Online worksheet, same | 8 | 7 | 8 | 8 | **no** (R4-1, R4-3) |
+| Quiz, same | 8 | 7 | 7 | 8 | **no** (R4-1, R4-4, R4-5) |
+| Basic 390 (ladder gate shots, card, worksheet, quiz) | no h-scroll, typing works | | | | basic OK (phone polish deferred) |
+
+## Defects (round 4)
+
+**R4-1 · Major · C2 −2 · card, worksheet, quiz. On − and column stacks, a wrong answer removes the teacher's touch dots.**
+
+Measured (all three hosts, both sizes, touch and mouse):
+- `subtract` with the teacher's "count back" (dots on the 4 of 18 − 4) shows "Touched 4" before the answer.
+  - After one wrong answer: "Not yet. Use the arrow, then try again." The 4 is plain, and the numerals count goes 1 → 0 (`out/1366x650-touch-card-subtract-touch-after-wrong.png`, quiz likewise).
+- `add_column_multi` with touch: 4 numerals → 0.
+- `add_column_multi` with touchall: 6 numerals → 0.
+- `subtract` with touchall: the dots are gone at wrong 1 (`ladder/ladder-subtraction-subtract-{card,worksheet}-wrong1-1280.png`, `ladder-addition-add_column_multi-card-wrong1-1280.png`).
+- add_facts is right: its next rung is the dot tiles, and the marks stay.
+
+Cause:
+- `rungsFor` now drops the touch rung, so the first rung is `startarrow`.
+- `redrawKit` rebuilds the cell with `on = had ∪ ids`.
+- On these cells the teacher's touch id is not in `had`: it is read from `ws-supported` / `data-ws-supports` on the kit root. So the redraw draws the arrow alone.
+- `startarrow` and `touchdots` do not clash (SUPPORTS compat table: ✓), so nothing should drop them.
+
+Fix:
+- In `redrawKit`, take the teacher's own supports for this item from `screenSupportsFor` (as `teacherTouches` already does), and union them into `on` before the clash filter.
+- The Say-line should read "Not yet. Now use the arrow too." (the "too" form), because the dots stay.
+
+Proof: the ladder gate with `{"support":["touch"]}` and `{"support":["touchall"]}` on subtract and add_column_multi, at wrong 1 on card, worksheet and quiz:
+- the numerals count is unchanged;
+- the arrow is added.
+
+**R4-2 · Major · C1 −1, C3 −1 · column stacks (card; any host whose stack overflows). Start again sits under the answer row.**
+
+Measured: `add_column_multi` with touch at 1366 × 650 and 1280 × 600.
+- The answer row overflows the bordered cell by 25 px (cell bottom 850, box bottom 875). This overflow is the same on main, so it is pre-existing.
+- The count line goes right after the cell, so the answer boxes cover "Touched N" and the top half of Start again (`out/1366x650-touch-card-add_column_multi-touch-tapped.png`).
+- A tap or a mouse click on Start again's centre lands on a box: greys stay at 10 after Start again, with touch and with mouse.
+
+Fix (either is enough; the first is better):
+- Make the cell hold its answer row (the 25 px overflow).
+- Or place the line below the cell's real content bottom (`max(cell.bottom, last input bottom)`), not as its next sibling.
+- Keep Start again ≥ 44 px and fully uncovered.
+
+Proof: `elementFromPoint` at Start again's centre is the button, and Start again clears the stack on card, worksheet and quiz.
+
+**R4-3 · Major · C2 −2, C4 −1 · add_column_multi touch rung (all hosts). The words do not fit column work.**
+
+The rung's message is built from the first two operands of the whole sum:
+- "Not yet. Say 99. Touch the dots on 17 and count on." for 17 + 73 + 18 + 99;
+- "Say 87. Touch the dots on 43" for 43 + 50 + 87.
+
+Problems:
+- Neither is the problem, and the dots sit on single digits in each column.
+- The count line then says "Touched 27" or "Touched 12", which adds every column together. Column work counts each column separately (S1.8's own stack rule).
+- A pupil cannot act on either line.
+- A "0: 0 touch dots. Tap to count." target is drawn on the 0 of 50. It counts nothing.
+
+Fix:
+- For stacks, use column words: "Not yet. Start with the ones. Touch the dots and count on."
+- In a stack, the count line counts per column. Show the column being touched ("Touched 4") and reset per column, or show greys only.
+- Give no target to a digit with 0 dots.
+
+Answer to "× column stacks keep 'Touched N'?":
+- On screen, no × item is detected as a stack: 2-digit × 1-digit (multiply_2by1, mult_2digit, mult_3digit, mult_zeros) draw the fact cell, so they get the count-by line. That is right.
+- A two-digit dotted factor never gets the touch rung (12 × 11, 12 × 12 fall to the sign), so no count-by is ever short.
+- A true × stack would fall to "Touched N" by `modeOf`. Today none is drawn.
+
+**R4-4 · Minor · C2 −1 · quiz. Ruling (c) is not met: count-all never shows "Touched N" after answering.**
+
+Measured:
+- Quiz with touchall on add_facts: all marks touched, then a wrong answer (`submitQuizTextAnswer`).
+- Feedback "Not yet. Use the dot tiles, then try again." is shown, but the line stays empty at 1366 and 1280.
+
+Cause: `words()` looks for `ANSWERED`, `.mq-ladder-card` or `#feedbackArea.mq-ladder-feedback`. The quiz marks its answer in `.qt-feedback` and none of those.
+
+Fix: count the quiz's own answered state, for example a non-empty `.qt-feedback` in the same `.qt-question-card`, or the ladder entry for that question.
+
+Proof: the same run shows "Touched 10" on the quiz after the wrong answer.
+
+**R4-5 · Minor · C3 −1 · card and quiz (ladder only, no teacher option). A wrong answer adds the count line as well as the message.**
+
+Measured:
+- Quiz add_facts: card 367 → 467 px at wrong 1, and Next 665 → 765. Of the 100 px, 44 px is the new count line; the rest is the message and the touch numeral.
+- The practice card does the same.
+- The worksheet reserves the line from the start (R3-3 fix), so only its message grows.
+
+S1.8 says the line's space is reserved in every cell "whose ladder can draw them". That holds only on the worksheet.
+
+Fix (do not reserve 44 px on every card at 650 px height; Check is already below the fold):
+- Put the count line on the ladder message's own row (one row: message, then count, then Start again).
+- Or put it on the card's Hint / Read row.
+
+Either way only the ladder's message line grows.
+
+**R4-6 · Minor · C4 −1 · the gate.** `ws-touch-tap` passes with R4-1, R4-2 and R4-4 present. Add these cases:
+- `subtract` and `add_column_multi` with the teacher's touch: wrong 1 keeps the numerals;
+- a stack: Start again is hit-testable at its centre and clears;
+- a quiz with count-all: "Touched N" appears after an answer.
+
+**Nits (not scored):**
+- "How much is 1 sixes?" is singularised by stripping a final s, so 1 × 6 with dots on the 1 reads "How much is 1 sixe?". Use a singular list.
+- Past twelve the plural is "70s" / "100s": "How much is 7 70s?" reads poorly. "How much is 7 groups of 70?" is clearer for ELL.
+- A count-by line of 9 × 100 on a worksheet card ("100, 200, … 900 (counting by 100s)") may need 3 lines. That is more than the reserved 44 px, so the card would grow mid-count. Cap the line at 2 lines, or show the last three counts.
+- "Start again" wraps to two lines inside its button when the × line is long on a 336 px card. Set `white-space: nowrap` on the button.
+
+## What would raise each screen host to 8+
+
+Fix R4-1 to R4-4, take R4-5's one-row placement, and add R4-6's cases to the gate. Then resolve the merge as above. Paper needs nothing.
