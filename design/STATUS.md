@@ -68,6 +68,7 @@ below; this file only points to them.
 
 | Ruling | Recorded in |
 |---|---|
+| 2026-10-09: printed problems are numbered by default (CL-30 tab); letters only for the parts / steps / sub-questions inside one problem | `WORKSHEET_DESIGN_STANDARD.md` CL-9a |
 | 2026-10-09: dot arrays much smaller, 4-8 per page by size (L 4-6, M 6, S 8); number-family pages without wasted white space (L 6, M 8, S 8-12), on every page type; dots stay countable (~3 mm S / ~4 mm L floor), boxes >= 6 mm | Lane D round 9 brief; `design/audit/runs/wave1-D/critic.md` |
 | 2026-10-09: 3 x 10 allowed for short one-line single-skill pages at S if it looks good; a page with more than 26 items numbers every item 1-N (no letter/number mix) | `WORKSHEET_DESIGN_STANDARD.md` CL-2b |
 | 2026-10-09: 2 x 9 / 2 x 10 grids allowed on a single-skill page capped by its own distinct problems, "as long as it looks good" (critic 8+) | `WORKSHEET_DESIGN_STANDARD.md` CL-2a |
