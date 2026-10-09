@@ -2887,6 +2887,30 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     return f;
 }
 
+/**
+ * critic r6 D6-3: cap the height of a dot-array cell on a grid host (the online worksheet). The
+ * array scales to its column's width, so a tall one (9 x 4) made a 535 px cell and left its
+ * row-mate a 290 px white band. The array alone is narrowed (as a percentage of its parent, so the
+ * same at any zoom the digit fit applied) until the whole cell `root` is no taller than `maxPx`;
+ * it never shrinks below `floor` of its drawn size, so the dots stay well above the counting floor.
+ */
+export function capDotArrays(root, maxPx = 420, floor = 0.6) {
+    if (!root || typeof document === 'undefined') return;
+    const svgs = Array.from(root.querySelectorAll('svg.mq-dotarray, svg[aria-label="array of dots"]'));
+    svgs.forEach((svg) => {
+        if (svg.dataset.mqCapMw == null) svg.dataset.mqCapMw = svg.style.maxWidth || '';
+        svg.style.maxWidth = svg.dataset.mqCapMw;
+    });
+    if (svgs.length !== 1) return;
+    const svg = svgs[0];
+    const over = root.getBoundingClientRect().height - maxPx;
+    const r = svg.getBoundingClientRect(), pr = svg.parentElement && svg.parentElement.getBoundingClientRect();
+    if (!(over > 0) || !r.height || !pr || !pr.width) return;
+    const k = Math.max(floor, (r.height - over) / r.height);
+    svg.style.setProperty('max-width', (100 * (r.width / pr.width) * k).toFixed(2) + '%');
+    svg.style.setProperty('height', 'auto');
+}
+
 // Answer types whose drawing is a live widget (drag, build, plot) or a screen twin already drawn
 // at the digit size: never scaled as a picture.
 const NO_FIT_TYPES = new Set([
