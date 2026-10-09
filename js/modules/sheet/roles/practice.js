@@ -839,16 +839,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
             // the size the stacks use, never the fact ladder's 28 pt beside 16 pt stacks at S. The
             // item's own question carries it (`pt`), so the pupil page, the key and the screen-free
             // measurement draw the same fact; never below the metric (content never shrinks).
-            const tplOf = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
-            const metricPt = (SIZES[size] || SIZES[DEFAULT_SIZE]).digitPt;
-            if (fs.fine.some((it) => tplOf(it) === 'stack') && fs.fine.some((it) => tplOf(it) === 'fact')) {
-                for (const it of fs.fine) {
-                    const q = it.q;
-                    const pl = q && q.cell && q.cell.payload;
-                    if (tplOf(it) !== 'fact' || !pl || pl.pt || pl.notation === 'horiz' || pl.notation === 'horizontal') continue;
-                    q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, pl, { pt: metricPt }) });
-                }
-            }
+            oneDigitSize(fs.fine, size);
             const at = sections.length;
             sections.push(Object.assign({}, sec));
             items.push(fs.mid);
@@ -872,7 +863,31 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1 }));
         items.push(wide);
     });
+    // Round 9 (critic r7 D7-4): the same one digit size in EVERY grid that holds a stack, not only
+    // the split-off column-work group (mixed_addition S: "14 + 6" at 10 mm beside 4.5 mm stacks in
+    // an ordinary row of a page that did not split).
+    for (const list of items) oneDigitSize(list, size);
     return { norm: Object.assign({}, norm, { sections }), items };
+}
+
+/**
+ * Round 8 (critic r6 D6-1) / round 9 (D7-4): ONE digit size where facts share a grid with stacks.
+ * A vertical fact dealt beside stacks (a mixed pool's 4 + 2 among 3117 + 2947) is drawn at the
+ * size's digit metric, the size the stacks use, never the fact ladder's 28 pt beside 16 pt stacks
+ * at S. The item's own question carries it (`pt`), so the pupil page and the key draw the same
+ * fact; never below the metric (content never shrinks). A horizontal fact is a sentence, not a
+ * column, and keeps its size.
+ */
+function oneDigitSize(list, size) {
+    const tplOf = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
+    if (!Array.isArray(list) || !list.some((it) => tplOf(it) === 'stack') || !list.some((it) => tplOf(it) === 'fact')) return;
+    const metricPt = (SIZES[size] || SIZES[DEFAULT_SIZE]).digitPt;
+    for (const it of list) {
+        const q = it.q;
+        const pl = q && q.cell && q.cell.payload;
+        if (tplOf(it) !== 'fact' || !pl || pl.pt || pl.notation === 'horiz' || pl.notation === 'horizontal') continue;
+        q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, pl, { pt: metricPt }) });
+    }
 }
 
 /**

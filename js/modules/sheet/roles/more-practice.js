@@ -41,7 +41,7 @@ export function plan(input = {}) {
         if (!it || !it.q || it.anchor) return true;
         const g = groupKey(it);
         if (!seen.has(g)) seen.set(g, new Set());
-        const sig = itemSignature(it);
+        const sig = it.sig || itemSignature(it);   // the host's own identity (print-sheet.js signature), else the kit's
         if (seen.get(g).has(sig)) { cut.add(g); return false; }
         seen.get(g).add(sig);
         return true;

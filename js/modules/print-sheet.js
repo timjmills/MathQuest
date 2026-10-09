@@ -30,7 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
+import { composePractice, renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
@@ -155,8 +155,12 @@ function normaliseRequest(req = {}) {
 
 /* ======================================================================= generation */
 
-/** A question's identity for de-duplication: what the pupil would see as "the same problem". */
-function signature(q) {
+/**
+ * A question's identity for de-duplication: what the pupil would see as "the same problem".
+ * Exported, and stamped on every host item as `sig` (round 9): the kit's More Practice role reads
+ * `it.sig` rather than keeping a copy of this rule (the kit may not import the app, SCC-01).
+ */
+export function signature(q) {
     // A template that knows when two items are the same problem in another order (a number
     // family: 4, 5, 20 = 5, 4, 20; critic r5 D5-1) supplies an order-free `dedupeKey`.
     try {
@@ -2219,6 +2223,7 @@ async function buildSheetDeal(req = {}) {
     }
 
     if (mpLetter) for (const it of hostItems) it.letter = mpLetter;
+    for (const it of hostItems) if (it && it.q && !it.sig) it.sig = signature(it.q);
 
     // S6: attach the worked examples - never one of the pupil's problems (signatures differ).
     let anchorsIn = null;
@@ -2262,7 +2267,10 @@ async function buildSheetDeal(req = {}) {
         tabId: n.tabId || '',
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
     };
-    const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    // (round 9) one letter dealt by the Independent page's rules (`_mpLetter`) is composed as that page is: the deal
+    // already holds distinct problems in whole rows, and buildSheet checks the printed page; the role's
+    // own re-fit is for letters dealt from the first letter's sample (several skills, worked examples)
+    const plan = mpLetter ? composePractice('more-practice', input) : n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -2868,7 +2876,7 @@ async function buildSheetCounted(req) {
  * Practice) is filled by `poolPage` instead.
  */
 async function buildSheetInner(req = {}) {
-    if (morePracticePool(req)) return buildMorePracticePool(req);
+    if (morePracticeByLetter(req)) return buildMorePracticeLetters(req);
     if (autoPoolPage(req)) return poolPage(req);
     const r = await buildSheetFill0(req);
     // (round 6, critic r5 D5-5) PG-15: a short last row is never left as an empty area. grid.js
@@ -3032,8 +3040,9 @@ const POOL_MIN_ITEMS = 3;
  * Round 9 (critic r7 D7-2): the search is a FIXED budget of deals, never a wall-clock limit, so the
  * same request always prints the same page. Each deal now costs about 0.1-0.3 s in this container
  * (batched, remembered cell measures), and a deal fills far more often (the slot redraw and the
- * column-work group below), so the budget keeps a pool page's build p90 under 5 s and its maximum
- * near 8 s while every page it keeps passes the printed-page check.
+ * column-work group in buildSheetDeal), so a passing deal is found within the first few: measured
+ * over 1000 pool builds (5 pools x S/L x Independent/More Practice x 50 seeds) the latest was deal
+ * 11, and ws-sheet-timing holds the build to p90 <= 5 s, max <= 10 s.
  */
 const POOL_DEALS = 16;
 /** D7-3: a page whose deals all failed is never kept with a band, a strip or under three problems
@@ -3043,7 +3052,7 @@ const POOL_DEALS_WIDE = 28;
 const POOL_SLOT_TRIES = 6;
 
 /** Is this request an Auto-count page of ONE mixed pool (mixed_*, *_all): an Independent page, or
- *  one letter of a More Practice pool page (`_mpLetter`, buildMorePracticePool)? */
+ *  one letter of a More Practice pool page (`_mpLetter`, buildMorePracticeLetters)? */
 function autoPoolPage(req) {
     const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
     const secs = Array.isArray(req.sections) ? req.sections : [];
@@ -3054,11 +3063,46 @@ function autoPoolPage(req) {
     return isMixedMetaSkill(id) || /_all$/.test(id);
 }
 
-/** A More Practice request of one mixed pool, Auto count, no worked examples (its letters are dealt one by one). */
-function morePracticePool(req) {
+/** A More Practice request of ONE skill, Auto count, no worked examples: its letters are dealt one by one. */
+function morePracticeByLetter(req) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     if (asked !== 'more-practice' || req._mpLetter || (req.anchors && req.anchors !== 'off')) return false;
-    return autoPoolPage(Object.assign({}, req, { role: 'independent' }));
+    const secs = Array.isArray(req.sections) ? req.sections : [];
+    const s = secs[0];
+    if (secs.length !== 1 || !s || (s.skills || []).length !== 1) return false;
+    return s.count === undefined || s.count === null || s.count === 'auto' || s.count === '';
+}
+
+/** How many derived deals a single-skill More Practice letter tries before it keeps its best. */
+const LETTER_DEALS = 4;
+
+/**
+ * Round 9 (orchestrator, after critic r7 D7-1): a single-skill More Practice letter is dealt as
+ * the Independent page is (buildSheetFill0: the count fills the page, whole rows, the skill's
+ * distinct problems), under the letter's own seed - never from the FIRST letter's sample, which let
+ * a later letter dealt taller problems (dot arrays) run onto a second side. A letter that still
+ * prints on two sides or fails the printed-page check is dealt again from a derived seed (seed +
+ * k x 7919, reproducible), LETTER_DEALS deals at most; the best is kept: one side first.
+ */
+async function letterPage(req) {
+    const base = Number(req.seed) >>> 0;
+    const blank = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+    const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+    const rank = (x, q) => [x.pageCount <= 1 ? 1 : 0, blank(x) || dupOf(x) ? 0 : 1, -q.bands, q.fill >= POOL_FILL_FLOOR ? 1 : 0, q.fill];
+    const better = (a, b) => { for (let i = 0; i < a.length; i++) { const t = i === a.length - 1 ? 0.01 : 0; if (a[i] > b[i] + t) return true; if (a[i] < b[i] - t) return false; } return false; };
+    let best = null, bestRank = null;
+    const tried = [];
+    for (let k = 0; k < LETTER_DEALS; k++) {
+        const x = await buildSheetFill0(Object.assign({}, req, { seed: k ? (base + k * 7919) >>> 0 : base }));
+        if (!x || !Array.isArray(x.items)) continue;
+        await nextTask();
+        const q = poolQuality(x);
+        tried.push(`${k}:${x.items.length}/${x.pageCount}p/${q.fill.toFixed(2)}${q.bands ? `/b${q.bands}` : ''}`);
+        if (x.pageCount <= 1 && q.ok && !blank(x) && !dupOf(x)) { x.pool = { deal: k, passed: true, tried }; return x; }
+        const rk = rank(x, q);
+        if (!best || better(rk, bestRank)) { best = x; bestRank = rk; best.pool = { deal: k, passed: false, tried }; }
+    }
+    return best;
 }
 
 /**
@@ -3070,13 +3114,17 @@ function morePracticePool(req) {
  * filled and checked exactly as an Independent pool page, and the letters are joined into one
  * sheet in order (each keeps its own header, Score and "1/1" footer, PT-MPR-1).
  */
-async function buildMorePracticePool(req) {
+async function buildMorePracticeLetters(req) {
     const s = req.sections[0];
     const asked = Array.isArray(req.letters) ? req.letters.map((l) => String(l).toUpperCase()).filter((l) => l.length === 1 && LETTERS.includes(l)) : [];
     const letters = asked.length ? asked : LETTERS.slice(0, Math.max(1, Math.min(LETTERS.length, Number(s.pages) || 1))).split('');
     const seed = Number.isFinite(Number(req.seed)) && req.seed !== null && req.seed !== '' ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
     const parts = [];
-    for (const L of letters) parts.push(await poolPage(Object.assign({}, req, { seed, letters: [L], _mpLetter: true })));
+    const pool = autoPoolPage(Object.assign({}, req, { role: 'independent' }));
+    for (const L of letters) {
+        const one = Object.assign({}, req, { seed, letters: [L], _mpLetter: true });
+        parts.push(await (pool ? poolPage(one) : letterPage(one)));
+    }
     return mergeLetterSheets(parts, seed);
 }
 
@@ -3166,7 +3214,8 @@ async function buildSheetFill0(req = {}) {
     try {
         const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
         const secs = Array.isArray(req.sections) ? req.sections : [];
-        if (asked !== 'independent' || secs.length !== 1 || (secs[0].skills || []).length !== 1 || !Array.isArray(r.items)) return r;
+        // (round 9) one letter of a single-skill More Practice page is filled as an Independent page
+        if (!(asked === 'independent' || (asked === 'more-practice' && req._mpLetter)) || secs.length !== 1 || (secs[0].skills || []).length !== 1 || !Array.isArray(r.items)) return r;
         const s = secs[0];
         if (s.count !== undefined && s.count !== null && s.count !== 'auto' && s.count !== '') return r;
         const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
