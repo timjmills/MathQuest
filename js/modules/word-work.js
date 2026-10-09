@@ -135,8 +135,16 @@ export function workHint(p) {
         const prev = i > 0 ? steps[i - 1].ans : undefined;
         const yours = `your Step ${i} answer`;
         let a = st.top, b = st.bottom, aPrev = false, bPrev = false;
-        if (prev !== undefined && String(a) === String(prev)) { a = yours; aPrev = true; }
-        else if (prev !== undefined && String(b) === String(prev)) { b = yours; bPrev = true; }
+        // the previous result is identified by position (st.prevSide when the generator gives
+        // it, else the first operand equal to it), so a same-valued own number never leaks it
+        const side = st.prevSide || (prev === undefined ? null : String(a) === String(prev) ? 'top' : String(b) === String(prev) ? 'bottom' : null);
+        if (side === 'top') { a = yours; aPrev = true; }
+        else if (side === 'bottom') { b = yours; bPrev = true; }
+        // the other operand equals the previous result too: naming it would print the Step 1 answer
+        if (side && String(st.top) === String(st.bottom)) {
+            const W = { '+': 'Add your Step N answer to itself', '-': 'Subtract your Step N answer from itself', '*': 'Multiply your Step N answer by itself', '/': 'Divide your Step N answer by itself' };
+            if (W[st.op]) return `${pre}${W[st.op].replace('N', String(i))}.`;
+        }
         switch (st.op) {
             case '+': return (aPrev || bPrev) ? `${pre}Add ${aPrev ? b : a} to ${aPrev ? a : b}.` : `${pre}Add ${a} and ${b}.`;
             case '-': return `${pre}Subtract ${b} from ${a}.`;

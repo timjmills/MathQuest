@@ -1446,7 +1446,8 @@ function _wsRenderCard(grid, q, i) {
     // Generate hint content with visual if available
     const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
     const baseHint = q.hint || 'Think about this problem step by step.';
-    const opHint = _wsOpHint(q);
+    // the popup title already carries the bulb: the note under it does not repeat it
+    const opHint = String(_wsOpHint(q) || '').replace(/^💡\s*/, '');
     let hintText = opHint
         ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
         : baseHint;
