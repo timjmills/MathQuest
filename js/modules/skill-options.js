@@ -148,6 +148,7 @@ export const levelOption = (dflt = 1) => ({
         { v: 0, l: '0 — nothing given' },
     ],
     allLabel: 'All four, fading down the page',
+    tip: 'Support level: how much help each problem prints (3 most, 0 none). Several fade down the page.',
     help: 'Tick one level for a page that stays at it, or several to fade across the page — most '
         + 'support first, least last. Structural supports stay at every level; hint supports fade.',
 });
@@ -1291,6 +1292,7 @@ const _cbPercent = (dflt, { nullLabel = null, help } = {}) => ({
     values: [...(nullLabel ? [{ v: null, l: nullLabel }] : []),
         ...[20, 50, 70, 80, 90, 100].map(v => ({ v, l: `${v}%` }))],
     help: help || 'How many of the numbers the pupil writes. The first number is always printed.',
+    tip: 'Numbers left blank: what share of the boxes the pupil fills in.',
 });
 const _cbTables = (from, label, titleVerb, help) => ({
     id: 'constant', label, type: 'set', group: 'difficulty',
@@ -1305,6 +1307,7 @@ const _cbShape = (dflt) => ({
     values: [{ v: 'box', l: 'Boxes' }, { v: 'circle', l: 'Circles' }, { v: 'hex', l: 'Hexagons' },
         { v: 'mixed', l: 'Circles and hexagons (younger pupils)' }],
     help: 'The outline each number is written in. Outlines only, black and white; every shape is big enough to write in.',
+    tip: 'The outline each number is written in.',
 });
 const _chartBand = (dflt) => _opsBand([25, 36, 100, 144], dflt, {
     label: 'Chart size', labels: { 25: '5 × 5', 36: '6 × 6', 100: '10 × 10', 144: '12 × 12' },
@@ -1356,6 +1359,16 @@ const CB_CHART_LINE_OPTIONS = {
             // Wave 1 lane C2 (owner 2026-10-02): the teacher builds the page's rows. It REPLACES the old "Tables" tick list
             // (the old `constant`, kept hidden so every old link still decodes, folded into this list below).
             id: 'rows', label: 'Count-bys on the page', type: 'rows', default: [], group: 'difficulty',
+            tip: 'The rows on the page: which numbers to count by. They stand smallest to biggest unless you move them.',
+            // the short explanation of each part of a row (owner 2026-10-03), shown on mouse-over
+            parts: {
+                step: 'Step: how much each jump adds (or takes away).',
+                start: 'Start: the first number in the row; 0 starts the count at zero.',
+                at: 'The number the row starts at.',
+                dir: 'Up counts on (3, 6, 9 ...); down counts back towards 0.',
+                move: 'Move this row up or down the page. Moving rows keeps your order.',
+                custom: 'Type any step (7, 15, 25, 250 ...) and press Add.',
+            },
             helpShort: 'Tap tables 1 to 12 or type any step; each row has its own start and direction.',
             help: 'Choose the rows the page deals: tap any of the tables 1 to 12, or type any other step (7, 15, 25, 250, 1,000 up to 100,000) and add it. '
                 + 'Each row has its own start (the step itself, 0, or a number you type: by 5 from 3 is 3, 8, 13 …) and its own direction (on, or back down towards 0, never below 0). Every row holds the full 12 numbers, in two lines of 6, so a back row whose start is too small is raised to the smallest start that works, keeping its ones digit (12 down by 5 starts at 57), and the panel says so beside the row). '
@@ -1368,6 +1381,7 @@ const CB_CHART_LINE_OPTIONS = {
         {
             // Wave 1 lane C (owner, overdue): the first two numbers print so the pupil can SEE the step.
             id: 'fill', label: 'Numbers printed to start', type: 'enum', default: 'two', group: 'support',
+            tip: 'How many numbers at the start of each row are already printed for the pupil.',
             values: [{ v: 'two', l: 'The first two (shows the step)' }, { v: 'one', l: 'The first one only' },
                 { v: 'half', l: 'Half of them (50 % filled, the first two and others spread along the row)' }],
             help: 'The first two numbers are printed so the pupil can see how much each jump adds; "Numbers left blank" then applies to the rest. '
@@ -1377,6 +1391,7 @@ const CB_CHART_LINE_OPTIONS = {
         _cbPercent(50),
         {
             id: 'times', label: 'Multiplication under each number', type: 'enum', default: 'none', group: 'support',
+            tip: 'A hint: the multiplication fact under each number (2 × 5 under 10).',
             helpShort: 'A hint: the fact that makes each number (2 × 5 under 10). Fade it; off on tests.',
             values: [{ v: 'none', l: 'None' }, { v: 'each', l: 'Under every number (1 × 4, 2 × 4, 3 × 4 …)' },
                 { v: 'given', l: 'Under the printed numbers only' }],
@@ -1389,6 +1404,7 @@ const CB_CHART_LINE_OPTIONS = {
         {
             // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
             id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
+            tip: 'Print every row once, each on one line, on a single sheet.',
             helpShort: 'Independent, More practice and Test pages: your rows (or the tables 1 to 12) once each on one compact sheet, as many as fit.',
             help: 'Independent, More practice and Test pages (the other page types keep their own layout). Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
                 + 'With rows chosen it is those rows, in order, as many as the paper holds (a row of very wide numbers takes two lines of six, so fewer fit; the panel says how many on Letter and on A4). '
@@ -1396,6 +1412,7 @@ const CB_CHART_LINE_OPTIONS = {
         },
         {
             id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'more',
+            tip: 'How many numbers each row holds.',
             helpShort: 'How many numbers a row holds: 12 or 15.',
             values: [{ v: 12, l: '12 numbers (two lines of 6)' }, { v: 15, l: '15 numbers (three lines of 5)' }],
             help: 'How many numbers a row holds: 12 (two lines of 6, the table to × 12) or 15 (three lines of 5, on to × 15). A row that starts at 0 holds the same count, one multiple shorter at the top.',
@@ -1404,6 +1421,7 @@ const CB_CHART_LINE_OPTIONS = {
         },
         {
             id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'more',
+            tip: 'Rows in the order listed, or shuffled.',
             helpShort: 'Deal the rows as listed, or shuffled.',
             values: [{ v: 'inorder', l: 'In order (as listed; the tables smallest first)' }, { v: 'mixed', l: 'Mixed' }],
             help: 'In order deals your rows as you listed them (the tables 2 to 12 smallest first when none are chosen); mixed shuffles them, every row once before any repeats.',
@@ -1411,6 +1429,17 @@ const CB_CHART_LINE_OPTIONS = {
             summary: (v) => (v === 'mixed' ? 'Mixed order' : 'In order'),
         },
         { ..._cbShape('box'), group: 'more', summary: (v) => ({ box: 'Boxes', circle: 'Circles', hex: 'Hexagons', mixed: 'Circles and hexagons' }[v] || v) },
+        {
+            // Owner 2026-10-03: "if we want to fit more (using the small) change from boxes to just the bare line" - ____ -> ____ -> ____.
+            // An owner exception to SL-3 (WORKSHEET_DESIGN_STANDARD.md), count rows only.
+            id: 'spaces', label: 'Answer spaces', type: 'enum', default: 'box', group: 'more',
+            values: [{ v: 'box', l: 'Boxes' }, { v: 'line', l: 'Lines (fit more on a page)', tip: 'A bare write-on line for each missing number; rows are shorter and hold 12 numbers on one line where they fit.' }],
+            tip: 'Lines fit more on a page; boxes show pupils exactly where to write.',
+            helpShort: 'Lines fit more on a page; boxes show pupils exactly where to write.',
+            help: 'Lines fit more on a page; boxes show pupils exactly where to write. With lines each missing number is a bare write-on line as wide as a box, '
+                + 'the row has no box height, and a row holds its 12 numbers on ONE line wherever the width allows (two lines of 6 for very wide numbers). Box shapes do not apply to lines.',
+            summary: (v) => (v === 'line' ? 'Lines' : 'Boxes'),
+        },
     ],
     'patterns:number_patterns_rule': [
         {
@@ -3381,6 +3410,7 @@ _ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) =
 export const calculatorOption = () => ({
     id: 'calculator', label: 'Calculator', type: 'bool', default: false,
     help: 'Show the pupil a calculator button on this skill. Off unless you turn it on.',
+    tip: 'Calculator: give the pupil a calculator button while practising.',
     group: PLAY_GROUP, summary: (v) => (v ? 'Calculator on' : 'Calculator off'),
 });
 // `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
@@ -3388,6 +3418,7 @@ export const calculatorOption = () => ({
 export const skipAfterOption = () => ({
     id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
     help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
+    tip: 'Skip: how many wrong tries before the pupil may skip a question (0 = never).',
     group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
 });
 export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];

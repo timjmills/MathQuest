@@ -9,6 +9,11 @@ typing works); phone-only polish is deferred to a later phone pass and listed be
 
 **Stretch / thinking pages (owner 2026-10-09):** not built, fixed or graded until after Wave 8 (lessons) — `MASTER_PLAN.md` Wave 9. Lanes and critics skip them.
 
+**Owner answers 2026-10-09 (evening):** count-by Lines at M and L — every row two lines of 6 with ~14 mm writing lines (one rhythm);
+ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; one-page Boxes 9s–12s rows may stay slightly uneven at
+14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
+the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
+
 ### Phone pass (deferred)
 - Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
   ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
@@ -19,6 +24,7 @@ typing works); phone-only polish is deferred to a later phone pass and listed be
 - four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
 - count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
 - add_three overflow at 390 (Lane B R5) unless the page itself overflows
+- count rows, Answer spaces: Lines, card at 390 (critic countby-arrows r1 D1/D7): check the next-box yellow and right/wrong tints never cover a jump arrow at phone width (the input is now clamped to its drawn line; Chromebook hosts measure 0 overlaps)
 
 ## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
 
