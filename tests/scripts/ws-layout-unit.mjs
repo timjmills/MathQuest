@@ -323,7 +323,9 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     eq(r.pupilPages.map(cellsOf), [6, 6, 4, 4], 'PG-23 through the role: 6 / 6 / 4 / 4');
     const gridStyles = (html) => (html.match(/<div class="ws-grid[^"]*" style="[^"]*"/g) || []);
     eq(r.pupilPages.map(gridStyles), r.keyPages.map(gridStyles), 'AK-1: every grid has the same geometry on the key');
-    ok(/data-ws-label="letter">g\.<\/span>/.test(r.pupilPages[1]) && !/>a\.<\/span>/.test(r.pupilPages[1]), 'CL-12: page 2 of an Independent run starts at g.');
+    // CL-9a (owner 2026-10-09): problems are numbered by default; the run still carries on across pages (CL-12).
+    ok(/data-ws-label="tab">7<\/span>/.test(r.pupilPages[1]) && !/data-ws-label="tab">1<\/span>/.test(r.pupilPages[1]), 'CL-12 / CL-9a: page 2 of an Independent run starts at 7');
+    ok(!/data-ws-label="letter"/.test(r.pupilPages.join('')), 'CL-9a: no problem is lettered by default');
     ok(r.pupilPages[1].includes('class="mq-cont"'), 'HD-20: pages 2+ carry the continuation header');
     ok(!/ws-field date/.test(r.pupilPages[1]) && !/ws-title/.test(r.pupilPages[1]), 'HD-20: no Date and no title on a continuation page');
     ok(/data-ws-instruction="add">Add\.<\/div>/.test(r.pupilPages[3]), 'PG-22: the instruction repeats on every page');
@@ -363,7 +365,7 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     eq(p.meta.scoreOutOf, [6, 6, 4, 4], 'PT-MPR-1: each letter has its own Score');
     eq(p.sheets.map((s) => s.seed), ['A', 'B', 'C', 'D'].map((L) => letterSeed(42, L)), 'PT-MPR-2: each letter has its own seed');
     const r = renderPlan(p);
-    ok(r.pupilPages.every((pg) => /data-ws-label="letter">a\.<\/span>/.test(pg)), 'PT-MPR-1: every letter starts at a.');
+    ok(r.pupilPages.every((pg) => /data-ws-label="tab">1<\/span>/.test(pg)), 'PT-MPR-1 / CL-9a: every letter starts at problem 1');
     ok(r.pupilPages.every((pg) => /<b>1\/1<\/b>/.test(pg)), 'PT-MPR-1: each letter is a one-page sheet (1/1)');
     ok(r.pupilPages.every((pg) => !pg.includes('class="mq-cont"')), 'PT-MPR-1: no letter carries a continuation header');
     ok(r.keyPages.length === 4 && r.keyPages.every((pg) => /Key · Form A · seed \d+/.test(pg)), 'AK-3: one key per letter, with its seed');

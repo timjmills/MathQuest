@@ -138,7 +138,9 @@ export const LOOKS = Object.freeze({
         cellBorderPt: STROKE.hair,   // 0.75 pt, shared
         trackEm: 0.72,               // TY-20
         rowGapMm: 0,                 // gap between operand rows
-        label: 'letter',             // CL-10 quiet lowercase letter
+        // CL-9a (owner 2026-10-09): problems are numbered by default (CL-30 tab) in every look;
+        // letters label only the parts inside one problem, or a section the teacher sets to letters (CL-20).
+        label: 'tab',
         autoColsStacked: 2,
     }),
     daily: Object.freeze({
