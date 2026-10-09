@@ -68,6 +68,7 @@ below; this file only points to them.
 
 | Ruling | Recorded in |
 |---|---|
+| 2026-10-09: 3 x 10 allowed for short one-line single-skill pages at S if it looks good; a page with more than 26 items numbers every item 1-N (no letter/number mix) | `WORKSHEET_DESIGN_STANDARD.md` CL-2b |
 | 2026-10-09: 2 x 9 / 2 x 10 grids allowed on a single-skill page capped by its own distinct problems, "as long as it looks good" (critic 8+) | `WORKSHEET_DESIGN_STANDARD.md` CL-2a |
 | Lessons one size; Practice / Mixed honour S/M/L, an item that can't shrink keeps its size | `LESSON_LIBRARY_PLAN.md` §8a |
 | Every lesson opens with a 3–4 question prerequisite check that routes a struggling pupil to the prerequisite lesson | §8b |
