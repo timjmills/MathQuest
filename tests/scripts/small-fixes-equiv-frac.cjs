@@ -13,7 +13,7 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const OUT = arg('out', path.join(require('os').tmpdir(), 'small-fixes-equiv-frac'));
 const [C, K] = arg('skill', 'fractions:equivalent_fractions').split(':');
-const VIEWPORTS = [[1366, 650], [1280, 600]];
+const VIEWPORTS = [[1366, 650], [1280, 600], [390, 844]];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -33,6 +33,21 @@ async function typeFrac(page, sel, value) {
     }
     return '';
 }
+
+// D3 (critic r1): each answer box >= 48 px tall, >= 44 px wide, and its digits at least as big as
+// the given fraction's numerator digits; no horizontal page overflow.
+async function sizes(page, sel) {
+    return page.evaluate((sel) => {
+        const root = document.querySelector(sel);
+        const given = root && root.querySelector('.frac .num');
+        const gpx = given ? parseFloat(getComputedStyle(given).fontSize) : 0;
+        const boxes = root ? Array.from(root.querySelectorAll('input.mq-cellslot')).map(i => { const r = i.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), f: parseFloat(getComputedStyle(i).fontSize) }; }) : [];
+        const over = document.documentElement.scrollWidth > innerWidth + 1;
+        return { gpx, boxes, over };
+    }, sel);
+}
+function sizeOk(z) { return z.boxes.length === 2 && z.gpx > 0 && !z.over && z.boxes.every(b => b.h >= 48 && b.w >= 44 && b.f >= z.gpx); }
+const sizeStr = z => `boxes ${z.boxes.map(b => `${b.w}x${b.h}@${b.f}px`).join(' ')}, given ${z.gpx}px${z.over ? ', OVERFLOW' : ''}`;
 const closePopups = (page) => page.evaluate(() => {
     Array.from(document.body.querySelectorAll('*')).filter(e => { const cs = getComputedStyle(e); return cs.position === 'fixed' && Number(cs.zIndex) >= 1000 && e.getBoundingClientRect().width > innerWidth * 0.6 && e.getBoundingClientRect().height > innerHeight * 0.6; }).forEach(e => { e.style.display = 'none'; });
 });
@@ -60,6 +75,8 @@ const closePopups = (page) => page.evaluate(() => {
             await sleep(500);
             const val = kind === 'right' ? ans : wrongOf(ans);
             const before = await page.evaluate(() => window.state.score || 0);
+            const zc = await sizes(page, '#questionPaper');
+            report('card', vp, 'size', sizeOk(zc), sizeStr(zc));
             let err = await typeFrac(page, '#questionPaper', val);
             if (!err) {
                 await sleep(150);
@@ -82,6 +99,8 @@ const closePopups = (page) => page.evaluate(() => {
             await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1' && document.fonts.status === 'loaded'; }, { timeout: 30000 });
             await sleep(1200);
             const wsAns = await page.evaluate(() => window.state.worksheetQs.map(q => String(q.ans)));
+            const zw = await sizes(page, '#ws_card_0 .ws-cell');
+            report('worksheet', vp, 'size', sizeOk(zw), sizeStr(zw));
             err = '';
             for (let i = 0; i < wsAns.length && !err; i++) {
                 err = await typeFrac(page, `#ws_card_${i} .ws-cell`, i === 0 && kind === 'wrong' ? wrongOf(wsAns[0]) : wsAns[i]);
@@ -115,6 +134,8 @@ const closePopups = (page) => page.evaluate(() => {
             }, C, K);
             await sleep(600);
             const qVal = kind === 'right' ? qAns : wrongOf(qAns);
+            const zq = await sizes(page, '#quizTakeView .qt-cell');
+            report('quiz', vp, 'size', sizeOk(zq), sizeStr(zq));
             err = await typeFrac(page, '#quizTakeView .qt-cell', qVal);
             if (!err) {
                 await page.keyboard.press('Tab');
