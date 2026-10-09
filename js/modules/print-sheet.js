@@ -245,7 +245,13 @@ export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' 
 /** The counting & cardinality categories whose mixed pools are dealt in the kit look only. */
 const K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
 
-function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
+/**
+ * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
+ * column work, to fill that group's last row (buildSheetOnce, whole rows). A draw of another kind
+ * is passed over for the next derived seed while tries remain (deterministic: the same seeds in
+ * the same order); the first draw is kept if no try gives the kind.
+ */
+function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, want = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
     // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
@@ -279,6 +285,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // is passed over for another draw while a few tries remain; the last try keeps it.
             // (the K-2 counting & cardinality pools, whose every member has a kit cell)
             if (k < Math.min(tries, 8) && K2_POOL_CATS.has(sk.categoryId) && isMixedMetaSkill(sk.skillId) && !(cand.cell && cand.cell.template && cand.cell.template !== 'legacy')) { if (!q) q = cand; continue; }
+            if (want && k < tries && !want(cand, sk)) { if (!q) q = cand; continue; }
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -1384,16 +1391,29 @@ function oneColumnOnly(it, n) {
  * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
  * clocks a page in one column because two of its nine skills are full width).
  */
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, freeRows: section.freeRows });
+
+/**
+ * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
+ * splits it, or null: {mid, fine, cols}. layoutOf counts the page with it, and buildSheetOnce's
+ * whole-rows check fills that group's last row with column work (wave 1 lane D round 7).
+ */
+function fineSplitOf(role, section, items, n, ctx) {
+    if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return null;
+    if (section.columns && section.columns !== 'auto') return null;
+    const narrow0 = items.filter((it) => !oneColumnOnly(it, n));
+    return fineSplit(Object.assign({}, layoutBase(role, section, items), { floor: null }), narrow0, ctx.paper, LIVE_W_MM, { size: n.size, look: n.look });
+}
+
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, freeRows: section.freeRows };
+    const base = layoutBase(role, section, items);
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
     const narrow0 = items.filter((it) => !oneColumnOnly(it, n));
     // the column problems of a mixed section in a group of their own (practice.js fineSplit)
-    const fs = !section.columns || section.columns === 'auto'
-        ? fineSplit(Object.assign({}, base, { floor: null }), narrow0, ctx.paper, LIVE_W_MM, { size: n.size, look: n.look }) : null;
+    const fs = fineSplitOf(role, section, items, n, ctx);
     const narrow = fs ? fs.mid : narrow0;
     if (!fs && (!wide.length || !narrow.length)) return whole;
     const Ln = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts);
@@ -1840,13 +1860,16 @@ async function buildSheetOnce(req = {}) {
                     const holeOf = (its) => {
                         const Lr = layoutOf(n.role, sec, withTwins(si, its), n, lctx);
                         const cols = Math.max(1, Number(Lr && Lr.cols) || 1);
-                        // column work (stack / fact) in a group of two or more stands in its own grid
-                        // (practice.js fineSplit), so only the other column problems share this one
+                        // column work (stack / fact) split off into its own grid (practice.js
+                        // fineSplit) is counted there: only the other column problems share this
+                        // one, and the group's own last row is `frem` short of its columns
                         const narrow = its.filter((it) => !oneColumnOnly(it, n));
-                        const isFine = (it) => it.template === 'stack' || it.template === 'fact';
-                        const fineN = narrow.filter(isFine).length;
-                        const narrowN = fineN >= 2 && fineN < narrow.length ? narrow.length - fineN : narrow.length;
-                        return { cols, rem: cols > 1 ? narrowN % cols : 0, cap: capFromL(sec, si, Lr) * pagesWanted };
+                        const fs = fineSplitOf(n.role, sec, withTwins(si, its), n, lctx);
+                        const narrowN = fs ? fs.mid.length : narrow.length;
+                        return {
+                            cols, rem: cols > 1 ? narrowN % cols : 0, cap: capFromL(sec, si, Lr) * pagesWanted,
+                            fineCols: fs ? fs.cols : 0, frem: fs ? fs.fine.length % fs.cols : 0,
+                        };
                     };
                     const floorFor = (its) => floorWith(si, pool ? its : probe.items.concat(its));
                     let h = holeOf(items);
@@ -1866,6 +1889,48 @@ async function buildSheetOnce(req = {}) {
                             sec.floor = floorFor(fewer);
                             if (!holeOf(fewer).rem) { items = fewer; done = true; }
                         }
+                        sec.floor = floorFor(items);
+                    }
+                    // A MIXED POOL's column work stands in a grid of its own (practice.js
+                    // fineSplit); a part-filled last row there is re-laid into wider cells (grid.js
+                    // `relaid`) with bands beside the stacks (round 6: mixed_multiplication S, 3
+                    // stacks in 61.5 mm cells, H13). The pool deals column work to fill that row
+                    // (generateRun `want`, derived seeds: reproducible) while the page holds it;
+                    // else the row's column work is dealt as other problems.
+                    h = holeOf(items);
+                    if (pool && !h.rem && h.frem) {
+                        const fineQ = (q, sk) => { try { const sp = kitCellSpec(q) || numberFamilySpec(q) || supportFactSpec(sk, q); return !!sp && (sp.template === 'stack' || sp.template === 'fact'); } catch (e) { return false; } };
+                        const isFine = (it) => it.template === 'stack' || it.template === 'fact';
+                        const dealt = (cnt, want) => {
+                            const key = `${sec.skills[0].categoryId}:${sec.skills[0].skillId}`;
+                            const out = build(si, sec, cnt, base, { startIndex: 1000 + items.length, seen: new Set(items.map((it) => signature(it.q))), kept: new Map([[key, items.length]]), want });
+                            measure(out, sec);
+                            return out;
+                        };
+                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem; };
+                        let fixed = null;
+                        // fill the row: one, then two rows' worth, of column work
+                        for (let r = 0; r < 2 && !fixed; r++) {
+                            const more = items.concat(dealt(h.fineCols - h.frem + r * h.fineCols, fineQ));
+                            if (more.every((it, i) => i < items.length || isFine(it)) && whole(more)) fixed = more;
+                        }
+                        // else the short row's column work is dealt again as other problems, in
+                        // whole rows of the main grid
+                        if (!fixed) {
+                            const fineIdx = items.map((it, i) => (isFine(it) ? i : -1)).filter((i) => i >= 0);
+                            const drop = new Set(fineIdx.slice(fineIdx.length - h.frem));
+                            const kept = items.filter((_, i) => !drop.has(i));
+                            const other = (q, sk) => !fineQ(q, sk);
+                            // as many as were dropped first, then more, then fewer
+                            const counts = [];
+                            for (let c = h.frem; c <= h.frem + h.cols; c++) counts.push(c);
+                            for (let c = h.frem - 1; c >= 0; c--) counts.push(c);
+                            for (const cnt of counts) {
+                                const more = cnt ? kept.concat(dealt(cnt, other)) : kept;
+                                if (more.slice(kept.length).every((it) => !isFine(it)) && whole(more)) { fixed = more; break; }
+                            }
+                        }
+                        if (fixed) items = fixed;
                         sec.floor = floorFor(items);
                     }
                     // A single-skill page never prints the same problem twice to fill its grid

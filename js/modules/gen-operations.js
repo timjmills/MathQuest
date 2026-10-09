@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { dealIndex, dealPick, onNewPage } from './page-deal.js';
+import { dealIndex, dealPick, onNewPage, blockPermutation } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -2214,15 +2214,37 @@ function _opt(id) {
 }
 // A number family's two parts, DEALT across a page (critic r4 D-E): the family is the unordered
 // pair {a, b} (2, 8, 10 and 8, 2, 10 are one family), so a page never repeats one while the band
-// has enough; a double / square is one item in six (never three of four), the rest are dealt from
-// the unequal pairs. The order the two parts print in is still free.
+// has enough. The order the two parts print in is still free.
+// Wave 1 lane D round 7: on a page every family of the band (the unequal pairs AND the doubles /
+// squares) is dealt once before any comes again: one seeded block of all of them per run of that
+// many items (page-deal.js blockPermutation). A square takes one random place in every six while
+// pairs remain (a page of 6 shows one), and the squares left over close the block. The 5 x 5
+// band's 10 families (6 pairs + 4 squares) all reach a page of 10; before, a square slot used up
+// a slot of the 6-pair deck, so a page of 10 printed only about 8 distinct families. In live play
+// (no page position) a family is drawn as before: a square one time in six, else a pair.
 function _familyPair(key, lo, hi) {
     const vals = [];
     for (let v = lo; v <= hi; v++) vals.push(v);
     const uneq = [];
     for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++) uneq.push([vals[i], vals[j]]);
-    const sq = !uneq.length || dealIndex(`${key}:sq`, 6) === 0;
-    const pair = sq ? (v => [v, v])(dealPick(`${key}:s`, vals)) : dealPick(`${key}:n`, uneq).slice();
+    let pair;
+    if (!uneq.length) pair = [vals[0], vals[0]];
+    else if (!Number.isFinite(state.itemIndex)) {
+        const sq = dealIndex(`${key}:sq`, 6) === 0;
+        pair = sq ? (v => [v, v])(dealPick(`${key}:s`, vals)) : dealPick(`${key}:n`, uneq).slice();
+    } else {
+        const U = uneq.length, Q = vals.length, L = U + Q;
+        const at = Math.max(0, Math.floor(state.itemIndex));
+        const block = Math.floor(at / L), pos = at % L;
+        let nu = 0, nq = 0, isSq = false;
+        for (let p = 0; p <= pos; p++) {
+            const slot = blockPermutation(`${key}:o${Math.floor(p / 6)}`, 6, block)[0];
+            isSq = nq < Q && (nu >= U || p % 6 === slot);
+            if (p < pos) { if (isSq) nq++; else nu++; }
+        }
+        pair = isSq ? (v => [v, v])(vals[blockPermutation(`${key}:q`, Q, block)[nq]])
+            : uneq[blockPermutation(`${key}:u`, U, block)[nu]].slice();
+    }
     if (Math.random() < 0.5) pair.reverse();
     return pair;
 }
