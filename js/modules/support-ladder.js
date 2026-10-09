@@ -630,7 +630,13 @@ export function drawLadder(root, q, ctx = {}) {
         }
     });
     const say = box.querySelector('.mq-lw-speak');
-    if (say) say.addEventListener('click', (ev) => { ev.preventDefault(); speakSay(say.getAttribute('data-say') || ''); });
+    // read what the box SHOWS (the screen wording, e.g. "Type", not the paper's "Write")
+    if (say) say.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const shown = [...box.querySelectorAll('.mq-lw-steps li')].map((li) => li.textContent || '');
+        const sayEl = box.querySelector('.mq-lw-say span');
+        speakSay(shown.length || sayEl ? speechOfWorked(shown, sayEl ? sayEl.textContent : '') : (say.getAttribute('data-say') || ''));
+    });
 }
 
 /* ------------------------------------------------------------------ the worked steps */
@@ -724,17 +730,34 @@ export function sayFor(q, ctx = {}) {
     return frame.replace(/__/g, '___');
 }
 
+// Listen reads the WHOLE box — every step, then the Say line — not the Say line alone (owner
+// 2026-10-04). Blanks are read as "blank" and signs as words, so speech says what the pupil sees.
+function toSpeech(t) {
+    return String(t)
+        .replace(/_{2,}/g, ' blank ')
+        .replace(/\s*[−-]\s*(?=\d)/g, ' minus ').replace(/\s*\+\s*/g, ' plus ')
+        .replace(/(?<=\d)\s*[×x]\s*(?=\d)/g, ' times ').replace(/\s*×\s*/g, ' times ')
+        .replace(/\s*÷\s*/g, ' divided by ').replace(/\s*=\s*/g, ' equals ')
+        .replace(/\s+([.,!?])/g, '$1').replace(/\s+/g, ' ').trim();
+}
+function speechOfWorked(steps, say) {
+    return ['Here is how.']
+        .concat(steps.map((st, i) => `${i + 1}. ${toSpeech(st)}`))
+        .concat(say ? [`Say: ${toSpeech(say)}`] : [])
+        .join(' ');
+}
+
 function workedHTML(q, ctx) {
     const steps = workedStepsFor(q, ctx);
     const say = sayFor(q, ctx);
     if (!steps.length && !say) return '';
     const voice = !!state.ttsEnabled && typeof window !== 'undefined' && 'speechSynthesis' in window;
-    const spoken = say.replace(/_{3}/g, '…');
+    const spoken = speechOfWorked(steps, say);
     return `<div class="mq-ladder-worked" data-mq-ladder-on="worked" role="note" aria-label="How to do it">`
         + `<div class="mq-lw-title">Here is how</div>`
         + (steps.length ? `<ol class="mq-lw-steps">${steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>` : '')
         + (say ? `<div class="mq-lw-say"><b>Say:</b> <span>${esc(say)}</span>`
-            + (voice ? ` <button type="button" class="mq-lw-speak" data-say="${esc(spoken)}" aria-label="Read the Say line aloud">Listen</button>` : '')
+            + (voice ? ` <button type="button" class="mq-lw-speak" data-say="${esc(spoken)}" aria-label="Read the steps and the Say line aloud">Listen</button>` : '')
             + `</div>` : '')
         + `</div>`;
 }

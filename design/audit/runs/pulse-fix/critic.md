@@ -1,0 +1,504 @@
+# Critic: next-answer-box pulse (commit 572a96b)
+
+Critic: independent, Opus medium, 2026-10-04. Graded what renders in headless Chromium (puppeteer via
+`/tmp/mq-browser-run.sh`), not what the code intends. Probes are in the session scratchpad under `pulse-critic/`:
+`flow.cjs` (type, tab, tap, blur per host and width), `cases.cjs` (blur before typing, a right box refocused,
+tapping a red box, non-answer views), `perf.cjs` (idle churn), `zoom.cjs` (3x crops and reduced motion), and
+`sweep.cjs` (the builder's all-skill probe plus a whole-document count and an entry-order check).
+
+## Verdict: FAIL
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 1280 and 390 | 8 | 7 | 7 | 8 | no |
+| Online worksheet, 1280 and 390 | 7 | 6 | 7 | 8 | no |
+| Quiz, 1280 and 390 | 8 | 7 | 7 | 8 | no |
+
+There is also a blocking defect outside the rubric: a continuous requestAnimationFrame loop (D1).
+
+## What passed (measured)
+
+- **Exactly one active box.** The whole-document `.mq-active-box` count is 1 for every skill that has answer boxes:
+  card 390 428/428, quiz 390 587/587, worksheet 1280 455/455. The glow moves (box-shadow sampled 450 ms apart).
+  Errors 0.
+- **Moves as the pupil types, tabs and taps.** This holds for stacks (digits run ones to tens), fact families
+  (box 0 to 1 on Tab), count rows (`gf-cell` / `mq-cellslot` 0 to 1) and word-work, on all three hosts at 390 and 1280.
+- **Right boxes never pulse.** If a right ones box is refocused, it stays green (`rgb(227,244,234)`, no
+  animation) and the pulse sits on the next empty box. A red box tapped clear becomes the pulsing box (case 3b).
+- **Non-answer inputs.** Home search and Skills Organizer search have no active box and nothing animates. The
+  only other users of `#questionCard` are the MAP test, which is a pupil screen.
+- **Reduced motion.** Six samples over 1.2 s are identical: `animation: none`, fill `#fff3a0`, ring 5 px.
+- **Placeholders.** No visible placeholder on any host in any sweep.
+- **Console.** 0 errors in every run.
+
+## Defects
+
+### D1 · critical (blocks the pass): the MutationObserver re-triggers itself every frame
+- **Where:** `js/modules/active-box.js:52` `keep.forEach(el => el.classList.add('mq-active-box'))`, together with
+  the observer at line 67 (`attributeFilter: ['class', …]`).
+- **Measured** (`perf.cjs`, card idle, unfocused, after it has settled):
+  - 270 requestAnimationFrame calls in 3 s.
+  - 180 `attributes:class` mutation records whose old value equals the new value
+    (`fact-family-input mq-active-box`).
+  - 0.118 s of script in 3 s.
+  - On home, where no box is active, the same counts are 0 and 0 s.
+
+  `classList.add` of a token that is already present still writes the attribute. That queues a mutation, which
+  calls `schedule()`, which runs `refreshActiveBox()` on the next frame, which adds the class again. The loop
+  never settles while a box is active. Each frame it runs `querySelectorAll`, `getBoundingClientRect` and
+  `getComputedStyle` over every input in the host. That drains battery on the classroom iPads and Chromebooks.
+  The cost grows with the box count (a word problem has 28 boxes).
+- **Fix:** only write when the state changes:
+  `keep.forEach(el => { if (!el.classList.contains('mq-active-box')) el.classList.add('mq-active-box'); });`
+  Removal is already guarded. As a belt-and-braces step, observe with `attributeOldValue: true` and ignore
+  records where `r.oldValue === r.target.getAttribute(r.attributeName)`.
+- **Proof:** in `perf.cjs`, "CARD active, unfocused" must report `raf3s` ≤ 2 and `recs` `{}`. Add the same
+  idle assertion to `tests/scripts/wave1-a-probe.cjs`.
+
+### D2 · major (worksheet C2 −2, C1 −1; card C2 −1): stack digits pulse the TENS box first, against SP-20 ones-first entry
+- **Where:** `js/modules/active-box.js:39` `pickActive()` picks the first empty box in DOM (left-to-right) order.
+- **Measured:**
+  - Worksheet 1280, at start: 25 skills point the pupil at the leftmost digit. These are add/sub 10 to 1k
+    (regroup, no_regroup and mixed), `add_column_multi`, `mixed_add_sub` and `equal_sign`.
+    `worksheet-1280-add_100_regroup-0.png` shows the tens box yellow and the ones box white.
+  - Card: the same happens as soon as focus leaves before the pupil types, for example after tapping Hint or Read
+    (case 1: tens x=613 pulses, ones x=667 does not).
+
+  `wireStackEntry()` (screen-cell.js:452) teaches right-to-left entry, and the pulse contradicts it. A pupil who
+  taps the pulsing box starts in the tens column.
+- **Fix:** in `pickActive()`, put the boxes in teaching order before the `find`. For each `.ws-stack`, list its
+  `input.mq-digit` boxes in reverse (ones first) at the position of the stack's first digit. Leave every other
+  box in DOM order. For example, build `ordered` by walking `boxes`. When `el.matches('input.mq-digit')` and
+  `el.closest('.ws-stack')` has not been seen yet, push that stack's digits `.reverse()`. Run the `next` search
+  over `ordered`.
+- **Proof:** `sweep.cjs worksheet 1280` prints `ORDER defects 0` for `STACK-NOT-ONES-FIRST`. `cases.cjs` case 1
+  shows `mq-active-box` on the x=667 (ones) box.
+
+### D3 · major (C2 −1 on all hosts; worksheet C1 −1): word-work optional regroup boxes pulse as "next"
+- **Where:** `js/modules/active-box.js:12,39`. `OPTIONAL` is tested only against `className`. Word-work regroup
+  boxes are `input.mq-wwork.mq-wwsmall data-mq-kind="regroup"` (sheet/cells/word-work.js:579), so they are not
+  excluded.
+- **Measured:**
+  - Quiz 390 at start: 37 skills. Worksheet 1280 at start: 38 skills. These are every `add_wp_*`, every
+    `sub_wp_*`, `add/sub_word_problems(_plain)` and `algebra:multi_step_word(_plain)`.
+  - On the card, the regroup box pulses after any blur (card-390 add_wp_10 "blur" step).
+
+  `card-390-add_wp_10-1.png` shows the small regroup box pulsing for 2 + 4, which never regroups. That tells the
+  pupil to write a regroup digit.
+- **Fix:** `const isOptional = (el) => OPTIONAL.test(el.className + ' ' + (el.getAttribute('data-mq-kind') || ''));`
+  Use it in place of `OPTIONAL.test(el.className)` at line 39.
+- **Proof:** `sweep.cjs quiz 390` and `sweep.cjs worksheet 1280` print 0 for `OPTIONAL-REGROUP`.
+
+### D4 · major (C3 −1 on all hosts): the glow ring is overpainted by the neighbour box or clipped by its row
+- **Where:** `css/screen-cell.css`, the new `.mq-active-box.mq-active-box.mq-active-box` rule. Its outer
+  `box-shadow` ring (3 px solid plus up to 9 px halo) paints outside the box.
+- **Measured** (3x crops):
+  - `zoom-ws-stack-390.png`: the ones box paints over the tens box's ring on the right, so the ring shows on
+    3 sides only.
+  - `zoom-wp-regroup-390.png`: the regroup box's ring is cut flat at the top by its row. Only side bars and a band
+    under the box show, so it reads as a smear rather than a ring.
+  - The same overlap is visible at 1280 in `worksheet-1280-add_100_regroup-0.png`.
+- **Fix:** draw the ring inside the box so neither neighbours nor `overflow` can cut it:
+  `box-shadow: inset 0 0 0 3px #f2c200, inset 0 0 0 var(--mq-next-ring) rgba(242,194,0,.45) !important;`
+  Change the keyframes to `--mq-next-ring: 3px → 7px`, and the reduced-motion ring to 5px. Keep the pulsing fill.
+  Keep it ADDITIVE by appending an override rule at the end of the file.
+- **Proof:** re-run `zoom.cjs`. Both crops must show a closed, even ring on all four sides.
+
+### D5 · minor (no score cost; note for the owner): the worksheet has two pulsing things
+The current `.problem-card.mq-active-problem` keeps its own `mq-active-card-pulse` (screen-cell.css:1335,
+Wave 1 1.2) beside the pulsing box. It is the approved earlier design, so it costs no points. If the owner wants
+"one pulse" literally, make the card highlight steady:
+`animation: none` on `.mq-active-problem`, keeping the `#fffbe0` fill and the 4 px ring.
+
+## What raises each score to 10
+- **C1:** D2 and D3 fixed, so the first pulse is always where the pupil should start.
+- **C2:** D2 and D3 fixed. Also, a focused red box with a wrong digit currently shows yellow fill over the red
+  (`mq-live-wrong` loses its `#FDE7E4` while focused) and keeps only the dashed outline. Keep the red fill while a
+  wrong digit is still in the box: add `:not(.mq-live-wrong)` to the fill declaration, or exclude
+  `.mq-live-wrong` with a value from `active` in `pickActive()`.
+- **C3:** D4 fixed.
+- **C4:** D4 fixed. The yellow stays in the screen-only feedback band SP-30 allows. Print is unaffected
+  (`@media print` rule at screen-cell.css:1362).
+
+---
+
+# Round 2 (commit c4d5d68)
+
+Critic: independent, Opus medium, 2026-10-04. I re-ran my own probes one at a time through
+`/tmp/mq-browser-run.sh`. Logs are in the scratchpad under `pulse-critic/r2/`. One new probe,
+`pulse-critic/expect.cjs`, asks of every word-problem skill whether the pulsing box expects a value.
+
+## Verdict: FAIL (one defect left, D6)
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 1280 and 390 | 8 | 7 | 9 | 8 | no |
+| Online worksheet, 1280 and 390 | 7 | 7 | 9 | 8 | no |
+| Quiz, 1280 and 390 | 7 | 7 | 9 | 8 | no |
+
+## Round 1 defects: all closed (measured)
+
+- **D1 closed.** `perf.cjs`, idle card with a box active: `raf3s 0`, `recs {}`, ScriptDuration 0.000 s.
+  - In `flow.cjs` the idle readings are 0/0 on card and quiz at both widths.
+  - On the worksheet they are 1–2 rAF and ≤ 34 mutations per 2 s. Those come from the worksheet's own widgets,
+    not a loop.
+- **D2 closed.** Card blurred before typing: the ones box pulses (x=667 at 1280, x=219 at 390), the tens box
+  does not.
+  - Worksheet stacks start on the ones box (`zoom-ws-stack-390.png`).
+  - Order defects from `sweep.cjs`: card 1280 0, card 390 0, worksheet 390 0. The coordinator reports worksheet
+    1280 and quiz 390 as 0.
+- **D3 closed.** No regroup or carry box pulses in any sweep.
+- **D4 closed.** In `zoom-ws-stack-390.png` and `zoom-wp-regroup-390.png` the ring is inside the box and closed
+  on all four sides. No neighbour overpaints it and no row clips it.
+- **Extra closed.** A focused `.mq-live-wrong` box keeps its red fill.
+- **Still true:**
+  - Exactly one box is active. Card 1280 428/428, card 390 428/428, worksheet 390 455/455, all moving, 0 errors,
+    0 visible placeholders.
+  - A right box never pulses (case 2), and a red box tapped clear becomes next (case 3b).
+  - Home and Skills Navigator inputs never pulse.
+  - Reduced motion is steady: `animation: none`, `#fff3a0`, inset ring 5 px.
+  - 0 console errors in every run.
+
+## D6 · major (C2 −1 on all hosts; C1 −1 on worksheet and quiz): the pulse lands on a word-work box that must stay EMPTY
+
+- **Where:** `js/modules/active-box.js`, `pickActive()`, the `next` search. Word-work operand boxes are
+  `input.mq-wwork` with `data-mq-expect` (sheet/cells/word-work.js:579). A box the item does not use carries
+  `data-mq-expect=""`.
+- **Measured:**
+  - `expect.cjs quiz`, 1280, at question start: in **24 of 46** word-problem skills the pulsing box expects
+    nothing. Those are every `add_wp_*` / `add_wp_*_plain`, `add/sub_word_problems(_plain)`,
+    `mult_word_problems(_plain)`, `word_problems_mixed_plain` and `multi_step_word_plain`.
+  - Example, `add_wp_10` (2 + 4): the pulse sits on the TENS box of the top row (worksheet x=232, quiz x=609 at
+    1280, crop `zoom-wp-regroup-390.png`). The "2" belongs in the ones box beside it. A pupil who follows the
+    pulse writes 2 in the tens place, which reads as 20.
+  - The card shows the same thing after any blur (flow-card-1280 / 390 `add_wp_10` "blur" step). The worksheet
+    and quiz show it at the start, because they do not autofocus.
+  - In round 1 the regroup box sat in this spot. D3 moved the pulse one box down, onto another box that must
+    stay blank.
+- **Fix:** in `pickActive()`, skip word-work boxes the item does not use. For example, add
+  `&& !(el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '')` to the `next` predicate,
+  next to `!isOptional(el)`.
+  - Restrict it to `input.mq-wwork`. Do not apply it to the answer row (`.mq-wwans` / host digit boxes).
+    Skipping blank answer digits would tell the pupil how many digits the answer has.
+  - The operand rows hold numbers given in the story, so skipping them leaks nothing.
+- **Proof:** `expect.cjs quiz` and `expect.cjs card` (the card variant blurs first) print
+  `pulsing a word-work box that expects NOTHING: 0`. The `sweep.cjs` order checks stay at 0.
+
+## What raises each score to 10
+- **C1 and C2:** D6 fixed, so on every host and every skill the first pulse is a box the pupil must fill.
+- **C3:** at 9 now. The inset halo grows to 9 px inside the box. On the small regroup-size boxes that tints the
+  glyph area while the pupil types. To reach 10, cap the inner halo at 6 px: keyframes 50%
+  `--mq-next-ring: 6px`.
+- **C4:** at 8. The highlight is screen-only and allowed by SP-30. To reach 10, the owner needs to rule on D5:
+  the worksheet card pulses beside the box, so the worksheet shows two pulsing things.
+
+---
+
+# Round 3 (commit 1c60eda)
+
+Critic: independent, Opus medium, 2026-10-04. Re-run one at a time. Logs are in the scratchpad under
+`pulse-critic/r3/`.
+
+## Verdict: PASS
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+| Online worksheet, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+| Quiz, 1280 and 390 | 9 | 9 | 9 | 8 | yes |
+
+## Measured
+
+- **D6 closed.** `expect.cjs` reports 0 of 46 word-problem skills pulsing a box that expects nothing, both on
+  the quiz at start and on the card after a blur.
+  - On both hosts `firstNeededIsActive` is true, and the pulsing box expects a digit (for example `add_wp_10`
+    expects "2" or "4").
+  - `zoom-wp-regroup-390.png` shows the ones box of the top row pulsing.
+  - The skip applies only to `input.mq-wwork` copy boxes (active-box.js `mustStayBlank`). Blank answer boxes are
+    never skipped, so the pulse does not reveal how many digits the answer has.
+- **Glow cap.** Over 1.2 s the inner glow runs from 3 to 6 px (inset). Reduced motion stays steady at 5 px with
+  `animation: none`.
+- **Regression checks.**
+  - Card 390: 428/428 skills with exactly one box pulsing and moving, 0 order defects.
+  - Worksheet 1280: 455/455, 0 order defects.
+  - Both sweeps: 0 visible placeholders and 0 errors.
+  - Perf on the idle card with a box active: `raf3s 0`, `recs {}`, ScriptDuration 0.000 s.
+  - 0 console errors in every run.
+
+## What keeps it below 10 (no defect costs a pass)
+- **C1, C2 and C3 at 9:** the worksheet's current problem card still pulses beside the box (D5). An owner
+  ruling decides whether to make the card highlight steady.
+- **C4 at 8:** the yellow highlight is screen-only feedback chrome inside the B&W cell, which SP-30 allows. It
+  reaches 10 only if the owner rules on D5 and approves the yellow inside the cell, or swaps it for an ink-only
+  cue.
+
+---
+
+# Round 4 (commits aca0560..5fab1b7: auto-select, no pop-ups over play)
+
+Critic: independent, Opus medium, 2026-10-04. I ran my probes one at a time. Logs are in the scratchpad under
+`pulse-critic/r4/`. New probes:
+- `steal.cjs`: every skill on the card. It blurs, taps the first non-button tap target, and records where focus
+  and scroll land.
+- `scen.cjs`: blank tap after scrolling up, Hint / Read / Check, count row, zoom, idle timing, toasts and the
+  end modal.
+- `missing.cjs`: a missing digit at Check.
+
+HEAD 6f74ef3 differs from 5fab1b7 only in evidence PNGs.
+
+## Verdict: FAIL
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 | 6 | 7 | 8 | 8 | no |
+| Practice card, 1280 | 7 | 7 | 8 | 8 | no |
+| Online worksheet, 1280 and 390 | 7 | 8 | 8 | 8 | no |
+| Quiz, 1280 and 390 | 7 | 8 | 8 | 8 | no |
+
+The worksheet and quiz C1 score is inferred. They share `selectIfLoose()` with the card, and the R4-1 tap targets
+(ordering tiles, rounding dots) render on them too. I did not sweep them separately, so I scored them down.
+
+## Gates
+
+| Gate | Result |
+|---|---|
+| wave1-a-probe | exit 0 |
+| wave1-a2-perbox | exit 0 |
+| **wave1-a3-wrongdigits** | **FAIL**, see R4-3 |
+| ws-screen-answer | exit 0 |
+| test-wrong-retry-skip | exit 0 |
+| hint-popup-e2e | ALL CHECKS PASSED (run against a server on :8765; the first run had none) |
+| wave1-c2-phone | exit 0 |
+
+## What works (measured)
+
+- **Focused on load.** Card 390 and 1280: 443/443 skills with a pulsing box have it focused. 0 console errors.
+- **Buttons keep focus.** Read and Hint keep their own focus. The hint modal opens (`.hint-modal-card`) and the
+  hint-popup-e2e gate passes. Check (wrong answer) keeps focus on `#qcCheckBtn`.
+- **No loop.** A count row samples one focus 10 times over 2 s. Idle script time is 0.000 s over 3 s. Perf on the
+  idle card: `raf3s 0`, `recs {}`.
+- **Zoom.** The pop-up holds the only active box (1 inside, 1 in total). Closing it returns focus to the card box.
+- **Idle timing.** At 31 s the timer pauses, with no modal and no nudge. At 301 s the idle modal shows. Dismissing
+  it returns focus to the box.
+- **Toasts and end modal.** A plain toast is suppressed. The XP toast shows with `pointer-events: none`. The
+  end-of-session modal still shows ("Done", score, Play again / Home; `scen-end-390.png`). The box behind it is
+  not focused.
+
+## Defects
+
+### R4-1 · major (card C1 −2 at 390, −1 at 1280; worksheet / quiz C1 −1): tapping a tap target throws the focus into a typing box
+- **Where:** `js/modules/active-box.js` `selectIfLoose()`. A tap on a non-focusable tap target (a `div` with
+  `onclick`, or an SVG `circle`) leaves focus on `body`, so the code treats it as a "blank tap".
+- **Measured** (`steal.cjs`, card): in 14 skills a tap on the widget moves focus into an input.
+  - **Ordering tiles**, 8 skills: `order_negatives`, `order_fractions`, `order_decimals`, `order_fdp`,
+    `conversions_all`, `order_least_to_greatest`, `order_greatest_to_least`, `all_domains_mixed`. The tile
+    `div.ordering-tile[onclick]` sends focus to `input.order-input-box`. At 390 the page also scrolls 67–82 px on
+    every tile tap.
+  - **Rounding number-line dots**, 3 skills: `round_nl_thousands`, `round_nl_ten_thousands`,
+    `round_nl_hundred_thousands`. `circle.mq-rl-dot` sends focus to `input.ib-cell`.
+  - **Coin taps**, 3 skills: `money_count`, `coin_value`, `money_notation`. These move focus to
+    `input.tm-cointap-in`, but that is the widget's own behaviour: it does the same at 1c60eda, so it is not
+    charged here.
+  - Baseline at 1c60eda (same probe, same skills): ordering and rounding taps leave focus alone.
+  - On a phone, every tile or dot tap now raises the soft keyboard over the widget the pupil is using, and moves
+    the page.
+- **Fix:** in `installActiveBox()`, record the last `pointerdown` target in a capture listener:
+  `lastDown = { t: e.target, at: Date.now() }`. In `selectIfLoose()`, return early when `Date.now() - lastDown.at < 800`
+  and the target or an ancestor inside the host is a tap target. Test that with
+  `closest('[onclick], [draggable="true"], [role="button"], [data-order-value], circle, svg [class], label')`, or
+  with `getComputedStyle(x).cursor` being `pointer` or `grab` on the target or an ancestor up to the host. Only a
+  pointerdown on a plain region (text, cell background, card padding) counts as a blank tap.
+- **Proof:** `steal.cjs 390` and `steal.cjs 1280` report `focus moved to a box after the tap` = 3 (the coin widget
+  only) and `scroll jump >40px` = 0.
+
+### R4-2 · major (card C1 −1 at 390): a blank tap after scrolling up jumps the page back down to the box
+- **Where:** `selectIfLoose()`. The off-screen branch calls `scrollIntoView({block:'nearest'})`.
+- **Measured** (`scen.cjs`, `add_wp_100`): the pupil scrolls to the top (y=0) to reread the story, then taps the
+  instruction or the story text. Focus goes to the box and the page jumps to y=352 at 390 (y=202 at 1280). Tapping
+  the story again leaves it at y=413. A pupil reading the story is pulled away from it by every tap.
+- **Fix:** scroll to an off-screen box only on load and after a re-render, never after a pupil tap. When the
+  trigger was a `pointerdown` within 800 ms (the same `lastDown` as R4-1) and the box is off screen, either skip
+  `selectIfLoose()` (the box still pulses), or focus with `preventScroll: true` and do not call `scrollIntoView`.
+  Skipping is better on phones, because a programmatic focus there can raise the keyboard and scroll anyway.
+- **Proof:** in `scen.cjs` the "blank tap on the text after scroll-up" rows keep `y` within 40 px of `y0` at 390
+  and 1280. The "load word problem" row still shows the box focused.
+
+### R4-3 · major (card C2 −1; it fails a gate): a missing digit is no longer marked red at Check (wave1-a3-wrongdigits FAIL)
+- **Where:** the gate reports `FAIL [390 card add_100_regroup reduced-motion] a missing digit at Check: its empty
+  box is marked red`. The box has `bad:false, empty:false`.
+- **Measured** (`missing.cjs`): the pupil fills the ones box, blurs, and Check runs.
+  - If Check runs before the next frame, the tens box is marked
+    (`mq-live-wrong mq-wrong-digit mq-wd-empty`).
+  - Once auto-focus has put the caret in the empty tens box (150 ms later, and on every reduced-motion run), the
+    box stays unmarked (`mq-active-box` only). The feedback still says "Not yet", but the missing digit is not
+    shown in red.
+  - At 1c60eda the same thing happens when the empty box is focused by hand. So the checker already skips a
+    focused empty box. Auto-select now makes that state the normal one after any blur, which is why the A3
+    missing-digit cue disappears.
+- **Fix** (in the checker, not the gate): make `markMissingDigits()` (screen-cell.js:928) mark a focused empty box
+  too. Trace why the card's Check path leaves the focused box unmarked or unmarks it; `answer-check.js:1161` is
+  the call. A pulse on a red empty box is fine: the red-fill override for `.mq-active-box.mq-live-wrong` already
+  exists. Alternatively, have `selectIfLoose()` leave the focus alone for 400 ms after a Check press.
+- **Proof:** `node tests/scripts/wave1-a3-wrongdigits.cjs` exits 0. `missing.cjs` shows `mq-wd-empty` on the tens
+  box in all four rows.
+
+### R4-4 · minor (no score cost): after Hint / Read, typing goes nowhere until the pupil taps the box
+After the hint modal closes, focus stays on `#hintBtn`. That follows the "buttons keep focus" rule, and on touch
+devices the button does not hold focus anyway. On a Chromebook keyboard the first keystrokes are lost. Option:
+when the hint modal closes, refocus the pulsing box (in the hint modal's close handler).
+
+## What raises each score to 10
+- **C1:** R4-1 and R4-2 fixed, and R4-4 handled.
+- **C2:** R4-3 fixed.
+- **C3:** the 8 reflects the scroll moves under R4-1. It reaches 9 when they are gone, and 10 with D5 settled.
+- **C4:** unchanged from round 3 (the owner's ruling on the yellow and D5).
+
+---
+
+# Round 5 (commits 0321fd1, 07743c1)
+
+Critic: independent, Opus medium, 2026-10-04. Logs are in the scratchpad under `pulse-critic/r5/`. New probes:
+- `scen2.cjs`: taps without any pre-scroll by the probe, and Space / typing on buttons.
+- `nextq.cjs`: the next question after a Check tap.
+- `dot.cjs`: the rounding dot.
+- `steal.cjs`: now takes a host and a `WAIT` (400 ms and 3000 ms), so a later re-focus would be caught.
+
+## Verdict: FAIL (one defect, R5-1)
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+| Online worksheet, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+| Quiz, 390 and 1280 | 7 | 9 | 9 | 8 | no |
+
+## R4 defects: closed (measured)
+
+- **R4-1 closed.**
+  - Ordering tiles: focus stays on `body` at +0.5 s and +3 s, with no scroll (`scen2` a2, 390 and 1280).
+  - `steal.cjs` full card 390: 0 scroll jumps. The only focus moves are coins (3, the widget's own, as at 1c60eda)
+    and the rounding dot (3).
+  - The rounding dot is a probe artifact, as the coordinator said. `circle.mq-rl-dot` is `visibility:hidden` at
+    x=−23 (`dot.cjs`), so no pupil can tap it. A tap on the real line (`.mq-rl svg`) keeps focus on `div.mq-rl`
+    at +0.5 s and +3 s.
+  - The worksheet at 390 matches the card at WAIT 400 and 3000.
+- **R4-2 closed.** A tap on the instruction at y=0 leaves y=0 at +0.5 s and +3 s (`scen2` b, 390 and 1280).
+  - Correction to round 4: `scen.cjs` row A scrolls the target into view itself before tapping
+    (`tap()` → `scrollIntoView`). Part of the round-4 jump was my probe's doing. `scen2` taps in place.
+- **R4-3 closed.** `missing.cjs` shows `mq-live-wrong mq-wrong-digit mq-wd-empty` on the empty tens box in all four
+  runs (motion and reduced motion, with and without the auto-focus delay). Flow at 390 shows a wrong active box
+  with `anim=none`, so it keeps its red.
+- **R4-4 closed.** After Hint is clicked and closed with Escape, typing "5" lands in the pulsing ones box
+  (values `["", "5"]`).
+
+## Regression checks
+
+- **Focused on load.**
+  - Full card 390 sweep: 442/443. The one miss, `order_greatest_to_least`, came 400 ms after the previous skill's
+    tile tap, inside the 800 ms guard. That is a harness artifact.
+  - `nextq.cjs`, real flow: after a right answer sent with a tap on Check, the next question's box is focused
+    (q2 / q3 / q4: BOX) at 390 and 1280.
+- **Worksheet 1280 sweep:** 455/455 pulsing, 0 order defects, 0 placeholders, 0 errors.
+- **Perf:** idle card `raf3s 0`, `recs {}`, 0.000 s.
+- **Flows:** card, worksheet and quiz at 390 are unchanged from round 3.
+- **`scen.cjs` 390:** zoom, idle at 31 s / 301 s, toasts and the end modal behave as in round 4.
+- **Console:** 0 errors.
+
+## R5-1 · major (C1 −1 on every host): Space on a focused button is hijacked into the box, so keyboard and switch users cannot press Hint, Read or Check
+- **Where:** `js/modules/active-box.js`, the new `keydown` capture listener in `installActiveBox()`. `' '` has
+  `e.key.length === 1`, and a button is not `TYPING`, so the listener moves focus to the pulsing box before the
+  button activates.
+- **Measured** (`scen2` c, 390 and 1280): focus is on `#hintBtn`. After pressing Space, the hint modal is not
+  open and focus is in `input.column-answer-input.mq-active-box`. The same path breaks Space on Check.
+  Switch-access devices and Chromebook keyboard users press buttons with Space. Many of the owner's SEN pupils use
+  these, and nothing on screen tells them why the button did nothing.
+- **Fix:** leave Space alone. At the top of the listener add `if (e.key === ' ') return;`. Also return when
+  `ae.matches('button, a[href], select, summary, [role="button"], [role="option"], [role="checkbox"], [role="radio"]')`
+  and the key is not a digit or a letter. Digits and letters should still go to the box (R4-4).
+- **Proof:** in `scen2.cjs` row c, "Space on focused Hint" shows `modal: true` and focus still on `#hintBtn`, and
+  row d still shows `"5"` in the box.
+
+## What raises each score to 10
+- **C1:** R5-1 fixed.
+- **C2 and C3 (now 9):** the owner's ruling on D5, the worksheet card that pulses beside the box.
+- **C4:** unchanged (the owner's ruling on the yellow inside the B&W cell).
+
+---
+
+# Round 6 (head bdf53f6: R5-1 fix, caret moves on after a right answer, Listen reads the whole box)
+
+Critic: independent, Opus medium, 2026-10-04. Logs are in the scratchpad under `pulse-critic/r6/`. New probes:
+- `typing.cjs`: types the right answer key by key into whatever box has focus, and samples the focus after every
+  key. Where a box's value is unknown it tries each candidate and keeps the one that turns green.
+- `listen.cjs`: spies on `speakAnswerOption` and presses Listen.
+
+## Verdict: PASS
+
+| Host | C1 Ease | C2 Teach | C3 Layout | C4 Fidelity | Pass |
+|---|---|---|---|---|---|
+| Practice card, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+| Online worksheet, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+| Quiz, 390 and 1280 | 9 | 9 | 9 | 8 | yes |
+
+The quiz has no live green marks, so the caret-advance does not apply there. Its pulse and focus regressions are
+covered by the round 3–5 sweeps, and the code path is unchanged.
+
+## R5-1: closed
+`scen2` row c, at 390 and 1280: Space on a focused Hint opens the hint modal (`modal: true`), and focus stays on
+`#hintBtn`. Row d: "5" typed after the hint closes lands in the pulsing ones box.
+
+## Caret moves on after a right answer (measured)
+
+- **It never leaves a box early.** `early=0` in every run, so the caret never leaves a box while a multi-digit
+  right answer is still being typed.
+  - Card 390 and 1280: `hundreds_chart_fill` 25, `count_by_tables` 28/35/56/70/77 and 28/42/49/63/84,
+    `add_sub_fact_family` 8/8/5, `number_families_add` 10.
+  - Worksheet 390 and 1280: `count_by_tables` 6/10/14/18 … 9/15/21/30/33, fact family 16/16/10 and 20/20/5.
+- **Where it goes next.** After each green box the caret is on the pulsing box (`offPulse=0`). On the worksheet,
+  the last box of a problem hands on to the first box of the next problem.
+- **Stack entry.** Typing the right ones digit moves the caret to the tens box, which is the pulsing box
+  (ones-first). A wrong digit keeps the caret in place. There is no jump into a regroup box.
+- **Count rows on a phone** (390, swipe row): no box is auto-focused on load, by design. Once the pupil taps the
+  pulsing box, each right number moves the caret to the next box, and that box is scrolled into view inside the
+  row.
+- **Boxes that do not go green while typing** (`count_by_step_up` grid cells, the last fact-family box): the caret
+  stays put. That is correct, because the trigger is the green mark.
+
+## Listen (measured, card 1280)
+
+| Skill | Spoken |
+|---|---|
+| `add_100_regroup` | "Here is how. 1. Ones: 8 plus 4 equals 12. Type 2. Regroup 1 ten. 2. Tens: 4 plus 1 regrouped equals 5. Type 5. 3. The sum is blank. Say: 48 plus 4 equals blank." |
+| `mult_facts` | "… 12 times 2 is 12 groups of 2 … Type blank. Say: 12 times 2 equals blank." |
+| `add_wp_20` | "… Tap plus. Add. … 14 plus 4 equals blank. 6. Type the answer: blank books. Say: The answer is blank blank." |
+
+In every case the spoken text is the title, every step and the Say line, using the screen wording ("Type",
+"Tap"), with signs as words and blanks as "blank".
+
+## Regressions: none
+
+| Check | Result |
+|---|---|
+| Card 390 sweep | 428/428 pulsing, 0 order defects, 0 placeholders, 0 errors |
+| `nextq` 390 | next question focused after a Check tap (q2 / q3 / q4) |
+| `steal` 390 at 3 s | ordering tile keeps focus off the box; only coins (the widget's own) and the hidden rounding dot (probe artifact) move it; 0 scroll jumps |
+| `scen2` | rounding line and tile taps keep focus; a blank tap after scrolling up keeps y=0 at 0.5 s and 3 s |
+| `missing.cjs` | `mq-wd-empty` red in all four runs |
+| Perf | `raf3s 0`, `recs {}`, 0.000 s |
+
+## Nits (no score cost)
+
+- **N1.** A worked box with steps but no Say line has no Listen button, because Listen sits inside `.mq-lw-say`
+  (`workedHTML`, support-ladder.js:756). Seen on a fallback skill id. Fix: render Listen whenever `steps.length` is
+  non-zero, outside the Say line.
+- **N2.** "Count by 2, 12 times: 2, 4, 6, …." is spoken with the ellipsis. Fix: in `toSpeech`, map `…` to
+  "and so on".
+- **N3.** One page error appeared, `Cannot read properties of undefined (reading 'answerType')`. It came only when
+  the probe started a new worksheet less than a second after finishing the previous one, during a 4-skill
+  sequence. It did not reproduce for any skill alone or in pairs. This looks like a pending
+  `advanceToNextProblem` timer outliving `initWorksheet`. It is a harness-speed race in pre-existing worksheet
+  code, not this change. Suggested guard: cancel `_wsAdv` in `initWorksheet` (worksheet.js:2222).
+
+## What keeps it below 10
+- **C1, C2 and C3 at 9:** D5 (the worksheet card that pulses beside the box) is still waiting on the owner.
+- **C4 at 8:** the yellow inside the black-and-white cell is allowed as screen feedback (SP-30); 10 needs the
+  owner's ruling.
