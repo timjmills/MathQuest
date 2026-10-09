@@ -1855,7 +1855,23 @@ export async function buildSheet(req = {}) {
         // Wave 5.2: only the pages holding a section that asked for the line print it (D8).
         refSections: nline ? [...nline.sections] : null,
     };
-    const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    let plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    // Wave 5.2 (critic nl-r4 D1): the number line never adds a page. A page-driven Independent
+    // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
+    // group under its grid) gives up its last problems, one at a time, until it is the pages it
+    // was asked for. The capacity above counts each section's grid; this counts the whole page.
+    if (nline && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
+        const wanted = n.sections.reduce((a, sec) => a + (sec.pages || 1), 0);
+        for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
+            const bySec = new Map();
+            hostItems.forEach((it, i) => { const si = Number(it.section) || 0; if (!bySec.has(si)) bySec.set(si, []); bySec.get(si).push(i); });
+            const donor = [...bySec.entries()].filter(([, ix]) => ix.length > 1).sort((x, y) => y[1].length - x[1].length)[0];
+            if (!donor) break;
+            hostItems.splice(donor[1][donor[1].length - 1], 1);
+            input.items = hostItems;
+            plan = independentPlan(input);
+        }
+    }
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};

@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { calcAllowedFor } from './skip-rule.js';
-import { syncPracticeRefLine } from './refline-screen.js';
+import { syncPracticeRefLine, poolHost } from './refline-screen.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
@@ -1381,7 +1381,9 @@ export function renderQuestion() {
     // Wave 5.2: the skill's number line above the card (refline-screen.js), when its options tick it on.
     try {
         const q = state.currentQ;
-        const key = q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
+        // A category pool keeps its options under the pool's id (refline-screen.js poolHost).
+        const key = poolHost(state.category, state.skill) ? state.category + ':' + state.skill
+            : q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
         syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill,
             opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
     } catch (e) { /* the line is a hint: never block the card */ }

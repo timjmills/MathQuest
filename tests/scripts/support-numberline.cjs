@@ -187,12 +187,14 @@ const SAMPLES = [
             o.mixS = !!rs.skillLine('subtraction', 'mixed_subtraction', { nlOn: true });
             o.mixSet = !!rs.skillLine('addition', 'mixed_addition', { nlOn: true, nlFrom: 0, nlTo: 100 });
             o.patDef = !!rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true });
-            const pa = rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true, pattern: ['add', 'sub'] });
+            // critic nl-r4 D4: count on / back with a tens start (the default Start) draws no line
+            o.patTens = !!rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true, pattern: ['add', 'sub'] });
+            const pa = rs.skillLine('patterns', 'number_patterns_rule', { nlOn: true, pattern: ['add', 'sub'], places: [1] });
             o.patOff = [];
             if (pa) {
                 const fine = (pa.step.num / pa.step.den) / (pa.minor && pa.minor !== 'auto' && pa.minor !== '0' ? Number(pa.minor) : 1);
-                for (let i = 0; i < 12; i++) {
-                    const q = window.generateQuestionFor({ category: 'patterns', skill: 'number_patterns_rule', opts: { nlOn: true, pattern: ['add', 'sub'] }, seed: 500 + i, itemIndex: i });
+                for (let i = 0; i < 42; i++) {
+                    const q = window.generateQuestionFor({ category: 'patterns', skill: 'number_patterns_rule', opts: { nlOn: true, pattern: ['add', 'sub'], places: [1] }, seed: 500 + i, itemIndex: i });
                     for (const x of kit.nlLineNumbers(q)) if (x.v < pa.from || x.v > pa.to || Math.abs(x.v / fine - Math.round(x.v / fine)) > 1e-9) o.patOff.push(x.v);
                 }
             }
@@ -215,6 +217,7 @@ const SAMPLES = [
         });
         check(!r3.mixA && !r3.mixS && r3.mixSet, `R3-D1 mixed pools: auto ${r3.mixA}/${r3.mixS}, with ends ${r3.mixSet}`);
         check(!r3.patDef && r3.pat && !r3.patOff.length, `R3-D2 number_patterns_rule: default ${r3.patDef}, count on/back ${r3.pat}, off the ticks ${r3.patOff.slice(0, 6)}`);
+        check(!r3.patTens, 'R4-D4 number_patterns_rule: count on / back with a tens start still draws a line');
         const gcd = (a, b) => (b ? gcd(b, a % b) : a);
         check(!r3.ordPairs.some(([n, d]) => gcd(Math.abs(Number(String(n).replace('−', '-'))), Number(d)) > 1), `R3-D3 ordering_rationals labels not in lowest terms: ${JSON.stringify(r3.ordPairs)}`);
         for (const [k, v] of Object.entries(r3.d4)) check(v.length === 1 && v[0] !== 'none', `R3-D4 ${k}: the line changes with the seed / role: ${v.join(' | ')}`);
@@ -228,30 +231,65 @@ const SAMPLES = [
                 for (const [cat, l] of Object.entries(window.SKILLS)) if (Array.isArray(l)) for (const s of l) if (s && !s.retired && mod.numberLineFits(cat, s.v)) out.push([cat, s.v]);
                 return out;
             });
-            const sweep = { noBand: [], lost: [], n: 0 };
-            for (const [cat, sk] of list) for (const size of ['S', 'L']) {
+            // critic nl-r4 D1/D2: S, M AND L; the pupil page count and the blank strip at the foot of
+            // every page, line on vs off. The band may never add a page; a build that keeps its count
+            // may not leave more than 5 mm more blank at the foot, and one that loses a row no more
+            // than the band's own height + 5 mm (the owner-accepted content-bound builds excepted).
+            const ACCEPTED = new Set(['round_sort_10@L', 'round_sort_100@L', 'round_sort_1000@L', 'add_wp_10@L', 'equiv_frac_nv@L']);
+            const sweep = { noBand: [], lost: [], pagesUp: [], blank: [], n: 0 };
+            for (const [cat, sk] of list) for (const size of ['S', 'M', 'L']) {
                 const r = await page.evaluate(async ({ cat, sk, size }) => {
-                    // (critic nl-r3 D1/D2: the mixed pools draw the line only with both ends set; the pattern rule only for count on / back)
-                    const extra = /^mixed_(addition|subtraction)$/.test(sk) ? { nlFrom: 0, nlTo: 100 } : sk === 'number_patterns_rule' ? { pattern: ['add', 'sub'] } : {};
+                    // (critic nl-r3 D1/D2: the mixed pools draw the line only with both ends set; the pattern rule only for count on / back from the ones)
+                    const extra = /^mixed_(addition|subtraction)$/.test(sk) ? { nlFrom: 0, nlTo: 100 } : sk === 'number_patterns_rule' ? { pattern: ['add', 'sub'], places: [1] } : {};
                     const mk = (on) => ({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: sk, opts: on ? Object.assign({ nlOn: true }, extra) : Object.assign({}, extra, { nlFrom: undefined, nlTo: undefined }) }], pages: 1 }], size, key: true, seed: 77 });
+                    const mm = 96 / 25.4;
+                    const meas = async (x) => {
+                        const host = document.createElement('div');
+                        host.style.cssText = 'position:absolute;left:0;top:0;width:210mm;background:#fff';
+                        host.innerHTML = x.pupilHtml;
+                        document.body.appendChild(host);
+                        await new Promise((res) => setTimeout(res, 20));
+                        const pages = [...host.querySelectorAll('.ws-page')].map((p) => {
+                            const body = p.querySelector('.ws-body');
+                            if (!body) return { cells: 0, blank: 0 };
+                            const bb = body.getBoundingClientRect();
+                            const kids = [...body.querySelectorAll('*')].filter((k) => k.getBoundingClientRect().height > 0);
+                            const bottom = kids.length ? Math.max(...kids.map((k) => k.getBoundingClientRect().bottom)) : bb.top;
+                            return { cells: p.querySelectorAll('.ws-cell').length, blank: (bb.bottom - bottom) / mm };
+                        });
+                        host.remove();
+                        return pages;
+                    };
                     let a, b;
                     try { a = await window.buildSheet(mk(true)); b = await window.buildSheet(mk(false)); } catch (e) { return null; }
                     const html = a.pupilHtml + a.keyHtml;
-                    const per = (x) => ((x.fits && (x.fits.sections || [x.fits])) || []).reduce((t, f) => t + (f.perPage || 0), 0);
-                    return { pages: (html.match(/class="ws-page[ "]/g) || []).length, bands: (html.match(/data-ws-band="refline"/g) || []).length, on: per(a), off: per(b) };
+                    const pa = await meas(a), pb = await meas(b);
+                    return {
+                        pages: (html.match(/class="ws-page[ "]/g) || []).length, bands: (html.match(/data-ws-band="refline"/g) || []).length,
+                        pcOn: a.pageCount, pcOff: b.pageCount, band: (a.numberLine && a.numberLine.hMm) || 0,
+                        on: pa.reduce((t, x) => t + x.cells, 0), off: pb.reduce((t, x) => t + x.cells, 0),
+                        blankOn: pa.length ? pa[0].blank : 0, blankOff: pb.length ? pb[0].blank : 0,
+                    };
                 }, { cat, sk, size });
                 if (!r) continue;
                 sweep.n++;
-                if (r.bands < r.pages) sweep.noBand.push(`${sk}@${size} ${r.bands}/${r.pages}`);
-                if (r.on < r.off) sweep.lost.push(`${sk}@${size} ${r.off}→${r.on}`);
+                const id = `${sk}@${size}`;
+                if (r.bands < r.pages) sweep.noBand.push(`${id} ${r.bands}/${r.pages}`);
+                if (r.pcOn > r.pcOff) sweep.pagesUp.push(`${id} ${r.pcOff}→${r.pcOn}`);
+                if (r.on < r.off) sweep.lost.push(`${id} ${r.off}→${r.on}`);
+                const grow = r.blankOn - r.blankOff;
+                const limit = r.on < r.off ? r.band + 5 : 5;
+                if (!ACCEPTED.has(id) && grow > limit) sweep.blank.push(`${id} ${r.blankOff.toFixed(0)}→${r.blankOn.toFixed(0)} mm (${r.off}→${r.on})`);
             }
             check(!sweep.noBand.length, `D6 pages without the line: ${sweep.noBand.join(', ')}`);
+            check(!sweep.pagesUp.length, `R4-D1 the band adds a page: ${sweep.pagesUp.join(', ')}`);
+            check(!sweep.blank.length, `R4-D2 the band leaves a blank strip at the foot: ${sweep.blank.join(', ')}`);
             // critic nl-r3 D5: these kept their count by giving up cell slack; they may not lose it again
             for (const k of ['sub_50_no_regroup@L', 'sub_50_regroup@L', 'sub_50_mixed@L', 'sub_100_no_regroup@L', 'sub_100_regroup@L', 'sub_100_mixed@L',
                 'sub_1k_no_regroup@L', 'sub_1k_regroup@L', 'sub_1k_mixed@L', 'sub_decimal@L', 'order_fdp@L', 'compare@S']) {
                 check(!sweep.lost.some((x) => x.startsWith(k + ' ')), `R3-D5 ${k} lost capacity to the band again`);
             }
-            log(`  sweep: ${sweep.n} builds; band on every page of ${sweep.n - sweep.noBand.length}; ${sweep.lost.length} lose capacity to the band (D7, recorded): ${sweep.lost.join(', ')}`);
+            log(`  sweep: ${sweep.n} builds (S, M, L); band on every page of ${sweep.n - sweep.noBand.length}; pages added ${sweep.pagesUp.length}; blank strips ${sweep.blank.length}; ${sweep.lost.length} lose capacity to the band (D7, recorded): ${sweep.lost.join(', ')}`);
         }
 
         // every page role where supports are allowed carries the line; test / check pages do not
@@ -396,6 +434,42 @@ const SAMPLES = [
         check(scr.off, 'practice card: line still shown with the option off');
         check(scr.ws && scr.wsOff, `online worksheet: line not mounted above the grid / not removed (${JSON.stringify(scr)})`);
         check(scr.quiz, 'the quiz draws the line (it draws no supports)');
+
+        /* critic nl-r4 D3: a category pool on screen follows paper - no line without both ends;
+           with them, the teacher's ONE line on every card question and on the worksheet */
+        const pool = await page.evaluate(async () => {
+            const W = window;
+            const st = W.state;
+            const out = {};
+            for (const [c, s] of [['addition', 'mixed_addition'], ['subtraction', 'mixed_subtraction']]) {
+                for (const [tag, o] of [['bare', { nlOn: true }], ['ends', { nlOn: true, nlFrom: 0, nlTo: 1000 }]]) {
+                    W.clearSetOptions({ silent: true });
+                    W.setSetOptions(c, s, o, { silent: true });
+                    st.quizMode = false; st.category = c; st.skill = s; st.skillOptions = null; st.gameMode = 'practice'; st.isMixedMode = false;
+                    W.showView('gameView');
+                    const card = new Set();
+                    for (let i = 0; i < 20; i++) {
+                        st.hasAnswered = false; st.currentQ = W.generateQuestion(); W.renderQuestion();
+                        const el = document.querySelector('#mqRefLine svg');
+                        card.add(el ? el.getAttribute('aria-label') : 'none');
+                    }
+                    st.gameMode = 'worksheet'; st.problemCount = 6;
+                    W.initWorksheet();
+                    await new Promise((r) => setTimeout(r, 300));
+                    const ws = document.querySelector('#mqWsRefLine svg');
+                    out[`${s}:${tag}`] = { card: [...card], ws: ws ? ws.getAttribute('aria-label') : 'none' };
+                }
+            }
+            W.clearSetOptions({ silent: true });
+            st.skillOptions = null;
+            W.showView('homeView');
+            return out;
+        });
+        for (const [k, v] of Object.entries(pool)) {
+            if (k.endsWith(':bare')) check(v.card.length === 1 && v.card[0] === 'none' && v.ws === 'none', `R4-D3 ${k}: a line without its ends ${JSON.stringify(v)}`);
+            else check(v.card.length === 1 && /0 to 1,?000/.test(v.card[0]) && v.ws === v.card[0], `R4-D3 ${k}: not the teacher's one line ${JSON.stringify(v)}`);
+        }
+        log(`  pools on screen: ${Object.entries(pool).map(([k, v]) => `${k} card ${v.card.join('/')} ws ${v.ws}`).join('; ')}`);
 
         if (SHOTS) await shots(h);
         check(!h.problems.length, `console problems: ${JSON.stringify(h.problems.slice(0, 5))}`);

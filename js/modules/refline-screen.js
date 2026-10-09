@@ -21,6 +21,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { normalizeOptions, numberLineFits, numberLineSkillHints, numberLineSummary } from './skill-options.js';
 import { getSetOptions } from './skill-option-store.js';
+import { SKILLS, isMixedMetaSkill } from './data.js';
 import { setNumberLineCoverCheck } from './skill-options-ui.js';
 import { nlResolveLine, nlLineNumbers, nlItemSteps, nlCommonStep, nlStepName, refLineHTML } from './sheet/index.js';
 
@@ -42,7 +43,7 @@ export function lineOpts(categoryId, skillId, opts) {
  * Why a skill that offers the line draws none with these options, or '' (critic nl-r3 D1, D2).
  * The mixed add / subtract pools deal from 4 + 2 to six-digit sums, so no Auto line serves them:
  * the line is drawn only once the teacher sets both ends. number_patterns_rule draws it only for
- * count on / count back starting in the ones or tens (doubling, × 10 and growing steps cannot be
+ * count on / count back starting in the ones (doubling, × 10 and growing steps cannot be
  * read on one additive line).
  */
 const _NL_MANUAL = new Set(['addition:mixed_addition', 'subtraction:mixed_subtraction']);
@@ -54,8 +55,10 @@ export function numberLineBlocked(categoryId, skillId, o) {
     }
     if (k === 'patterns:number_patterns_rule') {
         const pat = set(o.pattern), pl = set(o.places);
-        if (!pat || pat.some((v) => v !== 'add' && v !== 'sub') || !pl || pl.some((v) => v !== '1' && v !== '10')) {
-            return 'The line is drawn for Count on / Count back starting in the ones or tens only: doubling, × 10 and growing steps cannot be read on one number line.';
+        if (!pat || pat.some((v) => v !== 'add' && v !== 'sub') || !pl || pl.some((v) => v !== '1')) {
+            // Lead decision (critic nl-r4 D4): a tens start runs the line to ~280 with ticks
+            // thinned to 2s, so odd numbers fall between ticks; a ones start keeps every number on one.
+            return 'The line is drawn for Count on / Count back with Start in the ones only, so every number lands on a tick: doubling, × 10, growing steps and a tens start cannot be read on one number line.';
         }
     }
     return '';
@@ -167,16 +170,31 @@ export function mountRefLine(anchor, id, html) {
     return el;
 }
 
+/**
+ * The category pool (mixed_addition, mixed_subtraction ...) a host is playing, or null (critic
+ * nl-r4 D3). A pool's items carry their sub-skill's id, but the teacher set the line on the POOL:
+ * paper resolves it from the pool's options, so the screen does too - no line until the pool's
+ * own rules allow one (both ends set), then the teacher's ONE line on every question.
+ */
+export function poolHost(categoryId, skillId) {
+    if (!categoryId || !skillId) return null;
+    const list = SKILLS[categoryId];
+    if (!Array.isArray(list) || !list.some((s) => s && s.v === skillId)) return null;
+    return isMixedMetaSkill(skillId) ? { categoryId, skillId } : null;
+}
+
 /** Live practice: the skill's line above the practice card (the item on it only widens it). */
 export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = null } = {}) {
     if (typeof document === 'undefined') return;
     const card = document.getElementById('questionCard');
     if (!card) return;
-    const cat = (q && q.categoryId) || categoryId;
-    const sk = (q && (q.requestedSkillId || q.skillId)) || skillId;
-    const o = optionsInUse(cat, sk, opts, q);
+    const pool = poolHost(categoryId, skillId);
+    const cat = pool ? pool.categoryId : (q && q.categoryId) || categoryId;
+    const sk = pool ? pool.skillId : (q && (q.requestedSkillId || q.skillId)) || skillId;
+    const o = pool ? optionsInUse(cat, sk, opts, null) : optionsInUse(cat, sk, opts, q);
     let html = '';
-    try { html = bandHTML(skillLine(cat, sk, o, q ? [q] : []), card.clientWidth || 600); } catch (e) { html = ''; }
+    // A pool's line is the teacher's, the same on every question: the item never widens it.
+    try { html = bandHTML(skillLine(cat, sk, o, q && !pool ? [q] : []), card.clientWidth || 600); } catch (e) { html = ''; }
     const el = mountRefLine(card, 'mqRefLine', html);
     if (el) el.style.width = `${card.offsetWidth || card.clientWidth}px`;
 }
@@ -190,14 +208,17 @@ export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opt
     // The skills on the sheet, each with the options the app holds for it (critic nl-r1 D1: a
     // panel edit lives in the set's store, not in state.skillOptions).
     const seen = new Map();
-    for (const q of qs) {
+    // A category pool's sheet: the pool's one line (its options), as on paper (critic nl-r4 D3).
+    const pool = poolHost(categoryId, skillId);
+    if (pool) seen.set(`${pool.categoryId}:${pool.skillId}`, { categoryId: pool.categoryId, skillId: pool.skillId, opts: optionsInUse(pool.categoryId, pool.skillId, opts, null) });
+    if (!pool) for (const q of qs) {
         const cat = q.categoryId || categoryId, sk = q.requestedSkillId || q.skillId || skillId;
         const k = `${cat}:${sk}`;
         if (!seen.has(k)) seen.set(k, { categoryId: cat, skillId: sk, opts: optionsInUse(cat, sk, qs.length && seen.size === 0 ? opts : null, q) });
     }
     if (!seen.size && categoryId && skillId) seen.set(`${categoryId}:${skillId}`, { categoryId, skillId, opts: optionsInUse(categoryId, skillId, opts) });
     let html = '';
-    try { html = bandHTML(mergedLine([...seen.values()], qs), grid.clientWidth || 600); } catch (e) { html = ''; }
+    try { html = bandHTML(mergedLine([...seen.values()], pool ? [] : qs), grid.clientWidth || 600); } catch (e) { html = ''; }
     mountRefLine(grid, 'mqWsRefLine', html);
 }
 
