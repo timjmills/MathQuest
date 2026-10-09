@@ -117,7 +117,10 @@ async function typeInto(page, i, text) {
 
 async function info(page, i) {
   // a box scrolled out of its swipe row's window (a count-by row, wave 1 C2) rightly hides its badge: swipe it into view first
+  // a right answer now hands the caret to the next box (owner 2026-10-04), and a row keeps its focused box in view: take the
+  // caret out of the row first, or the row slides back to it while this looks at the earlier box
   await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); const w = el.closest('[data-mq-swiperow]');
+    if (w && w.contains(document.activeElement)) document.activeElement.blur();
     if (w) { const v = w.getBoundingClientRect(), r = el.getBoundingClientRect(); if (r.left < v.left) w.scrollLeft -= v.left - r.left + 4; else if (r.right > v.right) w.scrollLeft += r.right - v.right + 4; } }, i);
   await sleep(150);                       // the badge follows its box on the next animation frames
   return page.evaluate((i) => {

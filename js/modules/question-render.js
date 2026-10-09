@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { calcAllowedFor } from './skip-rule.js';
 import { syncPracticeRefLine } from './refline-screen.js';
+import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
 import {
@@ -922,9 +923,16 @@ export function wireBoxValidation(visualAidEl, q) {
         if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
     });
 
-    // 4) number-family / fact-family: each input has data-answer.
+    // 4) number-family / fact-family: each input has data-answer. A number family is judged in any
+    // order (each row any fact its sign makes, no fact twice): the family decides, not data-answer.
+    const nfAnyOrder = isOrderFreeFamily(q);
     nfInputs.forEach(el => {
-        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+        if (!(el.dataset && 'answer' in el.dataset)) return;
+        const slot = { el, expect: el.dataset.answer, norm: numNorm };
+        if (nfAnyOrder && el.classList.contains('number-family-input')) {
+            slot.judge = () => familyBoxVerdict(q.numberFamilyData, nfInputs, el) === true;
+        }
+        slots.push(slot);
     });
 
     // 5) factor-links: each input has data-answer.
@@ -1043,6 +1051,7 @@ export function wireBoxValidation(visualAidEl, q) {
     // and fraction-input cross-multiplied equivalence via customMatch).
     const slotMatches = (s) => {
         const v = s.norm(s.el.value);
+        if (typeof s.judge === 'function') return s.judge();
         if (typeof s.customMatch === 'function' && s.customMatch()) return true;
         if (s.multi && s.multi.length) return s.multi.some(exp => looseEq(v, exp));
         return looseEq(v, s.expect);
@@ -1166,7 +1175,9 @@ export function wireBoxValidation(visualAidEl, q) {
         }
         s.el.dataset._boxValAttached = '1';
         s.el.addEventListener('input', () => {
-            paintSlot(s);
+            // a family box's verdict depends on the other rows: repaint them all
+            if (s.judge) slots.forEach(o => { if (o.judge) paintSlot(o); });
+            else paintSlot(s);
             tryAdvance();
         });
         // Initial paint (in case the input arrives pre-filled, e.g. retry).
@@ -6783,15 +6794,18 @@ export function checkNumberFamilyAnswer() {
     const inputs = visualAid.querySelectorAll('.number-family-input, .fact-family-input');
     let allCorrect = true;
     let allFilled = true;
-    
+    // a number family is right in any order (each row any fact its sign makes, no fact twice)
+    const anyOrder = isOrderFreeFamily(q);
+
     inputs.forEach(input => {
         const userVal = input.value.trim();
         const correctVal = input.dataset.answer;
-        
+        const right = anyOrder ? familyBoxVerdict(q.numberFamilyData, inputs, input) === true : userVal === correctVal;
+
         if (userVal === '') {
             allFilled = false;
             allCorrect = false;
-        } else if (userVal === correctVal) {
+        } else if (right) {
             input.style.borderColor = 'var(--correct)';
             input.style.background = 'rgba(6,214,160,0.2)';
         } else {
@@ -6919,16 +6933,18 @@ export function checkNumberFamily() {
     let allFilled = true;
     let correctCount = 0;
     let totalInputs = inputs.length;
-    
+    const anyOrder = isOrderFreeFamily(q);
+
     inputs.forEach(input => {
         const userVal = input.value.trim();
         const correctVal = input.dataset.answer;
-        
+        const right = anyOrder ? familyBoxVerdict(q.numberFamilyData, inputs, input) === true : userVal === correctVal;
+
         if (userVal === '') {
             allFilled = false;
             input.style.borderColor = 'var(--accent-orange)';
             input.style.background = 'rgba(255, 152, 0, 0.1)';
-        } else if (userVal === correctVal) {
+        } else if (right) {
             correctCount++;
             input.style.borderColor = 'var(--accent-green)';
             input.style.background = 'rgba(76, 175, 80, 0.15)';
