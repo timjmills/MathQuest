@@ -1708,7 +1708,7 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
 .mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td),
-.mq-scell.mq-grid-cell[data-mq-touch-floor] { --mq-digit: 40px; }   /* touch floor: also set from the start when the item's ladder has a touch rung, so no cell grows mid-ladder */
+.mq-scell.mq-grid-cell[data-mq-touch-floor], [data-mq-touch-floor] .mq-scell.mq-grid-cell { --mq-digit: 40px; }   /* touch floor: also set from the start when the item's ladder has a touch rung, so no cell grows mid-ladder */
 
 /* Touch numerals are tappable on screen (SUPPORTS S1.8): each number is a target of at least 44 x 44 px,
    centred on it; the running count sits under the cell, outside the B&W cell. Additive. */
@@ -1717,3 +1717,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 .ws-tn.mq-tn-hit:focus-visible { outline: 3px solid var(--mq-focus, #1a73e8); outline-offset: 2px; border-radius: 4px; }
 .mq-tn-count { font-family: Andika, sans-serif; font-size: 16px; color: #595959; margin: 6px 0 0; display: flex; gap: 12px; align-items: center; justify-content: center; }
 .mq-tn-count .mq-tn-reset { min-height: 44px; padding: 0 14px; font: inherit; border: 1px solid #949494; border-radius: 8px; background: #fff; color: #222; cursor: pointer; }
+
+/* ---- Steps-box lane (D3): an open hint sits in flow between the bar and the paper, pushing
+   the cell down, so it never covers the story it hints about (RUBRIC C1: chrome never covers). */
+.problem-card.mq-wscard > .hint-popup.active {
+    position: relative; top: auto; bottom: auto; left: auto; right: auto;
+    margin: 0 0 8px; box-shadow: none;
+}
