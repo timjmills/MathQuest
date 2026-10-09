@@ -134,7 +134,17 @@
 
     /* the on-task timer chip and the toasts: lifted clear of the pinned Check / Next bar */
     html.mq-play body.student-mode .floating-timer { bottom: 84px; }
-    html.mq-play body.student-mode .toast-notification { bottom: 84px !important; }
+    /* toasts (XP, the start message) at the top right, just under the bar, clear of the question,
+       its feedback and the pinned bar; the correct-answer cheer at the bottom right, beside the cell */
+    html.mq-play body.student-mode :is(.toast-notification, .mq-notify) {
+        top: 70px !important; bottom: auto !important;
+        left: auto !important; right: max(16px, calc((100vw - 1200px) / 2 + 16px)) !important;
+        transform: none !important;
+        max-width: 300px;
+    }
+    html.mq-play body.student-mode .mq-mascot-cheer { place-items: end; padding: 0 max(16px, calc((100vw - 1200px) / 2 + 16px)) 90px 0; }
+    html.mq-play body.student-mode .mq-mascot-cheer .mq-mascot-cheer-bubble { font-size: 1.1rem; padding: 8px 16px; }
+    html.mq-play body.student-mode .mq-mascot-cheer svg { max-width: 110px; height: auto; }
 
     /* ---- Practice card, boss, race ---- */
     html.mq-play body.student-mode #gameView > .game-header {
@@ -146,6 +156,9 @@
     html.mq-play body.student-mode #gameView > .game-header > div { min-width: 0; flex: 0 0 auto; }
     html.mq-play body.student-mode #gameView > .game-header .btn { min-height: 44px; }
     html.mq-play body.student-mode #gameTopicDisplay { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* race in dark mode: lighter lanes so the cars read */
+    html.dark.mq-play body.student-mode #raceTrack .race-lane { border-bottom-color: #c9c3e6; }
+    html.mq-play body.student-mode #raceTrack .race-car { font-size: 1.2rem; }
     html.mq-play body.student-mode #gameView > #skillProgressContainer {
         grid-column: 3;
         width: clamp(170px, 20vw, 300px);
@@ -171,7 +184,7 @@
     html.mq-play body.student-mode #bossArena .boss-track { bottom: 6px; }
     html.mq-play body.student-mode #raceTrack[style*="block"] { display: flex !important; flex-direction: column; justify-content: center; }
     html.mq-play body.student-mode #raceTrack .race-lane { height: 23px; margin: 0; border-bottom-width: 1px; }
-    html.mq-play body.student-mode #raceTrack .race-car { bottom: 0; font-size: 1.05rem; }
+    html.mq-play body.student-mode #raceTrack .race-car { bottom: 0; }
 
     html.mq-play body.student-mode #gameView > .q-dots-row { margin: 0 auto; padding: 2px 10px; }
     html.mq-play body.student-mode #gameView #questionCard.mq-card { margin-top: 0; padding-top: 6px; padding-bottom: 0; }
@@ -264,4 +277,32 @@
         padding: 0 4px;
         flex-wrap: nowrap;
     }
+}
+
+/* Wide short screens, the quiz: "Q1 · skill" and Flag ride in the card's side gutters (the 720 px
+   paper is centred in a wider card) instead of taking a row of their own above the paper. A wide
+   paper (a chart and its question side by side) keeps the row. */
+@media screen and (max-height: 860px) and (min-width: 1100px) {
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card:not(:has(.fg-bar-graph, .k2-chart-ten)) {
+        position: relative;
+        padding-top: 8px;
+    }
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card:not(:has(.fg-bar-graph, .k2-chart-ten)) > .qt-q-header { display: contents; }
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card:not(:has(.fg-bar-graph, .k2-chart-ten)) > .qt-q-header > .qt-q-num {
+        position: absolute; top: 12px; left: 18px;
+    }
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card:not(:has(.fg-bar-graph, .k2-chart-ten)) > .qt-q-header > .qt-q-skill {
+        position: absolute; top: 44px; left: 18px;
+        max-width: calc((100% - 720px) / 2 - 30px);
+        white-space: normal;
+    }
+    html.mq-play body.student-mode #quizTakeView > .qt-question-card:not(:has(.fg-bar-graph, .k2-chart-ten)) > .qt-q-header > .qt-flag-btn {
+        position: absolute; top: 8px; right: 18px;
+    }
+}
+
+
+/* 700-900 px wide: the topic text gives way, so Exit and the score keep their room */
+@media screen and (max-height: 860px) and (min-width: 700px) and (max-width: 899px) {
+    html.mq-play body.student-mode #gameTopicDisplay { display: none; }
 }

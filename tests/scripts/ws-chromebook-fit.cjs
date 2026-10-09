@@ -17,7 +17,7 @@
 //
 // Boss and race also FAIL when the arena / track is out of view (at the top or after the page has
 // scrolled to a box), and the quiz FAILS when, after a click on Next, the pulsing box has not got the
-// focus (typing would go nowhere).
+// focus (typing would go nowhere) or when one click on Next, after typing a digit, does not move on.
 //
 // It also checks that nothing else changed: the home screen and a tall screen (1366 x 960) keep
 // the full app header, and the compact header never engages there.
@@ -43,7 +43,7 @@ const SHOTS = arg('shots', null);
 // The compact chrome's budget: the most a short screen may spend above the question paper
 // (header row + play bar + the card's own top line). An item whose problem is taller than what is
 // left is genuinely tall.
-const CHROME_BUDGET = 150;
+const CHROME_BUDGET = 130;
 const ARENA_BUDGET = 0;    // the boss arena and the race track ride in the play bar (css/play-compact.css)
 // The known tall shapes, always in the sample on top of one skill per category.
 const TALL = [
@@ -95,6 +95,8 @@ function MEASURE(host) {
         go: gR ? Math.round(gR.bottom) : null, goTop: gR ? Math.round(gR.top) : null,
         paperTop: Math.round(pR.top), cardsFull,
         goInPaper: !!(goEl && paper && paper.contains(goEl)),
+        // the bottom of the sticky play bar: a box under it is not seen
+        barBottom: Math.round(Math.max(0, ...Array.from(document.querySelectorAll('.mq-play-menu-btn, #myStatsBar, .view.active > .game-header, .view.active > .qt-topbar')).filter(vis).filter(el => getComputedStyle(el).position === 'sticky').map(el => el.getBoundingClientRect().bottom))),
         arena: (() => { const a = Array.from(document.querySelectorAll('#bossArena, #raceTrack')).find(vis); if (!a) return null; const q = a.getBoundingClientRect(); return q.top >= -0.5 && q.bottom <= H + 0.5; })(),
     };
 }
@@ -223,9 +225,9 @@ async function startHost(page, host, c, k, seed) {
                     if (isTall) {
                         // it may scroll, but active-box must have brought the box into view on load
                         const l = m.load || {};
-                        const seen = l.box != null && l.box <= l.fold && l.boxTop >= 0;
+                        const seen = l.box != null && l.box <= l.fold && l.boxTop >= (l.barBottom || 0);
                         tall.push(`${tag}: problem ${problem} px; box ${m.box} > fold ${m.fold}; on load ${seen ? 'in view' : `NOT in view (box ${l.box}, fold ${l.fold})`}`);
-                        if (host !== 'worksheet' && !seen && m.boxKind === 'active') { verdict = 'FAIL'; fails.push(`${tag}: tall item, active box not brought into view on load`); }
+                        if (host !== 'worksheet' && !seen && (m.boxKind === 'active' || m.boxKind === 'input')) { verdict = 'FAIL'; fails.push(`${tag}: tall item, active box not brought into view on load`); }
                         else if (verdict === 'ok') verdict = 'tall';
                     } else { verdict = 'FAIL'; fails.push(`${tag}: answer box bottom ${m.box} > fold ${m.fold} (paper top ${m.paperTop})`); }
                 }
@@ -233,12 +235,17 @@ async function startHost(page, host, c, k, seed) {
                 if ((host === 'boss' || host === 'race') && !(m.arena && m.load && m.load.arena)) { verdict = 'FAIL'; fails.push(`${tag}: the ${host === 'boss' ? 'arena' : 'track'} is not in view (top ${m.arena}, on load ${m.load && m.load.arena})`); }
                 // quiz: after Next (a click), the next question's pulsing box has the focus, so typing lands
                 if (host === 'quiz') {
+                    // the pupil types a digit first: the box's change must not swallow the first click on Next
+                    const typed = await page.evaluate(() => { const a = document.activeElement; return !!a && a.matches('#quizTakeView input:not([type=hidden])'); });
+                    if (typed) { await page.keyboard.type('1'); await sleep(100); }
                     const next = await page.$('#quizTakeView .qt-nav-btn.next');
                     if (next) {
+                        const before = await page.evaluate(() => window.state.quizQuestionIndex);
                         await next.click();
                         await sleep(700);
-                        const f = await page.evaluate(() => { const a = document.querySelector('#quizTakeView .mq-active-box'); return { has: !!a, typing: !!a && a.matches('input, textarea, [contenteditable="true"]'), focused: !!a && document.activeElement === a }; });
-                        if (f.typing && !f.focused) { verdict = 'FAIL'; fails.push(`${tag}: after Next the pulsing box does not have the focus`); }
+                        const f = await page.evaluate(() => { const a = document.querySelector('#quizTakeView .mq-active-box'); return { idx: window.state.quizQuestionIndex, typing: !!a && a.matches('input, textarea, [contenteditable="true"]'), focused: !!a && document.activeElement === a }; });
+                        if (f.idx !== before + 1) { verdict = 'FAIL'; fails.push(`${tag}: one click on Next${typed ? ' after typing' : ''} did not move to the next question`); }
+                        else if (f.typing && !f.focused) { verdict = 'FAIL'; fails.push(`${tag}: after Next the pulsing box does not have the focus`); }
                     }
                 }
                 rows.push({ skill: s, size: `${size.w}x${size.h}`, host, ...m, load: undefined, verdict });
