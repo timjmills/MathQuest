@@ -325,3 +325,12 @@
 /* wave 1 lane D (critic 2026-10-03): a key's value in an equation's answer box sits in the MIDDLE
    of the box at a size it holds ("120" no longer runs past the box edge from its bottom-left). */
 :is(.ws-page, .ws-sheet) .ws-eq .ws-box[data-ws-ink] { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; font-size: .72em; line-height: 1; vertical-align: bottom; }
+
+/* wave 1 lane D round 8 (critic r6 D6-1, additive): a fact's answer box among boxed column work
+   (cells/fact.js boxAns) is drawn at the fact's OWN digit size - a digit line tall (never under Hw)
+   and as wide as the widest answer's tracks - so the pupil writes at the size of the problem and a
+   key's "110" sits inside its box instead of hanging out of it. */
+:is(.ws-page, .ws-sheet) .ws-fact > .ws-factans--box { height: auto; justify-content: flex-end; margin-top: .5mm; }
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factbox { box-sizing: border-box; width: max(var(--w, 14mm), calc(var(--fn, 2) * 0.72em + 2mm + 2 * var(--ws-hair)));
+    height: calc(max(var(--ws-hw), 1.2em) + 2 * var(--ws-hair)); display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1em; line-height: 1; vertical-align: top; overflow: visible; }

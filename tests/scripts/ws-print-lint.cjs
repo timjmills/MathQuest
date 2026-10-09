@@ -40,6 +40,10 @@
 //   --report-only             print everything, exit 0 (never prints OK when something failed)
 //   --verbose                 print every finding group, not just the first 12 per document
 //   --save-html dir           app sources: also write each linted document's HTML there (for the critic / debugging)
+//   --seeds N                 kit: lint every POOL skill (mixed_*, *_all) at N seeds - its usual one plus N - 1
+//                             derived (hash(cat__skill:print:k)) - each page its own document `cat:skill@seed`
+//                             (a pool deals different members at every seed: critic r6 D6-6)
+//   --seed-list a,b,c         kit: lint every pool skill at exactly these seeds instead
 //
 // WHAT A DOCUMENT IS
 //   pack    one file of the mock-up pack; every `.ws-page` is one printed A4 sheet.
@@ -1062,7 +1066,45 @@ function wsLintPage(cfg) {
                 if (seenSig.has(sg)) repeats.push(`${seenSig.get(sg)} = ${i + 1}`);
                 else seenSig.set(sg, i + 1);
             });
+            // L-KEY AK-2 OVERFLOW (wave 1 lane D round 8, critic r6 D6-1/D6-6: the key's "110" hung
+            // 4 mm out of its fact box and no lint saw it): a key answer is written INSIDE its box.
+            // The ink of every written value in a bordered slot (box or digit box) is measured -
+            // the text's range rect for its width, the glyphs' own ascent / descent (canvas
+            // actualBoundingBox) against the baseline for its height - and must stay within the
+            // box's outer edge (1 px).
+            const keyOver = [];
+            if (ri.key) {
+                const cv = document.createElement('canvas').getContext('2d');
+                for (const sl of pg.querySelectorAll('.ws-box, [data-ws-slot]')) {
+                    const br = sl.getBoundingClientRect();
+                    if (br.width < 2 || br.height < 2 || !visible(sl)) continue;
+                    const st = getComputedStyle(sl);
+                    const bordered = ['Top', 'Bottom', 'Left', 'Right'].every(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
+                    if (!bordered) continue;
+                    const tw = document.createTreeWalker(sl, NodeFilter.SHOW_TEXT);
+                    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+                        const t = (n.nodeValue || '').trim();
+                        if (!t || !n.parentElement || !visible(n.parentElement)) continue;
+                        // a nested bordered slot judges its own text
+                        const own = n.parentElement.closest('.ws-box, [data-ws-slot]');
+                        if (own && own !== sl && sl.contains(own)) { const os = getComputedStyle(own); if (parseFloat(os.borderTopWidth) > 0 && parseFloat(os.borderBottomWidth) > 0) continue; }
+                        const ps = getComputedStyle(n.parentElement);
+                        cv.font = `${ps.fontStyle} ${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
+                        const m = cv.measureText(t);
+                        const rg = document.createRange();
+                        rg.selectNodeContents(n);
+                        for (const tr of rg.getClientRects()) {
+                            if (tr.width < 0.5) continue;
+                            const fb = (m.fontBoundingBoxAscent || 0) + (m.fontBoundingBoxDescent || 0);
+                            const base = tr.top + (fb > 0 ? (m.fontBoundingBoxAscent * tr.height) / fb : tr.height * 0.8);
+                            const d = Math.max(br.top - (base - m.actualBoundingBoxAscent), (base + m.actualBoundingBoxDescent) - br.bottom, br.left - tr.left, tr.right - br.right);
+                            if (d > 1) { keyOver.push({ text: t.slice(0, 12), mm: mm(d), tag: tagOf(sl) }); break; }
+                        }
+                    }
+                }
+            }
             out.pages.push({
+                keyOver,
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
                 // INK-30: a lesson page (or a practice page's lesson step strip) may print the accent.
@@ -1538,6 +1580,7 @@ function lintKitGeometry(dom, pdf, info, F) {
         const empty = p.cells.reduce((n, c) => n + (c.slots - c.answered), 0);
         if (empty > 0) F('L-KEY', 'AK-2', 'critical', { page: p.idx }, `key page ${p.idx}: ${empty} of ${p.slots} answer slot(s) carry no answer (AK-2, AK-4)`, 'unanswered slot');
         if (p.cells.some(c => !c.weightOk)) F('L-KEY', 'AK-2', 'minor', { page: p.idx }, `key page ${p.idx}: answers not in weight 700 (AK-2)`, 'key weight');
+        for (const o of (p.keyOver || [])) F('L-KEY', 'AK-2', 'major', { page: p.idx }, `key page ${p.idx}: the answer "${o.text}" runs ${o.mm} mm outside its box: a key writes each answer inside the slot the pupil writes in (AK-2, critic r6 D6-1)`, 'key answer outside its box');
     }
 }
 function maxDev(a, b) {
@@ -1764,9 +1807,23 @@ async function runApp(source) {
         // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
         // cannot take (a fact layout for a non-fact skill) is reported as n/a, not linted.
         const kitRoles = source === 'kit' ? (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean) : [null];
-        for (const s of skills) for (const role of kitRoles) {
-            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
-            const seed = hash(`${s.categoryId}__${s.skillId}:print`);
+        // --seeds N / --seed-list a,b (wave 1 lane D round 8, critic r6 D6-6): a POOL page (mixed_*,
+        // *_all) deals different members at every seed, so one seed proves one page. Each pool skill
+        // is linted at the usual seed plus N - 1 derived ones (hash(cat__skill:print:k)), or at the
+        // seeds listed; every other skill keeps its one seed. Each extra page is its own document
+        // (`cat:skill@seed`), so PAGEFILL, L-KEY and the rest are judged page by page.
+        const SEEDS_N = Math.max(1, parseInt(arg('seeds', '1'), 10) || 1);
+        const SEED_LIST = (arg('seed-list', '') || '').split(',').map(x => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite);
+        const poolSkill = (s) => /^mixed_|_all$/.test(s.skillId) || s.skillId === 'all_domains_mixed';
+        const seedsOf = (s) => {
+            const base = hash(`${s.categoryId}__${s.skillId}:print`);
+            if (source !== 'kit' || !poolSkill(s)) return [base];
+            if (SEED_LIST.length) return SEED_LIST.map(x => x >>> 0);
+            return [base, ...Array.from({ length: SEEDS_N - 1 }, (_, k) => hash(`${s.categoryId}__${s.skillId}:print:${k + 1}`))];
+        };
+        for (const s of skills) for (const role of kitRoles) for (const seed of seedsOf(s)) {
+            const extra = seed !== hash(`${s.categoryId}__${s.skillId}:print`);
+            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}${extra ? '@' + seed : ''}`;
             let r;
             let kitHalves = null;
             try {
@@ -1808,7 +1865,7 @@ async function runApp(source) {
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
             }
-            r.info.label = s.label + (role && role !== 'independent' ? ` (${role})` : '');
+            r.info.label = s.label + (role && role !== 'independent' ? ` (${role})` : '') + (extra ? ` (seed ${seed})` : '');
             results.push(r);
             process.stdout.write(`  ${id}: ${r.info.pages ?? '?'}+${r.info.keyPages ?? '?'} pages, ${r.findings.length} finding(s)\n`);
             await hideOverlays(page);
@@ -1987,6 +2044,27 @@ const SELF_TESTS = [
         const foot = p1.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
         // the grid ends 24 % of its problem area above the footer
         g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.76}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
+    } },
+    // wave 1 lane D round 8 (critic r6 D6-6): a pool page's split-off column work is a second grid on
+    // the page; the strip under the LAST grid is what PAGEFILL measures (first grid top to footer)
+    { name: 'strip under a page of two grids (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p1.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        const g2 = g.cloneNode(false);
+        g2.removeAttribute('id');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells.slice(Math.ceil(cells.length / 2)).forEach(c => g2.appendChild(c));
+        g.after(g2);
+        // the two grids end 28 % of the problem area above the footer
+        for (const x of [g, g2]) { x.style.flex = 'none'; x.style.height = `${(foot - top) * 0.36}px`; x.style.gridTemplateRows = 'repeat(2, 1fr)'; }
+    } },
+    // wave 1 lane D round 8 (critic r6 D6-1): the key's "110" hung 4 mm out of its answer box
+    { name: 'key answer outside its box', expect: ['L-KEY', 'AK-2'], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        k.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ws-box" style="display:inline-block;width:12mm;height:6mm;border:0.75pt solid #000;font-size:28pt;line-height:6mm;font-weight:700;overflow:visible">110</span>');
     } },
     { name: 'empty bordered run after the last problem', mode: 'kit', expect: ['L-DENSITY', 'HOLE'], fn: () => {
         const g = document.querySelector('.ws-page .ws-grid');

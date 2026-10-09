@@ -208,6 +208,14 @@ const withCue = (html, p) => (p && p.cue ? `${html}<div class="ws-factcue" style
  * before, so a page whose dialog chose 10 columns was laid out at the 5-column footprint.
  */
 const columnsOf = (p, ctx) => p.columns || (ctx && ctx.options && ctx.options.factColumns) || FACT_AUTO_COLS[ctx && ctx.size] || FACT_AUTO_COLS.L;
+/**
+ * Wave 1 lane D round 8 (critic r6 D6-1): a fact dealt among boxed column work (`boxAns`, Mixed
+ * Multiplication) is drawn on paper at its size's digit metric - the size the missing-digit
+ * stacks and the column work beside it use - so one row of column problems holds ONE digit size
+ * (the fact ladder's 28 pt beside 16 pt stacks at S read as two scales). Never smaller than the
+ * size's metric (content never shrinks); 0 when the fact is not boxed or is drawn on screen.
+ */
+const boxedPt = (p, ctx) => (p.boxAns === true && ctx && !(ctx.mode === 'screen' && !ctx.static) && SIZES[ctx.size] ? SIZES[ctx.size].digitPt : 0);
 
 /* ----------------------------------------------------------------- the across form */
 
@@ -306,7 +314,7 @@ register('fact', {
     renderFact(p, ctx) {
         const value = p.ans !== undefined ? p.ans : compute(p);
         const cols = columnsOf(p, ctx);
-        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || factDigitPt(cols));
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || boxedPt(p, ctx) || factDigitPt(cols));
         // VA-71 / the notation option: vertical rows first, then a horizontal block. An across
         // fact on a page of more than 4 columns (a fact-rows page) is drawn vertical (VA-65).
         const tn = touchNumbers(p);
@@ -353,7 +361,13 @@ register('fact', {
                 id: 'ans', kind: 'number', shape: 'box', digits: n, graded: true, order: 0,
                 maxLength: n, inputmode: 'numeric', scopes: ['full', 'answer-only'],
             }, ctx, this.answerKey(p));
-            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans" style="grid-column:2 / -1">${slot}</span>`);
+            // (round 8, critic r6 D6-1) on paper the box is sized from the fact's OWN digit size: as
+            // tall as a digit line (never under Hw) and as wide as the widest answer's digit tracks,
+            // so the pupil writes at the size of the problem and the key's digits sit inside it.
+            const paperBox = ctx.mode !== 'screen' || ctx.static
+                ? slot.replace('class="ws-box', 'class="ws-box ws-factbox').replace(/style="--w:([\d.]+)mm"/, `style="--w:$1mm;--fn:${Math.max(n, String(this.answerKey(p).value ?? '').length)}"`)
+                : slot;
+            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans${paperBox !== slot ? ' ws-factans--box' : ''}" style="grid-column:2 / -1">${paperBox}</span>`);
         }
         // The answer zone under the sum rule is open (PG-14: all spare height goes below the
         // rule). It is the same slot in every state (AK-4: the key and the pupil page carry the
@@ -458,7 +472,7 @@ register('fact', {
     gridItem(p, ctx) {
         if (drawsStack(p, ctx)) return { cls: '', style: '' };
         const cols = columnsOf(p, ctx);
-        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || factDigitPt(cols));
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || boxedPt(p, ctx) || factDigitPt(cols));
         return { cls: 'fact', style: `--fd:${pt}pt;--fp:${p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols)}mm` };
     },
 });
