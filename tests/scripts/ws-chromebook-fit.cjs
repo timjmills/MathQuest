@@ -64,7 +64,7 @@ function MEASURE(host) {
     const inputs = Array.from(root.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select, [contenteditable="true"]'))
         .filter(vis).filter(el => !OPTIONAL.test(el.className) && !el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .qt-q-header'));
     const active = Array.from(root.querySelectorAll('.mq-active-box')).find(vis);
-    const choice = Array.from(root.querySelectorAll('#answerOptions button, .answer-options button, .option-btn, .mq-choice, .qt-option, [data-choice], .mq-tap, .mq-target'))
+    const choice = Array.from(root.querySelectorAll('#answerOptions button, .answer-options button, .option-btn, .mq-choice, .qt-option, [data-choice], .mq-tap, .mq-target, .mq-tickbox'))
         .find(vis);
     // no typing box or choice found (a tick-one table, a drawing): the whole problem must show
     const box = active || inputs[0] || choice || paper || null;

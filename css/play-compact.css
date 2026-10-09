@@ -121,7 +121,9 @@
     html.mq-play body.student-mode #timerDisplay { padding: 6px 14px; min-height: 52px; box-sizing: border-box; font-size: 1.4rem; display: flex; align-items: center; gap: 6px; }
     html.mq-play body.student-mode #timerValue { font-size: 1.4rem; }
     html.mq-play body.student-mode #gameView > .q-dots-row { margin: 2px auto 0; padding: 2px 10px; }
-    html.mq-play body.student-mode #gameView #questionCard.mq-card { margin-top: 6px; padding-top: 8px; padding-bottom: 0; }
+    html.mq-play body.student-mode #gameView #questionCard.mq-card { margin-top: 6px; padding-top: 6px; padding-bottom: 0; }
+    html.mq-play body.student-mode #gameView #questionCard.mq-card > .mq-qtop { margin-bottom: 4px; }
+    html.mq-play body.student-mode #gameView #questionCard.mq-card #questionPaper.mq-qpaper { margin-top: 0; }
     /* The older short-screen rule (ui-components.css, max-height 760) capped the visual at 46vh and
        scrolled it inside the card, which hid a tall cell's answer row in a nested scroll box. The
        chrome is folded now and Check / Next are pinned, so the cell keeps its full height here. */
@@ -143,16 +145,23 @@
     html.mq-play body.student-mode #questionCard,
     html.mq-play body.student-mode #worksheetView.active,
     html.mq-play body.student-mode #quizTakeView.active { overflow-x: clip; overflow-y: visible; }
-    html.mq-play body.student-mode #questionCard > .mq-qactions,
+    /* Only a bar that holds Check is pinned: on an item answered by a tap on a choice the bar holds
+       just Hint and Read, and pinning it would cover the choices. */
+    html.mq-play body.student-mode #questionCard > .mq-qactions:has(> #qcCheckBtn.mq-show),
     html.mq-play body.student-mode #questionCard > .next-btn-container {
         position: sticky;
         bottom: 0;
         z-index: 30;
-        margin-top: 6px !important;
-        padding: 5px 0 6px;
+        margin-top: 4px !important;
+        padding: 4px 0 5px;
         background: var(--mq-paper, #fff);
         box-shadow: 0 -6px 10px -8px rgba(0, 0, 0, 0.25);
     }
+    /* the bar's buttons at a 46 px touch height (the Check button was 53 px of padding) */
+    html.mq-play body.student-mode #questionCard > .mq-qactions > .btn,
+    html.mq-play body.student-mode #questionCard > .next-btn-container > .btn { min-height: 46px; padding-top: 0; padding-bottom: 0; }
+    html.mq-play body.student-mode #questionCard > .mq-qactions > #qcCheckBtn,
+    html.mq-play body.student-mode #questionCard > .next-btn-container > #nextBtn { height: 46px; }
     html.dark.mq-play body.student-mode #questionCard > .mq-qactions,
     html.dark.mq-play body.student-mode #questionCard > .next-btn-container { background: var(--bg-card, #1e1e2e); }
 
@@ -187,7 +196,7 @@
         z-index: 3;
         box-sizing: border-box;
         height: 32px;
-        margin: 14px clamp(12px, 3vw, 28px) -46px 0;
+        margin: 12px clamp(12px, 3vw, 28px) -44px 0;
         padding: 0 4px;
         flex-wrap: nowrap;
     }
