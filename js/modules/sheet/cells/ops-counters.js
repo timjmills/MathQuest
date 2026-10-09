@@ -32,6 +32,10 @@ const PITCH = { S: 7.5, M: 8.5, L: 9.5 };      // centre to centre in a row, mm
 // stays inside the box below, which is what a 2-column cell leaves it (86 mm wide at every
 // size; about 38 mm tall at L for 3 rows once the two sentence lines are drawn).
 const MIN_PITCH = { S: 7, M: 8, L: 9 };
+// dot_array_mult's compact array (owner 2026-10-09): dot diameter floor 3 mm at S, 4 mm at L.
+const DOT_DENSE = { S: 3, M: 3.5, L: 4 };
+const DENSE_GAP = 1.2;                          // white between two dots of a row, mm
+const SUBITISE_GAP = 1.5;                       // RP-81: after the 5th row and column
 const PIC_BOX = { S: [84, 40], M: [84, 39], L: [84, 38] };
 const ARRAY_ROW_MM = 85.6;                      // the widest a dot row is drawn: a 2-column cell's content width less 0.7 mm
 const RING_SEP = 4;                            // gap between two group rings, mm
@@ -136,6 +140,17 @@ function arraysPicture(g, p) {
             }
         }
         return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W };
+    }
+    if (p.kind === 'frame' || p.kind === 'count_all') {
+        // dot_array_mult (owner 2026-10-09): a much smaller array, so 8 / 6 / 4-6 cells fill a page
+        // at S / M / L. Dots stay countable (3 / 3.5 / 4 mm across, a 1.2 mm gap) and an array
+        // over 5 takes RP-81's 1.5 mm subitising gap after its 5th row and column.
+        const dd = DOT_DENSE[g.size] || DOT_DENSE.L, pp = dd + DENSE_GAP, rr = dd / 2, m0 = 0.2;
+        const at = (k) => k * pp + (k >= 5 ? SUBITISE_GAP : 0);
+        const W0 = at(cols - 1) + dd + 2 * m0, H0 = at(rows - 1) + dd + 2 * m0;
+        let b = '';
+        for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += dot(m0 + rr + at(j), m0 + rr + at(i), rr, false);
+        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0 };
     }
     // The picture is as wide as its dots (wave 1 lane D round 4, D2): a half pitch of white on each
     // side made a 3 x 10 array 90 mm at L, too wide for a 2-column cell, so it took a full row.

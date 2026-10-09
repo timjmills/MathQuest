@@ -1750,3 +1750,9 @@ html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid > .problem-card.mq-
 /* Round 6 (critic r5 D5-6.4): the counters twin (count_objects, count_only …) drew its shapes against
    the cell's left border on the worksheet; the drawing gets its 3 mm inner padding on every host. Additive. */
 html body .ws-cell.mq-scell:has(.k2-twin[data-mq-template="counters"]) { padding-left: 12px; padding-right: 12px; box-sizing: border-box; }
+
+/* Round 9 (wave 1 lane D, critic r7 D7-5): the number-line card's bordered cell fills its card
+   like its row-mates' cells (a 262 px cell beside a 420 px dot array differed by 38 %). The drawing
+   sits in the MIDDLE of the taller cell, so the spare splits above and below it (RUBRIC H13), never
+   one band under it. Additive: it overrides the round-6 compact rule by specificity only. */
+html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) > .mq-wspaper > .ws-cell.mq-scell { flex: 1 1 auto; justify-content: center; }
