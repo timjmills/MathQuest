@@ -142,6 +142,69 @@ const SAMPLES = [
                 log(`  ${tag}: line ${r.nl.from} to ${r.nl.to} by ${r.nl.step}, band ${r.nl.hMm} mm, ${r.pageCount}+${r.keyPageCount} pages${r.nl.notes && r.nl.notes.length ? ' (' + r.nl.notes.join('; ') + ')' : ''}`);
             }
         }
+        /* critic nl-r2: the Auto line counts in what the items count in (D1, D2, D4, D5, D8) */
+        const ax = await page.evaluate(async () => {
+            const rs = await import('./js/modules/refline-screen.js');
+            const kit = await import('./js/modules/sheet/index.js');
+            const out = {};
+            for (const k of ['counting:count_sequence', 'patterns:seq_2', 'patterns:seq_5', 'multiplication:count_by_tables', 'patterns:skip_count_line',
+                'patterns:count_by_step_up', 'conversions:order_fdp', 'integers:mixed_integers', 'fractions:equivalent', 'decimals:add_decimal']) {
+                const [c, sk] = k.split(':');
+                const sp = rs.skillLine(c, sk, { nlOn: true });
+                const g = sp && kit.refLineHTML(sp, { size: 'S', widthMm: 186 });
+                // every number of 12 items lands on a drawn tick (a step or a small tick)
+                const off = [];
+                if (sp) {
+                    const sv = sp.step.num / sp.step.den;
+                    const fine = sp.minor && sp.minor !== 'auto' && sp.minor !== '0' ? sv / Number(sp.minor) : sv;
+                    for (let i = 0; i < 12; i++) {
+                        const q = window.generateQuestionFor({ category: c, skill: sk, seed: 300 + i, itemIndex: i });
+                        for (const x of kit.nlLineNumbers(q)) if (Number.isInteger(x.v) && sp.step.kind === 'whole' && Math.abs(x.v / fine - Math.round(x.v / fine)) > 1e-9) off.push(x.v);
+                    }
+                }
+                out[sk] = sp && { from: sp.from, to: sp.to, step: sp.step.num / sp.step.den, kind: sp.step.kind, labels: sp.labels, minor: sp.minor,
+                    labelEvery: g.geom.labelEvery, off: [...new Set(off)].slice(0, 6), svg: g.html };
+            }
+            out.fracOps = (await import('./js/modules/skill-options.js')).numberLineFits('fraction_operations', 'add_fractions_like');
+            return out;
+        });
+        check(ax.count_sequence && ax.count_sequence.step === 1 && ax.count_sequence.labels === 'auto', `D1 count_sequence: ${JSON.stringify(ax.count_sequence)}`);
+        for (const k of ['count_by_tables', 'skip_count_line', 'count_by_step_up', 'seq_5']) check(ax[k] && !ax[k].off.length && ax[k].labels !== 'ends', `D1 ${k}: counts off the ticks ${JSON.stringify(ax[k] && { ...ax[k], svg: 0 })}`);
+        check(ax.seq_2 && !ax.seq_2.off.length && ax.seq_2.labels !== 'ends' && ax.seq_2.labels !== 'none', `D2 seq_2 landmarks: ${JSON.stringify(ax.seq_2 && { ...ax.seq_2, svg: 0 })}`);
+        check(!ax.fracOps, 'D3 fraction_operations still offers the page-wide line');
+        check(ax.order_fdp && ax.order_fdp.from === 0 && ax.order_fdp.to === 1, `D4 order_fdp: ${JSON.stringify(ax.order_fdp && { ...ax.order_fdp, svg: 0 })}`);
+        check(ax.mixed_integers && ax.mixed_integers.kind === 'whole', `D5 mixed_integers: ${JSON.stringify(ax.mixed_integers && { ...ax.mixed_integers, svg: 0 })}`);
+        check(ax.equivalent && ax.equivalent.to <= 2, `D5 equivalent: ${JSON.stringify(ax.equivalent && { ...ax.equivalent, svg: 0 })}`);
+        check(ax.add_decimal && ax.add_decimal.to === 20 && /stroke-width/.test(ax.add_decimal.svg) && (ax.add_decimal.svg.match(/<line/g) || []).length > 100, `D8 add_decimal tenths: ${JSON.stringify(ax.add_decimal && { ...ax.add_decimal, svg: 0 })}`);
+        for (const [k, v] of Object.entries(ax)) if (v && v.from !== undefined) log(`  auto ${k}: ${v.from} to ${v.to} by ${v.step}${v.minor && v.minor !== 'auto' ? ' / ' + v.minor : ''}, labels ${v.labels} (every ${v.labelEvery})`);
+
+        /* critic nl-r2 D6 + D7: every fitting skill at S and L: the band on EVERY pupil and key page, and the rows it costs */
+        if (!process.argv.includes('--quick')) {
+            const list = await page.evaluate(async () => {
+                const mod = await import('./js/modules/skill-options.js');
+                const out = [];
+                for (const [cat, l] of Object.entries(window.SKILLS)) if (Array.isArray(l)) for (const s of l) if (s && !s.retired && mod.numberLineFits(cat, s.v)) out.push([cat, s.v]);
+                return out;
+            });
+            const sweep = { noBand: [], lost: [], n: 0 };
+            for (const [cat, sk] of list) for (const size of ['S', 'L']) {
+                const r = await page.evaluate(async ({ cat, sk, size }) => {
+                    const mk = (on) => ({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: sk, opts: on ? { nlOn: true } : {} }], pages: 1 }], size, key: true, seed: 77 });
+                    let a, b;
+                    try { a = await window.buildSheet(mk(true)); b = await window.buildSheet(mk(false)); } catch (e) { return null; }
+                    const html = a.pupilHtml + a.keyHtml;
+                    const per = (x) => ((x.fits && (x.fits.sections || [x.fits])) || []).reduce((t, f) => t + (f.perPage || 0), 0);
+                    return { pages: (html.match(/class="ws-page[ "]/g) || []).length, bands: (html.match(/data-ws-band="refline"/g) || []).length, on: per(a), off: per(b) };
+                }, { cat, sk, size });
+                if (!r) continue;
+                sweep.n++;
+                if (r.bands < r.pages) sweep.noBand.push(`${sk}@${size} ${r.bands}/${r.pages}`);
+                if (r.on < r.off) sweep.lost.push(`${sk}@${size} ${r.off}→${r.on}`);
+            }
+            check(!sweep.noBand.length, `D6 pages without the line: ${sweep.noBand.join(', ')}`);
+            log(`  sweep: ${sweep.n} builds; band on every page of ${sweep.n - sweep.noBand.length}; ${sweep.lost.length} lose capacity to the band (D7, recorded): ${sweep.lost.join(', ')}`);
+        }
+
         // every page role where supports are allowed carries the line; test / check pages do not
         for (const role of ['more-practice', 'guided', 'scripted-model', 'mixed-practice', 'review', 'stretch', 'reason-it', 'error-analysis', 'test', 'pre-skill-check']) {
             const r = await page.evaluate(async ({ role }) => {
@@ -214,8 +277,8 @@ const SAMPLES = [
             };
         });
         const a = auto;
-        check(a.seq2 && a.seq2.step.num === 2 && a.seq2.labels === 'ends', `seq_2 Auto: ${JSON.stringify(a.seq2)}`);
-        check(a.seq5 && a.seq5.step.num === 5 && a.seq5.labels === 'ends', `seq_5 Auto: ${JSON.stringify(a.seq5)}`);
+        check(a.seq2 && a.seq2.labels !== 'ends' && a.seq2.covers, `seq_2 Auto: ${JSON.stringify(a.seq2)}`);
+        check(a.seq5 && a.seq5.labels !== 'ends' && a.seq5.covers, `seq_5 Auto: ${JSON.stringify(a.seq5)}`);
         check(a.wp20 && a.wp20.from === 0 && a.wp20.to === 20, `add_wp_20 Auto: ${JSON.stringify(a.wp20)}`);
         check(a.wp50 && a.wp50.to === 50, `add_wp_50 Auto: ${JSON.stringify(a.wp50)}`);
         check(a.k1r && a.k1n && a.k1r.to === 1000 && a.k1n.to === 1000, `add_1k Auto: ${JSON.stringify([a.k1r, a.k1n])}`);
@@ -225,9 +288,9 @@ const SAMPLES = [
         check(a.ofn && a.ofn.step.kind === 'frac', `order_frac_numline Auto: ${JSON.stringify(a.ofn)}`);
         check(a.ofr && a.ofr.step.kind === 'frac', `order_fractions Auto: ${JSON.stringify(a.ofr)}`);
         check(a.dec && a.dec.step.kind === 'whole', `add_decimal Auto: ${JSON.stringify(a.dec)}`);
-        check(a.fop && a.fop.step.kind === 'frac', `add_fractions_like Auto: ${JSON.stringify(a.fop)}`);
+        check(!a.fop, `add_fractions_like is off the page-wide list (R2-D3): ${JSON.stringify(a.fop)}`);
         check(!a.roundDec, 'round_decimals still offers the line');
-        log(`  auto: seq_2 ${a.seq2 && a.seq2.from}..${a.seq2 && a.seq2.to} by 2 (ends), add_wp_20 0..${a.wp20 && a.wp20.to}, round_sort_1000 ${a.rs1000 && a.rs1000.from}..${a.rs1000 && a.rs1000.to}, order_negatives ${a.neg && a.neg.from}..${a.neg && a.neg.to}, order_fractions 1/${a.ofr && a.ofr.step.den}`);
+        log(`  auto: seq_2 ${a.seq2 && a.seq2.from}..${a.seq2 && a.seq2.to} by ${a.seq2 && a.seq2.step.num} (landmarks), add_wp_20 0..${a.wp20 && a.wp20.to}, round_sort_1000 ${a.rs1000 && a.rs1000.from}..${a.rs1000 && a.rs1000.to}, order_negatives ${a.neg && a.neg.from}..${a.neg && a.neg.to}, order_fractions 1/${a.ofr && a.ofr.step.den}`);
 
         // ONE range per skill across roles (D6), and the mixed page (D8)
         const one = await page.evaluate(async () => {

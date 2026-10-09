@@ -22,7 +22,7 @@ import { generateQuestionFor } from './generate-question.js';
 import { normalizeOptions, numberLineFits, numberLineSkillHints, numberLineSummary } from './skill-options.js';
 import { getSetOptions } from './skill-option-store.js';
 import { setNumberLineCoverCheck } from './skill-options-ui.js';
-import { nlResolveLine, nlLineNumbers, nlSequenceStep, nlStepName, refLineHTML } from './sheet/index.js';
+import { nlResolveLine, nlLineNumbers, nlItemSteps, nlCommonStep, nlStepName, refLineHTML } from './sheet/index.js';
 
 const PX_PER_MM = 3.4;     // the screen twin's scale (k2kit.js --mq-k2)
 const SAMPLE = 40;
@@ -53,7 +53,9 @@ export function skillLineBasis(categoryId, skillId, opts) {
     for (let i = 0; i < SAMPLE; i++) {
         try { const q = generateQuestionFor({ category: categoryId, skill: skillId, opts, seed: SAMPLE_SEED + i * 7919, itemIndex: i }); if (q) qs.push(q); } catch (e) { /* skip */ }
     }
-    if (hints.skip && !hints.step) hints.step = nlSequenceStep(qs);
+    // The step the skill's items count in: theirs when they share one, else the step every one of
+    // them lands on (the gcd: 2s and 5s share a line of ones) (critic nl-r2 D1).
+    if (hints.skip && !hints.step) hints.step = nlCommonStep(nlItemSteps(qs));
     const out = { hints, nums: qs.flatMap((q) => nlLineNumbers(q)) };
     if (_basis.size > 80) _basis.clear();
     _basis.set(key, out);

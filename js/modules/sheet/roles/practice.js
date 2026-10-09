@@ -722,7 +722,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
     const items = [];
     norm.sections.forEach((sec, si) => {
         const its = sheetItems[si] || [];
-        const keep = () => { sections.push(sec); items.push(its); };
+        const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
         const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
@@ -737,9 +737,9 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         // The narrow part keeps the section's floor: print-sheet.js measures it over the skill's
         // narrow problems only (floorOf), so the columns the page was counted for are the columns
         // it prints, whichever of the skill's problems this page happens to hold (PT-ENG-9).
-        sections.push(Object.assign({}, sec));
+        sections.push(Object.assign({}, sec, { srcIndex: si }));
         items.push(narrow);
-        sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1 }));
+        sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1, srcIndex: si }));
         items.push(wide);
     });
     return { norm: Object.assign({}, norm, { sections }), items };
@@ -912,8 +912,14 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
         // (its height stays reserved, so every page keeps one geometry).
+        // A part split off a section ("full width, at the bottom": splitOf) belongs to that section
+        // (critic nl-r2 D6), and so do the sub-sections a section was split into.
+        const refSec = (si) => {
+            const sec = norm.sections[si];
+            return input.refSections.includes(sec && Number.isInteger(sec.srcIndex) ? sec.srcIndex : si);
+        };
         let head = pg.cont ? cont : first;
-        if (head.refBand && Array.isArray(input.refSections) && !pg.parts.some((pt) => input.refSections.includes(pt.section))) {
+        if (head.refBand && Array.isArray(input.refSections) && !pg.parts.some((pt) => refSec(pt.section))) {
             head = Object.assign({}, head, { refBand: `<div class="ws-refline-gap" style="flex:none;height:${Number(head.refBandMm)}mm"></div>` });
         }
         return { header: head, sections };

@@ -3469,15 +3469,18 @@ const _NL_SKILLS = {
     multiplication: /^(nl_mult|count_by_tables)$/,
     division: /^(nl_div)$/,
     counting: /^(count_sequence|number_seq_fill|mixed_counting)$/,
-    composing: /^(fraction_number_line|whole_as_fraction)$/,
     patterns: /^(seq_2|seq_5|seq_10|count_by_fill|skip_count_line|count_by_step_up|count_by_step_down|number_patterns_rule)$/,
     placevalue: /^(more_less_10|more_less_100)$/,
     // rounding of WHOLE numbers (the decimal rounding skills draw their own local line, so a
     // page-wide one cannot show the place: critic nl-r1 D5)
     number_sense: /^(rounding_visual|nearest_(10|100|1000)|round_sort_(10|100|1000)|between_tens|place_on_number_line|make_a_ten|round_nl_(thousands|ten_thousands|hundred_thousands)|estimate_sum|estimate_diff)$/,
-    fractions: /^(equivalent|equiv_frac_nv|compare|improper_mixed|mixed_improper_visual|order_fractions|order_frac_numline|benchmark_fractions|compare_frac_lcd|graph_fractions|round_fractions|fraction_nl_drag|mixed_nl_drag)$/,
-    // jumps of a unit fraction: the CCSS 4.NF.3 model for adding and decomposing fractions
-    fraction_operations: /^(add_fractions_like|sub_fractions_like|add_mixed_like|sub_mixed_like|decompose_fractions|mult_frac_whole|add_frac_like_nv|sub_frac_like_nv|add_mixed_like_nv|sub_mixed_like_nv|decompose_frac_nv|mult_frac_whole_nv)$/,
+    // Only where a benchmark line (0, ½, 1 …) serves every item: compare / order / benchmark /
+    // round to the nearest half / equivalence. Skills whose items each need their own denominator
+    // (graph_fractions, improper_mixed, fraction_number_line …) are off the list (critic nl-r2 D3).
+    fractions: /^(equivalent|equiv_frac_nv|compare|order_fractions|order_frac_numline|benchmark_fractions|compare_frac_lcd|round_fractions|fraction_nl_drag)$/,
+    // fraction_operations is NOT listed (critic nl-r2 D3): its items mix denominators item by item,
+    // so one page-wide line cannot show their unit-fraction jumps; the line for those belongs in each
+    // problem (Support: "Number line in each problem"). Logged in design/STATUS.md.
     decimals: /^(add_decimal|sub_decimal|order_decimals|decimal_nl_drag)$/,
     conversions: /^(f_to_d|d_to_f|order_fdp)$/,
     integers: /^(number_line_int|compare_int|add_int|sub_int|order_negatives|integer_nl_drag|mixed_integers|abs_value|opposite_numbers|ordering_rationals)$/,
@@ -3494,7 +3497,8 @@ const _NL_SKILLS = {
 export function numberLineSkillHints(categoryId, skillId) {
     const id = String(skillId);
     const out = { skip: false, step: 0, within: 0, fraction: numberLineIsFraction(categoryId, skillId), decimal: categoryId === 'decimals' || /^(f_to_d|d_to_f|order_fdp)$/.test(id) };
-    if (/^(seq_\d+|count_by_|skip_count|count_sequence|number_seq_fill|number_patterns_rule)/.test(id)) out.skip = true;
+    // count_sequence counts in ones ("what comes after 8?"): a plain line, not a skip line (critic nl-r2 D1).
+    if (/^(seq_\d+|count_by_|skip_count|number_seq_fill|number_patterns_rule|nl_mult$|nl_div$)/.test(id)) out.skip = true;
     const m = /^seq_(\d+)$/.exec(id);
     if (m) out.step = Number(m[1]);
     const w = /_(\d+k?|1m)(?:_|$)/.exec(id.replace(/^(add|sub)_wp_/, '$1_'));

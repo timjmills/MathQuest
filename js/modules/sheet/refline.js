@@ -58,6 +58,11 @@ export function numbersInText(s) {
     let t = String(s == null ? '' : s).replace(/<sup>(\d+)<\/sup>\s*(?:\/|⁄)?\s*<sub>(\d+)<\/sub>/g, ' $1/$2 ')
         .replace(/<[^>]*>/g, ' ').replace(/&minus;/g, '−').replace(/&nbsp;/g, ' ').replace(/&[a-z]+;/g, ' ');
     const out = [];
+    // "15%" is 0.15 (critic nl-r2 D4): a percent is read as its value, never as a whole number.
+    t = t.replace(/(^|[^\w.])([-−]?)(\d+(?:\.\d+)?)\s*%/g, (m, pre, sg, a) => {
+        out.push({ v: (sg ? -1 : 1) * Number(a) / 100, den: 1, places: placesOf(a) + 2 });
+        return pre + ' ';
+    });
     t = t.replace(/([-−]?)(\d+)\s+(\d+)\s*\/\s*(\d+)/g, (m, sg, w, a, b) => {
         if (Number(b) > 0) out.push({ v: (sg ? -1 : 1) * (Number(w) + Number(a) / Number(b)), den: Number(b), places: 0 });
         return ' ';
@@ -107,7 +112,7 @@ function walkNumbers(p, out, depth = 0) {
 /** An answer or a card: a single value, or a list split on its commas ("-55,-52,18"). */
 function listNumbers(s) {
     const t = String(s);
-    if (/^[\s\d.,/−-]+$/.test(t) && t.includes(',') && !/^\s*\d{1,3}(,\d{3})+(\.\d+)?\s*$/.test(t)) return t.split(',').flatMap((x) => numbersInText(x));
+    if (/^[\s\d.,/%−-]+$/.test(t) && t.includes(',') && !/^\s*\d{1,3}(,\d{3})+(\.\d+)?\s*$/.test(t)) return t.split(',').flatMap((x) => numbersInText(x));
     return numbersInText(t);
 }
 
@@ -140,6 +145,40 @@ export function sequenceStep(qs = []) {
     return n >= 2 ? best : 0;
 }
 
+/**
+ * The step each item counts in (critic nl-r2 D1): per item, the commonest gap between the whole
+ * numbers of its text, in order. Items with no repeated gap (a doubling row) give none.
+ */
+export function itemSteps(qs = []) {
+    const commonGap = (v) => {
+        const tally = new Map();
+        for (let i = 1; i < v.length; i++) { const d = Math.abs(v[i] - v[i - 1]); if (d > 0) tally.set(d, (tally.get(d) || 0) + 1); }
+        let best = 0, n = 0;
+        for (const [d, c] of tally) if (c > n || (c === n && d < best)) { best = d; n = c; }
+        return n >= 2 ? best : 0;
+    };
+    const ints = (list) => list.map((x) => x.v).filter(Number.isInteger);
+    const out = [];
+    for (const q of qs) {
+        if (!q) continue;
+        const t = String(q.text || '').replace(/<[^>]*>/g, ' ');
+        // The step the item names: "Count by 11", "by 3s", "count-by-4s".
+        const m = /\bby[\s-]+(\d[\d,]*)s?\b/i.exec(t);
+        let st0 = m ? cleanNum(m[1]) : 0;
+        if (!st0) st0 = commonGap(ints(numbersInText(t)));
+        if (!st0 && typeof q.ans === 'string') st0 = commonGap(ints(listNumbers(q.ans)));
+        if (!st0 && Array.isArray(q.ans)) st0 = commonGap(q.ans.map(Number).filter(Number.isInteger));
+        if (!st0 && q.cell && q.cell.payload) { const w = []; walkNumbers(q.cell.payload, w); st0 = commonGap(ints(w)); }
+        if (st0 > 0) out.push(st0);
+    }
+    return out;
+}
+/** The one step every item of a skill lands on: their shared step, else the gcd of their steps. */
+export function commonStep(steps = []) {
+    if (!steps.length) return 0;
+    return steps.reduce((a, b) => gcd(a, b));
+}
+
 /* ------------------------------------------------------------------ the line's spec */
 
 const FRAC_NAMES = { 2: 'halves', 3: 'thirds', 4: 'quarters', 5: 'fifths', 6: 'sixths', 7: 'sevenths', 8: 'eighths', 9: 'ninths', 10: 'tenths', 12: 'twelfths', 100: 'hundredths' };
@@ -154,15 +193,34 @@ const FRAC_NAMES = { 2: 'halves', 3: 'thirds', 4: 'quarters', 5: 'fifths', 6: 's
  */
 export function defaultLine(nums = [], hints = {}) {
     const notes = [];
+    nums = lineNums(nums, hints);
     const vals = nums.map((x) => x.v).filter(Number.isFinite);
     const within = Number(hints.within) > 0 ? Number(hints.within) : 0;
     if (!vals.length && !within) return { from: 0, to: 10, step: { num: 1, den: 1, kind: 'whole' }, unknown: true, notes };
     let lo = Math.min(0, ...vals), hi = Math.max(0, within, ...vals);
-    const fracDens = nums.filter((x) => x.den > 1 && Math.abs(x.v - Math.round(x.v)) > EPS).map((x) => x.den);
+    const isFrac = (x) => x.den > 1 && Math.abs(x.v - Math.round(x.v)) > EPS;
+    const fracDens = nums.filter(isFrac).map((x) => x.den);
     const allDens = nums.filter((x) => x.den > 1).map((x) => x.den);
     const places = Math.max(0, ...nums.map((x) => x.places || 0));
+    // A fraction step only when the fractions are the page (critic nl-r2 D5): one stray −1/3 among
+    // a hundred integers does not turn −100..100 into twelfths.
+    const fracPage = hints.fraction ? allDens.length > 0 : fracDens.length > 0 && fracDens.length * 2 >= nums.length;
     let step, minor = 0;
-    if (fracDens.length || (hints.fraction && allDens.length)) {
+    if (hints.decimal || (places >= 1 && !fracPage)) {
+        lo = Math.floor(lo + EPS); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
+        const span = hi - lo;
+        if (span <= 2) {
+            // Values between 0 and 1 (or 2): a line of tenths, hundredths as small ticks (D4).
+            step = { num: 1, den: 10, kind: 'dec' };
+            minor = 10;
+        } else {
+            // A whole-number line with tenths as small ticks, like a ruler (D8), ends on a five.
+            const s = span <= 20 ? 1 : (NICE.find((k) => span / k <= 20) || 100000);
+            step = { num: s, den: 1, kind: 'whole' };
+            if (s === 1) { minor = 10; lo = Math.floor(lo / 5) * 5; hi = Math.ceil(hi / 5) * 5; }
+            else { lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s; }
+        }
+    } else if (fracPage) {
         const dens = [...new Set(fracDens.length ? fracDens : allDens)];
         const L = dens.reduce(lcm, 1);
         let den = L;
@@ -171,20 +229,24 @@ export function defaultLine(nums = [], hints = {}) {
             notes.push(`This page uses ${dens.sort((a, b) => a - b).map((d) => FRAC_NAMES[d] || `${d}ths`).join(', ')}: one line cannot show them all, so it marks halves.`);
         }
         step = { num: 1, den, kind: 'frac' };
-        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
-    } else if (places >= 1 || hints.decimal) {
-        // Decimals: a whole-number line, tenths as small ticks (a long line of hundredths cannot be read).
-        lo = Math.floor(lo); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
-        const span = hi - lo;
-        const s = span <= 20 ? 1 : (NICE.find((k) => span / k <= 20) || 100000);
-        step = { num: s, den: 1, kind: 'whole' };
-        if (s === 1) minor = 10;
-        lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s;
-    } else if (hints.skip && Number(hints.step) > 0) {
-        const s = Number(hints.step);
-        step = { num: s, den: 1, kind: 'whole' };
+        lo = Math.floor(lo + EPS); hi = Math.max(Math.ceil(hi - EPS), lo + 1);
+    } else if (hints.skip) {
+        // A count-by line counts in the items' own step, reduced so that every number of the page
+        // lands on a tick (critic nl-r2 D1): 71, 73, 75 is a count in 2s, but not on a line of evens.
+        const ints = vals.filter(Number.isInteger).map(Math.abs).filter((v) => v > 0);
+        let s = [Number(hints.step) > 0 ? Number(hints.step) : 0, ...ints].reduce((g, v) => gcd(g, v), 0) || 1;
         lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s;
         if (hi <= lo) hi = lo + 10 * s;
+        if (s === 1 && hi - lo > 60) {
+            // A long line of ones: tens, with every one as a small tick (fives or twos when ones would touch).
+            lo = Math.floor(lo / 10) * 10; hi = Math.ceil(hi / 10) * 10;
+            step = { num: 10, den: 1, kind: 'whole' };
+            minor = 10;
+            if (hi - lo > 1000) { const k = NICE.find((m) => (hi - lo) / (10 * m) <= 100) || 1; step = { num: 10 * k, den: 1, kind: 'whole' }; lo = Math.floor(lo / step.num) * step.num; hi = Math.ceil(hi / step.num) * step.num; }
+        } else {
+            if ((hi - lo) / s > 200) { const k = NICE.find((m) => (hi - lo) / (s * m) <= 200) || 1; s *= k; lo = Math.floor(lo / s) * s; hi = Math.ceil(hi / s) * s; }
+            step = { num: s, den: 1, kind: 'whole' };
+        }
     } else {
         const span = Math.max(1, hi - lo);
         const s = span <= 20 ? 1 : (NICE.find((k) => span / k <= 20) || 100000);
@@ -198,6 +260,15 @@ export function defaultLine(nums = [], hints = {}) {
         if (hi <= lo) hi = lo + 10 * s;
     }
     return { from: lo, to: hi, step, minor, notes };
+}
+
+/**
+ * The numbers a line must hold. On a fraction skill, a whole number that only answers "find the
+ * missing numerator" (2/3 = 8/?) is not a position on the line (critic nl-r2 D5).
+ */
+export function lineNums(nums = [], hints = {}) {
+    if (hints.fraction && nums.some((x) => x.den > 1)) return nums.filter((x) => x.den > 1);
+    return nums;
 }
 
 /** True when every number lies on the line's span. */
@@ -229,11 +300,17 @@ export function resolveLine(opts = {}, nums = [], hints = {}) {
     if (to - from < sv - EPS) to = from + sv;
     let labels = NL_LABEL_VALUES.includes(String(opts.nlLabels)) ? String(opts.nlLabels) : 'auto';
     // A skip-count line labels only its ends: every tick labelled would be the answer list.
-    if (labels === 'auto' && hints.skip) labels = 'ends';
+    // A skip-count line labels landmarks, not every count (critic nl-r2 D2): its ends when it has
+    // a dozen ticks or fewer, else every 5th count (0, 10, 20 … on a line of 2s), or every 10 on
+    // a line of ones. The counted values between them stay unlabelled.
+    if (labels === 'auto' && hints.skip) {
+        const ticks = Math.round((to - from) / sv);
+        labels = ticks <= 12 && !d.minor ? 'ends' : d.minor ? 'all' : step.kind === 'whole' && step.num === 1 ? '10' : '5';
+    }
     let minor = NL_MINOR_VALUES.includes(String(opts.nlMinor)) ? String(opts.nlMinor) : 'auto';
     if (minor === 'auto' && !own && d.minor) minor = String(d.minor);
     const spec = { from, to, step, labels, minor, hops: !!opts.nlHops, autoFrom: !hasFrom, autoTo: !hasTo, notes: d.notes.slice() };
-    const cov = lineCovers(spec, nums);
+    const cov = lineCovers(spec, lineNums(nums, hints));
     const fmt = (v) => String(Math.round(v * 1000) / 1000).replace('-', '−');
     spec.covers = cov.ok && !d.unknown;
     spec.unknown = !!d.unknown;
@@ -318,7 +395,13 @@ export function refLineGeom(c, spec, widthMm) {
     if (spec.minor === 'auto' && step.kind === 'whole' && tickEvery === 1 && step.num > 1) {
         minor = [10, 5, 4, 2].find((m) => step.num % m === 0 && pitch / m >= 1.6) || 0;
     }
-    if (minor && (pitch * tickEvery) / minor < 1.2) { notes.push('no small ticks: they would touch'); minor = 0; }
+    // Small ticks as fine as a ruler's millimetres (0.85 mm apart) stay readable (critic nl-r2 D8);
+    // closer than that, fall back to fifths, then halves, before dropping them.
+    if (minor && (pitch * tickEvery) / minor < 0.85) {
+        const alt = [5, 2].find((m) => m < minor && minor % m === 0 && (pitch * tickEvery) / m >= 0.85) || 0;
+        notes.push(alt ? `small ticks in ${alt === 2 ? 'halves' : 'fifths'}: ${minor} would touch` : 'no small ticks: they would touch');
+        minor = alt;
+    }
 
     const hopH = hopEvery ? 7 : 0;
     // A tight band (critic nl-r1 D9): the strokes and type keep their sizes, only the air goes.
@@ -345,7 +428,8 @@ export function refLineGeom(c, spec, widthMm) {
         if (minor && onGrid(i, tickEvery) && i + tickEvery <= i1) {
             for (let m = 1; m < minor; m++) {
                 const mx = x(i) + (m * pitch * tickEvery) / minor;
-                ticks += `<line x1="${n2(mx)}" y1="${n2(axisY - 1)}" x2="${n2(mx)}" y2="${n2(axisY + 1)}" ${st(c, SW.fine)}/>`;
+                const half = minor % 2 === 0 && m === minor / 2 ? 0.5 : 0;   // the half-way tick is longer, as on a ruler
+                ticks += `<line x1="${n2(mx)}" y1="${n2(axisY - 1 - half)}" x2="${n2(mx)}" y2="${n2(axisY + 1 + half)}" ${st(c, SW.fine)}/>`;
             }
         }
         if (hopEvery && onGrid(i, hopEvery) && i + hopEvery <= i1) {
@@ -390,4 +474,4 @@ export function refLineHTML(spec, { size = 'M', widthMm = 186, twin = false, pxP
     return { html, hMm, natural, notes: g.notes, geom: { tickEvery: g.tickEvery, labelEvery: g.labelEvery } };
 }
 
-export default { parseStep, numbersInText, lineNumbers, defaultLine, lineCovers, resolveLine, refLineGeom, refLineHTML };
+export default { parseStep, numbersInText, lineNumbers, itemSteps, commonStep, lineNums, defaultLine, lineCovers, resolveLine, refLineGeom, refLineHTML };
