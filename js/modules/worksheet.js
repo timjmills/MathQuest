@@ -1755,7 +1755,7 @@ export function newWorksheet() {
     _wsScheduleLayout(grid);
     _wsHeaderPill();
     // Wave 5.2: the skill's number line above the sheet, covering every item on it.
-    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null }); } catch (e) { /* a hint: never block the sheet */ }
+    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint: never block the sheet */ }
 
     document.getElementById("worksheetResult").innerText = "";
 }
@@ -1773,7 +1773,7 @@ export function addMoreProblems() {
         _wsRenderCard(grid, q, i);
     }
     _wsScheduleLayout(grid);
-    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null }); } catch (e) { /* a hint */ }
+    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint */ }
 
     // Scroll to the new problems
     const firstNewCard = document.getElementById(`ws_card_${startIndex}`);

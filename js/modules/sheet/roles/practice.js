@@ -619,6 +619,24 @@ export function splitCellH(L) {
     return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
 }
 
+/**
+ * Wave 5.2 (critic nl-r4 D1 / D2): the row heights of a split section's two parts when the
+ * number-line band shortens their page. `rowsN` rows of the narrow part at `hN` and `rowsW`
+ * full-width rows at `hW` must fit `budgetMm`; when they do not, both give up the same share of
+ * their slack above their content (`hMinN`, `hMinW`: the content never shrinks). null when even
+ * the content does not fit.
+ */
+export function splitPairH(hN, hMinN, rowsN, hW, hMinW, rowsW, budgetMm) {
+    const need = rowsN * hN + rowsW * hW;
+    if (need <= budgetMm) return { hN, hW, squeezed: false };
+    const slack = rowsN * Math.max(0, hN - hMinN) + rowsW * Math.max(0, hW - hMinW);
+    const excess = need - budgetMm;
+    if (!(slack > 0) || excess > slack) return null;
+    const t = excess / slack;
+    const fl = (x) => Math.floor(x * 1000 - 1e-6) / 1000;
+    return { hN: fl(hN - Math.max(0, hN - hMinN) * t), hW: fl(hW - Math.max(0, hW - hMinW) * t), squeezed: true };
+}
+
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
@@ -645,6 +663,24 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
         return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
     });
+    // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band, a split section's two parts
+    // that the host counted onto one page share its shorter height (splitPairH), each part's rows
+    // giving up the same share of their slack, instead of the full-width group going overleaf
+    // or the host dealing fewer problems.
+    if (Number(headerFirst && headerFirst.refBandMm) > 0 && !anchors) {
+        sectionsIn.forEach((sec, sj) => {
+            const si = sec.splitOf;
+            if (si === undefined || si === null || !layouts[si] || !layouts[sj]) return;
+            const Ln = layouts[si], Lw = layouts[sj];
+            const rowsN = Math.min(Ln.rows, Math.ceil(itemsBySection[si].length / Math.max(1, Ln.cols)));
+            const rowsW = Math.min(Lw.rows, itemsBySection[sj].length);
+            const fit = splitPairH(Ln.cellH, Ln.hMin, rowsN, Lw.cellH, Lw.hMin, rowsW, body - 1 - instr - 0.01);
+            if (fit && fit.squeezed) {
+                layouts[si] = Object.assign({}, Ln, { cellH: fit.hN });
+                layouts[sj] = Object.assign({}, Lw, { cellH: fit.hW });
+            }
+        });
+    }
     const chunksBySection = layouts.map((L, si) => (L.blocks
         ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
         : L.pairs

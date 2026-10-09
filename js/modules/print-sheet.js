@@ -31,7 +31,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
@@ -1315,12 +1315,29 @@ function layoutOf(role, section, items, n, ctx) {
     const hN = splitCellH(Ln), hW = splitCellH(Lw);
     const isWide = items.map((it) => oneColumnOnly(it, n));
     const f = wide.length / items.length;
-    let best = 1;
-    for (let N = 2; N <= 40; N++) {
-        const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
-        const nn = N - nw;
-        if (Math.ceil(nn / Ln.cols) * hN + nw * hW > G - 0.99) break;
-        best = N;
+    const count = (Gm, a, b, Lna, Lwa, squeeze) => {
+        let n = 1;
+        for (let N = 2; N <= 40; N++) {
+            const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
+            const nn = N - nw;
+            const rowsN = Math.ceil(nn / Lna.cols);
+            if (rowsN * a + nw * b > Gm - 0.99 && !(squeeze && splitPairH(a, Lna.hMin, rowsN, b, Lwa.hMin, nw, Gm - 1.01))) break;
+            n = N;
+        }
+        return n;
+    };
+    let best = count(G, hN, hW, Ln, Lw, false);
+    // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band the two parts' rows give up their
+    // slack (practice.js splitPairH, as the role lays them out), up to the count the page holds
+    // without the band - never more, so the band never packs a page tighter than its absence.
+    if (Number(ctx.header && ctx.header.refBandMm) > 0) {
+        const opts0 = Object.assign({}, opts, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) });
+        const Ln0 = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts0);
+        const Lw0 = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts0);
+        if (Ln0.cols === Ln.cols) {
+            const off = count(Ln0.gridH, splitCellH(Ln0), splitCellH(Lw0), Ln0, Lw0, false);
+            best = Math.max(best, Math.min(off, count(G, hN, hW, Ln, Lw, true)));
+        }
     }
     return Object.assign({}, Ln, { perPage: best, splitWide: true });
 }
@@ -1860,7 +1877,7 @@ export async function buildSheet(req = {}) {
     // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
     // group under its grid) gives up its last problems, one at a time, until it is the pages it
     // was asked for. The capacity above counts each section's grid; this counts the whole page.
-    if (nline && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
+    if (nline && !globalThis.__nlNoTrim && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
         const wanted = n.sections.reduce((a, sec) => a + (sec.pages || 1), 0);
         for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
             const bySec = new Map();

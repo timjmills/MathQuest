@@ -184,11 +184,11 @@ export function poolHost(categoryId, skillId) {
 }
 
 /** Live practice: the skill's line above the practice card (the item on it only widens it). */
-export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = null } = {}) {
+export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = null, pool: asPool = true } = {}) {
     if (typeof document === 'undefined') return;
     const card = document.getElementById('questionCard');
     if (!card) return;
-    const pool = poolHost(categoryId, skillId);
+    const pool = asPool ? poolHost(categoryId, skillId) : null;
     const cat = pool ? pool.categoryId : (q && q.categoryId) || categoryId;
     const sk = pool ? pool.skillId : (q && (q.requestedSkillId || q.skillId)) || skillId;
     const o = pool ? optionsInUse(cat, sk, opts, null) : optionsInUse(cat, sk, opts, q);
@@ -200,7 +200,7 @@ export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = n
 }
 
 /** The online worksheet: one line above the grid, for every skill on the sheet that asked for it. */
-export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opts = null } = {}) {
+export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opts = null, pool: asPool = true } = {}) {
     if (typeof document === 'undefined') return;
     const grid = document.getElementById('worksheetGrid');
     if (!grid) return;
@@ -209,7 +209,7 @@ export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opt
     // panel edit lives in the set's store, not in state.skillOptions).
     const seen = new Map();
     // A category pool's sheet: the pool's one line (its options), as on paper (critic nl-r4 D3).
-    const pool = poolHost(categoryId, skillId);
+    const pool = asPool ? poolHost(categoryId, skillId) : null;
     if (pool) seen.set(`${pool.categoryId}:${pool.skillId}`, { categoryId: pool.categoryId, skillId: pool.skillId, opts: optionsInUse(pool.categoryId, pool.skillId, opts, null) });
     if (!pool) for (const q of qs) {
         const cat = q.categoryId || categoryId, sk = q.requestedSkillId || q.skillId || skillId;

@@ -33,6 +33,8 @@ import { cellFootprint } from './registry.js';
 export const PT_MM = 25.4 / 72;
 const r2 = (n) => Math.round(n * 100) / 100;
 const r3 = (n) => Math.round(n * 1000) / 1000;
+/** Down to the micron: a height shared out over rows, so rows x it never rounds past the grid (critic nl-r4 D1). */
+const f3 = (n) => Math.floor(n * 1000 - 1e-6) / 1000;
 
 /** PG-1: the live width is 186 mm on every paper. */
 export const LIVE_W_MM = 186;
@@ -480,7 +482,13 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const band = Number(ctx.header && ctx.header.refBandMm) || 0;
     if (!(band > 0) || Number(section.gridH) > 0) return L1;
     const L0 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, Object.assign({}, ctx, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) }));
-    if (!(L0.perPage > L1.perPage)) return L1;
+    // (critic nl-r4 D2) The band-less grid is kept, rows giving up slack, also when the band would
+    // keep the count but change the grid's SHAPE (3 x 4 -> 4 x 3): the new shape's rows stop at
+    // their fill limit and leave a strip at the foot several times the band's height.
+    // The same shape is checked below: its rows may still sit on the far side of the fill rule's
+    // 0.8 fallback (add_sub_10s @M: 38 mm cells off, 29 mm on), so they take the grid's height too.
+    const sameShape = L0.perPage === L1.perPage && L0.cols === L1.cols && L0.rows === L1.rows;
+    if (L0.perPage < L1.perPage || (L0.packed && sameShape)) return L1;
     const G = L1.gridH;
     const hMin = Math.max(L0.hMin, L1.hMin);
     if (!(hMin > 0)) return L1;
@@ -492,13 +500,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         for (let i = 0; i < ord.length; i += L0.cols) rowH.push(Math.max(...ord.slice(i, i + L0.cols).map((it) => measuredH(it, L0.cols))));
         let k = 0, sum = 0;
         while (k < Math.min(L0.rows, rowH.length) && sum + rowH[k] <= G - SAFETY_H_MM) { sum += rowH[k]; k++; }
-        if (k * L0.cols <= L1.perPage) return L1;
+        if (k * L0.cols < L1.perPage || (k * L0.cols === L1.perPage && L0.cols === L1.cols)) return L1;
         const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
         return Object.assign({}, L0, { rows: k, perPage: k * L0.cols, pages: L0.count ? Math.ceil(L0.count / (k * L0.cols)) : 1, gridH: G, gridHCont: L1.gridHCont,
-            cellH: r3(Math.min(L0.cellH, (G - SAFETY_H_MM) / k)), note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
+            cellH: f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / k)), note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
     }
     if (L0.rows * hMin > G - SAFETY_H_MM) return L1;
-    const cellH = r3(Math.min(L0.cellH, (G - SAFETY_H_MM) / L0.rows));
+    const cellH = f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / L0.rows));
+    if (sameShape && !(cellH > L1.cellH + 0.01)) return L1;
     const pages = L0.count ? Math.ceil(L0.count / L0.perPage) : 1;
     const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
     return Object.assign({}, L0, { gridH: G, gridHCont: L1.gridHCont, cellH, hMin: r2(hMin), pages, fill: L0.fill && cellH >= G / L0.rows - 0.01, note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });

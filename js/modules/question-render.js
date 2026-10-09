@@ -1382,9 +1382,11 @@ export function renderQuestion() {
     try {
         const q = state.currentQ;
         // A category pool keeps its options under the pool's id (refline-screen.js poolHost).
-        const key = poolHost(state.category, state.skill) ? state.category + ':' + state.skill
+        // (A mixed-mode session's items come from the teacher's list, not from state.skill.)
+        const pool = !state.isMixedMode && poolHost(state.category, state.skill);
+        const key = pool ? state.category + ':' + state.skill
             : q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
-        syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill,
+        syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill, pool: !!pool,
             opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
     } catch (e) { /* the line is a hint: never block the card */ }
     // Widget hosts mount after a dynamic import; the chrome Check follows them.
