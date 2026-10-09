@@ -40,7 +40,7 @@ export function normKeyOptions(key) {
 const attrOf = (attrs, name) => { const m = new RegExp(`\\s${name}="([^"]*)"`).exec(attrs); return m ? m[1] : ''; };
 // an open tag and the text right after it (up to the next tag)
 const OPEN_TAG_TEXT = /<([a-zA-Z][\w-]*)\b([^>]*)>([^<]*)/g;
-const IGNORED = /\s(?:data-ws-key-ans|data-ws-key-add|data-ws-ink|data-ws-key)(?:="[^"]*")?/g;
+const IGNORED = /\s(?:data-ws-key-ans|data-ws-key-add|data-ws-key-model|data-ws-ink|data-ws-key)(?:="[^"]*")?/g;
 const markSig = (cell, tag, attrs, text) => `${cell}|${tag.toLowerCase()}|${attrs.replace(IGNORED, '').replace(/\s+/g, ' ').trim()}|${text.replace(/\s+/g, ' ').trim()}`;
 // the same element up to its paint: a shape by its geometry, anything else by its class, slot and text
 const SHAPE = /^(rect|circle|ellipse|line|path|polyline|polygon)$/i;
@@ -48,6 +48,8 @@ const GEOM_ATTRS = ['x', 'y', 'width', 'height', 'cx', 'cy', 'r', 'rx', 'ry', 'd
 const looseSig = (cell, tag, attrs, text) => (SHAPE.test(tag)
     ? `${cell}|${tag.toLowerCase()}|${GEOM_ATTRS.map((a) => attrOf(attrs, a)).join(',')}`
     : `${cell}|${tag.toLowerCase()}|${attrOf(attrs, 'data-ws-slot')}|${text.replace(/\s+/g, ' ').trim()}`);
+// R3-1: the element's build without its text and its colours (a write-on line, a box, a chart cell)
+const structSig = (tag, attrs) => `${tag.toLowerCase()}|${attrOf(attrs, 'class').replace(/\s+/g, ' ').trim()}|${attrOf(attrs, 'data-ws-slot')}|${attrOf(attrs, 'data-ws-shape')}|${attrOf(attrs, 'style').split(';').map((d) => d.trim()).filter((d) => d && !/^(color|fill|stroke)\s*:/i.test(d)).map((d) => d.replace(/#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|\b(?:black|white|transparent)\b/gi, 'C')).join(';')}`;
 const solidSig = (cell, tag, attrs) => `${cell}|${tag.toLowerCase()}|${attrOf(attrs, 'data-ws-slot')}|${attrOf(attrs, 'class').replace(/\s+/g, ' ').trim()}`;
 
 /**
@@ -70,10 +72,18 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
     const pool = new Map();
     for (const t of pTok) if (/\sdata-ws-ink="solid"/.test(t.attrs)) pool.set(solidSig(t.cell, t.tag, t.attrs), (pool.get(solidSig(t.cell, t.tag, t.attrs)) || 0) + 1);
     const take = (k) => { const n = pool.get(k) || 0; if (n > 0) { pool.set(k, n - 1); return true; } return false; };
+    // critic r3 (N-1, lead ruling on Q1): a MODEL cell (`data-ws-key-model`, set by the key render)
+    // whose pupil twin traces its answer is the worked example: everything on it is given, black.
+    // On Guided Practice the traced answer is the pupil's to go over: the answer, key ink.
+    const modelCells = new Set(kTok.filter((t) => /\sdata-ws-key-model\b/.test(t.attrs)).map((t) => t.cell));
+    const tracedCells = new Set(pTok.filter((t) => t.inCells && t.trace).map((t) => t.cell));
+    const worked = (c) => modelCells.has(c) && tracedCells.has(c);
     // R2-1: align each key cell with its pupil twin, in order - first by the whole open tag and its
     // text, then what is left by the element up to its paint (a shape's geometry; else class, slot
-    // and text). What still has no twin is a mark the key ADDS: the answer.
-    const verdict = new Map();   // key token index -> 'add' | 'fill' | 'mark'
+    // and text), then (R3-1) what is left by its build alone (tag, class, slot, shape, uncoloured
+    // style): an element that differs from its twin ONLY in its text is a given whose text is the
+    // answer - its line, box or border keeps its ink. What still has no twin is a mark the key ADDS.
+    const verdict = new Map();   // key token index -> 'same' | 'given' | 'ans' | 'text' | 'add' | 'fill' | 'mark'
     if (pupil.length) {
         const byCell = (list) => list.reduce((m, t, i) => { if (t.inCells) (m.get(t.cell) || m.set(t.cell, []).get(t.cell)).push(i); return m; }, new Map());
         const pc = byCell(pTok), kc = byCell(kTok);
@@ -84,20 +94,33 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
             const pUsed = new Set(exact.values());
             const pLeft = ps.filter((_, j) => !pUsed.has(j));
             const lo = align(pLeft.map((i) => pTok[i].loose), kLeft.map((i) => kTok[i].loose));
+            const loUsed = new Set(lo.values());
+            const kLeft2 = kLeft.map((ki, j) => (lo.has(j) ? -1 : ki)).filter((ki) => ki >= 0 && (!kTok[ki].svg || /^(text|tspan)$/i.test(kTok[ki].tag)));
+            const pLeft2 = pLeft.filter((_, j) => !loUsed.has(j));
+            const st = align(pLeft2.map((i) => pTok[i].struct), kLeft2.map((i) => kTok[i].struct));
+            const structTwin = new Map(kLeft2.map((ki, j) => [ki, st.has(j) ? pTok[pLeft2[st.get(j)]] : null]));
             ks.forEach((ki, j) => { if (exact.has(j)) verdict.set(ki, 'same'); });
             kLeft.forEach((ki, j) => {
                 const t = kTok[ki];
                 if (/\sdata-ws-cell="/.test(t.attrs) || /\bmq-pupil\b/.test(attrOf(t.attrs, 'class'))) return;
                 const solid = /\sdata-ws-ink="solid"/.test(t.attrs);
-                if (!lo.has(j)) {
+                const twin = lo.has(j) ? pTok[pLeft[lo.get(j)]] : structTwin.get(ki) || null;
+                if (!twin) {
                     // a ring the key draws round printed content (a coin, a letter): only the ring
-                    const ringOnly = solid && !t.text.trim() && /(?:^|;)\s*(?:border|outline)\s*:\s*[^;]*solid/i.test(attrOf(t.attrs, 'style')) && !attrOf(t.attrs, 'data-ws-slot');
+                    const ringOnly = solid && !t.text.trim() && ring(t.attrs) && !attrOf(t.attrs, 'data-ws-slot');
                     verdict.set(ki, ringOnly ? 'mark' : 'add');
                     return;
                 }
-                const twin = pTok[pLeft[lo.get(j)]];
-                // the pupil page traces it (a worked example's answer): a given, inked solid on the key
-                if (/\sdata-ws-ink="trace"/.test(twin.attrs)) { verdict.set(ki, 'given'); return; }
+                // the pupil page traces it: on a worked Model a given (black); on a Guided Practice
+                // item the answer the pupil goes over (key ink) - its text only on a printed line or box
+                if (twin.trace) {
+                    if (modelCells.has(c)) verdict.set(ki, 'given');
+                    else verdict.set(ki, solid ? 'ans' : (t.svg ? (/^(text|tspan)$/i.test(t.tag) ? 'ans' : 'add') : 'text'));
+                    return;
+                }
+                // the same element with new text (a filled write-on line, a sign box, an answer-row
+                // chart cell): only its text is the answer (R3-1)
+                if (!lo.has(j)) { verdict.set(ki, solid ? 'ans' : (t.svg ? (/^(text|tspan)$/i.test(t.tag) ? 'ans' : 'same') : 'text')); return; }
                 // the pupil page prints the same element, restyled on the key: a given whose answer is
                 // only its new paint - a part shaded (its fill), a choice ringed (its border)
                 if (solid && !SHAPE.test(t.tag)) { verdict.set(ki, 'mark'); return; }
@@ -105,8 +128,9 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
                     const fill = attrOf(t.attrs, 'fill').toLowerCase();
                     if (fill && fill !== attrOf(twin.attrs, 'fill').toLowerCase() && !/^(none|#fff|#ffffff|white|transparent)$/.test(fill)) verdict.set(ki, 'fill');
                 } else if (!/^(svg|g|defs|text|tspan)$/i.test(t.tag)) {
-                    const ring = (a) => /(?:^|;)\s*(?:border|outline)\s*:\s*[^;]*solid/i.test(attrOf(a, 'style')) || /\sdata-ws-chosen\b/.test(a);
-                    if (ring(t.attrs) && !ring(twin.attrs)) verdict.set(ki, 'mark');
+                    // R3-2: a ring the pupil page holds in transparent ink is not drawn there
+                    const ringed = (a) => ring(a) || /\sdata-ws-chosen\b/.test(a);
+                    if (ringed(t.attrs) && !ringed(twin.attrs)) verdict.set(ki, 'mark');
                 }
             });
         }
@@ -117,19 +141,24 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
         const tagged = (extra) => `<${tag} data-ws-key-ans${extra}${attrs}>${text}`;
         if (/\sdata-ws-key-ans\b/.test(attrs)) return m;
         const t = kTok[n];
+        if (t.inCells && worked(t.cell)) return m;
         const words = /\sdata-ws-key="(?:words|short)"/.test(attrs);
+        const v = verdict.get(n);
         if (/\sdata-ws-ink="solid"/.test(attrs) || words) {
             if (!words) {
                 // the pupil page prints the very same mark (a worked example's traced answer): a given
-                if (verdict.get(n) === 'same' || verdict.get(n) === 'given') { take(solidSig(t.cell, tag, attrs)); return m; }
+                if (v === 'same' || v === 'given') { take(solidSig(t.cell, tag, attrs)); return m; }
                 // a printed choice the key rings (a letter, a coin, a word): only the ring is the answer
-                if (verdict.get(n) === 'mark') { take(solidSig(t.cell, tag, attrs)); return tagged(' data-ws-key-mark'); }
+                if (v === 'mark') { take(solidSig(t.cell, tag, attrs)); return tagged(' data-ws-key-mark'); }
+                if (v === 'ans') { take(solidSig(t.cell, tag, attrs)); return tagged(''); }
                 if (take(solidSig(t.cell, tag, attrs))) return m;           // the pupil page prints it: a given
                 if (/\bmq-pupil\b/.test(attrOf(attrs, 'class'))) return m;     // the made-up pupil's work
             }
             return tagged('');
         }
-        const v = verdict.get(n);
+        if (v === 'ans') return tagged('');
+        // R3-1: only the text is the answer - the element's own line, box or border keeps its ink
+        if (v === 'text') return text.replace(/&nbsp;|\s/g, '') ? `<${tag}${attrs}><span data-ws-key-ans data-ws-key-text>${text}</span>` : m;
         if (v === 'add') return tagged(' data-ws-key-add');   // owner 2026-10-09: a drawn answer is fully orange
         if (v === 'fill') return tagged(' data-ws-key-fill');
         if (v === 'mark') return tagged(' data-ws-key-mark');
@@ -137,15 +166,46 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
     });
 }
 
-/** Every open tag of a page with its cell ordinal, whether it sits in the cells (not the header or footer), and its signatures. */
+/** A border or outline drawn in visible ink (inline style); `transparent` / `none` / 0 width is no ring. */
+function ring(attrs) {
+    const style = attrOf(attrs, 'style');
+    const re = /(?:^|;)\s*(?:border|outline)(?:-(?:top|right|bottom|left))?\s*:\s*([^;]*)/gi;
+    let m;
+    while ((m = re.exec(style))) {
+        const v = m[1].toLowerCase();
+        if (/\bsolid\b/.test(v) && !/\btransparent\b|rgba\([^)]*,\s*0\)/.test(v) && !/(?:^|\s)0(?:px|pt|mm)?(?:\s|$)/.test(v)) return true;
+    }
+    return false;
+}
+
+const VOID = /^(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)$/i;
+
+/**
+ * Every open tag of a page with its cell ordinal, whether it sits in the cells (not the header or
+ * footer), whether it or an ancestor is traced (`data-ws-ink="trace"`) or inside an SVG, and its
+ * signatures. The open tags are listed in the order OPEN_TAG_TEXT walks them.
+ */
 function tokens(html) {
     const out = [];
     let cell = 0, inCells = false;
-    html.replace(OPEN_TAG_TEXT, (m, tag, attrs, text) => {
+    const stack = [];   // {tag, trace, svg}
+    const TAG = /<(\/?)([a-zA-Z][\w-]*)\b([^>]*)>([^<]*)/g;
+    let m;
+    while ((m = TAG.exec(html))) {
+        const [, close, tag, attrs, text] = m;
+        const low = tag.toLowerCase();
+        if (close) {
+            const i = stack.map((s) => s.tag).lastIndexOf(low);
+            if (i >= 0) stack.length = i;
+            continue;
+        }
         if (/\sdata-ws-cell="/.test(attrs)) { cell++; inCells = true; } else if (/^(footer|header)$/i.test(tag)) inCells = false;
-        out.push({ tag, attrs, text, cell, inCells, sig: markSig(0, tag, attrs, text), loose: looseSig(0, tag, attrs, text) });
-        return m;
-    });
+        const top = stack[stack.length - 1] || { trace: false, svg: false };
+        const trace = top.trace || /\sdata-ws-ink="trace"/.test(attrs);
+        const svg = top.svg || low === 'svg';
+        out.push({ tag, attrs, text, cell, inCells, trace, svg, sig: markSig(0, tag, attrs, text), loose: looseSig(0, tag, attrs, text), struct: structSig(tag, attrs) });
+        if (!VOID.test(tag) && !/\/\s*$/.test(attrs)) stack.push({ tag: low, trace, svg });
+    }
     return out;
 }
 

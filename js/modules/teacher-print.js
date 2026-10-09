@@ -20,7 +20,7 @@
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
-import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
+import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, PRINT_DEFAULTS_KEY, fmtDay,
@@ -664,7 +664,8 @@ function check(key, label) {
 function renderSetup() {
     const box = root.querySelector('#tvSetup');
     const pages = last ? last.pages.length : 0;
-    const printLabel = pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}${pr.key ? ' + key' : ''}` : `Print pupil pages${pr.key ? ' + key' : ''}`;
+    const sheets = last && pr.key && last.newSheet && last.docPages ? Math.ceil(last.docPages / 2) : 0;
+    const printLabel = pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}${pr.key ? ' + key' : ''}${sheets ? ` on ${sheets} sheet${sheets === 1 ? '' : 's'}, double-sided` : ''}` : `Print pupil pages${pr.key ? ' + key' : ''}`;
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
@@ -827,7 +828,12 @@ async function buildAll(req) {
         out.parts.push({ res, role: r.role, letters: r.letters });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';
-        out.docHtml += (res.docHtml || res.pupilHtml) + '\n';
+        let part = res.docHtml || res.pupilHtml;
+        // critic r3 (N-3): with "Start each key on a new sheet" every section keeps its sheets whole,
+        // so the next section never starts on the back of the last one
+        const ko = res.keyOptions || {};
+        if (ko.on && ko.newSheet && (part.match(/<section class="ws-page/g) || []).length % 2) part += '\n' + blankBack(/letter/i.test(r.paper || '') ? 'letter' : 'a4');
+        out.docHtml += part + '\n';
         if (res.keyOptions && res.keyOptions.on && res.keyOptions.placement === 'after-page') after = true;
         out.keyPages += res.keyPageCount || 0;
         for (let p = 0; p < res.pageCount; p++) {
@@ -836,6 +842,9 @@ async function buildAll(req) {
     }
     // "At the end": every section's pupil pages, then every key (today's order).
     if (!after) out.docHtml = out.pupilHtml + out.keyHtml;
+    // critic r3 (N-2): the pages the printer will run, blank backs included
+    out.docPages = (out.docHtml.match(/<section class="ws-page/g) || []).length;
+    out.newSheet = after && req.parts.some((r) => r.key && r.key.newSheet);
     // Page labels must be unique when several sections repeat a letter.
     const seen = {};
     out.pages = out.pages.map((l) => { seen[l] = (seen[l] || 0) + 1; return seen[l] > 1 ? `${l} (${seen[l]})` : l; });

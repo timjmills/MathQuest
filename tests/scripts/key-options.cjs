@@ -62,6 +62,13 @@ async function alignProbe({ role, FAM }) {
         while (i < n && j < m) { if (a[i] === b[j]) { got.add(j); i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++; }
         return got;
     };
+    const lcsMap = (a, b) => {
+        const n = a.length, m = b.length; const dp = Array.from({ length: n + 1 }, () => new Int16Array(m + 1));
+        for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+        const got = new Map(); let i = 0, j = 0;
+        while (i < n && j < m) { if (a[i] === b[j]) { got.set(j, i); i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++; }
+        return got;
+    };
     for (const [categoryId, skillId] of FAM) {
         const req = { role, sections: [{ skills: [{ categoryId, skillId }] }], size: 'L', paper: 'A4', seed: 4242, key: { on: true, placement: 'end', style: 'copy' } };
         let res, sres;
@@ -86,7 +93,16 @@ async function alignProbe({ role, FAM }) {
                 // copy on the key; whatever the key adds beyond that must be key ink
                 const K = texts(cell), P = texts(pcell);
                 const tally = (list, f) => list.reduce((mp, x) => (f(x) ? mp.set(x.s, (mp.get(x.s) || 0) + 1) : mp), new Map());
-                const pT = tally(P, () => true), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
+                // lead ruling (critic r3, Q1): a Model cell that traces its answer is the worked example -
+                // all given, nothing in key ink; a traced answer anywhere else is the pupil's, key ink
+                const model = cell.matches('[data-ws-key-model]') || !!cell.querySelector('[data-ws-key-model]');
+                const traced = !!pcell.querySelector('[data-ws-ink="trace"]');
+                if (model && traced) {
+                    const or = [...cell.querySelectorAll('*')].find((e) => vis(e) && (w.getComputedStyle(e).color === ORANGE || (e instanceof w.SVGElement && (w.getComputedStyle(e).stroke === ORANGE || w.getComputedStyle(e).fill === ORANGE))));
+                    if (or) issues.push(`${where} the worked Model prints "${or.textContent.trim().slice(0, 16)}" in key ink`);
+                    return;
+                }
+                const pT = tally(P, (x) => !x.el.closest('[data-ws-ink="trace"]')), kB = tally(K, (x) => w.getComputedStyle(x.el).color !== ORANGE);
                 // (a hint the key leaves out, e.g. a model's traced count, is not a given in key ink)
                 const kO = tally(K, (x) => w.getComputedStyle(x.el).color === ORANGE);
                 for (const [t, n] of pT) if ((kB.get(t) || 0) < n && (kO.get(t) || 0) > 0) issues.push(`${where} given text "${t.slice(0, 24)}" in key ink`);
@@ -114,6 +130,35 @@ async function alignProbe({ role, FAM }) {
                         if (x.st === ORANGE || (x.fi === ORANGE && twin.fi === 'rgb(0, 0, 0)')) issues.push(`${where} given ${x.el.tagName} in key ink`);
                     } else if (!x.full) issues.push(`${where} drawn answer ${x.el.tagName} not fully key ink (stroke ${x.st || '-'} fill ${x.fi || '-'})`);
                 }
+                // critic r3 (R3-1 / R3-2): a printed line, box or border is given - an element matched to
+                // its pupil twin never takes the key ink on its border or outline unless the key rings it
+                // (`data-ws-key-mark`); and a ring the key draws where the pupil twin draws none (or a
+                // transparent one) is the answer, in key ink
+                const els = (c) => [...c.querySelectorAll('*')].filter((e) => !(e instanceof w.SVGElement) && vis(e));
+                const esig = (e) => [e.tagName, e.getAttribute('class') || '', e.getAttribute('data-ws-slot') || '', e.getAttribute('data-ws-shape') || ''].join('|');
+                const edges = (cs) => {
+                    const o = [];
+                    for (const s of ['Top', 'Right', 'Bottom', 'Left']) if (cs['border' + s + 'Style'] !== 'none' && parseFloat(cs['border' + s + 'Width']) > 0 && cs['border' + s + 'Color'] !== 'rgba(0, 0, 0, 0)') o.push(cs['border' + s + 'Color']);
+                    if (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0 && cs.outlineColor !== 'rgba(0, 0, 0, 0)') o.push(cs.outlineColor);
+                    return o;
+                };
+                const KE = els(cell).filter((e) => !e.matches('[data-ws-key-text]')), PE = els(pcell);
+                const me = lcsMap(PE.map(esig), KE.map(esig));
+                KE.forEach((e, j) => {
+                    const kb = edges(w.getComputedStyle(e));
+                    if (!kb.length) return;
+                    const nm = `${e.tagName.toLowerCase()}.${String(e.getAttribute('class') || '').split(' ')[0]}`;
+                    if (me.has(j)) {
+                        const pb = edges(w.getComputedStyle(PE[me.get(j)]));
+                        if (kb.includes(ORANGE) && !e.hasAttribute('data-ws-key-mark') && pb.length) issues.push(`${where} given border of ${nm} in key ink`);
+                        if (!pb.length && !kb.includes(ORANGE) && !e.closest('.mq-pupil')) issues.push(`${where} ring the key adds on ${nm} "${e.textContent.trim().slice(0, 16)}" is black`);
+                    }
+                });
+                // R3-3: text never takes a stroke from the key ink (inherited from an added group)
+                [...cell.querySelectorAll('svg text, svg tspan')].forEach((t) => {
+                    const cs = w.getComputedStyle(t);
+                    if (cs.stroke === ORANGE && parseFloat(cs.strokeWidth) > 0 && t.textContent.trim()) issues.push(`${where} svg text "${t.textContent.trim().slice(0, 8)}" stroked in key ink`);
+                });
                 const m = lcs(P.map((x) => x.s), K.map((x) => x.s));
                 const added = K.filter((x, j) => !m.has(j)).map((x) => x.s).filter((t) => /\d/.test(t) && !/^[a-z]\.$/.test(t));
                 const row = srows[ki];
@@ -359,6 +404,30 @@ print(len(d))
             check(/^(?:PB?K+B?)+$/.test(q) && q.length % 2 === 0 && [...q].every((c, i) => (c === 'P' || (c === 'K' && q[i - 1] !== 'K')) ? i % 2 === 0 : true), `new sheet ${st}: ${q} (every pupil page and key must start a sheet)`);
         }
         check(ns.end === false, 'the new-sheet option applies only to "After each page"');
+        // owner 2026-10-09: the blank back carries ONE very small line in the footer band's centre cell
+        const bb = await page.evaluate(async () => {
+            const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_facts' }], pages: 2 }], size: 'L', paper: 'A4', seed: 5, key: { on: true, placement: 'after-page', style: 'copy', newSheet: true } });
+            const f = document.createElement('iframe'); f.style.cssText = 'position:absolute;left:-3000px;width:900px;height:1400px'; document.body.appendChild(f);
+            f.srcdoc = window.sheetDocument(r.docHtml, 'bb'); await new Promise((ok) => { f.onload = ok; });
+            await f.contentDocument.fonts.ready;
+            const d = f.contentDocument, w = f.contentWindow;
+            const out = [...d.querySelectorAll('section[data-ws-mode="blank"]')].map((s) => {
+                const note = s.querySelector('footer.ws-foot > .ws-blank-note');
+                const foot = s.querySelector('footer.ws-foot');
+                const cs = note && w.getComputedStyle(note);
+                const pr = d.querySelector('section[data-ws-mode="print"] footer.ws-foot');
+                return {
+                    text: s.textContent.replace(/\s+/g, ' ').trim(), centre: note && foot.children[1] === note,
+                    weight: cs && cs.fontWeight, size: cs && cs.fontSize, color: cs && cs.color,
+                    head: !!s.querySelector('header, .ws-tabbox, .ws-copy'),
+                    level: foot && pr ? Math.abs((foot.getBoundingClientRect().bottom - s.getBoundingClientRect().top) - (pr.getBoundingClientRect().bottom - pr.closest('section').getBoundingClientRect().top)) : 99,
+                };
+            });
+            f.remove();
+            return out;
+        });
+        check(bb.length > 0 && bb.every((b) => b.text === 'This page is intentionally blank' && b.centre && b.weight === '400' && b.color === 'rgb(0, 0, 0)' && Math.abs(parseFloat(b.size) - 9.33) < 0.2 && !b.head && b.level < 1),
+            `blank back line: ${JSON.stringify(bb[0])}`);
         log(`  new sheet: copy ${ns['copy-true']} short ${ns['short-true']}`);
 
         // ---- 10. per-cell alignment (critic r2, R2-1 / R2-2): on the copy key, every mark it ADDS in a

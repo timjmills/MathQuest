@@ -352,8 +352,12 @@ function gridPart(part, ctx, report) {
     const cells = items.map((item, i) => {
         report.index = report.cellNo++;
         const gi = item.q ? cellGridItem(item.q, ctx) : { cls: '', style: '' };
+        // critic r3 (N-1, lead ruling on Q1): the key marks a Model cell, so its traced worked answer
+        // stays a black given there while a Guided Practice trace takes the key ink (key only).
+        let html = itemHtml(item, ctx, report);
+        if (ctx.state === 'answered' && (item.model || report.inModel)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
         return {
-            html: itemHtml(item, ctx, report),
+            html,
             cls: [gi.cls, item.cls].filter(Boolean).join(' '),
             style: [gi.style, item.style].filter(Boolean).join(';'),
             nolabel: !!item.nolabel,
@@ -393,7 +397,11 @@ function partHtml(part, ctx, report) {
         case 'band': {
             // `extra`: static html at the right end of the strip (a quadrant's own "__/4").
             // `style`: a fixed band height on a banded page (PT-ENG-3), identical in both states.
-            const html = band(part.label || '', part.instr || '', contentHtml(part, ctx, report), { grow: !!part.grow, extra: part.extra || '' });
+            const was = report.inModel;
+            if (/^(Model|Another example)\b/i.test(String(part.label || ''))) report.inModel = true;
+            const inner = contentHtml(part, ctx, report);
+            report.inModel = was;
+            const html = band(part.label || '', part.instr || '', inner, { grow: !!part.grow, extra: part.extra || '' });
             return part.style ? html.replace('<div class="ws-band', `<div style="${part.style}" class="ws-band`) : html;
         }
         case 'day': return dayBand(part.day, part.score, contentHtml(part, ctx, report));

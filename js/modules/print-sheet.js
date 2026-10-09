@@ -1833,6 +1833,17 @@ export async function buildSheet(req = {}) {
     return arrangeKey(res, ko, req);
 }
 
+/**
+ * The blank back of a sheet ("Start each key on a new sheet", owner 2026-10-09): no header, tab or
+ * border, and one very small line in the kit's own footer band, centre cell (regular, black, no
+ * copyright line), so a pupil never takes it for a worksheet.
+ */
+export function blankBack(paperAttr = 'a4') {
+    const letter = paperAttr === 'letter' ? ' mq-paper-letter' : '';
+    return `<section class="ws-page ws-blank-back${letter}" data-ws-paper="${paperAttr}" data-ws-mode="blank" aria-label="Blank back of the sheet"><main class="ws-body"></main>`
+        + '<footer class="ws-foot ws-blank-foot"><span></span><span class="ws-blank-note">This page is intentionally blank</span><span></span></footer></section>';
+}
+
 /** Restyle and order the key pages of a built sheet (exported for the lane test). */
 export function arrangeKey(res, ko, req = {}) {
     res.keyOptions = ko;
@@ -1905,8 +1916,7 @@ export function arrangeKey(res, ko, req = {}) {
                 // "Start each key on a new sheet" (owner 2026-10-09, double-sided printing): a blank
                 // back pads the run so every key starts on the front of a sheet, and the key keeps its
                 // sheet whole, so the next pupil page starts on a fresh sheet too.
-                const letter = paperAttr === 'letter' ? ' mq-paper-letter' : '';
-                const blank = `<section class="ws-page ws-blank-back${letter}" data-ws-paper="${paperAttr}" data-ws-mode="blank" aria-label="Blank back of the sheet"></section>`;
+                const blank = blankBack(paperAttr);
                 const out = [];
                 const pad = () => { if (out.length % 2) out.push(blank); };
                 pupil.forEach((p, i) => { pad(); out.push(p); pad(); out.push(...keyed[i]); });
@@ -1917,6 +1927,18 @@ export function arrangeKey(res, ko, req = {}) {
             keyPages = keyed.flat();
         } else {
             res.notes = (res.notes || []).concat('The key prints at the end: its pages do not match the pupil pages one to one.');
+            if (ko.newSheet) {
+                // critic r3 (N-3): a part that falls back to the end still keeps the sheets whole, so
+                // its key starts on a front and the next section never starts on a back
+                const blank = blankBack(paperAttr);
+                const nPages = (list) => list.reduce((n, h) => n + (String(h).match(/<section class="ws-page/g) || []).length, 0);
+                const out = [...pupil];
+                if (nPages(out) % 2) out.push(blank);
+                out.push(...keyPages);
+                if (nPages(out) % 2) out.push(blank);
+                doc = out.join('\n');
+                res.blankBacks = out.filter((h) => h === blank).length;
+            }
         }
     }
     res.keyPages = keyPages;

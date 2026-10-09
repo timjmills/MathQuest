@@ -372,3 +372,13 @@
    ringed choice's border - its content stays black (critic r2, R2-1). Additive. */
 .ws-page.ws-key svg [data-ws-key-fill] { fill: var(--ws-key-ink) !important; }
 .ws-page.ws-key [data-ws-key-mark] { border-color: var(--ws-key-ink) !important; outline-color: var(--ws-key-ink) !important; }
+/* critic r3 (R3-3): SVG stroke is inherited, so the key ink's stroke on an added or answered group
+   reached its text ("100", "10", "1" on the disks printed as blobs). Text never takes a stroke it
+   did not draw itself: only its fill is the key ink. Additive. */
+.ws-page.ws-key.ws-key.ws-key svg :is([data-ws-key-add], [data-ws-key-ans]) :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg[data-ws-key-add] :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg[data-ws-key-ans] :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg :is(text, tspan):is([data-ws-key-add], [data-ws-key-ans]):not([stroke]) { stroke: none !important; }
+/* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
+   footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
+.ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }
