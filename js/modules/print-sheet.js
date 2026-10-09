@@ -22,7 +22,9 @@
 // `installLegacyAdapters` at module load), which is what lets the `legacy` template reach the
 // app's print branches.
 
-import { generateQuestionFor } from './generate-question.js';
+import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+// Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
+const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
@@ -1487,6 +1489,26 @@ function drawNumberLine(nline, items, size, header) {
     header.refBand = band.html;
     return { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes.concat(spec.notes || []), warn: spec.warn };
 }
+
+/**
+ * Wave 5.2 (critic nl-r4 D1, nl-r5 D2): the page-count rule's last resort. While the plan runs
+ * past the `wanted` pages, the section with the most items gives up its last one and the page is
+ * planned again (`replan(items)` -> plan). `items` is changed in place. Returns {plan, trimmed}.
+ */
+export function trimToPages(plan, items, wanted, replan) {
+    let trimmed = 0;
+    for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
+        const bySec = new Map();
+        items.forEach((it, i) => { const si = Number(it.section) || 0; if (!bySec.has(si)) bySec.set(si, []); bySec.get(si).push(i); });
+        const donor = [...bySec.entries()].filter(([, ix]) => ix.length > 1).sort((x, y) => y[1].length - x[1].length)[0];
+        if (!donor) break;
+        items.splice(donor[1][donor[1].length - 1], 1);
+        trimmed++;
+        plan = replan(items);
+    }
+    return { plan, trimmed };
+}
+
 /**
  * Wave 5.2: the skills of a sheet that ask for the number line (skill-options.js numberLineFits,
  * ticked on), the sections they hold, and the band reserved for their ONE merged line before any
@@ -1877,17 +1899,11 @@ export async function buildSheet(req = {}) {
     // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
     // group under its grid) gives up its last problems, one at a time, until it is the pages it
     // was asked for. The capacity above counts each section's grid; this counts the whole page.
+    let trimmed = 0;
     if (nline && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
         const wanted = n.sections.reduce((a, sec) => a + (sec.pages || 1), 0);
-        for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
-            const bySec = new Map();
-            hostItems.forEach((it, i) => { const si = Number(it.section) || 0; if (!bySec.has(si)) bySec.set(si, []); bySec.get(si).push(i); });
-            const donor = [...bySec.entries()].filter(([, ix]) => ix.length > 1).sort((x, y) => y[1].length - x[1].length)[0];
-            if (!donor) break;
-            hostItems.splice(donor[1][donor[1].length - 1], 1);
-            input.items = hostItems;
-            plan = independentPlan(input);
-        }
+        const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
+        plan = t.plan; trimmed = t.trimmed;
     }
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
@@ -1898,7 +1914,7 @@ export async function buildSheet(req = {}) {
     // then any note the layout line does not already say.
     const line = f0.line || '';
     const fits = {
-        cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: pageCount,
+        cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: pageCount, trimmed,
         note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '),
         sections: fitsList,
     };

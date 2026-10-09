@@ -3702,7 +3702,11 @@ export function normalizeOptions(categoryId, skillId, opts) {
             // fail Array.isArray, fall back to the default, and silently discard the teacher's
             // choice — the page would print in a notation nobody picked.
             const list = Array.isArray(v) ? v : (v === undefined || v === null ? null : [v]);
-            if (list) out[def.id] = list.filter(x => legal.has(x));
+            // A value given as a string ('1' for 1, from a form field or a hand-built request)
+            // reads as the legal value it spells (critic nl-r5 nit), never as "no restriction".
+            const byText = new Map(def.values.map(x => [String(x.v), x.v]));
+            if (list) out[def.id] = list.map(x => legal.has(x) ? x : byText.has(String(x)) ? byText.get(String(x)) : x)
+                .filter(x => legal.has(x));
         }
     }
     // A control another option overrides (`lockedBy`, count_by_tables "All 12 tables on one page")

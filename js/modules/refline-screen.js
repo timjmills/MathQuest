@@ -183,12 +183,19 @@ export function poolHost(categoryId, skillId) {
     return isMixedMetaSkill(skillId) ? { categoryId, skillId } : null;
 }
 
+/** The pool an ITEM was dealt from, by its own category / skill (a pool queued as one skill), or null. */
+export function itemPool(q) {
+    return q && q.categoryId && q.skillId ? poolHost(q.categoryId, q.skillId) : null;
+}
+
 /** Live practice: the skill's line above the practice card (the item on it only widens it). */
 export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = null, pool: asPool = true } = {}) {
     if (typeof document === 'undefined') return;
     const card = document.getElementById('questionCard');
     if (!card) return;
-    const pool = asPool ? poolHost(categoryId, skillId) : null;
+    // A queue / link / custom_mixed session (critic nl-r5 D1): the item names its own skill, and
+    // a pool queued as a skill (mixed_addition) is still the pool, by the item's own pair.
+    const pool = (asPool ? poolHost(categoryId, skillId) : null) || itemPool(q);
     const cat = pool ? pool.categoryId : (q && q.categoryId) || categoryId;
     const sk = pool ? pool.skillId : (q && (q.requestedSkillId || q.skillId)) || skillId;
     const o = pool ? optionsInUse(cat, sk, opts, null) : optionsInUse(cat, sk, opts, q);
@@ -211,14 +218,19 @@ export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opt
     // A category pool's sheet: the pool's one line (its options), as on paper (critic nl-r4 D3).
     const pool = asPool ? poolHost(categoryId, skillId) : null;
     if (pool) seen.set(`${pool.categoryId}:${pool.skillId}`, { categoryId: pool.categoryId, skillId: pool.skillId, opts: optionsInUse(pool.categoryId, pool.skillId, opts, null) });
+    // A mixed sheet (queue / link / custom_mixed, critic nl-r5 D1): each item names its own skill;
+    // a pool on it is the pool's one line, and its items never widen the line.
+    const widen = [];
     if (!pool) for (const q of qs) {
-        const cat = q.categoryId || categoryId, sk = q.requestedSkillId || q.skillId || skillId;
+        const ip = itemPool(q);
+        const cat = ip ? ip.categoryId : q.categoryId || categoryId, sk = ip ? ip.skillId : q.requestedSkillId || q.skillId || skillId;
+        if (!ip) widen.push(q);
         const k = `${cat}:${sk}`;
-        if (!seen.has(k)) seen.set(k, { categoryId: cat, skillId: sk, opts: optionsInUse(cat, sk, qs.length && seen.size === 0 ? opts : null, q) });
+        if (!seen.has(k)) seen.set(k, { categoryId: cat, skillId: sk, opts: ip ? optionsInUse(cat, sk, null, null) : optionsInUse(cat, sk, qs.length && seen.size === 0 ? opts : null, q) });
     }
     if (!seen.size && categoryId && skillId) seen.set(`${categoryId}:${skillId}`, { categoryId, skillId, opts: optionsInUse(categoryId, skillId, opts) });
     let html = '';
-    try { html = bandHTML(mergedLine([...seen.values()], pool ? [] : qs), grid.clientWidth || 600); } catch (e) { html = ''; }
+    try { html = bandHTML(mergedLine([...seen.values()], pool ? [] : widen), grid.clientWidth || 600); } catch (e) { html = ''; }
     mountRefLine(grid, 'mqWsRefLine', html);
 }
 

@@ -1,6 +1,8 @@
 import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
-import { generateQuestionFor } from './generate-question.js';
+import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+// Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
+const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex, searchSkillIndex } from './skill-search.js';
 import { optionsFor, offeredOptionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS, pvRefusal } from './skill-options.js';

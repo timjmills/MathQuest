@@ -202,6 +202,20 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
 }
 
 /**
+ * Print's view of an item (critic nl-r5 D1). A review / mixed item now carries its REAL category
+ * (generateQuestion all_mixed branch) so the screen hosts find its skill's options; a printed page
+ * keeps the pair it asked for on the item, as it always has (the section's provider, instruction,
+ * grade settling and answer-key tags read it). The real category stays on `memberCategoryId`.
+ */
+export function configuredItem(q, category) {
+    if (q && q.mixedHost && category && q.categoryId !== category) {
+        q.memberCategoryId = q.categoryId;
+        q.categoryId = category;
+    }
+    return q;
+}
+
+/**
  * Swap in a seeded generator for the duration of one call so the same seed reprints the same
  * page. mulberry32: small, fast and stable across browsers, which matters because a teacher may
  * reprint form B on a different machine.
@@ -965,6 +979,13 @@ function generateResolvedQuestion() {
 
             q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(targetSkill, targetCategory) : '';
             q.skillId = targetSkill;
+            // Critic nl-r5 D1: the item carries its REAL category with its skill, so every screen
+            // host (the number line, the screen cell's support model) finds the options the
+            // teacher set on that skill in a queue / shared-link / custom_mixed session.
+            // `mixedHost` remembers the review / mixed pair the item was asked for: print keeps
+            // that pair on the page (print-sheet.js configuredItem), as it always has.
+            q.categoryId = targetCategory;
+            q.mixedHost = { categoryId: savedCategory, skillId: savedSkill };
             q.poolMember = targetCategory;   // P12: the topic this item came from (a grade / "_all" review)
 
             break;

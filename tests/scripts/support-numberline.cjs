@@ -477,6 +477,93 @@ const SAMPLES = [
         }
         log(`  pools on screen: ${Object.entries(pool).map(([k, v]) => `${k} card ${v.card.join('/')} ws ${v.ws}`).join('; ')}`);
 
+        /* critic nl-r5 D1 / D2: the REAL pupil paths. A queued set (UnifiedSkills + playSelectedSkills)
+           and a shared Direct link (?c=... -> startFromLanding) both play in custom_mixed mode: every
+           item names its own category and skill, and the line is the one the teacher set on it. */
+        const queue = await page.evaluate(async () => {
+            const W = window;
+            const st = W.state;
+            const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+            const play = async (list) => {
+                W.clearSetOptions({ silent: true });
+                W.UnifiedSkills.clear();
+                for (const [c, s, o] of list) W.UnifiedSkills.add({ categoryId: c, skillId: s, skillLabel: s, opts: o });
+                const card = {};
+                W.playSelectedSkills('practice');
+                await wait(300);
+                for (let i = 0; i < 24; i++) {
+                    st.hasAnswered = false; st.currentQ = W.generateQuestion(); W.renderQuestion();
+                    const q = st.currentQ;
+                    const el = document.querySelector('#mqRefLine svg');
+                    const k = `${q.categoryId}:${q.skillId}`;
+                    (card[k] = card[k] || new Set()).add(el ? el.getAttribute('aria-label') : 'none');
+                }
+                W.playSelectedSkills('worksheet');
+                await wait(500);
+                const ws = document.querySelector('#mqWsRefLine svg');
+                const out = { mixed: st.isMixedMode, skill: st.skill, card: {}, ws: ws ? ws.getAttribute('aria-label') : 'none', wsItems: (st.worksheetQs || []).map((q) => `${q.categoryId}:${q.skillId}`) };
+                for (const [k, v] of Object.entries(card)) out.card[k] = [...v];
+                return out;
+            };
+            const res = {
+                facts: await play([['addition', 'add_facts', { nlOn: true }]]),
+                poolBare: await play([['addition', 'mixed_addition', { nlOn: true }]]),
+                poolEnds: await play([['addition', 'mixed_addition', { nlOn: true, nlFrom: 0, nlTo: 1000 }]]),
+                two: await play([['addition', 'add_facts', { nlOn: true }], ['patterns', 'seq_2', {}]]),
+                none: await play([['addition', 'add_facts', {}]]),
+            };
+            W.clearSetOptions({ silent: true });
+            W.UnifiedSkills.clear();
+            st.isMixedMode = false;
+            W.showView('homeView');
+            return res;
+        });
+        const lab = (r, k) => (r.card[k] || []);
+        check(queue.facts.mixed && queue.facts.skill === 'custom_mixed', `R5-D1 queue: not the custom_mixed path ${JSON.stringify(queue.facts)}`);
+        check(Object.keys(queue.facts.card).join() === 'addition:add_facts' && lab(queue.facts, 'addition:add_facts').length === 1 && /0 to 20/.test(lab(queue.facts, 'addition:add_facts')[0]), `R5-D1 queue add_facts card: ${JSON.stringify(queue.facts.card)}`);
+        check(/0 to 20/.test(queue.facts.ws) && queue.facts.wsItems.every((k) => k === 'addition:add_facts'), `R5-D1 queue add_facts worksheet: ${queue.facts.ws} ${queue.facts.wsItems.join(',')}`);
+        check(JSON.stringify(queue.poolBare.card) === '{"addition:mixed_addition":["none"]}' && queue.poolBare.ws === 'none', `R5-D1 queue mixed_addition without ends draws a line: ${JSON.stringify(queue.poolBare)}`);
+        check(lab(queue.poolEnds, 'addition:mixed_addition').length === 1 && /0 to 1,?000/.test(lab(queue.poolEnds, 'addition:mixed_addition')[0]) && queue.poolEnds.ws === lab(queue.poolEnds, 'addition:mixed_addition')[0], `R5-D1 queue mixed_addition 0..1000: not the teacher's one line ${JSON.stringify(queue.poolEnds)}`);
+        check(/0 to 20/.test((lab(queue.two, 'addition:add_facts') || [])[0] || '') && lab(queue.two, 'addition:add_facts').length === 1
+            && JSON.stringify(lab(queue.two, 'patterns:seq_2')) === '["none"]' && /0 to 20/.test(queue.two.ws), `R5-D1 queue add_facts (line) + seq_2 (none): ${JSON.stringify(queue.two)}`);
+        check(JSON.stringify(queue.none.card) === '{"addition:add_facts":["none"]}' && queue.none.ws === 'none', `R5-D1 queue add_facts without the option draws a line: ${JSON.stringify(queue.none)}`);
+        log(`  queue path: add_facts ${lab(queue.facts, 'addition:add_facts')} / ws ${queue.facts.ws}; mixed_addition bare ${queue.poolBare.ws}, ends ${queue.poolEnds.ws}; two-skill seq_2 ${lab(queue.two, 'patterns:seq_2')}`);
+
+        // R5-D2: the page-count rule's last resort (print-sheet.js trimToPages), by itself...
+        const trim = await page.evaluate(async () => {
+            const m = await import('./js/modules/print-sheet.js');
+            const items = Array.from({ length: 9 }, (_, i) => ({ section: i < 6 ? 0 : 1, i }));
+            const plan = (list) => ({ pages: list.length > 7 ? [1, 2] : [1] });
+            const r = m.trimToPages(plan(items), items, 1, plan);
+            return { pages: r.plan.pages.length, trimmed: r.trimmed, left: items.map((x) => x.i).join(',') };
+        });
+        check(trim.pages === 1 && trim.trimmed === 2 && trim.left === '0,1,2,3,6,7,8', `R5-D2 trimToPages: ${JSON.stringify(trim)}`);
+
+        // ...and on a real Direct link, the way a pupil opens it (a fresh page load, the landing
+        // pop-up's Start). Last: it navigates the page.
+        const link = {};
+        for (const [c, s, o, want] of [['addition', 'add_facts', { nlOn: true }, /0 to 20/], ['addition', 'mixed_addition', { nlOn: true, nlFrom: 0, nlTo: 1000 }, /0 to 1,?000/], ['addition', 'mixed_addition', { nlOn: true }, null]]) {
+            const code = await page.evaluate((c, s, o) => window.SKILL_CODES[`${c}:${s}`] + '~' + window.encodeOptionPayload(c, s, window.packOptions(c, s, o)), c, s, o);
+            await page.goto(page.url().split('?')[0] + '?c=' + encodeURIComponent(code), { waitUntil: 'networkidle2' });
+            await page.waitForFunction(() => typeof window.startFromLanding === 'function' && window.state && window.state.landingSettings, { timeout: 30000 });
+            await page.evaluate(() => window.startFromLanding());
+            await new Promise((r) => setTimeout(r, 1500));
+            const r = await page.evaluate(() => {
+                const st = window.state;
+                const labs = new Set();
+                for (let i = 0; i < 20; i++) {
+                    if (i) { st.hasAnswered = false; st.currentQ = window.generateQuestion(); window.renderQuestion(); }
+                    const el = document.querySelector('#mqRefLine svg');
+                    labs.add(el ? el.getAttribute('aria-label') : 'none');
+                }
+                return { skill: st.skill, mixed: st.isMixedMode, q: st.currentQ ? `${st.currentQ.categoryId}:${st.currentQ.skillId}` : '', card: [...labs] };
+            });
+            const tag = `${s}${o.nlTo ? ' ends' : ''}`;
+            link[tag] = Object.assign({ code }, r);
+            check(r.q === `${c}:${s}` && r.card.length === 1 && (want ? want.test(r.card[0]) : r.card[0] === 'none'), `R5-D1 Direct link ${tag} (${code}): ${JSON.stringify(r)}`);
+        }
+        log(`  Direct link: ${Object.entries(link).map(([k, v]) => `${k} ${v.code} -> ${v.card.join('/')}`).join('; ')}`);
+
         if (SHOTS) await shots(h);
         check(!h.problems.length, `console problems: ${JSON.stringify(h.problems.slice(0, 5))}`);
     } catch (e) {
