@@ -99,7 +99,8 @@
     "skipAfter": "6Y",
     "rows": "1W",
     "times": "1Z",
-    "divForm": "5N"
+    "divForm": "5N",
+    "spaces": "1X"
   },
   "blocks": {
     "0": {
@@ -671,6 +672,10 @@
       "fraction": "F",
       "vertical": "V",
       "mix": "M"
+    },
+    "spaces": {
+      "box": "B",
+      "line": "L"
     }
   },
   "scalarOnly": {
