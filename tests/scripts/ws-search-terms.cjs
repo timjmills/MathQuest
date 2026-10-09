@@ -10,6 +10,9 @@
 //   (c) no query in QUERIES returns zero results
 //   (d) every PRIMARY_SKILLS phrase ranks its skill first (list and grouped picker)
 //   (e) every query in TOP1 ranks an allowed skill FIRST and keeps the named wrong skills out of the top 5
+//       (TOP2 pins a second place)
+//   (f) EXPECT0 real words no skill teaches return nothing (never "corrected" into another word)
+//   (g) CORRECTIONS: the "Showing results for" text a query gets, or none
 const path = require('path');
 const { pathToFileURL } = require('url');
 
@@ -336,7 +339,46 @@ const TOP1 = [
     ['bar chart', ['graphs:bar_graph']],
     ['bodmas', ['order_of_operations:oop_easy']],
     ['fact families', ['addition:add_sub_fact_family']],
+    // critic r2: real words are never rewritten (P-A), divide-by variants (P-B), the grid method is not
+    // short multiplication (P-C), analogue (C-A), position and direction / aera (C-C), part whole (R-A),
+    // vocabulary never leads a teaching query (R-B)
+    ['tile', ['area_perimeter:area_unit_squares', 'area_perimeter:area'], ['measurement:time_hour']],
+    ['tiles', ['area_perimeter:area_unit_squares', 'area_perimeter:area'], ['multiplication:mult_facts']],
+    ['tiling', ['area_perimeter:area_unit_squares', 'area_perimeter:area']],
+    ['divide by 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
+    ['divided by 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
+    ['÷2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
+    ['÷ 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
+    ['divided by 7', ['division:div_facts']],
+    ['short multiplication', ['multiplication:multiply'], ['multiplication:area_model_mult_hard']],
+    ['standard algorithm multiplication', ['multiplication:multiply'], ['multiplication:area_model_mult_hard']],
+    ['multiply by 1 digit', ['multiplication:multiply'], ['multiplication:area_model_mult_hard']],
+    ['3*4', ['multiplication:mult_facts']],
+    ['7 x 8', ['multiplication:mult_facts']],
+    ['analogue clock', ['measurement:time_analog_digital']],
+    ['analog clock', ['measurement:time_analog_digital']],
+    ['analogue', ['measurement:time_analog_digital']],
+    ['position and direction', ['shapes_early:shape_positions']],
+    ['aera', ['area_perimeter:area']],
+    ['part whole model', ['composing:number_bonds']],
+    ['grade 4 fractions', ['fractions:select_equiv_frac', 'fractions:equivalent', 'fractions:fraction_of_set_hard', 'fractions:identify', 'fractions:compare'], ['vocabulary:vocab_grade_4']],
+    ['kindergarten counting', ['counting:count_objects', 'counting:count_sequence'], ['vocabulary:vocab_grade_K']],
+    ['vocabulary', ['vocabulary:vocab_grade_K']],
+    ['skip counting', ['multiplication:count_by_tables']],
+    ['times tables 7', ['multiplication:mult_facts']],
 ];
+
+// [query, the second skill] for a pinned order (critic r2 P-B: Halving first, Division Facts second)
+const TOP2 = [
+    ['divide by 2', 'division:div_facts'], ['divided by 2', 'division:div_facts'], ['÷2', 'division:div_facts'], ['÷ 2', 'division:div_facts'],
+];
+
+// Correctly spelt words no skill teaches: 0 results is the honest answer (they must NOT be "corrected"
+// into a nearby vocabulary word: compass -> compare, east -> past, days -> ways, root -> foot ...).
+const EXPECT0 = ['compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar'];
+// [query, the correction shown, or null for none]
+const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days', null], ['full', null], ['area', null],
+    ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions']];
 
 (async () => {
     globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
@@ -389,6 +431,20 @@ const TOP1 = [
         top1ok++;
     }
     console.log(`ws-search-terms: ${top1ok}/${TOP1.length} rank-1 queries pass`);
+    for (const [q, second] of TOP2) {
+        const k = finder.findSkills(q)[1];
+        if (!k || k.key !== second) failures.push(`(e) "${q}": rank 2 is ${k && k.key}, want ${second}`);
+    }
+    for (const q of EXPECT0) {
+        const all = finder.findSkills(q);
+        if (all.length) failures.push(`(f) "${q}" should find nothing (no skill teaches it) but rank 1 is ${all[0].key}`);
+    }
+    for (const [q, want] of CORRECTIONS) {
+        const c = finder.searchCorrection(q);
+        const got = c ? c.to : null;
+        if (got !== want) failures.push(`(g) "${q}": correction ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
+    }
+    console.log(`ws-search-terms: ${TOP2.length} rank-2, ${EXPECT0.length} expected-empty and ${CORRECTIONS.length} correction checks run`);
     // (d) primary skills: every PRIMARY_SKILLS phrase puts its skill at rank 1 in findSkills AND first in
     //     a grouped picker (groupByRank: the order teacher-sets uses; the student list and teacher
     //     library show the ranked order directly. The Navigator / Quiz builder DOM reordering is checked

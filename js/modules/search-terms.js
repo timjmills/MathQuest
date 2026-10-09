@@ -185,7 +185,7 @@ export const CONCEPTS = {
     compare_attributes: ['longer', 'shorter', 'taller', 'bigger', 'smaller', 'heavier', 'lighter', 'compare length',
         'compare size', 'measurable attributes'],
     sorting: ['sort', 'sorting', 'classify', 'classifying', 'classification', 'group', 'categories', 'venn', 'carroll'],
-    position: ['position', 'positional language', 'above', 'below', 'beside', 'next to', 'in front', 'behind', 'under', 'over'],
+    position: ['position', 'positional language', 'position and direction', 'direction', 'directions', 'left', 'right', 'above', 'below', 'beside', 'next to', 'in front', 'behind', 'under', 'over'],
     composing_shapes: ['compose shapes', 'combine shapes', 'put shapes together', 'pattern blocks', 'tangrams', 'make a shape'],
     mixed_review: ['mixed', 'mixed review', 'review', 'revision', 'all', 'everything', 'assessment', 'test prep', 'spiral review'],
     exponents: ['exponent', 'exponents', 'powers', 'squared', 'cubed', 'indices', 'index'],
@@ -211,7 +211,7 @@ export const CONCEPT_RULES = [
     [/^(addition|subtraction):(add|sub)_(1k|10k|100k|1m|100|50)_/, ['column']],
     [/^addition:(add_\w*no_regroup|add_(1k|10k|100k|1m|100|50)_)/, ['column_add']],
     [/^subtraction:(sub_\w*no_regroup|sub_(1k|10k|100k|1m|100|50)_)/, ['column_sub']],
-    [/^multiplication:(mult_placeholder_zero|mult_missing_digit|multiply|area_model_mult_hard)$/, ['column_mult']],
+    [/^multiplication:(mult_placeholder_zero|mult_missing_digit|multiply)$/, ['column_mult']],
     [/^counting:count_objects$|^composing:ten_frame_build$|^comparing:compare_groups$/, ['subitizing']],
     [/_mixed\b.*within|add_\d+k?m?_mixed|sub_\d+k?m?_mixed/, ['regroup_add', 'regroup_sub', 'no_regroup']],
     [/(add|sub|mult|div)_facts/, ['facts']],
@@ -362,10 +362,11 @@ export const SKILL_TERMS = {
     'subtraction:sub_facts': ['take away', 'takeaway', 'difference', 'subtract', 'minus', 'subtraction facts', 'subtract facts', 'basic subtraction facts', 'number facts', 'within 20'],
     'subtraction:subtract': ['take away', 'minus', 'simple subtraction', 'basic', 'easy subtraction'],
     'subtraction:sub_5_pictures': ['take away', 'cross out', 'how many left', 'beginning subtraction', 'minus'],
-    'multiplication:mult_facts': ['x', 'multiply', 'times tables', 'times table', 'times', 'multiplication facts', 'tables', 'multiplication tables', 'x tables'],
+    'multiplication:mult_facts': ['x', 'multiply', 'times tables', 'times table', 'times', 'multiplication facts', 'tables', 'multiplication tables', 'x tables',
+        ...Array.from({ length: 12 }, (_, i) => `${i + 1} times table`), ...Array.from({ length: 12 }, (_, i) => `times tables ${i + 1}`)],
     'multiplication:mult_chart': ['times tables', 'multiplication square', 'multiplication grid', 'tables chart'],
     'multiplication:mult_chart_easy': ['times tables', 'multiplication square', 'multiplication grid'],
-    'division:div_facts': ['divide', 'division', 'divided by', 'division facts', 'sharing', 'share', 'division tables', 'inverse of times tables'],
+    'division:div_facts': ['divide', 'division', 'divided by', 'division facts', 'divide by 2', 'divide by 3', 'divide by 4', 'divide by 5', 'divide by 6', 'divide by 7', 'divide by 8', 'divide by 9', 'sharing', 'share', 'division tables', 'inverse of times tables'],
     'division:divide': ['divided by', 'sharing', 'share', 'simple division'],
     'division:share_into_groups': ['sharing', 'share equally', 'fair share', 'equal groups'],
     'addition:add_100_regroup': ['carrying', 'carry', '2 digit addition with carrying', 'double digit addition'],
@@ -434,7 +435,9 @@ export const SKILL_TERMS = {
     'measurement:reading_ruler': ['measuring length', 'measure length', 'measuring', 'ruler', 'inches', 'centimetres'],
     'measurement:length_metric': ['centimetres', 'centimeters', 'cm', 'metres', 'meters', 'millimetres', 'kilometres', 'metric length'],
     'measurement:length_customary': ['inches', 'feet', 'yards', 'miles', 'customary length', 'imperial'],
-    'area_perimeter:area': ['area', 'area of a rectangle', 'length times width', 'square units'],
+    'area_perimeter:area': ['area', 'area of a rectangle', 'length times width', 'square units', 'tile', 'tiles', 'tiling', 'tiled'],
+    'measurement:time_analog_digital': ['analog clock', 'analogue clock', 'analog and digital', 'analogue and digital', 'analog to digital'],
+    'area_perimeter:area_unit_squares': ['tile', 'tiles', 'tiling', 'tiled', 'tiling a rectangle', 'cover with tiles', 'count the squares', 'unit squares'],
     'area_perimeter:perimeter': ['perimeter', 'distance around', 'perimeter of a rectangle'],
     'area_perimeter:volume': ['volume', 'cubic units', 'volume of a cuboid', 'volume of a box'],
     'order_of_operations:oop_easy': ['order of operations', 'bodmas', 'bidmas', 'pemdas', 'which operation first'],
@@ -497,7 +500,7 @@ export const PRIMARY_SKILLS = {
     'division:share_into_groups': ['sharing', 'share equally', 'fair share'],
     'addition:add_100_regroup': ['carrying', 'carry'],
     'subtraction:sub_100_regroup': ['borrowing', 'borrow'],
-    'composing:number_bonds': ['number bonds', 'number bond', 'part whole', 'number bonds to 20', 'bonds to 20'],
+    'composing:number_bonds': ['number bonds', 'number bond', 'part whole', 'part whole model', 'part-whole model', 'cherry model', 'number bonds to 20', 'bonds to 20'],
     'composing:make_ten': ['bonds to 10', 'make 10', 'make ten'],
     'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'hundred chart', 'number square'],
     'composing:odd_even': ['odd and even', 'odd or even', 'even numbers', 'odd numbers'],
@@ -577,7 +580,7 @@ const ROOTS = {
     measuring: 'measure', measurement: 'measure', measurements: 'measure', comparing: 'compare', comparison: 'compare',
     ordering: 'order', estimating: 'estimate', estimation: 'estimate', doubling: 'double', halving: 'halve', halves: 'half',
     fractions: 'fraction', decimals: 'decimal', percentages: 'percent', percentage: 'percent', percents: 'percent',
-    simplifying: 'simplify', graphs: 'graph', charts: 'chart', angles: 'angle', shapes: 'shape', patterns: 'pattern',
+    analogue: 'analog', color: 'colour', colors: 'colour', coloring: 'colour', simplifying: 'simplify', graphs: 'graph', charts: 'chart', angles: 'angle', shapes: 'shape', patterns: 'pattern',
 };
 
 const ORD = { first: '1', second: '2', third: '3', fourth: '4', fifth: '5', sixth: '6', '1st': '1', '2nd': '2', '3rd': '3', '4th': '4', '5th': '5', '6th': '6' };
@@ -729,6 +732,7 @@ export function buildSearchIndex(entries) {
         return {
             entry: e, order, terms: t, labelBare,
             sets: [tokSet([labelPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet(t.code)],
+            vocab: /^vocab/.test(e.skillId) || e.categoryId === 'vocabulary',
             wp: /word|_wp_|story/.test(`${e.label} ${e.skillId}`.toLowerCase()),
             phrases: { extra: t.extra, concept: t.concept },
             primary: (PRIMARY_SKILLS[`${e.categoryId}:${e.skillId}`] || []).map((x) => normalize(x)),
@@ -752,18 +756,123 @@ function e2fam(e) { return `${String(e.categoryId || '').replace(/_/g, ' ')} ${e
 
 function editDistance(a, b, max) {
     if (Math.abs(a.length - b.length) > max) return max + 1;
-    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    // optimal string alignment: a swapped pair ('aera') is one edit
+    let prev2 = null, prev = Array.from({ length: b.length + 1 }, (_, i) => i);
     for (let i = 1; i <= a.length; i++) {
         const cur = [i];
         let best = i;
         for (let j = 1; j <= b.length; j++) {
             cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+            if (prev2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) cur[j] = Math.min(cur[j], prev2[j - 2] + 1);
             if (cur[j] < best) best = cur[j];
         }
         if (best > max) return max + 1;
+        prev2 = prev;
         prev = cur;
     }
     return prev[b.length];
+}
+
+// Correctly spelt English words that are not in the skill vocabulary. They are never "corrected" into a
+// vocabulary word ('tile' is not 'time', 'compass' is not 'compare'); a search for one honestly finds
+// what carries it, or nothing (critic r2 P-A).
+export const REAL_WORDS = new Set(('tile tiles tiling tiled compass north south east west northeast days day week weeks month ' +
+    'months year years root roots full empty bead beads rekenrek abacus calendar date dates season seasons ' +
+    'fill pill mill will till tall tell toll bell ball wall call fall hall ' +
+    'cat cats dog dogs hat bat rat mat sat pat fat car bar far jar star stair chair fair hair pair air ' +
+    'cake bake lake make take wake rake sake fake ' +
+    'bed red fed led wed head read bread lead dead ' +
+    'book look cook hook took foot boot hoot loot rook room ' +
+    'game came name same tame lame ' +
+    'ways rays bays pays says lays ' +
+    'past last fast mast cast vast rest best test nest west vest pest ' +
+    'worth north birth earth ' +
+    'like bike hike mike pike ' +
+    'line fine mine nine pine wine dine kine ' +
+    'rope hope pope cope dope mope ' +
+    'tree free three trees ' +
+    'sun run fun bun gun nun ' +
+    'box fox socks rocks clocks blocks locks ' +
+    'pen ten hen men den ' +
+    'pin tin bin win fin sin kin ' +
+    'map cap gap lap nap tap sap ' +
+    'dot hot lot pot rot cot not got ' +
+    'cup pup ' +
+    'egg eggs leg legs peg pegs ' +
+    'apple apples orange oranges banana bananas ' +
+    'sweet sweets cookie cookies candy ' +
+    'train trains plane planes boat boats ' +
+    'toy toys doll dolls ' +
+    'school class teacher pupil pupils student students ' +
+    'easy hard harder easier ' +
+    'big small large little long short tall ' +
+    'hot cold warm ' +
+    'fruit fruits flower flowers ' +
+    'pizza pie pies ' +
+    'dice die ' +
+    'string strings ' +
+    'paper pencil ruler ' +
+    'chair table tables desk ' +
+    'coin coins note notes ' +
+    'page pages ' +
+    'shop shopping ' +
+    'kids child children ' +
+    'friend friends ' +
+    'house houses ' +
+    'garden ' +
+    'water milk juice ' +
+    'bag bags ' +
+    'animal animals ' +
+    'spring summer autumn winter fall ' +
+    'pay pays paid bank banks sell sells sold spell team teams title titles moon pear '+
+    'monday tuesday wednesday thursday friday saturday sunday').split(/\s+/).filter(Boolean));
+
+/** Words the query corrects: [{ at, from, to }]. A word is corrected only when it is not a known word,
+ *  the nearest vocabulary word starts with the same letter, and it is a keyboard slip away: one edit
+ *  (a dropped, extra, changed or swapped letter) for a word of 6 letters or fewer, two for a longer one. */
+export function correctWords(index, q) {
+    const out = [];
+    q.forEach((w, at) => {
+        if (isNumTok(w) || w.length < 3 || w.includes('.') || REAL_WORDS.has(w) || REAL_WORDS.has(stem(w)) || STOP.has(w)) return;
+        const sw = stem(w);
+        if (index.vocab.some((v) => v === w || v === sw || (w.length >= 4 && (v.startsWith(w) || v.startsWith(sw))))) return;
+        const max = w.length <= 6 ? 1 : 2;
+        const cands = [];
+        for (const v of index.vocab) {
+            if (v[0] !== w[0] || isNumTok(v) || v.length < 3 || STOP.has(v) || v.includes('.')) continue;
+            // a short word is corrected only for a dropped letter ('tme') or a swapped pair ('aera'): a changed or
+            // extra letter in a short word is usually a different real word ('boy' / 'box', 'race' / 'rate')
+            if (w.length <= 5 && !(droppedLetter(w, v) || swappedPair(w, v))) continue;
+            const d = editDistance(w, v, max);
+            if (d <= max) cands.push({ v, d });
+        }
+        cands.sort((a, b) => a.d - b.d || (index.df.get(b.v) || 0) - (index.df.get(a.v) || 0) || b.v.length - a.v.length);
+        if (cands.length) out.push({ at, from: w, to: cands[0].v });
+    });
+    return out;
+}
+
+function droppedLetter(w, v) {
+    if (v.length !== w.length + 1) return false;
+    for (let i = 0; i < v.length; i++) if (v.slice(0, i) + v.slice(i + 1) === w) return true;
+    return false;
+}
+function swappedPair(w, v) {
+    if (v.length !== w.length) return false;
+    for (let i = 0; i < w.length - 1; i++) if (w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2) === v) return true;
+    return false;
+}
+
+/** The corrections a query gets, for the "Showing results for ..." line: { from: 'tme', to: 'telling time' } or null. */
+export function queryCorrection(index, query) {
+    const q = tokens(query, { query: true });
+    if (!q.length) return null;
+    const fixes = correctWords(index, q);
+    const spelt = normalize(query).split(' ').some((w) => MISSPELLINGS[w]);
+    if (!fixes.length && !spelt) return null;
+    const shown = normalize(query).split(' ').map((w) => MISSPELLINGS[w] || w);
+    const fixedShown = shown.map((w) => { const f = fixes.find((x) => x.from === w); return f ? f.to : w; });
+    return { from: String(query).trim(), to: fixedShown.join(' ') };
 }
 
 const isNumTok = (w) => /^\d+[a-z]?$/.test(w) || /^[gy][\dk]$/.test(w);
@@ -791,40 +900,34 @@ export function searchIndex(index, query) {
     if (!q.length) q = tokens(query);
     if (!q.length) return [];
     let phraseToks = tokens(query).filter((w) => !HARD_STOP.has(w));
+    const wantsVocab = q.some((w) => /^(vocab|words?$|definition|glossary|terms?$|keyword)/.test(w));
     const wantsWords = q.some((w) => /^(word|story|stories|problem|context|real)/.test(w));
-    // fuzzy candidates for every query word, once. An unknown word is REWRITTEN to its nearest vocabulary
-    // word (least edits, then the commonest), so a typo ranks like the word meant (critic r1 R1):
-    // 'subtracton' -> 'subtraction', 'rouding' -> 'rounding', 'tme' -> 'time'.
-    const fuzz = q.map((w, i) => {
-        if (isNumTok(w) || w.length < 3 || w.includes('.')) return [];
-        // a real word ('take', 'away') is never fuzzed into another one ('make', 'way')
-        const sw = stem(w);
-        if (index.vocab.some((v) => v === w || v === sw || (w.length >= 4 && (v.startsWith(w) || v.startsWith(sw))))) return [];
-        const max = w.length >= 7 ? 2 : 1;
-        const cands = [];
-        for (const v of index.vocab) {
-            if (isNumTok(v) || v.length < 3 || STOP.has(v)) continue;
-            const d = editDistance(w, v, max);
-            if (d <= max) cands.push({ v, d });
-        }
-        cands.sort((a, b) => a.d - b.d || (index.df.get(b.v) || 0) - (index.df.get(a.v) || 0) || b.v.length - a.v.length);
-        if (cands.length) {
-            const best = cands[0].v;
-            const j = phraseToks.indexOf(w);
-            if (j >= 0) phraseToks[j] = best;
-            q[i] = best;
-        }
-        return cands.filter((c) => c.d === (cands[0] && cands[0].d)).map((c) => c.v);
-    });
-    const phrase = phraseToks.join(' ') || q.join(' ');
+    // a likely keyboard slip is corrected to its nearest vocabulary word ('subtracton' -> 'subtraction',
+    // 'tme' -> 'time', 'aera' -> 'area'); a correctly spelt real word is never rewritten (critic r2 P-A)
+    const fixes = correctWords(index, q);
+    const fuzz = q.map(() => []);
+    for (const f of fixes) {
+        const j = phraseToks.indexOf(f.from);
+        if (j >= 0) phraseToks[j] = f.to;
+        q[f.at] = f.to;
+    }
+    // 'divided by 2', 'divide 2' (from '÷2') and 'dividing by 2' all read as 'divide by 2' (critic r2 P-B)
+    let phrase = (phraseToks.join(' ') || q.join(' ')).replace(/\b(?:divide|divided|dividing|divides)(?: by)? (\d+)\b/g, 'divide by $1');
+    // a fact-sized product typed as a sum ('3*4', '7 x 8') reads as the times tables (critic r2 P-C)
+    const fact = phrase.match(/^(\d{1,2}) (?:times x|times|x) (\d{1,2})$/);
+    if (fact && +fact[1] <= 12 && +fact[2] <= 12) phrase = 'times x';
     const qFam = q.map((w) => stem(w));
+    // the divisor in 'divide by 2' is not the '2' of '2÷1 digit', '2-Digit' or 'b×h÷2' (critic r2 P-B)
+    const divBy = (phrase.match(/\bdivide by (\d+)\b/) || [])[1];
+    const divNoise = divBy && new RegExp(`(^| )${divBy} (digit|divide)|divide ${divBy}( |$)`);
     const out = [];
     for (const it of index.items) {
         let score = 0, labelHits = 0;
         let ok = true;
         for (let i = 0; i < q.length && ok; i++) {
             const w = q[i];
-            if (tokHits(it.sets[0], w)) { score += W_LABEL; labelHits++; }
+            if (w === divBy && divNoise.test(it.terms.label) && !it.phrases.extra.includes(`divide by ${divBy}`)) ok = false;
+            else if (tokHits(it.sets[0], w)) { score += W_LABEL; labelHits++; }
             else if (tokHits(it.sets[1], w)) score += W_EXTRA;
             else if (tokHits(it.sets[2], w)) score += W_GRADE;
             else if (tokHits(it.sets[3], w)) score += W_CONCEPT;
@@ -833,7 +936,9 @@ export function searchIndex(index, query) {
             else ok = false;
         }
         if (!ok) continue;
-        if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
+        // a vocabulary skill never leads a teaching query by matching its label (critic r2 R-B)
+        if (it.vocab && !wantsVocab) score -= 3;
+        else if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
         else if (q.length > 1 && labelPhrase(it.labelBare, phrase)) score += 15;
         if (phrase.length >= 1) {
             if (it.primary.includes(phrase) || it.primary.includes(q.join(' '))) score += 60;

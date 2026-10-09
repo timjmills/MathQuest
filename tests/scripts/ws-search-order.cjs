@@ -23,7 +23,16 @@ const CASES = [
     ['subtracton', ['subtraction:sub_facts'], []],
     ['half past', ['measurement:time_half_hour'], []],
     ['perimeter', ['area_perimeter:perimeter'], []],
+    // critic r2
+    ['divided by 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div_2by1']],
+    ['÷2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div_2by1']],
+    ['tile', ['area_perimeter:area_unit_squares', 'area_perimeter:area'], ['measurement:time_hour']],
+    ['3*4', ['multiplication:mult_facts'], []],
+    ['part whole model', ['composing:number_bonds'], []],
 ];
+// [box id, query, the "Showing results for" text expected, or null for no notice] (critic r2 P-A)
+const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', null], ['qbSearchInput', 'compass', null],
+    ['qbSearchInput', 'aera', 'area'], ['skillSearchInput', 'perimter', 'perimeter'], ['skillSearchInput', 'days', null]];
 
 (async () => {
     const failures = [];
@@ -70,6 +79,20 @@ const CASES = [
             const bad = never.filter((k) => got.includes(k));
             if (bad.length) failures.push(`quiz builder "${q}": ${bad.join(', ')} in the first 3 (${got.join(', ')})`);
         }
+        // the "Showing results for" line: typed into the real box (an input event, as a keyboard does)
+        for (const [id, q, want] of NOTICES) {
+            if (id === 'skillSearchInput') await page.evaluate(() => { window.goHome && window.goHome(); });
+            const got = await page.evaluate((i, v) => {
+                const el = document.getElementById(i);
+                if (!el) return 'NO BOX';
+                el.value = v;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                const n = document.getElementById(i + 'Fix');
+                return n && !n.hidden ? n.textContent : null;
+            }, id, q);
+            const exp = want ? `Showing results for ${want}` : null;
+            if (got !== exp) failures.push(`notice ${id} "${q}": ${JSON.stringify(got)}, want ${JSON.stringify(exp)}`);
+        }
     } catch (e) {
         failures.push(`exception: ${e.message}`);
     } finally {
@@ -77,7 +100,7 @@ const CASES = [
     }
     const real = errors.filter((e) => !/favicon|\.woff2/.test(e));
     for (const e of real) failures.push(`console: ${e}`);
-    console.log(`ws-search-order: ${CASES.length} queries x 2 views`);
+    console.log(`ws-search-order: ${CASES.length} queries x 2 views, ${NOTICES.length} correction notices`);
     if (failures.length) { for (const f of failures) console.log('  ' + f); console.log('ws-search-order: FAIL'); process.exit(1); }
     console.log('ws-search-order: OK');
     process.exit(0);

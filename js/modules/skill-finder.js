@@ -7,7 +7,7 @@
 // on labels, concepts and grades, and the index is rebuilt when they arrive.
 
 import { DOMAINS, visibleSkills, getSkillGrade } from './data.js';
-import { buildSearchIndex, searchIndex } from './search-terms.js';
+import { buildSearchIndex, searchIndex, queryCorrection } from './search-terms.js';
 
 let index = null;
 let curriculum = null;       // { standardsFor, wrmFor } once loaded
@@ -110,4 +110,10 @@ export function rankByQuery(list, query, keyOf = (s) => `${s.categoryId}:${s.ski
     if (!scores) return list.slice();
     return list.filter((s) => scores.has(keyOf(s))).map((s, i) => ({ s, i, sc: scores.get(keyOf(s)) }))
         .sort((a, b) => b.sc - a.sc || a.i - b.i).map((x) => x.s);
+}
+
+/** { from, to } when the search corrected a misspelt word (for "Showing results for ..."), else null. */
+export function searchCorrection(query) {
+    if (!String(query || '').trim()) return null;
+    try { return queryCorrection(getIndex(), query); } catch (e) { return null; }
 }

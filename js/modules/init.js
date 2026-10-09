@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { warmSkillSearch } from './skill-finder.js';
+import { installSearchNotice } from './search-notice.js';
 import { createBackgroundShapes, loadState } from './ui-core.js';
 import { updateCategoryOptions, updateSkillOptions, updateBreadcrumb, initInlineDropdowns } from './category-dropdowns.js';
 import { renderNumbers } from './number-selection.js';
@@ -21,6 +22,7 @@ import { parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
 export function init() {
     createBackgroundShapes();
     // Load the standards / WRM search terms once the page has settled (search works without them meanwhile).
+    try { installSearchNotice(); } catch (e) { /* the notice is optional */ }
     setTimeout(() => { try { warmSkillSearch(); } catch (e) { /* search falls back to labels and concepts */ } }, 2500);
     updateCategoryOptions();
     updateSkillOptions();
