@@ -94,7 +94,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | # | Item |
 |---|---|
 | 5.1 | Resume the paused lanes from their backup branches: place value, figures, geometry, K-2, operations, fractions, worked examples. Order by WRM, early units first; each goes fix → critic ≥ 8 → merge. |
-| 5.2 | Steps and Number line as support options on every skill where they fit (the decimal-worksheet picture: a steps box plus a number line). Today both exist in `SUPPORT_LABELS` ("Step checklist", "Number line 0 to 20") but only some skills offer them, and the line is 0–20 only. |
+| 5.2 | Steps and Number line as support options on every skill where they fit (the decimal-worksheet picture: a steps box plus a number line). Today both exist in `SUPPORT_LABELS` ("Step checklist", "Number line 0 to 20") but only some skills offer them, and the line is 0–20 only. **Custom number line at the top of the page (owner 2026-10-03):** a support option on every skill where a number line helps (add/sub, counting, skip counting, rounding, fractions, decimals, integers, measurement): a reference line printed once at the top of the page (and above the card on screen), with the teacher setting start, end, step (whole, fraction or decimal ticks), which ticks are labelled, and optional jump arrows; sensible defaults come from the skill's own range. |
 | 5.3 | Same skill with and without supports: add a skill twice with different supports and weight them, or show a different support each wrong try. Today the support ladder (`support-ladder.js`) already varies supports by wrong try; adding a skill twice with different supports is missing. |
 | 5.4 | Remaining families: measurement, data, algebra, number theory. |
 
@@ -162,3 +162,11 @@ The intervention lesson library uses the owner's **Atomised Lesson V20** format 
 small step, CCSS standard / part and EE; each lesson is tagged and tied to a skill that practises it the same way.
 It includes the prerequisite check and per-part new numbers, and builds on the paused lessons-engine branch. The
 record is `LESSON_COVERAGE.md`.
+
+## Wave 9 — Stretch and thinking pages (after the lessons are done)
+
+Owner ruling 2026-10-09: "I don't want any stretch or think pages — that is for a wave after the lessons are done."
+Stretch, Reason It, True or False?, Error analysis / Find the mistake and any other thinking page type are not built,
+redone or graded before Wave 8 is finished. Existing code for them stays as it is (nothing is deleted); a lane does
+not add, fix or score them, and a critic does not fail a lane for them. The answer key keeps working for whatever
+page types exist; no new key work is done for these pages.

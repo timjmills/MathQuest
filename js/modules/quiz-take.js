@@ -210,9 +210,11 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
     'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
-    'cell', 'skillId', 'categoryId',
+    'cell', 'skillId', 'categoryId', 'pv',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
     'dualFractionAnswers',
+    // 2026-10-04: a number family is graded in any order from its rows
+    'numberFamilyData',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
     'screenInstr'];
@@ -248,7 +250,7 @@ function renderQuizInterface() {
     const total = allQs.length;
     const flatIdx = state.quizOrder[state.quizQuestionIndex];
     const qItem = allQs[flatIdx];
-    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const answered = quizAnswers.filter(isAnswered).length;
     const progressPct = ((state.quizQuestionIndex + 1) / total * 100).toFixed(0);
 
     // Section header (sequential mode with multiple sections)
@@ -272,7 +274,7 @@ function renderQuizInterface() {
             prevSectionIdx = item.sectionIdx;
             let cls = 'qt-q-dot';
             if (i === state.quizQuestionIndex) cls += ' current';
-            if (quizAnswers[fIdx].studentAnswer !== '') cls += ' answered';
+            if (isAnswered(quizAnswers[fIdx])) cls += ' answered';
             if (quizFlags[fIdx]) cls += ' flagged';
             dotGridHtml += `<div class="${cls}" onclick="jumpToQuizQuestion(${i})">${i + 1}</div>`;
         });
@@ -280,7 +282,7 @@ function renderQuizInterface() {
         dotGridHtml = state.quizOrder.map((fIdx, i) => {
             let cls = 'qt-q-dot';
             if (i === state.quizQuestionIndex) cls += ' current';
-            if (quizAnswers[fIdx].studentAnswer !== '') cls += ' answered';
+            if (isAnswered(quizAnswers[fIdx])) cls += ' answered';
             if (quizFlags[fIdx]) cls += ' flagged';
             return `<div class="${cls}" onclick="jumpToQuizQuestion(${i})">${i + 1}</div>`;
         }).join('');
@@ -323,6 +325,16 @@ function renderQuizInterface() {
     try { _mountQuizCell(flatIdx); } catch (e) { console.error('quiz cell:', e); }
 }
 
+/** The instant-feedback line of an answered question. The support ladder (support-ladder.js): while it climbs, a support, not the answer. */
+function quizFeedbackHtml(answer, qd) {
+    const lad = answer.correct ? null : shownOf(qd);
+    return answer.correct
+        ? '<div class="qt-feedback correct">Correct!</div>'
+        : lad && lad.n && !lad.spent
+            ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
+            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+}
+
 function renderQuizQuestion(qItem, flatIdx) {
     const q = qItem.question;
     const qd = q.questionData;
@@ -331,16 +343,7 @@ function renderQuizQuestion(qItem, flatIdx) {
     const test = state.currentQuiz;
     const showInstantFeedback = test.settings.showFeedback === 'instant' && answer.studentAnswer !== '';
 
-    let feedbackHtml = '';
-    if (showInstantFeedback) {
-        // The support ladder (support-ladder.js): while it climbs, a support, not the answer.
-        const lad = answer.correct ? null : shownOf(qd);
-        feedbackHtml = answer.correct
-            ? '<div class="qt-feedback correct">Correct!</div>'
-            : lad && lad.n && !lad.spent
-                ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
-                : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
-    }
+    const feedbackHtml = showInstantFeedback ? quizFeedbackHtml(answer, qd) : '';
 
     // Always use text input — no multiple choice.
     // Screen parity (WORKSHEET_DESIGN_STANDARD.md section 15): the question region is the
@@ -514,6 +517,9 @@ function restoreAnswer(flatIdx) {
     }
 }
 
+// answered: something written, and every box of a several-box answer filled
+const isAnswered = (a) => !!a && a.studentAnswer !== '' && !a.partial;
+
 // ---- Answer Submission ----
 
 export function submitQuizMC(flatIdx, value) {
@@ -523,7 +529,72 @@ export function submitQuizMC(flatIdx, value) {
 
 export function submitQuizTextAnswer(flatIdx, value) {
     recordAnswer(flatIdx, value.trim());
-    renderQuizInterface();
+    // In place, not a re-render: this runs on the box's change (its blur), and rebuilding the screen
+    // then replaced Next under the pupil's click, so the first Next after typing was swallowed and
+    // Tab from the box dropped the focus (Chromebook fit critic R2-1).
+    refreshQuizChrome();
+    refreshQuizFeedback(flatIdx);
+}
+
+// A pointer press in progress (the blur of a box fires its change on mousedown): the feedback
+// waits for the click to land, so nothing moves under the pupil's pointer.
+let _qtPointerDown = false;
+if (typeof document !== 'undefined') {
+    document.addEventListener('pointerdown', () => { _qtPointerDown = true; }, true);
+    const up = () => { _qtPointerDown = false; };
+    document.addEventListener('pointerup', up, true);
+    document.addEventListener('pointercancel', up, true);
+}
+
+/**
+ * Instant feedback, in place (merge of the touch numerals lane, r5): after the in-place submit the
+ * quiz showed no feedback and its support ladder never drew until the question was drawn again.
+ * The feedback line is replaced and the ladder drawn into the live cell (the pupil's inputs are
+ * moved, never re-created), without rebuilding the screen.
+ */
+function refreshQuizFeedback(flatIdx) {
+    const test = state.currentQuiz;
+    if (!test || !test.settings || test.settings.showFeedback !== 'instant') return;
+    if (_qtPointerDown) {
+        const later = () => { document.removeEventListener('click', later, true); setTimeout(() => refreshQuizFeedback(flatIdx), 0); };
+        document.addEventListener('click', later, true);
+        setTimeout(() => { if (!_qtPointerDown) later(); }, 600);
+        return;
+    }
+    const card = document.querySelector('#quizTakeView .qt-question-card');
+    const cellEl = card && card.querySelector('.qt-cell');
+    if (!cellEl || String(cellEl.dataset.flatIdx) !== String(flatIdx)) return;
+    const answer = quizAnswers[flatIdx];
+    const item = state.quizAllQuestions[flatIdx];
+    if (!answer || !item) return;
+    const qd = item.question.questionData;
+    const old = card.querySelector(':scope > .qt-feedback');
+    if (answer.studentAnswer === '') { if (old) old.remove(); return; }
+    if (!answer.correct) {
+        try { drawLadder(cellEl, qd, { kind: cellKindFor({ ...qd, options: [] }), categoryId: qd.categoryId, skillId: qd.skillId || item.question.skillId }); } catch (e) { /* optional */ }
+    }
+    const tpl = document.createElement('template');
+    tpl.innerHTML = quizFeedbackHtml(answer, qd).trim();
+    const fb = tpl.content.firstElementChild;
+    if (!fb) return;
+    if (old) {
+        if (old.className === fb.className && old.textContent === fb.textContent) return;
+        old.replaceWith(fb);
+    } else card.appendChild(fb);
+}
+
+// The answered count and the page buttons, brought up to date without rebuilding the question.
+function refreshQuizChrome() {
+    const c = document.getElementById('quizTakeView');
+    if (!c) return;
+    const total = state.quizAllQuestions.length;
+    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const count = c.querySelector('.qt-topbar-right > span:last-child');
+    if (count) count.textContent = `${answered}/${total} answered`;
+    c.querySelectorAll('.qt-q-grid .qt-q-dot').forEach((d, i) => {
+        const a = quizAnswers[state.quizOrder[i]];
+        if (a) d.classList.toggle('answered', a.studentAnswer !== '');
+    });
 }
 
 function recordAnswer(flatIdx, studentAnswer) {
@@ -552,7 +623,29 @@ function recordAnswer(flatIdx, studentAnswer) {
         }
     }
 
-    quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent };
+    // A several-box answer is answered only when every box holds something (critic placevalue-phones
+    // D1: "73, ," counted as answered, so the review did not warn the pupil)
+    let partial = false;
+    try {
+        const boxes = [...document.querySelectorAll('.qt-question-card input.mq-cellslot')];
+        // Critic r2 N1: a word-work answer row (.mq-wwans) is right-aligned with spare leading boxes
+        // that stay blank, so a row is partial only when an empty box sits right of a filled one.
+        // Every other box (fixed slots, inline blanks, cloze, unit-form places) must be filled.
+        const filled = (b) => !!String(b.value || '').trim();
+        if (boxes.length > 1 && String(studentAnswer).trim() !== '') {
+            const rows = new Map();
+            partial = boxes.some((b) => {
+                const row = b.closest('.mq-wwans');
+                if (row) { if (!rows.has(row)) rows.set(row, []); rows.get(row).push(b); return false; }
+                return !filled(b);
+            });
+            if (!partial) rows.forEach((rb) => {
+                const first = rb.findIndex(filled);
+                if (first >= 0 && rb.slice(first).some((b) => !filled(b))) partial = true;
+            });
+        }
+    } catch (e) { /* no DOM: not partial */ }
+    quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;
@@ -625,7 +718,7 @@ export function showQuizReview() {
 
     const allQs = state.quizAllQuestions;
     const total = allQs.length;
-    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const answered = quizAnswers.filter(isAnswered).length;
     const flagged = quizFlags.filter(f => f).length;
     const unanswered = total - answered;
 
@@ -643,13 +736,13 @@ export function showQuizReview() {
                 currentSIdx = sIdx;
                 const section = test.sections[sIdx];
                 const sectionQs = allQs.filter(q => q.sectionIdx === sIdx);
-                const sAnswered = sectionQs.filter(q => quizAnswers[q.globalIdx].studentAnswer !== '').length;
+                const sAnswered = sectionQs.filter(q => isAnswered(quizAnswers[q.globalIdx])).length;
                 reviewListHtml += `<div class="qt-section-header" style="margin-top:${displayIdx > 0 ? '12px' : '0'};">${escHtml(section.label)} (${sAnswered}/${sectionQs.length})</div>`;
             }
             const a = quizAnswers[fIdx];
             const f = quizFlags[fIdx];
             let status = '';
-            if (a.studentAnswer === '') status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
+            if (!isAnswered(a)) status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
             else status = '<span class="qt-review-status" style="color:#06D6A0;">&#10003;</span>';
             if (f) status += ' <span style="color:#f97316;font-size:0.8rem;">flagged</span>';
             const qText = escHtml((allQs[fIdx].question.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 60);
@@ -664,7 +757,7 @@ export function showQuizReview() {
             const a = quizAnswers[fIdx];
             const f = quizFlags[fIdx];
             let status = '';
-            if (a.studentAnswer === '') status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
+            if (!isAnswered(a)) status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
             else status = '<span class="qt-review-status" style="color:#06D6A0;">&#10003;</span>';
             if (f) status += ' <span style="color:#f97316;font-size:0.8rem;">flagged</span>';
             const qText = escHtml((allQs[fIdx].question.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 60);

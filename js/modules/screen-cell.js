@@ -27,8 +27,9 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
     withSupports, supportOpKey as opKey,
@@ -124,11 +125,24 @@ export function cellKindFor(q) {
             return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
         }
     }
+    // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
+    // carries the paper's "Divide." line and the hosts' digit size like the other forms (critic R1
+    // D9 / D10: it fell through to the legacy twin, which restated "54 ÷ 9 = ?" over a 48 px bracket).
+    if (cellT === 'division' && pay.fact && p.op === '/') return { kind: 'division', ...p, fact: true };
+    // div_facts' Fraction form: the kit equation template's fraction drawing, its slot typed.
+    if (cellT === 'equation' && pay.notation === 'fraction' && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', frac: true, ...p };
     if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
+    // div_facts' Vertical form (divForm): a 12s-table dividend has three digits (144 ÷ 12); the
+    // paper draws it on the fact template, so the screen does too.
+    if (cellT === 'fact' && pay.notation === 'vertical' && p.op === '/' && A.length <= 3 && B.length <= 2 && ANS.length <= 2) return { kind: 'fact', ...p };
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
     }
+    // div_facts' Standard form (an across division FACT): the paper's tight tracks, and on a Mix
+    // page the slot under the sentence as paper prints it (critic R3 §6: 0.7 em on screen against
+    // 0.29 em on paper; the Mix slot beside on screen, under on paper).
+    if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
     if (!v.trim()) return { kind: 'eq', ...p };
     return null;
 }
@@ -243,6 +257,25 @@ export function equationHTML(k, slotHtml) {
     // S2: touch dots on the given numbers (k.supports, screenSupportsFor).
     const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
     const to = touchOpts(40, 'px');
+    // div_facts' Fraction form (divForm): the dividend over the divisor on a bar, = [slot] - the
+    // kit equation template's fraction drawing, same markup as paper (cells/equation.js).
+    if (k.frac) {
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" style="align-items:center" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+            + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+            + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
+            + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
+    if (k.divFact) {
+        // the kit equation cell's division-fact tracks (cells/equation.js ACROSS_OP_EM / ACROSS_GAP_EM)
+        const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
+        const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
+        const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
+        if (k.mix) {
+            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
+                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+        }
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`
         + `<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
@@ -520,6 +553,8 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
  * neutral whatever is typed. The expected values live in a WeakMap, never in the page's markup.
  */
 const LIVE_EXPECT = new WeakMap();
+// test hook (read-only): the answers a live box accepts — lets the browser sweeps type a right answer
+if (typeof window !== 'undefined') window.__mqLiveExpect = (el) => (LIVE_EXPECT.get(el) || null);
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
 /*
@@ -680,8 +715,8 @@ function _badgePlace(el) {
     if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
     b.dataset.kind = kind;
     const r = el.getBoundingClientRect();
-    // not shown while the box is not, nor while this item's hint box is open over it
-    const hintOpen = !!host.querySelector('.hint-popup.active');
+    // not shown while the box is not
+    // (the hint now sits in page flow above the cell, so the tick stays while it is open)
     // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
     let clipped = false;
     for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
@@ -691,7 +726,7 @@ function _badgePlace(el) {
             if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
         }
     }
-    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
+    if (!r.width || !r.height || clipped) { b.style.display = 'none'; return; }
     b.style.display = '';
     const c = _badgeSpot(el, r, host);
     const hr = host.getBoundingClientRect();
@@ -709,10 +744,12 @@ function _badgeDrop(el) {
 /** Badges whose box has left the page (a new question drew over the card) go with it. */
 export function pruneBadges() {
     Array.from(BADGES.keys()).forEach((el) => { if (!el.isConnected) _badgeDrop(el); });
+    Array.from(MIRRORS.keys()).forEach((el) => { if (!el.isConnected) _mirrorDrop(el); });
 }
 function _badgePlaceAll() {
     _badgeRaf = 0;
     Array.from(BADGES.keys()).forEach(_badgePlace);
+    Array.from(MIRRORS.keys()).forEach(_mirrorPlace);
 }
 function _badgeSoon() {
     if (!_badgeRaf && typeof requestAnimationFrame === 'function') _badgeRaf = requestAnimationFrame(_badgePlaceAll);
@@ -749,10 +786,200 @@ function _badgeTrack(el) {
     setTimeout(settle, 600);
 }
 
+/* ---- Wave 1 / A3 (owner 2026-10-03): the wrong DIGITS blink red; tapping a red box empties it ----
+ * Practice card and online worksheet only (never the quiz, never paper). A one-digit box that is wrong
+ * IS the wrong digit (class mq-wrong-digit). A box that holds several digits gets a mirror overlay, one
+ * span per digit compared by place value, right-aligned: wrong digits mq-wd-bad, a missing digit an
+ * empty mq-wd-miss box, the right digits stay black. The input's own text goes clear under the mirror,
+ * so typing is untouched (the mirror goes on the next keystroke or the tap that empties the box). */
+const MIRRORS = new Map();
+// the expected value of a box bound by a judge (mixed / improper fractions): its digits can still be compared
+const LIVE_WANT = new WeakMap();
+const _inQuiz = (el) => !!(el && el.closest && el.closest('#quizTakeView'));
+function _mirrorDrop(el) {
+    const m = MIRRORS.get(el);
+    if (m) { m.remove(); MIRRORS.delete(el); }
+    el.classList.remove('mq-wd-mirrored', 'mq-wrong-digit');
+}
+function _mirrorPlace(el) {
+    const m = MIRRORS.get(el);
+    if (!m) return;
+    const host = m.parentElement;
+    if (!el.isConnected || !host || !host.isConnected) { _mirrorDrop(el); return; }
+    const r = el.getBoundingClientRect(), hr = host.getBoundingClientRect(), cs = getComputedStyle(el);
+    // a box inside its own swipe row (a count-by row): the digits are clipped to the row's window
+    let clip = 'none';
+    for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') && a.scrollWidth > a.clientWidth + 1) {
+            const q = a.getBoundingClientRect();
+            const L = Math.max(0, q.left - r.left), R = Math.max(0, r.right - q.right);
+            clip = (L + R >= r.width) ? 'inset(0 100% 0 0)' : 'inset(0 ' + Math.round(R) + 'px 0 ' + Math.round(L) + 'px)';
+            break;
+        }
+    }
+    Object.assign(m.style, {
+        left: Math.round(r.left - hr.left - host.clientLeft + host.scrollLeft) + 'px',
+        top: Math.round(r.top - hr.top - host.clientTop + host.scrollTop) + 'px',
+        width: Math.round(r.width) + 'px', height: Math.round(r.height) + 'px', clipPath: clip,
+        fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing,
+        paddingLeft: cs.paddingLeft, paddingRight: cs.paddingRight,
+        justifyContent: /center/.test(cs.textAlign) ? 'center' : /right|end/.test(cs.textAlign) ? 'flex-end' : 'flex-start',
+    });
+}
+/** A written number in parts: its sign, its digit runs and the marks between them (".", "/", a space). */
+function _wdParse(s) {
+    const t = String(s == null ? '' : s).trim().replace(/,/g, '').replace(/\s+/g, ' ').replace(/[−–]/g, '-');
+    const m = /^(-?)\s*([0-9./ ]*)$/.exec(t);
+    if (!m || !m[2] || !/\d/.test(m[2])) return null;
+    const parts = m[2].split(/([./ ])/);         // run, sep, run, sep, run ...
+    const runs = parts.filter((_, i) => i % 2 === 0);
+    const seps = parts.filter((_, i) => i % 2 === 1);
+    return { sign: m[1], runs, seps };
+}
+/** Line two parsed numbers up part by part; null when their shapes cannot be compared digit by digit. */
+function _wdAlign(v, w) {
+    let vr = v.runs, wr = w.runs, seps = v.seps;
+    const sameSeps = v.seps.join('|') === w.seps.join('|');
+    let dotMissing = false;
+    if (!sameSeps) {
+        // decimals line up at the point: a missing point (and the digits after it) are missing marks
+        const dec = (p) => p.seps.every((x) => x === '.') && p.seps.length <= 1;
+        if (!dec(v) || !dec(w)) return null;
+        vr = [v.runs[0], v.runs[1] != null ? v.runs[1] : ''];
+        wr = [w.runs[0], w.runs[1] != null ? w.runs[1] : ''];
+        seps = ['.'];
+        dotMissing = !v.seps.length;
+    }
+    const cells = [];
+    if (v.sign || w.sign) cells.push(v.sign && w.sign ? { ch: '-', cls: '' } : v.sign ? { ch: '-', cls: 'bad' } : { ch: ' ', cls: 'miss' });
+    vr.forEach((a, k) => {
+        if (k > 0) cells.push({ ch: seps[k - 1] === ' ' ? ' ' : seps[k - 1], cls: k === 1 && dotMissing ? 'miss' : '', sep: true });
+        const b = wr[k] || '';
+        const left = k > 0 && seps[k - 1] === '.';      // the digits after a point line up from the point
+        const n = Math.max(a.length, b.length);
+        for (let i = 0; i < n; i++) {
+            const x = left ? a[i] : a[i - (n - a.length)];
+            const y = left ? b[i] : b[i - (n - b.length)];
+            if (x === undefined) cells.push({ ch: ' ', cls: 'miss' });
+            else cells.push({ ch: x, cls: x === y ? '' : 'bad' });
+        }
+    });
+    return cells;
+}
+/** For tests: the marks a value gets against an answer ("." right, "b" wrong, "m" missing, "|" a separator), or null. */
+export function wrongDigitPattern(value, want) {
+    const v = _wdParse(value), w = _wdParse(want);
+    const cells = v && w ? _wdAlign(v, w) : null;
+    return cells ? cells.map((c) => (c.sep && c.cls !== 'miss' ? '|' : c.cls === 'bad' ? 'b' : c.cls === 'miss' ? 'm' : '.')).join('') : null;
+}
+/** Mark the wrong digits of a box judged wrong. Returns true when it could compare digit by digit. */
+function _markWrongDigits(el, want) {
+    _mirrorDrop(el);
+    if (_inQuiz(el) || typeof document === 'undefined') return false;
+    const v = _wdParse(el.value);
+    if (!v) return false;
+    const ws = (Array.isArray(want) ? want : [want]).map(_wdParse).filter(Boolean);
+    const w = ws.find((x) => x.seps.join('|') === v.seps.join('|')) || ws[0];
+    if (!w) return false;
+    const plain = (p) => !p.sign && !p.seps.length && p.runs[0].length === 1;
+    if (plain(v) && plain(w)) { el.classList.add('mq-wrong-digit'); return true; }
+    const cells = _wdAlign(v, w);
+    if (!cells) return false;
+    const host = el.closest('#questionCard, .problem-card');
+    if (!host) return false;
+    const m = document.createElement('span');
+    m.className = 'mq-wd-mirror';
+    m.setAttribute('aria-hidden', 'true');
+    m.dataset.v = el.value;
+    cells.forEach((c) => {
+        const s = document.createElement('span');
+        s.className = 'mq-wd' + (c.cls === 'bad' ? ' mq-wd-bad' : c.cls === 'miss' ? ' mq-wd-miss' : '') + (c.sep ? ' mq-wd-sep' : '');
+        s.textContent = c.cls === 'miss' ? ' ' : c.ch;
+        m.appendChild(s);
+    });
+    // on the card, like the corner mark (a cell's own redraws never touch it); _mirrorPlace keeps it on its box
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    host.appendChild(m);
+    MIRRORS.set(el, m);
+    el.classList.add('mq-wd-mirrored');
+    _mirrorPlace(el);
+    setTimeout(() => _mirrorPlace(el), 150);
+    _mirrorWatch();
+    return true;
+}
+// A checker that empties or rewrites a box without an input event (the ladder's last try, Check all)
+// must not leave its old digits floating: a mirror whose box no longer holds its value goes.
+let _mirrorTimer = 0;
+function _mirrorWatch() {
+    if (_mirrorTimer || typeof setInterval !== 'function') return;
+    _mirrorTimer = setInterval(() => {
+        MIRRORS.forEach((m, el) => { if (!el.isConnected || el.value !== m.dataset.v) _mirrorDrop(el); });
+        if (!MIRRORS.size) { clearInterval(_mirrorTimer); _mirrorTimer = 0; }
+    }, 200);
+}
+/**
+ * THE one way a checker empties or resets a box it has marked: the value, the red / green, the
+ * corner mark and the digit mirror all go together (Wave 1 / A3 critic r1).
+ */
+export function clearBoxMark(el, value = '') {
+    if (!el) return;
+    el.value = value;
+    el.classList.remove('mq-live-wrong', 'mq-live-correct', 'mq-wd-empty');
+    el.removeAttribute('aria-invalid');
+    _mirrorDrop(el);
+    _badgeDrop(el);
+}
+let _tabAt = 0;
+let _clearWired = false;
+function _clearIfWrong(el) {
+    if (!el || _inQuiz(el) || el.disabled || el.readOnly || !el.classList.contains('mq-live-wrong')) return;
+    clearBoxMark(el);
+    el.style.borderColor = ''; el.style.background = '';
+    // the item stays "helped" (host.dataset.mqHelped is kept): a cleared box still went red
+    const card = el.closest('.problem-card');
+    if (card && !card.querySelector('input.mq-live-wrong')) { card.style.background = ''; card.style.border = ''; }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+function _wireClear() {
+    if (_clearWired || typeof document === 'undefined') return;
+    _clearWired = true;
+    // a pupil's tap or click empties a red box; a Tab into it only selects it (typing replaces it, and
+    // Tabbing THROUGH it keeps it) - never a program focus (the app refocuses the box after Check)
+    document.addEventListener('pointerdown', (e) => { if (e.target && e.target.tagName === 'INPUT') _clearIfWrong(e.target); }, true);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Tab') _tabAt = Date.now(); }, true);
+    document.addEventListener('focusin', (e) => {
+        const t = e.target;
+        if (Date.now() - _tabAt < 400 && t && t.tagName === 'INPUT' && t.classList.contains('mq-live-wrong') && !_inQuiz(t)) {
+            setTimeout(() => { try { if (document.activeElement === t) t.select(); } catch (_) { /* not selectable */ } }, 0);
+        }
+    }, true);
+    window.addEventListener('resize', () => Array.from(MIRRORS.keys()).forEach(_mirrorPlace));
+}
+/**
+ * The item was judged wrong at Check: the digit boxes the pupil left empty are missing digits, so
+ * they are marked too (an answer digit box only; a regroup box may rightly stay empty).
+ */
+export function markMissingDigits(root) {
+    if (!root || _inQuiz(root)) return 0;
+    let n = 0;
+    root.querySelectorAll('input.mq-digit, input.mq-cellslot:not(.mq-cellslot-host), input.ib-cell').forEach((el) => {
+        if (el.classList.contains('mq-carry') || LIVE_FN.has(el) || String(el.value || '').trim() !== '') return;
+        const want = LIVE_EXPECT.get(el);
+        if (!want || !want.some((w) => w !== '') || !el.offsetWidth) return;
+        _liveSet(el, false, true);
+        el.classList.add('mq-wrong-digit', 'mq-wd-empty');
+        n++;
+    });
+    return n;
+}
+
 function _liveSet(el, ok, bad) {
     el.classList.toggle('mq-live-correct', ok);
     el.classList.toggle('mq-live-wrong', bad);
     if (ok || bad) _badgeTrack(el);
+    el.classList.remove('mq-wd-empty');
+    if (bad) { _wireClear(); _markWrongDigits(el, LIVE_WANT.get(el) || LIVE_EXPECT.get(el)); } else _mirrorDrop(el);
     if (bad) {
         el.setAttribute('aria-invalid', 'true');
         // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
@@ -777,6 +1004,9 @@ function _liveMark(el, final) {
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
+    // a missing digit marked at Check stays marked while the box is still empty: a blur or a move (the
+    // ladder redraws the stack around the box the caret is in) is not the pupil answering it
+    if (v === '' && el.classList.contains('mq-wd-empty')) return;
     const num = LIVE_NUM.has(el);
     const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
     const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
@@ -809,9 +1039,10 @@ function _liveBind(el, expected, { single = false, numeric = false } = {}) {
  * the other boxes the verdict depends on (a rule table's Out box depends on its In box): when one
  * of them changes, the rest are judged again - a box the pupil has left is judged as final.
  */
-function _liveBindFn(el, fn, group = []) {
+function _liveBindFn(el, fn, group = [], want = null) {
     if (!el || typeof fn !== 'function') return false;
     LIVE_FN.set(el, fn);
+    if (want != null && want !== '') LIVE_WANT.set(el, [String(want)]); else LIVE_WANT.delete(el);
     LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
@@ -845,6 +1076,8 @@ export function markBoxSubmitted(el, ok) {
     el.classList.toggle('mq-live-correct', !!ok);
     el.classList.toggle('mq-live-wrong', !ok);
     _badgeTrack(el);
+    if (!ok) { _wireClear(); const w = LIVE_WANT.get(el) || LIVE_EXPECT.get(el); if (w && w.some((x) => x !== '')) _markWrongDigits(el, w); }
+    else _mirrorDrop(el);
     if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     if (el.dataset.mqSubmitMark !== '1') {
         el.dataset.mqSubmitMark = '1';
@@ -852,6 +1085,7 @@ export function markBoxSubmitted(el, ok) {
             if (LIVE_EXPECT.has(el)) return;               // a bound box re-judges itself
             el.classList.remove('mq-live-wrong', 'mq-live-correct');
             el.removeAttribute('aria-invalid');
+            _mirrorDrop(el);
         });
     }
 }
@@ -865,6 +1099,7 @@ export function unwireLiveCorrect(el) {
     el.removeAttribute('data-mq-single');
     el.classList.remove('mq-live-correct', 'mq-live-wrong');
     el.removeAttribute('aria-invalid');
+    _mirrorDrop(el);
 }
 
 /**
@@ -959,6 +1194,21 @@ const _fracNorm = (s) => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').
 function _bindOwnBoxes(root, q) {
     let n = 0;
     const bind = (el, expected, opts) => { if (el && el.dataset.mqLive !== '1' && _liveBind(el, expected, opts)) n++; };
+    // A number family is right in ANY order (owner 2026-10-04): each row may hold any fact its sign
+    // makes, no fact twice. A box's verdict depends on the other rows, so they are one group.
+    if (isOrderFreeFamily(q)) {
+        const fam = Array.from(root.querySelectorAll('input.number-family-input[data-eq][data-pos]'));
+        fam.forEach((el) => {
+            if (el.dataset.mqLive === '1') return;
+            const r = Number(el.getAttribute('data-eq')), p = Number(el.getAttribute('data-pos'));
+            const fn = () => {
+                const w = familyWant(q.numberFamilyData, familyValuesFromInputs(fam), r, p);
+                if (w != null) LIVE_WANT.set(el, [String(w)]);
+                return familyBoxVerdict(q.numberFamilyData, fam, el);
+            };
+            if (_liveBindFn(el, fn, fam)) n++;
+        });
+    }
     // data-answer, compared exactly (the older checkers compare the trimmed text)
     root.querySelectorAll('input.fact-family-input[data-answer], input.number-family-input[data-answer], input.area-model-input[data-answer], input.area-model-total[data-answer], input.fp-input[data-answer]')
         .forEach((el) => bind(el, String(el.dataset.answer).replace(/,/g, '')));
@@ -986,7 +1236,7 @@ function _bindOwnBoxes(root, q) {
     if (q && q.dualFractionAnswers) {
         [['#mixedInput', q.dualFractionAnswers.mixed], ['#improperInput', q.dualFractionAnswers.improper]].forEach(([sel, want]) => {
             const el = root.querySelector(sel);
-            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want))) n++;
+            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want), [], want)) n++;
         });
     }
     // ordering boxes: the n-th item of the answer (text, else the same number)
@@ -995,7 +1245,7 @@ function _bindOwnBoxes(root, q) {
         root.querySelectorAll('input.order-input-box, input.ws-order-input').forEach((el) => {
             const want = parts[Number(el.getAttribute('data-order-idx'))];
             if (want !== undefined && el.dataset.mqLive !== '1') {
-                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); })) n++;
+                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); }, [], want)) n++;
             }
         });
     }
@@ -1339,6 +1589,28 @@ function wireChartSwipe(cellEl) {
     });
 }
 
+/** The disk mat's window (kitCellTwin): the same swipe cue, hidden when the mat fits or is scrolled to the end. */
+// ONE shared resize listener for every disk window on the page (critic nit: one per render piled up
+// and kept old nodes alive); it updates the windows that are in the page now.
+const diskWinEnd = (w) => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+let diskResizeWired = false;
+export function wireDiskSwipe(root) {
+    if (!root || !root.querySelectorAll) return;
+    if (!diskResizeWired && typeof window !== 'undefined') {
+        diskResizeWired = true;
+        window.addEventListener('resize', () => document.querySelectorAll('.mq-diskwin').forEach(diskWinEnd));
+    }
+    root.querySelectorAll('.mq-diskwin').forEach((w) => {
+        const upd = () => diskWinEnd(w);
+        if (w.dataset.mqSwipe !== '1') {
+            w.dataset.mqSwipe = '1';
+            w.addEventListener('scroll', upd, { passive: true });
+            setTimeout(upd, 300); setTimeout(upd, 1000);
+        }
+        upd();
+    });
+}
+
 /** A count-by row swipes sideways inside its cell on a phone; a box that takes focus scrolls into view so no gap is missed. */
 function wireSwipeRows(cellEl) {
     cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
@@ -1379,9 +1651,23 @@ function wireSwipeRows(cellEl) {
             const v = w.getBoundingClientRect();
             return [...w.querySelectorAll('.k2-countrow-body .k2-given, .k2-countrow-body input')].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > v.right + 1; });
         };
+        // the cue stays on ONE line inside a narrow window (29 px digits on a phone, TY-10b): its type shrinks to fit, never under 14 px
+        const fitCue = (win) => {
+            const cues = w.querySelector('.k2-swipe-cues');
+            if (!cues) return;
+            cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((c) => { c.style.fontSize = ''; });
+            const c = cues.querySelector('.k2-swipe-cue');
+            if (!c || getComputedStyle(c).display === 'none') return;
+            const need = c.scrollWidth, have = Math.max(0, win - 8);
+            if (need > have && have > 0) {
+                const fs = parseFloat(getComputedStyle(c).fontSize) || 18;
+                const nf = `${Math.max(14, Math.floor(fs * have / need))}px`;
+                cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
+            }
+        };
         const mode = () => {
             if (!frame || !body) return;
-            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
+            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
@@ -1389,14 +1675,26 @@ function wireSwipeRows(cellEl) {
             level();
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
-            const avail = frame.getBoundingClientRect().width;
+            // critic C2 r8 (a): the room is measured from the CELL's inner box (from the frame's left edge to the cell's inner right
+            // edge), not from the frame, which may hug a narrower drawing; as many whole columns as fit there
+            const fr = frame.getBoundingClientRect();
+            let avail = fr.width;
+            const cellEl2 = frame.closest('.mq-scell');
+            if (cellEl2) {
+                const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2);
+                // the drawing is centred in the cell, so the room is the cell's whole inner width (it widens, still centred)
+                const inner = cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
+                if (inner > avail) avail = inner;
+            }
             const n = Math.max(1, Math.floor((avail + gap + 0.5) / pitch));
             // critic C2 r7: when every column of a line fits, the window takes the full width and the row does not scroll at all
             // (a line's turn arrow may reach past the last column; it is drawn, never scrolled to)
             if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
             const win = Math.min(avail, n * pitch - gap + 3);
-            w.style.width = `${win}px`; w.style.maxWidth = '100%';
+            w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
+            frame.style.minWidth = `${Math.ceil(win)}px`;     // the drawing around the window widens with it (it stays centred in the cell)
             padEnd();
+            fitCue(win);
         };
         mode();
         window.addEventListener('resize', mode);
@@ -1408,6 +1706,18 @@ function wireSwipeRows(cellEl) {
         w.addEventListener('pointerdown', () => { tapAt = Date.now(); }, { capture: true, passive: true });
         const tappedNow = () => Date.now() - tapAt < 1500;
         watchTabKey();
+        // critic C2 r8 (b): when the card held its focus back (a first box the start does not show), the first digit key typed
+        // with nothing focused goes to that box under the same rule as the pupil's Tab (the row moves to show it whole)
+        const digitKey = (e) => {
+            if (!w.isConnected) { document.removeEventListener('keydown', digitKey, true); return; }
+            if (!held || !held.isConnected || !/^[0-9]$/.test(e.key) || e.ctrlKey || e.metaKey || e.altKey || !w.offsetParent) return;
+            const a = document.activeElement;
+            if (a && a !== document.body && a !== document.documentElement) return;
+            const t = held;
+            tabKeyNow = true; setTimeout(() => { tabKeyNow = false; }, 0);
+            try { t.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
+        };
+        document.addEventListener('keydown', digitKey, true);
         // is the box fully inside the window when the row rests at its start?
         const shownAtStart = (t) => {
             const v = w.getBoundingClientRect(), r = t.getBoundingClientRect(), sl = w.scrollLeft;
@@ -1523,7 +1833,9 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         el.setAttribute('inputmode', kind ? 'text' : 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
-        el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
+        el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        if (fixedW) el.dataset.mqFixed = '1';
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
@@ -2132,18 +2444,20 @@ export function unmonoCell(root) {
 const _n = (v) => { const x = Number(String(v == null ? '' : v).replace(/,/g, '')); return Number.isFinite(x) ? x : null; };
 
 /** One boxed answer slot for wireCellSlots: `w` is the digit capacity (SL-2: the section's width). */
-export function cellSlot(w = 2, label = '') {
+export function cellSlot(w = 2, label = '', fixed = false) {
     const n = Math.max(1, Math.min(8, w | 0));
-    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}" style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
+    // `fixed`: the box holds exactly `w` digits (a unit-form place box is one digit): maxlength is w,
+    // and a full box hands the caret on (active-box.js)
+    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}"${fixed ? ' data-mq-fixed="1"' : ''} style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths) {
+export function inlineBlanksHTML(text, widths, fixed = false) {
     let i = 0;
     const html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
-        return cellSlot(w);
+        return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
     return i ? `<div class="mq-ibline">${html}</div>` : '';
 }
@@ -2362,6 +2676,7 @@ export function ringCellHTML(p) {
  */
 export function workRowsHTML(k) {
     if (!k || k.kind !== 'division') return '';
+    if (k.fact) return '';      // a division FACT has no working rows (paper: workRows 0)
     const n = String(k.a).length;
     const steps = Math.max(1, Math.min(4, String(Math.floor(k.a / k.b)).length));
     const strip = (label) => `<div class="mq-workrow" role="group" aria-label="${attr(label)}"><span class="mq-workop">−</span>`
@@ -2520,6 +2835,8 @@ const _normFrac = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().
 export function cellInputVerdict(value, q) {
     if (!q) return null;
     const v = String(value == null ? '' : value);
+    // a number family's boxes, joined in reading order: right in any order, no fact twice
+    if (q.answerType === 'number-family' && isOrderFreeFamily(q) && v.includes(',')) return familyComposedRight(q.numberFamilyData, v);
     if ((q.answerType === 'tchart-cells' || q.answerType === 'factor-links') && typeof q.ans === 'string' && /[×x*]/.test(v)) {
         const want = q.ans.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
         const got = v.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
@@ -2606,6 +2923,13 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     // a kit twin is already drawn at the host's size (--mq-k2)
     if (root.matches('.k2-twin, [data-mq-k2]') || root.querySelector('[data-mq-k2]')) return 1;
     root.style.removeProperty('zoom');
+    // the disk mat keeps its paper width under a host's zoom (the worksheet scales the cell to its
+    // digit size; the mat was drawn to 790 px at 1280): its caps are divided by the zoom
+    const capMats = (z) => root.querySelectorAll('svg.pv-disk-mat[data-mq-paper-w]').forEach((s) => {
+        s.style.maxWidth = `${Math.round(Number(s.dataset.mqPaperW) / z)}px`;
+        s.style.minWidth = `${Math.ceil(Number(s.dataset.mqFloorW) / z)}px`;
+    });
+    capMats(1);
     delete root.dataset.mqFit;
     delete root.dataset.mqFitShort;
     const sizes = _numeralSizes(root);
@@ -2622,6 +2946,7 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     if (f < Math.min(want, max) * 0.97) root.dataset.mqFitShort = '1';
     if (f <= 1.04) return 1;
     root.style.setProperty('zoom', f.toFixed(3));
+    capMats(f);
     root.dataset.mqFit = f.toFixed(2);
     return f;
 }
@@ -2659,12 +2984,18 @@ export function cellDigitTarget(cellEl) {
  */
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
+    // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
+    // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
+    if (q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
+        && /class="k2-twin"/.test(String(q.visual || ''))) {
+        try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
+    }
     const kt = kitCellTwin(q, { categoryId, typedOrder });
     if (kt) return kt;
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -2741,6 +3072,7 @@ export function fitTwinRows(root) {
     if (!root || typeof getComputedStyle === 'undefined') return false;
     const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
     let changed = false;
+    wireDiskSwipe(root);
     // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks
     // hold printed digits, not inputs, so in a narrow cell they close up to the digit's own width;
     // the dividend's tracks keep their >= 44 px targets.
@@ -2795,6 +3127,20 @@ export function fitTwinRows(root) {
             // shrink the millimetre only as far as keeps every box a 44 px touch target, then it swipes (SP-10, SP-11a)
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = sw.scrollWidth, have = sw.clientWidth;
+            // owner ruling 2026-10-03 (TY-10b): on a phone the row is drawn at about 29 px digits (boxes scale with them) and swipes;
+            // a row whose numbers TY-10a already shrank (wider than six boxes hold) keeps that shrink, scaled by the same factor
+            if (typeof window !== 'undefined' && window.innerWidth <= 480 && have > 0) {
+                const dg = twin.querySelector('.k2-countrow-body .k2-given, .k2-countrow-body input.mq-cellslot');
+                const fs = dg ? parseFloat(getComputedStyle(dg).fontSize) : 0;
+                const base = parseFloat(twin.dataset.mqK2Base || '') || cur;
+                if (!twin.dataset.mqK2Base) twin.dataset.mqK2Base = String(cur);
+                const fs0 = cur > 0 ? fs * base / cur : 0;                    // the digit size at the drawing's own scale
+                // a full row grows to 29 px digits; a TY-10a-shrunk row (digits under 20 px) grows by the factor a full row of the
+                // card / quiz takes (29 / 24), so its long numbers grow with the rest and never pass 29 px
+                const k = fs0 >= 20 ? base * Math.max(1, 29 / fs0) : base * 29 / 24;
+                if (Math.abs(k - cur) > 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+                return;
+            }
             if (need > have + 1 && have > 0) {
                 const slot = twin.querySelector('.k2-tile-slot');
                 const r = slot ? slot.getBoundingClientRect() : null;
@@ -2846,6 +3192,8 @@ export function fitTwinRows(root) {
  * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
  */
 const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart']);
+const PV_PLACE_WORDS = new Set(['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands', 'millions',
+    'one', 'ten', 'hundred', 'thousand', 'tenths', 'hundredths', 'thousandths']);
 const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
 
 function _categoriesOf(skillId, given) {
@@ -3031,6 +3379,41 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
     tpl.innerHTML = _screenSizes(html, digitPt);
+    // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
+    // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
+    // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a
+    // line never splits a box from its word and the boxes and digits keep their full size.
+    tpl.content.querySelectorAll('.pv-blanks .pv-slotgroup').forEach((grp) => {
+        const kids = Array.from(grp.children);
+        const isSlot = (el) => el.hasAttribute('data-ws-slot') || !!el.querySelector('[data-ws-slot]');
+        const words = kids.filter((el) => !isSlot(el)).map((el) => el.textContent.trim());
+        if (!words.length || !words.every((w) => PV_PLACE_WORDS.has(w))) return;
+        // the frame's last word ("ones") follows the group: it joins the last pair
+        const tail = [];
+        for (let s = grp.nextElementSibling; s && !isSlot(s); s = s.nextElementSibling) {
+            if (!PV_PLACE_WORDS.has(s.textContent.trim())) break;
+            tail.push(s);
+        }
+        const pairs = [];
+        kids.forEach((el) => {
+            if (isSlot(el) || !pairs.length) {
+                const pr = document.createElement('span');
+                pr.className = 'mq-slotpair';
+                pr.style.cssText = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+                pairs.push(pr);
+            }
+            pairs[pairs.length - 1].appendChild(el);
+        });
+        tail.forEach((el) => pairs[pairs.length - 1].appendChild(el));
+        pairs.forEach((pr) => grp.appendChild(pr));
+        grp.style.flexWrap = 'wrap';
+        grp.style.whiteSpace = 'normal';
+        grp.style.justifyContent = 'center';
+        grp.style.rowGap = '2mm';
+        grp.style.columnGap = '0.45em';
+        grp.style.maxWidth = '100%';
+        grp.classList.add('mq-pairwrap');
+    });
     const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'))
         .filter((s) => s.getAttribute('data-ws-graded') !== '0');
     const chart = p.kind === 'chart';
@@ -3064,7 +3447,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         table.setAttribute('data-mq-join', '');
         slots.forEach((s, k) => {
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
             const box = t.content.firstChild;
             box.classList.add('mq-cellbox--chart');
             s.replaceWith(box);
@@ -3072,9 +3455,12 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         mode = 'slots';
     } else if (inline && sets && sets[0] && sets[0].length === slots.length) {
         slots.forEach((s, k) => {
-            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(/[^0-9]/g, '').length));
+            // a unit-form place box (fixedWidth) holds its own digits exactly: 1 for "7 hundreds"
+            const fx = !!q.inlineBlanksData.fixedWidth;
+            const len = String(sets[0][k]).replace(/[^0-9]/g, '').length;
+            const w = fx ? Math.max(1, Math.min(8, len)) : Math.max(2, Math.min(8, len));
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
             s.replaceWith(box);
@@ -3083,6 +3469,28 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } else {
         return null;
     }
+    // The disk mat is drawn in paper millimetres (three L zones = 115 mm = 435 px), wider than a
+    // phone card. It scales down with its cell, never below the size at which its smallest label
+    // reaches the 8 pt floor (TY-11); past that it swipes inside its own window with the SP-11a cue.
+    tpl.content.querySelectorAll('svg.pv-disk-mat').forEach((svg) => {
+        const wMm = parseFloat(svg.getAttribute('width'));
+        const labels = Array.from(svg.querySelectorAll('text')).map((t) => parseFloat(t.getAttribute('font-size'))).filter((v) => v > 0);
+        if (!(wMm > 0) || !labels.length) return;
+        const pxPerMm = 96 / 25.4;
+        const minLabelPt = Math.min(...labels) / (25.4 / 72);
+        const floor = Math.min(1, 8 / minLabelPt);
+        svg.style.width = '100%';
+        svg.style.height = 'auto';
+        svg.style.maxWidth = `${Math.round(wMm * pxPerMm)}px`;
+        svg.style.minWidth = `${Math.ceil(wMm * pxPerMm * floor)}px`;
+        svg.dataset.mqPaperW = String(Math.round(wMm * pxPerMm));
+        svg.dataset.mqFloorW = String(Math.ceil(wMm * pxPerMm * floor));
+        const win = document.createElement('div');
+        win.className = 'k2-chartwindow mq-diskwin';
+        svg.replaceWith(win);
+        win.appendChild(svg);
+        win.insertAdjacentHTML('beforeend', '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more</b></span>');
+    });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
     const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;

@@ -627,10 +627,13 @@ function renderPreview(q, categoryId, skillId) {
     const skills = SKILLS[categoryId];
     const skillDef = skills?.find(s => s.v === skillId);
     const label = skillDef ? skillDef.l : skillId;
+    // The skill's own note for the teacher (data.js `desc`), one short line under the name.
+    const descLine = skillDef && skillDef.desc
+        ? `<div class="so-popup-desc">${String(skillDef.desc).replace(/&/g, '&amp;').replace(/</g, '&lt;')}</div>` : '';
 
     if (!q) {
         popup.innerHTML = `
-            <div class="so-popup-label">${label}</div>
+            <div class="so-popup-label">${label}</div>${descLine}
             <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.85rem;">
                 Could not generate preview for this skill.
             </div>`;
@@ -682,7 +685,7 @@ function renderPreview(q, categoryId, skillId) {
             return String(ans);
         };
 
-        let html = `<div class="so-popup-label">${label}</div>`;
+        let html = `<div class="so-popup-label">${label}</div>${descLine}`;
         html += `<div class="so-popup-question">${q.text || ''}</div>`;
 
         if (q.visual) {

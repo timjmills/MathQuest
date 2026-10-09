@@ -279,8 +279,11 @@ export function clearAllProgress() {
 
 // Notification toast
 export function showNotification(message, type = 'info') {
+    if (['gameView', 'worksheetView', 'quizTakeView'].some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); })
+        && !/\bXP\b/i.test(String(arguments[0]))) return;   // no pop-ups over pupil play (owner 2026-10-04)
     // Create notification element
     const notification = document.createElement('div');
+    notification.className = 'mq-notify';   // css/play-compact.css places it clear of the question in play
     notification.style.cssText = `
         position: fixed;
         bottom: 20px;

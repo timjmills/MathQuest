@@ -146,7 +146,11 @@ export function genCountByTables(q) {
                 // one table from each stretch of the list, so the pages differ but always climb
                 const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
                 t = tables[randInt(lo, hi)];
-            } else t = tables[idx % tables.length];
+            } else {
+                // a page of more rows than 2 to 12 holds (12 or more) takes the 1s too rather than repeating a table (owner 2026-10-03)
+                const all = _page >= ticks.length ? ticks : tables;
+                t = all[idx % all.length];
+            }
         // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
         } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
             // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
@@ -219,6 +223,8 @@ export function genCountByTables(q) {
     // The step tab shows the way when it can change (a page with rows going down): "−7" back, "+7" on in a mixed page.
     const tab = dirOpt === 'forward' ? fmt(t) : `${down ? '−' : '+'}${fmt(t)}`;
     const payload = { values, blanks, look: 'arcs', tab, shape };
+    // owner 2026-10-03: "Answer spaces: Lines" - bare write-on lines instead of boxes (count rows only)
+    if (opt('spaces') === 'line') { payload.lines = true; payload.shape = 'box'; }
     if (labels) { payload.times = timesMode; payload.labels = labels; }
     if (onePage) {
         payload.compact = true; q.countBy.onePage = true;

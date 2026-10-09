@@ -53,7 +53,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2 } from './k2kit.js';
+import { L, P, B, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2, KEY_FEATURES } from './k2kit.js';
 import { tile, tileSize, shapeAt } from './shapes.js';
 
 /** The widest box pitch of an 'arcs' row (mm), and the narrowest box a size may print. */
@@ -65,7 +65,7 @@ const GAP_MM = 1.5;
 /** The width a one-column cell gives its content (186 mm less the cell's pads). */
 const LIVE_MM = 172;
 const COMPACT_LIVE_MM = 178;  // the one-page sheet's single full-width column (critic round 4, H)
-const COMPACT_GAP_MM = 1;      // and a tighter gap, so the box takes the width (3-digit keys keep clear space)
+const COMPACT_GAP_MM = 2.8;    // room for the short jump arrow between boxes (owner 2026-10-03); count-rows.js S_GAP matches
 /** Most boxes in one row of the screen twin: four (and the step tab) fit a 390 px phone at >= 44 px a box. */
 const TWIN_ROW = 4;
 const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by columns (~24 px at the card's 3.4 px/mm)
@@ -115,18 +115,20 @@ function geom(p, ctx) {
     // compact (12 tables on one page): less chrome, never smaller digits. Critic round 4 (H): the page had
     // about 30 mm spare under row l, so the boxes take it - taller (+3 mm, the most Letter still holds on one page) and wider (the one-column cell's
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
-    const baseH = S(ctx).writeMm + (p.compact ? 3.4 : 2.5);
+    // owner 2026-10-03: the arcs are gone, so the one-page sheet gives their 3 mm to the boxes (the page stays as full as before)
+    const baseH = S(ctx).writeMm + (p.compact ? 6.4 : 2.5);
     const live = p.compact ? COMPACT_LIVE_MM : LIVE_MM;
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
+    if (look === 'arcs' && p.lines) return linesGeom(p, ctx, { size, n, tabBody, tab, live, lblPt, lblChars, hasLbl, lblH });
     if (look === 'arcs' && p.compact && shape === 'box') {
-        const fitPitch = (live - tab + gap) / n;
-        const chars = maxDigits(p);
-        const ptFit = Math.min(digitPt(ctx), 18, (fitPitch - gap - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4);
-        if (chars <= 3 ? fitPitch - gap >= MIN_BOX[size] : ptFit >= FLOOR_PT) {
-            const w = fitPitch - gap;
-            return { size, n, look, shape, w, h: baseH, pitch: w + gap, gap, tab, tabBody, perRow: n, rows: 1, arcH: 3, pt: ptFit, hasLbl, lblH, lblPt, compact: true };
+        // Owner 2026-10-03: each box is its MINIMUM writing width (the widest number at the working size + a margin, never under
+        // COMPACT_MIN_BOX) and the rest of the line is the gaps, so every jump arrow keeps >= 1 mm clear each side (COMPACT_MIN_GAP).
+        // A row too wide for that (3+ digits) shrinks its digits under TY-10a, never below FLOOR_PT; otherwise two lines of six.
+        const fit = compactFit(maxDigits(p), live - tab, n, digitPt(ctx), (p.blanks || []).length);
+        if (fit) {
+            return { size, n, look, shape, w: fit.w, h: baseH, pitch: fit.w + fit.gap, gap: fit.gap, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: fit.pt, gw: fit.gw, hasLbl, lblH, lblPt, compact: true };
         }
     }
     if (look === 'arcs') return arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab, baseH, live, lblPt, lblChars, hasLbl, lblH });
@@ -142,6 +144,34 @@ function geom(p, ctx) {
     return { size, n, look, shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH: 0, pt, hasLbl, lblH, lblPt };
 }
 
+/** The one-page sheet's single line of `n` boxes in `avail` mm: {w, gap, pt} or null (two lines). Mirrored by count-rows.js rowLines. */
+// Owner / coordinator 2026-10-03: keep 12 per line; every gap holds a REAL arrow (COMPACT_ARROW_MM, the same on every row) with
+// 1 mm clear each side. Only a box needs writing width; a printed number takes its glyph width (+ 0.3 mm each side).
+export const COMPACT_MIN_BOX = 9, COMPACT_ARROW_MM = 2.2, COMPACT_MIN_GAP = COMPACT_ARROW_MM + 2;
+/**
+ * `nBox` of the `n` numbers are boxes (the rest printed). Returns {w (box), gw (printed), gap, pt} or null (two lines). The digits
+ * keep the working size whenever the line holds them; only a row too full even then (very many boxes of 3+ digits) shrinks them
+ * just enough under TY-10a, never below FLOOR_PT.
+ */
+export function compactFit(chars, avail, n, digit, nBox = n) {
+    const pt0 = Math.min(digit, 18);
+    const glyph = (pt) => chars * 0.56 * pt * PT_MM;
+    const sizes = (pt) => ({ w: Math.max(COMPACT_MIN_BOX, glyph(pt) + 1.8), gw: glyph(pt) + 0.6 });
+    const used = (pt) => { const s = sizes(pt); return nBox * s.w + (n - nBox) * s.gw; };
+    const room = avail - (n - 1) * COMPACT_MIN_GAP;
+    let pt = pt0;
+    if (used(pt0) > room) {
+        // solve for the digit size that fills the line exactly (the box minimum may bind: step down)
+        for (pt = pt0; pt >= FLOOR_PT && used(pt) > room; pt -= 0.1);
+        if (pt < FLOOR_PT) return null;
+    }
+    const s = sizes(pt);
+    // critic r1 D5 (2026-10-09): a printed number takes the box's width (centred) whenever the line still holds every arrow at
+    // this digit size, so the columns line up row to row; only a line too full for that (3-digit rows) keeps glyph widths.
+    if (n * s.w <= room + 1e-6) s.gw = s.w;
+    return { w: s.w, gw: s.gw, gap: (avail - (nBox * s.w + (n - nBox) * s.gw)) / (n - 1), pt };
+}
+
 /**
  * THE COUNT-BY ROW (owner 2026-10-02, wave 1 C2): every row is EXACTLY two lines of six numbers (the 15-number long row is
  * three lines of five), on paper and in the screen twin, filling the whole width the cell gives it: the boxes take
@@ -153,8 +183,56 @@ function geom(p, ctx) {
  * fit keeps today's digit size.
  */
 export const FLOOR_PT = 9;
-const MIN_GAP = 3;          // mm between two boxes, at least
+const CLEAR_MM = 1.5;       // the jump arrow's clearance from each neighbour (owner mark-up 2026-10-03)
+const COMPACT_CLEAR_MM = 1.0;   // the one-page sheet and the Lines rows: at least 1 mm clear (coordinator 2026-10-03)
+const MIN_GAP = 2 * CLEAR_MM + 3.5;   // mm between two boxes, at least: a 3.5 mm arrow and its clearance
 const EXIT_MM = 7.5;        // the turn arrow that leaves a line (6 mm + its margin)
+
+/**
+ * ANSWER SPACES: LINES (owner 2026-10-03, an owner exception to SL-3, count rows only): "____ -> ____ -> ____". Each missing
+ * number is a bare write-on line, the row has no box height, and the row takes its numbers on ONE line wherever the width holds
+ * them at today's digit size (with a jump arrow and its clearance in every gap); otherwise two even lines (6 + 6, 5 + 5 + 5).
+ * A row of up to 12 narrows its lines (digits down to FLOOR_PT) to stay on ONE line (owner ruling: 12 per row); only a row
+ * whose numbers are too wide even then takes two lines.
+ */
+const LINE_GAP_MIN = { paper: 2 * 1.0 + 3, compact: 2 * 1.0 + 3 };   // a 3 mm arrow (head 2.4 mm), 1 mm clear each side
+const LINE_GAP_MAX = 10;
+function linesGeom(p, ctx, c) {
+    const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
+    const chars = maxDigits(p);
+    const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
+    const need = (pt) => Math.max(7, chars * 0.56 * pt * PT_MM + 2.4);   // the line is as wide as its widest number + a margin
+    const minGap = p.compact ? LINE_GAP_MIN.compact : LINE_GAP_MIN.paper;
+    const gapFor = (per, w, exit) => (live - tab - (exit ? EXIT_MM : 0) - per * w) / Math.max(1, per - 1);
+    let pt = basePt, w = need(basePt), perRow = n;
+    const twin = isTwin(ctx);
+    // owner 2026-10-09 (critic r1 D2/D3): 12 on ONE line is a PAPER rule at Size S only ("use small to fit more"): there the
+    // lines narrow (digits down to FLOOR_PT) before the row splits. At M and L, and on the one-page sheet, a row never shrinks
+    // its digits or tab below the size's working size - it takes two lines of six. On SCREEN Lines wraps 6 + 6 like Boxes.
+    const mayNarrow = !twin && !p.compact && size === 'S';
+    if (twin) perRow = n >= 13 ? 5 : Math.ceil(n / 2);
+    else if (gapFor(n, w, false) < minGap && n <= 12 && mayNarrow) {
+        const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
+        if (pt1 >= FLOOR_PT) { w = w1; pt = Math.min(basePt, pt1); }
+    }
+    if (!twin && gapFor(n, w, false) < minGap - 1e-6) {
+        perRow = n >= 13 ? 5 : Math.ceil(n / 2);
+        if (gapFor(perRow, w, true) < minGap) {
+            w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
+            pt = Math.max(FLOOR_PT, Math.min(basePt, (w - 2.4) / (chars * 0.56 * PT_MM)));
+        }
+    }
+    // the spare width widens the lines a little (a line up to 8 mm wider than its number), the rest stays as the gaps
+    const spare = gapFor(perRow, w, perRow < n);
+    if (spare > LINE_GAP_MAX) w = Math.min(w + 8, w + (spare - LINE_GAP_MAX) * (perRow - 1) / perRow);
+    let gap = Math.max(minGap, Math.min(LINE_GAP_MAX, gapFor(perRow, w, perRow < n)));
+    if (twin && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
+    const rows = Math.ceil(n / perRow);
+    const h = S(ctx).writeMm + (p.compact ? 2 : 1);
+    const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (w + gap - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+    const lblH = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : 0;
+    return { size, n, look: 'arcs', shape: 'box', w, h, pitch: w + gap, gap, tab, tabBody, perRow, rows, arcH: 0, pt, tabPt: basePt, hasLbl, lblH, lblPt, compact: !!p.compact, lines: true };
+}
 
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
@@ -177,10 +255,18 @@ function arcsGeom(p, ctx, c) {
     if (isTwin(ctx) && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     // digits: today's size, shrunk only as far as the widest number needs, never below the floor
     const pt = Math.max(FLOOR_PT, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
+    // the PHONE twin (TY-10b, critic phone29): the screen draws the digits at ~29 px, so px per mm there is 29 / (pt mm);
+    // the gap is capped at `twinGapPx` px absolute (24, set by the screen host on a phone), never under MIN_GAP
+    if (isTwin(ctx) && Number(p.twinGapPx) > 0) {
+        const kPhone = 29 / Math.max(1, pt * PT_MM);
+        // the cap wins over the paper's arrow clearance (MIN_GAP): the jump arrow sizes itself to the gap it gets, and the
+        // gap never falls under 14 px (3 mm on the phone) so the arrow still reads (lane a91a01fc, after merging TY-10b)
+        gap = Math.min(gap, Math.max(14 / kPhone, Number(p.twinGapPx) / kPhone));
+    }
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
-    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + gap, gap, tab, tabBody, perRow, rows, arcH: p.compact ? 3 : (p.axis ? 5 : 3.8), pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact, axis: !!p.axis, axisH: p.axis ? AXIS_MM : 0 };
+    return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + gap, gap, tab, tabBody, perRow, rows, arcH: p.axis ? (p.compact ? 3 : 5) : 0, pt, hasLbl, lblH: lblHh, lblPt, compact: !!p.compact, axis: !!p.axis, axisH: p.axis ? AXIS_MM : 0 };
 }
 
 /** The keyed values in reading order: the missing numbers, then the rule's number. */
@@ -219,7 +305,7 @@ const shownAt = (p, i) => {
  * 9 pt beside "+3" at 17 pt; the step is the cue the pupil reads first). geom() already sizes the tab for the size's full digit.
  */
 const TAB_FLOOR_PT = 14;
-const tabPt = (g) => { const pt = Math.min(g.pt * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
+const tabPt = (g) => { const pt = Math.min((g.tabPt || g.pt) * 1.05, 20); return g.compact ? Math.max(TAB_FLOOR_PT, pt) : pt; };
 
 /** The step tab: a bold number in a pentagon pointing into the row ("7>"). */
 function stepTab(ctx, g, text, ink = INK) {
@@ -231,6 +317,47 @@ function stepTab(ctx, g, text, ink = INK) {
         + `font-weight="700" font-size="${n2(tabPt(g) * 25.4 / 72)}" fill="${ink}">${esc(text)}</text>`;
     return `<span class="k2-steptab" data-ws-steptab="${esc(text)}" style="flex:none;display:inline-block;width:${L(ctx, w)};height:${L(ctx, h)};margin-right:${L(ctx, 2)};${g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : ''}">`
         + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="count by ${esc(text)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
+}
+
+/**
+ * The jump arrow (owner 2026-10-03): a SHORT arrow "->" in the gap between two neighbouring boxes, centred on the
+ * boxes' height, with a complete (filled) arrowhead. It replaced the long hop arcs over the row, so a row is no
+ * taller than its boxes. `w` is the gap's width (mm).
+ */
+function jumpArrow(ctx, g, w) {
+    const h = g.h, mid = h / 2;
+    // owner mark-up (2026-10-03): a short BOLD arrow centred in the gap, >= 1.5 mm clear of both neighbours (CLEAR_MM). Only
+    // the one-page sheet's 12-number line has no room for that and keeps COMPACT_CLEAR_MM.
+    const clear = w >= 2 * CLEAR_MM + 4 ? CLEAR_MM : COMPACT_CLEAR_MM;
+    const len = g.compact && !g.lines ? Math.min(COMPACT_ARROW_MM, w - 2 * clear) : Math.max(0.6, Math.min(w - 2 * clear, 5));
+    const head = Math.min(2.5, len * 0.8), half = Math.max(head * 0.5, 0.9);
+    const x0 = (w - len) / 2, x1 = x0 + len;
+    const body = (len - head > 0.3 ? `<path d="M${n2(x0)} ${n2(mid)} H${n2(x1 - head + 0.2)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linecap="butt"/>` : '')
+        + `<polygon points="${n2(x1 - head)},${n2(mid - half)} ${n2(x1)},${n2(mid)} ${n2(x1 - head)},${n2(mid + half)}" fill="${INK}" stroke="none"/>`;
+    // drawn in the gap to the LEFT of the box it points at (absolute, so the row's columns stay one element each: the screen
+    // twin's swipe snaps and its Tab order read the line's children as its columns)
+    return `<span class="k2-jump" aria-hidden="true" style="position:absolute;top:0;right:100%;display:block;width:${L(ctx, w)};height:${L(ctx, h)};pointer-events:none;">`
+        + `<svg viewBox="0 0 ${n2(w)} ${n2(h)}" style="display:block;width:100%;height:100%;overflow:visible;">${body}</svg></span>`;
+}
+
+/**
+ * A write-on LINE (Answer spaces: Lines): the slot is the line's width and the row's height, drawn as a 1.5 pt rule along its
+ * bottom; the key writes its number on the line. On screen the input fills the same place, so it reads as an underlined field,
+ * and the per-box marks tint the area above the line.
+ */
+function lineSlot(ctx, g, { id, value, ink, shown, maxLen }) {
+    const color = ink === 'trace' ? GREY : INK;
+    const hook = isTwin(ctx) ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}` : '';
+    return `<span class="k2-shape k2-shape-line" style="position:relative;display:inline-flex;flex:none;box-sizing:border-box;width:${L(ctx, g.w)};height:${L(ctx, g.h)};vertical-align:middle;">`
+        + `<span class="k2-tile k2-tile-slot k2-line-slot" data-ws-slot="${esc(id)}" data-ws-shape="line"${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${shown ? ' data-ws-shown="1"' : ''} `
+        + `style="position:relative;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;padding-bottom:${L(ctx, 0.6)};`
+        + `border:0;border-bottom:${B(ctx, 1.5)} solid ${INK};border-radius:0;background:transparent;font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;color:${color};${KEY_FEATURES}">${esc(value)}</span></span>`;
+}
+
+/** A filled arrowhead at (x, y) pointing along (ux, uy): the turn arrows share the jump arrow's head. */
+function headAt(x, y, ux, uy) {
+    const head = 1.9, half = 1.05, bx = x - ux * head, by = y - uy * head;
+    return `<polygon points="${n2(bx - uy * half)},${n2(by + ux * half)} ${n2(x)},${n2(y)} ${n2(bx + uy * half)},${n2(by - ux * half)}" fill="${INK}" stroke="${INK}" stroke-width="${n2(SW.hair * 0.5)}"/>`;
 }
 
 /** The hop arcs over one row of `k` numbers. */
@@ -278,12 +405,15 @@ function axisSVG(ctx, g, k) {
  * (critic, wave 1 C). Paper only: the screen twin's short rows stay as they are.
  */
 function turnArrow(ctx, g, kind, w) {
-    const h = g.h, mid = h / 2, sw = n2(SW.hair);
-    const d = kind === 'out'
-        ? `M0.4 ${n2(mid)} H${n2(w - 2.2)} Q${n2(w - 0.8)} ${n2(mid)} ${n2(w - 0.8)} ${n2(mid + 1.6)} V${n2(h - 0.4)} M${n2(w - 2.1)} ${n2(h - 1.8)} L${n2(w - 0.8)} ${n2(h - 0.3)} L${n2(w + 0.5)} ${n2(h - 1.8)}`
-        : `M${n2(w - 7)} ${n2(mid)} H${n2(w - 0.4)} M${n2(w - 2.0)} ${n2(mid - 1.4)} L${n2(w - 0.4)} ${n2(mid)} L${n2(w - 2.0)} ${n2(mid + 1.4)}`;
+    const h = g.h, mid = h / 2, sw = n2(SW.one);
+    // the same short line and filled head as the jump arrows: "out" leaves the line's last box and turns down,
+    // "in" enters the next line's first box from the left
+    const path = kind === 'out'
+        ? `M0.4 ${n2(mid)} H${n2(w - 2.2)} Q${n2(w - 0.8)} ${n2(mid)} ${n2(w - 0.8)} ${n2(mid + 1.6)} V${n2(h - 1.5)}`
+        : `M${n2(w - 6)} ${n2(mid)} H${n2(w - 3)}`;
+    const head = kind === 'out' ? headAt(w - 0.8, h - 0.2, 0, 1) : headAt(w - 1.5, mid, 1, 0);
     return `<svg aria-hidden="true" viewBox="0 0 ${n2(w)} ${n2(h)}" style="display:block;width:${L(ctx, w)};height:${L(ctx, h)};overflow:visible;">`
-        + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        + `<path d="${path}" fill="none" stroke="${INK}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>${head}</svg>`;
 }
 
 register('count-row', {
@@ -304,12 +434,13 @@ register('count-row', {
                 const text = fmt(over !== undefined ? over : v);
                 if (plainGiven) {
                     return `<span class="k2-given"${over !== undefined ? ' data-ws-shown="1"' : ''} style="flex:none;display:inline-flex;align-items:center;justify-content:center;`
-                        + `width:${L(ctx, g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;">${esc(text)}</span>`;
+                        + `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;">${esc(text)}</span>`;
                 }
                 return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
             }
             const val = over !== undefined ? String(over) : shown[k];
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
+            if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits });
             return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits });
         });
         if (g.hasLbl) {
@@ -326,7 +457,10 @@ register('count-row', {
         const tabsCol = [];
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
-            const arcs = g.look === 'arcs' ? arcsSVG(ctx, g, part.length) + (g.axis ? axisSVG(ctx, g, part.length) : '') : '';
+            // skip_count_line keeps its hop arcs over a number line (owner 2026-10-09); every other row takes the short jump arrows
+            const arcs = g.axis ? arcsSVG(ctx, g, part.length) + axisSVG(ctx, g, part.length) : '';
+            const jumps = g.look === 'arcs' && !g.axis;
+            const lineCells = jumps ? part.map((c, k) => (k ? `<span class="k2-jumpcell" style="position:relative;flex:none;display:block;">${jumpArrow(ctx, g, g.gap)}${c}</span>` : c)) : part;
             const turns = g.look === 'arcs' && g.tab && g.rows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
@@ -337,7 +471,7 @@ register('count-row', {
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, 2.5)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;gap:${L(ctx, g.gap)};${arcs && !g.axis ? `margin-top:${L(ctx, 0.6)};` : ''}">${part.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
