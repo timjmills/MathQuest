@@ -273,6 +273,19 @@ const nfBlanks = (p) => {
 };
 const nfDigits = (p) => Math.max(1, ...(p.eqs || []).flatMap((eq) => eq.nums.map((v) => String(v).length)));
 const nfOp = (op) => ({ '*': '×', x: '×', '/': '÷', '-': '−' })[op] || op;
+/**
+ * The family's ORDER-FREE identity (wave 1 lane D round 6, critic r5 D5-1): 4, 5, 20 and 5, 4, 20
+ * are one family (the same four facts), so a page holds each family once. The key is the set
+ * {a, b, whole} plus the operation kind; buildSheet's de-duplication (print-sheet.js signature)
+ * and the lint's REPEAT check (the cell's data-ws-dedupe) both read it.
+ */
+export const nfDedupeKey = (p) => {
+    const nums = (p && p.nums || []).map(Number).filter(Number.isFinite);
+    if (nums.length < 2) return '';
+    const ops = (p.eqs || []).map((e) => e && e.op).join('');
+    const kind = /[*x×\/÷]/.test(ops) ? 'x' : '+';
+    return `nf${kind}:${nums.slice().sort((a, b) => a - b).join(',')}`;
+};
 
 register('number-family', {
     render(p, ctx) {
@@ -299,7 +312,8 @@ register('number-family', {
         // (round 5 D-E: the gaps are kept tight so three families stand in a column at L, 2 x 3)
         const set = `<div style="display:inline-block;white-space:nowrap;border:${HAIR} solid ${INK.ink};border-radius:${g.em(3)};padding:${g.em(0.5)} ${g.em(2.5)};line-height:1">`
             + (p.nums || []).map((v) => esc(v)).join(', ') + '</div>';
-        const body = `<div style="display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">${set}${lines}</div>`;
+        const dk = nfDedupeKey(p);
+        const body = `<div${dk ? ` data-ws-dedupe="${esc(dk)}"` : ''} style="display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">${set}${lines}</div>`;
         return root(g, 'number-family', body, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
@@ -320,4 +334,5 @@ register('number-family', {
         return nfBlanks(p || {}).map((b, k) => ({ id: b.id, kind: 'number', shape: 'box', graded: true, order: k, inputmode: 'numeric', scopes: ['full'] }));
     },
     layout() { return { card: 'card-number-family', checker: 'list', requiresVisual: true }; },
+    dedupeKey: nfDedupeKey,
 });

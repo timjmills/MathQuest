@@ -1035,12 +1035,9 @@ function wsLintPage(cfg) {
             const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
                 const r = e.getBoundingClientRect();
                 if (r.width < 4 || r.height < 4) return false;
-                // a blank run laid over the grid's outer border (grid.js `cut`) leaves the border
-                // round the filled cells only: a hole only where the frame still closes round it
-                if (e.classList.contains('blankrun')) {
-                    const gr = e.parentElement.getBoundingClientRect();
-                    return r.right < gr.right - 0.5 || r.bottom < gr.bottom - 0.5;
-                }
+                // an empty run after the last problem is a hole inside PG-15's closed frame, always
+                // (critic r5 D5-5: no border trick hides it; the layout removes it)
+                if (e.classList.contains('blankrun')) return true;
                 const st = getComputedStyle(e);
                 const bordered = ['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
                 return bordered && !(e.textContent || '').trim() && !e.querySelector('svg, img, canvas, [data-ws-slot], input');
@@ -1048,6 +1045,10 @@ function wsLintPage(cfg) {
             // L-DENSITY REPEAT (critic r4 D-B: add_sub_10s S printed 30 + 10 twice): the same problem
             // drawn twice on one page. A problem's identity is its drawing less its item label.
             const sigOf = (c) => {
+                // a cell whose template declares an order-free identity (a number family's set
+                // {a, b, whole}: critic r5 D5-1) is compared by it, so a reordered family repeats
+                const dk = c.querySelector('[data-ws-dedupe]');
+                if (dk && dk.getAttribute('data-ws-dedupe')) return 'dk|' + dk.getAttribute('data-ws-dedupe');
                 const k = c.cloneNode(true);
                 k.querySelectorAll('[data-ws-label], .ws-letter, .ws-tabnum').forEach(e => e.remove());
                 return k.innerHTML.replace(/\s(id|aria-labelledby|aria-describedby|data-ws-item|data-ws-n)="[^"]*"/g, '').replace(/\s+/g, ' ').trim();
@@ -1992,6 +1993,14 @@ const SELF_TESTS = [
         const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
         cells[cells.length - 1].remove();
         g.insertAdjacentHTML('beforeend', '<div class="ws-cell blankrun" style="--from:2"></div>');
+    } },
+    { name: 'a number family reordered on the same page', mode: 'kit', expect: ['L-DENSITY', 'REPEAT'], fn: () => {
+        // critic r5 D5-1: 4, 5, 20 and 5, 4, 20 draw differently but are one family (data-ws-dedupe)
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const cells = [...p1.querySelectorAll('.ws-grid > [data-ws-cell]')];
+        cells[0].insertAdjacentHTML('beforeend', '<div data-ws-dedupe="nfx:4,5,20">4, 5, 20</div>');
+        cells[1].insertAdjacentHTML('beforeend', '<div data-ws-dedupe="nfx:4,5,20">5, 4, 20</div>');
     } },
     { name: 'the same problem twice on a page', mode: 'kit', expect: ['L-DENSITY', 'REPEAT'], fn: () => {
         const p1 = document.querySelector('.ws-page');

@@ -27,7 +27,7 @@ import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, hasCell } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
@@ -157,6 +157,14 @@ function normaliseRequest(req = {}) {
 
 /** A question's identity for de-duplication: what the pupil would see as "the same problem". */
 function signature(q) {
+    // A template that knows when two items are the same problem in another order (a number
+    // family: 4, 5, 20 = 5, 4, 20; critic r5 D5-1) supplies an order-free `dedupeKey`.
+    try {
+        const spec = (q.cell && q.cell.template && q.cell.template !== 'legacy') ? q.cell : numberFamilySpec(q);
+        const t = spec && spec.template ? getCell(spec.template) : null;
+        const dk = t && typeof t.dedupeKey === 'function' ? t.dedupeKey(spec.payload || {}) : '';
+        if (dk) return `dk|${dk}`;
+    } catch (e) { /* fall through to the drawn identity */ }
     const payload = q.cell && q.cell.payload ? JSON.stringify(q.cell.payload) : '';
     const ans = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans);
     return `${String(q.text || '').replace(/\s+/g, ' ').trim()}|${ans}|${payload}`;
@@ -256,7 +264,12 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
-            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
+            // A page dealer (page-deal.js) gives a kept item the same slot on every retry, so a slot whose
+            // choice the page already holds (a number family's block of 6 pairs dealt a second time:
+            // critic r5 D5-1) repeats however the seed moves. After half the retries the item is
+            // asked for at a later page position, which deals from a fresh block.
+            const at = k >= tries / 2 ? itemIndex + 6 * (k - Math.floor(tries / 2) + 1) + (k % 5) : itemIndex;
+            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: at, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
             if (!cand) continue;
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
@@ -2543,6 +2556,39 @@ try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catc
  * other role keep what they were dealt.
  */
 export async function buildSheet(req = {}) {
+    const r = await buildSheetFilled(req);
+    // (round 6, critic r5 D5-5) PG-15: a short last row is never left as an empty area. grid.js
+    // re-lays it (class `relaid`) when nothing better exists; before that, an auto single-skill
+    // independent page is dealt again from a derived seed (seed + k x 7919, reproducible) at the
+    // same count, then one problem fewer, and the first page of whole rows on the pages
+    // asked is kept.
+    try {
+        const secs = Array.isArray(req.sections) ? req.sections : [];
+        const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+        const s = secs[0];
+        const auto = s && (s.count === undefined || s.count === null || s.count === 'auto' || s.count === '');
+        const holed = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+        if (req._noReseat || asked !== 'independent' || secs.length !== 1 || (s.skills || []).length !== 1 || !auto || !Array.isArray(r.items) || !holed(r)) return r;
+        const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
+        const n = r.items.length;
+        const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+        const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+        const ok = (alt, k) => alt && alt.pageCount <= wanted && !holed(alt) && !dupOf(alt) && alt.items.length === k;
+        for (let k = 1; k <= 3; k++) {
+            const alt = await buildSheetFilled(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
+            if (ok(alt, n)) return alt;
+        }
+        for (let d = 1; d <= 1 && n - d >= 2; d++) {
+            for (let k = 0; k <= 2; k++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, k ? { seed: (base + k * 7919) >>> 0 } : {}, { sections: [Object.assign({}, s, { count: n - d })] }));
+                if (ok(alt, n - d)) return alt;
+            }
+        }
+    } catch (e) { /* keep the page as built */ }
+    return r;
+}
+
+async function buildSheetFilled(req = {}) {
     const r = await buildSheetOnce(req);
     try {
         const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
@@ -2565,7 +2611,9 @@ export async function buildSheet(req = {}) {
             // a hole on the page (critic 2026-10-03: mixed_multiplication L, a lone area model
             // beside an empty cell): the largest count without one is kept, stepping back one
             // problem when the counts tried all leave one.
-            const hole = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+            // (round 6: grid.js re-lays a short last row - class `relaid` - so no hole prints; whole rows
+            // of the skill's own problems are still preferred, so a re-laid page counts here too)
+            const hole = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
             // the share of a lone grid's page its rows fill (first page; 1 when not measured)
             const fillOf = (x) => {
                 const pg = x.plan && x.plan.pages && x.plan.pages[0];
@@ -2651,16 +2699,41 @@ export async function buildSheet(req = {}) {
             // dealt again from a derived seed (seed + k x 7919, reproducible: the same request
             // always lands on the same deal) until one fills its rows with as many problems.
             const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+            const alts = [];
             for (let k = 1; k <= 4; k++) {
                 const alt = await buildSheet(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
                 if (!hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length && (alt.narrowCells || 0) <= (best.narrowCells || 0)) return alt;
+                alts.push(alt);
             }
-            return best;
+            // (round 6, critic r5 D5-5) no deal gives whole rows at this count: a deal of whole rows
+            // one problem shorter is taken before the re-laid last row (grid.js `relaid`), which
+            // stretches one problem across a row it was not drawn for
+            let shorter = alts.find((alt) => !hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length - 1);
+            for (let d = 1; !shorter && d <= 2 && best.items.length - d >= 2; d++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length - d })] }));
+                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length === best.items.length - d) shorter = alt;
+            }
+            return shorter || best;
         }
         let n = r.items.length, best = r;
         for (let k = 0; k < 8 && n > 1 && best.pageCount > wanted; k++) {
             n -= 1;
             best = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n })] }));
+        }
+        // (round 6, critic r5 D5-5) the count that fits the pages asked can leave a short last row
+        // (re-laid by grid.js, or a blank run): a deal from a derived seed, else one or two
+        // problems fewer in whole rows, is taken first
+        const holed = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+        if (best.pageCount <= wanted && holed(best) && !req._noReseat) {
+            const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+            for (let k = 1; k <= 3; k++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, sections: [Object.assign({}, s, { count: n })] }));
+                if (alt.pageCount <= wanted && !holed(alt) && alt.items.length === n) return alt;
+            }
+            for (let d = 1; d <= 2 && n - d >= 2; d++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n - d })] }));
+                if (alt.pageCount <= wanted && !holed(alt) && alt.items.length === n - d) return alt;
+            }
         }
         return best;
     } catch (e) {

@@ -1267,6 +1267,21 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(L9.rows >= 9 && L9.pages === 1, `D-D: free rows hold 18 short problems on one L page in 2 x 9 (${L9.cols} x ${L9.rows}, ${L9.pages} page)`);
 }
 
+/* ============================================== round 6 (critic r5 D5-5): a short last row is re-laid */
+{
+    const { grid: g6 } = await import('../../js/modules/sheet/grid.js');
+    const a = g6(['a', 'b'], { cols: 4 });
+    ok(!/blankrun/.test(a) && /relaid/.test(a) && /repeat\(4,1fr\)/.test(a) && (a.match(/span 2;/g) || []).length === 2, 'D5-5: 2 problems in a 4-column grid share the row (2 + 2 of 4 tracks), no empty area');
+    const b = g6(['a', 'b', 'c'], { cols: 2 });
+    ok(!/blankrun/.test(b) && (b.match(/span 1;/g) || []).length === 2 && (b.match(/span 2;/g) || []).length === 1, 'D5-5: 3 in 2 columns: the last problem takes the whole last row');
+    const c = g6(['a', 'b', 'c', 'd', 'e'], { cols: 3 });
+    ok(/repeat\(6,1fr\)/.test(c) && (c.match(/span 2;/g) || []).length === 3 && (c.match(/span 3;/g) || []).length === 2, 'D5-5: 5 in 3 columns: last row 2 equal cells over 6 tracks');
+    const d = g6(['a', 'b', 'c', 'd'], { cols: 2 });
+    ok(!/relaid|blankrun|span/.test(d), 'D5-5: whole rows are untouched');
+    const e = g6(['a', 'b', 'c'], { cols: 2, rows: 3 });
+    ok(/blankrun/.test(e) && !/class="ws-cell blankrun cut"/.test(e), 'PG-15: an explicit taller grid keeps one blank run inside the closed frame (no `cut`)');
+}
+
 /* ======================================================================= report */
 
 if (fails.length) {

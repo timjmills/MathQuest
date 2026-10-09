@@ -158,10 +158,6 @@
 :is(.ws-page, .ws-sheet) .ws-grid.facts { gap: var(--ws-hair); }                  /* fact grids: hairline interiors in both looks */
 :is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
 :is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
-/* wave 1 lane D round 5 (critic r4 D-B): the empty run after the last problem is paper, its
-   right and bottom laid over the grid's outer border, so the border goes round the filled cells
-   only - never an empty bordered track beside the last problem */
-:is(.ws-page, .ws-sheet) .ws-cell.blankrun.cut { margin: 0 calc(-1 * var(--ws-heavy)) calc(-1 * var(--ws-heavy)) 0; padding: 0; }
 :is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
 :is(.ws-page, .ws-sheet) .ws-tab { position: absolute; left: 0; top: 0; min-width: var(--ws-tab); height: var(--ws-tab); padding: 0 .6mm; background: var(--ws-ink); color: var(--ws-paper);
     font-size: var(--ws-tabnum); font-weight: 700; line-height: var(--ws-tab); text-align: center; }
@@ -225,6 +221,9 @@
 :is(.ws-page, .ws-sheet) .ws-eq .o { font-weight: 700; width: 1em; text-align: center; }
 :is(.ws-page, .ws-sheet) .ws-line { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border-bottom: var(--ws-hair) solid var(--ws-ink); }
 :is(.ws-page, .ws-sheet) .ws-box { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border: var(--ws-hair) solid var(--ws-ink); }
+/* wave 1 lane D round 6 (critic r5 D5-6, SL-4): the box's CLEAR height is Hw (6 mm at S), so the
+   hairline border sits outside it - the writing room never falls under 6 mm */
+:is(.ws-page, .ws-sheet) .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-circle { display: inline-block; width: calc(var(--ws-hw) + 2mm); height: calc(var(--ws-hw) + 2mm); border: 1pt solid var(--ws-ink); border-radius: 50%; }
 :is(.ws-page, .ws-sheet) .ws-check { display: inline-block; width: 5mm; height: 5mm; border: var(--ws-hair) solid var(--ws-ink); vertical-align: -1mm; margin-right: 2mm; }
 
