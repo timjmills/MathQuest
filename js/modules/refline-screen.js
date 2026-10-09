@@ -224,9 +224,10 @@ export function syncWorksheetRefLine(items, { categoryId = '', skillId = '', opt
     if (!pool) for (const q of qs) {
         const ip = itemPool(q);
         const cat = ip ? ip.categoryId : q.categoryId || categoryId, sk = ip ? ip.skillId : q.requestedSkillId || q.skillId || skillId;
-        if (!ip) widen.push(q);
         const k = `${cat}:${sk}`;
         if (!seen.has(k)) seen.set(k, { categoryId: cat, skillId: sk, opts: ip ? optionsInUse(cat, sk, null, null) : optionsInUse(cat, sk, qs.length && seen.size === 0 ? opts : null, q) });
+        // Only the items of a skill that asked for the line widen it (as on paper: nline.keys).
+        if (!ip && lineOpts(cat, sk, seen.get(k).opts)) widen.push(q);
     }
     if (!seen.size && categoryId && skillId) seen.set(`${categoryId}:${skillId}`, { categoryId, skillId, opts: optionsInUse(categoryId, skillId, opts) });
     let html = '';
