@@ -90,6 +90,7 @@ function MEASURE(host) {
         box: bR ? Math.round(bR.bottom) : null, boxTop: bR ? Math.round(bR.top) : null, boxKind: active ? 'active' : inputs[0] ? 'input' : choice ? 'choice' : paper ? 'paper' : 'none',
         go: gR ? Math.round(gR.bottom) : null, goTop: gR ? Math.round(gR.top) : null,
         paperTop: Math.round(pR.top), cardsFull,
+        goInPaper: !!(goEl && paper && paper.contains(goEl)),
     };
 }
 
@@ -203,7 +204,8 @@ async function startHost(page, host, c, k, seed) {
                     await page.screenshot({ path: path.join(SHOTS, `${size.w}x${size.h}-${host}-${c}-${k}.png`) });
                 }
                 const tag = `${s} ${size.w}x${size.h} ${host}`;
-                const problem = m.box != null ? m.box - m.paperTop : 0;
+                // a widget's own Submit inside the cell (a legacy coordinate plot) is part of the problem
+                const problem = m.box != null ? Math.max(m.box, m.goInPaper && m.go != null ? m.go : 0) - m.paperTop : 0;
                 // boss and race add their arena / track to the chrome: the game itself, not header
                 const budget = CHROME_BUDGET + (host === 'boss' || host === 'race' ? ARENA_BUDGET : 0);
                 const isTall = m.box != null && problem > m.fold - budget;
@@ -211,6 +213,7 @@ async function startHost(page, host, c, k, seed) {
                 // Check / Next must show on a typical item; a tall item's own Check may sit below its boxes
                 if (m.go == null) { verdict = 'FAIL'; fails.push(`${tag}: no Check / Next found`); }
                 else if (m.go > m.H + 0.5 && !isTall) { verdict = 'FAIL'; fails.push(`${tag}: Check / Next off screen (bottom ${m.go} > ${m.H})`); }
+                else if (m.go > m.H + 0.5 && !(m.box > m.fold)) { verdict = 'tall'; tall.push(`${tag}: problem ${problem} px; its own Submit ${m.go} > ${m.H} (the answer box ${m.box} shows)`); }
                 if (m.box != null && m.box > m.fold) {
                     if (isTall) {
                         // it may scroll, but active-box must have brought the box into view on load
