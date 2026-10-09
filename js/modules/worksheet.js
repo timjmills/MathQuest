@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
-import { SKILLS } from './data.js';
+import { SKILLS, isMixedMetaSkill } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
@@ -826,6 +826,11 @@ function _wsItemKey(q) {
     if (!q) return '';
     return plainText(q.text) + '\u0001' + String(q.ans) + '\u0001' + plainText(q.visual || '');
 }
+const WS_K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
+// a kit member the SCREEN draws as its kit twin (the paper cell's static twin, or its build model):
+// a parity / fraction-wall cell whose screen is still a check-box list or tile widget does not count
+const _wsKitCell = (q) => !!(q && q.cell && q.cell.template && q.cell.template !== 'legacy'
+    && /class="k2-twin"|data-mq-model=/.test(String(q.visual || '')));
 function _wsGenerate(i) {
     const base = (state.worksheetSeed >>> 0) || 1;
     const earlier = state.worksheetQs.slice(0, i);
@@ -833,6 +838,7 @@ function _wsGenerate(i) {
     const prevKey = i > 0 ? _wsItemKey(earlier[i - 1]) : null;
     let q = null;
     let fallback = null;                 // the first candidate that is not a copy of the item before it
+    const kitPool = WS_K2_POOL_CATS.has(state.category) && isMixedMetaSkill(state.skill);
     for (let attempt = 0; attempt < 12; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
@@ -845,6 +851,11 @@ function _wsGenerate(i) {
             console.error('worksheet: generateQuestionFor failed', e);
         }
         if (!cand) continue;
+        // D7 (wave 1 lane D): a K-2 counting & cardinality POOL deals the kit members only, as
+        // the paper deal does (print-sheet.js generateRun): a member drawn in the legacy look
+        // (a check-box list with Submit, a trade chart with buttons) is passed over while a few
+        // tries remain, so every card is a kit cell with a paper twin.
+        if (kitPool && attempt < 8 && !_wsKitCell(cand)) { if (!q) q = cand; continue; }
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;
