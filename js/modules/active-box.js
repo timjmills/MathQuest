@@ -132,6 +132,7 @@ function isTapTarget(el) {
 // fold as the page settles (fonts, a late re-fit, a legacy visual scaling itself). For its first 4 s,
 // and only while the pupil has not tapped or scrolled, the focused box is kept in view.
 let activeEl = null;
+let activeSig = '';
 let activeSince = 0;
 let lastUserScroll = 0;
 function revealSettled(active) {
@@ -142,7 +143,10 @@ function revealSettled(active) {
 }
 
 function selectIfLoose(active) {
-    if (active !== activeEl) { activeEl = active; activeSince = Date.now(); }
+    // a new box, or the same box under a new question (#answerInput is reused from item to item)
+    const paper = active.closest('#questionPaper, .mq-qtpaper, .mq-wspaper, ' + HOSTS);
+    const sig = paper ? paper.textContent : '';
+    if (active !== activeEl || sig !== activeSig) { activeEl = active; activeSig = sig; activeSince = Date.now(); }
     if (document.activeElement === active) { revealSettled(active); return; }
     const sinceTap = Date.now() - lastTap.t;
     if (sinceTap < 800 && lastTap.target && isTapTarget(lastTap.target)) return;
