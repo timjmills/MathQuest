@@ -577,8 +577,14 @@ export function toggleCelebrations(enabled) {
     savePersistentData();
 }
 
+// Pupil play (owner 2026-10-04): nothing may cover the answer box or take the typing focus. During play
+// the only pop-ups are the XP message after a right answer (it leaves by itself) and the idle nudge after
+// 5 minutes without activity.
+const _inPupilPlay = () => typeof document !== 'undefined' && ['gameView', 'worksheetView', 'quizTakeView']
+    .some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); });
 export function showCelebrationModal({ emoji, title, message, subMessage, autoDismissMs }) {
     if (!state.celebrationsEnabled) return;
+    if (_inPupilPlay()) return;
     // Brief mascot cheer on every celebration trigger.
     if (typeof window !== 'undefined' && typeof window.flashMascotCheer === 'function') {
         window.flashMascotCheer(title || message);
@@ -796,7 +802,8 @@ export function getSessionTimeFormatted() {
 }
 
 // ===== GAME STATS BANNER =====
-const IDLE_THRESHOLD_MS = 30000; // 30 seconds of no interaction → idle + modal
+const IDLE_THRESHOLD_MS = 30000; // 30 seconds of no interaction → the timer pauses (gauge shows it)
+const IDLE_MODAL_MS = 300000;    // 5 minutes of no interaction → the idle pop-up (owner 2026-10-04)
 const EFFORT_PER_10SEC = 1;      // +1 effort every 10s of active time
 const EFFORT_PER_ATTEMPT = 5;    // +5 for trying any question
 const EFFORT_PER_CORRECT = 3;    // +3 bonus on top of attempt for correct
@@ -1025,9 +1032,11 @@ export function startBannerTimer() {
                 // "redirecting" away from the MAP selector.
                 const gameViewActive = document.getElementById('gameView') &&
                     document.getElementById('gameView').classList.contains('active');
-                if (!state._idleModalShown && gameViewActive && document.body.classList.contains('student-mode')) {
-                    showIdleModal();
-                }
+            }
+            if (timeSinceInteraction >= IDLE_MODAL_MS && !state._idleModalShown
+                && document.getElementById('gameView') && document.getElementById('gameView').classList.contains('active')
+                && document.body.classList.contains('student-mode')) {
+                showIdleModal();
             }
         } else {
             // Active — accumulate time (unless frozen)
@@ -1386,6 +1395,14 @@ export function showStudentLandingModal(parsed) {
         skillsHTML += '<div class="landing-skill-code">' + parsed.skillsCode + '</div>';
     }
     skillsHTML += '</div>';
+    // Many skills (owner 2026-10-05): a long wall of pills overwhelms a pupil and pushed Start Playing
+    // off the screen. Past 3 skills the pop-up says how many, and the list folds away behind a tap.
+    const nSkills = decodedSkills.length;
+    const manySkills = nSkills > 3;
+    if (manySkills) {
+        skillsHTML = '<details class="landing-skill-list"><summary>See the ' + nSkills + ' skills</summary>'
+            + skillsHTML.replace('class="landing-skills"', 'class="landing-skills landing-skills-scroll"') + '</details>';
+    }
 
     // Build settings display
     let settingsHTML = '<div class="landing-settings" style="margin:12px 0;">';
@@ -1437,13 +1454,19 @@ export function showStudentLandingModal(parsed) {
     overlay.id = 'studentLandingOverlay';
     overlay.className = 'landing-overlay';
     overlay.innerHTML = '<div class="landing-modal">' +
-        '<h2>Ready to Practice!</h2>' +
-        '<p>Your teacher has set up a practice session for you.</p>' +
+        (manySkills
+            ? '<h2>Ready to Practice ' + nSkills + ' Skills?</h2>' +
+              '<p>Your teacher has set up a practice session for you. Click Start Playing!</p>'
+            : '<h2>Ready to Practice!</h2>' +
+              '<p>Your teacher has set up a practice session for you.</p>') +
         skillsHTML +
         settingsHTML +
         '<button class="btn btn-primary landing-start-btn" onclick="startFromLanding()">Start Playing!</button>' +
         '</div>';
     document.body.appendChild(overlay);
+    // the pupil can start straight away: Enter or Space presses Start Playing
+    const startBtn = overlay.querySelector('.landing-start-btn');
+    if (startBtn) try { startBtn.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
 }
 
 export function startFromLanding() {
@@ -1452,9 +1475,11 @@ export function startFromLanding() {
 
     const s = parsed.settings;
 
-    // Remove modal
+    // Remove modal. The pupil's own choices (timer, count, mode) are read from the removed pop-up
+    // below: it used to look them up in the page after removing it, so every choice was lost.
     const overlay = document.getElementById('studentLandingOverlay');
     if (overlay) overlay.remove();
+    const _pick = (id) => (overlay ? overlay.querySelector('#' + id) : null);
 
     // Force student mode (not in the teacher's board window, ?board=1: it stays a teacher view)
     let boardWindow = false;
@@ -1488,7 +1513,7 @@ export function startFromLanding() {
     if (s.timer !== undefined && s.timer !== '?') {
         timerDuration = s.timer;
     } else {
-        const el = document.getElementById('landingTimer');
+        const el = _pick('landingTimer');
         timerDuration = el ? parseInt(el.value, 10) : 0;
     }
 
@@ -1502,7 +1527,7 @@ export function startFromLanding() {
             problemCount = s.problemCount;
         }
     } else {
-        const el = document.getElementById('landingCount');
+        const el = _pick('landingCount');
         const val = el ? parseInt(el.value, 10) : 20;
         if (val === 0) {
             infinityMode = true;
@@ -1516,7 +1541,7 @@ export function startFromLanding() {
     if (s.gameMode && s.gameMode !== '?') {
         gameMode = s.gameMode;
     } else {
-        const el = document.getElementById('landingMode');
+        const el = _pick('landingMode');
         gameMode = el ? el.value : 'practice';
     }
 
@@ -1753,6 +1778,7 @@ const NUDGE_MESSAGES = [
 ];
 
 function showNudgePopup() {
+    if (_inPupilPlay()) return;   // the gauge still shows the off-task alert; no pop-up over the work
     // Remove existing popup if any
     dismissNudgePopup();
 
