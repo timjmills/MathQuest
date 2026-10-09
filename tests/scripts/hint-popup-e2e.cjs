@@ -281,6 +281,73 @@ function pass(msg) { console.log('  ✓', msg); }
     }
   }
 
+  // [17] Word problem on the practice card: hint sits in flow BELOW the story,
+  // never over it (owner ruling); answer boxes and Check stay reachable; the same
+  // Hint button closes it; Listen reads it.
+  page.on('dialog', d => d.accept().catch(() => {}));
+  for (const vp of [{ width: 1366, height: 650 }, { width: 1280, height: 600 }]) {
+    const tag = `${vp.width}x${vp.height}`;
+    console.log(`\n[17] Word-problem hint below the story at ${tag}:`);
+    await page.setViewport(vp);
+    await page.evaluate(() => {
+      window.closeHintPopup();
+      window.state.quizMode = false;
+      window.skillQueue.length = 0;
+      window.skillQueue.push({ categoryId: 'addition', skillId: 'add_word_problems', skillLabel: 'Addition word problems' });
+      window.playSelectedSkills('practice');
+    });
+    await new Promise(r => setTimeout(r, 1500));
+    await page.evaluate(() => document.getElementById('hintBtn').click());
+    await new Promise(r => setTimeout(r, 200));
+    const g = await page.evaluate(() => {
+      const h = document.getElementById('hintModal');
+      const s = document.querySelector('#questionCard .mq-wwstory, #questionCard .k2-story');
+      if (!h || !s) return { missing: !h ? 'hint' : 'story' };
+      const hr = h.getBoundingClientRect(), sr = s.getBoundingClientRect();
+      const inter = hr.left < sr.right && hr.right > sr.left && hr.top < sr.bottom && hr.bottom > sr.top;
+      const pos = getComputedStyle(h).position;
+      const inCard = document.getElementById('questionCard').contains(h);
+      // every answer box and the Check button can be scrolled to and is not covered
+      const targets = Array.from(document.querySelectorAll('#questionCard input:not([type=hidden]), #qcCheckBtn'))
+        .filter(e => e.getClientRects().length);
+      const covered = [];
+      for (const t of targets) {
+        t.scrollIntoView({ block: 'center' });
+        const r = t.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        if (!hit || !(hit === t || t.contains(hit) || hit.contains(t))) covered.push((t.id || t.className) + ' by ' + (hit ? (hit.id || hit.className) : 'nothing'));
+      }
+      return { hr: [hr.top, hr.bottom].map(Math.round), sr: [sr.top, sr.bottom].map(Math.round), below: hr.top >= sr.bottom - 0.5, inter, pos, inCard, targets: targets.length, covered,
+        body: (h.querySelector('.hint-modal-body') || {}).textContent || '', speak: !!h.querySelector('#hintSpeakBtn') };
+    });
+    if (g.missing) { fail(`${tag}: ${g.missing} missing on word-problem card`); continue; }
+    if (g.pos === 'fixed' || g.pos === 'absolute' || !g.inCard) fail(`${tag}: hint is an overlay (position ${g.pos}, in card ${g.inCard})`);
+    else pass(`${tag}: hint is in the card flow (position ${g.pos})`);
+    if (!g.below || g.inter) fail(`${tag}: hint rect ${JSON.stringify(g.hr)} not below story ${JSON.stringify(g.sr)} (intersects ${g.inter})`);
+    else pass(`${tag}: hint ${JSON.stringify(g.hr)} below story ${JSON.stringify(g.sr)}, no overlap`);
+    if (!g.targets || g.covered.length) fail(`${tag}: answer boxes/Check not reachable: ${g.covered.join('; ') || 'none found'}`);
+    else pass(`${tag}: ${g.targets} answer boxes + Check reachable, none covered`);
+    if (!g.body.trim() || !g.speak) fail(`${tag}: hint body or Listen button missing`);
+    else pass(`${tag}: hint body present with Listen button`);
+    const spoken = await page.evaluate(() => {
+      let said = null;
+      const orig = window.speechSynthesis && window.speechSynthesis.speak;
+      if (!orig) return 'no-tts';
+      window.speechSynthesis.speak = (u) => { said = u.text; };
+      try { window.speakHint(); } finally { window.speechSynthesis.speak = orig; }
+      return said;
+    });
+    if (spoken === 'no-tts') console.log('  ~ speechSynthesis unavailable; Listen not exercised');
+    else if (!spoken) fail(`${tag}: Listen did not read the hint`);
+    else pass(`${tag}: Listen reads "${spoken.slice(0, 50)}"`);
+    await page.evaluate(() => document.getElementById('hintBtn').click());
+    await new Promise(r => setTimeout(r, 100));
+    if (await page.$('#hintModal')) fail(`${tag}: second Hint click did not close the hint`);
+    else pass(`${tag}: same Hint button closes it`);
+    await page.evaluate(() => { try { window.exitGame(); } catch (_) {} });
+    await new Promise(r => setTimeout(r, 300));
+  }
+
   await browser.close();
   console.log('\n=== TEST RESULT ===');
   if (failures.length) {

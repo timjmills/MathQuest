@@ -8046,6 +8046,59 @@ html.dark .student-def strong {
     .mq-shake { animation: none !important; }
 }
 
+/* ============================================================
+ * Word-problem hint in flow, BELOW the story (owner ruling,
+ * 2026-10). Black and white, Andika; never an overlay.
+ * ============================================================ */
+.mq-hint-inline {
+    position: static;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 12px 0;
+    padding: 12px 16px 14px;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    border-radius: 10px;
+    font-family: 'Andika', 'Open Sans', sans-serif;
+    text-align: left;
+    grid-column: 1 / -1;
+}
+.mq-hint-inline-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.mq-hint-inline-head h3 { margin: 0; margin-right: auto; font-size: 1.25rem; color: #000; font-family: inherit; }
+.mq-hint-inline-btn {
+    min-width: 44px; min-height: 44px; background: #fff; color: #000;
+    border: 2px solid #000; border-radius: 10px; font-size: 1.3rem; line-height: 1; cursor: pointer;
+}
+.mq-hint-inline .hint-modal-body { font-size: 1.15rem; line-height: 1.6; color: #000; }
+.mq-hint-inline .hint-modal-body * { color: #000 !important; }
+.mq-hint-inline-got {
+    margin-top: 10px; min-height: 44px; padding: 0 22px; background: #fff; color: #000;
+    border: 2px solid #000; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer;
+}
+
+/* XP burst anchored to the score in the play bar, never over the question. */
+.mq-xp-burst.mq-xp-burst--bar {
+    position: fixed;
+    left: var(--mq-xp-x, 50%);
+    top: var(--mq-xp-y, 60px);
+    transform: none;
+    font-size: 1.3rem;
+    padding: 2px 10px;
+    background: #fff;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-shadow: none;
+    z-index: 9000;
+    animation-name: mqXpBurstBar;
+}
+@keyframes mqXpBurstBar {
+    0%   { opacity: 0; transform: translate(0, 6px) scale(0.7); }
+    20%  { opacity: 1; transform: translate(0, 0) scale(1.1); }
+    60%  { opacity: 1; transform: translate(0, -4px) scale(1.0); }
+    100% { opacity: 0; transform: translate(0, -10px) scale(0.95); }
+}
+
 @keyframes mqOnbFadeIn { from { opacity: 0; } to { opacity: 1; } }
 .mq-onb-overlay { animation: mqOnbFadeIn 220ms ease; }
 .mq-onb-card { animation: mqOnbFadeIn 280ms ease 100ms both; }
