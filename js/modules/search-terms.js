@@ -376,8 +376,8 @@ export const SKILL_TERMS = {
     'subtraction:sub_20_regroup': ['borrowing', 'bridging ten'],
     'subtraction:sub_1k_regroup': ['borrowing', '3 digit subtraction with borrowing'],
     'subtraction:sub_across_zeros': ['borrowing across zeros', 'borrowing', 'zeros', 'subtract from 100', 'subtract from 1000'],
-    'composing:number_bonds': ['number bonds', 'bonds to 10', 'part whole', 'cherry', 'ways to make 10', 'number bonds to 20', 'bonds to 20', 'number bonds to 10'],
-    'composing:make_ten': ['bonds to 10', 'number bonds to 10', 'pairs that make 10', 'ten frame'],
+    'composing:number_bonds': ['number bonds', 'bonds to 10', 'part whole', 'cherry', 'ways to make 10', 'number bonds to 20', 'bonds to 20', 'number bonds to 10', 'numicon'],
+    'composing:make_ten': ['bonds to 10', 'number bonds to 10', 'pairs that make 10', 'ten frame', 'numicon'],
     'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'number square', 'missing numbers'],
     'composing:number_chart_fill': ['hundred square', 'number square', 'number grid', '1000 chart'],
     'composing:odd_even': ['odd and even', 'odd or even', 'pairs', 'evens and odds'],
@@ -388,7 +388,7 @@ export const SKILL_TERMS = {
     'measurement:time_5min': ['five minutes', 'telling time', 'clock', 'minutes past'],
     'measurement:time_1min': ['nearest minute', 'telling time', 'clock'],
     'measurement:clock_parts': ['clock face', 'hands', 'hour hand', 'minute hand', 'telling time'],
-    'measurement:time_sense': ['am', 'pm', 'am pm', 'morning', 'afternoon', 'evening', 'night'],
+    'measurement:time_sense': ['am', 'pm', 'am pm', 'morning', 'afternoon', 'evening', 'night', 'midnight', 'noon', 'midday'],
     'measurement:money_count': ['counting money', 'count coins', 'coins', 'cents', 'pence', 'money'],
     'measurement:coin_value': ['coin names', 'coins', 'penny', 'nickel', 'dime', 'quarter', 'pence', 'cents', 'value of coins'],
     'measurement:pictograph_intro': ['pictogram', 'picture graph', 'pictograph'],
@@ -449,7 +449,12 @@ export const SKILL_TERMS = {
     'number_theory:multiples': ['multiples', 'list multiples', 'multiples of a number'],
     'shapes_early:name_2d_shapes': ['shapes', '2d shapes', 'flat shapes', 'shape names', 'name the shape'],
     'shapes_early:name_3d_shapes': ['3d shapes', 'solid shapes', '3d shape names'],
-    'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles'],
+    'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles', 'clockwise', 'anticlockwise', 'counterclockwise', 'quarter turn', 'half turn', 'turns'],
+    // critic r3 C-E
+    'shapes_early:count_sides_vertices_2d': ['vertex', 'corner'],
+    'algebra:function_table_easy': ['input output', 'in out', 'function machine'],
+    'algebra:function_table_hard': ['input output', 'in out', 'function machine'],
+    'placevalue:place_value_10x': ['10 times bigger', 'ten times bigger', '10 times smaller', 'ten times as much'],
     'angles_lines:symmetry': ['symmetry', 'line of symmetry', 'symmetrical', 'mirror line'],
     'coordinates:coordinate_q1': ['coordinates', 'coordinate grid', 'plot points', 'ordered pairs', 'first quadrant'],
     'graphs:line_plot': ['line plot', 'dot plot'],
@@ -532,6 +537,7 @@ export const PRIMARY_SKILLS = {
 };
 
 export const MISSPELLINGS = {
+    quatre: 'quarter', quater: 'quarter',
     multipication: 'multiplication', multiplcation: 'multiplication', multiplacation: 'multiplication', mulitplication: 'multiplication',
     multiplicaton: 'multiplication', multiplikation: 'multiplication', multply: 'multiply', mutiply: 'multiply', multipy: 'multiply',
     subtration: 'subtraction', subraction: 'subtraction', substraction: 'subtraction', subtracion: 'subtraction', subtact: 'subtract',
@@ -699,6 +705,9 @@ export function termsFor(entry) {
     // 'no regrouping' / 'without carrying' rank below the positive words, so 'carrying' leads with regrouping skills
     for (let i = concept.length - 1; i >= 0; i--) if (/^(no|without)\s/.test(concept[i])) code.push(...concept.splice(i, 1));
     for (let i = extra.length - 1; i >= 0; i--) if (/^(no|without)\s/.test(extra[i])) code.push(...extra.splice(i, 1));
+    // the '(No Pictures)' / '(No Visuals)' / 'No Parens' variant is found by that text (critic r3 C-D)
+    for (const m of String(entry.label || '').matchAll(/\b(?:no|without)\s+\w+/gi)) code.push(m[0]);
+    if (/\bno (pictures|visuals)\b|_plain$|_nv$/i.test(`${entry.label} ${entry.skillId}`)) code.push('no pictures', 'no visuals', 'no pics', 'plain', 'text only', 'pictures', 'visuals');
     const clean = (l) => [...new Set(l.map((t) => normalize(t)).filter(Boolean))];
     return { label: normalize(entry.label), extra: clean(extra), grade: clean(grade), concept: clean(concept), code: clean(code) };
 }
@@ -776,7 +785,7 @@ function editDistance(a, b, max) {
 // Correctly spelt English words that are not in the skill vocabulary. They are never "corrected" into a
 // vocabulary word ('tile' is not 'time', 'compass' is not 'compare'); a search for one honestly finds
 // what carries it, or nothing (critic r2 P-A).
-export const REAL_WORDS = new Set(('tile tiles tiling tiled compass north south east west northeast days day week weeks month ' +
+export const REAL_WORDS = new Set(('lost tie ties pond may sole seed spit bride tile tiles tiling tiled compass north south east west northeast days day week weeks month ' +
     'months year years root roots full empty bead beads rekenrek abacus calendar date dates season seasons ' +
     'fill pill mill will till tall tell toll bell ball wall call fall hall ' +
     'cat cats dog dogs hat bat rat mat sat pat fat car bar far jar star stair chair fair hair pair air ' +
@@ -912,21 +921,30 @@ export function searchIndex(index, query) {
         q[f.at] = f.to;
     }
     // 'divided by 2', 'divide 2' (from '÷2') and 'dividing by 2' all read as 'divide by 2' (critic r2 P-B)
-    let phrase = (phraseToks.join(' ') || q.join(' ')).replace(/\b(?:divide|divided|dividing|divides)(?: by)? (\d+)\b/g, 'divide by $1');
+    // Only a bare divisor: never before digit/digits/numbers, never inside 'N÷M' or 'b×h÷2' (critic r3 P-D)
+    let phrase = (phraseToks.join(' ') || q.join(' ')).replace(/(^|\s)(\S+ )?(?:divide|divided|dividing|divides)(?: by)? (\d+)(?= (\S+)|$)/g,
+        (m, sp, prev, n, next) => ((prev && /^(\d+|[a-z]|times|x) $/.test(prev)) || (next && /^(digit|digits|numbers?|divide|by|times|x)$/.test(next))
+            ? m : `${sp}${prev || ''}divide by ${n}`));
     // a fact-sized product typed as a sum ('3*4', '7 x 8') reads as the times tables (critic r2 P-C)
     const fact = phrase.match(/^(\d{1,2}) (?:times x|times|x) (\d{1,2})$/);
     if (fact && +fact[1] <= 12 && +fact[2] <= 12) phrase = 'times x';
     const qFam = q.map((w) => stem(w));
     // the divisor in 'divide by 2' is not the '2' of '2÷1 digit', '2-Digit' or 'b×h÷2' (critic r2 P-B)
-    const divBy = (phrase.match(/\bdivide by (\d+)\b/) || [])[1];
+    const divBy = (phrase.match(/\bdivide by (\d+)(?! (?:digit|digits|numbers?|divide|by|times|x)\b)(?= |$)/) || [])[1];
     const divNoise = divBy && new RegExp(`(^| )${divBy} (digit|divide)|divide ${divBy}( |$)`);
     const out = [];
     for (const it of index.items) {
         let score = 0, labelHits = 0;
         let ok = true;
+        // a label whose N is 'N digit' / 'N÷M', or a skill without this divisor, is demoted, never excluded (critic r3 P-D, R-C)
+        let divPen = 0;
+        if (divBy && !it.phrases.extra.includes(`divide by ${divBy}`)) divPen = divNoise.test(it.terms.label) ? 20 : 4;
+        // a label that names its own divisors ('Divide by 10, 100, 1,000') is not a 'divide by 2' skill (critic r3 R-C)
+        const ownDiv = divBy && it.terms.label.match(/\bdivide by ((?:\d+ ?)+)/);
+        if (ownDiv && !ownDiv[1].trim().split(' ').includes(divBy)) continue;
         for (let i = 0; i < q.length && ok; i++) {
             const w = q[i];
-            if (w === divBy && divNoise.test(it.terms.label) && !it.phrases.extra.includes(`divide by ${divBy}`)) ok = false;
+            if (tokHits(it.sets[0], w)) { score += W_LABEL; labelHits++; }
             else if (tokHits(it.sets[0], w)) { score += W_LABEL; labelHits++; }
             else if (tokHits(it.sets[1], w)) score += W_EXTRA;
             else if (tokHits(it.sets[2], w)) score += W_GRADE;
@@ -936,6 +954,7 @@ export function searchIndex(index, query) {
             else ok = false;
         }
         if (!ok) continue;
+        score -= divPen;
         // a vocabulary skill never leads a teaching query by matching its label (critic r2 R-B)
         if (it.vocab && !wantsVocab) score -= 3;
         else if (it.labelBare === phrase || it.terms.label === phrase) score += 100;

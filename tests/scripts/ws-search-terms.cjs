@@ -345,10 +345,10 @@ const TOP1 = [
     ['tile', ['area_perimeter:area_unit_squares', 'area_perimeter:area'], ['measurement:time_hour']],
     ['tiles', ['area_perimeter:area_unit_squares', 'area_perimeter:area'], ['multiplication:mult_facts']],
     ['tiling', ['area_perimeter:area_unit_squares', 'area_perimeter:area']],
-    ['divide by 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
-    ['divided by 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
-    ['÷2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
-    ['÷ 2', ['patterns:halve'], ['division:box_division_easy', 'division:area_model_div']],
+    ['divide by 2', ['patterns:halve']],  // r3: 'N digit' skills are demoted below, never excluded
+    ['divided by 2', ['patterns:halve']],  // r3: 'N digit' skills are demoted below, never excluded
+    ['÷2', ['patterns:halve']],  // r3: 'N digit' skills are demoted below, never excluded
+    ['÷ 2', ['patterns:halve']],  // r3: 'N digit' skills are demoted below, never excluded
     ['divided by 7', ['division:div_facts']],
     ['short multiplication', ['multiplication:multiply'], ['multiplication:area_model_mult_hard']],
     ['standard algorithm multiplication', ['multiplication:multiply'], ['multiplication:area_model_mult_hard']],
@@ -366,6 +366,29 @@ const TOP1 = [
     ['vocabulary', ['vocabulary:vocab_grade_K']],
     ['skip counting', ['multiplication:count_by_tables']],
     ['times tables 7', ['multiplication:mult_facts']],
+    // critic r3 P-D: a digit count or 'N÷M' is never a divisor
+    ['divide by 2 digit numbers', ['division:long_div_2digit']],
+    ['Divide by 2-Digit Numbers', ['division:long_div_2digit']],
+    ['divide by 2-digit', ['division:long_div_2digit']],
+    ['divide 2 digit by 1 digit', ['division:box_division_easy', 'division:area_model_div_2by1']],
+    ['divide 3 digit by 1 digit', ['division:box_division_hard', 'division:area_model_div_3by1']],
+    ['dividing 3 digit numbers', ['division:box_division_hard', 'division:area_model_div_3by1']],
+    ['divide by 1 digit', ['division:box_division_easy', 'division:box_division_hard', 'division:area_model_div_2by1', 'division:area_model_div_3by1']],
+    ['Box Method Division (2÷1 digit)', ['division:box_division_easy']],
+    ['Box Method Division (3÷1 digit)', ['division:box_division_hard']],
+    ['Area Model Division (2÷1 digit)', ['division:area_model_div_2by1']],
+    ['Area Model Division (3÷1 digit)', ['division:area_model_div_3by1']],
+    ['Area of a Triangle (b×h÷2)', ['area_perimeter:area_triangle']],
+    // critic r3 C-D / C-E
+    ['equivalent fractions no visuals', ['fractions:equiv_frac_nv']],
+    ['addition word problems no pictures', ['addition:add_word_problems_plain']],
+    ['vertex', ['shapes_early:count_sides_vertices_2d']],
+    ['input output', ['algebra:function_table_easy', 'algebra:function_table_hard']],
+    ['clockwise', ['angles_lines:identify_angles']],
+    ['midnight', ['measurement:time_sense']],
+    ['10 times bigger', ['placevalue:place_value_10x']],
+    ['numicon', ['composing:number_bonds', 'composing:make_ten']],
+    ['quatre past', ['measurement:time_quarter']],
 ];
 
 // [query, the second skill] for a pinned order (critic r2 P-B: Halving first, Division Facts second)
@@ -375,7 +398,7 @@ const TOP2 = [
 
 // Correctly spelt words no skill teaches: 0 results is the honest answer (they must NOT be "corrected"
 // into a nearby vocabulary word: compass -> compare, east -> past, days -> ways, root -> foot ...).
-const EXPECT0 = ['compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar'];
+const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar'];
 // [query, the correction shown, or null for none]
 const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days', null], ['full', null], ['area', null],
     ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions']];
@@ -434,7 +457,19 @@ const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days'
     for (const [q, second] of TOP2) {
         const k = finder.findSkills(q)[1];
         if (!k || k.key !== second) failures.push(`(e) "${q}": rank 2 is ${k && k.key}, want ${second}`);
+        // the grouped pickers (Navigator, Quiz builder, Sets) show the same second card (critic r3 R-C)
+        const g = finder.groupByRank(finder.findSkills(q).map((h) => h.entry));
+        const flat = g.flatMap((d) => d.items.flatMap((c) => c.items.map((x) => x.key)));
+        if (flat[1] !== second) failures.push(`(e) "${q}": grouped picker rank 2 is ${flat[1]}, want ${second}`);
     }
+    // (h) every live skill's own label finds that skill in the top 3 (critic r3 P-D)
+    let selfOk = 0;
+    for (const e of entries) {
+        const keys = finder.findSkills(e.label).slice(0, 3).map((h) => h.key);
+        if (keys.includes(e.key)) selfOk++;
+        else failures.push(`(h) label "${e.label}" does not find ${e.key} in the top 3 (got ${keys.join(', ')})`);
+    }
+    console.log(`ws-search-terms: ${selfOk}/${entries.length} skills found by their own label`);
     for (const q of EXPECT0) {
         const all = finder.findSkills(q);
         if (all.length) failures.push(`(f) "${q}" should find nothing (no skill teaches it) but rank 1 is ${all[0].key}`);

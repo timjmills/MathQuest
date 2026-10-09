@@ -30,6 +30,8 @@ const CASES = [
     ['3*4', ['multiplication:mult_facts'], []],
     ['part whole model', ['composing:number_bonds'], []],
 ];
+// [query, the SECOND visible card] (critic r3 R-C: Halving first, Division Facts second in every box)
+const SECOND = [['divide by 2', 'division:div_facts'], ['divided by 2', 'division:div_facts'], ['÷2', 'division:div_facts'], ['÷ 2', 'division:div_facts']];
 // [box id, query, the "Showing results for" text expected, or null for no notice] (critic r2 P-A)
 const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', null], ['qbSearchInput', 'compass', null],
     ['qbSearchInput', 'aera', 'area'], ['skillSearchInput', 'perimter', 'perimeter'], ['skillSearchInput', 'days', null]];
@@ -63,6 +65,12 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
             const bad = never.filter((k) => got.includes(k));
             if (bad.length) failures.push(`navigator "${q}": ${bad.join(', ')} in the first 3 (${got.join(', ')})`);
         }
+        for (const [q, second] of SECOND) {
+            await page.evaluate((v) => { const i = document.getElementById('soSearchInput'); if (i) i.value = v; window.soSearchInput(v); }, q);
+            await sleep(120);
+            const got = await firstCards('.so-skill-card', 'soCat', 'soSkill');
+            if (got[1] !== second) failures.push(`navigator "${q}": second card ${got[1]}, want ${second}`);
+        }
         await page.evaluate(() => window.soSearchInput(''));
 
         // Quiz builder
@@ -79,6 +87,12 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
             const bad = never.filter((k) => got.includes(k));
             if (bad.length) failures.push(`quiz builder "${q}": ${bad.join(', ')} in the first 3 (${got.join(', ')})`);
         }
+        for (const [q, second] of SECOND) {
+            await page.evaluate((v) => { const i = document.getElementById('qbSearchInput'); if (i) i.value = v; window.qbSearchInput(v); }, q);
+            await sleep(120);
+            const got = await firstCards('.qb-skill-card', 'qbCat', 'qbSkill');
+            if (got[1] !== second) failures.push(`quiz builder "${q}": second card ${got[1]}, want ${second}`);
+        }
         // the "Showing results for" line: typed into the real box (an input event, as a keyboard does)
         for (const [id, q, want] of NOTICES) {
             if (id === 'skillSearchInput') await page.evaluate(() => { window.goHome && window.goHome(); });
@@ -93,6 +107,14 @@ const NOTICES = [['qbSearchInput', 'tme', 'time'], ['qbSearchInput', 'tile', nul
             const exp = want ? `Showing results for ${want}` : null;
             if (got !== exp) failures.push(`notice ${id} "${q}": ${JSON.stringify(got)}, want ${JSON.stringify(exp)}`);
         }
+        // the notice never moves the box or its filter row (critic r3 U-A)
+        const rects = () => page.evaluate(() => ['qbSearchInput', 'qbCategorySelect'].map((i) => {
+            const r = document.getElementById(i).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)].join(','); }));
+        await page.evaluate(() => { const el = document.getElementById('qbSearchInput'); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); });
+        const before = await rects();
+        await page.evaluate(() => { const el = document.getElementById('qbSearchInput'); el.value = 'tme'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+        const after = await rects();
+        if (before.join('|') !== after.join('|')) failures.push(`notice moved the quiz builder filter row: ${before.join('|')} -> ${after.join('|')}`);
     } catch (e) {
         failures.push(`exception: ${e.message}`);
     } finally {
