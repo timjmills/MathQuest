@@ -528,7 +528,24 @@ export function submitQuizMC(flatIdx, value) {
 
 export function submitQuizTextAnswer(flatIdx, value) {
     recordAnswer(flatIdx, value.trim());
-    renderQuizInterface();
+    // In place, not a re-render: this runs on the box's change (its blur), and rebuilding the screen
+    // then replaced Next under the pupil's click, so the first Next after typing was swallowed and
+    // Tab from the box dropped the focus (Chromebook fit critic R2-1).
+    refreshQuizChrome();
+}
+
+// The answered count and the page buttons, brought up to date without rebuilding the question.
+function refreshQuizChrome() {
+    const c = document.getElementById('quizTakeView');
+    if (!c) return;
+    const total = state.quizAllQuestions.length;
+    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const count = c.querySelector('.qt-topbar-right > span:last-child');
+    if (count) count.textContent = `${answered}/${total} answered`;
+    c.querySelectorAll('.qt-q-grid .qt-q-dot').forEach((d, i) => {
+        const a = quizAnswers[state.quizOrder[i]];
+        if (a) d.classList.toggle('answered', a.studentAnswer !== '');
+    });
 }
 
 function recordAnswer(flatIdx, studentAnswer) {
