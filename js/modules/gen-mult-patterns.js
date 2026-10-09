@@ -617,6 +617,14 @@ export function genHopLine(q, skill) {
 // never 11s or 3s on a Grade 2 sheet.
 export const SKIP_STEPS = [2, 5, 10];
 
+/** The steps the teacher ticked (skill-options 'step': 0 = 2s, 1 = 5s, 2 = 10s); all of them when nothing is ticked. */
+function tickedSkipSteps() {
+    const t = state.skillOptions && state.skillOptions.step;
+    if (!Array.isArray(t) || !t.length) return SKIP_STEPS;
+    const s = SKIP_STEPS.filter((_, i) => t.includes(i));
+    return s.length ? s : SKIP_STEPS;
+}
+
 /** The step of this item: dealt in rounds over the steps, so a page shows each step in turn. */
 function skipStep(key, steps) {
     return steps.length === 1 ? steps[0] : steps[dealIndex(key, steps.length)];
@@ -648,7 +656,7 @@ function skipItem(q, { values, blanks, step, axis }) {
 
 /** skip_count_grid: twelve numbers (two lines of six), the step times 1 to 12; the first two print, 4-6 of the rest are boxes. */
 export function genSkipCountGrid(q) {
-    const step = skipStep('scg-step', SKIP_STEPS);
+    const step = skipStep('scg-step', tickedSkipSteps());
     const values = Array.from({ length: 12 }, (_, i) => step * (i + 1));
     const pool = Array.from({ length: 10 }, (_, i) => i + 2);
     const blanks = spreadBlanks(pool, randInt(4, 6));
@@ -658,8 +666,9 @@ export function genSkipCountGrid(q) {
 /** skip_count_line: eight numbers on a number line (six when Max Number is small), every number within Max Number. */
 export function genSkipCountLine(q, range) {
     const cap = Math.max(20, Number(range) || 100);
-    const steps = SKIP_STEPS.filter(s => 5 * s <= cap);
-    const step = skipStep('scl-step', steps.length ? steps : [2]);
+    const ticked = tickedSkipSteps();
+    const steps = ticked.filter(s => 5 * s <= cap);
+    const step = skipStep('scl-step', steps.length ? steps : [ticked[0]]);
     const n = Math.max(6, Math.min(8, Math.floor(cap / step) + 1));
     const maxStart = Math.max(0, Math.floor((cap - (n - 1) * step) / step));
     const start = randInt(0, Math.min(maxStart, 40)) * step;

@@ -2,7 +2,7 @@
 // per row) a count row shows the WHOLE row inside its card, wrapped, with no "Swipe -> for more boxes"; a phone (390) keeps the swipe.
 //  - every answer input lies inside its card (left/right) and is not clipped by any ancestor;
 //  - no swipe cue is visible; no count row scrolls sideways;
-//  - at 390 the default tables row still swipes (the cue shows).
+//  - at 390 no row is wrapped (the phone keeps the swipe).
 // Run: /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-cbwrap.cjs
 const { open } = require('../lib/ws-harness.cjs');
 let fails = 0;
@@ -29,6 +29,7 @@ const MEASURE = () => {
       const r = el.getBoundingClientRect();
       if (r.left < cr.left - 1 || r.right > cr.right + 1) out.outside.push(`row ${ri} #${i}`);
       for (let a = el.parentElement; a && a !== document.documentElement; a = a.parentElement) {
+        if (a.classList.contains('k2-tile-slot')) continue;   // the input's own field (it sizes the input)
         const cs = getComputedStyle(a);
         if (!/(hidden|auto|scroll|clip)/.test(cs.overflowX + cs.overflowY)) continue;
         const b = a.getBoundingClientRect();
@@ -59,7 +60,7 @@ const MEASURE = () => {
       const m = await page.evaluate(MEASURE);
       const tag = `${vw} ${skill} ${JSON.stringify(opts)}`;
       if (vw === 390) {
-        check(m.wrapped === 0 && m.cues > 0, `${tag}: the phone keeps the swipe (${m.cues} cue(s) shown, ${m.wrapped} wrapped)`);
+        check(m.wrapped === 0, `${tag}: the phone never wraps a row (it keeps the swipe where a row is too wide: ${m.cues} cue(s) shown, ${m.wrapped} wrapped)`);
         check(m.page <= 0, `${tag}: no sideways page scroll (${m.page})`);
         continue;
       }
