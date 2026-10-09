@@ -217,12 +217,12 @@ const startQuiz = (page, c, k, seed = 301) => page.evaluate((c, k, seed) => {
     const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
     window.startQuizTest(); window.scrollTo(0, 0);
 }, c, k, seed);
-/** A wrong answer in the quiz, then the question drawn again (the quiz shows its feedback on a redraw). */
+/** A wrong answer in the quiz: its feedback and ladder are drawn in place. */
 const wrongQuiz = (page) => page.evaluate(() => {
     const st = window.state; const flat = st.quizOrder[st.quizQuestionIndex];
     const q = st.quizAllQuestions[flat].question.questionData;
     window.submitQuizTextAnswer(flat, String(Number(String(q.ans).replace(/,/g, '')) + 1));
-    window.navigateQuizQuestion(1); window.navigateQuizQuestion(-1); window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
 });
 
 /** R4-1, owner ruling (b): a wrong answer keeps the teacher's touch marks and ADDS the next support, on every host. */
@@ -343,7 +343,7 @@ async function realRow(fails) {
         const r = await page.evaluate(() => {
             const fb = document.getElementById('feedbackArea');
             const bar = document.querySelector('#gameView .mq-tn-count');
-            return { tn: document.querySelectorAll('#visualAid .ws-tn').length, inRow: !!(bar && fb && fb.contains(bar)), bars: document.querySelectorAll('#gameView .mq-tn-count').length, fbH: fb ? Math.round(fb.getBoundingClientRect().height + parseFloat(getComputedStyle(fb).marginTop) + parseFloat(getComputedStyle(fb).marginBottom)) : 0 };
+            return { tn: document.querySelectorAll('#visualAid .ws-tn').length, inRow: !!(bar && fb && fb.contains(bar)), bars: document.querySelectorAll('#gameView .mq-tn-count').length, fbH: fb ? Math.round(fb.getBoundingClientRect().height + parseFloat(getComputedStyle(fb).marginTop) + parseFloat(getComputedStyle(fb).marginBottom) + (parseFloat(getComputedStyle(fb.parentElement).rowGap) || 0)) : 0, gap: fb ? getComputedStyle(fb.parentElement).display + ' ' + getComputedStyle(fb.parentElement).rowGap : '' };
         });
         if (!r.tn) { fails.push('row: the add_facts ladder drew no touch numerals at wrong 1'); return; }
         ok(r.bars === 1 && r.inRow, `card: the count line sits in the ladder message's row: ${JSON.stringify(r)}`);
@@ -353,7 +353,7 @@ async function realRow(fails) {
         const t1 = await top(page, checkSel);
         // the numerals themselves may draw a little taller than the plain digits; nothing else may grow
         const grow = Math.max(0, (await cellH()) - h0);
-        ok(t1 - t0 <= r.fbH + grow + 2, `card: only the message row is added (${t0} -> ${t1}, row ${r.fbH}, numerals ${grow})`);
+        ok(t1 - t0 <= r.fbH + grow + 2, `card: only the message row is added (${t0} -> ${t1}, row ${r.fbH} [${r.gap}], numerals ${grow})`);
         // the quiz: the same, after its redraw
         await startQuiz(page, 'addition', 'add_facts'); await sleep(1200);
         await wrongQuiz(page); await sleep(1200);
