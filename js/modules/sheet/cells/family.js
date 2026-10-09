@@ -249,3 +249,74 @@ register('cloze-bank', {
     },
     layout() { return { card: 'card-simple', checker: 'list', requiresVisual: true }; },
 });
+
+/* --------------------------------------------------------------------- number family */
+
+/**
+ * `number-family` (wave 1 lane D round 4, D10 / LESSONS L1): the number_families_add / _mult item
+ * (`q.numberFamilyData`: the three numbers, each equation's numbers and operator, and which of
+ * them are missing) drawn by the kit at the sheet's own size. The legacy print branch drew it in
+ * fixed px, so S printed the same 2 x 2 page as L, and its bold "Number Family (+/-)" heading
+ * repeated the page title (L7). The family's three numbers stand in a thin rounded box (a thing
+ * to read), then one equation per line on one grid, so numbers, operators, "=" and boxes stand in
+ * columns. Every missing number is one box (AK-1: the key writes each).
+ *
+ * Payload: {nums: [a, b, c], eqs: [{nums: [x, y, z], op}], miss: [[positions] per equation]}
+ */
+const nfBlanks = (p) => {
+    const out = [];
+    (p.eqs || []).forEach((eq, i) => {
+        const miss = ((p.miss || [])[i] || []).slice().sort((x, y) => x - y);
+        for (const k of miss) out.push({ id: `nf${out.length}`, i, k, value: String(eq.nums[k]) });
+    });
+    return out;
+};
+const nfDigits = (p) => Math.max(1, ...(p.eqs || []).flatMap((eq) => eq.nums.map((v) => String(v).length)));
+const nfOp = (op) => ({ '*': '×', x: '×', '/': '÷', '-': '−' })[op] || op;
+
+register('number-family', {
+    render(p, ctx) {
+        const g = geo(ctx);
+        const ink = inkOf(ctx);
+        const blanks = nfBlanks(p);
+        const key = {};
+        for (const b of blanks) key[b.id] = b.value;
+        const vals = slotValues(ctx, key, (w) => {
+            const l = splitList(w);
+            const o = {};
+            blanks.forEach((b, k) => { if (l[k] !== undefined) o[b.id] = l[k]; });
+            return o;
+        });
+        const n = nfDigits(p);
+        const bw = Math.max(g.writeMm * 1.6, (n * 0.62 + 0.8) * g.E);
+        const c = (t, extra = '') => `<span style="${extra}">${t}</span>`;
+        const cells = (p.eqs || []).map((eq, i) => [0, 1, 2].map((k) => {
+            const b = blanks.find((x) => x.i === i && x.k === k);
+            const v = b ? box(g, b.id, { wMm: bw, hMm: g.stripMm, value: vals[b.id] || '', ink, mark: g.twin ? 'cell' : null }) : c(esc(eq.nums[k]), 'text-align:center');
+            return k === 0 ? v : k === 1 ? c(nfOp(eq.op), 'font-weight:700;text-align:center') + v : c('=', 'font-weight:700;text-align:center') + v;
+        }).join('')).join('');
+        const lines = `<div style="display:inline-grid;grid-template-columns:auto 1em auto 1em auto;column-gap:0.28em;row-gap:${g.em(2)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
+        const set = `<div style="display:inline-block;white-space:nowrap;border:${HAIR} solid ${INK.ink};border-radius:${g.em(3)};padding:${g.em(0.8)} ${g.em(2.5)};line-height:1.1">`
+            + (p.nums || []).map((v) => esc(v)).join(', ') + '</div>';
+        const body = `<div style="display:flex;flex-direction:column;align-items:center;gap:${g.em(3)}">${set}${lines}</div>`;
+        return root(g, 'number-family', body, 'text-align:center;', this.footprint(p, ctx).wMm);
+    },
+    answerKey(p) {
+        const blanks = nfBlanks(p);
+        const slots = {};
+        for (const b of blanks) slots[b.id] = { value: b.value, graded: true };
+        const list = blanks.map((b) => b.value).join(', ');
+        return { value: list, display: list, slots };
+    },
+    footprint(p, ctx) {
+        const g = geo(ctx);
+        const n = nfDigits(p);
+        const bw = Math.max(g.writeMm * 1.6, (n * 0.62 + 0.8) * g.E);
+        const line = 3 * Math.max(bw, n * 0.56 * g.E) + 2 * g.E + 4 * 0.28 * g.E;
+        return { wMm: Math.ceil(line + 8), hMm: null, measure: true, factLike: false, maxCols: 3 };
+    },
+    inputs(p) {
+        return nfBlanks(p || {}).map((b, k) => ({ id: b.id, kind: 'number', shape: 'box', graded: true, order: k, inputmode: 'numeric', scopes: ['full'] }));
+    },
+    layout() { return { card: 'card-number-family', checker: 'list', requiresVisual: true }; },
+});

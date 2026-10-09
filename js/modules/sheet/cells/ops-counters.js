@@ -33,7 +33,8 @@ const PITCH = { S: 7.5, M: 8.5, L: 9.5 };      // centre to centre in a row, mm
 // size; about 38 mm tall at L for 3 rows once the two sentence lines are drawn).
 const MIN_PITCH = { S: 7, M: 8, L: 9 };
 const PIC_BOX = { S: [84, 40], M: [84, 39], L: [84, 38] };
-const RING_SEP = 4;                             // gap between two group rings, mm
+const ARRAY_ROW_MM = 85.6;                      // the widest a dot row is drawn: a 2-column cell's content width less 0.7 mm
+const RING_SEP = 4;                            // gap between two group rings, mm
 const RING_PAD = 2;                             // ring to dot, mm
 /** Dots per line inside a group ring, by group size: subitisable, never n - 1 + 1. */
 const PER_LINE = { 1: 1, 2: 2, 3: 3, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 3, 10: 5, 11: 4, 12: 4 };
@@ -78,7 +79,9 @@ function arrayGeometry(size, p) {
     const clamp = (v) => Math.max(min, Math.min(top, v));
     if (p.kind !== 'equal_groups') {
         const pitch = clamp(Math.min(bw / Math.max(1, cols), bh / Math.max(1, rows)));
-        return { pitch, d: Math.min(d0, pitch - 2.5) };
+        // The pitch never closes below RP-3; a wide array (10 across at L) instead draws its dots
+        // a little smaller (never under 4 mm) so the row fits a 2-column cell's 86 mm (D2).
+        return { pitch, d: Math.max(Math.min(4, d0), Math.min(d0, pitch - 2.5, ARRAY_ROW_MM - (cols - 1) * pitch)) };
     }
     const per = PER_LINE[cols] || Math.ceil(Math.sqrt(cols));
     const lines = Math.ceil(cols / per);
@@ -131,8 +134,11 @@ function arraysPicture(g, p) {
         }
         return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W };
     }
-    const W = cols * pitch, H = rows * pitch;
-    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(pitch / 2 + j * pitch, pitch / 2 + i * pitch, r, false);
+    // The picture is as wide as its dots (wave 1 lane D round 4, D2): a half pitch of white on each
+    // side made a 3 x 10 array 90 mm at L, too wide for a 2-column cell, so it took a full row.
+    const m = 0.2;
+    const W = (cols - 1) * pitch + d + 2 * m, H = (rows - 1) * pitch + d + 2 * m;
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(m + r + j * pitch, m + r + i * pitch, r, false);
     return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W };
 }
 

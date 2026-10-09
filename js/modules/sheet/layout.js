@@ -151,7 +151,9 @@ export const DENSE_CEILING = Object.freeze({
     // L1: 12 at every size printed a 3 x 4 page of tiny two-digit stacks at S; S and M hold more
     // (critic guided-r1: 20 rounding strips filled half a page at S).
     standard: Object.freeze({ S: 30, M: 20, L: 12 }),
-    long: Object.freeze({ S: 6, M: 6, L: 4 }),
+    // Wave 1 lane D round 4 (D6, L1): at S a long division is a third of the page wide, so S holds
+    // 3 x 3 where 6 kept it to the 2 x 3 of M with two-thirds of every cell empty across (H13).
+    long: Object.freeze({ S: 9, M: 6, L: 4 }),
 });
 
 /** PT-IND-1: target rows when the teacher sets the column count explicitly. */
