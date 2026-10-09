@@ -1,29 +1,29 @@
-// Small fixes item 1 (2026-10-09): in a count-by row the caret never moved on, so in the QUIZ typing "21" then "28"
-// put "2128" in one box. A box holding its number's digit count now hands the caret to the next box, on every host
-// (practice card, online worksheet, quiz), right or wrong digits alike, and the phone's swipe row still shows the
-// box the caret lands in.
-//
-// The pupil taps the FIRST box once and then only types: every box must hold exactly its own number.
-// Run: node tests/scripts/small-fixes-countrow-caret.cjs
+// Small fixes item 1 (2026-10-09; critic r1 D1, r2 N1/N2): in a count-by row the caret never moved on, so in the QUIZ typing
+// "21" then "28" put "2128" in one box. The rule now, on every host (practice card, online worksheet, quiz):
+//   - the caret never moves by itself on a pause or on a box's own answer (that would tell the answer's length);
+//   - Space, a comma, Enter or Tab after a number moves on, and the row says so under it (a tap, on a touch screen);
+//   - a box takes as many digits as the row's WIDEST number (the same for every box); a digit typed past that goes on to the
+//     next box, never lost - so a row of same-length numbers typed straight on still lands one number per box.
+// Run: node tests/scripts/small-fixes-countrow-caret.cjs     (SIZES=1366,390 to limit the viewports)
 const { open } = require('../lib/ws-harness.cjs');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
 
 const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 390, height: 844 }];
-// the default row (5 boxes) and a long row of 3-digit numbers (12 numbers: the phone row swipes)
-const SKILLS = [['multiplication', 'count_by_tables', null], ['multiplication', 'count_by_tables', { rows: [{ step: 25, start: 'step', dir: 'up' }] }]];
 const ONLY = process.env.SIZES ? process.env.SIZES.split(',').map(Number) : null;
+const ROWS = {
+  default: null,
+  by25: { rows: [{ step: 25, start: 'step', dir: 'up' }] },
+  by25lines: { rows: [{ step: 25, start: 'step', dir: 'up' }], spaces: 'line' },
+  by7: { rows: [{ step: 7, start: 'step', dir: 'up' }] },
+};
+const digits = (s) => String(s).replace(/\D/g, '');
 
-async function boot(page) {
-  await page.reload({ waitUntil: 'networkidle2' });
-  await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
-  await page.evaluate(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) { /* ignore */ } });
-}
-
-async function mount(page, host, c, k, seed, opts) {
-  return page.evaluate(async (host, c, k, seed, opts) => {
+async function mount(page, host, opts, seed) {
+  return page.evaluate(async (host, opts, seed) => {
     const st = window.state;
+    const c = 'multiplication', k = 'count_by_tables';
     st.range = 100; st.decimalPlaces = 0; st.isMixedMode = false; st.quizMode = false; st.hasAnswered = false; st.skillOptions = opts;
     const q = window.generateQuestionFor({ category: c, skill: k, seed, itemIndex: 0, opts: opts || undefined });
     if (host === 'quiz') {
@@ -41,97 +41,118 @@ async function mount(page, host, c, k, seed, opts) {
       st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.problemCount = 2;
       window.initWorksheet();
     }
-    return true;
-  }, host, c, k, seed, opts);
+  }, host, opts, seed);
 }
 
+async function setup(app, host, opts, vp) {
+  const { page } = app;
+  await page.reload({ waitUntil: 'networkidle2' });
+  await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+  await page.evaluate(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) { /* ignore */ } });
+  await mount(page, host, opts, 11);
+  await sleep(900);
+  await page.evaluate(() => { const d = document.getElementById('mqWorkedDismiss'); if (d) d.click(); });
+  const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
+  return page.evaluate((root, host) => {
+    const r = document.querySelector(root);
+    const els = [...r.querySelectorAll('input.mq-cellslot:not(.mq-cellslot-host)')];
+    els.forEach((e, i) => e.setAttribute('data-t', String(i)));
+    const q = host === 'quiz' ? window.state.quizAllQuestions[0].question.questionData : host === 'card' ? window.state.currentQ : window.state.worksheetQs[0];
+    const keys = r.querySelector('.k2-countrow-keys');
+    const vis = (sel) => { const e = keys && keys.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0; };
+    return { n: els.length, ans: String(q.ans), max: els.map((e) => e.dataset.mqMax || ''), maxlength: els.map((e) => e.maxLength),
+      values: (q.cell && q.cell.payload && q.cell.payload.values) || [], typeLine: vis('.k2-keys-type'), touchLine: vis('.k2-keys-touch') };
+  }, root, host);
+}
+
+async function tapFirst(page, touch) {
+  const b0 = await page.$('[data-t="0"]');
+  await b0.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  if (touch) await b0.tap(); else await b0.click();
+  await sleep(150);
+}
+const boxVals = (page) => page.evaluate(() => [...document.querySelectorAll('[data-t]')].map((e) => e.value));
+const active = (page) => page.evaluate(() => Number((document.activeElement && document.activeElement.getAttribute('data-t')) ?? -1));
+
 (async () => {
-for (const vp of SIZES) {
-  for (const host of ['quiz', 'card', 'worksheet']) {
-    for (const [c, k, opts] of SKILLS) {
-      if (ONLY && !ONLY.includes(vp.width)) continue;
-      for (const wrong of [false, true]) {
-        const app = await open({ viewport: { ...vp, deviceScaleFactor: 1, isMobile: vp.width < 480, hasTouch: vp.width < 480 } });
+  for (const vp of SIZES) {
+    if (ONLY && !ONLY.includes(vp.width)) continue;
+    const touch = vp.width < 480;
+    for (const host of ['quiz', 'card', 'worksheet']) {
+      for (const [rk, opts] of Object.entries(ROWS)) {
+        const app = await open({ viewport: { ...vp, deviceScaleFactor: 1, isMobile: touch, hasTouch: touch } });
         const { page } = app;
         const errs = [];
         page.on('pageerror', (e) => errs.push(String(e)));
+        const tag = `[${vp.width}x${vp.height} ${host} ${rk}]`;
         try {
-          await boot(page);
-          await mount(page, host, c, k, 11, opts);
-          await sleep(900);
-          await page.evaluate(() => { const d = document.getElementById('mqWorkedDismiss'); if (d) d.click(); });
-          const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
-          const info = await page.evaluate((root, host) => {
-            const r = document.querySelector(root);
-            const els = [...r.querySelectorAll('input.mq-cellslot:not(.mq-cellslot-host)')];
-            els.forEach((e, i) => e.setAttribute('data-t', String(i)));
-            const q = host === 'quiz' ? window.state.quizAllQuestions[0].question.questionData : host === 'card' ? window.state.currentQ : window.state.worksheetQs[0];
-            // the number before each box in the row (printed or a box): a box moves on by itself only when its length matches it
-            const vals = (q.cell && q.cell.payload && q.cell.payload.values) || [];
-            const bl = ((q.cell && q.cell.payload && q.cell.payload.blanks) || []).map(Number);
-            const prevLen = bl.map((i) => (i > 0 ? String(vals[i - 1]).replace(/\D/g, '').length : 0));
-            return { n: els.length, ans: String(q.ans), full: els.map((e) => e.dataset.mqFull || ''), prevLen };
-          }, root, host);
-          const tag = `[${vp.width}x${vp.height} ${host} ${k}${opts ? ' by 25' : ''}${wrong ? ' wrong digits' : ''}]`;
-          const exp = info.ans.split(/\s*,\s*/).slice(0, info.n);
-          const wantFull = exp.map((e) => e.replace(/\D/g, '').length);
-          check(info.n >= 2 && info.full.every((f, i) => (Number(f) || 0) === wantFull[i]), `${tag} ${info.n} boxes, each knows its number's digit count (${info.full.join('/')})`);
-          // wrong: change the last digit of every number (same length), so nothing turns green to move the caret
-          const typed = exp.map((e) => (wrong ? e.replace(/\d$/, (m) => String((Number(m) + 1) % 10)) : e).replace(/\D/g, ''));
-          // the pupil taps the first box once, then just types
-          const b0 = await page.$('[data-t="0"]');
-          await b0.evaluate((el) => el.scrollIntoView({ block: 'center' }));
-          if (vp.width < 480) await b0.tap(); else await b0.click();
-          await sleep(150);
-          let offView = 0, stayFails = 0;
-          for (let i = 0; i < typed.length; i++) {
-            await page.keyboard.type(typed[i], { delay: 20 });
-            // the caret never moves by itself (it would tell the answer's length): it stays until the pupil's next number
-            // (on the card and the worksheet a RIGHT number turns green and hands the caret on - owner 2026-10-04; that shows nothing new)
+          let info = await setup(app, host, opts, vp);
+          const exp = info.ans.split(/\s*,\s*/).slice(0, info.n).map(digits);
+          const W = Math.max(...info.values.map((v) => digits(v).length));
+          check(info.n >= 2 && info.max.every((m) => Number(m) === W) && info.maxlength.every((m) => m === W),
+            `${tag} ${info.n} boxes, each takes the row's widest number: ${W} digits (${info.max.join('/')})`);
+          check(touch ? info.touchLine && !info.typeLine : info.typeLine && !info.touchLine, `${tag} the row says how to move on (${touch ? 'tap' : 'Space'})`);
+          if (touch) {
+            // phone (basic): tapping each box and typing lands every number in its box
+            for (let i = 0; i < exp.length; i++) {
+              const b = await page.$(`[data-t="${i}"]`);
+              await b.evaluate((el) => { const w = el.closest('[data-mq-swiperow]'); if (w) { const v = w.getBoundingClientRect(), r = el.getBoundingClientRect(); w.scrollLeft += r.left - v.left - 8; } el.scrollIntoView({ block: 'center' }); });
+              await sleep(100); await b.tap(); await sleep(100);
+              await page.keyboard.type(exp[i], { delay: 30 });
+            }
+            const got = (await boxVals(page)).map(digits);
+            check(JSON.stringify(got) === JSON.stringify(exp), `${tag} tap + type: ${got.join('|')} (want ${exp.join('|')})`);
+            check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
+            continue;
+          }
+          // A. a SLOW pupil (750 ms between keys), Space after each number: the caret never moves inside a number
+          await tapFirst(page, false);
+          let moved = 0;
+          for (let i = 0; i < exp.length; i++) {
+            for (const ch of exp[i]) { await page.keyboard.type(ch); await sleep(750); if ((await active(page)) !== i && host === 'quiz') moved++; }
+            if (i < exp.length - 1) await page.keyboard.press('Space');
             await sleep(150);
-            const stays = await page.evaluate((i) => document.activeElement === document.querySelector(`[data-t="${i}"]`), i);
-            if (!stays && (wrong || host === 'quiz')) { stayFails++; console.log('   box', i, 'moved on by itself'); }
-            await sleep(700);   // the pupil thinks of the next number
-            await sleep(120);
-            // the box the caret is now in is fully on screen and inside its row's window
-            const ok = await page.evaluate(() => {
-              const a = document.activeElement;
-              if (!a || a.tagName !== 'INPUT') return true;
-              const r = a.getBoundingClientRect();
-              const w = a.closest('[data-mq-swiperow]');
-              if (w && getComputedStyle(w).overflowX !== 'visible') { const v = w.getBoundingClientRect(); if (r.left < v.left - 1 || r.right > v.right + 1) return `x ${Math.round(r.left)}-${Math.round(r.right)} in ${Math.round(v.left)}-${Math.round(v.right)}`; }
-              // a phone (basic check, STATUS 00): its emulated viewport rescales as the page settles - most of the box on screen is enough
-              const slack = innerWidth < 480 ? r.height * 0.2 : 1;
-              return r.top >= -slack && r.bottom <= innerHeight + slack ? true : `y ${Math.round(r.top)}-${Math.round(r.bottom)} of ${innerHeight}`;
-            });
-            if (ok !== true && i < typed.length - 1) { offView++; console.log('   off after box', i, ok); }
           }
-          const vals = await page.evaluate(() => [...document.querySelectorAll('[data-t]')].map((e) => e.value));
-          const want = typed.map((t, i) => (wrong ? t : exp[i].replace(/\D/g, '')));
-          const got = vals.map((v) => v.replace(/\D/g, ''));
-          check(JSON.stringify(got) === JSON.stringify(want), `${tag} every box holds its own number: ${got.join('|')} (want ${want.join('|')})`);
-          check(offView === 0, `${tag} the box the caret moves to is in view each time (${offView} off)`);
-          check(stayFails === 0, `${tag} a full box keeps the caret until the pupil's next number (${stayFails})`);
-          // a number too long for its box, typed in one go, stays in that box (critic r1 D1, wave1-a3)
-          const bi = 0;
-          if (bi >= 0 && !wrong && host !== 'quiz') {
-            await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }, bi);
-            await page.keyboard.type(exp[bi].replace(/\D/g, '') + '0', { delay: 20 });
-            const v = await page.evaluate((i) => document.querySelector(`[data-t="${i}"]`).value.replace(/\D/g, ''), bi);
-            check(v === exp[bi].replace(/\D/g, '') + '0', `${tag} a too-long number typed in one go stays in its box (${v})`);
-          }
+          let got = (await boxVals(page)).map(digits);
+          check(JSON.stringify(got) === JSON.stringify(exp), `${tag} slow typing, Space after each number: ${got.join('|')} (want ${exp.join('|')})`);
+          if (host === 'quiz') check(moved === 0, `${tag} the caret never moved by itself inside a number (${moved})`);
           if (host === 'quiz') {
             const hidden = await page.evaluate(() => document.getElementById('qtAnswerInput').value);
-            check(hidden.split(/\s*,\s*/).map((v) => v.replace(/\D/g, '')).join('|') === want.join('|'), `${tag} the quiz answer composes one number per box (${hidden})`);
+            check(hidden.split(/\s*,\s*/).map(digits).join('|') === exp.join('|'), `${tag} the quiz answer composes one number per box (${hidden})`);
           }
+          // B. comma after each number, fast; then C. no separator at all
+          for (const mode of ['comma', 'none']) {
+            info = await setup(app, host, opts, vp);
+            await tapFirst(page, false);
+            for (let i = 0; i < exp.length; i++) {
+              await page.keyboard.type(exp[i], { delay: 30 });
+              if (mode === 'comma' && i < exp.length - 1) await page.keyboard.type(',');
+            }
+            await sleep(200);
+            got = (await boxVals(page)).map(digits);
+            const typedDigits = exp.join('');
+            if (mode === 'comma' || exp.every((e) => e.length === W)) {
+              check(JSON.stringify(got) === JSON.stringify(exp), `${tag} ${mode === 'comma' ? 'commas between numbers' : 'numbers all ' + W + ' digits, typed straight on'}: ${got.join('|')}`);
+            } else {
+              // mixed lengths with no separator cannot be split by the screen without telling lengths: nothing may be lost
+              check(got.join('') === typedDigits && got.every((g) => g.length <= W), `${tag} no separator, mixed lengths: no digit lost, no box over ${W} (${got.join('|')})`);
+            }
+          }
+          // D. a number too long for the row, typed in one go: the extra digit goes to the next box, never dropped
+          info = await setup(app, host, opts, vp);
+          await tapFirst(page, false);
+          const long = exp[0] + '0'.repeat(W - exp[0].length + 1);
+          await page.keyboard.type(long, { delay: 30 });
+          await sleep(150);
+          got = (await boxVals(page)).map(digits);
+          check(got.join('') === long && got.every((g) => g.length <= W), `${tag} a number longer than the row's widest keeps every digit (${got.join('|')})`);
           check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
         } catch (e) {
-          check(false, `[${vp.width} ${host} ${k}] ${e.message}`);
+          check(false, `${tag} ${e.message}`);
         } finally { await app.close(); }
       }
     }
   }
-}
-console.log(fails ? `small-fixes-countrow-caret: FAIL (${fails})` : 'small-fixes-countrow-caret: OK');
-process.exit(fails ? 1 : 0);
+  console.log(fails ? `small-fixes-countrow-caret: FAIL (${fails})` : 'small-fixes-countrow-caret: OK');
+  process.exit(fails ? 1 : 0);
 })();

@@ -196,7 +196,7 @@ function selectIfLoose(active) {
 // that has already moved the caret itself is left alone.
 function advanceIfFull(el) {
     if (!el || el !== document.activeElement || el.tagName !== 'INPUT' || !isAnswerBox(el)) return;
-    if (el.dataset.mqFull) return;          // a count-by box moves on at the pupil's next number (nextNumberKey), never by itself
+    if (el.dataset.mqMax) return;           // a count-by box never moves the caret by itself (overflowKey)
     const max = el.maxLength;
     if (!(max > 0) || String(el.value || '').length < max) return;
     if (el.closest('[data-mq-swiperow]')) return;
@@ -221,32 +221,26 @@ function moveTo(next) {
     if (!whole || underPinnedBar(next)) { try { next.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ } }
 }
 
-// A count-by box (data-mq-full = its number's digits, count-row.js) that is full hands the pupil's NEXT number to the next box
-// (small fixes item 1: in the quiz "21" then "28" joined as "2128"). The caret never moves by itself - that would tell the
-// answer's length, and a too-long number typed in one go must stay in its box (critic r1 D1, wave1-a3) - so the hand-on waits
-// for the next digit, and only a digit started after a pause (a new number) goes on; a digit typed straight on stays.
-const NEW_NUMBER_PAUSE = 600;
-const lastKeyAt = new WeakMap();
-function nextNumberKey(e) {
+// A count-by box takes as many digits as the row's widest number (data-mq-max, count-row.js - the same for every box, so it
+// tells no box's answer). A digit typed into a box already holding that many goes on to the next empty box instead of being
+// lost (small fixes item 1, critic r2 N1/N2: in the quiz "21" then "28" joined as "2128"). Nothing moves on a pause or on the
+// box's own answer; the pupil moves on with Space, comma, Enter, Tab or a tap (screen-cell.js wireCellSlots).
+function overflowKey(e) {
     const el = e.target;
     if (!/^[0-9]$/.test(e.key || '') || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (!el || el.tagName !== 'INPUT' || !el.dataset || !el.dataset.mqFull || el !== document.activeElement || !isAnswerBox(el)) return;
-    const last = lastKeyAt.get(el) || 0;
-    lastKeyAt.set(el, Date.now());
+    if (!el || el.tagName !== 'INPUT' || !el.dataset || !el.dataset.mqMax || el !== document.activeElement || !isAnswerBox(el)) return;
     const v = String(el.value || '');
-    if (v.replace(/\D/g, '').length < Number(el.dataset.mqFull)) return;
-    if (el.selectionStart !== v.length || el.selectionEnd !== v.length) return;       // the pupil is editing inside the number
-    if (Date.now() - last < NEW_NUMBER_PAUSE) return;                                   // typed straight on: the same number
+    if (v.replace(/\D/g, '').length < Number(el.dataset.mqMax)) return;
+    if (el.selectionStart !== v.length || el.selectionEnd !== v.length) return;       // a selection is typed over, in place
     const host = el.closest(POPUP) || el.closest(HOSTS);
     if (!host) return;
     const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
     const i = boxes.indexOf(el);
-    const next = i < 0 ? null : nextEmptyBox(boxes, i);
+    const next = i < 0 ? null : boxes.slice(i + 1).find(okNext);
     if (!next || next.tagName !== 'INPUT') return;
     e.preventDefault();
     moveTo(next);
     next.value = e.key;
-    lastKeyAt.set(next, Date.now());
     lastInput = { t: Date.now(), el: next };
     next.dispatchEvent(new Event('input', { bubbles: true }));   // the host composes its answer from its boxes
 }
@@ -300,7 +294,7 @@ export function installActiveBox() {
         if (!box || box.closest('[data-mq-swiperow]') || !onScreen(box) || !uncovered(box)) return;
         try { box.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
     }, true);
-    document.addEventListener('keydown', nextNumberKey, true);
+    document.addEventListener('keydown', overflowKey, true);
     for (const ev of ['focusin', 'focusout', 'input', 'change', 'click']) document.addEventListener(ev, schedule, true);
     // Questions are re-rendered by many code paths; watch the DOM rather than hooking each one.
     const mo = new MutationObserver(schedule);

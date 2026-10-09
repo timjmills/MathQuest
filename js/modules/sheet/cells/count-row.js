@@ -380,7 +380,7 @@ function jumpArrow(ctx, g, w) {
  */
 function lineSlot(ctx, g, { id, value, ink, shown, maxLen, full = 0 }) {
     const color = ink === 'trace' ? GREY : INK;
-    const hook = isTwin(ctx) ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}${full > 0 ? ` data-mq-full="${full}"` : ''}` : '';
+    const hook = isTwin(ctx) ? ` data-mq-cell="1"${maxLen > 0 ? ` data-mq-w="${maxLen}"` : ''}${full > 0 ? ` data-mq-max="${full}"` : ''}` : '';
     return `<span class="k2-shape k2-shape-line" style="position:relative;display:inline-flex;flex:none;box-sizing:border-box;width:${L(ctx, g.w)};height:${L(ctx, g.h)};vertical-align:middle;">`
         + `<span class="k2-tile k2-tile-slot k2-line-slot" data-ws-slot="${esc(id)}" data-ws-shape="line"${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${shown ? ' data-ws-shown="1"' : ''} `
         + `style="position:relative;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;padding-bottom:${L(ctx, 0.6)};`
@@ -420,6 +420,9 @@ register('count-row', {
         const plainGiven = g.look === 'arcs' && g.shape === 'box';
         // the widest written answer, in digits (no separators): the screen box takes that many (a count by 25,000 writes 6 digits).
         const keyDigits = Math.max(4, ...blanks.map((i) => String(values[i]).replace(/\D/g, '').length));
+        // small fixes item 1 (critic r2 N1/N2): on screen a box takes as many digits as the row's WIDEST number - the same for
+        // every box, so it tells no box's answer; a digit typed past that goes on to the next box (active-box.js), never lost
+        const rowMax = Math.max(1, ...values.map((x) => String(x).replace(/\D/g, '').length));
         const cells = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -433,12 +436,9 @@ register('count-row', {
                 return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
             }
             const val = over !== undefined ? String(over) : shown[k];
-            // the digits of THIS box's number (small fixes item 1): once it holds them, the pupil's NEXT number goes to the next
-            // box (active-box.js nextNumberKey) - "21" then "28" no longer join. The caret never moves by itself.
-            const full = String(v).replace(/\D/g, '').length;
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
-            if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full });
-            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full });
+            if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
+            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
         });
         if (g.hasLbl) {
             const lblInk = lvlOf(ctx) === 2 ? GREY : INK;
@@ -483,13 +483,18 @@ register('count-row', {
                 + `font-size:${P(ctx, textPt(ctx))};font-weight:400;white-space:nowrap;">`
                 + `<span>${esc(p.ruleBox.pre || 'Rule:')}</span>${rb}${p.ruleBox.post ? `<span>${esc(p.ruleBox.post)}</span>` : ''}</div>`;
         }
+        // screen only (critic r2 N1): how to move on between boxes - the caret never moves by itself
+        const keys = isTwin(ctx) && blanks.length > 1
+            ? `<div class="k2-countrow-keys" style="margin-top:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx))};font-weight:400;line-height:1.3;color:${INK};text-align:${g.tab ? 'left' : 'center'};">`
+                + `<span class="k2-keys-type">After each number, press Space.</span><span class="k2-keys-touch">After each number, tap the next box.</span></div>`
+            : '';
         const align = g.tab ? 'left' : 'center';
         const vp = Number(p.vpad) > 0 ? Number(p.vpad) : 0;
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${ruleFrame}`,
+            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
     },
     answerKey(p) {

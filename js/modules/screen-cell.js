@@ -1842,7 +1842,8 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
         el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
         if (fixedW) el.dataset.mqFixed = '1';
-        if (Number(slot.getAttribute('data-mq-full')) > 0) el.dataset.mqFull = slot.getAttribute('data-mq-full');
+        // a count-by box: as many digits as the row's widest number; one more goes on to the next box (active-box.js)
+        if (Number(slot.getAttribute('data-mq-max')) > 0) { el.dataset.mqMax = slot.getAttribute('data-mq-max'); el.setAttribute('maxlength', el.dataset.mqMax); }
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
@@ -1863,8 +1864,9 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         });
         b.addEventListener('change', () => { if (onChange) onChange(compose()); });
         b.addEventListener('keydown', (e) => {
-            // a LIST of numbers (a count-by row): Space after a number moves on to the next box, as a pupil writes a gap
-            if (e.key === ' ' && join.trim() === ',' && !b.dataset.mqKind && (b.value || '').trim() && boxes[k + 1]) {
+            // a LIST of numbers (a count-by row): Space or a comma after a number moves on to the next box, as a pupil writes
+            // a gap (a box keeps digits only, so a comma is never part of a number here)
+            if ((e.key === ' ' || e.key === ',') && join.trim() === ',' && !b.dataset.mqKind && (b.value || '').trim() && boxes[k + 1]) {
                 e.preventDefault();
                 const nx = boxes[k + 1];
                 nx.focus({ preventScroll: true });

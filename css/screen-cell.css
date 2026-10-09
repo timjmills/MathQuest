@@ -1746,3 +1746,11 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body .mq-scell .k2-shape-line { overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
+/* Small fixes item 1 (critic r2 N1): a count-by row says how to move on between its boxes - Space on a keyboard,
+   a tap on a touch screen (the caret never moves by itself). */
+.k2-countrow-keys .k2-keys-touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
