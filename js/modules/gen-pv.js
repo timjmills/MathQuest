@@ -447,7 +447,9 @@ function genUnitForm(q, skill, o) {
     const words = places.map(p => PLACE_WORD[p]);
     const text = `${fmt(n)} = ${words.map(w => `___ ${w}`).join(' ')}`;
     inlineBlanks(q, text, [ds.slice()], ds.map(() => 2));
-    q.ans = ds.map((d, i) => `${d} ${words[i]}`).join(' ');
+    // one digit per place box (a standard item never has more than 9 of one place): maxlength 1
+    q.inlineBlanksData.fixedWidth = true;
+    q.ans = ds.map((d, i) => `${d} ${plural(words[i], d)}`).join(' ');   // "1 one", never "1 ones"
     q.printAnswer = q.ans;
     q.hint = 'Each digit tells how many of its place. A zero means none of that place.';
     q.pv = { kind: 'unit', n, rename: false, counts: Object.fromEntries(places.map((p, i) => [p, ds[i]])) };

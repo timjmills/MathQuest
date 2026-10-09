@@ -304,14 +304,27 @@ export function schemaOf(text, st, ans) {
     const some = /\bsome\b/.test(t) && /\b(at first|at the start|to start|start with|started with|in the beginning)\b/.test(t);
     const change = /\b(needs?|wants?|after (getting|walking|reading|earning|saving)|now has|now have|in total|started with|some more)\b/.test(t);
     const compare = /\b(more|fewer|less)\s+than\b|\bhow (many|much) (more|fewer|less)\b|\bdifference\b/.test(t);
+    // a comparison between two people: the question asks about someone other than the story's
+    // first subject, and nobody gives or adds ("Noor earned 7. Omar earned 3 more. How many did Omar earn?")
+    const raw = String(text || '');
+    const subj0 = (raw.match(/^\s*([A-Z][a-z]+)\b/) || [])[1];
+    const subjQ = (raw.match(/\b(?:did|does|do)\s+([A-Z][a-z]+)\b[^.?!]*\?\s*$/) || [])[1];
+    const twoPeople = !!(subj0 && subjQ && subj0 !== subjQ && !/\b(gave|gives|added|adds|give)\b/.test(t));
     if (st.op === '+') {
         if (some) return 'start-sub';
-        if (/\bmore than\b/.test(t)) return 'compare-more';
+        if (/\bmore( \w+)? than\b/.test(t) || (twoPeople && /\bmore\b/.test(t))) return 'compare-more';
         return 'join';
     }
     if (st.op === '-') {
         if (some) return 'start-add';
         if (change && /\bhow many more\b/.test(t)) return 'change';
+        // change-unknown join told as "had a … now has b. How many did X earn / get?": the
+        // missing change, retold as "has a, wants b, how many more needed" (never a give-away)
+        if (change && /\bhow many \w+ did .+? (earn|get|gain|save|find|collect)\b/.test(t)) return 'change';
+        // "Omar has 7 fewer than Noor": a fewer comparison, never a give-away
+        if (/\bfewer\b|\bless than\b/.test(t) && !/\bhow many (fewer|less)\b/.test(t)) return 'compare-fewer';
+        // "had 50, after spending some has 20 left, how many spent?": the change is unknown
+        if (/\bafter\b[^.]*\b(some|part|a while)\b|\bnow there (are|is)\b/.test(t) && /\b(left|now)\b/.test(t)) return 'take-some';
         if (compare) return 'compare';
         return 'separate';
     }
@@ -362,6 +375,10 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
             return S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${countOf(b, T)}.`, `How many more ${T.many} does ${n1} have than ${n2}?`], T);
         case 'change':
             return S([`${n1} has ${countOf(b, T)}.`, `${n1} wants ${countOf(a, T)}.`, `How many more ${T.many} does ${n1} need?`], T);
+        case 'compare-fewer':
+            return S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${b} fewer ${b === 1 ? T.one : T.many} than ${n1}.`, `How many ${T.many} does ${n2} have?`], T);
+        case 'take-some':
+            return S([`${n1} had ${countOf(a, T)}.`, `${n1} gave some away.`, `Now ${n1} has ${countOf(b, T)}.`, `How many ${T.many} did ${n1} give away?`], T);
         case 'start-add':
             return S([`${n1} had some ${T.many}.`, `${n1} got ${countOf(b, T).replace(/^(\S+) /, '$1 more ')}.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} have at first?`], T);
         case 'groups': {
@@ -434,7 +451,7 @@ export function wordWorkPayload(q, o = {}) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
         const told = steps.length > 1 ? tellTwoStep(steps[0], steps[1], k)
-            : tellStory(schema, last, k, { ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
+            : tellStory(schema, last, k, { ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
         if (told && told.ans === ans) {
             lines = told.lines;
             const u = told.unit;
