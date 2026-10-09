@@ -7,6 +7,8 @@ Pupils mostly use **Chromebooks**; phones are rare for now. Screen work is teste
 Check/Next must be reachable at that height. Phones (390 px) get a basic check only (no page overflow, boxes tappable,
 typing works); phone-only polish is deferred to a later phone pass and listed below, never blocking a lane.
 
+**Stretch / thinking pages (owner 2026-10-09):** not built, fixed or graded until after Wave 8 (lessons) — `MASTER_PLAN.md` Wave 9. Lanes and critics skip them.
+
 ### Phone pass (deferred)
 - place-value rename sentences wrapping at 390 ("=" at a line start, number split from its unit)
 - four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
