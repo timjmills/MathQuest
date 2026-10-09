@@ -877,7 +877,10 @@ function answerBlock(ctx, p, shown, unitShown, vertical = false, eq = '') {
             + `<span style="font-weight:700;line-height:1.1;">Answer:</span>${num}${unit}${bank}</div>`;
     }
     return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1.6)};">`
-        + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 2)};font-size:${P(ctx, tp)};flex-wrap:${isTwin(ctx) && !eq ? 'nowrap' : 'wrap'};justify-content:${eq && !isTwin(ctx) ? 'flex-start' : 'center'};">${eq || '<span style="font-weight:700;align-self:center;">Answer:</span>'}${num}${unit}</div>`
+        + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 2)};font-size:${P(ctx, tp)};flex-wrap:${isTwin(ctx) && !eq ? 'nowrap' : 'wrap'};justify-content:${eq && !isTwin(ctx) ? 'flex-start' : 'center'};">${eq && isTwin(ctx)
+            // the screen keeps "= [ ]" on the equation's own line (critic r3 D4): only the unit line may wrap
+            ? `<span class="mq-wweqrow" style="display:inline-flex;align-items:center;flex-wrap:nowrap;gap:${L(ctx, 2)};white-space:nowrap;">${eq}${num}</span>`
+            : `${eq || '<span style="font-weight:700;align-self:center;">Answer:</span>'}${num}`}${unit}</div>`
         + bank + '</div>';
 }
 

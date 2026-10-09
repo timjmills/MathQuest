@@ -1705,3 +1705,22 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
 .mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
+
+/* ---- Wave 1 lane D, critic r3 D8 (H6): the short-division ("bus stop") twin. Every quotient box is a
+   >= 44 px target on every host: the drawing is set at a digit size whose 0.9-track box is >= 44 px
+   (its columns are em tracks, so the boxes stay over their dividend digits), and a phone cell scrolls
+   sideways inside itself rather than shrinking the boxes (as the long-division twin, R2-3). The
+   exchange (scratch) boxes carry a transparent 44 px touch input centred over the drawn box
+   (long-multiplication.js scratch). Additive; screen only. */
+.mq-scell .ws-ops-shortdiv { font-size: max(var(--mq-digit, 40px), 58px) !important; max-width: none; }
+.mq-scell .ws-ops-shortdiv [data-mq-cell] > input.mq-cellslot { min-height: 44px; }
+html .mq-scell .ws-ops-shortdiv input.mq-opswork.mq-opswork-touch { background: transparent !important; box-shadow: none !important; caret-color: transparent; }
+html .mq-scell .ws-ops-shortdiv input.mq-opswork.mq-opswork-touch:focus { box-shadow: inset 0 0 0 3px #000 !important; outline: none !important; }
+.ws-cell.mq-scell:has(.ws-ops-shortdiv) { overflow-x: auto; }
+@media (max-width: 480px) { .mq-scell:has(.ws-ops-shortdiv) { padding-left: 2px !important; padding-right: 2px !important; } .mq-scell .ws-ops-shortdiv { padding: 0 !important; } }
+
+/* ---- Wave 1 lane D, critic r3 D4 (parity): the word-work twin's sign slot is the paper's CIRCLE on every
+   host (the hosts' generic input rules squared it), and its neutral equation keeps "= [ ]" on one line.
+   Additive; screen only. */
+html body .mq-wwtwin input.mq-wwork[data-mq-kind="sign"] { border-radius: 50% !important; }
+html body .mq-wwtwin .mq-wweqrow { flex-wrap: nowrap !important; }

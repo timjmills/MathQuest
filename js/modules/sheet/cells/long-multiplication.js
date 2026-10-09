@@ -98,15 +98,26 @@ const rowHOf = (g) => Math.max(g.writeMm, 6) + 1;
 const slimOf = (g) => g.carryMm * 0.8;
 // the exchange box's share of a short-division digit column, in tracks
 const EX_W = 0.62;
+// TY-21 / SL-12 (critic r3 D12): the exchange box is never under 4.4 mm wide, so a digit can be
+// written in it; the box is 0.86 of its column share
+const EX_MIN_MM = 4.4;
+// (paper only: on screen the box is a scratch box under a 44 px touch input, and the em tracks
+// already scale it up with the screen digit size)
+const exOf = (tr, g) => (g && g.twin ? tr * EX_W : Math.max(tr * EX_W, EX_MIN_MM / 0.86));
 // the operator gutter ("×", "+") of the multiplication grid, in tracks: the sign stands clear of the digits
 const GUTTER = 1.6;
 
 /** A scratch input for the screen twin: typed, never graded, outside the tab order. */
-function scratch(labelText, small = false) {
-    return `<input type="text" class="mq-work mq-opswork" inputmode="numeric" maxlength="1" autocomplete="off" spellcheck="false" tabindex="-1" `
+function scratch(labelText, small = false, touch = false) {
+    // `touch` (critic r3 D8, H6): the input is a 44 px touch target centred over its small drawn
+    // box, transparent, so the box keeps its size and its column; the drawn box stays the outline
+    const size = touch
+        ? 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px)!important;height:max(100%,44px)!important;'
+        : 'display:block!important;width:100%!important;height:100%!important;';
+    return `<input type="text" class="mq-work mq-opswork${touch ? ' mq-opswork-touch' : ''}" inputmode="numeric" maxlength="1" autocomplete="off" spellcheck="false" tabindex="-1" `
         // inline !important: the hosts' generic input rules (a 44-50 px minimum, a white fill) would
         // otherwise overflow the grid cell and paint over its walls; the CELL is the target here
-        + `data-ws-graded="0" aria-label="${esc(labelText)}" style="display:block!important;width:100%!important;height:100%!important;min-height:0!important;`
+        + `data-ws-graded="0" aria-label="${esc(labelText)}" style="${size}min-height:0!important;`
         + `min-width:0!important;box-sizing:border-box;border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;`
         + `text-align:center;font-family:inherit!important;font-size:${small ? '0.6em' : '0.9em'}!important;color:#000!important;padding:0!important;margin:0!important;">`;
 }
@@ -289,9 +300,9 @@ function sdFootprint(p, ctx) {
     const g = geo(ctx);
     const n = S(p.dividend).length, dv = S(p.divisor).length;
     const tr = trackOf(ctx, g);
-    const ex = (Number(p.level) || 0) >= 1 ? tr * EX_W : 0;
+    const ex = (Number(p.level) || 0) >= 1 ? exOf(tr, g) : 0;
     return {
-        wMm: Math.ceil((dv + 1.1) * tr + n * (tr + ex) + 8),
+        wMm: Math.ceil((dv + (g.twin ? 0.8 : 1.1)) * tr + n * (tr + ex) + 8),
         hMm: Math.ceil(g.stripMm + g.E * 1.4 + 8),
         tracks: n + dv + 1,
     };
@@ -305,7 +316,7 @@ register('short-division', {
         const n = D.length, dv = V.length;
         const lvl = Number(p.level) || 0;
         const tr = trackOf(ctx, g);
-        const ex = lvl >= 1 ? tr * EX_W : 0;
+        const ex = lvl >= 1 ? exOf(tr, g) : 0;
         const ink = inkOf(ctx);
         const vals = slotValues(ctx, ks, (v) => {
             const s = String(v).replace(/\D/g, '').padStart(n, ' ');
@@ -313,13 +324,13 @@ register('short-division', {
             for (let i = 0; i < n; i++) o[`q-${i}`] = s[i] === ' ' ? '' : s[i];
             return o;
         });
-        const cols = `grid-template-columns:repeat(${dv}, ${g.em(tr)}) ${g.em(tr * 1.1)} repeat(${n}, ${g.em(tr + ex)});`;
+        const cols = `grid-template-columns:repeat(${dv}, ${g.em(tr)}) ${g.em(tr * (g.twin ? 0.8 : 1.1))} repeat(${n}, ${g.em(tr + ex)});`;
         let html = '';
         // the quotient strip, each box over its dividend digit (right of the exchange box)
         for (let i = 0; i < n; i++) {
             const id = `q-${i}`;
             // each quotient box stands alone over its digit (the exchange boxes sit between the digits)
-            html += at(box(g, id, { wMm: tr * 0.92, hMm: g.stripMm, value: vals[id] || '', ink, mark: 'cell', graded: ks[id] !== '' }),
+            html += at(box(g, id, { wMm: tr * (g.twin ? 1 : 0.92), hMm: g.stripMm, value: vals[id] || '', ink, mark: 'cell', graded: ks[id] !== '' }),
                 dv + 2 + i, 1, `justify-content:flex-end;align-items:flex-end;padding-bottom:0.08em;`);
         }
         for (let i = 0; i < dv; i++) html += at(esc(V[i]), i + 1, 2);
@@ -331,10 +342,10 @@ register('short-division', {
             if (lvl >= 1) {
                 // the exchange box: small, raised, before the digit (never before the first digit)
                 const v = ink !== null && sd.exch[i] ? String(sd.exch[i]) : '';
-                const inner = i === 0 ? '' : g.twin ? scratch(`exchange into digit ${i + 1}`, true)
+                const inner = i === 0 ? '' : g.twin ? scratch(`exchange into digit ${i + 1}`, true, true)
                     : (v ? `<span style="font-size:0.5em;line-height:1">${inked(v, ink)}</span>` : '');
                 exBox = i === 0 ? `<span style="display:inline-block;width:${g.em(ex)}"></span>`
-                    : `<span style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${g.em(ex * 0.86)};height:${g.em(slimOf(g))};`
+                    : `<span style="${g.twin ? 'position:relative;' : ''}display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${g.em(ex * 0.86)};height:${g.em(slimOf(g))};`
                     + `align-self:flex-start;margin-top:0.08em;border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm * 0.6)};background:#fff;">${inner}</span>`;
             }
             html += at(`${exBox}<span style="display:inline-block;width:${g.em(tr)};text-align:center">${esc(D[i])}</span>`, dv + 2 + i, 2,

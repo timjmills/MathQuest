@@ -2915,6 +2915,27 @@ export function cellDigitTarget(cellEl) {
  *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
  * null: the item keeps the host's legacy path.
  */
+/** Does the drawing show every number the prompt names (so the prompt only restates the cell)? */
+function _visualSaysNumbers(text, visual) {
+    const nums = (s) => (String(s || '').replace(/<[^>]+>/g, ' ').match(/\d+(?:[.,]\d+)*/g) || []);
+    const want = nums(plainText(text));
+    if (!want.length) return false;
+    const have = new Set(nums(visual));
+    return want.every((n) => have.has(n));
+}
+
+/**
+ * critic r3 D11: the card's prompt for a kit twin whose drawing already shows every number of the
+ * item's text: the paper's instruction (the caller swaps its verbs), or '' to keep the text.
+ */
+export function kitTwinPrompt(q, categoryId = '') {
+    if (!q || q.screenInstr) return '';
+    const v = String(q.visual || '');
+    if (!/class="k2-twin"|data-mq-blank=/.test(v)) return '';
+    if (!_visualSaysNumbers(q.text, v)) return '';
+    return printInstructionFor(q, categoryId);
+}
+
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
     // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
@@ -2956,9 +2977,13 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
         const said = _normText(q.text);
         // `q.screenInstr`: a generator's own instruction for a twin that prints its whole sentence
         // (add_three: "Add." over `8 + 5 + 3 = [ ]`, never the sentence twice).
+        // critic r3 D11: a prompt whose every number the drawing already shows ("Multiply the
+        // array: 2 rows × 4 columns = ?" over a cell reading "2 rows × 4 columns / 2 × 4 = [ ]")
+        // restates the cell; the card prints the paper's instruction instead (its verbs swapped).
+        const paperInstr = _visualSaysNumbers(q.text, q.visual) ? printInstructionFor(q, categoryId) : '';
         const instr = q.screenInstr ? q.screenInstr : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
             : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
-                : plainText(q.text);
+                : paperInstr || plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
     }
     // the place-value disk mat (round 3: the worksheet and quiz drew an empty cell for pv_disks_build)
@@ -3284,11 +3309,56 @@ function _wireRoundLines() {
 }
 
 /**
+ * A MISSING-NUMBER equation (the kit `equation` template with its unknown on a factor / addend,
+ * or a page that boxes every unknown, `resultBox`): the screen draws the paper's own sentence with
+ * its BOX (critic r3 D9: the worksheet drew the legacy text with an underline where paper boxes,
+ * and the card printed the equation again above the cell). The instruction is the skill's print
+ * instruction, never the equation. Returns undefined when the item is not such a cell (the caller
+ * goes on), null when it is but cannot be drawn.
+ */
+function equationKitTwin(q, categoryId = '') {
+    const c = q && q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || typeof c.payload !== 'object') return undefined;
+    const p = c.payload;
+    const u = p.unknown || 'result';
+    if (!(u === 'a' || u === 'b' || (u === 'result' && p.resultBox))) return undefined;
+    if (p.notation === 'fraction' || p.notation === 'bracket') return undefined;
+    if (q.answerType && q.answerType !== 'number') return undefined;
+    if (Array.isArray(q.options) && q.options.length) return undefined;
+    // a drawing of its own (a rule box, a tick list) is the item's cell: it stays
+    if (String(q.visual || '').trim()) return undefined;
+    if (typeof document === 'undefined') return undefined;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell(Object.assign({}, q, { cell: { template: 'equation', payload: p, v: 1 } }), ctx);
+    } catch (e) { return undefined; }
+    if (!html || /data-ws-refused/.test(html)) return undefined;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]')).filter((s) => s.getAttribute('data-ws-graded') !== '0');
+    if (slots.length !== 1) return undefined;
+    const b = document.createElement('span');
+    b.className = 'mq-kblank mq-kblank--box';
+    b.setAttribute('data-mq-blank', 'box');
+    slots[0].replaceWith(b);
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="equation" data-mq-kind="missing">${wrap.innerHTML}</div>`;
+    const instr = printInstructionFor(q, categoryId) || 'Find the missing number.';
+    return { mode: 'blank', html: body, instr, count: 0, kit: 'equation' };
+}
+
+/**
  * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
  * @returns {{mode: 'blank'|'slots', html: string, instr: string, count: number, kit: string}|null}
  */
 export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const c = q && q.cell;
+    const eqTwin = equationKitTwin(q, categoryId);
+    if (eqTwin !== undefined) return eqTwin;
     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
     if (typeof document === 'undefined') return null;
     const p = c.payload;
