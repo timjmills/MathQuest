@@ -1,4 +1,5 @@
 import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, isMixedMetaSkill, getMixedSkillCount } from './data.js';
+import { findSkills, onSkillSearchReady } from './skill-finder.js';
 
 export function buildSkillIndex() {
     const index = [];
@@ -39,6 +40,27 @@ export function getSkillIndex() {
     return skillIndex;
 }
 
+/**
+ * The index entries that match a query, best first, through the shared thesaurus search
+ * (search-terms.js via skill-finder.js): every word must match a label word, a concept term
+ * (plus, take away, carrying, skip counting ...), a standards / WRM / grade code, or a near spelling.
+ */
+export function searchSkillIndex(query) {
+    const byKey = new Map(getSkillIndex().map((it) => [`${it.categoryId}:${it.skillId}`, it]));
+    const out = [];
+    for (const h of findSkills(query)) { const it = byKey.get(h.key); if (it) out.push(it); }
+    return out;
+}
+
+// When the standards / WRM terms finish loading, re-run a search that is on screen.
+onSkillSearchReady(() => {
+    try {
+        const el = document.getElementById('skillSearchInput');
+        const res = document.getElementById('skillSearchResults');
+        if (el && el.value && res && res.style.display !== 'none') handleSkillSearch(el.value);
+    } catch (e) { /* no DOM */ }
+});
+
 export function handleSkillSearch(query) {
     const resultsDiv = document.getElementById('skillSearchResults');
     if (!query || query.trim().length < 2) {
@@ -46,14 +68,11 @@ export function handleSkillSearch(query) {
         return;
     }
     
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
     
     // Find matches - all terms must match
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    });
+    const matches = index;
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:15px;color:var(--text-dim);text-align:center;">No skills found. Try different keywords.</div>';

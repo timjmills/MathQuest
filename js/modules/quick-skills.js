@@ -4,6 +4,7 @@ import { setCookie, getCookie } from './storage.js';
 import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js';
 import { describeOptions } from './skill-options.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
+import { searchSkillIndex } from './skill-search.js';
 
 // A Quick Start card may carry the skill's options (`card.opts`, packed): a teacher link
 // "EA~C78" makes a "Mult Facts" card that drills only the 7s and 8s, and a teacher can set them
@@ -488,14 +489,11 @@ export function handleQuickSkillSearch(query) {
         return;
     }
 
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
 
     // Find matches
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    }).slice(0, 10);
+    const matches = index.slice(0, 10);
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:var(--text-dim);text-align:center;">No skills found</div>';

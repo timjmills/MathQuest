@@ -14,6 +14,9 @@ ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; o
 14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
 the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
 
+**Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
+passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
+
 ### Phone pass (deferred)
 - Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
   ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
@@ -211,6 +214,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
 - 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
+- 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
