@@ -856,6 +856,9 @@ function wsLintPage(cfg) {
         if (!visible(s) || s.closest(SLOT_EXEMPT) || inFeedback(s)) continue;
         const r = s.getBoundingClientRect();
         if (!r.width) continue;
+        // SL-3a (owner 2026-10-09): a count row's narrow Lines write-on line (.k2-line-slot) is allowed at size S ONLY
+        // ("use small to fit more"); at M and L it still needs 14 mm like every other answer line.
+        if (s.classList.contains('k2-line-slot') && (s.closest('[data-ws-size]')?.getAttribute('data-ws-size') === 'S')) continue;
         if (r.width < 14 * PX - 1) F('L-ANSAREA', 'SL-1', 'major', s, `answer line ${mm(r.width)} mm wide; no answer line or stand-alone box is under 14 mm (SL-1, AX-5)`, `short line ${mm(r.width)}`);
     }
     for (const ri of rootInfo) {
@@ -1882,6 +1885,8 @@ const SELF_TESTS = [
     { name: 'answer line under 14 mm', expect: ['L-ANSAREA', 'SL-1'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ws-line" data-ws-slot="x" data-ws-shape="line" style="--w:10mm"></span>'); } },
     { name: 'underscore blank', expect: ['L-ANSAREA', 'SL-6'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span>_____ blocks</span>'); } },
     { name: 'draw zone too small for the model', expect: ['L-ANSAREA', 'H12'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="font-size:11pt">Draw 169 with disks.</div><div data-ws-zone="hundreds" style="width:40mm;height:18mm;border:0.75pt solid #000"></div>'); } },
+    { name: 'narrow Lines write-on line at size M (SL-3a: S only)', expect: ['L-ANSAREA', 'SL-1'], fn: () => { const p = document.querySelector('.ws-page'); p.setAttribute('data-ws-size', 'M'); p.querySelectorAll('[data-ws-cell]').forEach((c) => c.setAttribute('data-ws-size', 'M')); p.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="k2-tile k2-line-slot" data-ws-slot="x" data-ws-shape="line" style="display:inline-block;width:10mm;height:8mm;border-bottom:2px solid #000"></span>'); } },
+    { name: 'narrow Lines write-on line at size S (SL-3a exception)', absent: ['L-ANSAREA', 'SL-1'], expect: [], fn: () => { const p = document.querySelector('.ws-page'); p.setAttribute('data-ws-size', 'S'); p.querySelectorAll('[data-ws-cell]').forEach((c) => c.setAttribute('data-ws-size', 'S')); p.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="k2-tile k2-line-slot" data-ws-slot="x" data-ws-shape="line" style="display:inline-block;width:10mm;height:8mm;border-bottom:2px solid #000"></span>'); } },
     { name: 'an input on paper', expect: ['L-INPUT', 'SP-10'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<input style="width:14mm">'); } },
     { name: 'grade and CCSS code in a cell', expect: ['L-CCSS', 'SC-5'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span style="font-size:11pt">Grade 3 3.NBT.A.2</span>'); } },
 ];
@@ -1949,7 +1954,12 @@ async function selfTest() {
             await sleep(50);
             const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: 'pack' });
             await page.close();
-            const exp = Array.isArray(t.expect[0]) ? t.expect : [t.expect];
+            if (t.absent) {
+                asserts++;
+                if (fired(r, t.absent)) bad.push(`${t.name}: ${t.absent.join(' ')} fired but must not`);
+                else console.log(`  ok   ${t.name}: ${t.absent.join(' ')} not fired`);
+            }
+            const exp = !t.expect.length ? [] : Array.isArray(t.expect[0]) ? t.expect : [t.expect];
             for (const e of exp) {
                 asserts++;
                 if (fired(r, e)) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${r.findings.find(f => f.lint === e[0] && f.rule === e[1]).msg.slice(0, 110)}`);

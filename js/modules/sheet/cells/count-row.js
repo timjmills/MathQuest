@@ -197,6 +197,7 @@ const EXIT_MM = 7.5;        // the turn arrow that leaves a line (6 mm + its mar
  */
 const LINE_GAP_MIN = { paper: 2 * 1.0 + 3, compact: 2 * 1.0 + 3 };   // a 3 mm arrow (head 2.4 mm), 1 mm clear each side
 const LINE_GAP_MAX = 10;
+const LINE_ROOMY_MM = 14;   // a Lines write-on line at M and L is at least this wide (SL-1)
 function linesGeom(p, ctx, c) {
     const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
     const chars = maxDigits(p);
@@ -215,7 +216,11 @@ function linesGeom(p, ctx, c) {
         const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
         if (pt1 >= FLOOR_PT) { w = w1; pt = Math.min(basePt, pt1); }
     }
-    if (!twin && gapFor(n, w, false) < minGap - 1e-6) {
+    // owner ruling 2026-10-09: at print sizes M and L EVERY Lines row takes two lines of 6 (one rhythm on the page) with roomy
+    // write-on lines (~14 mm); only size S keeps 12 on one line with narrow lines (SL-3a, S only)
+    const twoLines = !twin && !p.compact && size !== 'S';
+    if (twoLines) w = Math.max(w, LINE_ROOMY_MM);
+    if (!twin && (twoLines || gapFor(n, w, false) < minGap - 1e-6)) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;

@@ -1629,6 +1629,7 @@ function wireSwipeRows(cellEl) {
                 if (!ln) return;
                 t.style.height = swipes ? '' : `${ln.getBoundingClientRect().height}px`;
                 t.style.marginTop = swipes ? '' : getComputedStyle(ln).marginTop;
+                t.style.alignItems = w.hasAttribute('data-mq-wrapfit') ? 'flex-start' : '';
             });
         };
         // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
@@ -1665,7 +1666,34 @@ function wireSwipeRows(cellEl) {
                 cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
             }
         };
+        // owner ruling 2026-10-09: at Chromebook width (a window 1024 px or wider: 1366 / 1280 with three worksheet cards per row)
+        // a row too wide for its cell WRAPS inside the cell, so the whole row shows with no "Swipe -> for more boxes"; a phone
+        // (narrower window) keeps the swipe. The jump arrow before a wrapped line's first box stays, pointing on from the line above.
+        const wrapRow = () => {
+            const conts = [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')];
+            const was = w.hasAttribute('data-mq-wrapfit');
+            w.removeAttribute('data-mq-wrapfit');
+            conts.forEach((c) => { c.style.flexWrap = ''; c.style.rowGap = ''; c.style.maxWidth = ''; });
+            if (was) w.style.overflowX = 'auto';
+            if (window.innerWidth < 1024) return false;
+            const cellEl2 = w.closest('.mq-scell');
+            if (!cellEl2 || !conts.length) return false;
+            if (frame) { frame.removeAttribute('data-mq-swipes'); frame.style.minWidth = ''; }
+            w.style.width = ''; w.style.maxWidth = '';
+            const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2);
+            const inner = cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
+            const colW = col ? col.getBoundingClientRect().width : 0;
+            if (w.scrollWidth + colW <= inner + 1) return false;
+            w.setAttribute('data-mq-wrapfit', '');
+            w.setAttribute('data-mq-end', '');
+            w.style.overflowX = 'visible';
+            const room = Math.max(120, inner - colW - 14);
+            conts.forEach((c) => { c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.floor(room)}px`; });
+            level();
+            return true;
+        };
         const mode = () => {
+            if (wrapRow()) return;
             if (!frame || !body) return;
             frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
             const its = items();

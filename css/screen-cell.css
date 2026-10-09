@@ -1746,3 +1746,9 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body .mq-scell .k2-shape-line { overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
+/* owner ruling 2026-10-09: a count row that wraps inside its cell at Chromebook width (wireSwipeRows sets data-mq-wrapfit) shows no swipe cue */
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues,
+html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swipe-cue,
+html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swipe-back { display: none; }
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] { scroll-snap-type: none; }
