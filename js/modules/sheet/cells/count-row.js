@@ -68,8 +68,10 @@ const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by column
  * Item 7 (wave 1): a count row placed in a cell narrower than the full line - the Opener's and the Scripted Model's
  * Model cell, half the page wide - wraps to THAT cell's width (more, shorter lines), never shrinking its digits for it.
  * Only a print cell of 2+ columns narrows; the one-column sheets, the one-page sheet and the screen twin keep their line.
+ * A one-page (compact) row placed in such a cell (critic r1 D5) draws as the ordinary row there: the compact single line is the
+ * one-page SHEET's layout, which only a full-width one-column cell holds.
  */
-const narrowCols = (p, ctx) => (!p.compact && ctx && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
+const narrowCols = (p, ctx) => (ctx && ctx.wrapToCell && !p.noWrap && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
 const narrowLive = (p, ctx, live) => { const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
 /** The fewest even lines whose numbers keep `boxW` mm each (and `gap` between) in `avail(rows)` mm. */
 function wrapRows(n, rows0, boxW, gap, avail) {
@@ -96,6 +98,8 @@ function labelAt(p, ctx, i) {
  * is ever squeezed below the size's writing width (RUBRIC H9: 14 mm at L).
  */
 function geom(p, ctx) {
+    const p0 = p;
+    if (p.compact && narrowCols(p, ctx) > 1) p = Object.assign({}, p, { compact: false, fullPt: true });   // keeps the one-page sheet's digit size
     const size = sizeOf(ctx);
     const n = (p.values || []).length || 1;
     const look = p.look === 'train' ? 'train' : 'arcs';
@@ -106,7 +110,7 @@ function geom(p, ctx) {
     let wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
     const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
     // The step tab grows with its text ("−25,000"): the pentagon's point and padding plus the digits at the tab's own size.
-    const tabPtEst = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64) * 1.05, 20);
+    const tabPtEst = Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64) * 1.05, 20);
     const tabLen = String(p.tab || '').length;
     const tabBody = look === 'arcs' && p.tab ? (tabLen <= 2 ? TAB_MM[size] : Math.max(TAB_MM[size], tabLen * 0.6 * tabPtEst * PT_MM + 7)) : 0;
     const tab = tabBody ? tabBody + 2 : 0;
@@ -136,7 +140,12 @@ function geom(p, ctx) {
             return { size, n, look, shape, w: fit.w, h: baseH, pitch: fit.w + fit.gap, gap: fit.gap, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: fit.pt, gw: fit.gw, hasLbl, lblH, lblPt, compact: true };
         }
     }
-    if (look === 'arcs') return arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab, baseH, live, lblPt, lblChars, hasLbl, lblH });
+    if (look === 'arcs') {
+        const ga = arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab, baseH, live, lblPt, lblChars, hasLbl, lblH });
+        // a row too wide for two numbers a line even at FLOOR_PT keeps its full-line geometry: it does not fit the narrow cell
+        // (measured so), and the role gives the Model the whole width instead (opener: Steps underneath, LESSONS_LEARNED L11)
+        return ga || geom(Object.assign({}, p0, { noWrap: true }), ctx);
+    }
     let boxW = 14 + wide;
     let perRow = n;
     const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
@@ -205,7 +214,7 @@ const LINE_GAP_MAX = 10;
 function linesGeom(p, ctx, c) {
     const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
     const chars = maxDigits(p);
-    const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
+    const basePt = Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18);
     const need = (pt) => Math.max(7, chars * 0.56 * pt * PT_MM + 2.4);   // the line is as wide as its widest number + a margin
     const minGap = p.compact ? LINE_GAP_MIN.compact : LINE_GAP_MIN.paper;
     const gapFor = (per, w, exit) => (live - tab - (exit ? EXIT_MM : 0) - per * w) / Math.max(1, per - 1);
@@ -246,12 +255,23 @@ function arcsGeom(p, ctx, c) {
     let perRow = n >= 13 ? 5 : Math.ceil(n / 2);             // 12 -> 6 + 6; 15 -> 5 + 5 + 5
     let rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
-    const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
+    const basePt = Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18);
     if (narrowCols(p, ctx) > 1) {
         // a narrow (Model) cell: more lines, each box keeping today's digits (never below the size's floor)
         const kS = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
         const bMin = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4) * kS;
-        ({ rows, perRow } = wrapRows(n, rows, bMin, MIN_GAP, (r) => live - tab - (r > 1 ? EXIT_MM : 0)));
+        const availR = (r) => live - tab - (r > 1 ? EXIT_MM : 0);
+        const w1 = wrapRows(n, rows, bMin, MIN_GAP, availR);
+        // at most lines of three at today's digits; a wider number (14,000, 1,000,000) shrinks its digits toward FLOOR_PT
+        // (TY-10a, as on the full line) before the row takes more lines, so the Model stays on its page
+        if (w1.perRow >= Math.min(3, n)) ({ rows, perRow } = w1);
+        else {
+            const bFloor = Math.max(MIN_BOX[size], chars * 0.56 * FLOOR_PT * PT_MM + 2.4) * kS;
+            const w2 = wrapRows(n, rows, bFloor, MIN_GAP, availR);
+            if (w2.perRow < Math.min(2, n)) return null;
+            perRow = Math.min(3, n, w2.perRow);
+            rows = Math.ceil(n / perRow);
+        }
     }
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill
     const pitch = (avail + MIN_GAP) / perRow;                   // box + gap, so six boxes and five gaps fill the line

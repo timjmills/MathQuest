@@ -19,6 +19,8 @@ import {
 } from './compose.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
+/** Item 7: the one item is the Model; it wraps to the half-width state cell (count-row reads ctx.wrapToCell). */
+export const WRAP_TO_CELL = (index) => index === 0;
 export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'scripted-model';
 
