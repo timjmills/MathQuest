@@ -123,6 +123,12 @@ const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 
 /** A division fact prints ACROSS ("24 ÷ 6 = ___", PT-FRW-6/7): vertical division is not a fact form. */
 // A division fact the teacher asked for Vertical (div_facts `divForm`) is stacked in the vertical
 // rows (up to 10 columns), like + - x; every other division fact prints across.
+// FALLBACK (documented, divForm): Long division and Fraction are NOT fact-row forms. Fact rows
+// are the dense 5-10 column fluency layout (PT-FRW), one short line per fact; a bracket with
+// its quotient row, or a fraction bar with its answer, is a full cell (Independent, Test,
+// Fact probe ... all draw those forms). So on this page those facts print in the across
+// Standard form, which is the same fact in its plainest written form; the owner's spec puts
+// only Vertical "in up to 10 columns like fact rows".
 const notationOfItem = (it) => String((((it.q || {}).cell || {}).payload || {}).notation || '');
 const isAcross = (items) => items.some((it) => (opOf(it.q || {}) === 'divide' && notationOfItem(it) !== 'vertical')
     || /horiz/.test(notationOfItem(it)));

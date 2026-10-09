@@ -7062,6 +7062,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // (the equation / division templates read ctx.metrics), so the three forms keep
                     // one cell size and one row height and interleave on the page.
                     const inMix = _divFactMixOn();
+                    if (inMix) q.divMix = true;   // read by roles that keep one shape per page (error-analysis)
                     q.skillLabel = 'Div Facts';
                     q.visual = '';
                     q.answerType = 'number';

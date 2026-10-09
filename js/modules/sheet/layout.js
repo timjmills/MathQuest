@@ -573,7 +573,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride) {
         const hs = (items || []).map((it) => measuredH(it, cols));
         if (hs.length >= 2 && hs.every((h) => h > 0) && Math.max(...hs) > Math.min(...hs) * 1.6) {
-            const sorted = hs.slice().sort((a, b) => b - a);
+            // (a div_facts Mix section keeps its dealt order - groupByHeight - so its rows are
+            // the rows it will print, not the tall-first ones)
+            const keepOrder = (items || []).every((it) => it && it.q && it.q.divMix);
+            const sorted = keepOrder ? [] : hs.slice().sort((a, b) => b - a);
+            if (keepOrder) for (let i = 0; i < hs.length; i += cols) sorted.push(Math.max(...hs.slice(i, i + cols)), ...Array(Math.max(0, Math.min(cols, hs.length - i) - 1)).fill(0));
             const rowH = [];
             for (let i = 0; i < sorted.length; i += cols) rowH.push(sorted[i]);
             const avg = rowH.reduce((a, b) => a + b, 0) / rowH.length;
@@ -751,6 +755,10 @@ export function groupByHeight(items, cols) {
     if (!(hi > lo * 1.6)) return items;
     // Wave 1 C2: a one-page count-by sheet is the teacher's row list, printed in the teacher's order (its title names that order).
     if (items.every((it) => it && it.q && it.q.countBy && it.q.countBy.onePage)) return items;
+    // div_facts Mix (`divForm`, owner 2026-10-03): the page interleaves Standard, Long division and
+    // Fraction, one third each in every block of three. Tall-first would sort the brackets and
+    // fractions to the top and every Standard fact to the foot - or onto a page of its own.
+    if (items.every((it) => it && it.q && it.q.divMix)) return items;
     // Height CLASSES, tallest class first; within a class the dealt order stands (critic
     // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
     // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.

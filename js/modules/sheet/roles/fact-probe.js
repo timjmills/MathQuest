@@ -16,7 +16,7 @@
 // Pure module (SCC-01).
 
 import {
-    ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, planItem, gridPart, instructionPart, instructionKeyOf,
+    ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart, instructionPart, instructionKeyOf,
     assemble, poolItems, labelStyleOf, opOf, opGlyphOf, operandsOf, answerOf, writeLine, slotKey, esc, rng, shuffle, deriveSeed,
 } from './compose.js';
 import { isFact, factTitle } from './fact-rows.js';
@@ -26,7 +26,9 @@ export const DEFAULT_LOOK = 'daily';
 const H_ROW = { S: 16, M: 20, L: 24 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
-export const measureCols = () => [5];
+// 5 is the probe's grid; 4 / 3 / 2 are measured for the cells that do not fit 5 (a long-division
+// bracket or a fraction at L: see plan).
+export const measureCols = () => [5, 4, 3, 2];
 export const counts = () => ({ main: 20 });
 
 export function supports(items) {
@@ -80,18 +82,56 @@ export function plan(input = {}) {
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const G = m.body - m.instr - 1;
     const hH = H_ROW[ctx.size];
+    // div_facts "How it is written" (`divForm`): the probe draws every fact in the form the teacher
+    // chose. Standard is "36 ÷ 4 = __" - across, never stacked in the 5-column vertical grid
+    // (VA-65 would stack it there, which is the Vertical form) - so a Standard probe is 20 across
+    // facts in 2 columns. Vertical is 20 vertical facts (no across block: the teacher chose
+    // stacked). Long division and Fraction draw their own cells in the 5-column grid (their
+    // cells are taller, so the page takes the 5 x 4 layout below).
+    const divForms = new Set(items.map((it) => (it.q && it.q.divForm) || ''));
+    const divForm = op === 'divide' && divForms.size === 1 ? [...divForms][0] : '';
     const vert = items.slice(0, 15);
     const hor = items.slice(15).map(horizontal);
-    const canH = hor.every(Boolean);
+    const canH = hor.every(Boolean) && divForm !== 'vertical';
     const labels = labelStyleOf(ctx.look, input.labels);
     const hMin = hMinAt(vert, 5, ctx);
     let body;
+    let extraPages = [];
+    let probeCols = 0;
     let vRows = 3;
     let vH;
     if (canH) {
         vH = Math.min(1.3 * hMin, (G - 6 - 3 * hH) / 3);
     }
-    if (!canH || vH < hMin) {
+    const across = divForm === 'standard' ? items.map(horizontal) : null;
+    if (across && across.every(Boolean)) {
+        // 20 across facts, 2 columns x 10 rows: each row the across row height when the page has
+        // room, never less than the across fact's own height (the digits never shrink, PG-20).
+        vRows = 10;
+        vH = Math.max(hH * 0.8, Math.min(hH * 1.3, G / 10));
+        body = gridPart(across.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 10, cellH: vH, labels, start: 1 });
+    } else if (!fitsAt(items, 5, ctx)) {
+        // A cell that does not fit the 5-column grid (div_facts Long division / Fraction / Mix at
+        // M or L: the bracket and its quotient boxes are wider than a fifth of the page). The
+        // digits never shrink to fit (PG-20), so the probe takes the widest column count every
+        // fact fits (measured, DN-10), as many rows as their height allows, and runs on to a
+        // second page when 20 facts need it - the probe stays 20 facts in the chosen form.
+        const cols = bestCols(items, [4, 3, 2], ctx);
+        const h = hMinAt(items, cols, ctx);
+        const rowsFit = Math.max(1, Math.floor(G / (Number.isFinite(h) ? h : G)));
+        // the pages share the facts evenly (a rebalanced last page, PG-21), never a short tail
+        const nPages = Math.ceil(items.length / (cols * Math.min(rowsFit, Math.ceil(items.length / cols))));
+        const rows = Math.ceil(Math.ceil(items.length / nPages) / cols);
+        const per = cols * rows;
+        vRows = rows;
+        vH = Math.min(Number.isFinite(h) ? 1.3 * h : G / rows, G / rows);
+        const chunks = [];
+        for (let i = 0; i < items.length; i += per) chunks.push(items.slice(i, i + per));
+        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + k * per, cls: 'facts' }));
+        body = grids[0];
+        if (grids.length > 1) extraPages = grids.slice(1).map((g) => ({ sections: [g] }));
+        probeCols = cols;
+    } else if (!canH || vH < hMin) {
         // No room (or no operands) for the horizontal block: 20 vertical facts, 5 x 4.
         vRows = 4;
         vH = Math.min(1.3 * hMin, G / 4);
@@ -110,10 +150,10 @@ export function plan(input = {}) {
     } else {
         sections.push(body.kind === 'col' ? body : body);
     }
-    return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
+    return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }, ...extraPages], {
         defaultLook: DEFAULT_LOOK,
         meta: { items: items.length, scoreOutOf: items.length, form, strip: strip || null,
-            fits: [{ cols: 5, rows: vRows, line: `Fits: 5 columns x ${vRows} rows${vRows === 3 ? ' + 5 horizontal' : ''}, ${items.length} facts.` }],
+            fits: [{ cols: probeCols || (vRows === 10 ? 2 : 5), rows: vRows, line: `Fits: ${probeCols || (vRows === 10 ? 2 : 5)} columns x ${vRows} rows${vRows === 3 && !probeCols ? ' + 5 horizontal' : ''}${extraPages.length ? `, ${1 + extraPages.length} pages` : ''}, ${items.length} facts.` }],
             notes: strip ? [] : [op === 'add' || op === 'subtract' ? 'Add and subtract probes print without a cue strip (number track and dot tile not built yet).' : 'Mixed set: no skip-count strip.'] },
     });
 }

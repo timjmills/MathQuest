@@ -12,6 +12,13 @@
 //   mixed   inside a mixed-practice page (div_facts + mult_facts) the default deals all Standard,
 //           and Mix deals one third each of the division items.
 //   codes   every value round-trips through the share-code option payload.
+//   roles   every form + Mix on EVERY role buildSheet composes (SHEET_ROLES), key built: it builds,
+//           the pupil page draws the item in its chosen form (or the role's documented fallback:
+//           fact-rows prints Long division / Fraction across, stretch and word-problems rewrite
+//           the item), the key prints the answers, and Error analysis / True or False / Reason it
+//           carry their verdicts (ticks) on the key only, never on the pupil page.
+//   hosts   the online worksheet and the quiz draw each form and a right answer scores (driven by
+//           ws-screen-answer.cjs --opts, the screen round-trip every redone skill passes).
 //
 // Run: /tmp/mq-browser-run.sh node tests/scripts/ws-div-facts-forms.cjs
 const { open } = require('../lib/ws-harness.cjs');
@@ -62,6 +69,50 @@ const MARK = {
             check(!/Digits \d+ pt so/.test(r.note + r.note2), `paper vertical fact-rows ${size}: no shrink ("${r.note}" / "${r.note2}")`);
         }
 
+
+        // ---------------------------------------------------------------- every role
+        const ROLES = await page.evaluate(async () => (await import('/js/modules/print-sheet.js')).SHEET_ROLES);
+        // Roles that rewrite the item (no single fact left to draw in a form) - see their comments.
+        const REWRITE = new Set(['stretch', 'word-problems']);
+        for (const role of ROLES) {
+            for (const form of [...FORMS, 'mix']) {
+                const r = await page.evaluate(async (role, form) => {
+                    try {
+                        const res = await window.buildSheet({ role, size: 'M', seed: 4242, key: true,
+                            sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: form } }], count: 6 }] });
+                        // the item's kit template (count-row: the Review page's own warm-up rows)
+                        const forms = res.items.map((i) => i.template).filter((t) => t !== 'count-row');
+                        const p = res.pupilHtml || '', k = res.keyHtml || '';
+                        const txt = (h) => { const d = document.createElement('div'); d.innerHTML = h.replace(/<style[^]*?<\/style>/g, ''); return d.textContent; };
+                        return { n: res.items.length, forms, pupil: p, key: k, keyText: txt(k), answers: res.items.map((i) => String(i.ans)),
+                            pupilSaid: /The answer is\s*\d/.test(txt(p)), keySaid: /The answer is\s*\d/.test(txt(k)),
+                            pupilTicks: (txt(p).match(/✓/g) || []).length, keyTicks: (txt(k).match(/✓/g) || []).length };
+                    } catch (e) { return { err: String(e && e.message || e) }; }
+                }, role, form);
+                const tag = `role ${role} ${form}`;
+                if (r.err) { check(false, `${tag}: builds (${r.err})`); continue; }
+                check(r.n > 0 && !!r.key, `${tag}: builds with its key (${r.n} items)`);
+                if (REWRITE.has(role)) check(true, `${tag}: dealt (${r.forms[0]})`);
+                else if (form !== 'mix') check(r.forms.every((f) => f === TEMPLATE[form]), `${tag}: every item dealt on the ${TEMPLATE[form]} template`);
+                else check(r.forms.every((f) => f === 'division' || f === 'equation') && (r.n < 3 || new Set(r.forms).size === 2), `${tag}: Mix deals bracket and one-line cells (${[...new Set(r.forms)].join(',')})`);
+                const long = (r.pupil.match(/data-ws-ops="division"/g) || []).length;
+                const frac = (r.pupil.match(/data-ws-notation="fraction"/g) || []).length;
+                const vert = (r.pupil.match(/class="ws-fact"/g) || []).length;
+                if (REWRITE.has(role)) check(true, `${tag}: role rewrites the item (documented fallback)`);
+                else if (role === 'fact-rows' && (form === 'long' || form === 'fraction' || form === 'mix')) check(long === 0 && frac === 0 && /÷/.test(r.pupil), `${tag}: prints across (documented fact-rows fallback)`);
+                else if (form === 'long') check(long > 0 && frac === 0 && vert === 0, `${tag}: draws the bracket (${long})`);
+                else if (form === 'fraction') check(frac > 0 && long === 0 && vert === 0, `${tag}: draws the fraction bar (${frac})`);
+                else if (form === 'vertical') check(vert > 0 && long === 0 && frac === 0, `${tag}: draws vertical facts (${vert})`);
+                else if (form === 'standard') check(vert === 0 && long === 0 && frac === 0 && /÷/.test(r.pupil), `${tag}: draws across, nothing stacked`);
+                else if (r.n < 3) check(long + frac > 0 && vert === 0, `${tag}: one worked item, drawn in a Mix form`);
+                else check(long > 0 && frac > 0 && vert === 0, `${tag}: draws both bracket and fraction (${long}/${frac})`);
+                if (['error-analysis', 'true-false'].includes(role)) check(r.pupilTicks === 0 && r.keyTicks > 0, `${tag}: the verdicts are on the key only (pupil ${r.pupilTicks}, key ${r.keyTicks})`);
+                if (role === 'reason-it') check(!r.pupilSaid && r.keySaid, `${tag}: "The answer is __" is written on the key only`);
+                // the key carries the answers (a role prints a subset of the dealt items, so at least one)
+                check(r.answers.some((a) => r.keyText.includes(a)), `${tag}: key prints answers`);
+            }
+        }
+
         // ---------------------------------------------------------------- screen (practice card)
         for (const form of FORMS) {
             for (const w of [390, 1280]) {
@@ -98,6 +149,41 @@ const MARK = {
             }
         }
 
+
+        // ---------------------------------------------------------------- online worksheet + quiz: drawn in form
+        await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+        for (const form of [...FORMS, 'mix']) {
+            await page.reload({ waitUntil: 'networkidle2' });
+            await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+            await page.evaluate((form) => {
+                window.clearSetOptions({ silent: true });
+                window.setSetOptions('division', 'div_facts', { divForm: form }, { silent: true });
+                const st = window.state; st.category = 'division'; st.skill = 'div_facts'; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6;
+                window.initWorksheet();
+            }, form);
+            await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 30000 });
+            const w = await page.evaluate(() => window.state.worksheetQs.map((q, i) => ({ f: q.divForm, html: (document.getElementById('ws_card_' + i) || {}).innerHTML || '' })));
+            const okW = w.length > 0 && w.every((c) => (form === 'mix' ? ['standard', 'long', 'fraction'].includes(c.f) : c.f === form) && MARK[c.f](c.html));
+            check(okW, `worksheet ${form}: every card drawn in its form (${w.map((c) => c.f).join(',')})`);
+            await page.evaluate(() => { Array.from(document.body.children).filter((e) => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach((e) => e.remove()); });
+            const qz = await page.evaluate((form) => {
+                const questions = [];
+                for (let i = 0; i < 3; i++) {
+                    const q = window.generateQuestionFor({ category: 'division', skill: 'div_facts', seed: 300 + i, itemIndex: i, opts: { divForm: form } });
+                    questions.push({ id: i, skillId: 'div_facts', points: 1, questionData: window.quizQuestionData(q) });
+                }
+                const test = { id: null, name: 'Forms', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
+                    settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                window.handleQuizURL(window.compressTestForURL(test));
+                const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                window.startQuizTest();
+                const cell = document.querySelector('#quizTakeView .qt-cell');
+                return { f: window.generateQuestionFor({ category: 'division', skill: 'div_facts', seed: 300, itemIndex: 0, opts: { divForm: form } }).divForm, html: cell ? cell.innerHTML : '' };
+            }, form);
+            check((form === 'mix' ? ['standard', 'long', 'fraction'].includes(qz.f) : qz.f === form) && !!qz.f && MARK[qz.f](qz.html), `quiz ${form}: the question draws its form (${qz.f})`);
+            await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
+        }
+
         // ---------------------------------------------------------------- mix
         // A page's forms, counted from what it draws: the bracket, the fraction bar, the rest across.
         const formsOf = (r) => {
@@ -118,6 +204,17 @@ const MARK = {
             check(r.t.join() === r.t2.join(), `mix ${n}: reproduces from its seed`);
             check(r.fits === 1, `mix ${n}: one section, one grid (aligned cells; ${r.fits} section(s))`);
             check((r.key.match(/data-ws-ops="division"/g) || []).length === c.long && (r.key.match(/data-ws-notation="fraction"/g) || []).length === c.fraction, `mix ${n}: the key draws each cell in its own form`);
+        }
+        // the page's own count (one page) at every size: Mix stays one page, in dealt order (the
+        // tall-first H13 sort would put every Standard fact at the foot, or overleaf)
+        for (const size of ['S', 'M', 'L']) {
+            const r = await page.evaluate(async (size) => {
+                const res = await window.buildSheet({ role: 'independent', size, seed: 69559, key: true,
+                    sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'mix' } }] }] });
+                return { pages: res.pageCount, n: res.items.length, order: res.items.map((i) => i.template[0]).join(''), kinds: (res.pupilHtml.match(/data-ws-ops="division"|data-ws-notation="fraction"|÷/g) || []).length };
+            }, size);
+            const firstHalf = r.order.slice(0, Math.ceil(r.n / 2));
+            check(r.pages === 1 && /d/.test(firstHalf) && /e/.test(firstHalf), `mix ${size}, the page's own count: one page, forms interleaved (${r.n} items, ${r.pages} page(s), ${r.order})`);
         }
         const forms = await page.evaluate(() => {
             const out = [];
@@ -158,6 +255,17 @@ const MARK = {
         check(false, 'threw: ' + (e && e.stack || e));
     } finally {
         await app.close();
+    }
+    // Right answers score on the online worksheet and the quiz (and the card), each form: the same
+    // round-trip ws-screen-answer.cjs runs for every redone skill, with the form as the skill option.
+    const { execFileSync } = require('child_process');
+    for (const form of [...FORMS, 'mix']) {
+        let out = '';
+        try {
+            out = execFileSync(process.execPath, [require('path').join(__dirname, 'ws-screen-answer.cjs'), '--skills', 'division:div_facts', '--hosts', 'worksheet,quiz', '--opts', JSON.stringify({ divForm: form })], { encoding: 'utf8', timeout: 300000 });
+        } catch (e) { out = String((e.stdout || '') + (e.stderr || e.message)); }
+        const line = (out.match(/^division:div_facts.*$/m) || [''])[0].replace(/\s+/g, ' ');
+        check(/worksheet ok/.test(line) && /quiz ok/.test(line) && /ws-screen-answer: OK/.test(out), `hosts ${form}: right answers score (${line})`);
     }
     console.log(fails ? `ws-div-facts-forms: FAIL (${fails})` : 'ws-div-facts-forms: OK');
     process.exit(fails ? 1 : 0);

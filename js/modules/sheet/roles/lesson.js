@@ -1122,7 +1122,18 @@ export function plan(input = {}) {
     const colsFor = (k) => (k >= 3 ? 4 : k === 2 ? 3 : 2);
     const cue = (its) => its.some((it) => countCueOf(it));
     let gk = 3;
-    const drawnW = (it) => (it.template === 'fact' ? 26 : ((it.footprint && it.footprint.wMm) || 99));
+    // A vertical fact is about 26 mm wide. An ACROSS fact ("132 ÷ 12 =", the answer line under it:
+    // fact.js's DN-22 'below' form) is as wide as its sentence at the page's digit size - it never
+    // shrinks (PG-20) - so 3-digit division facts take 2 Guided cells, not 3 that they overrun.
+    const acrossW = (it) => {
+        const p = (it.q && it.q.cell && it.q.cell.payload) || {};
+        if (!/^horiz/.test(String(p.notation || ''))) return 26;
+        const pt = Number(p.pt) || (ctx.metrics && ctx.metrics.digitPt) || 28;
+        return (pt * 25.4 / 72) * (0.56 * (String(p.a).length + String(p.b).length) + 2 * 0.8 + 3 * 0.18) + 3;   // + the cell pads the check below leaves out
+    };
+    // (the widest of the pool: the Guided set is picked from it after this count is chosen)
+    const factW = Math.max(26, ...main.filter((it) => it.template === 'fact').map(acrossW));
+    const drawnW = (it) => (it.template === 'fact' ? factW : ((it.footprint && it.footprint.wMm) || 99));
     while (gk > 2 && !(fitsWidth(rest.slice(0, gk), 4) && rest.slice(0, gk).every((it) => drawnW(it) + (cue([it]) ? 10 : 0) <= 124 / gk - 4))) gk--;
     if (gk === 2 && !fitsWidth(rest.slice(0, 2), 3)) gk = 1;
     const zH = hOf(stepsZone, 3);
