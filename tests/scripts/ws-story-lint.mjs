@@ -79,7 +79,7 @@ for (let k = 0; k < 40; k++) {
                 const add = makeStep(x - y, '+', y);                // (x - y) + y
                 for (const sc of ['join', 'compare-more', 'start-sub']) { const s = tellStory(sc, add, k); lint(s, add, `${sc} ${add.top}+${add.bottom} k${k}`); if (s) out(sc, s); }
                 const sub = makeStep(x, '-', y);
-                for (const sc of ['separate', 'compare', 'change', 'start-add']) { const s = tellStory(sc, sub, k); lint(s, sub, `${sc} ${x}-${y} k${k}`); if (s) out(sc, s); }
+                for (const sc of ['separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some']) { const s = tellStory(sc, sub, k); lint(s, sub, `${sc} ${x}-${y} k${k}`); if (s) out(sc, s); }
             }
         }
     }

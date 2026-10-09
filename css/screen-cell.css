@@ -1732,3 +1732,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
 .mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
+
+/* ---- Steps-box lane (D3): an open hint sits in flow between the bar and the paper, pushing
+   the cell down, so it never covers the story it hints about (RUBRIC C1: chrome never covers). */
+.problem-card.mq-wscard > .hint-popup.active {
+    position: relative; top: auto; bottom: auto; left: auto; right: auto;
+    margin: 0 0 8px; box-shadow: none;
+}

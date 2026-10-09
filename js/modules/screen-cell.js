@@ -683,8 +683,8 @@ function _badgePlace(el) {
     if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
     b.dataset.kind = kind;
     const r = el.getBoundingClientRect();
-    // not shown while the box is not, nor while this item's hint box is open over it
-    const hintOpen = !!host.querySelector('.hint-popup.active');
+    // not shown while the box is not
+    // (the hint now sits in page flow above the cell, so the tick stays while it is open)
     // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
     let clipped = false;
     for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
@@ -694,7 +694,7 @@ function _badgePlace(el) {
             if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
         }
     }
-    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
+    if (!r.width || !r.height || clipped) { b.style.display = 'none'; return; }
     b.style.display = '';
     const c = _badgeSpot(el, r, host);
     const hr = host.getBoundingClientRect();
