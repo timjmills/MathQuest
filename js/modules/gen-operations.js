@@ -1698,7 +1698,20 @@ function _generateLadderV2(q, skill, helpers, range) {
     // quotient is BUILT to carry an interior zero, and the item is checked for it below.
     if (skill === 'div_zero_in_quotient') {
         let dividend = 0, divisor = 0, quotient = 0;
-        for (let t = 0; t < 40; t++) {
+        // critic r5 D5-6: the second named edge case, a zero in the quotient's ONES (840 ÷ 4 = 210),
+        // is dealt on 1 cell in 4 (balanced per page, page-deal.js); the rest keep the middle zero
+        const onesZero = dealIndex(`dzq-ones:${state.skill}`, 4) === 0;
+        for (let t = 0; onesZero && t < 40; t++) {
+            const d = rng(2, 9);
+            const maxQ = Math.floor(999 / d);
+            if (maxQ < 110) continue;
+            const h = rng(1, Math.min(9, Math.floor(maxQ / 100)));
+            const tMax = Math.min(9, Math.floor((maxQ - h * 100) / 10));
+            if (tMax < 1) continue;
+            const qq = h * 100 + rng(1, tMax) * 10;     // h, t, 0 — the zero is the ones place
+            dividend = qq * d; divisor = d; quotient = qq; break;
+        }
+        for (let t = 0; !divisor && t < 40; t++) {
             const fourDigit = range >= 1000 && rng(0, 2) === 0;
             const d = fourDigit ? rng(2, 4) : rng(2, 9);
             if (fourDigit) {
@@ -1725,7 +1738,9 @@ function _generateLadderV2(q, skill, helpers, range) {
         const head = Math.floor(quotient / 100) * divisor;
         q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
             + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
-            + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
+            + (quotient % 10 === 0
+                ? `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times. When ${divisor} does not go into the last digit, write 0 in the ones place.`
+                : `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`);
         // The kit's `short-division` bus stop (lint 2026-09-26: the legacy bracket was Arial and had
         // no named slot): a quotient box over EVERY digit, so the pupil sees the place the 0 must
         // fill, and the exchange boxes carry what is left to the next digit. Paper, key and the

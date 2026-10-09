@@ -1737,3 +1737,16 @@ html body .mq-nfkit input.number-family-input:focus { outline: none; }
 /* Round 5 (wave 1 lane D, D-C): a number-line card on the worksheet grid is sized to its own
    content; it no longer stretches to a taller neighbour's row height (a 37 % empty band). Additive. */
 html body .online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) { align-self: start; height: auto; }
+
+/* Round 6 (wave 1 lane D, critic r5 D5-4): cards in one worksheet row share the row height again (a
+   short number-line card beside a tall array left the row ragged). The number-line card stretches,
+   but its bordered cell keeps its own compact height at the top of the card, so the drawing has no
+   empty band inside it.
+   Additive: it overrides the round-5 align-self:start rule by specificity only. */
+html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) { align-self: stretch; height: auto; }
+html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) > .mq-wspaper { justify-content: flex-start; }
+html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) > .mq-wspaper > .ws-cell.mq-scell { flex: 0 0 auto; justify-content: flex-start; }
+
+/* Round 6 (critic r5 D5-6.4): the counters twin (count_objects, count_only …) drew its shapes against
+   the cell's left border on the worksheet; the drawing gets its 3 mm inner padding on every host. Additive. */
+html body .ws-cell.mq-scell:has(.k2-twin[data-mq-template="counters"]) { padding-left: 12px; padding-right: 12px; box-sizing: border-box; }
