@@ -355,13 +355,15 @@ function gridPart(part, ctx, report) {
         // critic r3 (N-1, lead ruling on Q1): the key marks a Model cell, so its traced worked answer
         // stays a black given there while a Guided Practice trace takes the key ink (key only).
         let html = itemHtml(item, ctx, report);
-        if (report.key && (item.model || report.inModel)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
+        const keyModel = report.key && (item.model || report.inModel);
+        if (keyModel && /\sdata-ws-cell="/.test(html)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
         return {
             html,
             cls: [gi.cls, item.cls].filter(Boolean).join(' '),
             style: [gi.style, item.style].filter(Boolean).join(';'),
             nolabel: !!item.nolabel,
             model: !!item.model,
+            keyAttr: keyModel && !/\sdata-ws-key-model\b/.test(html) ? 'data-ws-key-model' : '',
         };
     });
     // CL-12: a label run continues across sections and across pages, so the counter lives on

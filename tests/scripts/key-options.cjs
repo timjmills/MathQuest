@@ -129,6 +129,10 @@ async function alignProbe({ role, FAM }) {
                 for (const x of KS) {
                     const twin = twins.get(x);
                     if (twin) {
+                        // a mark the pupil page traces and the key inks solid is the pupil's answer on a
+                        // Guided Practice item (lead ruling, critic r3 Q1): key ink, whole
+                        const overTrace = twin.el.closest('[data-ws-ink="trace"]') && !x.el.closest('[data-ws-ink="trace"]');
+                        if (overTrace) { if (!x.full) issues.push(`${where} traced answer ${x.el.tagName} not in key ink`); continue; }
                         if (x.st === ORANGE || (x.fi === ORANGE && twin.fi === 'rgb(0, 0, 0)')) issues.push(`${where} given ${x.el.tagName} in key ink`);
                     } else if (!x.full) issues.push(`${where} drawn answer ${x.el.tagName} not fully key ink (stroke ${x.st || '-'} fill ${x.fi || '-'})`);
                 }
