@@ -23,14 +23,16 @@ import {
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'opener';
+/** Item 7: the first item is the Model; it wraps to the half-width Model cell (count-row reads ctx.wrapToCell). */
+export const WRAP_TO_CELL = (index) => index === 0;
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
 
 /** Lines a list of steps takes in the 93 mm Steps zone, from an Andika width estimate. */
-function stepLines(list, textPt) {
-    const perLine = Math.max(12, Math.floor((93 - 16) / (0.5 * textPt * 25.4 / 72)));
+function stepLines(list, textPt, zoneMm = 93) {
+    const perLine = Math.max(12, Math.floor((zoneMm - 16) / (0.5 * textPt * 25.4 / 72)));
     return list.reduce((a, s) => a + Math.max(1, Math.ceil(s.length / perLine)), 0);
 }
 
@@ -44,20 +46,26 @@ function geometry(items, input) {
     const whatsNew = String(str.whatsNew || '').trim();
     const steps = first ? generalSteps(first).slice(0, 6) : [];
     const twoModels = items.length >= 2 && fitsAt(items.slice(0, 2), 4, ctx);
-    const mc = twoModels ? 4 : 2;
+    // Item 7 (LESSONS_LEARNED L11): a count row too wide for the half-width Model cell even wrapped (1,000,000 by 100,000)
+    // takes the whole width, with the Steps band underneath; every other Model keeps the Model | Steps row.
+    const modelFull = !twoModels && !!first && first.template === 'count-row' && steps.length > 0 && !fitsAt([first], 2, ctx);
+    const mc = twoModels ? 4 : modelFull ? 1 : 2;
     const modelH = hMinAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
-    const stepsH = stepLines(steps, m.textPt) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
-    const modelBand = m.strip + Math.max(modelH, stepsH);
+    const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
+    const modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
     const gc = bestCols(items, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
     const gH = hMinAt(items, gc, ctx);
     let used = (whatsNew ? m.strip + 2 : 0) + modelBand + m.say + m.strip + gH;
     let iRows = 0;
-    while (iRows < 2 && used + (iRows ? 0 : m.strip) + gH <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
-    const spare = Math.max(0, m.budget - used);
+    // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
+    // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
+    const hand = first && first.template === 'count-row' ? m.strip : 0;
+    while (iRows < 2 && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
+    const spare = Math.max(0, m.budget - used - hand);
     const rowsThatGrow = 1 + iRows;
     const grow = Math.min(8, spare / rowsThatGrow);
-    return { ctx, m, whatsNew, steps, twoModels, mc, modelH, stepsH, modelBand, gc, gH, iRows, grow, overBudget: used > m.budget, used };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, iRows, grow, overBudget: used > m.budget, used };
 }
 
 export function counts(pools, input) {
@@ -80,11 +88,14 @@ export function plan(input = {}) {
     const modelItems = models.map((it, i) => planItem(it, { cols: g.mc, level: i === 0 ? 3 : 2, nolabel: true, model: ctx.look === 'daily', render: i === 0 ? traced(it) : undefined }));
     const sections = [];
     if (g.whatsNew) sections.push({ kind: 'band', label: "What's New:", instr: g.whatsNew, html: '' });
-    const modelContentH = g.modelBand - m.strip;
+    const modelContentH = g.modelFull ? g.modelH : g.modelBand - m.strip;
     // SCC 3.8: the Steps come from the skill's provider; a skill with none gets no Steps box
     // (generic operation steps were wrong for half the skills), and the Model takes the row.
     const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) };
-    if (g.steps.length) {
+    if (g.steps.length && g.modelFull) {
+        sections.push(modelBandPart);
+        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });
+    } else if (g.steps.length) {
         sections.push({
             kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow',
             parts: [

@@ -795,7 +795,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (ink === 'trace' && v === answer) st = 'traced';
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
-        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
         // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
         // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
@@ -984,7 +984,7 @@ function measureItems(items, { size, look, colsList }) {
             for (const it of items) {
                 let best = { hMm: 0, fits: true };
                 for (const state of ['blank', 'answered']) {
-                    const ctx = resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state });
+                    const ctx = Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state }), it.wrapToCell ? { wrapToCell: true } : {});
                     let body = '';
                     try { body = it.render(ctx, { cols: c }); } catch (e) { body = ''; }
                     root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
@@ -1973,6 +1973,13 @@ async function buildRoleSheet(n, metaOf) {
                 prepared.pool = pool.id;
                 // A role that draws Model / Guided cells measures them at their tallest level.
                 if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+                // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
+                // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
+                if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
+                    prepared.wrapToCell = true;
+                    // a wrapped count row redraws its arrows to the narrower pitch and takes more lines on purpose (digits keep their size)
+                    if (prepared.template === 'count-row') { prepared.scalesWithCols = true; prepared.colsLayout = true; }
+                }
                 prepared.section = 0;
                 out.push(prepared);
             }
