@@ -38,10 +38,15 @@ export function prepare(it, info = {}) {
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
     const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false }));
-    const render = (c, o = {}) => `<div class="mq-ab">`
-        + `<div class="mq-abbox"><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
-        + `<div class="mq-abbox"><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
-        + `<div class="mq-abresp">`
+    // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
+    // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
+    // box; the response column stays beside both.
+    const wide = it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2;
+    const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
+    const render = (c, o = {}) => `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
+        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
+        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
+        + `<div class="mq-abresp"${at(2, '1 / 3')}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
         + `<div class="mq-frame">The answer is ${writeLine('ri-ans', c, key, digits)}.</div>`

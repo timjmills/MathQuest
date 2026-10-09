@@ -1,5 +1,26 @@
 # Status and handover — paused 2026-09-26 (owner: "stop our work for now, keep track of what is done")
 
+## 00. Device priority (owner, 2026-10-09)
+
+Pupils mostly use **Chromebooks**; phones are rare for now. Screen work is tested first at Chromebook size —
+1366 x 768 window (~650 px visible height), 1280 x 720, mouse/trackpad and touch. The answer box, its problem and
+Check/Next must be reachable at that height. Phones (390 px) get a basic check only (no page overflow, boxes tappable,
+typing works); phone-only polish is deferred to a later phone pass and listed below, never blocking a lane.
+
+**Stretch / thinking pages (owner 2026-10-09):** not built, fixed or graded until after Wave 8 (lessons) — `MASTER_PLAN.md` Wave 9. Lanes and critics skip them.
+
+### Phone pass (deferred)
+- Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
+  ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
+  unbreakable and "=" with its box (sheet/cells/pv.js frameHTML), so no line starts with "=" and no number
+  parts from its unit; any remaining 390-only line-wrap polish is deferred to the phone pass.
+- place-value "7,330 = [ ] tens 0 ones" is CLIPPED at both edges on the 390 quiz/card (critic pv-r3 P1)
+- place-value rename sentences wrapping at 390 ("=" at a line start, number split from its unit)
+- four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
+- count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
+- add_three overflow at 390 (Lane B R5) unless the page itself overflows
+- count rows, Answer spaces: Lines, card at 390 (critic countby-arrows r1 D1/D7): check the next-box yellow and right/wrong tints never cover a jump arrow at phone width (the input is now clamped to its drawn line; Chromebook hosts measure 0 overlaps)
+
 ## 0. Wave 1 paused 2026-10-03 (owner: "save and commit what we have and we will pick up later")
 
 **Live (master = `71c600a`):** Lane A (pulse, Skip after N, per-skill calculator, hint audio, four Start buttons),
@@ -81,6 +102,10 @@ below; this file only points to them.
 | Per-part "New numbers" for the built lessons; per-section refresh noted as a later option | `LESSON_LIBRARY_PLAN.md` §8e |
 | **2026-09-27, recorded, not built:** answers on every printed key are reddish orange (owner 2026-10-02; was red) (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
 | **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker; several skills can be selected in one go in thumbnail or list view | `design/TEACHER_SCREENS.md` "Selecting skills" |
+
+| **2026-10-09, provisional (lead):** the four-zone place-value disk mat swipes inside its cell on a 390 px phone (SP-11a extended to disk mats) until the owner rules | `WORKSHEET_DESIGN_STANDARD.md` SP-11a |
+
+Open question (place-value disks lane): on a phone, keep the four-zone disk mat as a swipe, or draw it 2 × 2 (Th H over T O)?
 
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
@@ -180,3 +205,26 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
+
+## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
+
+These are deferred to Wave 8 (owner ruling 2026-10-03: lessons and anchor charts wait for the Lesson wave). A fix
+for all of them was built and then reverted from the Steps-box / hint branch; see commits `504f71a`, `8971231`,
+`f98e75e`, `a1ae434` (reverted by the commit that adds this section) for a worked approach.
+
+- **Anchor chart overflows** (`ws-grade-render --roles lesson`, OVERFLOW) for add / sub / mult / div word problems
+  and `multi_step_word`: every panel repeats the story and the column work, so a 2 x 2 chart runs past the page.
+  The rule to keep: never zoom below 1 (content never shrinks); fit by structure (story only in panel 1, the work
+  only after it; continue on a second chart page with whole panels, full width).
+- **Off-skill Warm-up**: an addition word-problem lesson warms up on `add_sub_100s` ("900 − 100"); a lesson with no
+  lesson data takes the two skills listed before it, whatever their operation. Rule: only earlier skills whose name
+  holds no operation the skill's own name lacks; a prerequisite too tall for a Warm-up is replaced, never the band
+  dropped (PT-OPN-1).
+- **`multi_step_word`**: the Warm-up uses tape-diagram items that overlap the next band (ruling: warm up on one add
+  and one subtract fact skill); the Model clamps to six steps, so only Step 1 shows (say each step as one move:
+  "Step 1: Circle +. 17 + 27 = 44."); at L the Warm-up and the Guided band cannot share a page (ruling: the Warm-up
+  sits beside the Guided cells, under the Steps).
+- **mult lesson Warm-up**: `mult_properties` arrays overflow the sheet; a 2-digit by 2-digit stack spills a 4-column
+  half cell; the key's answer digits need about 4 mm more row height than the pupil page.
+- 2026-10-09 div_facts forms fix round 3: builder escalated to Opus medium (the ceiling) - Mix at size L wasted space (critic R1 D14, R2 D-A) survived two Opus-low rounds.
+

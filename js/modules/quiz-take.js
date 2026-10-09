@@ -216,7 +216,7 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
     'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
-    'cell', 'skillId', 'categoryId',
+    'cell', 'skillId', 'categoryId', 'pv',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
     'dualFractionAnswers',
     // 2026-10-04: a number family is graded in any order from its rows
@@ -256,7 +256,7 @@ function renderQuizInterface() {
     const total = allQs.length;
     const flatIdx = state.quizOrder[state.quizQuestionIndex];
     const qItem = allQs[flatIdx];
-    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const answered = quizAnswers.filter(isAnswered).length;
     const progressPct = ((state.quizQuestionIndex + 1) / total * 100).toFixed(0);
 
     // Section header (sequential mode with multiple sections)
@@ -280,7 +280,7 @@ function renderQuizInterface() {
             prevSectionIdx = item.sectionIdx;
             let cls = 'qt-q-dot';
             if (i === state.quizQuestionIndex) cls += ' current';
-            if (quizAnswers[fIdx].studentAnswer !== '') cls += ' answered';
+            if (isAnswered(quizAnswers[fIdx])) cls += ' answered';
             if (quizFlags[fIdx]) cls += ' flagged';
             dotGridHtml += `<div class="${cls}" onclick="jumpToQuizQuestion(${i})">${i + 1}</div>`;
         });
@@ -288,7 +288,7 @@ function renderQuizInterface() {
         dotGridHtml = state.quizOrder.map((fIdx, i) => {
             let cls = 'qt-q-dot';
             if (i === state.quizQuestionIndex) cls += ' current';
-            if (quizAnswers[fIdx].studentAnswer !== '') cls += ' answered';
+            if (isAnswered(quizAnswers[fIdx])) cls += ' answered';
             if (quizFlags[fIdx]) cls += ' flagged';
             return `<div class="${cls}" onclick="jumpToQuizQuestion(${i})">${i + 1}</div>`;
         }).join('');
@@ -546,6 +546,9 @@ function restoreAnswer(flatIdx) {
     }
 }
 
+// answered: something written, and every box of a several-box answer filled
+const isAnswered = (a) => !!a && a.studentAnswer !== '' && !a.partial;
+
 // ---- Answer Submission ----
 
 export function submitQuizMC(flatIdx, value) {
@@ -555,7 +558,24 @@ export function submitQuizMC(flatIdx, value) {
 
 export function submitQuizTextAnswer(flatIdx, value) {
     recordAnswer(flatIdx, value.trim());
-    renderQuizInterface();
+    // In place, not a re-render: this runs on the box's change (its blur), and rebuilding the screen
+    // then replaced Next under the pupil's click, so the first Next after typing was swallowed and
+    // Tab from the box dropped the focus (Chromebook fit critic R2-1).
+    refreshQuizChrome();
+}
+
+// The answered count and the page buttons, brought up to date without rebuilding the question.
+function refreshQuizChrome() {
+    const c = document.getElementById('quizTakeView');
+    if (!c) return;
+    const total = state.quizAllQuestions.length;
+    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const count = c.querySelector('.qt-topbar-right > span:last-child');
+    if (count) count.textContent = `${answered}/${total} answered`;
+    c.querySelectorAll('.qt-q-grid .qt-q-dot').forEach((d, i) => {
+        const a = quizAnswers[state.quizOrder[i]];
+        if (a) d.classList.toggle('answered', a.studentAnswer !== '');
+    });
 }
 
 function recordAnswer(flatIdx, studentAnswer) {
@@ -599,7 +619,29 @@ function recordAnswer(flatIdx, studentAnswer) {
         }
     }
 
-    quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent };
+    // A several-box answer is answered only when every box holds something (critic placevalue-phones
+    // D1: "73, ," counted as answered, so the review did not warn the pupil)
+    let partial = false;
+    try {
+        const boxes = [...document.querySelectorAll('.qt-question-card input.mq-cellslot')];
+        // Critic r2 N1: a word-work answer row (.mq-wwans) is right-aligned with spare leading boxes
+        // that stay blank, so a row is partial only when an empty box sits right of a filled one.
+        // Every other box (fixed slots, inline blanks, cloze, unit-form places) must be filled.
+        const filled = (b) => !!String(b.value || '').trim();
+        if (boxes.length > 1 && String(studentAnswer).trim() !== '') {
+            const rows = new Map();
+            partial = boxes.some((b) => {
+                const row = b.closest('.mq-wwans');
+                if (row) { if (!rows.has(row)) rows.set(row, []); rows.get(row).push(b); return false; }
+                return !filled(b);
+            });
+            if (!partial) rows.forEach((rb) => {
+                const first = rb.findIndex(filled);
+                if (first >= 0 && rb.slice(first).some((b) => !filled(b))) partial = true;
+            });
+        }
+    } catch (e) { /* no DOM: not partial */ }
+    quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;
@@ -672,7 +714,7 @@ export function showQuizReview() {
 
     const allQs = state.quizAllQuestions;
     const total = allQs.length;
-    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    const answered = quizAnswers.filter(isAnswered).length;
     const flagged = quizFlags.filter(f => f).length;
     const unanswered = total - answered;
 
@@ -690,13 +732,13 @@ export function showQuizReview() {
                 currentSIdx = sIdx;
                 const section = test.sections[sIdx];
                 const sectionQs = allQs.filter(q => q.sectionIdx === sIdx);
-                const sAnswered = sectionQs.filter(q => quizAnswers[q.globalIdx].studentAnswer !== '').length;
+                const sAnswered = sectionQs.filter(q => isAnswered(quizAnswers[q.globalIdx])).length;
                 reviewListHtml += `<div class="qt-section-header" style="margin-top:${displayIdx > 0 ? '12px' : '0'};">${escHtml(section.label)} (${sAnswered}/${sectionQs.length})</div>`;
             }
             const a = quizAnswers[fIdx];
             const f = quizFlags[fIdx];
             let status = '';
-            if (a.studentAnswer === '') status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
+            if (!isAnswered(a)) status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
             else status = '<span class="qt-review-status" style="color:#06D6A0;">&#10003;</span>';
             if (f) status += ' <span style="color:#f97316;font-size:0.8rem;">flagged</span>';
             const qText = escHtml((allQs[fIdx].question.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 60);
@@ -711,7 +753,7 @@ export function showQuizReview() {
             const a = quizAnswers[fIdx];
             const f = quizFlags[fIdx];
             let status = '';
-            if (a.studentAnswer === '') status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
+            if (!isAnswered(a)) status = '<span class="qt-review-status" style="color:#f97316;">&#9711;</span>';
             else status = '<span class="qt-review-status" style="color:#06D6A0;">&#10003;</span>';
             if (f) status += ' <span style="color:#f97316;font-size:0.8rem;">flagged</span>';
             const qText = escHtml((allQs[fIdx].question.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 60);
