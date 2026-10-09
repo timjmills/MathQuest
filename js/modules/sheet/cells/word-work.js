@@ -658,8 +658,10 @@ function columnWork(ctx, st, show, idx, p = {}, isAnswer = false) {
             }
             r++; continue;
         }
+        // critic r5 D5-3: with no sign row the frame's operator box is the one sign place, drawn as a
+        // ring (as on screen and on mult_comparison) so its shape says "a sign", not "a digit"
         if (row.sign) {
-            html += `<span style="grid-row:${r};grid-column:1;">${wbox(ctx, { id: `w${idx}-sign`, value: put ? GLYPH[row.sign] : '', expect: GLYPH[st.op], w: bx, h: bx, pt, kind: 'sign' })}</span>`;
+            html += `<span style="grid-row:${r};grid-column:1;">${wbox(ctx, { id: `w${idx}-sign`, value: put ? GLYPH[row.sign] : '', expect: GLYPH[st.op], w: bx, h: bx, pt, kind: 'sign', round: p.signRow === false })}</span>`;
         }
         const ev = eRow(row.id);
         const eT = expect.T;

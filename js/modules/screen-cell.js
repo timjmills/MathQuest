@@ -100,6 +100,9 @@ export function cellKindFor(q) {
     if (multi) return multi;
     const p = binaryParts(q);
     if (!p) return null;
+    // critic r5 D5-2: a kit equation that boxes every unknown (`resultBox`, missing_add_sub) is
+    // drawn by its kit twin (a box), never the plain fact kind (a line beside its boxed neighbours)
+    if (q.cell && q.cell.template === 'equation' && q.cell.payload && q.cell.payload.resultBox) return null;
     const v = String(q.visual || '');
     const A = String(p.a), B = String(p.b), ANS = String(p.ans);
     if (/Long Division/.test(v) || q.printFormat === 'long-division') {
@@ -3047,7 +3050,14 @@ export function fitTwinRows(root) {
     twins.forEach((twin) => {
         const cell = twin.closest('.mq-scell, .ws-cell, #visualAid') || twin.parentElement;
         if (!cell) return;
-        const box = cell.getBoundingClientRect();
+        let box = cell.getBoundingClientRect();
+        // critic r5 D5-6.4: a counters drawing keeps the cell's inner padding (screen-cell.css), so
+        // its fit measures against the cell's CONTENT box, never letting shapes run into the border
+        if (twin.getAttribute('data-mq-template') === 'counters') {
+            const cs = getComputedStyle(cell);
+            const pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0;
+            if (pl || pr) box = { left: box.left + pl, right: box.right - pr, top: box.top, bottom: box.bottom, width: box.width - pl - pr, height: box.height };
+        }
         if (box.width <= 0) return;
         // A clock face is read, so it keeps a reading size (about 120 px) - the row wraps instead
         // of shrinking three faces to 100 px each on a phone.
