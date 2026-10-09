@@ -513,8 +513,6 @@ function restoreAnswer(flatIdx) {
     if (answer.studentAnswer !== '') {
         const input = document.getElementById('qtAnswerInput');
         if (input) input.value = answer.studentAnswer;
-        // what each box held (small fixes item 4): a row that joins with no separator ("816") cannot be split back by itself
-        if (input && Array.isArray(answer.boxes)) input.dataset.mqBoxes = JSON.stringify(answer.boxes);
     }
 }
 
@@ -580,14 +578,12 @@ function recordAnswer(flatIdx, studentAnswer) {
     // A several-box answer is answered only when every box holds something (critic placevalue-phones
     // D1: "73, ," counted as answered, so the review did not warn the pupil)
     let partial = false;
-    let boxVals = null;
     try {
         const boxes = [...document.querySelectorAll('.qt-question-card input.mq-cellslot')];
         // Critic r2 N1: a word-work answer row (.mq-wwans) is right-aligned with spare leading boxes
         // that stay blank, so a row is partial only when an empty box sits right of a filled one.
         // Every other box (fixed slots, inline blanks, cloze, unit-form places) must be filled.
         const filled = (b) => !!String(b.value || '').trim();
-        if (boxes.length > 1) boxVals = boxes.map((b) => String(b.value || ''));
         if (boxes.length > 1 && String(studentAnswer).trim() !== '') {
             const rows = new Map();
             partial = boxes.some((b) => {
@@ -604,7 +600,6 @@ function recordAnswer(flatIdx, studentAnswer) {
         }
     } catch (e) { /* no DOM: not partial */ }
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
-    if (boxVals) quizAnswers[flatIdx].boxes = boxVals;
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;

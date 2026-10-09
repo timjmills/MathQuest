@@ -414,8 +414,11 @@ register('count-row', {
             }
             const val = over !== undefined ? String(over) : shown[k];
             // the digits of THIS box's number: once typed, the screen hands the caret to the next box (small fixes item 1:
-            // "21" then "28" no longer join in one box). The row's neighbours already show how long its numbers are.
-            const full = String(v).replace(/\D/g, '').length;
+            // "21" then "28" no longer join in one box) - only where the length is the one just before it in the row (critic r1
+            // D1): the number before is printed, or the pupil's own last answer. A box at a change of length (9 -> 12, 75 -> 100)
+            // never moves on by itself, so the caret never tells the length of its answer there; Space, Enter or a tap move on.
+            const own = String(v).replace(/\D/g, '').length;
+            const full = i > 0 && String(values[i - 1]).replace(/\D/g, '').length === own ? own : 0;
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
             if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full });
             return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full });

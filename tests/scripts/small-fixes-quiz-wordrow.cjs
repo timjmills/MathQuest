@@ -60,6 +60,23 @@ const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }];
         check(JSON.stringify(back) === JSON.stringify(full), `${tag} back on the item, each box holds its own digit: [${back.join('|')}] (typed [${full.join('|')}])`);
         const rec = await page.evaluate(() => document.getElementById('qtAnswerInput').value);
         check(rec === ans, `${tag} the answer still reads ${ans} (${rec})`);
+        // (c) the working: every copy box, the sign box and the tapped sign come back too (critic r1 D4)
+        const work = await page.evaluate(() => {
+          const card = document.querySelector('.qt-question-card');
+          const ops = [...card.querySelectorAll('button.mq-wwop')];
+          if (ops.length) ops[ops.length - 1].click();
+          const ins = [...card.querySelectorAll('input.mq-wwork')];
+          ins.forEach((e, i) => { e.value = e.matches('[data-mq-kind="sign"]') ? '+' : String((i % 9) + 1); e.dispatchEvent(new Event('input', { bubbles: true })); });
+          return { boxes: ins.map((e) => e.value), pressed: ops.map((b) => b.getAttribute('aria-pressed') === 'true') };
+        });
+        await page.evaluate(() => window.navigateQuizQuestion(1)); await sleep(500);
+        await page.evaluate(() => window.navigateQuizQuestion(-1)); await sleep(700);
+        const work2 = await page.evaluate(() => {
+          const card = document.querySelector('.qt-question-card');
+          return { boxes: [...card.querySelectorAll('input.mq-wwork')].map((e) => e.value), pressed: [...card.querySelectorAll('button.mq-wwop')].map((b) => b.getAttribute('aria-pressed') === 'true') };
+        });
+        check(work.boxes.length > 0 && JSON.stringify(work2) === JSON.stringify(work), `${tag} the working (${work.boxes.length} boxes, sign ${work.pressed.indexOf(true)}) comes back as left: ${JSON.stringify(work2.boxes)} sign ${work2.pressed.indexOf(true)}`);
+        check(JSON.stringify(await boxesOf()) === JSON.stringify(full), `${tag} the answer row is still as typed after the working round trip`);
         // (b) a hole on the right: [_|8|1|_]
         const holey = full.slice(); holey[n - 1] = '';
         await page.evaluate(() => { document.querySelectorAll('.qt-question-card .mq-wwans input.mq-cellslot').forEach((e) => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); }); });

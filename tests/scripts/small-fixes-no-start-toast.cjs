@@ -22,7 +22,7 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
           window.skillQueue.push({ categoryId: 'addition', skillId: 'add_facts', weight: 1 }, { categoryId: 'subtraction', skillId: 'sub_facts', weight: 1 });
           window.__seen = [];
           const look = () => {
-            document.querySelectorAll('.mq-notify, .toast-notification').forEach((el) => {
+            document.querySelectorAll('.mq-notify, .toast-notification, .mixed-play-toast').forEach((el) => {
               const r = el.getBoundingClientRect();
               if (r.width > 0 && getComputedStyle(el).opacity !== '0') window.__seen.push(el.textContent.trim().slice(0, 60));
             });
@@ -36,9 +36,9 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
         check(/gameView|worksheetView/.test(r.view || ''), `${tag} play started (${r.view})`);
         check(r.seen.length === 0, `${tag} no pop-up over play: ${JSON.stringify(r.seen)}`);
         // a toast raised just BEFORE play (on the home screen) does not stay into play
-        await page.evaluate(() => { window.showView('homeView'); window.showToast('Saved!', 'success'); window.showNotification('Saved!', 'info'); window.showView('gameView'); });
+        await page.evaluate(() => { window.showView('homeView'); window.showToast('Saved!', 'success'); window.showNotification('Saved!', 'info'); window.showMixedPlayToast('Playing all skills at easy difficulty!'); window.showView('gameView'); });
         await sleep(400);
-        const left = await page.evaluate(() => [...document.querySelectorAll('.mq-notify, .toast-notification')].filter((e) => e.isConnected).length);
+        const left = await page.evaluate(() => [...document.querySelectorAll('.mq-notify, .toast-notification, .mixed-play-toast')].filter((e) => e.isConnected).length);
         check(left === 0, `${tag} a toast from just before play is gone once play shows (${left})`);
         // the XP message is still allowed
         await page.evaluate(() => window.showToast('+5 XP', 'success'));

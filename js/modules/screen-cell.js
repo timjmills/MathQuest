@@ -1829,11 +1829,6 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const ch = [...String(input.value || '').replace(/\s/g, '')];
         saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
     }
-    // the host may keep what each box held (the quiz, quizAnswers[].boxes): that wins, holes and all
-    try {
-        const kept = input.dataset.mqBoxes ? JSON.parse(input.dataset.mqBoxes) : null;
-        if (Array.isArray(kept) && kept.length === slots.length) saved = kept.map((t) => String(t == null ? '' : t).trim());
-    } catch (e) { /* not kept */ }
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -1868,6 +1863,14 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         });
         b.addEventListener('change', () => { if (onChange) onChange(compose()); });
         b.addEventListener('keydown', (e) => {
+            // a LIST of numbers (a count-by row): Space after a number moves on to the next box, as a pupil writes a gap
+            if (e.key === ' ' && join.trim() === ',' && !b.dataset.mqKind && (b.value || '').trim() && boxes[k + 1]) {
+                e.preventDefault();
+                const nx = boxes[k + 1];
+                nx.focus({ preventScroll: true });
+                try { nx.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (err) { /* ignore */ }   // a box 1 px under the fold too
+                return;
+            }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const next = boxes[k + 1];
@@ -2000,11 +2003,17 @@ export function wireNumberLines(root) {
  * The pupil's working in a cell (number-line jumps, long-division working digits), so a host that
  * redraws the cell (the quiz re-renders on every answer) can put it back. Working is never graded.
  */
+// A word problem's working and answer (small fixes item 4, critic r1 D4): the copy boxes and sign box (input.mq-wwork), each
+// answer box (input.mq-cellslot: a row joined with no separator cannot be split back from "816"), and the tapped sign or unit word.
+const WORK_BOXES = 'input.mq-wwork, input.mq-cellslot:not(.mq-cellslot-host)';
+const WORK_PICKS = 'button.mq-wwop, button.mq-wwword';
 export function saveWorking(root) {
     if (!root) return null;
     return {
         nl: Array.from(root.querySelectorAll('[data-mq-nl]')).map((w) => w.dataset.mqJumps || ''),
         work: Array.from(root.querySelectorAll('input.mq-work')).map((i) => i.value || ''),
+        boxes: Array.from(root.querySelectorAll(WORK_BOXES)).map((i) => i.value || ''),
+        picks: Array.from(root.querySelectorAll(WORK_PICKS)).map((b) => b.getAttribute('aria-pressed') === 'true'),
     };
 }
 export function restoreWorking(root, saved) {
@@ -2016,6 +2025,19 @@ export function restoreWorking(root, saved) {
     Array.from(root.querySelectorAll('input.mq-work')).forEach((i, k) => {
         if (saved.work && saved.work[k]) i.value = saved.work[k];
     });
+    // every box back as the pupil left it, holes and all (only when the drawing is the same one: same number of boxes)
+    const boxes = Array.from(root.querySelectorAll(WORK_BOXES));
+    if (Array.isArray(saved.boxes) && saved.boxes.length === boxes.length) {
+        boxes.forEach((i, k) => {
+            if ((i.value || '') === saved.boxes[k]) return;
+            i.value = saved.boxes[k];
+            i.dispatchEvent(new Event('input', { bubbles: true }));   // the host recomposes its answer from its boxes
+        });
+    }
+    const picks = Array.from(root.querySelectorAll(WORK_PICKS));
+    if (Array.isArray(saved.picks) && saved.picks.length === picks.length) {
+        picks.forEach((b, k) => { if (saved.picks[k] && b.getAttribute('aria-pressed') !== 'true') b.click(); });
+    }
 }
 
 /**
