@@ -16,7 +16,7 @@ import { cell, label, esc } from './cell.js';
  * remainder is ONE unruled blank area inside the closed outer frame, with no interior borders
  * and no labels, so a pupil cannot mistake it for unanswered work.
  */
-export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--from:${fromColumn}"></div>`;
+export const blankRun = (fromColumn) => `<div class="ws-cell blankrun cut" style="--from:${fromColumn}"></div>`;
 
 /**
  * A grid of cells.

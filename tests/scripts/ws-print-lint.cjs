@@ -1030,6 +1030,37 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // L-DENSITY HOLE (wave 1 lane D round 5, critic r4 D-B): a bordered empty run of grid
+            // tracks after the last problem (the kit's .ws-cell.blankrun, or any empty bordered cell)
+            const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
+                const r = e.getBoundingClientRect();
+                if (r.width < 4 || r.height < 4) return false;
+                // a blank run laid over the grid's outer border (grid.js `cut`) leaves the border
+                // round the filled cells only: a hole only where the frame still closes round it
+                if (e.classList.contains('blankrun')) {
+                    const gr = e.parentElement.getBoundingClientRect();
+                    return r.right < gr.right - 0.5 || r.bottom < gr.bottom - 0.5;
+                }
+                const st = getComputedStyle(e);
+                const bordered = ['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
+                return bordered && !(e.textContent || '').trim() && !e.querySelector('svg, img, canvas, [data-ws-slot], input');
+            }).length;
+            // L-DENSITY REPEAT (critic r4 D-B: add_sub_10s S printed 30 + 10 twice): the same problem
+            // drawn twice on one page. A problem's identity is its drawing less its item label.
+            const sigOf = (c) => {
+                const k = c.cloneNode(true);
+                k.querySelectorAll('[data-ws-label], .ws-letter, .ws-tabnum').forEach(e => e.remove());
+                return k.innerHTML.replace(/\s(id|aria-labelledby|aria-describedby|data-ws-item|data-ws-n)="[^"]*"/g, '').replace(/\s+/g, ' ').trim();
+            };
+            const seenSig = new Map();
+            const repeats = [];
+            ri.cells.forEach((c, i) => {
+                if (!cells[i] || !cells[i].item) return;
+                const sg = sigOf(c);
+                if (!sg) return;
+                if (seenSig.has(sg)) repeats.push(`${seenSig.get(sg)} = ${i + 1}`);
+                else seenSig.set(sg, i + 1);
+            });
             out.pages.push({
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
@@ -1037,7 +1068,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop,
+                footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
                 doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
@@ -1436,10 +1467,18 @@ function lintKitGeometry(dom, pdf, info, F) {
             // problems end more than 20% of the body above the footer wastes the page. The last page
             // of a multi-page sheet may be short (PG-23).
             if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !(last && pt.pages.length > 1)) {
-                const body = p.footRect[1] - (p.padT || 0);
+                // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
+                // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
+                // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
+                const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
-                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
+            // L-DENSITY HOLE (critic r4 D-B): an empty bordered run of cells after the last problem
+            // reads as a missing problem; a page deals whole rows or spans its last problem.
+            if (!pt.key && p.holes > 0) F('L-DENSITY', 'HOLE', 'major', { page: p.idx }, `page ${p.idx}: ${p.holes} empty bordered cell area(s) in the grid (a blank run after the last problem): deal whole rows (RUBRIC C3)`, 'empty bordered area');
+            // L-DENSITY REPEAT (critic r4 D-B): a practice page never prints the same problem twice.
+            if (info.mode === 'kit' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.repeats && p.repeats.length) F('L-DENSITY', 'REPEAT', 'major', { page: p.idx }, `page ${p.idx}: the same problem printed twice (items ${p.repeats.slice(0, 4).join(', ')}): a page holds the skill's distinct problems (RUBRIC C2)`, 'repeated problem');
             // L-ANSAREA DOUBLE (wave 1 lane D round 4, critic r3 D1, H8): one problem, one answer place.
             if (p.doubled > 0) F('L-ANSAREA', 'H8', 'critical', { page: p.idx }, `page ${p.idx}: ${p.doubled} cell(s) carry an "Answer:" row under their own option list or check boxes: two answer places (H8)`, 'doubled answer place');
             // L-DENSITY PG-23 ORPHAN (wave 1 lane D, critic 2026-10-02: dot_array_mult dealt 4 + 1, the
@@ -1938,6 +1977,32 @@ const SELF_TESTS = [
     { name: 'draw zone too small for the model', expect: ['L-ANSAREA', 'H12'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="font-size:11pt">Draw 169 with disks.</div><div data-ws-zone="hundreds" style="width:40mm;height:18mm;border:0.75pt solid #000"></div>'); } },
     { name: 'an input on paper', expect: ['L-INPUT', 'SP-10'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<input style="width:14mm">'); } },
     { name: 'grade and CCSS code in a cell', expect: ['L-CCSS', 'SC-5'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span style="font-size:11pt">Grade 3 3.NBT.A.2</span>'); } },
+    // wave 1 lane D round 5: the page-fill gaps the critic found on kit pages (mode kit)
+    { name: 'strip of a fifth of the problem area (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p1.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        // the grid ends 24 % of its problem area above the footer
+        g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.76}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
+    } },
+    { name: 'empty bordered run after the last problem', mode: 'kit', expect: ['L-DENSITY', 'HOLE'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells[cells.length - 1].remove();
+        g.insertAdjacentHTML('beforeend', '<div class="ws-cell blankrun" style="--from:2"></div>');
+    } },
+    { name: 'the same problem twice on a page', mode: 'kit', expect: ['L-DENSITY', 'REPEAT'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const cells = [...p1.querySelectorAll('.ws-grid > [data-ws-cell]')];
+        const copy = cells[0].cloneNode(true);
+        const lab = copy.querySelector('[data-ws-label], .ws-letter');
+        const lab1 = cells[1].querySelector('[data-ws-label], .ws-letter');
+        if (lab && lab1) lab.textContent = lab1.textContent;
+        cells[1].replaceWith(copy);
+    } },
 ];
 
 // A synthetic sheet in the legacy DOM shape (.worksheet-set / .worksheet-problem / .answer-key-grid,
@@ -2001,7 +2066,7 @@ async function selfTest() {
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
-            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: 'pack' });
+            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack' });
             await page.close();
             const exp = Array.isArray(t.expect[0]) ? t.expect : [t.expect];
             for (const e of exp) {

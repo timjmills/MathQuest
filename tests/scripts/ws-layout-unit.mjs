@@ -1252,6 +1252,21 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(Ld.cols === 3 && Ld.perPage === 9, `D6: long division at S prints 3 x 3 (${Ld.cols} x ${Ld.rows})`);
 }
 
+/* ============================================ wave 1 lane D round 5: free rows, even rows */
+{
+    const { evenRows, TWO_COL_ROWS } = await import('../../js/modules/sheet/layout.js');
+    // D-E: rows of the same content stand at one height (the smallest any of them was given)
+    const H = evenRows([47.6, 47.6, 47.6, 30], [52.4, 56.7, 52.4, 45]);
+    ok(H[0] === 52.4 && H[1] === 52.4 && H[2] === 52.4 && H[3] === 45, `D-E: same-content rows take one height (${H.join(' / ')})`);
+    // D-B / D-D: a section in free rows may take two columns of any row count (CL-2's 2/3/4/5/8 otherwise)
+    const eq = (i) => ({ id: `eq${i}`, template: 'equation', fclass: 'short', measured: { 1: { hMm: 23, fits: true }, 2: { hMm: 23, fits: true } }, footprint: { wMm: 80, hMm: null, measure: true, maxCols: 2 } });
+    const its = Array.from({ length: 18 }, (_, i) => eq(i));
+    const L8 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    const L9 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true, freeRows: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    ok(TWO_COL_ROWS.includes(L8.rows), `CL-2: two columns keep a permitted row count without free rows (${L8.rows})`);
+    ok(L9.rows >= 9 && L9.pages === 1, `D-D: free rows hold 18 short problems on one L page in 2 x 9 (${L9.cols} x ${L9.rows}, ${L9.pages} page)`);
+}
+
 /* ======================================================================= report */
 
 if (fails.length) {

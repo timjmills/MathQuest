@@ -1,0 +1,478 @@
+{
+  "skill": "multiplication:number_families_mult",
+  "category": "multiplication",
+  "skillId": "number_families_mult",
+  "label": "Number Families (Multiply & Divide)",
+  "grade": "3",
+  "dir": "multiplication__number_families_mult",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 4,
+        "rows": 4,
+        "perPage": 16,
+        "pages": 1,
+        "note": "Fits: 4 columns x 4 rows, 16 per page, 1 page. Digits 16 pt. Dense: 4 x 4, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 4,
+            "rows": 4,
+            "perPage": 16,
+            "pages": 1,
+            "cellW": 46.5,
+            "cellH": 57,
+            "requested": 4,
+            "clamped": false,
+            "note": "Dense: 4 x 4, cells sized to the problems.",
+            "line": "Fits: 4 columns x 4 rows, 16 per page, 1 page. Digits 16 pt. Dense: 4 x 4, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 47.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 480508,
+      "title": "I Can complete a number family (×, ÷)",
+      "notes": [
+        "Dense: 4 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 2, 4",
+          "measured": {
+            "1": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.8,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 3, 9",
+          "measured": {
+            "1": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.8,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 4, 12",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 5, 25",
+          "measured": {
+            "1": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.8,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "4, 2, 8",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 2, 6",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 3, 15",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "4, 3, 12",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 5, 15",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "4, 4, 16",
+          "measured": {
+            "1": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 30.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 30.8,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 2, 10",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 3, 6",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "4, 5, 20",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 4, 20",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 4, 8",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "number-family",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 5, 10",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 47.6,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 326,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 385,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          16
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 270
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          16
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 326
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

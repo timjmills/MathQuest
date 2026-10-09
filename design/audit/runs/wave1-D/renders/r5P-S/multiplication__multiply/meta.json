@@ -1,0 +1,654 @@
+{
+  "skill": "multiplication:multiply",
+  "category": "multiplication",
+  "skillId": "multiply",
+  "label": "Basic Multiplication",
+  "grade": "3",
+  "dir": "multiplication__multiply",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 5,
+        "rows": 4,
+        "perPage": 20,
+        "pages": 1,
+        "note": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 5,
+            "rows": 4,
+            "perPage": 20,
+            "pages": 1,
+            "cellW": 37.2,
+            "cellH": 57,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 5 x 4, cells sized to the problems.",
+            "line": "Fits: 5 columns x 4 rows, 20 per page, 1 page. Digits 16 pt. Dense: 5 x 4, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 42.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 456521,
+      "title": "I Can multiply numbers",
+      "notes": [
+        "Dense: 5 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 7 = ?",
+          "ans": "84",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "2 × 5 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "2 × 6 = ?",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "10 × 5 = ?",
+          "ans": "50",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "11 × 8 = ?",
+          "ans": "88",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "7 × 2 = ?",
+          "ans": "14",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 × 9 = ?",
+          "ans": "27",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 8 = ?",
+          "ans": "96",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 2 = ?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "2 × 4 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 × 3 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "5 × 12 = ?",
+          "ans": "60",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "10 × 4 = ?",
+          "ans": "40",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "4 × 2 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 × 1 = ?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "6 × 4 = ?",
+          "ans": "24",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "7 × 8 = ?",
+          "ans": "56",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "10 × 6 = ?",
+          "ans": "60",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 7 = ?",
+          "ans": "56",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "1 × 12 = ?",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 114,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 137,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          20
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 102
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          20
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 138
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

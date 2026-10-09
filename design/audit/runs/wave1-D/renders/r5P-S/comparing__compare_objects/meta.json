@@ -1,0 +1,252 @@
+{
+  "skill": "comparing:compare_objects",
+  "category": "comparing",
+  "skillId": "compare_objects",
+  "label": "Compare Attributes (Visual)",
+  "grade": "K",
+  "dir": "comparing__compare_objects",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 4,
+        "rows": 2,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 4 columns x 2 rows, 8 per page, 1 page. Digits 16 pt. Tall problems: 3 rows per page. Dense: 4 x 2, cells sized to the problems. 3 problems are too wide for 4 columns: full width, at the bottom. Tall problems: 5 rows per page.",
+        "sections": [
+          {
+            "cols": 4,
+            "rows": 2,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 46.5,
+            "cellH": 85.2,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 3 rows per page. Dense: 4 x 2, cells sized to the problems.",
+            "line": "Fits: 4 columns x 2 rows, 8 per page, 1 page. Digits 16 pt. Tall problems: 3 rows per page. Dense: 4 x 2, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 71,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 5,
+            "perPage": 5,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 45.4,
+            "requested": 1,
+            "clamped": false,
+            "note": "3 problems are too wide for 4 columns: full width, at the bottom. Tall problems: 5 rows per page.",
+            "line": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 16 pt. Tall problems: 5 rows per page. 3 full-width problems at the bottom.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 42.3,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 175335,
+      "title": "I Can compare attributes",
+      "notes": [
+        "Tall problems: 3 rows per page. Dense: 4 x 2, cells sized to the problems.",
+        "3 problems are too wide for 4 columns: full width, at the bottom. Tall problems: 5 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Which line is shorter?",
+          "ans": "B",
+          "measured": {
+            "1": {
+              "hMm": 42.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 60.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 63,
+              "fits": false
+            },
+            "4": {
+              "hMm": 65.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 80.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Which tower is taller?",
+          "ans": "B",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 82.4,
+              "fits": true
+            },
+            "5": {
+              "hMm": 145.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Which tower is shorter?",
+          "ans": "B",
+          "measured": {
+            "1": {
+              "hMm": 71,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71,
+              "fits": true
+            },
+            "3": {
+              "hMm": 76.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 82.4,
+              "fits": true
+            },
+            "5": {
+              "hMm": 145.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Which bar is thicker?",
+          "ans": "B",
+          "measured": {
+            "1": {
+              "hMm": 42.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 60.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 65.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 65.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 80.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Which bar is thinner?",
+          "ans": "A",
+          "measured": {
+            "1": {
+              "hMm": 42.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 60.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 65.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 65.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 80.6,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 104,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 112,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 44
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 49
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

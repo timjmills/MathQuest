@@ -330,7 +330,7 @@ register('short-division', {
         for (let i = 0; i < n; i++) {
             const id = `q-${i}`;
             // each quotient box stands alone over its digit (the exchange boxes sit between the digits)
-            html += at(box(g, id, { wMm: tr * (g.twin ? 1 : 0.92), hMm: g.stripMm, value: vals[id] || '', ink, mark: 'cell', graded: ks[id] !== '' }),
+            html += at(box(g, id, { wMm: g.twin ? tr : Math.max(EX_MIN_MM, tr * 0.92), hMm: g.stripMm, value: vals[id] || '', ink, mark: 'cell', graded: ks[id] !== '' }),
                 dv + 2 + i, 1, `justify-content:flex-end;align-items:flex-end;padding-bottom:0.08em;`);
         }
         for (let i = 0; i < dv; i++) html += at(esc(V[i]), i + 1, 2);

@@ -55,7 +55,7 @@ export const SHEET_ROLES = Object.freeze(['independent', 'more-practice', ...Obj
 const ROLES = new Set(SHEET_ROLES);
 const LETTERS = 'ABCDEFGHIJ';
 const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol items
-const RETRIES = 12;               // duplicate retries per item before a duplicate is accepted
+const RETRIES = 40;               // duplicate retries per item before a duplicate is accepted (12 let a 20-fact pool repeat at 18, round 4 D-B)
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
 const SHEET_STYLESHEETS = Object.freeze([
@@ -96,6 +96,9 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // A single-skill page held short by its own pool, laid in fewer, longer columns
+            // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
+            freeRows: !!(s && s.freeRows),
         }))
         .filter((s) => s.skills.length);
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
@@ -1369,7 +1372,7 @@ function oneColumnOnly(it, n) {
  * clocks a page in one column because two of its nine skills are full width).
  */
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
+    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, freeRows: section.freeRows };
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
@@ -1714,7 +1717,7 @@ async function buildSheetOnce(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -1950,7 +1953,7 @@ async function buildSheetOnce(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, freeRows: s.freeRows })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -2001,7 +2004,7 @@ async function buildSheetOnce(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, sig: signature(it.q),
         })),
         gaps: out.gaps,
         narrowCells,
@@ -2283,6 +2286,7 @@ async function buildRoleSheet(n, metaOf) {
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
             text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            sig: it.q ? signature(it.q) : undefined,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
@@ -2562,12 +2566,67 @@ export async function buildSheet(req = {}) {
             // beside an empty cell): the largest count without one is kept, stepping back one
             // problem when the counts tried all leave one.
             const hole = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+            // the share of a lone grid's page its rows fill (first page; 1 when not measured)
+            const fillOf = (x) => {
+                const pg = x.plan && x.plan.pages && x.plan.pages[0];
+                const grids = pg ? pg.sections.filter((g) => g.kind === 'grid') : [];
+                if (grids.length !== 1 || !(grids[0].availMm > 0)) return 1;
+                return (parseFloat(grids[0].height) || 0) / grids[0].availMm;
+            };
+            // A single-skill page never prints the same problem twice (round 4 D-B: add_sub_10s S
+            // dealt 22 from a pool of 20 facts): the fill stops at the skill's distinct problems.
+            const dup = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
             const tried = [r];
             for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
                 const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
                 if (!(more.pageCount <= wanted) || more.items.length <= best.items.length) break;
+                if (dup(more) && !dup(best)) break;
                 best = more;
                 tried.push(more);
+            }
+            // A page held short by the skill's own pool (no more distinct problems) and leaving a
+            // strip under its rows is laid in fewer, wider columns: the same distinct problems in
+            // more rows fill the page (round 4 D-B: add_sub_10s S, 18 facts in 3 x 6 over a 40 %
+            // strip; 20 in 2 x 10 fill it). Only whole rows, no repeat, still one page.
+            if (!req._noReseat && (s.columns === undefined || s.columns === null || s.columns === 'auto')) {
+                const capped = (hole(best) || fillOf(best) < 0.85) && (dup(best) || (best.items.length < ceil() * wanted && await (async () => {
+                    const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
+                    return dup(more) || more.items.length <= best.items.length;
+                })()));
+                if (capped) {
+                    const c0 = Number(best.fits && best.fits.cols) || 1;
+                    let pick = hole(best) || dup(best) ? null : best;
+                    let pickFill = pick ? fillOf(pick) : 0;
+                    for (let c = c0; c >= 1; c--) {
+                        for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
+                            if (n % c) continue;
+                            const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c, freeRows: true })] }));
+                            if (alt.pageCount > wanted || dup(alt) || hole(alt) || alt.items.length !== n || Number(alt.fits && alt.fits.cols) !== c) continue;
+                            const f = fillOf(alt);
+                            if (f > 1.001) continue;
+                            const better = !pick || (pickFill < 0.85 && f > pickFill + 0.02) || (f >= 0.85 && alt.items.length > pick.items.length);
+                            if (better) { pick = alt; pickFill = f; }
+                            break;
+                        }
+                        if (pickFill >= 0.85) break;
+                    }
+                    if (pick) return pick;
+                } else if (!hole(best) && !dup(best) && fillOf(best) < 0.85) {
+                    // A page that still has distinct problems to give and leaves a strip under
+                    // its rows (round 4 D-D: missing_mult_div L, 2 x 8 over a 16 % strip where a
+                    // ninth row stands) takes whole rows more in the same columns while the page
+                    // holds them: two columns then take any row count, not only CL-2's 2/3/4/5/8.
+                    const c0 = Number(best.fits && best.fits.cols) || 1;
+                    let pick = best, pickFill = fillOf(best);
+                    for (let n = best.items.length + c0; n <= best.items.length + 3 * c0 && n <= Math.max(ceil(), best.items.length + 2 * c0) * wanted; n += c0) {
+                        const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c0, freeRows: true })] }));
+                        if (alt.pageCount > wanted || dup(alt) || hole(alt) || alt.items.length !== n) break;
+                        const f = fillOf(alt);
+                        if (f > 1.001 || f <= pickFill) break;
+                        pick = alt; pickFill = f;
+                    }
+                    return pick;
+                }
             }
             if (!hole(best) || req._noReseat) return best;
             const whole = tried.filter((x) => !hole(x) && x.items.length >= best.items.length).sort((a, b) => b.items.length - a.items.length)[0];

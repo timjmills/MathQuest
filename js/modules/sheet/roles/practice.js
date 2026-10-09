@@ -26,7 +26,7 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH,
+    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -647,13 +647,14 @@ function partCellH(isSplit, its, L) {
 export const SPREAD_CAP = 1.7;
 
 /**
- * The rows of a lone grid that leaves more than a fifth of its page empty, stretched to share the
+ * The rows of a lone grid that leaves more than a tenth of its page empty (round 5: the lint reads a
+ * strip against the problem area), stretched to share the
  * page: each row as tall as its tallest problem x k, k the same for every row, no row past
  * SPREAD_CAP x its shortest problem, the grid no taller than the page's grid less 1 mm (PG-12). null when
  * the grid already fills four fifths of the page or nothing is measured.
  */
 export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
-    if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.8 * availMm) return null;
+    if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.9 * availMm) return null;
     const w = [], mins = [];
     for (let r = 0; r < rows; r++) {
         const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols)).filter((h) => h > 0);
@@ -665,7 +666,7 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
     const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
-    const H = w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r])));
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
@@ -679,7 +680,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const fineParts = new Set(sectionsIn.flatMap((s, i) => (s.fineSplit ? [i, s.splitOf] : [])));
     const layouts = sectionsIn.map((sec, si) => {
         const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -825,7 +826,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(sec); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -916,7 +917,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -1053,7 +1054,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 cls: spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread',
                 height: spread ? `${spread.heightMm}mm` : gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 rowsTpl: spread ? spread.rowsTpl : shape ? shape.rowsTpl : '',
-                rowGap: gap.gap || 0,
+                rowGap: gap.gap || 0, availMm: lone ? avail : undefined,
                 items: its.map((it) => planItem(it, level, L.cols)),
                 _its: its,
             });
@@ -1067,7 +1068,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const hdr = { tab: input.header && input.header.tab === false ? false : words.tabLines, title: input.header && input.header.title === false ? '' : words.title, titleLines };
             const availAll = bodyHeightMm(norm.paper, hdr, pg.cont ? { cont: true } : undefined) - sections.filter((x) => x.kind === 'html').length * instructionMm(size) - 2;
             const used = grids.reduce((a, x) => a + parseFloat(x.height), 0);
-            if (grids.length === pg.parts.length && used > 0 && used < 0.8 * availAll) {
+            if (grids.length === pg.parts.length && used > 0 && used < 0.9 * availAll) {
                 const f = (availAll - grids.length) / used;
                 for (const x of grids) {
                     const b = parseFloat(x.height);

@@ -1,0 +1,346 @@
+{
+  "skill": "multiplication:mult_comparison",
+  "category": "multiplication",
+  "skillId": "mult_comparison",
+  "label": "Times as Many Word Problems (Visual)",
+  "grade": "4",
+  "dir": "multiplication__mult_comparison",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 3,
+        "rows": 3,
+        "perPage": 9,
+        "pages": 1,
+        "note": "Fits: 3 columns x 3 rows, 9 per page, 1 page. Digits 16 pt. Dense: 3 x 3, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 3,
+            "perPage": 9,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 68.8,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 3, cells sized to the problems.",
+            "line": "Fits: 3 columns x 3 rows, 9 per page, 1 page. Digits 16 pt. Dense: 3 x 3, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 48.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 978949,
+      "title": "I Can solve times-as-many stories",
+      "notes": [
+        "Dense: 3 x 3, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 81 pencils. That is 9 times as many as Ravi has. How many pencils does R",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi has 10 apples. Zara has 3 times as many apples. How many apples does Zara h",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 28 cookies. That is 4 times as many as Tom has. How many cookies does T",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 6 buttons. Sam has 48 buttons. How many times as many buttons does Sam h",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 31.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 36.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 52.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 66.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 crayons. Leo has 35 crayons. How many times as many crayons does Leo h",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 31.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 36.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 47.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 52.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 66.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 8 stamps. Mia has 5 times as many stamps. How many stamps does Mia have?",
+          "ans": "40",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 18 beads. That is 6 times as many as Ana has. How many beads does Ana ha",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 4 shells. Ana gives 2 shells to Noor. How many shells does Ana have left",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 69.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 36 cards. That is 9 times as many as Omar has. How many cards does Omar",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 258,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 304,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 94
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 137
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

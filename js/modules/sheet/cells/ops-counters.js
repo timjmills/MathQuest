@@ -81,7 +81,10 @@ function arrayGeometry(size, p) {
         const pitch = clamp(Math.min(bw / Math.max(1, cols), bh / Math.max(1, rows)));
         // The pitch never closes below RP-3; a wide array (10 across at L) instead draws its dots
         // a little smaller (never under 4 mm) so the row fits a 2-column cell's 86 mm (D2).
-        return { pitch, d: Math.max(Math.min(4, d0), Math.min(d0, pitch - 2.5, ARRAY_ROW_MM - (cols - 1) * pitch)) };
+        // One dot size per page (round 5 D-H2: a 3 x 10 array at L drew smaller dots than its
+        // 5-across neighbours): every array at a size takes the dot the widest one (10 across at
+        // the closest pitch) can hold, so arrays side by side never differ in dot size.
+        return { pitch, d: Math.max(Math.min(4, d0), Math.min(d0, min - 2.5, ARRAY_ROW_MM - 9 * min)) };
     }
     const per = PER_LINE[cols] || Math.ceil(Math.sqrt(cols));
     const lines = Math.ceil(cols / per);
