@@ -15,6 +15,8 @@
 //
 // Ranking (searchIndex): exact label match > label word > hand-written term > concept term >
 // standards / WRM / grade code > fuzzy or misspelt word. Every query word must match somewhere.
+// An unknown word is rewritten to its nearest vocabulary word first. Equal scores are broken by how
+// many query words hit the LABEL, then the skill's family, and only then by catalogue order.
 
 /* ================================================================= concepts */
 
@@ -22,15 +24,25 @@ export const CONCEPTS = {
     addition: ['add', 'adding', 'addition', 'added', 'adds', 'plus', '+', 'sum', 'sums', 'total', 'totals', 'altogether', 'in all',
         'combine', 'combining', 'join', 'joining', 'put together', 'how many altogether', 'and makes', 'increase'],
     subtraction: ['subtract', 'subtracting', 'subtraction', 'subtracted', 'minus', 'take away', 'takeaway', 'taking away', 'take from',
-        'difference', 'differences', 'how many left', 'left over', 'remove', 'decrease', 'fewer', 'less'],
+        'difference', 'differences', 'how many left', 'left over', 'remove', 'decrease'],
     regroup_add: ['regroup', 'regrouping', 'with regrouping', 'carry', 'carrying', 'carry over', 'carry the one', 'exchange',
         'exchanging', 'renaming', 'rename', 'bridging ten', 'bridge ten', 'crossing ten', 'cross the tens', 'trading', 'make a ten'],
     regroup_sub: ['regroup', 'regrouping', 'with regrouping', 'borrow', 'borrowing', 'exchange', 'exchanging', 'renaming', 'rename',
         'trading', 'decompose a ten', 'break a ten', 'bridging ten', 'crossing ten'],
     no_regroup: ['no regrouping', 'without regrouping', 'no carrying', 'without carrying', 'no borrowing', 'without borrowing',
         'no exchange', 'no exchanging', 'no renaming', 'simple'],
-    column: ['column', 'columns', 'column method', 'column addition', 'column subtraction', 'vertical', 'stacked', 'line up',
-        'standard algorithm', 'written method', 'formal method', 'algorithm'],
+    // the written column method; the operation word lives in column_add / column_sub / column_mult only, so
+    // 'column subtraction' never reaches an addition skill (critic r1 P2)
+    column: ['column', 'columns', 'column method', 'vertical', 'stacked', 'line up',
+        'standard algorithm', 'written method', 'formal method', 'formal written method', 'algorithm'],
+    column_add: ['column addition', 'vertical addition', 'written addition', 'standard algorithm addition'],
+    column_sub: ['column subtraction', 'vertical subtraction', 'written subtraction', 'standard algorithm subtraction'],
+    column_mult: ['column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm',
+        'standard algorithm multiplication', 'formal written method', 'written method', 'written multiplication',
+        'vertical multiplication', 'column method', 'column', 'columns', '2 digit by 1 digit', '2 digit by 2 digit',
+        'multiply by 1 digit', 'multiply by 2 digit', 'multi digit multiplication'],
+    subitizing: ['subitizing', 'subitising', 'subitize', 'subitise', 'quick look', 'quick images', 'dot patterns', 'dot pattern',
+        'dice patterns', 'how many without counting'],
     multiplication: ['multiply', 'multiplying', 'multiplication', 'multiplied', 'multiplied by', 'times', 'x', '×', 'product', 'products',
         'lots of', 'groups of', 'sets of', 'rows of', 'repeated addition'],
     times_tables: ['times tables', 'times table', 'timestables', 'tables', 'multiplication tables', 'multiplication table',
@@ -183,17 +195,24 @@ export const CONCEPTS = {
 
 /* ================================================================= the mapping table */
 
-// Each rule is [regex over `${categoryId}:${skillId} ${label}` lowercased, [concept ids]]. Every rule
-// that matches adds its concepts. Checked by hand family by family (see the gate's per-family dump).
+// Each rule is [regex over `${categoryId}:${skillId}`, [concept ids]] — the SKILL ID, never the label
+// (critic r1 P1: 'multiples' in the label "Multiply by 10, 100 and Multiples of Ten" gave mult_zeros
+// skip counting and primes). A rule that must read the label says so: [re, [...], { label: true }]
+// and then tests `${categoryId}:${skillId} ${label}`. Every rule that matches adds its concepts.
+// Checked by hand family by family (see the gate's per-family dump).
 export const CONCEPT_RULES = [
     // ---- operations
     [/^addition:/, ['addition']],
     [/^subtraction:(?!mixed_add_sub)/, ['subtraction']],
     [/^subtraction:mixed_add_sub|^addition:(add_sub|number_families|fact_family|comparison_word|equal_sign)|missing_add_sub/, ['addition', 'subtraction']],
-    [/^addition:add_\d+[km]?_regroup|^addition:.*bridging ten|^addition:add_column|add_missing_digit/, ['regroup_add', 'column']],
-    [/^subtraction:sub_\d+[km]?_regroup|across_zeros|sub_missing_digit/, ['regroup_sub', 'column']],
+    [/^addition:add_\d+[km]?_regroup|^addition:.*bridging ten|^addition:add_column|add_missing_digit/, ['regroup_add', 'column', 'column_add'], { label: true }],
+    [/^subtraction:sub_\d+[km]?_regroup|across_zeros|sub_missing_digit/, ['regroup_sub', 'column', 'column_sub']],
     [/no_regroup/, ['no_regroup', 'column']],
     [/^(addition|subtraction):(add|sub)_(1k|10k|100k|1m|100|50)_/, ['column']],
+    [/^addition:(add_\w*no_regroup|add_(1k|10k|100k|1m|100|50)_)/, ['column_add']],
+    [/^subtraction:(sub_\w*no_regroup|sub_(1k|10k|100k|1m|100|50)_)/, ['column_sub']],
+    [/^multiplication:(mult_placeholder_zero|mult_missing_digit|multiply|area_model_mult_hard)$/, ['column_mult']],
+    [/^counting:count_objects$|^composing:ten_frame_build$|^comparing:compare_groups$/, ['subitizing']],
     [/_mixed\b.*within|add_\d+k?m?_mixed|sub_\d+k?m?_mixed/, ['regroup_add', 'regroup_sub', 'no_regroup']],
     [/(add|sub|mult|div)_facts/, ['facts']],
     [/^multiplication:/, ['multiplication']],
@@ -208,7 +227,7 @@ export const CONCEPT_RULES = [
     [/make_ten|make_a_ten|ten_frame/, ['ten_frame']],
     [/arrays_groups|dot_array|repeated_add|equal_or_unequal|share_into_groups|mult_properties/, ['arrays']],
     [/check_by|sub_check|div_check/, ['inverse_check']],
-    [/missing|cloze|which_sign|missing_factor/, ['missing_number']],
+    [/missing|cloze|which_sign|missing_factor/, ['missing_number'], { label: true }],
     [/number_ops_mixed:/, ['addition', 'subtraction', 'multiplication', 'division', 'mixed_review']],
     [/mixed_mult_div/, ['multiplication', 'division']],
     [/integers:/, ['integers']],
@@ -227,7 +246,7 @@ export const CONCEPT_RULES = [
     [/odd_even|select_even_odd/, ['odd_even']],
     [/number_word_form|number_word_names/, ['number_words']],
     // ---- skip counting & patterns
-    [/seq_\d|count_by|skip_count|time_fives_ring|multiples/, ['skip_count']],
+    [/seq_\d|count_by|skip_count|time_fives_ring|:multiples$/, ['skip_count']],
     [/^patterns:|pattern/, ['patterns']],
     [/patterns:double|patterns:halve|doubles_near/, ['doubling']],
     // ---- place value & number sense
@@ -236,7 +255,7 @@ export const CONCEPT_RULES = [
     [/placevalue:expand|placevalue:combine|unit_form/, ['expanded_form']],
     [/place_value_10x|mult_zeros/, ['place_value']],
     [/round|nearest_/, ['rounding']],
-    [/estimate/, ['estimate']],
+    [/estimate/, ['estimate'], { label: true }],
     [/make_a_ten|doubles_near|compensation/, ['strategies']],
     [/make_a_ten/, ['regroup_add']],
     // ---- fractions, decimals, percents
@@ -255,7 +274,7 @@ export const CONCEPT_RULES = [
     [/order_decimals/, ['ordering']],
     [/percent|_to_p|p_to_|pct|fdp/, ['percent']],
     [/^conversions:(f_|d_|p_|order_fdp|mixed)|fdp|conversions_all/, ['fdp']],
-    [/(^|[\s_:])ratios?(?![a-z])|unit_rate|double_num_line/, ['ratio']],
+    [/(^|[\s_:])ratios?(?![a-z])|unit_rate|double_num_line/, ['ratio'], { label: true }],
     [/partition_shapes/, ['partition_shapes']],
     // ---- geometry
     [/name_2d|shape_name_match_2d|count_sides_vertices_2d|shape_corners|compose_shapes|compose_hexagon|compose_rect|shape_attributes|compose_from_attributes|shape_positions|hotspot_quads|classify_quads|classify_triangles|shape_pattern/, ['shapes_2d']],
@@ -264,10 +283,11 @@ export const CONCEPT_RULES = [
     [/triangle/, ['triangles']],
     [/shape_positions/, ['position']],
     [/compose_shapes|compose_hexagon|compose_rect/, ['composing_shapes']],
-    [/:\w*perimeter|coord_polygon/, ['perimeter']],
+    [/:\w*perimeter|coord_polygon|composite_shapes/, ['perimeter']],
+    [/composite_shapes|area_polygon_decompose/, ['area', 'shapes_2d']],
     [/:\w*area|net_surface/, ['area']],
     [/:\w*volume(?!_liquid)/, ['volume']],
-    [/[\s_:]angles?(?![a-z])|^angles_lines:(identify_angles|measure|additive|mixed)/, ['angles']],
+    [/[\s_:]angles?(?![a-z])|^angles_lines:(identify_angles|measure|additive|mixed)/, ['angles'], { label: true }],
     [/identify_lines|symmetry/, ['lines']],
     [/symmetry/, ['symmetry']],
     [/^coordinates:(coord|mixed)/, ['coordinates']],
@@ -281,8 +301,8 @@ export const CONCEPT_RULES = [
     [/time_quarter/, ['time_quarter']],
     [/time_5min|time_1min|time_fives/, ['time_minutes']],
     [/elapsed/, ['elapsed']],
-    [/money|coin|enough_money|make_change/, ['money']],
-    [/ruler|length|measure_nonstandard|estimate_length|order_objects_length|unit_conversion|measurement_all/, ['length']],
+    [/money|coin|enough_money|make_change/, ['money'], { label: true }],
+    [/ruler|length|measure_nonstandard|estimate_length|order_objects_length|unit_conversion|measurement_all/, ['length'], { label: true }],
     [/heavier|mass_volume|unit_conversions/, ['mass']],
     [/capacity|mass_volume_liquid/, ['capacity']],
     [/temperature/, ['temperature']],
@@ -304,7 +324,7 @@ export const CONCEPT_RULES = [
     [/inequalities/, ['compare']],
     [/^order_of_operations:|order_ops_all/, ['order_of_operations']],
     [/exponent|oop_hard/, ['exponents']],
-    [/^number_theory:|number_theory_all|multiples/, ['number_theory']],
+    [/^number_theory:|number_theory_all/, ['number_theory']],
     [/function_table/, ['patterns']],
     // ---- mixed pools and vocabulary
     [/:mixed|_all\b|:mixed$|all_/, ['mixed_review']],
@@ -312,7 +332,7 @@ export const CONCEPT_RULES = [
     [/vocab_.*_operations/, ['addition', 'subtraction', 'multiplication', 'division']],
     [/vocab_.*_geometry/, ['shapes_2d']], [/vocab_.*_data/, ['graphs']], [/vocab_.*_fractions/, ['fractions']],
     [/vocab_.*_measurement/, ['length', 'time']], [/vocab_.*_algebra/, ['patterns']], [/vocab_.*_counting/, ['counting']],
-    [/\(visual\)|pictures/, ['visual']],
+    [/\(visual\)|pictures/, ['visual'], { label: true }],
     [/fractions_all/, ['fractions', 'fraction_ops']], [/decimals_all/, ['decimals']],
     [/mixed_composing/, ['number_bonds', 'place_value', 'odd_even', 'ten_frame', 'fractions']],
     [/patterns_all/, ['skip_count']], [/placevalue_all/, ['place_value', 'expanded_form', 'compare']],
@@ -343,7 +363,6 @@ export const SKILL_TERMS = {
     'subtraction:subtract': ['take away', 'minus', 'simple subtraction', 'basic', 'easy subtraction'],
     'subtraction:sub_5_pictures': ['take away', 'cross out', 'how many left', 'beginning subtraction', 'minus'],
     'multiplication:mult_facts': ['x', 'multiply', 'times tables', 'times table', 'times', 'multiplication facts', 'tables', 'multiplication tables', 'x tables'],
-    'multiplication:multiply': ['times', 'multiplying', 'lots of'],
     'multiplication:mult_chart': ['times tables', 'multiplication square', 'multiplication grid', 'tables chart'],
     'multiplication:mult_chart_easy': ['times tables', 'multiplication square', 'multiplication grid'],
     'division:div_facts': ['divide', 'division', 'divided by', 'division facts', 'sharing', 'share', 'division tables', 'inverse of times tables'],
@@ -356,7 +375,7 @@ export const SKILL_TERMS = {
     'subtraction:sub_20_regroup': ['borrowing', 'bridging ten'],
     'subtraction:sub_1k_regroup': ['borrowing', '3 digit subtraction with borrowing'],
     'subtraction:sub_across_zeros': ['borrowing across zeros', 'borrowing', 'zeros', 'subtract from 100', 'subtract from 1000'],
-    'composing:number_bonds': ['number bonds', 'bonds to 10', 'part whole', 'cherry', 'ways to make 10'],
+    'composing:number_bonds': ['number bonds', 'bonds to 10', 'part whole', 'cherry', 'ways to make 10', 'number bonds to 20', 'bonds to 20', 'number bonds to 10'],
     'composing:make_ten': ['bonds to 10', 'number bonds to 10', 'pairs that make 10', 'ten frame'],
     'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'number square', 'missing numbers'],
     'composing:number_chart_fill': ['hundred square', 'number square', 'number grid', '1000 chart'],
@@ -382,7 +401,8 @@ export const SKILL_TERMS = {
     'number_sense:compensation': ['round and adjust', 'adjusting', 'mental math strategy'],
     'number_sense:make_a_ten': ['bridge through ten', 'bridging ten', 'make 10'],
     'number_sense:doubles_near_doubles': ['doubles plus one', 'near doubles', 'double facts'],
-    'counting:count_objects': ['how many', 'counting objects', 'count pictures', 'one to one counting'],
+    'counting:count_objects': ['how many', 'counting objects', 'count pictures', 'one to one counting', 'counting to 10', 'count to 10',
+        'counting to 20', 'count to 20', 'numbers to 10', 'subitizing', 'subitising'],
     'counting:count_sequence': ['what comes next', 'number after', 'number before', 'one more one less'],
     'placevalue:identify': ['place value', 'tens and ones', 'hundreds tens ones', 'which place', 'ones tens hundreds', 'place name', 'digit place'],
     'placevalue:value': ['digit value', 'what is the digit worth', 'value of the underlined digit'],
@@ -437,7 +457,7 @@ export const SKILL_TERMS = {
     'algebra:solve_eq_addsub': ['equations', 'solve equations', 'one step equations'],
     'integers:number_line_int': ['negative numbers', 'below zero', 'integers on a number line'],
     'integers:add_int': ['integers', 'adding negative numbers'],
-    'decimals:add_decimal': ['decimals', 'adding decimals', 'decimal addition'],
+    'decimals:add_decimal': ['adding decimals', 'decimal addition'],
     'fractions:equivalent': ['equivalent fractions', 'equal fractions'],
     'fractions:simplify': ['simplify fractions', 'lowest terms', 'simplest form', 'reduce fractions'],
     'fractions:improper_mixed': ['improper fractions', 'mixed numbers', 'top heavy fractions'],
@@ -450,7 +470,15 @@ export const SKILL_TERMS = {
     'measurement:temperature': ['temperature', 'thermometer'],
     'measurement:unit_conversions': ['unit conversions', 'converting units', 'convert measurements'],
     'measurement:elapsed_30min': ['elapsed time', 'how much later', 'time later'],
-    'measurement:money_change': ['change', 'giving change', 'how much change'],
+    'measurement:money_change': ['change', 'giving change', 'how much change', 'making change', 'make change', 'find the change'],
+    // critic r1 additions (P3, C1, C2, C4, C5)
+    'multiplication:multiply': ['times', 'multiplying', 'lots of', 'column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm',
+        'standard algorithm multiplication', 'formal written method', 'written method', '2 digit by 1 digit',
+        '3 digit by 1 digit', '2 digit by 2 digit', 'multiply by 1 digit', 'multiply by 2 digit', 'multiplication 2 digit by 1 digit'],
+    'patterns:halve': ['divide by 2', 'half of', 'halving', 'halve', 'find half', 'half of a number'],
+    'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared', 'cube numbers', 'cubed', 'powers'],
+    'area_perimeter:composite_shapes': ['compound shapes', 'composite shapes', 'rectilinear shapes', 'l shapes', 'compound area', 'compound perimeter'],
+    'decimals:decimal_nl_drag': ['decimals', 'decimal place value', 'tenths and hundredths', 'decimals on a number line'],
 };
 
 /* ================================================================= misspellings */
@@ -462,14 +490,14 @@ export const SKILL_TERMS = {
 export const PRIMARY_SKILLS = {
     'multiplication:count_by_tables': ['skip counting', 'skip count', 'skipcounting', 'skip countin', 'count by', 'counting by',
         'count in', 'counting in', 'counting in multiples', 'skip counting by 1 to 12'],
-    'multiplication:mult_facts': ['times tables', 'times table', 'timestables', 'multiplication tables', 'multiplication facts', 'times', 'multiply', 'multiplication', 'x'],
+    'multiplication:mult_facts': ['times tables', 'times table', 'timestables', 'multiplication tables', 'multiplication facts', 'times', 'multiply', 'multiplication', 'x', 'times x'],
     'addition:add_facts': ['plus', 'add', 'adding', 'addition', 'addition facts', 'sum'],
     'subtraction:sub_facts': ['take away', 'takeaway', 'minus', 'subtract', 'subtraction', 'subtraction facts', 'difference'],
     'division:div_facts': ['divide', 'division', 'divided by', 'division facts'],
     'division:share_into_groups': ['sharing', 'share equally', 'fair share'],
     'addition:add_100_regroup': ['carrying', 'carry'],
     'subtraction:sub_100_regroup': ['borrowing', 'borrow'],
-    'composing:number_bonds': ['number bonds', 'number bond', 'part whole'],
+    'composing:number_bonds': ['number bonds', 'number bond', 'part whole', 'number bonds to 20', 'bonds to 20'],
     'composing:make_ten': ['bonds to 10', 'make 10', 'make ten'],
     'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'hundred chart', 'number square'],
     'composing:odd_even': ['odd and even', 'odd or even', 'even numbers', 'odd numbers'],
@@ -487,6 +515,17 @@ export const PRIMARY_SKILLS = {
     'area_perimeter:perimeter': ['perimeter'],
     'area_perimeter:area': ['area'],
     'angles_lines:symmetry': ['symmetry', 'line of symmetry'],
+    // critic r1 additions
+    'multiplication:multiply': ['column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm multiplication',
+        'multiply by 1 digit', '2 digit by 1 digit', 'multiplication 2 digit by 1 digit'],
+    'patterns:halve': ['divide by 2', 'halving', 'halve', 'half of'],
+    'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared'],
+    'counting:count_objects': ['counting to 10', 'count to 10', 'counting to 20', 'count to 20', 'subitizing', 'subitising'],
+    'area_perimeter:composite_shapes': ['compound shapes', 'composite shapes'],
+    'measurement:money_change': ['making change', 'make change', 'giving change', 'find the change'],
+    'decimals:decimal_nl_drag': ['decimals', 'decimal'],
+    'conversions:percent_visual': ['percent', 'percentage', 'percentages', 'percents'],    'number_sense:nearest_10': ['rounding', 'round', 'round off'],
+    'subtraction:sub_100_regroup': ['column subtraction', 'column method subtraction'],
 };
 
 export const MISSPELLINGS = {
@@ -501,14 +540,14 @@ export const MISSPELLINGS = {
     perimiter: 'perimeter', parimeter: 'perimeter', perimetre: 'perimeter', perameter: 'perimeter',
     arear: 'area', aria: 'area', angels: 'angles', angel: 'angle', symetry: 'symmetry', simetry: 'symmetry', semetry: 'symmetry',
     geometery: 'geometry', probablity: 'probability', probabilty: 'probability', percnt: 'percent', precent: 'percent',
-    pictogram: 'pictogram', pictogragh: 'pictograph', grapgh: 'graph', grahp: 'graph', graf: 'graph',
+    pictogragh: 'pictograph', grapgh: 'graph', grahp: 'graph', graf: 'graph',
     countin: 'counting', counitng: 'counting', couting: 'counting', skipcounting: 'skip counting', skipcount: 'skip count',
     timestables: 'times tables', timetables: 'times tables', timestable: 'times table', tabels: 'tables', tabls: 'tables',
     regroupping: 'regrouping', regroop: 'regroup', regrouing: 'regrouping', borowing: 'borrowing', barrowing: 'borrowing',
     carying: 'carrying', carrieing: 'carrying', numbr: 'number', nubmer: 'number', numer: 'number', vaule: 'value', valu: 'value',
-    rounding: 'rounding', roundig: 'rounding', estamate: 'estimate', estimat: 'estimate', equivelent: 'equivalent',
+    roundig: 'rounding', estamate: 'estimate', estimat: 'estimate', equivelent: 'equivalent',
     equivalant: 'equivalent', eqivalent: 'equivalent', quater: 'quarter', quaters: 'quarters', haf: 'half', halfs: 'halves',
-    oclock: 'oclock', clok: 'clock', mony: 'money', monye: 'money', coines: 'coins', shapse: 'shapes', shaps: 'shapes',
+    clok: 'clock', mony: 'money', monye: 'money', coines: 'coins', shapse: 'shapes', shaps: 'shapes',
     triangel: 'triangle', rectangel: 'rectangle', sqaure: 'square', cirlce: 'circle', hexigon: 'hexagon',
     quadrilatral: 'quadrilateral', integars: 'integers', intergers: 'integers', negitive: 'negative', exponant: 'exponents',
     algabra: 'algebra', algebr: 'algebra', equasion: 'equation', equasions: 'equations', expresion: 'expression',
@@ -517,7 +556,7 @@ export const MISSPELLINGS = {
     mesurement: 'measurement', measurment: 'measurement', mesure: 'measure', lenght: 'length', lenth: 'length', wieght: 'weight',
     capasity: 'capacity', tempreture: 'temperature', temprature: 'temperature', vocabulery: 'vocabulary', vocabluary: 'vocabulary',
     hundered: 'hundred', hundert: 'hundred', thousend: 'thousand', tallys: 'tally', talley: 'tally', avarage: 'average',
-    averge: 'average', meadian: 'median', kindergarden: 'kindergarten', kindergarden2: 'kindergarten',
+    averge: 'average', meadian: 'median', kindergarden: 'kindergarten', 
 };
 
 /* ================================================================= normalisation */
@@ -547,7 +586,7 @@ const ORD = { first: '1', second: '2', third: '3', fourth: '4', fifth: '5', sixt
 export function normalize(s) {
     return String(s == null ? '' : s).toLowerCase()
         .replace(/[’'`]/g, '')
-        .replace(/×/g, ' times x ').replace(/÷/g, ' divide ').replace(/\+/g, ' plus ').replace(/−/g, ' minus ')
+        .replace(/[×*]/g, ' times x ').replace(/÷/g, ' divide ').replace(/\+/g, ' plus ').replace(/−/g, ' minus ')
         .replace(/(^|\s)-(\s|$)/g, ' minus ').replace(/%/g, ' percent ').replace(/[£$¢]/g, ' money ').replace(/°/g, ' degrees ')
         .replace(/[<>≤≥≠]/g, ' compare ').replace(/=/g, ' equals ').replace(/&/g, ' and ')
         .replace(/½/g, ' 1/2 half ').replace(/¼/g, ' 1/4 quarter ').replace(/¾/g, ' 3/4 ').replace(/∥/g, ' parallel ').replace(/⊥/g, ' perpendicular ')
@@ -605,6 +644,15 @@ function withinTerms(skillId) {
     return out;
 }
 
+/** 'nearest_100' -> 'round to the nearest hundred', 'nearest 100' ... (critic r1 P3). */
+function nearestTerms(skillId) {
+    const m = skillId.match(/^nearest_(\d+)$/);
+    if (!m || !N_WORD[+m[1]]) return [];
+    const n = +m[1], w = N_WORD[n];
+    return [`nearest ${n}`, `nearest ${w}`, `round to the nearest ${n}`, `round to the nearest ${w}`, `rounding to the nearest ${w}`,
+        `round to ${n}`, `round to ${w}`];
+}
+
 /** Grade words: grade 2 -> 'grade 2', g2, '2nd grade', 'year 3', y3. */
 export function gradeTerms(grade) {
     const g = grade == null ? 'M' : String(grade);
@@ -619,9 +667,10 @@ export function gradeTerms(grade) {
 
 /** Concepts a skill teaches, from the mapping table. */
 export function conceptsFor(categoryId, skillId, label) {
-    const hay = `${categoryId}:${skillId} ${String(label || '').toLowerCase()}`;
+    const id = `${categoryId}:${skillId}`;
+    const withLabel = `${id} ${String(label || '').toLowerCase()}`;
     const out = new Set();
-    for (const [re, list] of CONCEPT_RULES) if (re.test(hay)) for (const c of list) out.add(c);
+    for (const [re, list, o] of CONCEPT_RULES) if (re.test(o && o.label ? withLabel : id)) for (const c of list) out.add(c);
     return [...out];
 }
 
@@ -633,7 +682,7 @@ export function conceptsFor(categoryId, skillId, label) {
  */
 export function termsFor(entry) {
     const key = `${entry.categoryId}:${entry.skillId}`;
-    const extra = [...(SKILL_TERMS[key] || []), ...withinTerms(entry.skillId)];
+    const extra = [...(SKILL_TERMS[key] || []), ...withinTerms(entry.skillId), ...nearestTerms(entry.skillId)];
     const concept = [];
     for (const c of conceptsFor(entry.categoryId, entry.skillId, entry.label)) concept.push(...(CONCEPTS[c] || []));
     concept.push(entry.categoryName || '', entry.categoryId.replace(/_/g, ' '), entry.skillId.replace(/_/g, ' '));
@@ -686,10 +735,20 @@ export function buildSearchIndex(entries) {
             demote: (/^mixed|_all$|^all_|^operations_all|^vocab/.test(e.skillId) ? 0.4 : 0) + (/no pictures|no visuals|_plain|_nv$/.test(`${e.label} ${e.skillId}`.toLowerCase()) ? 0.2 : 0),
         };
     });
-    const vocab = new Set();
-    for (const it of items) for (const s of it.sets) for (const w of s) vocab.add(w);
-    return { items, vocab: [...vocab] };
+    const df = new Map();
+    for (const it of items) {
+        const seen = new Set();
+        for (const s of it.sets) for (const w of s) seen.add(w);
+        for (const w of seen) df.set(w, (df.get(w) || 0) + 1);
+        it.family = new Set([...tokSet([e2fam(it.entry)])].filter((w) => w.length >= 4 && !FAM_GENERIC.has(w)));
+    }
+    return { items, vocab: [...df.keys()], df };
 }
+
+const FAM_GENERIC = new Set(['number', 'numbers', 'sense', 'mixed', 'early', 'line', 'lines', 'all']);
+
+/** The family words of a skill (its category id and name), for the relevance tie-break. */
+function e2fam(e) { return `${String(e.categoryId || '').replace(/_/g, ' ')} ${e.categoryName || ''}`; }
 
 function editDistance(a, b, max) {
     if (Math.abs(a.length - b.length) > max) return max + 1;
@@ -714,7 +773,12 @@ function tokHits(set, q) {
     const sq = stem(q);
     if (set.has(sq)) return true;
     if (isNumTok(q) || q.length < 3) return false;
-    for (const w of set) if (w.startsWith(q) || (sq.length >= 3 && w.startsWith(sq))) return true;
+    for (const w of set) {
+        if (!(w.startsWith(q) || (sq.length >= 3 && w.startsWith(sq)))) continue;
+        // a place name never reaches its fraction: 'hundred' is not 'hundredths', 'ten' not 'tenths'
+        if (/^ths?$/.test(w.slice(q.length)) || /^ths?$/.test(w.slice(sq.length))) continue;
+        return true;
+    }
     return false;
 }
 
@@ -726,24 +790,41 @@ export function searchIndex(index, query) {
     let q = tokens(query, { query: true });
     if (!q.length) q = tokens(query);
     if (!q.length) return [];
-    const phrase = tokens(query).filter((w) => !HARD_STOP.has(w)).join(' ') || q.join(' ');
+    let phraseToks = tokens(query).filter((w) => !HARD_STOP.has(w));
     const wantsWords = q.some((w) => /^(word|story|stories|problem|context|real)/.test(w));
-    // fuzzy candidates for every query word, once
-    const fuzz = q.map((w) => {
-        if (isNumTok(w) || w.length < 4 || w.includes('.')) return [];
+    // fuzzy candidates for every query word, once. An unknown word is REWRITTEN to its nearest vocabulary
+    // word (least edits, then the commonest), so a typo ranks like the word meant (critic r1 R1):
+    // 'subtracton' -> 'subtraction', 'rouding' -> 'rounding', 'tme' -> 'time'.
+    const fuzz = q.map((w, i) => {
+        if (isNumTok(w) || w.length < 3 || w.includes('.')) return [];
         // a real word ('take', 'away') is never fuzzed into another one ('make', 'way')
         const sw = stem(w);
-        if (index.vocab.some((v) => v === w || v === sw || v.startsWith(w) || v.startsWith(sw))) return [];
+        if (index.vocab.some((v) => v === w || v === sw || (w.length >= 4 && (v.startsWith(w) || v.startsWith(sw))))) return [];
         const max = w.length >= 7 ? 2 : 1;
-        return index.vocab.filter((v) => !isNumTok(v) && editDistance(w, v, max) <= max);
+        const cands = [];
+        for (const v of index.vocab) {
+            if (isNumTok(v) || v.length < 3 || STOP.has(v)) continue;
+            const d = editDistance(w, v, max);
+            if (d <= max) cands.push({ v, d });
+        }
+        cands.sort((a, b) => a.d - b.d || (index.df.get(b.v) || 0) - (index.df.get(a.v) || 0) || b.v.length - a.v.length);
+        if (cands.length) {
+            const best = cands[0].v;
+            const j = phraseToks.indexOf(w);
+            if (j >= 0) phraseToks[j] = best;
+            q[i] = best;
+        }
+        return cands.filter((c) => c.d === (cands[0] && cands[0].d)).map((c) => c.v);
     });
+    const phrase = phraseToks.join(' ') || q.join(' ');
+    const qFam = q.map((w) => stem(w));
     const out = [];
     for (const it of index.items) {
-        let score = 0;
+        let score = 0, labelHits = 0;
         let ok = true;
         for (let i = 0; i < q.length && ok; i++) {
             const w = q[i];
-            if (tokHits(it.sets[0], w)) score += W_LABEL;
+            if (tokHits(it.sets[0], w)) { score += W_LABEL; labelHits++; }
             else if (tokHits(it.sets[1], w)) score += W_EXTRA;
             else if (tokHits(it.sets[2], w)) score += W_GRADE;
             else if (tokHits(it.sets[3], w)) score += W_CONCEPT;
@@ -753,15 +834,30 @@ export function searchIndex(index, query) {
         }
         if (!ok) continue;
         if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
-        else if (q.length > 1 && (` ${it.labelBare} `).includes(` ${phrase} `)) score += 15;
+        else if (q.length > 1 && labelPhrase(it.labelBare, phrase)) score += 15;
         if (phrase.length >= 1) {
             if (it.primary.includes(phrase) || it.primary.includes(q.join(' '))) score += 60;
             if (it.phrases.extra.includes(phrase)) score += 14;
             else if (it.phrases.concept.includes(phrase)) score += 6;
         }
         score -= it.demote + (it.wp && !wantsWords ? 0.3 : 0);
-        out.push({ entry: it.entry, score, order: it.order });
+        // relevance for equal scores (critic r1 R2): words in the label, then the family, then catalogue order
+        const fam = qFam.filter((w) => it.family.has(w)).length;
+        out.push({ entry: it.entry, score, labelHits, fam, order: it.order });
     }
-    out.sort((a, b) => b.score - a.score || a.order - b.order);
+    out.sort((a, b) => b.score - a.score || b.labelHits - a.labelHits || b.fam - a.fam || a.order - b.order);
     return out.map(({ entry, score }) => ({ entry, score }));
+}
+
+/** The phrase appears in the label as whole words — and a number in it is not the start of 'N digit'
+ *  ('divide by 2' is not 'Divide by 2-Digit Numbers'). */
+function labelPhrase(label, phrase) {
+    const hay = ` ${label} `;
+    let at = hay.indexOf(` ${phrase} `);
+    while (at >= 0) {
+        const rest = hay.slice(at + phrase.length + 2);
+        if (!(/\d$/.test(phrase) && /^digit/.test(rest))) return true;
+        at = hay.indexOf(` ${phrase} `, at + 1);
+    }
+    return false;
 }

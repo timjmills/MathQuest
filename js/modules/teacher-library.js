@@ -18,7 +18,7 @@
 // grid as it scrolls into view, and the List | Thumbnails choice is the same per-device choice the
 // Send screen uses (skillView / setSkillView / viewToggleHTML).
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import { optionsFor } from './skill-options.js';
@@ -620,3 +620,6 @@ function wire() {
         if (next) { next.focus(); e.preventDefault(); }
     });
 }
+
+// The standards / WRM terms load after boot: re-run a search that is on screen (critic r1 N2).
+onSkillSearchReady(() => { try { if (root && root.isConnected && lib.query.trim()) renderResults(); } catch (e) { /* screen gone */ } });

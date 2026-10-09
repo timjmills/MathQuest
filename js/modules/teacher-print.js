@@ -20,7 +20,7 @@
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -1057,3 +1057,11 @@ export function printoutMeta(p) {
         line2: `${p.pages} page${p.pages === 1 ? '' : 's'}${p.key ? ' + key' : ''} · ${fmtDay(p.at)}`,
     };
 }
+
+// The standards / WRM terms load after boot: re-run a skill-picker search that is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try {
+        if (!root || !root.isConnected) return;
+        root.querySelectorAll('input[data-pick]').forEach((inp) => { if (inp.value.trim()) renderPickResults(Number(inp.dataset.pick), inp.value); });
+    } catch (e) { /* screen gone */ }
+});

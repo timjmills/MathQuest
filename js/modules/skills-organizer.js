@@ -1,7 +1,7 @@
 // skills-organizer.js - Full-screen skill browsing, preview, and queue management
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { skillSearchScores, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
@@ -832,3 +832,8 @@ function soOrderByRank(cards, hits) {
     for (const grp of best.keys()) { if (!grp.parentElement) continue; if (!parents.has(grp.parentElement)) parents.set(grp.parentElement, []); parents.get(grp.parentElement).push(grp); }
     parents.forEach((kids, parent) => order(parent, kids, (k) => best.get(k) ?? -1));
 }
+
+// The standards / WRM terms load after boot: re-rank a Navigator search that is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try { if (so.searchText) { so.searchHits = skillSearchScores(so.searchText); soApplyFilters(); } } catch (e) { /* view not built */ }
+});

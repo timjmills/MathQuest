@@ -20,7 +20,7 @@
 //   - `?board=1` in the URL (the "Open board view in new window" link) hides the teacher
 //     shell entirely for that window (`body.tv-board`).
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { listTests, loadTest, deleteTest, exportTestJSON, importTestJSON, compressTestForURL } from './quiz-storage.js';
 import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelectedVoiceURI } from './voice-picker.js';
@@ -989,3 +989,11 @@ if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
 }
+
+// The standards / WRM terms load after boot: re-run the "one skill" search if it is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try {
+        const inp = document.getElementById('tvRunOne');
+        if (inp && inp.isConnected && inp.value.trim()) inp.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (e) { /* screen gone */ }
+});

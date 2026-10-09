@@ -8,6 +8,8 @@
 //   (a) every live skill has >= 5 distinct search terms beyond its label
 //   (b) every query in QUERIES has its listed skills in the top 5
 //   (c) no query in QUERIES returns zero results
+//   (d) every PRIMARY_SKILLS phrase ranks its skill first (list and grouped picker)
+//   (e) every query in TOP1 ranks an allowed skill FIRST and keeps the named wrong skills out of the top 5
 const path = require('path');
 const { pathToFileURL } = require('url');
 
@@ -261,6 +263,81 @@ const QUERIES = [
     ['2nd grade addition', ['addition:add_50_no_regroup']],
 ];
 
+
+// [query, the skill(s) allowed at RANK 1, and optionally skills that must NOT be in the top 5].
+// Every query the round-1 critic reported (P1-P3, C1-C5, R1-R2) plus its 40-query sample.
+const TOP1 = [
+    // critic r1 P1: 'multiples' in mult_zeros's label must not give it skip counting or primes
+    ['factors and multiples', ['number_theory:factors_identify', 'number_theory:multiples'], ['multiplication:mult_zeros']],
+    ['prime', ['number_theory:prime_composite'], ['multiplication:mult_zeros']],
+    ['skip counting', ['multiplication:count_by_tables'], ['multiplication:mult_zeros']],
+    // P2
+    ['column subtraction', ['subtraction:sub_100_regroup'], ['addition:add_column_multi', 'addition:add_20_regroup', 'addition:add_10_no_regroup']],
+    ['column addition', ['addition:add_column_multi']],
+    // P3
+    ['divide by 2', ['patterns:halve', 'division:div_facts']],
+    ['round to the nearest hundred', ['number_sense:nearest_100']],
+    ['number bonds to 20', ['composing:number_bonds', 'composing:make_ten']],
+    ['less', ['placevalue:more_less_10', 'comparing:compare_groups', 'placevalue:compare']],
+    ['square numbers', ['order_of_operations:exponents_simple']],
+    ['counting to 10', ['counting:count_objects', 'counting:count_sequence']],
+    ['multiplication 2 digit by 1 digit', ['multiplication:multiply']],
+    ['multiply by 1 digit', ['multiplication:multiply']],
+    // C1
+    ['short multiplication', ['multiplication:multiply']],
+    ['standard algorithm multiplication', ['multiplication:multiply']],
+    ['column multiplication', ['multiplication:multiply']],
+    ['long multiplication', ['multiplication:multiply']],
+    ['formal written method', ['multiplication:multiply', 'addition:add_100_regroup', 'subtraction:sub_100_regroup', 'addition:add_10_no_regroup']],
+    // C2-C5
+    ['subitizing', ['counting:count_objects']],
+    ['subitising', ['counting:count_objects']],
+    ['*', ['multiplication:mult_facts']],
+    ['compound shapes', ['area_perimeter:composite_shapes']],
+    ['composite shapes', ['area_perimeter:composite_shapes']],
+    ['making change', ['measurement:money_change']],
+    ['decimals', ['decimals:decimal_nl_drag']],
+    ['percentages', ['conversions:percent_visual']],
+    // R1: misspellings not in MISSPELLINGS rank like the word meant
+    ['subtracton', ['subtraction:sub_facts']],
+    ['rouding', ['number_sense:nearest_10']],
+    ['perimter', ['area_perimeter:perimeter']],
+    ['telling tme', ['measurement:time_hour']],
+    ['multiplcation', ['multiplication:mult_facts']],
+    ['fracton', ['fractions:identify']],
+    // the critic's 40-query sample (the 31 that passed must keep passing)
+    ['count by 3s', ['multiplication:count_by_tables']],
+    ['times tables 7', ['multiplication:mult_facts', 'multiplication:count_by_tables']],
+    ['x tables', ['multiplication:mult_facts']],
+    ['long division', ['division:long_div_2digit']],
+    ['dividing with remainders', ['division:div_remainders']],
+    ['double digit addition', ['addition:add_100_regroup', 'addition:add_100_no_regroup', 'addition:add_100_mixed']],
+    ['subtraction with regrouping', ['subtraction:sub_100_regroup', 'subtraction:sub_20_regroup']],
+    ['expanded form', ['placevalue:expand']],
+    ['compare numbers', ['placevalue:compare']],
+    ['ordering numbers', ['placevalue:order_least_to_greatest', 'placevalue:order_greatest_to_least']],
+    ['equivalent fractions', ['fractions:equivalent']],
+    ['adding fractions', ['fraction_operations:add_fractions_like']],
+    ['mixed numbers', ['fractions:improper_mixed']],
+    ['percent of a number', ['conversions:percent_of_number']],
+    ['ratio', ['conversions:ratio_intro']],
+    ['negative numbers', ['integers:number_line_int']],
+    ['telling the time', ['measurement:time_hour']],
+    ['half past', ['measurement:time_half_hour']],
+    ['quarter to', ['measurement:time_quarter']],
+    ['money', ['measurement:money_count']],
+    ['coins', ['measurement:money_count']],
+    ['perimeter', ['area_perimeter:perimeter']],
+    ['volume', ['area_perimeter:volume']],
+    ['symmetry', ['angles_lines:symmetry']],
+    ['coordinates', ['coordinates:coordinate_q1']],
+    ['tally chart', ['graphs:tally_chart']],
+    ['pictogram', ['graphs:pictograph']],
+    ['bar chart', ['graphs:bar_graph']],
+    ['bodmas', ['order_of_operations:oop_easy']],
+    ['fact families', ['addition:add_sub_fact_family']],
+];
+
 (async () => {
     globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
     const log = console.log;
@@ -300,9 +377,22 @@ const QUERIES = [
         if (miss.length) failures.push(`(b) "${q}": ${miss.join(', ')} not in top 5 (got ${keys.join(', ')})`);
         else passed++;
     }
+    // (e) rank 1 (TOP1): the right skill FIRST, and the named wrong skills out of the top 5
+    let top1ok = 0;
+    for (const [q, first, never = []] of TOP1) {
+        const all = finder.findSkills(q);
+        const keys = all.slice(0, 5).map((h) => h.key);
+        if (!all.length) { failures.push(`(e) "${q}" returns no results`); continue; }
+        if (!first.includes(keys[0])) { failures.push(`(e) "${q}": rank 1 is ${keys[0]}, want ${first.join(' or ')}`); continue; }
+        const bad = never.filter((k) => keys.includes(k));
+        if (bad.length) { failures.push(`(e) "${q}": ${bad.join(', ')} must not be in the top 5`); continue; }
+        top1ok++;
+    }
+    console.log(`ws-search-terms: ${top1ok}/${TOP1.length} rank-1 queries pass`);
     // (d) primary skills: every PRIMARY_SKILLS phrase puts its skill at rank 1 in findSkills AND first in
     //     a grouped picker (groupByRank: the order teacher-sets uses; the student list and teacher
-    //     library show the ranked order directly; Navigator / quiz builder reorder their groups the same way)
+    //     library show the ranked order directly. The Navigator / Quiz builder DOM reordering is checked
+    //     in a real browser by tests/scripts/ws-search-order.cjs)
     let prim = 0;
     for (const [key, phrases] of Object.entries(st.PRIMARY_SKILLS)) {
         for (const q of phrases) {

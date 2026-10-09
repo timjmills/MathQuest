@@ -18,7 +18,7 @@
 // options (skill-options.js optionsFor) is shown. Chosen values live on the queue item as
 // `item.opts`; the share code carries them once skill-codes.js encodes `opts`.
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady, groupByRank } from './skill-finder.js';
+import { rankByQuery, onSkillSearchReady, groupByRank } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import {
@@ -757,3 +757,6 @@ function renderMenu() {
   <button type="button" data-act="delete-set" data-id="${esc(s.id)}" aria-label="Delete ${esc(s.name || 'set')}" style="width:36px;justify-content:center;padding:0;">${icon('trash', 16)}</button>
 </div>`).join('') : '<p class="tv-cap" style="padding:8px 10px;">No saved sets yet. Save one with “Save set”.</p>';
 }
+
+// The standards / WRM terms load after boot: re-run a search that is on screen (critic r1 N2).
+onSkillSearchReady(() => { try { if (root && root.isConnected && ui.query) renderBrowser(); } catch (e) { /* screen gone */ } });

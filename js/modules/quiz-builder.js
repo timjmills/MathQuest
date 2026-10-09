@@ -9,7 +9,7 @@
 // of the teacher previews (teacher-preview.js), and the preview column stays visible at tablet
 // widths (it is the only way to add questions). Skills are buttons, so the keyboard reaches them.
 
-import { skillSearchScores, rankByQuery, onSkillSearchReady } from './skill-finder.js';
+import { skillSearchScores, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
 import { shuffle } from './utils.js';
@@ -1637,3 +1637,8 @@ function qbOrderByRank(cards, hits) {
     for (const grp of best.keys()) { if (!grp.parentElement) continue; if (!parents.has(grp.parentElement)) parents.set(grp.parentElement, []); parents.get(grp.parentElement).push(grp); }
     parents.forEach((kids, parent) => order(parent, kids, (k) => best.get(k) ?? -1));
 }
+
+// The standards / WRM terms load after boot: re-rank a Quiz-builder search that is on screen (critic r1 N2).
+onSkillSearchReady(() => {
+    try { if (qb.searchText) { qb.searchHits = skillSearchScores(qb.searchText); qbApplyFilters(); } } catch (e) { /* view not built */ }
+});

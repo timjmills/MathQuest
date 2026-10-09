@@ -55,7 +55,9 @@ export function warmSkillSearch() {
     if (loading) return loading;
     loading = Promise.all([import('./standards.js'), import('./wrm.js')]).then(([std, wrm]) => {
         curriculum = { standardsFor: std.standardsFor, wrmFor: wrm.wrmFor };
+        // build the full index now, at idle, so the first search after loading does not pay for it (critic r1 N2)
         index = null;
+        try { getIndex(); } catch (e) { index = null; }
         for (const fn of listeners) { try { fn(); } catch (e) { /* a listener must not break search */ } }
         return true;
     }).catch(() => { loading = null; return false; });
