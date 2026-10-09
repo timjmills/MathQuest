@@ -18,7 +18,6 @@
 // grid as it scrolls into view, and the List | Thumbnails choice is the same per-device choice the
 // Send screen uses (skillView / setSkillView / viewToggleHTML).
 
-import { skillHay, rankSkillHits } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS } from './data.js';
 import { optionsFor } from './skill-options.js';
@@ -154,11 +153,11 @@ function matches(s) {
     if (lib.stdHits) return lib.stdHits.has(`${s.categoryId}:${s.skillId}`);
     const words = lib.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return true;
-    const hay = skillHay(s.categoryId, s.skillId, s.label, s.categoryName, s.domainName);
+    const hay = `${s.label} ${s.categoryName} ${s.domainName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
     return words.every((w) => hay.includes(w));
 }
 
-function shown() { return rankSkillHits(skillCatalogue().filter(matches), lib.stdHits ? '' : lib.query, (s) => `${s.categoryId}:${s.skillId}`, (s) => s.label); }
+function shown() { return skillCatalogue().filter(matches); }
 
 function keyOf(s) { return `${s.categoryId}|${s.skillId}`; }
 

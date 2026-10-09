@@ -1,4 +1,3 @@
-import { rankSkillHits } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS } from './data.js';
 
@@ -271,9 +270,9 @@ export function handleMixedSkillSearch(query) {
     const lowerQuery = query.toLowerCase().trim();
     const terms = lowerQuery.split(/\s+/);
     
-    const matches = rankSkillHits(index.filter(item => {
+    const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
-    }), query, (it) => `${it.categoryId}:${it.skillId}`, (it) => it.skillLabel).slice(0, 12);
+    }).slice(0, 12);
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:#666;text-align:center;font-size:0.85rem;">No skills found.</div>';

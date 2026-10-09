@@ -1,4 +1,3 @@
-import { rankSkillHits } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
 
@@ -666,9 +665,9 @@ export function handlePrintSkillSearch(query) {
     const terms = lowerQuery.split(/\s+/);
     
     // Find matches - all terms must match
-    const matches = rankSkillHits(index.filter(item => {
+    const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
-    }), query, (it) => `${it.categoryId}:${it.skillId}`, (it) => it.skillLabel);
+    });
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.9rem;">No skills found. Try different keywords.</div>';

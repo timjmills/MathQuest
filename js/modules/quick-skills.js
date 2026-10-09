@@ -1,4 +1,3 @@
-import { rankSkillHits } from './skill-search-terms.js';
 import { state } from './state.js';
 import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, gradeCircleHTML, GRADE_COLORS } from './data.js';
 import { setCookie, getCookie } from './storage.js';
@@ -494,9 +493,9 @@ export function handleQuickSkillSearch(query) {
     const terms = lowerQuery.split(/\s+/);
 
     // Find matches
-    const matches = rankSkillHits(index.filter(item => {
+    const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
-    }), query, (it) => `${it.categoryId}:${it.skillId}`, (it) => it.skillLabel).slice(0, 10);
+    }).slice(0, 10);
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:var(--text-dim);text-align:center;">No skills found</div>';

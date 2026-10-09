@@ -1,4 +1,3 @@
-import { skillHay, rankSkillHits } from './skill-search-terms.js';
 import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 
 export function buildSkillIndex() {
@@ -22,7 +21,7 @@ export function buildSkillIndex() {
                         skillId: skill.v,
                         skillLabel: skill.l,
                         // Create searchable text
-                        searchText: skillHay(category.id, skill.v, domain.name, category.name, skill.l)
+                        searchText: `${domain.name} ${category.name} ${skill.l}`.toLowerCase()
                     });
                 }
             }
@@ -52,9 +51,9 @@ export function handleSkillSearch(query) {
     const terms = lowerQuery.split(/\s+/);
     
     // Find matches - all terms must match
-    const matches = rankSkillHits(index.filter(item => {
+    const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
-    }), query, (it) => `${it.categoryId}:${it.skillId}`, (it) => it.skillLabel);
+    });
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:15px;color:var(--text-dim);text-align:center;">No skills found. Try different keywords.</div>';

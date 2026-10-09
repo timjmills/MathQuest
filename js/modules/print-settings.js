@@ -1,4 +1,3 @@
-import { rankSkillHits } from './skill-search-terms.js';
 import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor } from './generate-question.js';
@@ -652,11 +651,11 @@ export function handlePrintDialogSearch(query) {
     const lowerQuery = query.toLowerCase().trim();
     const terms = lowerQuery.split(/\s+/);
 
-    const matches = rankSkillHits(index.filter(item => {
+    const matches = index.filter(item => {
         // Skip mixed/meta skills
         if (item.skillId === 'mixed' || item.skillId.startsWith('mixed_')) return false;
         return terms.every(term => item.searchText.includes(term));
-    }), query, (it) => `${it.categoryId}:${it.skillId}`, (it) => it.skillLabel);
+    });
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;">No skills found.</div>';
