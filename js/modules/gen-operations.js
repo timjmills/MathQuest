@@ -7068,7 +7068,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.answerType = 'number';
                     const A = Number(a), B = Number(b), Q = A / B;
                     if (form === 'long') {
-                        const payload = { dividend: A, divisor: B, quotient: Q, workRows: 0, fact: true };
+                        const payload = { dividend: A, divisor: B, quotient: Q, workRows: 0, fact: true, ...(inMix ? { mix: true } : {}) };
                         q.notation = 'bracket'; q._variant = 'long';
                         q.printFormat = 'div-facts-long';
                         q.cell = { template: 'division', v: 1, payload };
@@ -7093,7 +7093,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         // empty and printed S as the L page).
                         q.notation = 'across'; q._variant = 'horiz';
                         q.printFormat = 'div-facts-horizontal';
-                        q.cell = { template: 'equation', v: 1, payload: { a: A, b: B, op: '/', result: Q, digits: _bandDigits('div_facts', '\u00f7', range), fact: true } };
+                        // In Mix (`mix`) the sentence prints over its answer line on paper, a two-line cell
+                        // like the bracket and the fraction, so a Mix page is one cell height (critic R2 D-A).
+                        q.cell = { template: 'equation', v: 1, payload: { a: A, b: B, op: '/', result: Q, digits: _bandDigits('div_facts', '\u00f7', range), fact: true, ...(inMix ? { mix: true } : {}) } };
                     }
                 }
 

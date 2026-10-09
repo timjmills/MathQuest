@@ -347,6 +347,174 @@ const MARK = {
         });
         codes.forEach((c) => check(c.back === c.v || (c.v === 'standard' && (c.back === undefined || c.back === 'standard')), `share code ${c.v}: "${c.p}" -> ${c.back}`));
 
+        // ---------------------------------------------------------------- critic R2 defects (D-A ... R-2)
+        // Built at the SAME seeds and counts as the evidence pages (ws-grade-render: seed =
+        // hash('<category>__<skill>:<role>') % 1e6, the role's own count), and measured on the INK
+        // (tests/lib/ws-ink.cjs: the rendered page's dark pixels per cell), not on element boxes.
+        // Bands: the critic's calibration reads up to 0.33 as normal (a passed Standard fact-rows page
+        // measures 0.30-0.31); H13 is 0.30 of a cell with its label.
+        const hashS = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+        const evSeed = (role, sk = 'division__div_facts') => hashS(`${sk}:${role}`) % 1000000;
+        const evBuild = (role, size, opts, { skill = ['division', 'div_facts'], seed } = {}) => page.evaluate(async (a) => {
+            const r = await window.buildSheet({ role: a.role, size: a.size, seed: a.seed, form: 'A', key: true, anchors: 'off',
+                sections: [{ skills: [{ categoryId: a.skill[0], skillId: a.skill[1], opts: a.opts }] }] });
+            return { doc: window.sheetDocument(r.pupilHtml, 'x'), pupil: r.pupilHtml, n: r.items.length, pages: r.pageCount,
+                note: (r.fits && (r.fits.note || r.fits.line)) || '', forms: r.items.map((i) => i.template) };
+        }, { role, size, opts, skill, seed: seed === undefined ? evSeed(role, skill.join('__')) : seed });
+        const { inkScan, worst } = require('../lib/ws-ink.cjs');
+        const f2 = (x) => (x === null || x === undefined ? '-' : x.toFixed(2));
+        const BAND = 0.33;
+        // (bands are compared at the critic's reporting precision, two decimals)
+        const r2 = (x) => Math.round(x * 100) / 100;
+        const rowsEven = (pg) => { const hs = pg.cells.map((c) => c.h); return Math.max(...hs) / Math.min(...hs) <= 1.05; };
+        // D-A: Mix at L (and S) - one cell size, no wide side bands, the page full
+        for (const size of ['L', 'S']) {
+            for (const role of ['independent', 'test']) {
+                const r = await evBuild(role, size, { divForm: 'mix' });
+                const ink = await inkScan(page, r.doc);
+                const pg = ink.pages[0], w = worst(pg);
+                check(r.pages === 1 && rowsEven(pg), `D-A mix ${role} ${size}: one page, every row one height (${w.rowsH.join('/')} px)`);
+                check(r2(w.side) <= BAND && r2(w.bottom) <= 0.35, `D-A mix ${role} ${size}: ink side band ${f2(w.side)} <= ${BAND}, bottom ${f2(w.bottom)} <= 0.35`);
+                check(w.strip < 0.2, `D-A mix ${role} ${size}: page strip under the grid ${f2(w.strip)} < 0.20`);
+                if (role === 'independent') check(r.n >= (size === 'L' ? 15 : 27), `D-A mix independent ${size}: ${r.n} items (>= ${size === 'L' ? 15 : 27})`);
+                if (role === 'test') check(r.n === (size === 'L' ? 12 : 20), `D-A mix test ${size}: the Test's ceiling, ${r.n}`);
+            }
+            const ls = await evBuild('lesson', size, { divForm: 'mix' });
+            const li = await inkScan(page, ls.doc);
+            // pages 2 and 3: the lesson sheet's Independent grid and the practice page
+            for (const k of [1, 2]) {
+                const pg = li.pages[k];
+                if (!pg) { check(false, `D-A mix lesson ${size} p${k + 1}: exists`); continue; }
+                const grids = pg.cells.filter((c) => !c.empty);
+                // the practice cells: the most common cell height on the page (Guided / warm-up bands differ)
+                const tally = new Map();
+                grids.forEach((c) => tally.set(Math.round(c.h), (tally.get(Math.round(c.h)) || 0) + 1));
+                const hMain = [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
+                const prac = grids.filter((c) => Math.abs(c.h - hMain) <= 3);
+                const side = Math.max(...prac.map((c) => Math.max(c.left, c.right))), bottom = Math.max(...prac.map((c) => c.bottom));
+                const wide = prac.filter((c) => c.w > 300).length;
+                check(prac.length >= 9 && wide === 0 && r2(side) <= BAND && r2(bottom) <= 0.35, `D-A mix lesson ${size} p${k + 1}: ${prac.length} practice cells of one height, none a half-page cell (${wide}), side ${f2(side)}, bottom ${f2(bottom)}`);
+            }
+        }
+        // D-B: the Standard Test holds its ceiling (20 / 12), the page filled, the bottom band held
+        for (const size of ['S', 'L']) {
+            const r = await evBuild('test', size, { divForm: 'standard' });
+            const w = worst((await inkScan(page, r.doc)).pages[0]);
+            check(r.n === (size === 'S' ? 20 : 12) && r.pages === 1, `D-B standard test ${size}: ${r.n} items on ${r.pages} page`);
+            check(w.strip < 0.2 && r2(w.bottom) <= 0.35, `D-B standard test ${size}: strip ${f2(w.strip)} < 0.20, ink bottom band ${f2(w.bottom)} <= 0.35`);
+        }
+        // D-C: Mix fact rows and probe - the across facts at the Standard rows' rung, bands held, a
+        // two-digit dividend read as one number
+        for (const size of ['S', 'L']) {
+            const std = await evBuild('fact-rows', size, { divForm: 'standard' }, { seed: evSeed('fact-rows') });
+            const stdPt = Number((/Digits (\d+) pt/.exec(std.note) || [])[1]) || 20;
+            for (const role of ['fact-rows', 'fact-probe']) {
+                const r = await evBuild(role, size, { divForm: 'mix' });
+                const ink = await inkScan(page, r.doc);
+                const w = worst(ink.pages[0]);
+                check(r.pages === 1 && (role === 'fact-rows' || r.n === 20), `D-C mix ${role} ${size}: one page (${r.n} facts)`);
+                check(r2(w.bottom) <= 0.32 && r2(w.side) <= BAND && rowsEven(ink.pages[0]), `D-C mix ${role} ${size}: ink bottom ${f2(w.bottom)} <= 0.32, side ${f2(w.side)} <= ${BAND}, rows one height (${w.rowsH.join('/')} px)`);
+                const pts = [...new Set((r.pupil.match(/--ws-digit:(\d+)pt/g) || []).map((m) => Number(m.replace(/\D/g, ''))))];
+                check(pts.length === 1 && pts[0] >= stdPt, `D-C mix ${role} ${size}: every form at ${pts.join('/')} pt (Standard rows ${stdPt} pt)`);
+                const gaps = await page.evaluate((html) => {
+                    const host = document.createElement('div');
+                    host.className = 'ws-sheet';
+                    host.style.cssText = 'position:absolute;left:0;top:0;width:210mm;visibility:hidden';
+                    host.innerHTML = html;
+                    document.body.appendChild(host);
+                    const out = [];
+                    for (const d of host.querySelectorAll('[data-ws-ops="division"]')) {
+                        const digits = Array.from(d.querySelectorAll('span')).filter((s) => /border-top/.test(s.getAttribute('style') || '') && /^\d$/.test(s.textContent.trim()));
+                        for (let i = 1; i < digits.length; i++) {
+                            const rg = (el) => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect(); };
+                            const a = rg(digits[i - 1]), b = rg(digits[i]);
+                            out.push((b.left - a.right) / a.width);
+                        }
+                    }
+                    host.remove();
+                    return out;
+                }, r.pupil);
+                check(gaps.length > 0 && Math.max(...gaps) <= 1, `D-C mix ${role} ${size}: dividend digit gap <= 1 digit width (worst ${f2(Math.max(...gaps))} of a digit)`);
+            }
+        }
+        // D-D: a Mix Guided page models every form (3 Models), every problem in its own box
+        for (const size of ['S', 'L']) for (const seed of [evSeed('guided'), 11, 2026]) {
+            const r = await evBuild('guided', size, { divForm: 'mix' }, { seed });
+            const models = (r.pupil.match(/class="[^"]*\bmq-modelcell\b/g) || []).length;
+            const kinds = { long: /data-ws-ops="division"/.test(r.pupil), fraction: /data-ws-notation="fraction"/.test(r.pupil), across: /class="ws-eq(?: ws-eq-below)?"(?! data-ws-notation)/.test(r.pupil) };
+            const over = await page.evaluate(async (doc) => {
+                const fr = document.createElement('iframe');
+                fr.style.cssText = 'position:absolute;left:-3000px;top:0;width:900px;height:1300px';
+                document.body.appendChild(fr);
+                fr.srcdoc = doc;
+                await new Promise((ok) => { fr.onload = ok; });
+                await fr.contentDocument.fonts.ready;
+                const bad = [];
+                for (const c of fr.contentDocument.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')) {
+                    const cr = c.getBoundingClientRect();
+                    for (const e of c.querySelectorAll('*')) {
+                        const er = e.getBoundingClientRect();
+                        if (er.height && (er.bottom > cr.bottom + 1 || er.top < cr.top - 1)) { bad.push(c.textContent.trim().slice(0, 20)); break; }
+                    }
+                }
+                fr.remove();
+                return bad;
+            }, r.doc);
+            check(models === 3 && kinds.long && kinds.fraction && kinds.across, `D-D mix guided ${size} seed ${seed}: 3 Models, every form dealt (${models}; ${JSON.stringify(kinds)})`);
+            check(over.length === 0, `D-D mix guided ${size} seed ${seed}: every problem inside its own box (${over.join(' | ')})`);
+        }
+        // R-1: the div_remainders lesson at L stays on its pages; R-2: the divide lesson's warm-up holds 3
+        for (const size of ['S', 'L']) {
+            const r = await evBuild('lesson', size, {}, { skill: ['division', 'div_remainders'] });
+            const ink = await inkScan(page, r.doc);
+            const over = ink.pages.filter((pg) => pg.gridBottom !== null && pg.footTop !== null && pg.gridBottom > pg.footTop - 2).length;
+            check(over === 0, `R-1 div_remainders lesson ${size}: no page runs into its footer (${over})`);
+            const d = await evBuild('lesson', size, {}, { skill: ['division', 'divide'] });
+            const m = /(\d+) warm-up, (\d+) guided and (\d+) independent/.exec(d.note) || [];
+            check(Number(m[1]) === 3, `R-2 divide lesson ${size}: the warm-up holds 3 (${m.slice(1).join('/')})`);
+            const strip = (await inkScan(page, d.doc)).pages[1].strip;
+            check(strip !== null && strip < 0.35, `R-2 divide lesson ${size} p2: page strip ${f2(strip)} < 0.35 (parent 0.37)`);
+        }
+        // R-2: one across look - the div_facts equation cell's "÷" advance matches the fact rows'
+        {
+            const adv = async (role) => {
+                const r = await evBuild(role, 'L', { divForm: 'standard' });
+                return page.evaluate((html) => {
+                    const host = document.createElement('div');
+                    host.className = 'ws-sheet';
+                    host.style.cssText = 'position:absolute;left:0;top:0;width:210mm;visibility:hidden';
+                    host.innerHTML = html;
+                    document.body.appendChild(host);
+                    const out = [];
+                    const tw = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+                    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+                        const t = n.textContent;
+                        const k = t.indexOf('÷');
+                        if (k < 0) continue;
+                        const rg = document.createRange();
+                        rg.setStart(n, k); rg.setEnd(n, k + 1);
+                        const g = rg.getBoundingClientRect();
+                        // the digit before the sign: in this text node, else the previous digit text
+                        let prev = null;
+                        const all = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+                        for (let m2 = all.nextNode(); m2 && m2 !== n; m2 = all.nextNode()) if (/\d\s*$/.test(m2.textContent)) prev = m2;
+                        let dr;
+                        const before = t.slice(0, k).replace(/\s+$/, '');
+                        if (/\d$/.test(before)) { const r2 = document.createRange(); r2.setStart(n, before.length - 1); r2.setEnd(n, before.length); dr = r2.getBoundingClientRect(); }
+                        else if (prev) { const s = prev.textContent.replace(/\s+$/, ''); const r2 = document.createRange(); r2.setStart(prev, s.length - 1); r2.setEnd(prev, s.length); dr = r2.getBoundingClientRect(); }
+                        if (!dr) continue;
+                        const fs = parseFloat(getComputedStyle(n.parentElement).fontSize);
+                        out.push((g.left - dr.right) / fs);
+                        if (out.length >= 6) break;
+                    }
+                    host.remove();
+                    return out.length ? out.reduce((a, b) => a + b, 0) / out.length : null;
+                }, r.pupil);
+            };
+            const a = await adv('independent'), b = await adv('fact-rows');
+            check(a !== null && b !== null && Math.abs(a - b) <= 0.1 * Math.max(a, b) + 0.02, `R-2 one across look: digit-to-"÷" space ${f2(a)} em on Independent, ${f2(b)} em on fact rows`);
+        }
+
         check(app.problems.filter((p) => p.type !== 'requestfailed').length === 0, `no console errors (${app.problems.map((p) => p.text).slice(0, 3).join(' | ')})`);
     } catch (e) {
         check(false, 'threw: ' + (e && e.stack || e));

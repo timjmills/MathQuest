@@ -120,6 +120,12 @@ export function factTitle(items) {
 const OP_SIGN = { add: '+', subtract: '-', multiply: 'x', divide: '/' };
 const LADDER_PTS = [28, 24, 20, 18, 16];
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
+/**
+ * A bracket's digit track on a fact-rows page, in em of the rung's digit: 1 em leaves 0.44 em
+ * between two dividend digits (under one digit's width, so "72" reads as one number) and room to
+ * write the quotient digit over its track.
+ */
+const FACT_ROW_TRACK_EM = 1;
 
 /** A division fact prints ACROSS ("24 ÷ 6 = ___", PT-FRW-6/7): vertical division is not a fact form. */
 // A division fact the teacher asked for Vertical (div_facts `divForm`) is stacked in the vertical
@@ -143,18 +149,25 @@ export function divForms(items) {
 /** Width (mm) of the widest item of `forms` at `pt` (the templates' own geometry, + the cell pads). */
 function formWidthMm(items, forms, pt, size) {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
-    const hw = (SIZES[size] || SIZES.L).writeMm;
-    const track = Math.max(em * FACT_TRACK_EM, hw * (size === 'S' ? 1 : 0.8));   // long-division.js's track
+    // A bracket on a fact-rows page is drawn at the rung's digit with tracks from THAT digit
+    // (formCell's factRowTrack; critic R2 D-C: tracks from the size's writing height spread
+    // "72" into "7  2").
+    // (a page of one form keeps the size's writing-height track: critic R2 passed those pages)
+    const mixed = forms.size > 1;
+    const track = mixed ? em * FACT_ROW_TRACK_EM : Math.max(em * FACT_TRACK_EM, (SIZES[size] || SIZES.L).writeMm * (size === 'S' ? 1 : 0.8));
     let w = 0;
     for (const it of items) {
         const o = operandsOf(it.q || {});
         const A = String(o[0] || '').length, B = String(o[1] || '').length;
         const f = formOf(it);
-        if (f === 'long') w = Math.max(w, (A + B + 1.1) * track + 6);
+        if (f === 'long') w = Math.max(w, (Math.max(A, mixed ? 2 : 1) + B + 1.1) * track + 6);
         // the bar (digits + 0.4 em pad), two .28 em gaps, "=" (1 em), the line; + the cell's pads
         else if (f === 'fraction') w = Math.max(w, em * (0.6 * Math.max(A, B) + 0.4 + 1 + 0.56) + blankWidth(2, size) + 10);
-        // the equation template's across sentence: digits, "÷" and "=" at 1 em each, four .28 em gaps
-        else w = Math.max(w, em * (0.56 * (A + B) + 2 + 4 * 0.28) + blankWidth(2, size) + 10);
+        // Mix: the across sentence with its line under it (the equation template's narrow form,
+        // so every form of a Mix page is a two-line cell of one height); else the line beside it
+        else if (mixed) w = Math.max(w, Math.max(em * (0.56 * (A + B) + 2 * 0.8 + 3 * 0.18), blankWidth(2, size)) + 10);
+        // the equation template's across sentence: digits, tight "÷" and "=" tracks, the line beside
+        else w = Math.max(w, em * (0.56 * (A + B) + 2 * 0.8 + 4 * 0.18) + blankWidth(2, size) + 10);
     }
     return w;
 }
@@ -163,10 +176,15 @@ function formHeightMm(forms, pt, size, cols) {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
     const sz = SIZES[size] || SIZES.L;
     let h = 0;
-    if (forms.has('long')) h = Math.max(h, (sz.stripMm || sz.writeMm) + 1.3 * em + 9);
-    if (forms.has('fraction')) h = Math.max(h, 2.45 * em + 7);
-    if (forms.has('standard')) h = Math.max(h, ACROSS_ROW[size]);
-    return Math.max(h, factCellHMmSafe(cols, size));
+    // A Mix page's pads follow the size (S is the denser page, LESSONS L1); a page of one form
+    // keeps its own.
+    const pad = forms.size > 1 ? { S: 5, M: 6, L: 7 }[size] || 7 : 7;
+    if (forms.has('long')) h = Math.max(h, (sz.stripMm || sz.writeMm) + 1.3 * em + pad + 2);
+    if (forms.has('fraction')) h = Math.max(h, 2.45 * em + pad);
+    // (Mix: the across fact two lines, the sentence over its line, as tall as the other forms)
+    if (forms.has('standard')) h = Math.max(h, forms.size > 1 ? 1.3 * em + sz.writeMm + pad : ACROSS_ROW[size]);
+    // (a Mix page's cells are its forms' own height: the vertical-fact table's cell is not a floor)
+    return forms.size > 1 ? h : Math.max(h, factCellHMmSafe(cols, size));
 }
 const factCellHMmSafe = (cols, size) => { try { return factRowsCapacity(cols, size).cellH * 0.8; } catch (e) { return 0; } };
 
@@ -186,7 +204,12 @@ function formRows(items, input, ctx, G, labels, forms) {
         if (cols > cap) { cols = cap; notes.push(`Bracket division: at most ${cap} columns (PT-FRW-5).`); }
     }
     let pt = 0;
-    for (; cols >= 2; cols--) {
+    // Mix (critic R2 D-C): every form at the Standard fact rows' rung (MIX_RUNG_PT), in the most
+    // columns at which the widest fact of each form fits at it - never a smaller rung to squeeze a
+    // fourth column in. A page whose facts do not fit the rung in 2 columns falls back below.
+    const mixPick = forms.size > 1 && !(input.columns && input.columns !== 'auto') ? pickMixRung(items, forms, ctx, Math.min(cols, 4)) : null;
+    if (mixPick) ({ cols, pt } = mixPick);
+    for (; !mixPick && cols >= 2; cols--) {
         const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
         pt = LADDER_PTS.filter((p) => p <= factDigitPt(cols)).find((p) => formWidthMm(items, forms, p, ctx.size) <= inner) || 0;
         if (pt) break;
@@ -200,6 +223,23 @@ function formRows(items, input, ctx, G, labels, forms) {
     const names = [...forms].map((f) => ({ long: 'bracket', fraction: 'fraction', standard: 'across', vertical: 'vertical' }[f] || f)).join(' + ');
     notes.unshift(`Division facts as written (${names}): ${cols} columns x ${rows} rows.`);
     return { across: false, forms, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: tracksOf(items), gridH: G, labels, note: notes.join(' ') };
+}
+
+/** The rung every form of a Mix page is drawn at: the Standard fact rows' across rung (20 pt). */
+const MIX_RUNG_PT = 20;
+/**
+ * A Mix page's columns and rung: the most columns (from `maxCols` down to 2) at which every
+ * fact fits at MIX_RUNG_PT - the across facts on one line over their answer line, the brackets
+ * tracked from the rung's digit - so the three forms share one cell size and the across digits
+ * are the Standard rows' digits (critic R2 D-C: 15 px digits against 19 px). null when even 2
+ * columns cannot hold them at the rung.
+ */
+export function pickMixRung(items, forms, ctx, maxCols = 4) {
+    for (let cols = maxCols; cols >= 2; cols--) {
+        const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+        if (formWidthMm(items, forms, MIX_RUNG_PT, ctx.size) <= inner) return { cols, pt: MIX_RUNG_PT };
+    }
+    return null;
 }
 
 /** Digit tracks of the widest fact in the section (operands and answer, TY-22, at least 2). */
@@ -294,6 +334,16 @@ export function factRowsLayout(items, input) {
  * cannot hold them.
  */
 export function formGrid(items, ctx, G, forms, count, maxCols = 5) {
+    // Mix: the rung of the Standard rows, in the most columns that hold it (pickMixRung).
+    if (forms.size > 1) {
+        for (let cols = Math.min(maxCols, 4); cols >= 2; cols--) {
+            const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+            const rows = Math.ceil(count / cols);
+            const h = formHeightMm(forms, MIX_RUNG_PT, ctx.size, cols);
+            if (formWidthMm(items, forms, MIX_RUNG_PT, ctx.size) > inner || rows * h > G - SAFETY_H_MM) continue;
+            return { forms, cols, rows, perPage: cols * rows, cellH: (G - SAFETY_H_MM) / rows, hMin: h, digitPt: MIX_RUNG_PT, size: ctx.size, look: ctx.look };
+        }
+    }
     for (let cols = maxCols; cols >= 2; cols--) {
         const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
         const rows = Math.ceil(count / cols);
@@ -324,7 +374,8 @@ function factCell(it, L) {
     const ans = answerOf(it);
     if (L.forms) {
         // the item's OWN cell (bracket, fraction or across), at the page's point size and tracks
-        const metrics = Object.assign({}, metricsFor(L.size || 'L', L.look || DEFAULT_LOOK, { factColumns: L.cols }), { digitPt: L.digitPt });
+        const metrics = Object.assign({}, metricsFor(L.size || 'L', L.look || DEFAULT_LOOK, { factColumns: L.cols }),
+            { digitPt: L.digitPt, ...(L.forms.size > 1 ? { factRowTrack: (EM_MM[L.digitPt] || (L.digitPt / 72) * 25.4) * FACT_ROW_TRACK_EM } : {}) });
         return Object.assign({}, it, {
             // (the equation template's digits follow the page's --ws-digit: set it to the row's size)
             render: (c) => `<div style="--ws-digit:${L.digitPt}pt">${renderCell(q, Object.assign({}, c, { columns: L.cols, metrics: Object.assign({}, c.metrics || {}, metrics) }))}</div>`,

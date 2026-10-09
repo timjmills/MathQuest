@@ -98,7 +98,23 @@ export const partialEndOf = (cols, span, n = Infinity) => {
     return 1 + (tries <= firstRow ? 1 : firstRow);
 };
 /** The row the first tries sit in. */
-const partialRowOf = (cols, span) => (span || cols === 1 ? 1 : 0);
+// (a div_facts Mix page whose Models fill the first row - mixModels - has its first tries in row 2)
+const partialRowOf = (cols, span, nModels = 1) => (span || cols === 1 || nModels >= cols ? 1 : 0);
+/**
+ * A Mix page's hinted tries: the tries in the row after the last Model (the rest of that row when
+ * the Models do not fill it), or the first try alone when the tries end in that row (the fade then
+ * still reaches "none", partialEndOf). Returns the index after the last hinted try.
+ */
+const mixPartialEnd = (nM, cols, n) => {
+    const end = (Math.floor(nM / cols) + 1) * cols;
+    return n > end ? end : Math.min(n, nM + 1);
+};
+/** Extra height a Mix page's row r takes: the Model trace on a Model row, the hint on a hinted row. */
+// (one cue under each fact: a row holding Models and hinted tries takes the taller of the two)
+const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? extra : 0,
+    hint && r * cols < pEnd && (r + 1) * cols > nM ? hint : 0);
+/** The page ceiling with the Models it leads with: a Mix page's extra Models are not scored tries. */
+const ceilFor = (ctx, items) => ceilOf(ctx) + Math.max(0, mixModels(items || []) - 1);
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -163,11 +179,14 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
     // The plan takes the kind counts() chose from the whole probe (its deal is a prefix of it).
     if (kind !== null) top = kind;
     const same = items0.filter((it) => kindOf(it) === top);
-    const cut = kind !== null ? kind !== '' : same.length >= MIN_ITEMS && same.length < items0.length;
+    // A div_facts Mix pool keeps every form it deals (critic R2 D-D: the kind cut and the width
+    // filter below left a Mix Guided page with no across fact, so 2 Models instead of 3).
+    const mix = items0.length > 0 && items0.every(isMixItem);
+    const cut = mix ? false : kind !== null ? kind !== '' : same.length >= MIN_ITEMS && same.length < items0.length;
     const items = cut ? same : items0;
     let cols = bestCols(items, options, ctx);
     let use = items;
-    for (const c of options) {
+    for (const c of mix ? [] : options) {
         if (c <= cols) break;
         const keep = items.filter((it) => fitsAt([it], c, ctx));
         if (keep.length >= MIN_ITEMS && keep.length * 2 >= items.length) { cols = c; use = keep; break; }
@@ -344,11 +363,17 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // hint wraps to two lines in a third of the page), plus the line's top margin.
     // Every cell of that row carries one, or none does: a row where one try has no hint of its
     // own would leave that cell a hint-line's height of empty band (H13).
-    const partial = items.slice(1, partialEndOf(cols, span, Math.min(items.length, ceilOf(ctx))));
+    const nM = mixModels(items);
+    const nTot = Math.min(items.length, ceilFor(ctx, items));
+    const partial = items.slice(nM, nM > 1 ? mixPartialEnd(nM, cols, nTot) : partialEndOf(cols, span, nTot));
     const hints = noHint ? [] : partial.map((x) => hintOf(x));
-    const hint = hints.some(Boolean) ? Math.max(HINT_MM, ...hints.filter(Boolean).map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
+    let hint = hints.some(Boolean) ? Math.max(HINT_MM, ...hints.filter(Boolean).map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
+    // A Mix page's first tries carry the times-fact cue under the fact, as the Models do (the
+    // Model row's 17 mm, `extra`): their row is that much taller (critic R2 D-D: the cue ran into
+    // the try under it).
+    if (nM > 1 && !noHint && partial.some((x) => thinkCueOf(x))) hint = Math.max(hint, 17);
     const h = h0 + extra;
-    const rows = Math.max(1, Math.min(Math.floor(ceilOf(ctx) / cols), Math.floor(avail / Math.max(1, h))));
+    const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items) / cols), Math.floor(avail / Math.max(1, h))));
     return { rows, h, h0, avail, stepsH, steps, frame, m, span, hint, wrap, noLines: !!noLines };
 }
 
@@ -407,17 +432,21 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     };
     const pages = [];
     let total = 0;
-    while (pages.length < MAX_PAGES && total < ceilOf(ctx) && (pages.length === 0 || total < MIN_ITEMS)) {
+    const ceil = ceilFor(ctx, items);
+    const nM = mixModels(items);
+    while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || total < MIN_ITEMS)) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
-        const maxR = Math.max(1, Math.ceil((ceilOf(ctx) - total) / cols));
+        const maxR = Math.max(1, Math.ceil((ceil - total) / cols));
         // Each row is as tall as what IT holds (H13), so the rows that fit are counted by the sum
         // of their own heights, page 1's first row taller by the model's trace.
         const rowsH = (k) => {
             let idx = total, sum = 0;
             for (let rr = 0; rr < k; rr++) {
                 const n = isFirst && first.span && rr === 0 ? 1 : cols;
-                sum += hOf(idx, n) + (isFirst && rr === partialRowOf(cols, first.span) ? first.hint : 0);
+                sum += hOf(idx, n) + (isFirst && nM > 1
+                    ? mixRowAdd(rr, cols, nM, mixPartialEnd(nM, cols, ceil), extra, first.hint) - (rr === 0 ? extra : 0)
+                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? first.hint : 0));
                 idx += n;
             }
             return sum;
@@ -437,7 +466,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // (round-4 re-grade), so the sheet may run up to one row past the ceiling there.
     // `limit`: the items there are (a pool cut to the Model's kind); never a page of empty cells.
     const slack = pages.length > 1 ? cols - 1 : 0;
-    const most = () => Math.min(ceilOf(ctx) + (pages.length > 1 ? slack : 0), limit);
+    const most = () => Math.min(ceil + (pages.length > 1 ? slack : 0), limit);
     let over = total - most();
     while (over > 0 && pages.length) {
         const pg = pages[pages.length - 1];
@@ -867,8 +896,18 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const lesson = Math.max(1, Number(input.lesson) || 1);
-    const { cols, items } = pageSet(poolItems(input, 'main'), ctx, typeof input.guidedKind === 'string' ? input.guidedKind : null,
+    const set = pageSet(poolItems(input, 'main'), ctx, typeof input.guidedKind === 'string' ? input.guidedKind : null,
         Number(input.guidedCols) > 0 ? null : input, Number(input.guidedCols) || 0);
+    const { items } = set;
+    let { cols } = set;
+    // div_facts Mix (critic R2 D-D): one Model per written form, all in the first row - the row
+    // sized for a Model's trace and hint. Three forms in two columns put the third Model in a
+    // row sized for tries, where it ran into the try under it. The page takes as many columns
+    // as it deals forms, where every item fits them.
+    if (items.length >= 4 && items.every(isMixItem)) {
+        const nForms = new Set(items.map(formOfItem)).size;
+        if (nForms > cols && fitsAt(items, nForms, ctx)) cols = nForms;
+    }
     const fit = sheetFit(ordered(items, cols), cols, ctx, input, items.length);
     const use = ordered(items, cols).slice(0, Math.min(items.length, fit.total));
     const key = instructionKeyOf(use, input.skills);
@@ -879,7 +918,9 @@ export function plan(input = {}) {
     const scored = use.length - nModels;
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: scored });
     // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
-    const partialEnd = partialEndOf(cols, fit.span, use.length);
+    // (a Mix page led by a Model per form: its first tries are the whole next row - every cell of
+    // a hinted row carries a hint, H13 - or the first try alone when the tries fill only that row)
+    const partialEnd = nModels > 1 ? mixPartialEnd(nModels, cols, use.length) : partialEndOf(cols, fit.span, use.length);
     const planItems = use.map((it, i) => {
         const ans = answerOf(it);
         const stage = i < nModels ? 'model' : i < Math.max(partialEnd, nModels + 1) && ans ? 'partial' : 'blank';
@@ -926,8 +967,9 @@ export function plan(input = {}) {
         const host = use.slice(at, at + chunk.length);
         const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
         const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
-        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere) : -1;
-        const add = (r) => (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? fit.hint : 0);
+        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
+        const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
+            : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? fit.hint : 0));
         const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
         const sumW = w.reduce((x, y) => x + y, 0);

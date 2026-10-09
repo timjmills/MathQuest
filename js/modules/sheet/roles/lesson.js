@@ -46,7 +46,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
-    esc, blank,
+    esc, blank, stripExtraMm,
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
@@ -1250,23 +1250,35 @@ export function plan(input = {}) {
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
     let indep = [];
     if (Number.isFinite(hI) && hI > 0) {
-        const room = cur.budget - cur.used - m.strip;
+        // The band's strip is as tall as its label and instruction wrap (critic R2 R-1: a two-line
+        // "Circle groups of the second number. Write the quotient and the remainder." ran the
+        // div_remainders lesson 4.5 mm past its page at L).
+        const iText = instructionText(instructionKeyOf(indepPool.slice(0, ic), input.skills), indepPool.slice(0, ic));
+        const room = cur.budget - cur.used - m.strip - stripExtraMm(ctx, 'Independent Practice:', iText);
         // 12.1: an Independent page holds 6 at most; a page of rows fills its height like one.
         // div_facts facts (any written form, critic R1 D8): one-number answers, so the rows fill the
         // room left on the page up to 12.1's one-symbol ceiling of 12, not the 6 of taller problems.
-        const oneNum = indepPool.length && indepPool.every((it) => it.q && it.q.divForm);
-        const rows = Math.min(Math.max(1, Math.floor((oneNum ? 12 : 6) / ic)), Math.floor(room / hI));
-        if (rows >= 1) {
+        // (any division FACT cell: `divide`'s "12 ÷ 4 = __" is the same one-number answer - critic
+        // R2 R-2: its lesson page was left 44-48 % blank under 6 of them)
+        const divFact = (it) => !!it.q && opOf(it.q) === 'divide' && /^\s*\d+\s*÷\s*\d+\s*=\s*\?\s*$/.test(String(it.q.text || ''))
+            && /^\d+$/.test(String(answerOf(it)));
+        const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it)));
+        let rows = Math.min(Math.max(1, Math.floor((oneNum ? 12 : 6) / ic)), Math.floor(room / hI));
+        // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
+        const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));
+        while (rows > 1 && rows * hRows(rows) > room) rows--;
+        if (rows >= 1 && hRows(rows) <= room) {
             indep = indepPool.slice(0, rows * ic);
             const r = Math.ceil(indep.length / ic);
+            const hTop = hRows(r);
             // The rows take the page's spare height (an Independent page's cells fill the grid,
             // PG-11), never more than half a cell again (H13: no cell mostly empty).
-            const cellH = Math.min(room / r, hI * 1.15);
+            const cellH = Math.min(room / r, hTop * 1.15);
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
                 content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),
             });
-            cur.used += m.strip + r * cellH;
+            cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH;
         }
     }
 
