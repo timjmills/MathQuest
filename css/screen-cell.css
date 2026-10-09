@@ -1724,3 +1724,16 @@ html .mq-scell .ws-ops-shortdiv input.mq-opswork.mq-opswork-touch:focus { box-sh
    Additive; screen only. */
 html body .mq-wwtwin input.mq-wwork[data-mq-kind="sign"] { border-radius: 50% !important; }
 html body .mq-wwtwin .mq-wweqrow { flex-wrap: nowrap !important; }
+
+/* Round 5 (wave 1 lane D): a number family on screen is the kit `number-family` cell, B&W Andika,
+   one typed box per missing number (screen-cell.js familyScreenVisual). Additive. */
+.mq-nfkit { font-family: 'Andika', sans-serif; font-size: var(--mq-digit, 32px); color: #000; background: #fff;
+    text-align: center; max-width: 100%; padding: 12px 8px; box-sizing: border-box; }
+html body .mq-nfkit input.number-family-input { box-sizing: border-box; font: inherit; font-family: 'Andika', sans-serif;
+    font-weight: 700; color: #000; background: #fff; text-align: center; vertical-align: middle; padding: 0;
+    border: 2px solid #000; border-radius: 6px; min-width: 44px; min-height: 44px; outline-offset: 2px; }
+html body .mq-nfkit input.number-family-input:focus { outline: none; }
+
+/* Round 5 (wave 1 lane D, D-C): a number-line card on the worksheet grid is sized to its own
+   content; it no longer stretches to a taller neighbour's row height (a 37 % empty band). Additive. */
+html body .online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) { align-self: start; height: auto; }

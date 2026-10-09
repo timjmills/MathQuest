@@ -1,0 +1,348 @@
+{
+  "skill": "multiplication:number_families_mult",
+  "category": "multiplication",
+  "skillId": "number_families_mult",
+  "label": "Number Families (Multiply & Divide)",
+  "grade": "3",
+  "dir": "multiplication__number_families_mult",
+  "screen": {
+    "card-1280": {
+      "answerType": "number-family",
+      "printFormat": "number-family-mult-div",
+      "text": "Number Family: Complete all equations",
+      "ans": "4, 2, 8",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            18
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-820": {
+      "answerType": "number-family",
+      "printFormat": "number-family-mult-div",
+      "text": "Number Family: Complete all equations",
+      "ans": "4, 2, 8",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            18
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-390": {
+      "answerType": "number-family",
+      "printFormat": "number-family-mult-div",
+      "text": "Number Family: Complete all equations",
+      "ans": "4, 2, 8",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            18
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "worksheet-1280": {
+      "cards": 6,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "borderTopColor:rgb(221, 214, 238)",
+            12
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            12
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            12
+          ],
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "borderTopColor:rgb(79, 75, 107)",
+            6
+          ],
+          [
+            "color:rgb(229, 114, 43)",
+            6
+          ],
+          [
+            "borderTopColor:rgb(255, 138, 61)",
+            6
+          ],
+          [
+            "backgroundColor:rgb(255, 251, 224)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(255, 226, 80)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            92
+          ],
+          [
+            "Nunito",
+            18
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "quiz-1280": {
+      "questions": 3,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "color:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            5
+          ],
+          [
+            "borderTopColor:rgb(244, 240, 251)",
+            3
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            2
+          ],
+          [
+            "box-shadow",
+            2
+          ],
+          [
+            "borderTopColor:rgb(124, 92, 230)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(220, 238, 238)",
+            2
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(255, 226, 80)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(124, 92, 230)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            18
+          ],
+          [
+            "Nunito",
+            11
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -12,6 +12,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -376,6 +377,11 @@ function renderQuizQuestion(qItem, flatIdx) {
         cellBody = `<div class="qt-visual-aid mq-twin">${twin.html}</div>`
             + `<div class="qt-answer-area"${twin.mode === 'build' || twin.mode === 'model' ? ' style="display:none"' : ''}>${inputHtml}</div>`;
         instrHtml = escHtml(screenInstruction(twin.instr));
+    } else if (qd.answerType === 'number-family' && familyScreenVisual(qd)) {
+        // round 5: the kit number-family cell (paper's drawing), its boxes the answer inputs
+        cellBody = `<div class="qt-visual-aid mq-nfhost">${familyScreenVisual(qd)}</div>`
+            + `<div class="qt-answer-area">${inputHtml}</div>`;
+        instrHtml = escHtml(FAMILY_SCREEN_INSTRUCTION);
     } else {
         cellBody = `<div class="qt-question-text">${qd.text || ''}</div>`
             + (qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : '')

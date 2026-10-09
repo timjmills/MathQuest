@@ -1,0 +1,344 @@
+{
+  "skill": "composing:mixed_composing",
+  "category": "composing",
+  "skillId": "mixed_composing",
+  "label": "Mixed Number Sense",
+  "grade": "M",
+  "dir": "composing__mixed_composing",
+  "screen": {
+    "card-1280": {
+      "answerType": "text",
+      "printFormat": "",
+      "text": "What fraction does the dot show?",
+      "ans": "1/6",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            7
+          ],
+          [
+            "Andika",
+            4
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-820": {
+      "answerType": "text",
+      "printFormat": "",
+      "text": "What fraction does the dot show?",
+      "ans": "1/6",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            7
+          ],
+          [
+            "Andika",
+            4
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-390": {
+      "answerType": "text",
+      "printFormat": "",
+      "text": "What fraction does the dot show?",
+      "ans": "1/6",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            7
+          ],
+          [
+            "Andika",
+            4
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "worksheet-1280": {
+      "cards": 6,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "borderTopColor:rgb(221, 214, 238)",
+            18
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            18
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            18
+          ],
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "borderTopColor:rgb(79, 75, 107)",
+            6
+          ],
+          [
+            "color:rgb(229, 114, 43)",
+            6
+          ],
+          [
+            "borderTopColor:rgb(255, 138, 61)",
+            6
+          ],
+          [
+            "backgroundColor:rgb(255, 251, 224)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(255, 225, 77)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            31
+          ],
+          [
+            "Nunito",
+            24
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "quiz-1280": {
+      "questions": 3,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "color:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            5
+          ],
+          [
+            "borderTopColor:rgb(244, 240, 251)",
+            3
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(124, 92, 230)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(220, 238, 238)",
+            2
+          ],
+          [
+            "box-shadow",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(124, 92, 230)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            11
+          ],
+          [
+            "Andika",
+            4
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    }
+  },
+  "consoleErrors": []
+}
