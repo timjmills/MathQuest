@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { dealIndex, dealPick } from './page-deal.js';
+import { dealIndex, dealPick, onNewPage } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -106,6 +106,8 @@ function _dealStride(len) {
 }
 let _constantCursor = 0;
 let _constantOffset = 0;   // where this page starts in the fact-set cycle; redrawn at item 0
+let _constantFresh = true; // a new page has not drawn its offset yet (page-deal.js onNewPage)
+onNewPage(() => { _constantFresh = true; });
 function factConstantFor(narrowTo) {
     let def = null;
     try {
@@ -138,7 +140,8 @@ function factConstantFor(narrowTo) {
     // The offset is drawn once per page, from Math.random, so a seeded page still reproduces
     // exactly (the harness and generateQuestionFor both seed it) while successive live pages move
     // through the whole set.
-    if (at === 0) _constantOffset = Math.floor(Math.random() * len);
+    if (at === 0 || (_constantFresh && Number.isFinite(state.itemIndex))) _constantOffset = Math.floor(Math.random() * len);
+    _constantFresh = false;
     const step = (((at + _constantOffset) % len) + len) % len;
     return ticked[(step * _dealStride(len)) % len];
 }

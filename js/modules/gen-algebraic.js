@@ -8,6 +8,7 @@ import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan,
 import { numeralTracksHTML, k2Twin } from './sheet/index.js';
 import { generateFunctionTable } from './gen-function-table.js';
 import { genNumberPatterns } from './gen-mult-patterns.js';
+import { onNewPage } from './page-deal.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -80,6 +81,7 @@ function oddEvenSortKey(nums) {
 // Live play has no page and no item index, so it draws per question, which is what a single
 // question on screen means.
 let _seqPageStep = null;
+onNewPage(() => { _seqPageStep = null; });
 function seqStepFor(range) {
     const legal = range <= 20 ? [1]
         : range <= 100 ? [1, 10]

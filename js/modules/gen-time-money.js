@@ -28,7 +28,7 @@
 // which generateQuestionFor() seeds, so a seed reprints the same page.
 
 import { state } from './state.js';
-import { dealAt, blockPermutation } from './page-deal.js';
+import { dealAt, blockPermutation, onNewPage } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { normalizeOptions } from './skill-options.js';
 import { k2Twin, fmtTime, fmtDuration, toMin, fromMin, currencyOf, unitWord, fmtMoney, amountText } from './sheet/index.js';
@@ -574,6 +574,7 @@ const ACTIVITIES = [
 /** The a.m. / p.m. pattern of a page: each run of six holds three of each in a dealt order, so the
  *  answers never simply alternate (critic round 3: a, p, a, p ... could be guessed). */
 const _apBlocks = {};
+onNewPage(() => { for (const k of Object.keys(_apBlocks)) delete _apBlocks[k]; });
 function apAt(skill, at) {
     const b = Math.floor(at / 6);
     const key = `${skill}:${b}`;
