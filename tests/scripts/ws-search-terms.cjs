@@ -394,6 +394,19 @@ const TOP1 = [
     ['10 times bigger', ['placevalue:place_value_10x']],
     ['numicon', ['composing:number_bonds', 'composing:make_ten']],
     ['quatre past', ['measurement:time_quarter']],
+    // critic r5 P-E / R-F / C-G / R-G: a property query lands on a skill that deals that property
+    ['commutative', ['multiplication:mult_properties']],
+    ['commutative addition', ['addition:add_sub_fact_family']],
+    ['commutative property of addition', ['addition:add_sub_fact_family']],
+    ['turnaround facts addition', ['addition:add_sub_fact_family']],
+    ['commutative property of multiplication', ['multiplication:mult_properties']],
+    ['distributive property', ['algebra:distributive_expr']],
+    ['zero property', ['multiplication:mult_properties']],
+    ['identity property', ['multiplication:mult_properties']],
+    ['identity', ['multiplication:mult_properties']],
+    ['multi digit multiplication', ['multiplication:multiply']],
+    ['multi-digit multiplication', ['multiplication:multiply']],
+    ['skip counting', ['multiplication:count_by_tables']],
 ];
 
 // [query, the second skill] for a pinned order (critic r2 P-B: Halving first, Division Facts second)
@@ -403,10 +416,14 @@ const TOP2 = [
 
 // Correctly spelt words no skill teaches: 0 results is the honest answer (they must NOT be "corrected"
 // into a nearby vocabulary word: compass -> compare, east -> past, days -> ways, root -> foot ...).
-const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar'];
+const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar',
+    // critic r5 P-E: no skill deals the associative property (Multiplication Properties deals commutative, distributive, identity, zero)
+    'associative', 'associative property', 'associative property of addition', 'associative property of multiplication'];
 // [query, the correction shown, or null for none]
 const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days', null], ['full', null], ['area', null],
-    ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions']];
+    ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions'],
+    ['identity', null], ['identity property', null], ['associative', null], ['zero property', null],
+    ['multiplcation', 'multiplication'], ['probabilty', 'probability'], ['perimter', 'perimeter']];
 
 (async () => {
     globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };

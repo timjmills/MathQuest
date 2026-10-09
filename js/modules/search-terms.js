@@ -452,7 +452,13 @@ export const SKILL_TERMS = {
     'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles', 'clockwise', 'anticlockwise', 'counterclockwise', 'quarter turn', 'half turn', 'turns'],
     // critic r3 C-E
     'shapes_early:count_sides_vertices_2d': ['vertex', 'corner'],
-    'multiplication:mult_properties': ['commutative', 'commutative property', 'associative', 'associative property', 'turnaround facts', 'distributive property'],
+    // critic r5 P-E / C-G: what _mpTypes really deals (commutative, distributive, identity, zero), never associative
+    'multiplication:mult_properties': ['commutative', 'commutative property', 'commutative property of multiplication', 'turnaround facts',
+        'distributive property', 'distributive property of multiplication', 'identity', 'identity property', 'identity property of multiplication',
+        'zero property', 'zero property of multiplication', 'property of zero', 'property of one', 'properties of multiplication', 'multiplication properties'],
+    // the addition turnaround (commutative) facts: a fact family deals a + b = c and b + a = c (1.OA.B.3)
+    'addition:add_sub_fact_family': ['commutative', 'commutative property', 'commutative property of addition', 'commutative addition',
+        'turnaround facts', 'turn around facts', 'turnaround', 'addition turnaround facts', 'related facts'],
     'algebra:function_table_easy': ['input output', 'in out', 'function machine'],
     'algebra:function_table_hard': ['input output', 'in out', 'function machine'],
     'placevalue:place_value_10x': ['10 times bigger', 'ten times bigger', '10 times smaller', 'ten times as much'],
@@ -483,7 +489,8 @@ export const SKILL_TERMS = {
     // critic r1 additions (P3, C1, C2, C4, C5)
     'multiplication:multiply': ['times', 'multiplying', 'lots of', 'column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm',
         'standard algorithm multiplication', 'formal written method', 'written method', '2 digit by 1 digit',
-        '3 digit by 1 digit', '2 digit by 2 digit', 'multiply by 1 digit', 'multiply by 2 digit', 'multiplication 2 digit by 1 digit'],
+        '3 digit by 1 digit', '2 digit by 2 digit', 'multiply by 1 digit', 'multiply by 2 digit', 'multiplication 2 digit by 1 digit',
+        'multi digit multiplication', 'multidigit multiplication'],
     'patterns:halve': ['divide by 2', 'half of', 'halving', 'halve', 'find half', 'half of a number'],
     'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared', 'cube numbers', 'cubed', 'powers'],
     'area_perimeter:composite_shapes': ['compound shapes', 'composite shapes', 'rectilinear shapes', 'l shapes', 'compound area', 'compound perimeter'],
@@ -501,8 +508,14 @@ export const PRIMARY_SKILLS = {
     'shapes_early:shape_corners_count': ['corner', 'corners', 'count corners'],
     'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
     'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
-    'multiplication:mult_properties': ['commutative property', 'commutative', 'associative property', 'associative', 'distributive property',
-        'properties of multiplication'],
+    // critic r5: no skill deals the associative property, so 'associative' finds nothing (REAL_WORDS keeps it uncorrected);
+    // 'distributive property' leads with the skill named for it (R-F); 'zero / identity property' reach the skill that deals them (C-G)
+    'multiplication:mult_properties': ['commutative property', 'commutative', 'properties of multiplication', 'multiplication properties',
+        'commutative property of multiplication', 'distributive property of multiplication', 'zero property', 'zero property of multiplication',
+        'identity property', 'identity property of multiplication', 'identity', 'property of zero', 'property of one'],
+    'algebra:distributive_expr': ['distributive property', 'distributive property of expressions'],
+    'addition:add_sub_fact_family': ['commutative addition', 'commutative property of addition', 'commutative property addition',
+        'turnaround facts addition', 'addition turnaround facts', 'turn around facts addition'],
     'multiplication:count_by_tables': ['skip counting', 'skip count', 'skipcounting', 'skip countin', 'count by', 'counting by',
         'count in', 'counting in', 'counting in multiples', 'skip counting by 1 to 12'],
     'multiplication:mult_facts': ['times tables', 'times table', 'timestables', 'multiplication tables', 'multiplication facts', 'times', 'multiply', 'multiplication', 'x', 'times x'],
@@ -532,7 +545,9 @@ export const PRIMARY_SKILLS = {
     'angles_lines:symmetry': ['symmetry', 'line of symmetry'],
     // critic r1 additions
     'multiplication:multiply': ['column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm multiplication',
-        'multiply by 1 digit', '2 digit by 1 digit', 'multiplication 2 digit by 1 digit'],
+        'multiply by 1 digit', '2 digit by 1 digit', 'multiplication 2 digit by 1 digit',
+        // critic r5 R-G: 'digit' is not the Missing Digit skill
+        'multi digit multiplication', 'multidigit multiplication', 'multi digit multiply', 'multiply multi digit numbers', 'multiplying multi digit numbers'],
     'patterns:halve': ['divide by 2', 'halving', 'halve', 'half of'],
     'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared'],
     'counting:count_objects': ['counting to 10', 'count to 10', 'counting to 20', 'count to 20', 'subitizing', 'subitising'],
@@ -840,6 +855,7 @@ export const REAL_WORDS = new Set(('lost tie ties pond may sole seed spit bride 
     'bag bags ' +
     'animal animals ' +
     'spring summer autumn winter fall ' +
+    'associative associate '+
     'pay pays paid bank banks sell sells sold spell team teams title titles moon pear '+
     'monday tuesday wednesday thursday friday saturday sunday').split(/\s+/).filter(Boolean));
 
