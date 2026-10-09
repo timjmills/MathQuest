@@ -17,7 +17,7 @@ names for column multiplication are missing.
 | `node tests/scripts/ws-search-terms.cjs` | OK: 592 skills, 232/232 queries, 89 primary-skill queries rank 1 |
 | `ws-boot-smoke` | OK |
 | `ws-teacher-library` | OK |
-| `ws-teacher-shell` | first run hit the known Andika font-abort flake; rerun alone (see the lead's log) |
+| `ws-teacher-shell` | FAIL twice (once in a slot, once alone), both times only on the known Andika `.woff2` font-abort console line; no functional check failed. The lead should confirm on a quiet machine. |
 | `node --input-type=module --check` on all 16 changed modules | clean |
 | `git merge-tree --write-tree claude/sweet-newton-c8wrv1 HEAD` (main c91cc8b) | clean, no conflicts |
 | My probe: about 150 queries through `findSkills` (`skill-finder.js`) | see below |
