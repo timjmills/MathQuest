@@ -1114,3 +1114,187 @@ The other More Practice pages pass the probe numbers: odd_even, whole_as_fractio
   - CL-2b numbering on the 30-item pages;
   - the worksheet dot-array cap.
 - **The regression set holds:** five documents pixel-identical to round 6; three changed only as intended.
+
+# Round 8: independent critic (Opus medium), 2026-10-09
+
+Tree: claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535 at 079843a (round-9 fixes e2327be / 29d55f2 / 9ddd188, CL-9a 079843a).
+- **My renders.** `ws-grade-render --roles independent,more-practice` for the 16 documents at S (print) and L (print and every screen host: card 1280/820/390, worksheet 1280, quiz 1280). At M (print) for dot_array_mult, number_families_add, number_families_mult and mixed_multiplication.
+- **Probe.** A scratchpad probe calls `window.buildSheet` with the teacher print screen's request shape (More Practice asks for letters A and B). It records the build time and the longest stretch a 20 ms heartbeat could not run. It then lays out the pupil document in a same-origin tab and measures, per page: items, grid fill (grid top to bottom over grid top to footer), repeats (order-free dedupe key, else the drawing), label kind, the dot diameter, the smallest `.ws-box`, "Answer:" / "Any number" in the visible text, and a **CL-40 keep-out check** (any text or drawing inside the label square plus 1 mm).
+  - Pools (mixed_multiplication, mixed_composing, counting_all): S and L, both roles, seeds 1–10, 100, 140, 160, 180, 200 = **180 builds**. mixed_addition: S and L, both roles, seeds 1–11 = 44 builds.
+  - All 16 documents: S, M and L, both roles, seeds 1–6 = **576 builds**.
+- **Earlier tree.** The same probe on cf39d5d (round 7, scratchpad worktree via MQ_ROOT) for the two findings that needed a before/after.
+- **Regression set.** Independent S on this tree and on origin/claude/sweet-newton-c8wrv1 (686b907), pixel-diffed and looked at side by side.
+- **Files.** The 10 PNGs cited are in `renders/r8c/`. The scratchpad worktrees are removed.
+
+## Verdict: FAIL
+
+**Every round-7 defect is fixed.** More Practice now deals and fills each letter as its own page, pool builds are fast and never freeze, and CL-9a numbering reads well on almost every page. The harness pages of all 16 documents grade 8 or better at S and L on both roles and every screen host.
+
+**The round fails on four findings, one introduced by CL-9a:**
+- **D8-1 [MAJOR, regression from 079843a]** At L, mult_comparison's story text runs into the new black number tab on 12 of 12 pages sampled. The text starts 0.5 mm inside the tab's right edge, on the same line.
+- **D8-2 [MAJOR]** dot_array_mult deals more arrays than the owner's target: up to **16 at S** (target 8) and **9 at L** (target 4–6).
+- **D8-3 [MAJOR, owner target]** number_families_add at M prints 6 families (target 8) over a 17 % strip.
+- **D8-4 [MAJOR, pre-existing, never graded]** missing_add_sub Independent at M prints 18 sentences in 3 × 6 over a **29 % empty strip** on every seed.
+
+## Gates
+| Gate | Result |
+|---|---|
+| ws-grade-render, 16 documents, S/L/M, both roles, all hosts | 0 console errors. hScroll 0 and smallTargetCount 0 everywhere, except mixed_multiplication worksheet-1280 (1 small target; a desktop host, so H6 does not apply) |
+| Pool probe, 180 builds (+44 mixed_addition) | **Fill:** lowest 0.82 (mixed_multiplication L More Practice). **Items:** at least 3 on every page. **Repeats / "Answer:" / "Any number":** 0 / 0 / 0. Every page has numbered tabs (CL-9a) and no letters |
+| 16-document probe, 576 builds | 0 repeats. Fill ≥ 0.82 on every page, **except missing_add_sub Independent M at 0.71 on 6 of 6 seeds** (D8-4). Keep-out hits: **mult_comparison L 10 of 12 pages, text 0.5 mm inside the tab** (D8-1). Near misses (0.5 mm gap, under CL-40's 1 mm): remainder_interpret M on 12 of 12 pages, mixed_multiplication M on 2 pages, counting_all L/M on 2 pages (a shape's box) |
+| Dot diameter (DOM) | S 3.0 mm, M 3.5 mm, L 4.0 mm on every dot_array_mult page, which meets the owner's floor (about 3 mm at S, 4 mm at L) |
+| Slot boxes | `.ws-box` ≥ 6.5 mm at S, 8.5 mm at M, 10.5 mm at L |
+| D7-4 (one digit size) | mixed_addition S seed 7: row 5–8 prints "18 + 2" at the stacks' digit size (round 7: 10 mm beside 4.5 mm). **FIXED** |
+| D7-5 (worksheet row 3) | mixed_multiplication worksheet 1280: cards 5 and 6 are equal bordered cells (`renders/r8c/mixed_multiplication-worksheet-1280.png`). **FIXED** |
+| Orchestrator gates (full kit lint 0/281 at S and L, ws-layout-unit 564, lint self-test 54; More Practice lint, timing and determinism running) | Not re-run by me; taken as reported. **The lint runs at S and L only**, so it cannot see D8-3 or D8-4 at M. It has no keep-out rule, so it cannot see D8-1 |
+
+## Round-7 defects: status
+| # | Round-7 defect | Status on 079843a |
+|---|---|---|
+| D7-1 | More Practice under-fills and repeats | **FIXED.** mixed_multiplication More Practice holds 5–10 problems per letter at S and 3–7 at L, with fill ≥ 0.82, over 15 seeds × 2 letters × 2 sizes. add_sub_10s More Practice S prints 20 distinct facts in 2 × 10. number_families_mult More Practice S prints 8 distinct in 2 × 4. number_families_add More Practice S prints 12 in 3 × 4 (fill 0.90). dot_array_mult More Practice S prints 8–10 at fill ≥ 0.95 on 11 of 12 letters. Residues are D8-2 and D8-3 |
+| D7-2 | pool build freezes the app | **FIXED** (table below). No build exceeds 4.2 s. The longest blocked stretch is 1.03 s, once in 224 pool builds; everything else is ≤ 0.74 s |
+| D7-3 | kept page fails H13 | **FIXED** in what I sampled: no band and no fill under 0.81 on 224 pool pages, and every build reports a passing deal (`ok@n`) |
+| D7-4 | fact beside stacks at another size | **FIXED** (see Gates) |
+| D7-5 | worksheet row 3 cells unequal | **FIXED** |
+
+## Build time (teacher print request, `window.buildSheet`, this container's headless Chromium; More Practice builds letters A and B)
+| Pool, size, role | n | Median | p90 | Max | Longest blocked stretch |
+|---|---|---|---|---|---|
+| mixed_multiplication S Independent | 21 | 0.67 s | 1.03 s | 1.48 s | 0.54 s |
+| mixed_multiplication S More Practice | 21 | 1.57 s | 3.85 s | **4.13 s** | **1.03 s** (seed 160) |
+| mixed_multiplication L Independent / More Practice | 21 / 21 | 0.49 / 1.15 s | 0.86 / 1.62 s | 1.05 / 2.70 s | 0.32 / 0.62 s |
+| mixed_multiplication M Independent / More Practice | 6 / 6 | 0.47 / 1.06 s | 0.67 / 2.13 s | 0.74 / 2.27 s | 0.29 / 0.41 s |
+| mixed_addition S Independent / More Practice | 11 / 11 | 0.71 / 0.99 s | 1.15 / 1.89 s | 1.48 / 3.23 s | 0.74 / 0.72 s |
+| mixed_composing, counting_all (any) | 162 | ≤ 0.74 s | ≤ 0.96 s | 1.35 s | 0.60 s |
+
+Round 7 measured a 63 s maximum and a 56.5 s single task. Every figure now sits inside the round-7 check (median < 1.5 s, maximum < 5 s), and the 1 s single-task limit is exceeded once, by 30 ms. Builder's figures (S Independent median 0.57 s, More Practice p90 4.26 s) agree with mine. **Accepted.**
+
+## Visual grading
+Print rows cover the pupil page and the key. Screen rows cover card 1280/820/390, worksheet 1280 and quiz 1280. "IND" is Independent and "MP" is More Practice. Unless a seed is named, the harness seed is graded, and the probe numbers cover seeds 1–6 (16 documents) or the 15-seed set (pools).
+
+| Document | Version | Clarity | Pedagogy | Layout | Parity | Result |
+|---|---|---|---|---|---|---|
+| composing:odd_even | IND + MP, S/M/L, keys | 9 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 9 | PASS |
+| composing:whole_as_fraction | IND + MP, S/L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:div_zero_in_quotient | IND + MP, S (1–28)/L, keys | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| composing:ten_frame_build | IND + MP, S/L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:dot_array_mult | IND S (8 in 2 × 4), IND L (6), IND + MP M (6–8) | 8 | 8 | 8 | 9 | PASS |
+| | **MP S seed 6 letter B (16 in 4 × 4)** | 8 | **7** | **7** | 8 | **FAIL (D8-2)** |
+| | **MP L seed 2 letter A / IND L seed 6 (9 / 8 at L)** | 8 | 8 | **7** | 8 | **FAIL (D8-2)** |
+| | screen | 8 | 8 | 8 | 8 | PASS (card note below) |
+| addition:add_sub_10s | IND + MP S (20 in 2 × 10, CL-2a), L, keys | 8 | 8 | 8 | 9 | PASS |
+| | screen | 9 | 8 | 8 | 8 | PASS |
+| division:missing_mult_div | IND + MP S (1–30)/M/L | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mixed_multiplication | IND + MP S/M/L, keys, 15 seeds | 8 | 8 | 8 | 8 | PASS |
+| | MP L seed 5 letter A (3 problems, one full-width column) | 8 | 8 | 8 | 8 | PASS (see owner question) |
+| | screen (worksheet row 3 now level) | 8 | 8 | 8 | 8 | PASS |
+| composing:mixed_composing | IND + MP S/M/L, 15 seeds | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| counting_mixed:counting_all | IND + MP S/M/L, 15 seeds | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:long_div_2digit | IND + MP S/M/L | 8 | 8 | 8 | 9 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:mult_comparison | IND + MP S/M, keys | 8 | 8 | 8 | 8 | PASS |
+| | **IND + MP L, pupil and key** | **7** | 8 | **7** | 8 | **FAIL (D8-1)** |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| division:remainder_interpret | IND + MP S/L, keys | 8 | 8 | 8 | 8 | PASS |
+| | IND + MP M (text 0.5 mm from the tab) | 8 | 8 | 8 | 8 | PASS (nit, D8-5) |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| addition:number_families_add | IND + MP S (12 in 3 × 4), L (6) | 8 | 8 | 8 | 8 | PASS |
+| | **IND + MP M (6 in 2 × 3, fill 0.83)** | 8 | 8 | **7** | 8 | **FAIL (D8-3)** |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| multiplication:number_families_mult | IND + MP S (8 in 2 × 4), M (9 in 3 × 3), L (6) | 8 | 8 | 8 | 8 | PASS |
+| | screen | 8 | 8 | 8 | 8 | PASS |
+| subtraction:missing_add_sub | IND + MP S (1–30), L, MP M (16, fill 0.92) | 8 | 8 | 8 | 8 | PASS |
+| | **IND M (18 in 3 × 6, fill 0.71)** | 8 | 8 | **6** | 8 | **FAIL (D8-4)** |
+| | worksheet 1280, card, quiz | 8 | 8 | 8 | 8 | PASS |
+
+## Defects (ranked, §6 form)
+
+**D8-1 [MAJOR, in lane, regression from 079843a CL-9a] At L, mult_comparison's story text runs into the black number tab.**
+- **What:**
+  - On every mult_comparison L page sampled (Independent and More Practice, seeds 1–6), cells whose story starts at the top of the cell begin the first line 0.5 mm *inside* the tab's right edge, on the tab's own line.
+  - Example: "1 ■Lena has 54 crayons." The black square touches the "L" (`renders/r8c/mult_comparison-L-tab-collision.png`). The key is the same.
+  - On cf39d5d the same cell carried the quiet letter "a.", and the text cleared it by 0.9 mm (`renders/r8c/mult_comparison-L-r7-letter.png`). The 6 mm tab now fills the reserved square that the letter left mostly empty.
+  - Near misses elsewhere: remainder_interpret M and mixed_multiplication M ("Write the sign in …") start 0.5 mm right of the tab, and counting_all L/M bring a shape within 1 mm. All are under the CL-40 keep-out (label side + 1 mm).
+- **Cost:** C1 7 (a label touching content, CL-40). C3 7 (the label and the problem collide).
+- **Cause:** the story/comparison cell content starts at the cell's top-left padding. It does not start below the label square, or at label side + 2 mm, as CL-40 requires. Nothing checks CL-40: the lint has no keep-out rule, and the switch to tabs was not re-rendered at L.
+- **Fix:** honour CL-40 in the cell frame (`sheet/cell.js`): when a label is drawn, the content box's top inset becomes label side + 1 mm, unless the first content line starts at least label side + 2 mm from the left. Add an L-LABEL keep-out rule to `ws-print-lint`: no text range rect or drawing rect intersects the label square plus 1 mm.
+- **Check:** the probe's keep-out check finds 0 hits on the 16 documents at S, M and L, both roles, seeds 1–6. The lint fails cf39d5d+079843a's mult_comparison L.
+
+**D8-2 [MAJOR, in lane] dot_array_mult deals more arrays than the owner's density target.**
+- **What:**
+  - The owner's target (STATUS §2, 2026-10-09) is 4–8 arrays a page: L 4–6, M 6, S 8.
+  - **S:** More Practice seed 6 letter B prints **16 arrays in 4 × 4** (`renders/r8c/MP-dot_array_mult-S-seed6-B.png`). The arrays nearly touch the tabs, and a 10 × 5 sits in a 44 mm cell. Independent seed 6 and More Practice A seed 1 / B seed 5 print 10.
+  - **L:** More Practice seed 2 letter A prints **9 in 3 × 3** (`renders/r8c/MP-dot_array_mult-L-seed2-A.png`), and so does letter B at seed 4. Independent seed 6 prints 8.
+  - **M** prints 6–8 (target 6).
+  - In all, 7 of the 54 sampled pages exceed the target, 3 of them by 50 % or more.
+  - Dots stay at 3.0 / 3.5 / 4.0 mm, which is right.
+- **Cost:** a 16-array page for an SEN pupil is a wall of dots: C2 7, C3 7. A 9-array L page breaks the owner's L ceiling: C3 7.
+- **Cause:** with smaller dots, a deal of small arrays (2 × 3, 3 × 2 …) measures short. The fill loop (`refitLetters`) then adds columns (3c, 4c) and items to reach FILL_OK 0.81. Nothing caps the count at the owner's per-size number.
+- **Fix:** give dot_array_mult a per-size ceiling of 8 at S, 6 at M and 6 at L, in its footprint or the role's distinct-cap. When short arrays leave height, spread the rows (or deal a taller array) instead of adding a column.
+- **Check:** across seeds 1–20, both roles, S ≤ 8, M ≤ 6 (or 8 with a note) and L ≤ 6 arrays per page, each page with fill ≥ 0.81.
+
+**D8-3 [MAJOR, owner target] number_families_add prints 6 families at M.**
+- **What:**
+  - At M, Independent and More Practice print **6 families in 2 × 3** on every seed, with fill 0.83: a 17 % strip, about 40 mm (`renders/r8c/number_families_add-M-p1.png`). The owner's target is M 8, "without wasted white space".
+  - number_families_mult at M prints **9 in 3 × 3** (fill 0.83, `renders/r8c/MP-number_families_mult-M-A.png`). That is at or above the target, and the cells read well, so I accept 9 for ×/÷.
+  - The builder's "6 or 9 at M" is therefore half right: 9 is acceptable and 6 is not.
+- **Cost:** C3 7 (an owner-named count missed, with a visible strip).
+- **Fix:** let number_families_add take the 3-column M layout that number_families_mult uses. "17 − 10 = ☐" at M is about 52 mm and fits a 61 mm column. Alternatively, tighten the M family cell's row pitch so 2 × 4 fits. Then judge at 9 or 8.
+- **Check:** number_families_add M prints ≥ 8 distinct families with fill ≥ 0.85 on seeds 1–20, both roles, and no H13 band.
+
+**D8-4 [MAJOR, in lane, pre-existing (identical on cf39d5d), never graded at M] missing_add_sub Independent M has a 29 % empty strip.**
+- **What:** 18 sentences in 3 × 6 end at 71 % of the problem area on every seed (`renders/r8c/missing_add_sub-M-seed1-p1.png`). More Practice at M prints 16 in 2 × 8 at fill 0.92, so the Independent page's distinct cap / CL-2b path takes a different grid.
+- **Cost:** H13 (C3 6).
+- **Fix:** at M, either use More Practice's 2 × 8, or deal 3 × 7 / 3 × 8 (21–24 sentences, within DN-1a for short problems), or stretch the rows.
+- **Check:** `ws-print-lint --source kit --size M --skills subtraction:missing_add_sub,division:missing_mult_div,addition:add_sub_10s` is clean. **Run the lane's lint at M too**; it covers only S and L today.
+
+**D8-5 [MINOR] CL-40 near misses at M.**
+- **What:** remainder_interpret M (12 of 12 pages) and mixed_multiplication M story cells start their text 0.5 mm right of the tab. That reads acceptably but breaks the 1 mm keep-out.
+- **Fix:** the same as D8-1.
+
+**D8-6 [MINOR, lint] DN-2 on More Practice compares letters A and B as one sheet.** See the DN-2 judgement below. Scope DN-2 (and PG-23) per letter, as PAGEFILL already does with `letterOf`.
+
+## DN-2 judgement (More Practice letter A against letter B)
+**Not a real defect. The lint finding is a false positive.**
+- PT-MPR-1 makes each letter its own sheet, handed out alone, with its own score.
+- For example, mixed_multiplication S seed 2 prints 10 problems on A (fill 0.93) and 5 on B: a times-table grid, a family and three skip-count strips, at fill 0.92. Both pages are full, and neither is "less than half used".
+- The item counts differ because the problems differ in size, which a mixed review is meant to have.
+- DN-2's "a page is never less than half used" should compare pages *within* one letter (the fix is in D8-6).
+
+## CL-9a judgement (numbered tabs by default)
+**The ruling is implemented and right, with one regression (D8-1).**
+- Every page of every lane document now numbers its problems 1–N with the CL-30 tab, on the pupil page and on the key. Each More Practice letter restarts at 1. I saw no page that mixes letters and tabs.
+- Letters for parts inside a problem stay as they were: counting_all's "A has more / B has more", compare_objects' "Tower A / Tower B" and "Line A / B". They read better beside numbers than they did beside item letters.
+- Tab sizes follow CL-31 (4 mm at S, 6 mm at L).
+- The legacy cells in the regression set (mult_properties) carry the tab cleanly.
+- The tab is heavier than the quiet letter it replaces, so every template that put content inside the reserved square now shows it (D8-1, D8-5).
+
+## Screen hosts
+- All 16 documents pass on card 1280/820/390, worksheet 1280 and quiz 1280.
+- Note (not graded down): dot_array_mult's practice card at 1280/820 draws a 2 × 4 array with dots about 85 px across. The card scales a small array to fill its box, which contradicts "dot arrays much smaller" on screen. Consider a dot-pitch cap on the card, as the worksheet host already has.
+
+## Pre-existing, out-of-lane items
+- **remainder_interpret:** the remainder box is one digit wide. At seed 1 S, 71 ÷ 12 = 5 R 11 puts a 2-digit remainder into it (the key's "11" fills the box edge to edge). It should be as wide as the divisor's digit count.
+- **mult_properties (legacy):** "… + ____ × 7. What is the missing number? Answer: ___" still has two answer places (unchanged).
+- **mixed_multiplication worksheet card 4:** "Fact Family: 10, 8, 80" as the instruction (unchanged).
+- **Owner question (carried):** mixed_multiplication L prints 3 problems on 7 of 45 sampled pages (Independent and both letters), and mixed_addition L on 16 of 33. They pass the fill floor. mixed_multiplication MP L seed 5 A lays its 3 in one full-width column (`renders/r8c/MP-mixed_multiplication-L-seed5-A.png`), which is acceptable but spacious. Should an L review page hold at least 4?
+- **Kit-wide missing-digit box** (solid, 4.1 mm at S; see round 7): unchanged.
+
+## Non-lane regression spot check (S Independent, this tree against origin/claude/sweet-newton-c8wrv1 686b907)
+- **All 8 documents differ, as expected.** Every item label changed from "a." to a numbered tab. add_20_regroup, time_5min, multiply and add_fractions_like differ in nothing else: the same items and the same grid. The tabs sit in the same reserved square, with no collision.
+- **mixed_addition, mixed_subtraction and mult_properties** also differ through rounds 5–9's own changes (kit-only pool members, the ringed sign place, and mult_properties dealt 7 items in kit and legacy cells instead of 2 legacy cells). All three are better than live.
+- **compare_objects:** "Tower A / Tower B" now sits under a numbered tab, which is clearer than the letter-plus-letter labelling it replaces.
+- **Nothing regressed beyond the intended label change.**
+
+## What passes
+- **D7-1 to D7-5 are all fixed.** More Practice letters are dealt, filled and de-duplicated as their own pages. Pool builds take seconds, not a minute, and the page stays live. The kept page passes. One digit size sits beside stacks. The worksheet row is level.
+- **CL-9a** numbering on every page type and on the key.
+- **Owner density targets met:** number families S (12 ×/+ at 3 × 4, 8 ×/÷ at 2 × 4), L 6, M ×/÷ 9. Dot arrays S 8 and L 6 on the harness pages. Dots at 3.0 / 3.5 / 4.0 mm. Boxes ≥ 6.5 mm.
+- **Unchanged and still 8+:** odd_even, whole_as_fraction, div_zero_in_quotient, ten_frame_build, add_sub_10s (2 × 10 in both roles), missing_mult_div, long_div_2digit, remainder_interpret, mixed_composing, counting_all, number_families_mult.
