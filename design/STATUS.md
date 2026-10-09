@@ -9,6 +9,11 @@ typing works); phone-only polish is deferred to a later phone pass and listed be
 
 **Stretch / thinking pages (owner 2026-10-09):** not built, fixed or graded until after Wave 8 (lessons) — `MASTER_PLAN.md` Wave 9. Lanes and critics skip them.
 
+**Owner answers 2026-10-09 (evening):** count-by Lines at M and L — every row two lines of 6 with ~14 mm writing lines (one rhythm);
+ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; one-page Boxes 9s–12s rows may stay slightly uneven at
+14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
+the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
+
 ### Phone pass (deferred)
 - Place-value disks / unit_form (lane a5e11bcf3d1414886, critic r2 N3): the rename frame
   ("6 hundreds 15 tens = ___") may wrap onto two lines at 390. Round 3 keeps every "number unit" pair
