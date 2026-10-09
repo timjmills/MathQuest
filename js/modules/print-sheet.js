@@ -1890,6 +1890,25 @@ async function buildSheetOnce(req = {}) {
     };
     const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
     const out = renderPlan(plan, { key: n.key });
+    // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
+    // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
+    // six-digit one). buildSheet's reseat never trades a page for a deal with more of them.
+    let narrowCells = 0;
+    try {
+        const byQ = new Map(hostItems.map((it) => [it.q, it]));
+        for (const pg of plan.pages || []) {
+            for (const s of pg.sections || []) {
+                if (s.kind !== 'grid' || !(s.cols > 1) || /mq-anchorgrid/.test(s.cls || '')) continue;
+                for (const pi of s.items || []) {
+                    const it = byQ.get(pi && pi.q);
+                    if (!it) continue;
+                    const span = Number((/grid-column:span (\d+)/.exec(pi.style || '') || [])[1]) || 1;
+                    const w = (itemInfo(it, { size: n.size, look: n.look, paper: n.paper, mode: 'print' }).fp || {}).wMm || 0;
+                    if (w > 0 && w < 0.4 * (LIVE_W_MM * span / s.cols)) narrowCells++;
+                }
+            }
+        }
+    } catch (e) { narrowCells = 0; }
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
@@ -1913,6 +1932,7 @@ async function buildSheetOnce(req = {}) {
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
+        narrowCells,
         anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,
@@ -2486,7 +2506,7 @@ export async function buildSheet(req = {}) {
             const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
             for (let k = 1; k <= 4; k++) {
                 const alt = await buildSheet(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
-                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length) return alt;
+                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length && (alt.narrowCells || 0) <= (best.narrowCells || 0)) return alt;
             }
             return best;
         }

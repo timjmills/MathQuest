@@ -710,6 +710,28 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 // the practice ceiling's (critic guided-r1: 10 mixed problems split 6 + 4 at S).
                 gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));
+    // A SPLIT part's grid prints its rows as dealt (composeSheet: rowShape against partCellH), not
+    // rows x its layout's cell. Placed at rows x cellH, a split page was charged up to 30 mm more
+    // than it prints, so a sixth problem that fits went to a page of its own and page 1 kept a
+    // 56 mm strip (kit lint PAGEFILL, mixed_multiplication L, 2026-10-09). Each chunk carries
+    // the height and row template it will print at, so the page is placed as it prints.
+    if (!anchors) {
+        chunksBySection.forEach((chunks, si) => {
+            const L = layouts[si];
+            const sec = sectionsIn[si] || {};
+            const isSplit = (sec.splitOf !== undefined && sec.splitOf !== null) || sectionsIn.some((x) => x && x.splitOf === si);
+            if (!isSplit || L.blocks || L.pairs || sec.noCap || !Array.isArray(chunks)) return;
+            chunks.forEach((c, ci) => {
+                if (Number(c.gridMm) > 0 || c.blocks) return;
+                const its = itemsBySection[si].slice(c.from, c.from + c.count);
+                if (!its.length || its.some((it) => it.anchor)) return;
+                const pcH = partCellH(true, its, L);
+                const sh = rowShape(its, L.cols, c.rows, pcH);
+                const mm = sh ? sh.heightMm : pcH < L.cellH - 0.5 ? Math.round(c.rows * pcH * 100) / 100 : 0;
+                if (mm > 0 && mm < c.rows * L.cellH) chunks[ci] = Object.assign({}, c, { gridMm: mm, rowsTpl: sh ? sh.rowsTpl : '' });
+            });
+        });
+    }
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
