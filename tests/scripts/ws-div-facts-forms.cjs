@@ -27,11 +27,11 @@ let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
 
 const FORMS = ['standard', 'long', 'fraction', 'vertical'];
-const TEMPLATE = { standard: 'fact', vertical: 'fact', long: 'division', fraction: 'equation' };
+const TEMPLATE = { standard: 'equation', vertical: 'fact', long: 'division', fraction: 'equation' };
 // What the form looks like in the drawn HTML (paper and screen).
 const MARK = {
     standard: (h) => /class="ws-eq"|mq-hfact|ws-fact-across|data-ws-across/.test(h) || /÷[^<]*<\/span>[^]*=/.test(h),
-    long: (h) => /data-ws-ops="division"/.test(h),
+    long: (h) => /data-ws-ops="division"|class="mq-ldiv"/.test(h),
     fraction: (h) => /data-ws-notation="fraction"/.test(h),
     vertical: (h) => /ws-fact\b/.test(h) && !/data-ws-notation="fraction"/.test(h),
 };
@@ -99,7 +99,6 @@ const MARK = {
                 const frac = (r.pupil.match(/data-ws-notation="fraction"/g) || []).length;
                 const vert = (r.pupil.match(/class="ws-fact"/g) || []).length;
                 if (REWRITE.has(role)) check(true, `${tag}: role rewrites the item (documented fallback)`);
-                else if (role === 'fact-rows' && (form === 'long' || form === 'fraction' || form === 'mix')) check(long === 0 && frac === 0 && /÷/.test(r.pupil), `${tag}: prints across (documented fact-rows fallback)`);
                 else if (form === 'long') check(long > 0 && frac === 0 && vert === 0, `${tag}: draws the bracket (${long})`);
                 else if (form === 'fraction') check(frac > 0 && long === 0 && vert === 0, `${tag}: draws the fraction bar (${frac})`);
                 else if (form === 'vertical') check(vert > 0 && long === 0 && frac === 0, `${tag}: draws vertical facts (${vert})`);
@@ -129,6 +128,8 @@ const MARK = {
                 const s = await page.evaluate(() => ({ html: document.getElementById('questionPaper').innerHTML, form: window.state.currentQ.divForm, tpl: window.state.currentQ.cell && window.state.currentQ.cell.template, ans: window.state.currentQ.ans }));
                 check(s.form === form && s.tpl === TEMPLATE[form], `screen ${form} ${w}: item is ${s.form} on ${s.tpl}`);
                 check(MARK[form](s.html), `screen ${form} ${w}: the card draws the ${form} form`);
+                const instr = await page.evaluate(() => { const e = document.querySelector('#questionText .mq-instr-text'); return e ? e.textContent.trim() : (document.getElementById('questionText') || {}).textContent; });
+                check(instr === 'Divide.', `D9 screen ${form} ${w}: the card's line is "Divide." (${instr})`);
                 // Answer it through the boxes the card draws.
                 const before = await page.evaluate(() => window.state.score || 0);
                 await page.evaluate((ans) => {
@@ -165,6 +166,17 @@ const MARK = {
             const w = await page.evaluate(() => window.state.worksheetQs.map((q, i) => ({ f: q.divForm, html: (document.getElementById('ws_card_' + i) || {}).innerHTML || '' })));
             const okW = w.length > 0 && w.every((c) => (form === 'mix' ? ['standard', 'long', 'fraction'].includes(c.f) : c.f === form) && MARK[c.f](c.html));
             check(okW, `worksheet ${form}: every card drawn in its form (${w.map((c) => c.f).join(',')})`);
+            // D9: every card says "Divide." (no across restatement); D10: one digit size on the page
+            const scr = await page.evaluate(() => {
+                const cards = Array.from(document.querySelectorAll('#worksheetGrid .problem-card'));
+                const instr = cards.map((c) => { const e = c.querySelector('.mq-instr-text, .ws-instr, .problem-instr, .ws-card-instr'); return e ? e.textContent.trim() : ''; });
+                const sizes = cards.map((c) => Math.max(0, ...Array.from(c.querySelectorAll('.ws-cell *')).filter((e) => !e.children.length && /^\d+$/.test(e.textContent.trim()) && e.offsetParent).map((e) => parseFloat(getComputedStyle(e).fontSize))));
+                const said = cards.map((c) => (c.innerText || '').replace(/\s+/g, ' '));
+                return { instr, sizes, said };
+            });
+            check(scr.said.every((t) => !/\d+ ÷ \d+ = \?/.test(t)), `D9 worksheet ${form}: no "a ÷ b = ?" restatement on a card`);
+            const sz = scr.sizes.filter((x) => x > 0);
+            check(sz.length && Math.max(...sz) / Math.min(...sz) <= 1.1, `D10 worksheet ${form}: one digit size across the cards (${[...new Set(sz)].join(', ')} px)`);
             await page.evaluate(() => { Array.from(document.body.children).filter((e) => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach((e) => e.remove()); });
             const qz = await page.evaluate((form) => {
                 const questions = [];
@@ -182,6 +194,91 @@ const MARK = {
             }, form);
             check((form === 'mix' ? ['standard', 'long', 'fraction'].includes(qz.f) : qz.f === form) && !!qz.f && MARK[qz.f](qz.html), `quiz ${form}: the question draws its form (${qz.f})`);
             await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
+        }
+
+
+        // ---------------------------------------------------------------- critic R1 defects (D1-D14)
+        const build = (req) => page.evaluate(async (req) => {
+            const res = await window.buildSheet(req);
+            const tmp = document.createElement('div');
+            const txt = (h) => { tmp.innerHTML = h.replace(/<style[^]*?<\/style>/g, ''); return tmp.textContent; };
+            return { pupil: res.pupilHtml, key: res.keyHtml, n: res.items.length, pages: res.pageCount, keyText: txt(res.keyHtml), pupilText: txt(res.pupilHtml),
+                fits: res.fits, items: res.items.map((i) => ({ t: i.template, text: i.text, ans: String(i.ans) })) };
+        }, req);
+        const one = (form, role, size, extra = {}) => build(Object.assign({ role, size, seed: 4242, key: true,
+            sections: [Object.assign({ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: form } }] }, extra)] }));
+        // D1: every answer line on a page is one width (the band's, never the answer's own)
+        for (const form of ['standard', 'fraction', 'mix']) for (const size of ['S', 'L']) {
+            const r = await one(form, 'independent', size);
+            const ws = [...new Set((r.pupil.match(/class="ws-line[^"]*" style="--w:[^;"]+/g) || []).map((m) => m.replace(/^.*--w:/, '')))];
+            check(ws.length === 1, `D1 ${form} ${size}: every answer line one width (${ws.join(' | ')})`);
+            // D2: the key's written answer at the digit size, bold (not the line's caption size)
+            check(/class="ws-line[^"]*" style="[^"]*font-size:1em;font-weight:700/.test(r.key), `D2 ${form} ${size}: key answers drawn at the digit size`);
+            if (form !== 'standard') check(/border-bottom:1\.5pt solid #000/.test(r.pupil) && /data-ws-notation="fraction" style="align-items:center"/.test(r.pupil), `D3 ${form} ${size}: fraction bar 1.5 pt, "=" and the line on its axis`);
+        }
+        // D4: Standard packs at its one-line height - S holds more than L, and more than the old 12
+        {
+            const S = await one('standard', 'independent', 'S'), L = await one('standard', 'independent', 'L');
+            check(S.n > L.n && S.n > 12 && S.pages === 1 && L.pages === 1, `D4 standard: S ${S.n} > L ${L.n} items, one page each`);
+        }
+        // D5: fact rows draw every form; Mix one third each
+        for (const size of ['S', 'L']) for (const form of ['long', 'fraction', 'mix']) {
+            const r = await one(form, 'fact-rows', size);
+            const long = (r.pupil.match(/data-ws-ops="division"/g) || []).length, frac = (r.pupil.match(/data-ws-notation="fraction"/g) || []).length;
+            const ok = form === 'long' ? long === r.n : form === 'fraction' ? frac === r.n : (long === r.n / 3 && frac === r.n / 3);
+            check(ok && r.pages === 1, `D5 fact rows ${form} ${size}: every fact in its form (${r.n} facts, ${long} bracket, ${frac} fraction)`);
+        }
+        // D6: a probe is ONE page in every form at every size
+        for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) for (const size of ['S', 'M', 'L']) {
+            const r = await one(form, 'fact-probe', size);
+            check(r.pages === 1 && r.n === 20, `D6 probe ${form} ${size}: 20 facts on ${r.pages} page(s)`);
+        }
+        // D7: a Mix lesson models all three forms; Mix Guided leads with a Model of each form
+        {
+            const r = await page.evaluate(async () => {
+                const res = await window.buildSheet({ role: 'lesson', size: 'L', seed: 4242, key: true, sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'mix' } }] }] });
+                return res.pupilHtml;
+            });
+            const chart = r.split(/Guided Practice:/)[0];
+            check(/data-ws-ops="division"/.test(chart) && /data-ws-notation="fraction"/.test(chart) && /class="ws-eq"(?! data-ws-notation)/.test(chart), 'D7 Mix lesson: the anchor chart shows the fact in all three forms');
+            const g = await one('mix', 'guided', 'L');
+            const models = (g.pupil.match(/mq-modelcell/g) || []).length;
+            check(models >= 3, `D7 Mix guided: one Model per form (${models} model cells)`);
+        }
+        // D8: lesson Long / Fraction: the lesson sheet's Independent rows fill the page (more than 6)
+        for (const form of ['long', 'fraction']) {
+            const r = await page.evaluate(async (form) => {
+                const res = await window.buildSheet({ role: 'lesson', size: 'L', seed: 4242, key: true, sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: form } }] }] });
+                const m = /(\d+) independent/.exec((res.fits && res.fits.note) || '');
+                return { indep: m ? Number(m[1]) : 0, practice: res.items.filter((i) => i.part === 'practice').length };
+            }, form);
+            check(r.indep > 6 && r.practice > 6, `D8 lesson ${form}: the lesson sheet's Independent and the practice page hold more than 6 (${JSON.stringify(r)})`);
+        }
+        // D11: one label sequence per page (aa. after z.)
+        for (const form of ['long', 'fraction', 'mix']) {
+            const r = await one(form, 'independent', 'S');
+            const pages = r.pupil.split(/class="ws-page\b/).slice(1);
+            const dup = pages.some((pg) => { const l = (pg.match(/data-ws-label="letter">([a-z]+)\./g) || []).map((x) => x.replace(/^.*>/, '')); return new Set(l).size !== l.length; });
+            check(!dup, `D11 ${form} S: no repeated label on a page`);
+        }
+        // D12: guided Long / Fraction keep the times-fact hint; the steps never name other numbers
+        for (const form of ['long', 'fraction']) {
+            const r = await one(form, 'guided', 'L');
+            check(/mq-thinkcue/.test(r.pupil) && !/Read the division: 24 ÷ 6/.test(r.pupilText), `D12 guided ${form}: the times-fact hint kept, number-free steps`);
+        }
+        // D13: no quotient boxes on Independent / Test bracket cells; the Guided ones keep them
+        for (const role of ['independent', 'test']) {
+            const r = await one('long', role, 'L');
+            check(!/data-ws-slot="q-\d+" data-ws-shape="box"/.test(r.pupil) && /data-ws-slot="q-\d+" data-ws-shape="open"/.test(r.pupil), `D13 ${role}: the quotient is written on the bracket, no boxes`);
+        }
+        {
+            const r = await one('long', 'guided', 'L');
+            check(/data-ws-slot="q-\d+" data-ws-shape="box"/.test(r.pupil), 'D13 guided: the quotient boxes stay (VA-61)');
+        }
+        // D14: Mix at L holds at least 12, one page
+        {
+            const r = await one('mix', 'independent', 'L');
+            check(r.n >= 12 && r.pages === 1, `D14 Mix L: ${r.n} items on ${r.pages} page(s)`);
         }
 
         // ---------------------------------------------------------------- mix

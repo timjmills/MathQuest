@@ -19,7 +19,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart, instructionPart, instructionKeyOf,
     assemble, poolItems, labelStyleOf, opOf, opGlyphOf, operandsOf, answerOf, writeLine, slotKey, esc, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { isFact, factTitle } from './fact-rows.js';
+import { isFact, factTitle, divForms as divFormSet, formGrid, formCell } from './fact-rows.js';
 
 export const ROLE_ID = 'fact-probe';
 export const DEFAULT_LOOK = 'daily';
@@ -97,6 +97,7 @@ export function plan(input = {}) {
     const hMin = hMinAt(vert, 5, ctx);
     let body;
     let extraPages = [];
+    let FG = null;
     let probeCols = 0;
     let vRows = 3;
     let vH;
@@ -110,6 +111,14 @@ export function plan(input = {}) {
         vRows = 10;
         vH = Math.max(hH * 0.8, Math.min(hH * 1.3, G / 10));
         body = gridPart(across.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 10, cellH: vH, labels, start: 1 });
+    } else if (divFormSet(items) && (FG = formGrid(items, ctx, G, divFormSet(items), items.length, 5))) {
+        // div_facts Long division / Fraction / Mix (critic R1 D6): ONE page (PT-FPR-6), each fact
+        // in its own form at one size - the most columns and the largest ladder size at which the
+        // widest fact fits - and the rows take the whole grid (PG-14), at S as at L.
+        vRows = FG.rows;
+        vH = FG.cellH;
+        probeCols = FG.cols;
+        body = gridPart(items.map((it) => planItem(formCell(it, FG), { cols: FG.cols })), { cols: FG.cols, rows: FG.rows, cellH: vH, labels, start: 1, cls: 'facts' });
     } else if (!fitsAt(items, 5, ctx)) {
         // A cell that does not fit the 5-column grid (div_facts Long division / Fraction / Mix at
         // M or L: the bracket and its quotient boxes are wider than a fifth of the page). The

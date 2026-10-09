@@ -125,6 +125,10 @@ export function cellKindFor(q) {
             return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
         }
     }
+    // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
+    // carries the paper's "Divide." line and the hosts' digit size like the other forms (critic R1
+    // D9 / D10: it fell through to the legacy twin, which restated "54 ÷ 9 = ?" over a 48 px bracket).
+    if (cellT === 'division' && pay.fact && p.op === '/') return { kind: 'division', ...p, fact: true };
     // div_facts' Fraction form: the kit equation template's fraction drawing, its slot typed.
     if (cellT === 'equation' && pay.notation === 'fraction' && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', frac: true, ...p };
     if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
@@ -252,9 +256,9 @@ export function equationHTML(k, slotHtml) {
     // div_facts' Fraction form (divForm): the dividend over the divisor on a bar, = [slot] - the
     // kit equation template's fraction drawing, same markup as paper (cells/equation.js).
     if (k.frac) {
-        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" style="align-items:center" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
             + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
-            + `<span style="border-bottom:0.75pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
+            + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
             + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
     }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
@@ -2631,6 +2635,7 @@ export function ringCellHTML(p) {
  */
 export function workRowsHTML(k) {
     if (!k || k.kind !== 'division') return '';
+    if (k.fact) return '';      // a division FACT has no working rows (paper: workRows 0)
     const n = String(k.a).length;
     const steps = Math.max(1, Math.min(4, String(Math.floor(k.a / k.b)).length));
     const strip = (label) => `<div class="mq-workrow" role="group" aria-label="${attr(label)}"><span class="mq-workop">−</span>`

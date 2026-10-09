@@ -254,7 +254,15 @@ export function pickWeDo(items, example, data, n) {
     const same = rest.filter((it) => (!re || re.test(workedStepsOf(it).map((s) => s.text).join(' '))) && digitsOfOps(it) === shape);
     // The lesson's preferred kind of number first (never an end case like 99 as the first try).
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
-    const order = liked.concat(same.filter((it) => !liked.includes(it)), rest.filter((it) => !same.includes(it)));
+    let order = liked.concat(same.filter((it) => !liked.includes(it)), rest.filter((it) => !same.includes(it)));
+    // div_facts Mix (critic R1 D7): the Guided set tries each written form - the forms the
+    // example did not show first.
+    if (order.length && order.every((it) => it.q && it.q.divMix)) {
+        const f = (it) => String(it.q.divForm || '');
+        const lead = [];
+        for (const it of order) if (f(it) !== f(example) && !lead.some((x) => f(x) === f(it))) lead.push(it);
+        order = [...lead, ...order.filter((it) => !lead.includes(it))];
+    }
     // Lessons r1: a Guided set is varied - no two with the same answer, at most one "make 10"
     // (a fact whose answer is the band's top), and the big number on both sides where the pool
     // has it (the chart models both).
@@ -859,6 +867,23 @@ const WEDO_W_MM = 62;       // the Steps zone beside the Guided cells: one third
  * and drawings, the vocabulary match, the Steps zone and the practice pages' step strip. The
  * example is chosen here and again in `plan` by the same deterministic rule.
  */
+/** The example's fact in the other div_facts Mix forms, as chart examples (see extras). */
+function sameFactForms(ex) {
+    const [a, b] = operandsOf(ex.q || {}).map(Number);
+    if (!b || a % b) return [];
+    const Q = a / b;
+    const cells = {
+        standard: { template: 'equation', payload: { a, b, op: '/', result: Q, digits: 2, fact: true } },
+        long: { template: 'division', payload: { dividend: a, divisor: b, quotient: Q, workRows: 0, fact: true } },
+        fraction: { template: 'equation', payload: { a, b, op: '/', result: Q, notation: 'fraction', digits: 2, fact: true } },
+    };
+    const names = { standard: 'the same fact across', long: 'the same fact as long division', fraction: 'the same fact as a fraction' };
+    return Object.keys(cells).filter((f) => f !== ex.q.divForm).map((f) => ({
+        it: Object.assign({}, ex, { template: cells[f].template, q: Object.assign({}, ex.q, { divForm: f, cell: Object.assign({ v: 1 }, cells[f]) }) }),
+        label: names[f],
+    }));
+}
+
 export function extras(input = {}) {
     const lesson = input.lesson || {};
     const data = lesson.data || null;
@@ -873,7 +898,11 @@ export function extras(input = {}) {
     // of states does not fit), the third and fourth cases where the lesson names them (rounding:
     // ends in 5; the 90s round up to 100).
     const lab = (k) => (data && data[k] && data[k].label) || '';
-    out.push(...finalItems([{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
+    // div_facts Mix (critic R1 D7): the chart shows the example's ONE fact in the other two
+    // forms it deals ("the same fact, written another way"), so every form on the practice pages
+    // has been modelled.
+    const mixFinals = ex && !ex2 && ex.q && ex.q.divMix ? sameFactForms(ex) : [];
+    out.push(...finalItems(mixFinals.length ? mixFinals : [{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
     const v = vocabItem(data && data.vocab, input.seed);
     if (v) out.push(v);
     if (steps.length) { out.push(stepsItem(data, steps)); out.push(stripItem(data, steps)); }
@@ -1143,7 +1172,9 @@ export function plan(input = {}) {
     // A rounding Guided cell carries the chart's number line under its problem (weDoRender).
     const lineExtra = (its) => (its.some(isRound) ? roundLineMm(Math.max(12, (ctx.metrics && ctx.metrics.zonePt) || 12), GUIDED_BOX_MM[ctx.size] || 12) : 0);
     const shortH = Math.max(20, hAt(rest.slice(0, 3), 2) + lineExtra(rest.slice(0, 3)));
-    const stackRows = zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH ? Math.min(3, Math.floor(zH / shortH)) : 0;
+    // (one stacked row is not a stack: it left a single Guided cell beside the Steps - critic R1,
+    // div_facts long-division lesson - so a stack is at least two rows)
+    const stackRows = zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0;
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);
@@ -1221,7 +1252,10 @@ export function plan(input = {}) {
     if (Number.isFinite(hI) && hI > 0) {
         const room = cur.budget - cur.used - m.strip;
         // 12.1: an Independent page holds 6 at most; a page of rows fills its height like one.
-        const rows = Math.min(Math.max(1, Math.floor(6 / ic)), Math.floor(room / hI));
+        // div_facts facts (any written form, critic R1 D8): one-number answers, so the rows fill the
+        // room left on the page up to 12.1's one-symbol ceiling of 12, not the 6 of taller problems.
+        const oneNum = indepPool.length && indepPool.every((it) => it.q && it.q.divForm);
+        const rows = Math.min(Math.max(1, Math.floor((oneNum ? 12 : 6) / ic)), Math.floor(room / hI));
         if (rows >= 1) {
             indep = indepPool.slice(0, rows * ic);
             const r = Math.ceil(indep.length / ic);

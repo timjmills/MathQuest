@@ -7074,7 +7074,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.cell = { template: 'division', v: 1, payload };
                         q.visual = _kitTwin('division', payload, { join: '' });
                     } else if (form === 'fraction') {
-                        const payload = { a: A, b: B, op: '/', result: Q, notation: 'fraction', digits: String(Q).length, fact: true };
+                        // D1 (critic R1): the answer line's width is the BAND's (as Standard), never this answer's own
+                        // length - a 2-digit answer must not get a longer line than a 1-digit one (L3).
+                        const payload = { a: A, b: B, op: '/', result: Q, notation: 'fraction', digits: _bandDigits('div_facts', '\u00f7', range), fact: true };
                         q.notation = 'fraction'; q._variant = 'fraction';
                         q.printFormat = 'div-facts-fraction';
                         q.cell = { template: 'equation', v: 1, payload };
@@ -7084,14 +7086,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.notation = 'stacked'; q._variant = 'vertical';
                         q.printFormat = 'div-facts-vertical';
                         q.cell = { template: 'fact', v: 1, payload };
-                    } else if (inMix) {
-                        q.notation = 'across'; q._variant = 'horiz';
-                        q.printFormat = 'div-facts-horizontal';
-                        q.cell = { template: 'equation', v: 1, payload: { a: A, b: B, op: '/', result: Q, digits: String(Q).length, fact: true } };
                     } else {
+                        // Standard, alone or in Mix: the one-line equation cell "12 ÷ 3 = ___", packed at
+                        // its measured one-line height (critic R1 D4: the fact template's across form
+                        // keeps the VERTICAL fact's height - VA-70 - which left 42-49 % of every cell
+                        // empty and printed S as the L page).
                         q.notation = 'across'; q._variant = 'horiz';
                         q.printFormat = 'div-facts-horizontal';
-                        q.cell = { template: 'fact', v: 1, payload: { a: A, b: B, op: '/', notation: 'horiz', digits: _bandDigits('div_facts', '\u00f7', range) } };
+                        q.cell = { template: 'equation', v: 1, payload: { a: A, b: B, op: '/', result: Q, digits: _bandDigits('div_facts', '\u00f7', range), fact: true } };
                     }
                 }
 

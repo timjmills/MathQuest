@@ -42,6 +42,15 @@ import { stepTemplateOf } from '../anchors.js';
 import { FILL_CAP, groupByHeight, fillLimit } from '../layout.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
+const isMixItem = (it) => !!(it && it.q && it.q.divMix);
+const formOfItem = (it) => String((it && it.q && it.q.divForm) || '');
+/** How many Model cells lead a div_facts Mix page: one per form dealt, in a row (else 1). */
+const mixModels = (use) => {
+    if (use.length < 4 || !use.every(isMixItem)) return 1;
+    let n = 1;
+    while (n < use.length && n < 3 && !use.slice(0, n).some((x) => formOfItem(x) === formOfItem(use[n]))) n++;
+    return n;
+};
 const ordered = (items0, cols) => {
     // Round-4 re-grade: the Model is a problem the Steps work forwards - a start-unknown or
     // missing-part item ("[ ] - 1 = 15") is never the worked example when another item is not.
@@ -64,7 +73,14 @@ const ordered = (items0, cols) => {
         const it = items0[i];
         if (hOf(it) < 0.85 * hOf(items0[first]) && hOf(it) < hOf(items0[k])) k = i;
     });
-    const items = k > 0 ? [items0[k], ...items0.slice(0, k), ...items0.slice(k + 1)] : items0;
+    let items = k > 0 ? [items0[k], ...items0.slice(0, k), ...items0.slice(k + 1)] : items0;
+    // div_facts Mix (critic R1 D7): one item of EACH form first - each is modelled once (plan:
+    // mixModels) before the tries, so no form reaches a try without a model.
+    if (items.length > 2 && items.every(isMixItem)) {
+        const lead = [];
+        for (const it of items) if (!lead.some((x) => formOfItem(x) === formOfItem(it))) lead.push(it);
+        items = [...lead, ...items.filter((it) => !lead.includes(it))];
+    }
     return items.length > 2 ? [items[0], ...groupByHeight(items.slice(1), cols)] : items;
 };
 
@@ -777,7 +793,10 @@ export function countCueRow(it) {
  */
 export function thinkCueOf(it, filled = false) {
     const q = it.q || {};
-    if (it.template !== 'fact' || opOf(q) !== 'divide') return '';
+    // every written form of a division fact (fact, equation: across / fraction, division: the
+    // bracket) keeps the related times fact as its hint (critic R1 D12)
+    if (!['fact', 'equation', 'division'].includes(it.template) || opOf(q) !== 'divide') return '';
+    if (it.template !== 'fact' && !/div_facts/.test(String(q.skillId || ''))) return '';
     const o = operandsOf(q);
     if (o.length < 2 || !o[1] || o[0] % o[1]) return '';
     const gap = filled ? String(o[0] / o[1]) : '__';
@@ -856,27 +875,31 @@ export function plan(input = {}) {
     // Critic round 2 (C4): the Guided page is labelled and scored like every other role. The
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
     const worked = use.length > 1 && !!answerOf(use[0]);
-    const scored = use.length - (worked ? 1 : 0);
+    const nModels = worked ? mixModels(use) : 0;
+    const scored = use.length - nModels;
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: scored });
     // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
     const partialEnd = partialEndOf(cols, fit.span, use.length);
     const planItems = use.map((it, i) => {
         const ans = answerOf(it);
-        const stage = i === 0 && worked ? 'model' : i < partialEnd && ans ? 'partial' : 'blank';
+        const stage = i < nModels ? 'model' : i < Math.max(partialEnd, nModels + 1) && ans ? 'partial' : 'blank';
         // A column stack keeps its digit grid - the place-value header and the answer boxes - on
         // every guided try (structural, PEDAGOGY 4.2); at level 1 the template drops them, the
         // later rows came out 38 mm shorter than the row sized for them (H13, add_50_mixed).
         // Critic guided-r1: at level 2 a blank stack greys its boxes, so the grid was black on the
         // Model and row 1 and grey below it - one structure in two weights on one page. A stack
         // takes level 3 on every try (the same grid, black; its hint is the partial trace).
-        const level = stage === 'model' || it.template === 'stack' ? 3 : stage === 'partial' ? 2 : 1;
+        // A bracket keeps its quotient boxes on every Guided try (VA-61: the digit grid belongs to
+        // Model and Guided; at level 1 the division template writes on the open vinculum).
+        const level = stage === 'model' || it.template === 'stack' ? 3 : stage === 'partial' || it.template === 'division' ? 2 : 1;
         // Round-3 re-grade: the Model tab overprinted the first line of a story, a sentence or a
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
         // steps its content down clear of the tab.
+        const spanIt = fit.span && i === 0;
         const cell = stage === 'model' && !OWN_TOP_BAND.has(it.template)
             ? Object.assign({}, it, {
-                cellCls: [it.cellCls || '', 'mq-modelcell', fit.span ? 'mq-modelspan' : ''].join(' ').trim(),
-                cellStyle: fit.span ? [it.cellStyle || '', 'grid-column:1 / -1'].filter(Boolean).join(';') : it.cellStyle,
+                cellCls: [it.cellCls || '', 'mq-modelcell', spanIt ? 'mq-modelspan' : ''].join(' ').trim(),
+                cellStyle: spanIt ? [it.cellStyle || '', 'grid-column:1 / -1'].filter(Boolean).join(';') : it.cellStyle,
             }) : it;
         return planItem(cell, { cols, level, render: fadeRender(it, stage, ans, { hint: !!fit.hint, lines: !fit.noLines }), model: stage === 'model', nolabel: stage === 'model' });
     });

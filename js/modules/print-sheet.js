@@ -2162,7 +2162,10 @@ async function buildLesson(n, metaOf) {
     const stripH = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
     const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: 'ican', mode: 'print' })) : '';
     // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
-    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
+    // A div_facts fact in any written form (across or fraction on the equation cell, the bracket)
+    // is a one-number answer too (critic R1 D8: Long / Fraction practice pages printed 2 x 3).
+    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round')
+        || ((it.template === 'equation' || it.template === 'division') && /div_facts/.test(String(it.skill || '')));
     const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
     // The skill ref of the practice pages: a subtraction lesson gives step 5 ("Check: add back")
     // its room, a Check line under every problem.

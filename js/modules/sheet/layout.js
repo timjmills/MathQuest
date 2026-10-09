@@ -570,12 +570,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // the AVERAGE row of the measured sample fits (never above the ceiling). Explicit column
     // counts, word problems, wide rows and long procedures keep the grid.
     let packed = false;
+    let mixKeep = false;      // a div_facts Mix section (dealt order kept): the dense pass may still take more
     if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride) {
         const hs = (items || []).map((it) => measuredH(it, cols));
         if (hs.length >= 2 && hs.every((h) => h > 0) && Math.max(...hs) > Math.min(...hs) * 1.6) {
             // (a div_facts Mix section keeps its dealt order - groupByHeight - so its rows are
             // the rows it will print, not the tall-first ones)
             const keepOrder = (items || []).every((it) => it && it.q && it.q.divMix);
+            mixKeep = keepOrder;
             const sorted = keepOrder ? [] : hs.slice().sort((a, b) => b - a);
             if (keepOrder) for (let i = 0; i < hs.length; i += cols) sorted.push(Math.max(...hs.slice(i, i + cols)), ...Array(Math.max(0, Math.min(cols, hs.length - i) - 1)).fill(0));
             const rowH = [];
@@ -587,7 +589,9 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const packCeil = section.dense && (section.ceiling === undefined || section.ceiling === null)
                 ? bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling : ceiling;
             let fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
-            if (cols === 2 && fit > 1) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
+            // (a div_facts Mix page holds every row it fits - 2 x 7 at L, not the two-column row
+            // step down to 2 x 5; critic R1 D14)
+            if (keepOrder) { /* every row it fits */ } else if (cols === 2 && fit > 1) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
             if (fit > rows) {
                 rows = fit;
                 packed = true;
@@ -608,7 +612,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // keep each cell at least DENSE_ROOM x its tallest content, up to the section's dense ceiling
     // (12.3's capacity tables; never above DN-1's 20 scored responses at L). The teacher's
     // explicit column count is never overridden (DN-12), and it only ever ADDS items.
-    if (section.dense && !clamped && !packed && cls !== 'word' && cls !== 'wide' && hMin > 0) {
+    if (section.dense && !clamped && (!packed || mixKeep) && cls !== 'word' && cls !== 'wide' && hMin > 0) {
         // 12.1: a role that states its own ceiling (a Test: 20 / 16 / 12) is never packed past it,
         // however dense it asks to be (round-3 re-grade: a Test printed 20 facts at L under a
         // "At most 12 problems" note).

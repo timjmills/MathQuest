@@ -95,7 +95,14 @@ register('division', {
         const D = String(p.dividend), V = String(p.divisor);
         const n = D.length, dv = V.length;
         const rows = rowsOf(p);
-        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
+        // A division fact's quotient box is at least the writing height wide (critic R1 D13: 4.5 mm
+        // boxes for 6 mm handwriting at S).
+        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
+        // VA-61: the digit grid over the dividend is a Model / Guided scaffold. A division FACT on
+        // an Independent, Test, Probe ... page (scaffold level below 2) writes its quotient on the
+        // vinculum's open space, one digit per track, with no boxes (critic R1 D13). Screen twins
+        // keep their typed boxes (the input needs a target).
+        const openQ = !!p.fact && !g.twin && ctx.mode !== 'screen' && !((Number(ctx.scaffoldLevel) || 1) >= 2);
         const gutterMm = trackMm * 1.1;
         const k = keyOf(p);
         const ink = inkOf(ctx);
@@ -117,7 +124,8 @@ register('division', {
         // Row 1: the quotient strip over every dividend track (VA-61, SL-12).
         for (let i = 0; i < n; i++) {
             html += cell(box(g, `q-${i}`, {
-                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: stripPos(i, n),
+                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
+                ...(openQ ? { shape: 'open', extra: 'border:0;background:transparent;' } : {}),
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
             }), dv + 2 + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
@@ -131,7 +139,9 @@ register('division', {
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
         const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
             + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
-        html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block">${arc}</span>`;
+        // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
+        // inside its row: the arc drops half a stroke so the two meet in one line.
+        html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
         for (let i = 0; i < n; i++) html += cell(esc(D[i]), dv + 2 + i, 2, `border-top:${HEAVY} solid ${INK.ink};`);
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
@@ -177,7 +187,7 @@ register('division', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const n = String(p.dividend).length, dv = String(p.divisor).length;
-        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
+        const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
         const rows = rowsOf(p);
         return {
             wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),

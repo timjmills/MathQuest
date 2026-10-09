@@ -87,7 +87,11 @@ register('equation', {
             id: 'answer', kind: u === 'op' ? 'sign' : 'number', shape: slotShape(p),
             digits, graded: true, order: 0, inputmode: u === 'op' ? 'text' : 'numeric',
             scopes: ['full', 'answer-only'],
-        }, ctx, ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })));
+        }, ctx, ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })))
+            // AK-2 (critic R1 D2): a value written on the line - the key's answer, a model's trace, a
+            // pupil's claimed answer - is drawn at the DIGIT size, on the line, as the fact template
+            // draws it; never the small caption size of the line's own default.
+            .replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
         // P11: a ÷ sentence written the way the teacher ticked (`notation`): the dividend over the
         // divisor on a fraction bar, or the divisor outside a long-division bracket. The unknown
         // keeps its slot wherever it sits.
@@ -101,10 +105,12 @@ register('equation', {
             const B = u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`;
             const R = u === 'result' ? slotHtml : `<span>${esc(result)}</span>`;
             const body = p.notation === 'fraction'
+                // D3 (critic R1): the fraction bar is a Heavy stroke (1.5 pt, stroke table), and "=" and the
+                // answer line sit on the bar's axis (align-items:center below), on paper as on screen.
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
-                    + `<span style="border-bottom:0.75pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
+                    + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq" data-ws-notation="${p.notation}">${body}<span class="o">=</span>${R}</div>`;
+            return `<div class="ws-eq" data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
         }
         const pieces = [
             u === 'a' ? slotHtml : `<span>${num('a')}</span>`,
