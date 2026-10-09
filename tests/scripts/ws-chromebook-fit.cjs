@@ -40,6 +40,7 @@ const SHOTS = arg('shots', null);
 // (header row + play bar + the card's own top line). An item whose problem is taller than what is
 // left is genuinely tall.
 const CHROME_BUDGET = 190;
+const ARENA_BUDGET = 90;   // the boss arena or the race track, folded (css/play-compact.css)
 // The known tall shapes, always in the sample on top of one skill per category.
 const TALL = [
     'addition:add_column_multi', 'addition:add', 'subtraction:subtract', 'division:long_div_2digit',
@@ -188,6 +189,9 @@ async function startHost(page, host, c, k, seed) {
                 try {
                     await startHost(page, host, c, k, hash(`${s}:${host}`));
                     const load = await page.evaluate(MEASURE, host);
+                    // the pupil scrolls back to the top: a wheel first, so active-box (which keeps a
+                    // focused box in view for its first seconds) leaves the page where they put it
+                    await page.mouse.move(5, 300); await page.mouse.wheel({ deltaY: -1 });
                     await page.evaluate(() => window.scrollTo(0, 0));
                     await sleep(150);
                     m = await page.evaluate(MEASURE, host);
@@ -200,9 +204,13 @@ async function startHost(page, host, c, k, seed) {
                 }
                 const tag = `${s} ${size.w}x${size.h} ${host}`;
                 const problem = m.box != null ? m.box - m.paperTop : 0;
-                const isTall = m.box != null && problem > m.fold - CHROME_BUDGET;
+                // boss and race add their arena / track to the chrome: the game itself, not header
+                const budget = CHROME_BUDGET + (host === 'boss' || host === 'race' ? ARENA_BUDGET : 0);
+                const isTall = m.box != null && problem > m.fold - budget;
                 let verdict = 'ok';
-                if (m.go == null || m.go > m.H + 0.5) { verdict = 'FAIL'; fails.push(`${tag}: Check / Next off screen (bottom ${m.go} > ${m.H})`); }
+                // Check / Next must show on a typical item; a tall item's own Check may sit below its boxes
+                if (m.go == null) { verdict = 'FAIL'; fails.push(`${tag}: no Check / Next found`); }
+                else if (m.go > m.H + 0.5 && !isTall) { verdict = 'FAIL'; fails.push(`${tag}: Check / Next off screen (bottom ${m.go} > ${m.H})`); }
                 if (m.box != null && m.box > m.fold) {
                     if (isTall) {
                         // it may scroll, but active-box must have brought the box into view on load

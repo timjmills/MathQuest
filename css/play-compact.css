@@ -129,11 +129,11 @@
     /* Boss and race: the arena and the track keep their characters, on a lower stage */
     html.mq-play body.student-mode #gameView > .boss-status,
     html.mq-play body.student-mode #gameView > .race-status { margin: 0; font-size: 0.9rem; line-height: 1.2; }
-    html.mq-play body.student-mode #gameView > .boss-arena { height: 76px; margin: 0; border-width: 3px; }
+    html.mq-play body.student-mode #gameView > .boss-arena { height: 68px; margin: 0; border-width: 3px; }
     html.mq-play body.student-mode #gameView > .boss-arena .char-sprite { bottom: 14px; font-size: 2.2rem; }
-    html.mq-play body.student-mode #gameView > .race-track-container { padding: 4px 16px; margin: 0; }
-    html.mq-play body.student-mode #gameView > .race-track-container .race-lane { height: 30px; margin-bottom: 2px; }
-    html.mq-play body.student-mode #gameView > .race-track-container .race-car { bottom: 2px; font-size: 1.5rem; }
+    html.mq-play body.student-mode #gameView > .race-track-container { padding: 2px 16px; margin: 0; }
+    html.mq-play body.student-mode #gameView > .race-track-container .race-lane { height: 26px; margin-bottom: 2px; }
+    html.mq-play body.student-mode #gameView > .race-track-container .race-car { bottom: 1px; font-size: 1.35rem; }
 
     /* Check / Hint / Read / Skip and Next stay on screen, pinned to the bottom edge while the card
        runs past it (sticky: on a short item they sit in place, under the problem, as before). */
@@ -149,7 +149,7 @@
         bottom: 0;
         z-index: 30;
         margin-top: 6px !important;
-        padding: 6px 0 8px;
+        padding: 5px 0 6px;
         background: var(--mq-paper, #fff);
         box-shadow: 0 -6px 10px -8px rgba(0, 0, 0, 0.25);
     }
