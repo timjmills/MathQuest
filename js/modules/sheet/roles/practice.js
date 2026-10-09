@@ -710,7 +710,9 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * section).
  */
 /** The library lines a choose-all list's section prints for it (RM-08 and its paper tasks). */
-const PAPER_TASK_KEYS = new Set(['default-circle-all', 'sort-even-odd']);
+const PAPER_TASK_KEYS = new Set(['default-circle-all', 'sort-even-odd', 'circle-part-of-set']);
+/** A fraction-of-a-set list ("Circle 2/3 of the stars."): its own paper task. */
+const PART_OF_SET_RE = /^\s*(?:Click|Circle|Tap)\s+\d+\/\d+\s+of\s+the\b/;
 
 /** A choose-all cell without its prompt line when the section line says exactly that. */
 function dropSamePrompt(html, line) {
@@ -760,6 +762,7 @@ export function itemInstructionKey(it) {
     // The provider's key for THIS question first: the host stamps a mixed pool's items with the
     // pool's one key, which is exactly the line that does not fit each kind.
     const q = it.q || {};
+    if (q.printFormat === 'multi-select' && !q.printText && PART_OF_SET_RE.test(String(q.text || ''))) return 'circle-part-of-set';
     if (q.printFormat === 'multi-select' && !q.printText) return 'default-circle-all';
     // a choose-all list with its own paper task (the odd/even sort): that task's library line
     if (q.printFormat === 'multi-select' && q.printText) {
@@ -957,7 +960,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     // RM-08: under the section line "Circle all the correct answers." a choose-all
                     // cell keeps only its criterion ("Sums that equal 1."), never a second verb
                     // (P-LG-2, P-LG-5); under any other line it keeps its own "Circle all ...".
-                    if (instr[part.section].key === 'default-circle-all' && typeof pi.render === 'function') {
+                    if (instr[part.section].key === 'circle-part-of-set' && typeof pi.render === 'function') {
+                        // "Circle 2/3 of the stars." under "Circle the fraction of the set." -> "2/3 of the stars."
+                        const draw = pi.render;
+                        pi.render = (c) => String(draw(c)).replace(/(<div class="ms-prompt[^"]*">)\s*(?:Circle|Click|Tap)\s+/, '$1');
+                    } else if (instr[part.section].key === 'default-circle-all' && typeof pi.render === 'function') {
                         const draw = pi.render;
                         pi.render = (c) => circleAllCriterion(draw(c));
                     } else if (PAPER_TASK_KEYS.has(instr[part.section].key) && typeof pi.render === 'function') {

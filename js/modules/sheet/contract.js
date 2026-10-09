@@ -110,6 +110,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
     'sort-even-odd': 'Circle the even numbers. Cross out the odd numbers.',
+    'circle-part-of-set': 'Circle the fraction of the set.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',
     which: 'Which answer is correct? Circle A or B.',
     stretch: 'Find more than one answer. Fill in the table.',

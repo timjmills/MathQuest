@@ -255,6 +255,12 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
             if (k < tries && !refAccepts(sk, cand, key, seen, kept)) continue;
+            // At most one choose-all list per run of a skill that also deals production items
+            // (critic fractions-key N2 / N3: a "Subtract" page of two "less than 1/2" lists, a
+            // test of comparisons). A skill that only deals lists is never held to it.
+            const isList = cand.printFormat === 'multi-select';
+            if (!isList) seen.add(`prod:${key}`);
+            if (isList && k < tries && (kept.get(`list:${key}`) || 0) >= 1 && seen.has(`prod:${key}`)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -263,6 +269,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         seen.add(signature(q));
+        if (q.printFormat === 'multi-select') kept.set(`list:${key}`, (kept.get(`list:${key}`) || 0) + 1);
         refRecord(sk, q, key, seen, kept);
         kept.set(key, itemIndex + 1);
         out.push({ q, skill: sk });

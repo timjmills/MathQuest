@@ -17,8 +17,15 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, writeLine, slotKey, judgeGroup,
-    esc, operandsOf, opOf, opGlyphOf,
+    esc, stackedFracs, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
+
+/** TY-7 (critic fractions-key N6): the key writes a fraction answer stacked on its line. */
+function stackKeyFrac(html, value) {
+    const v = String(value == null ? '' : value);
+    if (!/\d\/\d/.test(v)) return html;
+    return html.split(`>${esc(v)}<`).join(`>${stackedFracs(esc(v))}<`);
+}
 
 export const ROLE_ID = 'true-false';
 const CEILING = { S: 8, M: 6, L: 4 };
@@ -44,7 +51,7 @@ export function prepare(it, info = {}) {
         return `<div class="mq-judge mq-tf">`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`)
-            + `<div class="mq-frame">${esc(stem)}${writeLine('tf-ans', c, key, digits)}.</div>`
+            + `<div class="mq-frame">${esc(stem)}${stackKeyFrac(writeLine('tf-ans', c, key, digits), correct)}.</div>`
             + `</div>`;
     };
     return Object.assign({}, it, {

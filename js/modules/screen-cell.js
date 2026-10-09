@@ -28,6 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
+import { fracValueMatches, stackSlashFractions } from './utils.js';
 import { optionsFor } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -232,6 +233,11 @@ export function screenTextLine(el) {
             const t2 = screenInstruction(text);
             if (t2 !== text) { head.forEach((c) => c.remove()); el.insertBefore(document.createTextNode(t2), sr); }
         }
+    }
+    // TY-7 (critic fractions-key N6): a plain line that writes a fraction sum or difference
+    // ("Calculate: 1/2 + 1/3 = ?") stacks each fraction over its bar, as the cell draws it.
+    if (!el.children.length && /\b\d+\/\d+\s*[+\u2212\-\u00d7\u00f7]\s*\d+\/\d+\b/.test(el.textContent || '')) {
+        el.innerHTML = stackSlashFractions(String(el.textContent).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
     }
 }
 
@@ -2642,6 +2648,11 @@ export function slotAnswerMatches(value, q) {
     if (!q) return null;
     // A function table checks each slot against the rule (a 'make your own' table has no one answer).
     if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
+    // a fraction sentence is judged by value on every host: 1, 5/5, 1 0/5 (owner ruling; critic N1)
+    if (q.cell && q.cell.template === 'frac-model') {
+        const fv = fracValueMatches(value, q.ans);
+        if (typeof fv === 'boolean') return fv;
+    }
     const cv = cellInputVerdict(value, q);
     if (typeof cv === 'boolean') return cv;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());

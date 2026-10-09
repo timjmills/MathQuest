@@ -1255,6 +1255,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `spot` | Find the mistake. Circle it. Write the correct answer. | Reason It |
 | `odd-one` | Circle the one that does not belong. Finish the sentence. | Reason It |
 | `sort-even-odd` | Circle the even numbers. Cross out the odd numbers. | the odd/even sort (a choose-all list with two marks); one line per section, never repeated in the cell |
+| `circle-part-of-set` | Circle the fraction of the set. | a fraction of a set to ring (fraction_of_set picture list); the cell keeps only its criterion ("2/3 of the stars.") |
 | `asn` | Check one box: Always, Sometimes or Never. Write an example. | Reason It |
 | `which` | Which answer is correct? Circle A or B. | Reason It |
 | `stretch` | Find more than one answer. Fill in the table. | Stretch |

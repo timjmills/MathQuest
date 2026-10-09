@@ -2087,3 +2087,20 @@ body.map-immersive #mapSessionView .map-session-banner:not(.has-controls) {
         gap: 6px;
     }
 }
+
+/* Critic fractions-key N4 (additive): in the ring list (black-and-white cell) the feedback after a
+   wrong Check sits UNDER the option, never on its numerals, and every option that needs fixing has
+   its own mark: a missed answer a dashed amber ring and "missed", a wrong ring a red ring and
+   "not this". The mark goes when the pupil taps the option. */
+.msc-grid.msc-ring .msc-opt.missed-correct,
+.msc-grid.msc-ring .msc-opt.wrong-persistent { position: relative; margin-bottom: 22px; }
+.msc-grid.msc-ring .msc-opt.missed-correct { border: 2px dashed #b26a00 !important; }
+.msc-grid.msc-ring .msc-opt.wrong-persistent { border: 2px solid #c62828 !important; }
+.msc-grid.msc-ring .msc-opt.missed-correct::after,
+.msc-grid.msc-ring .msc-opt.wrong-persistent::after {
+    position: absolute; top: calc(100% + 3px); left: 50%; right: auto; transform: translateX(-50%);
+    font-family: "Andika", sans-serif; font-size: 0.8rem; font-weight: 700; line-height: 1.2;
+    padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none;
+}
+.msc-grid.msc-ring .msc-opt.missed-correct::after { content: 'missed'; color: #6d4c00; background: #fff3cd; }
+.msc-grid.msc-ring .msc-opt.wrong-persistent::after { content: 'not this'; color: #b71c1c; background: #ffebee; }

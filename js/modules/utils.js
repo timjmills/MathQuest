@@ -39,6 +39,24 @@ export function fracText(num, den) {
     return `${num}/${den}`;
 }
 
+// A fraction sentence answer judged by VALUE (owner ruling 2026-10-03): "1", "5/5", "1 0/5",
+// "7/5" and "1 2/5" are equally right for a sum of 7/5 or 1. Returns true/false when both sides
+// read as a whole, fraction or mixed number, else null (the caller falls back to its own check).
+export function parseFracValue(t) {
+    const s = String(t == null ? '' : t).replace(/\u2044/g, '/').trim();
+    let m = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return Number(m[3]) ? { n: Number(m[1]) * Number(m[3]) + Number(m[2]), d: Number(m[3]) } : null;
+    m = /^(\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return Number(m[2]) ? { n: Number(m[1]), d: Number(m[2]) } : null;
+    m = /^(\d+)$/.exec(s);
+    return m ? { n: Number(m[1]), d: 1 } : null;
+}
+export function fracValueMatches(user, ans) {
+    const u = parseFracValue(user), a = parseFracValue(ans);
+    if (!u || !a) return null;
+    return u.n * a.d === a.n * u.d;
+}
+
 export function fractionToPercent(n, d) { return Math.round((n / d) * 100) + "%"; }
 
 // ========================================

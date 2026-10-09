@@ -347,3 +347,7 @@
 }
 :is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt[data-ws-circled] { border-color: var(--ws-ink); }
 :is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt[data-ws-circled][data-ws-ink="trace"] { border-color: #949494; }
+
+/* Critic fractions-key N5 (RM-08): the key's ring stays >= 2 mm clear of the option's numerals,
+   a stacked fraction included (the ring is the option's own border, so it is padded, not drawn). */
+:is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt { padding: 2mm 3.5mm; }

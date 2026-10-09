@@ -476,7 +476,14 @@ export function slotOnly(key, id) {
 
 /** The Steps list with outlined circle markers (BD-4). */
 export const stepsHtml = (list, { cls = '' } = {}) =>
-    `<ol class="ws-steps ${cls}">${list.map((s, i) => `<li><em>${i + 1}</em><span>${esc(s)}</span></li>`).join('')}</ol>`;
+    `<ol class="ws-steps ${cls}">${list.map((s, i) => `<li><em>${i + 1}</em><span>${stackedFracs(esc(s))}</span></li>`).join('')}</ol>`;
+
+/** TY-7 (critic fractions-key N6): a fraction in a line of text is written stacked over its bar,
+ *  never with a slash ("7/5 = 1 2/5" -> stacked 7 over 5 = 1 and stacked 2 over 5). */
+export function stackedFracs(html) {
+    return String(html).replace(/(^|[^\w/.:])(\d{1,3})\/(\d{1,3})(?![\w/])/g, (m, pre, n, d) => `${pre}<span class="ws-ifrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;font-size:0.8em;margin:0 0.08em;">`
+        + `<span>${n}</span><span style="border-top:0.75pt solid currentColor;align-self:stretch;text-align:center;">${d}</span></span>`);
+}
 
 /** Slot-key helper: {slots: {id: {value}}} with an overall display. */
 export function slotKey(slots, display = '') {

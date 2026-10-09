@@ -31,6 +31,12 @@ function getSkillLabel(skillId) {
     return skillId;
 }
 
+/** A results row's question line: the generator's "Click ALL ..." reads "Circle all ..." (the pupil
+ *  rang the options; critic fractions-key N6). */
+function resultLine(qd) {
+    return String((qd && qd.text) || '').replace(/<[^>]*>/g, '').replace(/\b(?:Click|Select|Tap) ALL\b/g, 'Circle all');
+}
+
 function escHtml(str) {
     const d = document.createElement('div');
     d.textContent = str || '';
@@ -846,7 +852,7 @@ function showQuizResults() {
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
-                    <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>
+                    <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml(resultLine(q.questionData)).substring(0, 50)}</span>
                     ${detail}
                 </div>`;
             });
@@ -865,7 +871,7 @@ function showQuizResults() {
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
-                    <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>
+                    <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml(resultLine(q.questionData)).substring(0, 50)}</span>
                     ${detail}
                 </div>`;
             });

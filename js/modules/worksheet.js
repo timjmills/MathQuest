@@ -4,7 +4,7 @@ import { skipAfterFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
-import { shuffle, normalizeText, stackSlashFractions } from './utils.js';
+import { shuffle, normalizeText, stackSlashFractions, fracValueMatches } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
@@ -2921,7 +2921,11 @@ export function checkAllWorksheet() {
             // Strip commas from user input before comparing
             const cleanedValue = value.replace(/,/g, "");
             const slotVerdictAll = q._mqSlots ? slotAnswerMatches(value, q) : null;
-            if (typeof slotVerdictAll === 'boolean') {
+            // a fraction sentence is judged by value on every host (owner ruling; critic N1)
+            const fracVerdict = (q.cell && q.cell.template === 'frac-model') ? fracValueMatches(value, q.ans) : null;
+            if (typeof fracVerdict === 'boolean') {
+                isCorrect = fracVerdict;
+            } else if (typeof slotVerdictAll === 'boolean') {
                 isCorrect = slotVerdictAll;
             } else if (q.answerType === "number" || typeof q.ans === "number") {
                 isCorrect = Number(cleanedValue) === Number(q.ans);

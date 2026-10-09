@@ -323,35 +323,28 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 1/2
+                // Critic fractions-key N3: a list that discriminates - 1 to 3 of the 5 differences
+                // are less than 1/2 (never all, rarely 4), and one wrong option is the near miss
+                // whose difference IS 1/2.
                 const den = pick([4, 6, 8, 10, 12]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const a = rng(2, den);
-                    const b = rng(1, a - 1);
-                    const key = `${a}-${b}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, b, diff: (a - b) / den });
-                }
-                let opts = items.map((it, i) => ({
+                const half = den / 2;
+                const all = [];
+                for (let a = 2; a <= den; a++) for (let b = 1; b < a; b++) all.push({ a, b, diff: (a - b) / den });
+                const lo = shuffle(all.filter(it => it.a - it.b < half));
+                const atHalf = shuffle(all.filter(it => it.a - it.b === half));
+                const hi = shuffle(all.filter(it => it.a - it.b > half));
+                const nCorrect = pick([1, 2, 2, 3, 3]);
+                const chosen = lo.slice(0, nCorrect);
+                const wrong = atHalf.slice(0, 1).concat(hi);
+                // wrong options: the near miss, then the rest over 1/2 (another 1/2 when the pool runs short)
+                for (const it of wrong.concat(atHalf.slice(1))) { if (chosen.length >= 5) break; chosen.push(it); }
+                // (quarters have few wrong differences: the list is topped up with one more correct)
+                for (const it of lo.slice(nCorrect)) { if (chosen.length >= 5) break; chosen.push(it); }
+                let opts = chosen.map((it, i) => ({
                     id: 'opt' + i,
                     label: `${it.a}/${den} \u2212 ${it.b}/${den}`,
                     correct: it.diff < 0.5 - 1e-9
                 }));
-                // Force at least one correct option
-                if (!opts.some(o => o.correct)) {
-                    const aF = rng(1, Math.floor(den / 2));
-                    const bF = aF > 1 ? rng(1, aF - 1) : 0;
-                    if (aF > bF) {
-                        opts[0] = { id: 'opt0', label: `${aF}/${den} \u2212 ${bF || 0}/${den}`, correct: (aF - (bF || 0)) / den < 0.5 - 1e-9 };
-                    }
-                    if (!opts[0].correct) {
-                        opts[0] = { id: 'opt0', label: `2/${den} \u2212 1/${den}`, correct: true };
-                    }
-                }
                 opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
                 const ans = opts.filter(o => o.correct).map(o => o.id);
                 q.text = 'Click ALL differences that are less than 1/2.';
@@ -3930,11 +3923,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const fosMS_mult = rng(minMult, maxMult);
                     const fosMS_total = fosDen * fosMS_mult;
                     const correctCount = Math.min(fosNum, fosDen) * fosMS_mult;
-                    const emojis = ['🍎','🐱','⭐','🍌','🐶','🚗','🍕','🐠','🌸','🎈'];
-                    const emoji = pick(emojis);
+                    // Black-and-white shapes drawn as text, never colour emoji (critic fractions-key:
+                    // H4 on paper); the noun names them, so the line reads as a sentence.
+                    const shapeSet = pick([['\u25CF', 'circles'], ['\u25A0', 'squares'], ['\u25B2', 'triangles'], ['\u2605', 'stars'], ['\u25C6', 'diamonds']]);
+                    const emoji = shapeSet[1];
                     const opts = [];
                     for (let i = 0; i < fosMS_total; i++) {
-                        opts.push({ id: 'opt' + i, label: emoji, correct: i < correctCount });
+                        opts.push({ id: 'opt' + i, label: shapeSet[0], correct: i < correctCount });
                     }
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ${fosNum}/${fosDen} of the ${emoji}.`;
@@ -3942,7 +3937,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.options = opts;
                     q.ans = ans;
                     q.minCorrect = correctCount;
-                    q.hint = `${fosNum}/${fosDen} of ${fosMS_total} = ${correctCount}. Click ${correctCount} ${emoji}.`;
+                    q.hint = `${fosNum}/${fosDen} of ${fosMS_total} = ${correctCount}. Tap ${correctCount} ${emoji}.`;
                     q.printFormat = 'multi-select';
                     q.skillLabel = 'Fraction of Set';
                     return;

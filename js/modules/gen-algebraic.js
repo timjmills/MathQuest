@@ -1452,27 +1452,16 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     // reading "0,2" cannot be marked against, so the paper key names the numbers.
                     q.printText = ODD_EVEN_SORT_PRINT;
                     q.printAnswer = oddEvenSortKey(allNums);
-                    q.answerType = "odd-even-select";
-                    q.oeNumbers = allNums;
-                    q.oeTarget = targetType;
-                    q.oeCorrectIndices = correctIndices;
+                    // Critic fractions-key D1: the same choose-all list as select_even_odd, on screen
+                    // (rings, Check) and on paper (circle the evens, cross out the odds, a
+                    // facsimile key) - the legacy tile panel printed an extra "Answer: ____".
+                    q.options = allNums.map((n, i) => ({ id: 'opt' + i, label: String(n), correct: correctIndices.includes(i) }));
+                    q.ans = q.options.filter(o => o.correct).map(o => o.id);
+                    q.answerType = 'multi-select-check';
+                    q.printFormat = 'multi-select';
                     q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers ${targetType === "even" ? "can be divided by 2 with no remainder (end in 0, 2, 4, 6, 8)" : "have a remainder of 1 when divided by 2 (end in 1, 3, 5, 7, 9)"}.`;
-
-                    const boxes = allNums.map((n, i) =>
-                        `<div class="oe-num-box" id="oeBox${i}" onclick="selectOddEvenNumber(${i})" style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);cursor:pointer;transition:all 0.2s;user-select:none;">${n}</div>`
-                    ).join('');
-
-                    // No heading and no caption inside the cell. The old ones restated the
-                    // instruction inside the cell (BD-10) and, because the print path keeps the
-                    // visual, the caption printed "Click each even number, then check your
-                    // answer." at a pupil holding a pencil. The instruction above the boxes says
-                    // what to do; the button is screen furniture and print strips it.
-                    q.visual = `<div style="text-align:center;">
-                        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0;">
-                            ${boxes}
-                        </div>
-                        <button class="btn btn-primary" id="checkOddEvenBtn" onclick="checkOddEvenSelection()" style="margin-top:12px;">Check Answer</button>
-                    </div>`;
+                    q.visual = '';
+                    q.text = `Click ALL the ${targetType.toUpperCase()} numbers.`;
 
                 } else {
                     // Type 3: Which of these 3 numbers is odd/even?
