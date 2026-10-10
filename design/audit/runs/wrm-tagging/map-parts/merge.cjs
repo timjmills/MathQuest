@@ -24,6 +24,18 @@ for (const f of fs.readdirSync(dir).filter(f => /^[A-Z]\.json$/.test(f)).sort())
     }
 }
 for (const p of Object.values(proposals)) if (!Array.isArray(p.map)) p.map = p.map ? [p.map] : [];
+// A reused id carries its source entry verbatim; the audit adds only the map facet.
+const imp = f => import(require('url').pathToFileURL(path.join(ROOT, f)).href);
+const W = await imp('js/modules/wrm.js'), B = await imp('js/modules/build-list.js');
+const SRC = { WRM_PROPOSALS: W.WRM_PROPOSALS, STANDARD_PROPOSALS: B.STANDARD_PROPOSALS, WRM_EXTENSIONS: B.WRM_EXTENSIONS, VISUAL_BUILDS: B.VISUAL_BUILDS };
+for (const [id, p] of Object.entries(proposals)) {
+    if (!p.reused) { for (const [n, o] of Object.entries(SRC)) if (o[id]) errs.push(`proposal ${id}: marked new but exists in ${n}`); continue; }
+    const hit = Object.entries(SRC).find(([, o]) => o[id]);
+    if (!hit) { errs.push(`proposal ${id}: reused but not in any source list`); continue; }
+    // source wins; a field the source entry lacks (e.g. ccss on a WRM step proposal) keeps the audit's value
+    const keep = {}; for (const k of ['ccss', 'why', 'teaches', 'representation', 'family']) if (hit[1][id][k] === undefined && p[k] !== undefined) keep[k] = p[k];
+    proposals[id] = { ...keep, ...hit[1][id], source: hit[0], map: p.map, reused: true };
+}
 const live = k => LIVE.has(k);
 rows.forEach((r, i) => {
     const at = `row ${i} "${r.task}"`;
@@ -36,7 +48,7 @@ rows.forEach((r, i) => {
 const used = new Set(rows.map(r => r.proposal).filter(Boolean));
 for (const [id, p] of Object.entries(proposals)) {
     if (!used.has(id)) errs.push(`proposal ${id} not used by any row`);
-    for (const k of ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'reused']) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);
+    for (const k of (p.reused ? ['name'] : ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'map'])) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);
     if (p.kind === 'option' && !p.option) errs.push(`proposal ${id}: option without option`);
 }
 const out = { generatedBy: 'map-audit', rows, proposals };

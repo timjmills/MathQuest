@@ -1,0 +1,1720 @@
+{
+ "rows": [
+  {
+   "task": "Symmetry: compare shapes' numbers of lines",
+   "strand": "Geometry",
+   "ritBand": "201-210",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "angles_lines:symmetry",
+    "angles_lines:place_symmetry_lines"
+   ],
+   "proposal": "map_symmetry_compare",
+   "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare"
+  },
+  {
+   "task": "Symmetry: is this proposed line correct?",
+   "strand": "Geometry",
+   "ritBand": "191-200",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "angles_lines:symmetry"
+   ],
+   "proposal": "map_symmetry_check_line",
+   "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial"
+  },
+  {
+   "task": "Area: pick the picture with area N",
+   "strand": "Measurement",
+   "ritBand": "181-190",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "area_perimeter:area_unit_squares"
+   ],
+   "proposal": "map_area_pick",
+   "note": "area_unit_squares: \"Count the unit squares. What is the area?\" number entry on one shape only"
+  },
+  {
+   "task": "Nets of 3-D solids",
+   "strand": "Geometry",
+   "ritBand": "201-215",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "shapes_classify:net_identify"
+   ],
+   "proposal": "shapes_3d_props",
+   "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade"
+  },
+  {
+   "task": "Missing angle in a triangle",
+   "strand": "Geometry",
+   "ritBand": "211-230",
+   "source": "6.2",
+   "status": "missing",
+   "skills": [],
+   "proposal": "angle_rules",
+   "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360)"
+  },
+  {
+   "task": "Volume by unit cubes",
+   "strand": "Measurement",
+   "ritBand": "201-215",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "area_perimeter:volume",
+    "area_perimeter:volume_composite"
+   ],
+   "proposal": "volume_cubes",
+   "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form)"
+  },
+  {
+   "task": "Perimeter",
+   "strand": "Measurement",
+   "ritBand": "181-200",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "area_perimeter:perimeter",
+    "area_perimeter:perimeter_grid",
+    "area_perimeter:perimeter_intro"
+   ],
+   "proposal": "missing_lengths",
+   "note": "number entry, rectangles + rare missing-side; perimeter \"Find the perimeter of a rectangle: length = 5, width = 2\" text-only — regrade; missing-side/rectilinear via missing_lengths"
+  },
+  {
+   "task": "Reading clocks",
+   "strand": "Measurement",
+   "ritBand": "161-195",
+   "source": "6.2",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:time_hour",
+    "measurement:time_half_hour",
+    "measurement:time_quarter",
+    "measurement:time_5min",
+    "measurement:time_1min",
+    "measurement:time_match_clock"
+   ],
+   "note": "kit clock cell, write the time / draw hands / match clock (response + stimulus options); MAP select-the-clock and number entry both covered"
+  },
+  {
+   "task": "Minutes → hours (90 min = 1.5 h = 1 ½ h)",
+   "strand": "Measurement",
+   "ritBand": "201-210",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "measurement:unit_conversion_word",
+    "measurement:unit_conversions"
+   ],
+   "proposal": "map_minutes_to_hours",
+   "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours"
+  },
+  {
+   "task": "Line / dot plots",
+   "strand": "Data & graphing",
+   "ritBand": "181-215",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "graphs:line_plot",
+    "graphs:line_plot_g2",
+    "graphs:line_plot_fractions"
+   ],
+   "proposal": "make_line_plot",
+   "note": "read-only (how many at 1/2, most common); line_plot_g2 is legacy \"wide\" print; MAP also has build-a-line-plot"
+  },
+  {
+   "task": "Ordering times / a time between two times",
+   "strand": "Measurement",
+   "ritBand": "181-200",
+   "source": "6.2",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:order_clocks_analog_asc",
+    "measurement:order_clocks_digital_asc",
+    "measurement:elapsed_visual_medium",
+    "measurement:elapsed_find_duration"
+   ],
+   "note": "order 3 clocks by writing 1,2,3; time-line duration \"__ h __ min\"; kit cells"
+  },
+  {
+   "task": "Meaning of a coordinate point in context",
+   "strand": "Geometry",
+   "ritBand": "211-230",
+   "source": "6.2",
+   "status": "missing",
+   "skills": [
+    "coordinates:coordinate_q1"
+   ],
+   "proposal": "coord_context",
+   "note": "coordinate_q1 deals read/plot abstract points A, B only; no context"
+  },
+  {
+   "task": "Match: graph ↔ sentence (data)",
+   "strand": "Data & graphing",
+   "ritBand": "181-200",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "graphs:bar_graph",
+    "graphs:pictograph"
+   ],
+   "proposal": "map_graph_sentence",
+   "note": "graph skills ask one numeric/text question; no statement-matching form"
+  },
+  {
+   "task": "Match: shape ↔ property (geometry)",
+   "strand": "Geometry",
+   "ritBand": "171-200",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:compose_from_attributes",
+    "shapes_early:shape_attributes",
+    "shapes_classify:classify_quads"
+   ],
+   "note": "\"Click ALL the shapes that have 4 right angles\" multi-select, classify_quads categories multi-select"
+  },
+  {
+   "task": "Match: clock ↔ time words (measurement)",
+   "strand": "Measurement",
+   "ritBand": "161-190",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:time_5min",
+    "measurement:time_match_clock"
+   ],
+   "note": "clock skills have stimulus \"words\" / \"words-past\" / \"words-oh\" and draw-the-hands response (skill-options.js _tmStimulus)"
+  },
+  {
+   "task": "Match: number line ↔ number (rulers, scales)",
+   "strand": "Measurement",
+   "ritBand": "171-195",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:reading_ruler",
+    "measurement:reading_ruler_hard",
+    "measurement:temperature"
+   ],
+   "note": "ruler cell arrow → length (incl. quarter inches); thermometer cell → °C/°F; number entry"
+  },
+  {
+   "task": "Match: picture ↔ equation (area / perimeter)",
+   "strand": "Measurement",
+   "ritBand": "191-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "area_perimeter:area_distributive_visual"
+   ],
+   "proposal": "map_area_equation",
+   "note": "distributive model computes a total; nothing asks which equation models the picture"
+  },
+  {
+   "task": "Match: model ↔ number (unit cubes)",
+   "strand": "Measurement",
+   "ritBand": "201-215",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "area_perimeter:volume"
+   ],
+   "proposal": "volume_cubes",
+   "note": "no cube-drawing volume item"
+  },
+  {
+   "task": "Compare / order objects by length (K-1)",
+   "strand": "Measurement",
+   "ritBand": "141-165",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:order_objects_length",
+    "comparing:compare_objects"
+   ],
+   "note": "drag to order shortest → longest (dnd-generic)"
+  },
+  {
+   "task": "What attribute can be measured (length, weight, capacity)",
+   "strand": "Measurement",
+   "ritBand": "141-160",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "measurable_attributes",
+   "note": "none of comparing:* names the attribute"
+  },
+  {
+   "task": "Measure with non-standard units",
+   "strand": "Measurement",
+   "ritBand": "151-170",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:measure_nonstandard"
+   ],
+   "note": "\"How many paper clips long is the pencil?\" number entry"
+  },
+  {
+   "task": "Compare two lengths: how much longer",
+   "strand": "Measurement",
+   "ritBand": "161-185",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "shapes_early:order_objects_length"
+   ],
+   "proposal": "compare_lengths",
+   "note": "no difference item"
+  },
+  {
+   "task": "Measure an object with a ruler (incl. not at 0)",
+   "strand": "Measurement",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:reading_ruler"
+   ],
+   "proposal": "map_ruler_measure_object",
+   "note": "reading_ruler: \"What length does the arrow point to?\" only"
+  },
+  {
+   "task": "Two objects on a ruler: difference",
+   "strand": "Measurement",
+   "ritBand": "181-195",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "ruler_difference",
+   "note": "none"
+  },
+  {
+   "task": "Estimate length / choose the unit",
+   "strand": "Measurement",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:estimate_length"
+   ],
+   "note": "\"About how long is a shoe?\" MC + click all reasonable estimates (MAP form is select)"
+  },
+  {
+   "task": "Heavier / lighter (K)",
+   "strand": "Measurement",
+   "ritBand": "141-160",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "measurement:heavier_lighter_visual"
+   ],
+   "proposal": "mass_scales",
+   "note": "MC with emoji answers (ans=\"📕\"), not B&W; regrade"
+  },
+  {
+   "task": "Read a scale or measuring jug (g, kg, mL, L)",
+   "strand": "Measurement",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:mass_volume_liquid"
+   ],
+   "proposal": "mass_scales",
+   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell"
+  },
+  {
+   "task": "Mass / liquid volume word problems",
+   "strand": "Measurement",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "mass_ops",
+   "note": "none"
+  },
+  {
+   "task": "Length word problems (add/sub lengths)",
+   "strand": "Measurement",
+   "ritBand": "181-195",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "length_ops",
+   "note": "none"
+  },
+  {
+   "task": "Convert units large → small (ft→in, kg→g, L→mL)",
+   "strand": "Measurement",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:unit_conversions",
+    "measurement:length_customary",
+    "measurement:length_metric",
+    "measurement:capacity",
+    "measurement:unit_conversion_word"
+   ],
+   "note": "number entry and column arithmetic; length_customary reaches 11 mi → ft (58080), heavy but sound"
+  },
+  {
+   "task": "Conversion table: complete and use",
+   "strand": "Measurement",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "conversion_table",
+   "note": "none"
+  },
+  {
+   "task": "Coins: identify value / count coins",
+   "strand": "Measurement",
+   "ritBand": "161-185",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:coin_value",
+    "measurement:money_count"
+   ],
+   "note": "kit coin cell, number entry"
+  },
+  {
+   "task": "Coins: make an amount (drag coins)",
+   "strand": "Measurement",
+   "ritBand": "171-185",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:equiv_coin_sets",
+    "measurement:make_change_least_coins"
+   ],
+   "proposal": "map_money_build",
+   "note": "check a given set or write fewest coins; no free build"
+  },
+  {
+   "task": "Money: change and comparisons",
+   "strand": "Measurement",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:money_change",
+    "measurement:money_compare",
+    "measurement:enough_money"
+   ],
+   "note": "money columns subtraction, compare"
+  },
+  {
+   "task": "Money two-step word problems",
+   "strand": "Measurement",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "money_2step",
+   "note": "none"
+  },
+  {
+   "task": "Time to the hour / half hour (K-1)",
+   "strand": "Measurement",
+   "ritBand": "151-170",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:time_hour",
+    "measurement:time_half_hour"
+   ],
+   "note": "kit clock, write or draw"
+  },
+  {
+   "task": "a.m. / p.m. and time units (hours, minutes, seconds)",
+   "strand": "Measurement",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:time_sense"
+   ],
+   "note": "a.m./p.m. choice; units choice still in WRM time_units"
+  },
+  {
+   "task": "Elapsed time: end, start, duration",
+   "strand": "Measurement",
+   "ritBand": "181-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:elapsed_mixed",
+    "measurement:elapsed_find_start",
+    "measurement:elapsed_find_duration"
+   ],
+   "note": "time-line cell, \"__ h __ min\" production"
+  },
+  {
+   "task": "Elapsed time word problems (story)",
+   "strand": "Measurement",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:elapsed_mixed"
+   ],
+   "proposal": "elapsed_stories",
+   "note": "time line only, no story context"
+  },
+  {
+   "task": "Temperature: read a thermometer",
+   "strand": "Measurement",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:temperature"
+   ],
+   "note": "kit thermometer cell, number entry"
+  },
+  {
+   "task": "Area by counting / tiling, then multiply",
+   "strand": "Measurement",
+   "ritBand": "181-195",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "area_perimeter:area_unit_squares",
+    "area_perimeter:area"
+   ],
+   "note": "count unit squares; area of rectangle"
+  },
+  {
+   "task": "Area and perimeter together; same area different perimeter",
+   "strand": "Measurement",
+   "ritBand": "195-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "area_perimeter:area_perimeter"
+   ],
+   "proposal": "same_area",
+   "note": "dual P= A= of one shape only"
+  },
+  {
+   "task": "Rectilinear area by decomposing",
+   "strand": "Measurement",
+   "ritBand": "195-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "area_perimeter:area_polygon_decompose",
+    "area_perimeter:composite_shapes"
+   ],
+   "note": "L/T/U total area and perimeter, number entry"
+  },
+  {
+   "task": "Missing side given perimeter / area",
+   "strand": "Measurement",
+   "ritBand": "195-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "area_perimeter:perimeter"
+   ],
+   "proposal": "missing_lengths",
+   "note": "about 1 in 3 perimeter items, rectangles only"
+  },
+  {
+   "task": "Volume of a prism (l × w × h), incl. missing edge",
+   "strand": "Measurement",
+   "ritBand": "205-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "area_perimeter:volume"
+   ],
+   "note": "formula + missing dimension items"
+  },
+  {
+   "task": "Volume with fractional edges",
+   "strand": "Measurement",
+   "ritBand": "215-230",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "volume_fractional",
+   "note": "integer edges only"
+  },
+  {
+   "task": "Area of a triangle / parallelogram (Gr 6 edge of MAP 2-5)",
+   "strand": "Measurement",
+   "ritBand": "215-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "area_perimeter:area_triangle"
+   ],
+   "note": "b×h÷2 number entry"
+  },
+  {
+   "task": "Name 2-D shapes",
+   "strand": "Geometry",
+   "ritBand": "141-165",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:name_2d_shapes",
+    "shapes_early:shape_name_match_2d"
+   ],
+   "note": "MC name + click all squares"
+  },
+  {
+   "task": "Name 3-D shapes",
+   "strand": "Geometry",
+   "ritBand": "151-175",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:name_3d_shapes",
+    "shapes_early:shape_name_match_3d"
+   ],
+   "note": "MC + click all"
+  },
+  {
+   "task": "Position words (above, below, beside)",
+   "strand": "Geometry",
+   "ritBand": "141-155",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:shape_positions"
+   ],
+   "note": "visual positions"
+  },
+  {
+   "task": "Count sides, vertices, faces, edges",
+   "strand": "Geometry",
+   "ritBand": "161-185",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:count_sides_vertices_2d",
+    "shapes_early:count_edges_faces_vertices"
+   ],
+   "note": "number entry on drawn shape"
+  },
+  {
+   "task": "Defining vs non-defining attributes",
+   "strand": "Geometry",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "defining_attributes",
+   "note": "none"
+  },
+  {
+   "task": "Compose shapes (pattern blocks, make a rectangle)",
+   "strand": "Geometry",
+   "ritBand": "151-175",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_early:compose_shapes",
+    "shapes_early:compose_hexagon",
+    "shapes_early:compose_rect_from_squares"
+   ],
+   "note": "visual compose"
+  },
+  {
+   "task": "Partition shapes into equal shares",
+   "strand": "Geometry",
+   "ritBand": "161-185",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "shapes_early:partition_shapes"
+   ],
+   "proposal": "map_shape_partition_pick",
+   "note": "fraction shaded / count parts; no equal-vs-unequal pick"
+  },
+  {
+   "task": "Regular and irregular polygons; name polygons by sides",
+   "strand": "Geometry",
+   "ritBand": "181-195",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "shapes_early:shape_attributes"
+   ],
+   "proposal": "polygons",
+   "note": "sides/vertices counts only"
+  },
+  {
+   "task": "Points, lines, segments, rays",
+   "strand": "Geometry",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "points_lines_rays",
+   "note": "identify_lines covers parallel/perpendicular/intersecting only"
+  },
+  {
+   "task": "Parallel and perpendicular lines",
+   "strand": "Geometry",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "angles_lines:identify_lines"
+   ],
+   "note": "MC type + click all parallel pairs"
+  },
+  {
+   "task": "Classify angles (acute, right, obtuse)",
+   "strand": "Geometry",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "angles_lines:identify_angles"
+   ],
+   "note": "MC + click all acute"
+  },
+  {
+   "task": "Measure an angle with a protractor",
+   "strand": "Geometry",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "angles_lines:measure_angles"
+   ],
+   "proposal": "protractor_read",
+   "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor"
+  },
+  {
+   "task": "Draw an angle of a given size",
+   "strand": "Geometry",
+   "ritBand": "205-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "draw_angles",
+   "note": "none"
+  },
+  {
+   "task": "Additive angles (part + part = whole)",
+   "strand": "Geometry",
+   "ritBand": "205-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "angles_lines:additive_angles"
+   ],
+   "note": "missing part number entry; note sampled \"One part is 292°\" of 360 — odd but valid"
+  },
+  {
+   "task": "Classify triangles (sides and angles)",
+   "strand": "Geometry",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_classify:classify_triangles"
+   ],
+   "note": "MC + click all equilateral"
+  },
+  {
+   "task": "Classify quadrilaterals (hierarchy)",
+   "strand": "Geometry",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_classify:classify_quads",
+    "shapes_classify:hotspot_quads"
+   ],
+   "note": "select all categories; hot-spot quads"
+  },
+  {
+   "task": "Lines of symmetry: count and draw",
+   "strand": "Geometry",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "angles_lines:symmetry",
+    "angles_lines:place_symmetry_lines"
+   ],
+   "note": "count + draw lines (place-symmetry-lines production)"
+  },
+  {
+   "task": "3-D shape properties and nets",
+   "strand": "Geometry",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "shapes_classify:net_identify",
+    "shapes_early:count_edges_faces_vertices"
+   ],
+   "proposal": "shapes_3d_props",
+   "note": "no \"which shape has 5 faces\" property items"
+  },
+  {
+   "task": "Coordinates: name and plot a point (Q1)",
+   "strand": "Geometry",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "coordinates:coordinate_q1"
+   ],
+   "note": "coord-input and coord-plot (click to plot) answer types"
+  },
+  {
+   "task": "Distance between points / polygon on a grid",
+   "strand": "Geometry",
+   "ritBand": "211-225",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "coordinates:coord_distance_q1",
+    "coordinates:coord_polygon"
+   ],
+   "note": "number entry"
+  },
+  {
+   "task": "Four quadrants problems",
+   "strand": "Geometry",
+   "ritBand": "215-230",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "coordinates:coordinate_all",
+    "coordinates:coordinate_graph"
+   ],
+   "proposal": "four_quadrants",
+   "note": "naming points only"
+  },
+  {
+   "task": "Horizontal / vertical lines",
+   "strand": "Geometry",
+   "ritBand": "171-185",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "hv_lines",
+   "note": "none"
+  },
+  {
+   "task": "Reflections / translations on a grid",
+   "strand": "Geometry",
+   "ritBand": "205-225",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "coordinates:geo_reflect",
+    "coordinates:geo_translate"
+   ],
+   "note": "MC pick the figure; MAP 2-5 rarely; regrade only",
+   "proposal": "reflect_grid"
+  },
+  {
+   "task": "Sort and count by category (K)",
+   "strand": "Data & graphing",
+   "ritBand": "141-160",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "comparing:classify_count"
+   ],
+   "note": "visual sort and count"
+  },
+  {
+   "task": "Read a picture graph (key = 1)",
+   "strand": "Data & graphing",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:pictograph_intro",
+    "graphs:pictograph"
+   ],
+   "note": "kit pictograph cell; how many / how many more"
+  },
+  {
+   "task": "Picture graph with a key of 2, 5, 10: build",
+   "strand": "Data & graphing",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "graphs:build_pictograph"
+   ],
+   "proposal": "pictogram_scale",
+   "note": "build uses each picture = 1"
+  },
+  {
+   "task": "Read a bar graph: how many, how many more/fewer",
+   "strand": "Data & graphing",
+   "ritBand": "171-195",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:bar_graph_intro",
+    "graphs:bar_graph"
+   ],
+   "note": "kit bar-graph cell, number entry"
+  },
+  {
+   "task": "Build / complete a bar graph",
+   "strand": "Data & graphing",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "graphs:build_bar_graph"
+   ],
+   "note": "graph-builder answer type (drag bar heights), scale 1"
+  },
+  {
+   "task": "Build a scaled bar graph",
+   "strand": "Data & graphing",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "graphs:build_bar_graph"
+   ],
+   "proposal": "bar_graph_scale",
+   "note": "scale 1 only"
+  },
+  {
+   "task": "Read a tally chart",
+   "strand": "Data & graphing",
+   "ritBand": "161-185",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "graphs:tally_chart"
+   ],
+   "note": "kit tally cell; how many more, most"
+  },
+  {
+   "task": "Complete a tally chart from data",
+   "strand": "Data & graphing",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "graphs:tally_chart"
+   ],
+   "proposal": "map_tally_build",
+   "note": "read only"
+  },
+  {
+   "task": "Read a table of data",
+   "strand": "Data & graphing",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "table_data",
+   "note": "none (tables only inside other items)"
+  },
+  {
+   "task": "Make a line plot from measurements",
+   "strand": "Data & graphing",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "graphs:line_plot_fractions"
+   ],
+   "proposal": "make_line_plot",
+   "note": "read only"
+  },
+  {
+   "task": "Line plot with fractions: operations (total, difference)",
+   "strand": "Data & graphing",
+   "ritBand": "205-220",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "graphs:line_plot",
+    "graphs:line_plot_fractions"
+   ],
+   "proposal": "make_line_plot",
+   "note": "counts at a value and total; few add/subtract-fraction items"
+  },
+  {
+   "task": "Line graphs (Gr 5 edge)",
+   "strand": "Data & graphing",
+   "ritBand": "211-225",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "line_graph",
+   "note": "none"
+  },
+  {
+   "task": "Mean / median / mode / range (upper band)",
+   "strand": "Data & graphing",
+   "ritBand": "215-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "data_analysis:mean",
+    "data_analysis:median",
+    "data_analysis:mode",
+    "data_analysis:range"
+   ],
+   "note": "number entry + click-all"
+  }
+ ],
+ "proposals": {
+  "map_symmetry_compare": {
+   "kind": "option",
+   "skill": "angles_lines:symmetry",
+   "option": "form \"compare\": two shapes side by side; which has more lines of symmetry (or write both counts and >, <, =)",
+   "name": "Compare Lines of Symmetry (option)",
+   "teaches": "counting lines of symmetry in two shapes and comparing the counts",
+   "representation": "one boxed cell, two B&W shapes (Andika labels A and B), answer slot for each count plus a sign box; screen: two number boxes and a click-to-pick sign, never MC when counts can be written",
+   "family": "geometry",
+   "ccss": [
+    "4.G.A.3"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "201-210",
+    "taskType": "compare two figures; number entry / select"
+   },
+   "why": "MAP asks which shape has more lines of symmetry; symmetry today only asks the count of one shape or click-all-symmetric",
+   "reused": false
+  },
+  "map_symmetry_check_line": {
+   "kind": "option",
+   "skill": "angles_lines:symmetry",
+   "option": "form \"is this a line of symmetry?\": one dashed line drawn on a shape; tick Yes or No (fold check), half the items wrong lines (diagonal of a rectangle, off-centre)",
+   "name": "Is This a Line of Symmetry? (option)",
+   "teaches": "judging a proposed fold line: the two halves must match exactly",
+   "representation": "boxed cell, B&W shape with one dashed line, Yes / No check boxes; screen: click Yes or No; misconception items: rectangle diagonal, parallelogram",
+   "family": "geometry",
+   "ccss": [
+    "4.G.A.3"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "191-200",
+    "taskType": "true/false on a drawn line"
+   },
+   "why": "MAP shows one proposed line and asks if it is a line of symmetry; we only have click-all candidate lines (39/200 symmetry items), never a single yes/no judgement with the rectangle-diagonal trap",
+   "reused": false
+  },
+  "map_area_pick": {
+   "kind": "option",
+   "skill": "area_perimeter:area_unit_squares",
+   "option": "form \"pick the area\": 3–4 grid shapes, click the one with area N square units (distractor: same perimeter, different area)",
+   "name": "Which Shape Has Area N? (option)",
+   "teaches": "finding area by counting unit squares and matching it to a given number",
+   "representation": "boxed cell with 3 B&W grid shapes labelled A–C, check box under each; screen: click the shape (hot-spot), not a list of letters",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.C.6"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "181-190",
+    "taskType": "hot spot: select the figure"
+   },
+   "why": "area_unit_squares only asks to count one shape; MAP asks which of several pictures has the stated area",
+   "reused": false
+  },
+  "map_minutes_to_hours": {
+   "kind": "option",
+   "skill": "measurement:unit_conversion_word",
+   "option": "direction \"small → large\" for time: minutes → hours written three ways (90 min = 1 h 30 min = 1.5 h = 1 ½ h); multiples of 15 and 30",
+   "name": "Minutes to Hours (option)",
+   "teaches": "converting minutes to hours as h-and-min, a decimal and a mixed number",
+   "representation": "boxed cell with a 60-minute bar model under the question, answer slots \"__ h __ min\" and \"__ h\"; screen: number entry (decimal or mixed accepted)",
+   "family": "measurement",
+   "ccss": [
+    "4.MD.A.1",
+    "4.MD.A.2",
+    "5.MD.A.1"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "201-210",
+    "taskType": "number entry; select equivalent"
+   },
+   "why": "today unit_conversion_word only goes large → small (hr → min, min → sec, 200-item dist); MAP asks 90 min = 1.5 h. Extends WRM time_convert, which does not name the decimal/mixed form",
+   "reused": false
+  },
+  "map_money_build": {
+   "kind": "option",
+   "skill": "measurement:money_count",
+   "option": "response \"build the amount\": drag coins (or draw them on paper) to make a given total; any correct set accepted",
+   "name": "Make the Amount With Coins (option)",
+   "teaches": "composing a money amount from coins",
+   "representation": "boxed cell with the coin bank and an empty purse box; paper: draw/tally coins in the box; screen: drag coins, checked by total",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "171-180",
+    "taskType": "drag and drop coins"
+   },
+   "why": "MAP drags coins to make an amount; we only count shown coins, check a set, or write fewest coins",
+   "reused": false
+  },
+  "map_graph_sentence": {
+   "kind": "option",
+   "skill": "graphs:bar_graph",
+   "option": "form \"which sentence is true?\": a bar or picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
+   "name": "Which Sentence Matches the Graph? (option)",
+   "teaches": "reading a graph and checking comparison statements against it",
+   "representation": "boxed cell, B&W graph on top, statements with check boxes below; screen: select all that apply",
+   "family": "data",
+   "ccss": [
+    "2.MD.D.10",
+    "3.MD.B.3"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "181-200",
+    "taskType": "multi-select statements"
+   },
+   "why": "MAP graph items often ask which statement the graph supports; our graph skills only ask one numeric question",
+   "reused": false
+  },
+  "map_area_equation": {
+   "kind": "option",
+   "skill": "area_perimeter:area_unit_squares",
+   "option": "form \"match the equation\": a grid rectangle and equations (3 × 4, 3 + 4, 3 + 4 + 3 + 4, 4 × 4); tick the one that gives the area (or the perimeter)",
+   "name": "Picture to Area Equation (option)",
+   "teaches": "connecting area to multiplication and perimeter to adding sides",
+   "representation": "boxed cell, B&W grid rectangle with side labels, equation bank with check boxes; screen: click the equation",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.C.7",
+    "3.MD.D.8"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "191-200",
+    "taskType": "select the expression"
+   },
+   "why": "6.4 picture ↔ equation for area/perimeter: no skill shows a picture and asks which equation models it",
+   "reused": false
+  },
+  "map_ruler_measure_object": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "task \"measure the object\": an object drawn beside the ruler, not starting at 0 on some items; write its length",
+   "name": "Measure an Object Not at Zero (option)",
+   "teaches": "measuring length as the distance between two marks",
+   "representation": "boxed cell, B&W ruler cell with a bar object above it, answer slot with unit; screen: number entry",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.A.1",
+    "3.MD.B.4"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "171-190",
+    "taskType": "number entry from a ruler picture"
+   },
+   "why": "reading_ruler gives an arrow on a mark; MAP shows an object (sometimes offset from 0) to measure",
+   "reused": false
+  },
+  "map_tally_build": {
+   "kind": "option",
+   "skill": "graphs:tally_chart",
+   "option": "task \"make the tally\": a list or picture of items; complete the tally marks and totals",
+   "name": "Complete a Tally Chart (option)",
+   "teaches": "recording data with tally marks in fives",
+   "representation": "boxed cell, item list then a 2-column tally table with empty cells; screen: click to add tallies, number box for total",
+   "family": "data",
+   "ccss": [
+    "1.MD.C.4",
+    "2.MD.D.10"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "161-180",
+    "taskType": "complete the table"
+   },
+   "why": "tally_chart only reads a finished chart; MAP also asks pupils to complete one",
+   "reused": false
+  },
+  "map_shape_partition_pick": {
+   "kind": "option",
+   "skill": "shapes_early:partition_shapes",
+   "option": "form \"equal or not?\": shapes cut into parts, some unequal; click the shapes showing halves/thirds/fourths",
+   "name": "Which Shows Equal Parts? (option)",
+   "teaches": "equal shares must be the same size",
+   "representation": "boxed cell, 3–4 B&W cut shapes with check boxes; screen: select all that apply",
+   "family": "geometry",
+   "ccss": [
+    "1.G.A.3",
+    "2.G.A.3"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "161-180",
+    "taskType": "multi-select figures"
+   },
+   "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares",
+   "reused": false
+  },
+  "angle_rules": {
+   "kind": "new",
+   "skill": "angles_lines:angle_rules",
+   "name": "Angle Rules",
+   "teaches": "vertically opposite angles, angles in a triangle (180°), in a quadrilateral (360°), in polygons, and special triangles",
+   "representation": "a diagram with some angles given; write the missing angle",
+   "family": "geometry",
+   "ccss": [
+    "4.MD.C.7",
+    "8.G.A.5"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "211-230",
+    "taskType": "number entry: missing angle in a triangle"
+   },
+   "why": "6.2 \"missing angle in a triangle\" — no skill deals it today (additive_angles deals parts of a split angle only)",
+   "reused": true
+  },
+  "volume_cubes": {
+   "kind": "new",
+   "skill": "area_perimeter:volume_counting_cubes",
+   "name": "Volume by Counting Cubes",
+   "teaches": "volume as the number of unit cubes (cm³), comparing volumes and estimating volume and capacity",
+   "representation": "isometric drawings of cube solids; write how many cubes / cm³; option: which has more",
+   "family": "measurement",
+   "ccss": [
+    "5.MD.C.3",
+    "5.MD.C.4"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "201-215",
+    "taskType": "number entry: count unit cubes"
+   },
+   "why": "6.2 volume by unit cubes and 6.4 model ↔ number: volume skills give l, w, h only",
+   "reused": true
+  },
+  "coord_context": {
+   "kind": "option",
+   "skill": "coordinates:coordinate_q1",
+   "option": "form \"in context\": points are data (hours and pages, days and height); plot them and say what a point means",
+   "name": "Graph Points in a Real Problem (option)",
+   "teaches": "representing real-world problems by graphing points in the first quadrant and interpreting the coordinates",
+   "representation": "plot; write the meaning from a bank — B&W boxed cell; screen keeps the production form",
+   "family": "geometry",
+   "ccss": [
+    "5.G.A.2"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "211-230",
+    "taskType": "plot / interpret a point in a story"
+   },
+   "why": "6.2 meaning of a coordinate point in context — still not built",
+   "reused": true
+  },
+  "protractor_read": {
+   "kind": "option",
+   "skill": "angles_lines:measure_angles",
+   "option": "form \"read the protractor\": a protractor drawn over the angle; write the degrees (not multiple choice)",
+   "name": "Measure With a Protractor (option)",
+   "teaches": "measuring angles in whole degrees with a protractor: which scale, from 0",
+   "representation": "write the angle in degrees — B&W boxed cell; screen keeps the production form",
+   "family": "geometry",
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "201-215",
+    "taskType": "read a protractor, number entry"
+   },
+   "why": "measure_angles is MC choice of 4 degree values",
+   "reused": true
+  },
+  "points_lines_rays": {
+   "kind": "new",
+   "skill": "angles_lines:points_lines_rays",
+   "name": "Point, Line, Segment or Ray?",
+   "teaches": "identifying and drawing points, lines, line segments, rays, right/acute/obtuse angles and perpendicular and parallel lines, and finding them in 2-D figures",
+   "representation": "write the word from a bank; draw on the grid (the key shows one drawing) — B&W boxed cell; screen keeps the production form",
+   "family": "geometry",
+   "ccss": [
+    "4.G.A.1"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "191-205",
+    "taskType": "select the figure: line, ray, segment"
+   },
+   "why": "identify_lines covers parallel/perpendicular only",
+   "reused": true
+  },
+  "make_line_plot": {
+   "kind": "new",
+   "skill": "graphs:make_a_line_plot",
+   "name": "Make a Line Plot",
+   "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+   "representation": "draw the × marks; write the answers — B&W boxed cell; screen keeps the production form",
+   "family": "data",
+   "ccss": [
+    "2.MD.D.9",
+    "3.MD.B.4",
+    "4.MD.B.4",
+    "5.MD.B.2"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "191-210",
+    "taskType": "build a line plot from data (drag Xs)"
+   },
+   "why": "line_plot skills only read",
+   "reused": true
+  },
+  "bar_graph_scale": {
+   "kind": "option",
+   "skill": "graphs:build_bar_graph",
+   "option": "scale 2, 5 or 10 per square (draw a scaled bar graph)",
+   "name": "Draw a Scaled Bar Graph (option)",
+   "teaches": "drawing scaled bar graphs and answering one- and two-step \"how many more / less\" questions from them",
+   "representation": "draw the bars; write the answer — B&W boxed cell; screen keeps the production form",
+   "family": "data",
+   "ccss": [
+    "3.MD.B.3"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "191-205",
+    "taskType": "build a scaled bar graph"
+   },
+   "why": "build_bar_graph uses scale 1 only",
+   "reused": true
+  },
+  "pictogram_scale": {
+   "kind": "option",
+   "skill": "graphs:build_pictograph",
+   "option": "key 2, 5, 10",
+   "name": "Pictograms with a Key (option)",
+   "teaches": "drawing pictograms where one picture stands for 2, 5 or 10, including half pictures",
+   "representation": "a key option (1, 2, 5, 10) on build_pictograph",
+   "family": "data",
+   "ccss": [
+    "3.MD.B.3"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "181-200",
+    "taskType": "build/read a picture graph with a key"
+   },
+   "why": "build_pictograph uses each picture = 1",
+   "reused": true
+  },
+  "compare_lengths": {
+   "kind": "new",
+   "skill": "measurement:compare_lengths",
+   "name": "Compare Lengths",
+   "teaches": "comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm)",
+   "representation": "two labelled bars; write <, > or = after converting",
+   "family": "measurement",
+   "ccss": [
+    "1.MD.A.1",
+    "2.MD.A.4"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "161-185",
+    "taskType": "compare two lengths; how much longer"
+   },
+   "why": "order_objects_length orders only; no \"how much longer\"",
+   "reused": true
+  },
+  "ruler_difference": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "task \"how much longer?\": two objects on one ruler; cm and inches",
+   "name": "How Much Longer? (option)",
+   "teaches": "measuring two objects with a standard unit and finding how much longer one is",
+   "representation": "write both lengths and the difference with the unit — B&W boxed cell; screen keeps the production form",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.A.4"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "181-195",
+    "taskType": "two objects on one ruler, difference"
+   },
+   "why": "no difference-of-lengths form",
+   "reused": true
+  },
+  "missing_lengths": {
+   "kind": "new",
+   "skill": "area_perimeter:rectilinear_missing_sides",
+   "name": "Missing Lengths in Rectilinear Shapes",
+   "teaches": "finding missing side lengths in rectilinear shapes and then their perimeter",
+   "representation": "an L or T shape with some sides labelled; write the missing lengths",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "195-210",
+    "taskType": "missing side of a rectilinear shape"
+   },
+   "why": "perimeter gives one missing-side item per ~3 for rectangles only",
+   "reused": true
+  },
+  "same_area": {
+   "kind": "new",
+   "skill": "area_perimeter:same_area_different_perimeter",
+   "name": "Same Area, Different Perimeter",
+   "teaches": "shapes with the same area but different perimeters, and the reverse",
+   "representation": "shapes on squared paper; write area and perimeter for each; circle the pair that match",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "195-210",
+    "taskType": "same area different perimeter"
+   },
+   "why": "not dealt",
+   "reused": true
+  },
+  "elapsed_stories": {
+   "kind": "option",
+   "skill": "measurement:elapsed_mixed",
+   "option": "form \"story\": time-interval word problems with the time line as the drawing",
+   "name": "Time Word Problems (option)",
+   "teaches": "word problems adding and subtracting time intervals in minutes, drawn on a number-line (time line) diagram",
+   "representation": "write the time or the minutes — B&W boxed cell; screen keeps the production form",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.A.1"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "191-205",
+    "taskType": "elapsed time word problem"
+   },
+   "why": "elapsed skills use time lines without stories",
+   "reused": true
+  },
+  "mass_scales": {
+   "kind": "new",
+   "skill": "measurement:read_scales",
+   "name": "Read Scales (g, kg, ml, l)",
+   "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100",
+   "representation": "a drawn dial or jug scale; write the reading with the unit; option: scale step",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.A.2"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "181-200",
+    "taskType": "read a scale or jug"
+   },
+   "why": "mass_volume_liquid reads scales on a few items, MC sort elsewhere",
+   "reused": true
+  },
+  "mass_ops": {
+   "kind": "new",
+   "skill": "measurement:mass_capacity_word_problems",
+   "name": "Mass and Capacity Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "representation": "picture of scales/jugs with values; write the answer with the unit",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.A.2"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "191-205",
+    "taskType": "mass/volume word problems"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "length_ops": {
+   "kind": "new",
+   "skill": "measurement:length_word_problems",
+   "name": "Length Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing lengths and heights in context (same units)",
+   "representation": "a drawn ruler or bar model with the lengths labelled; write the answer with its unit",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "181-195",
+    "taskType": "length word problems"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "money_2step": {
+   "kind": "new",
+   "skill": "measurement:money_two_step",
+   "name": "Two-Step Money Problems",
+   "teaches": "two-step money word problems (buy two items, then find the change)",
+   "representation": "a price list drawn as tags plus a short story; bar model support level",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.C.8",
+    "4.MD.A.2"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "191-205",
+    "taskType": "money word problem, two steps"
+   },
+   "why": "money skills are one step",
+   "reused": true
+  },
+  "conversion_table": {
+   "kind": "option",
+   "skill": "measurement:unit_conversions",
+   "option": "form \"conversion table\": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it",
+   "name": "Conversion Tables (option)",
+   "teaches": "knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)",
+   "representation": "write the missing entries — B&W boxed cell; screen keeps the production form",
+   "family": "measurement",
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "201-215",
+    "taskType": "complete a conversion table"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "defining_attributes": {
+   "kind": "new",
+   "skill": "shapes_early:defining_attributes",
+   "name": "Is It Still a Triangle?",
+   "teaches": "defining attributes (closed, number of straight sides, corners) versus non-defining attributes (colour-free: size, orientation, thickness of line)",
+   "representation": "tick yes / no; tick attributes from a bank — B&W boxed cell; screen keeps the production form",
+   "family": "geometry",
+   "ccss": [
+    "1.G.A.1"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "161-180",
+    "taskType": "is it still a triangle? (defining vs non-defining)"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "shapes_3d_props": {
+   "kind": "new",
+   "skill": "shapes_classify:3d_shape_properties",
+   "name": "3-D Shapes: Names and Properties",
+   "teaches": "naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets",
+   "representation": "a 3-D shape drawing with a property table; option: which net makes it",
+   "family": "geometry",
+   "ccss": [
+    "1.G.A.1",
+    "2.G.A.1"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "181-200",
+    "taskType": "3-D shape properties"
+   },
+   "why": "count_edges_faces_vertices counts only",
+   "reused": true
+  },
+  "polygons": {
+   "kind": "new",
+   "skill": "shapes_classify:regular_irregular_polygons",
+   "name": "Regular and Irregular Polygons",
+   "teaches": "naming polygons by the number of sides, and telling regular from irregular",
+   "representation": "polygon line drawings; write the name and tick regular / irregular",
+   "family": "geometry",
+   "ccss": [
+    "2.G.A.1"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "181-195",
+    "taskType": "regular vs irregular polygons"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "hv_lines": {
+   "kind": "new",
+   "skill": "angles_lines:horizontal_vertical",
+   "name": "Horizontal and Vertical Lines",
+   "teaches": "recognising horizontal and vertical lines in shapes and on a grid",
+   "representation": "shapes with sides marked; write H or V for each marked line",
+   "family": "geometry",
+   "ccss": [],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "171-185",
+    "taskType": "horizontal/vertical lines"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "line_graph": {
+   "kind": "new",
+   "skill": "graphs:line_graphs",
+   "name": "Line Graphs",
+   "teaches": "reading and drawing line graphs that show change over time",
+   "representation": "a line graph on a grid with labelled axes; read values, find differences, or plot the points",
+   "family": "data",
+   "ccss": [
+    "5.G.A.2"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "211-225",
+    "taskType": "read a line graph"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "table_data": {
+   "kind": "new",
+   "skill": "graphs:read_and_make_tables",
+   "name": "Tables",
+   "teaches": "reading and completing simple tables and tally-to-number tables",
+   "representation": "a two-column table with blanks; fill in the counts; answer one question",
+   "family": "data",
+   "ccss": [
+    "3.MD.B.3"
+   ],
+   "map": {
+    "strand": "Data & graphing",
+    "ritBand": "171-190",
+    "taskType": "read a table"
+   },
+   "why": "none",
+   "reused": true
+  },
+  "four_quadrants": {
+   "kind": "option",
+   "skill": "coordinates:coordinate_all",
+   "option": "problems",
+   "name": "Coordinates in Four Quadrants (option)",
+   "teaches": "reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints)",
+   "representation": "a task option on coordinate_all",
+   "family": "geometry",
+   "ccss": [],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "215-230",
+    "taskType": "four-quadrant coordinates problems"
+   },
+   "why": "coordinate_all covers naming only",
+   "reused": true
+  },
+  "measurable_attributes": {
+   "kind": "new",
+   "skill": "comparing:what_can_we_measure",
+   "name": "What Can We Measure?",
+   "teaches": "naming measurable attributes of one object (how long, how tall, how heavy, how much it holds) and telling measurable from not measurable (colour)",
+   "representation": "tick words from a picture-word bank — B&W boxed cell; screen keeps the production form",
+   "family": "measurement",
+   "ccss": [
+    "K.MD.A.1"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "141-160",
+    "taskType": "what can we measure (length/weight)"
+   },
+   "why": "compare_objects compares; no attribute naming",
+   "reused": true
+  },
+  "volume_fractional": {
+   "kind": "option",
+   "skill": "area_perimeter:volume",
+   "option": "fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes",
+   "name": "Volume With Fractional Edges (option)",
+   "teaches": "volume of a prism with fractional edges by packing 1/2-unit cubes and by V = l × w × h = B × h",
+   "representation": "write the volume as a fraction or mixed number of cubic units — B&W boxed cell; screen keeps the production form",
+   "family": "geometry",
+   "ccss": [
+    "6.G.A.2"
+   ],
+   "map": {
+    "strand": "Measurement",
+    "ritBand": "215-230",
+    "taskType": "volume with fractional edges"
+   },
+   "why": "integer edges only",
+   "reused": true
+  },
+  "draw_angles": {
+   "kind": "new",
+   "skill": "angles_lines:draw_angles",
+   "name": "Draw Angles and Lines",
+   "teaches": "drawing angles of a given size with a protractor and lines of a given length",
+   "representation": "a protractor picture with a base line; the key shows the angle drawn; print-first skill",
+   "family": "geometry",
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "205-220",
+    "taskType": "draw an angle of N degrees"
+   },
+   "why": "no draw form",
+   "reused": true
+  },
+  "reflect_grid": {
+   "kind": "new",
+   "skill": "coordinates:reflect_on_grid",
+   "name": "Reflect on a Grid",
+   "teaches": "reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes",
+   "representation": "a grid with a dashed mirror line and a shape; draw the reflection; key shows it",
+   "family": "geometry",
+   "ccss": [
+    "8.G.A.3"
+   ],
+   "map": {
+    "strand": "Geometry",
+    "ritBand": "211-230",
+    "taskType": "reflect on a grid"
+   },
+   "why": "geo_reflect is MC; reflect_grid gives the drawing form",
+   "reused": true
+  }
+ }
+}

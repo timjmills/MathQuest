@@ -59,8 +59,7 @@
    "source": "6.2",
    "status": "partial",
    "skills": [
-    "order_of_operations:compare_expressions",
-    "algebra:compare_number_sentences"
+    "order_of_operations:compare_expressions"
    ],
    "note": "compare_expressions sampled: 'Compare: 6 × 6 + 1 ◻ 4 × 2 − 6' is evaluate-then-compare, MC answer; nothing asks reasoning without computing (37 + 25 ◻ 37 + 28). WRM compare_sentences proposal covers it.",
    "proposal": "compare_sentences"
