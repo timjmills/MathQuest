@@ -119,3 +119,6 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
     or choose another skill.
     Rule 18 is checked PER STEP: a link's generated items must fit the step's own dealt maximum and its school week — a
     year-wide ceiling is not enough (Y4 critic r4).
+    Rule 18 also covers CONTENT and LAYOUT, not only number size: no eighths/fifths for a halves step, no unlike-fraction
+    compares at Grade 2, no customary units on a metric/time step, no column regrouping before the column steps, and
+    coordinate skills are checked too. Judge size against what the pupil has met BY THAT SCHOOL WEEK (xlsx order).
