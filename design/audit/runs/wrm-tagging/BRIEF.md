@@ -114,3 +114,6 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
     measure; counting in 5s/10s before money and time) — or a note saying why not.
 16. `closes` is the STEP's exact missing clause, never the proposal's `teaches` copied.
 17. Check option values change what is dealt as intended (generate): e.g. money change needs `paid:'note'` + a band.
+18. PRE and RELATED links carry opts too: a pre/related skill with its defaults must deal numbers and layouts a pupil of
+    THIS step can do (no "1 more than 69", 3-digit compare or column layouts for PK/K). Set band/range/forms on the link,
+    or choose another skill.
