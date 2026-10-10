@@ -75,6 +75,7 @@ for sp in ns['STEPS']:
     if v == 'full' and (sp.get('build') or partial): errs.append(sid + ' full but build/partial')
     if v != 'full' and not sp.get('build'): errs.append(sid + ' not full but no build')
     if v == 'gap' and direct: errs.append(sid + ' gap with direct')
+    sp['preBuild'] = [p for p in sp.get('preBuild', []) if p not in sp.get('build', [])]
     for p in sp.get('build', []) + sp.get('preBuild', []):
         used.setdefault(p, []).append(sid)
     out_steps[sid] = {'title': steps[sid]['title'], 'direct': direct, 'partial': partial, 'verdict': v,
