@@ -17,6 +17,7 @@ import { startMapSession } from './map-engine.js';
 import { generateMapShareLink } from './map-mode-ui.js';
 import { icon, esc, toast, copyText, readStore, writeStore, findSkill } from './teacher-ui.js';
 import { mountSample } from './teacher-preview.js';
+import { renderMapTasks } from './teacher-map-tasks.js';
 
 const UI_KEY = 'mq_teacher_map_ui';
 
@@ -40,7 +41,10 @@ function bandsFor(tier) { return tier === 'k2' ? BANDS_K2 : BANDS_ALL; }
 function defaultCount(tier) { return tier === 'k2' ? 15 : 20; }
 function bandText(b) { return b.replace('-', '–'); }
 
+const TABS = [['tasks', 'Practise by task'], ['reps', 'By representation'], ['start', 'Start a MAP test']];
+
 const m = {
+    tab: 'tasks',       // the page view: MAP tasks by strand / representation changes / the test itself
     tier: '35',
     mode: 'practice',
     count: 20,
@@ -60,8 +64,9 @@ const m = {
     if (COUNTS.includes(Number(s.count))) m.count = Number(s.count);
     if (Array.isArray(s.bands)) m.bands = s.bands.filter((b) => bandsFor(m.tier).includes(b));
     if (Array.isArray(s.domains)) m.domains = s.domains.filter((d) => DOMAINS.some((x) => x[0] === d));
+    if (TABS.some((x) => x[0] === s.tab)) m.tab = s.tab;
 })();
-function persist() { writeStore(UI_KEY, { tier: m.tier, mode: m.mode, count: m.count, bands: m.bands, domains: m.domains }); }
+function persist() { writeStore(UI_KEY, { tab: m.tab, tier: m.tier, mode: m.mode, count: m.count, bands: m.bands, domains: m.domains }); }
 
 let root = null;
 let seenTier = null;   // the last state.mapTier this screen read or wrote
@@ -73,6 +78,7 @@ export function renderMapScreen(el) {
     // openMapTest('k2' | '35' | 'mixed') from an old entry point names a tier: honour it once.
     if (state.mapTier && state.mapTier !== seenTier && TIERS.some((t) => t[0] === state.mapTier)) {
         if (state.mapTier !== m.tier) setTier(state.mapTier);
+        m.tab = 'start';   // an old "open the MAP test" entry point lands on the test itself
     }
     seenTier = state.mapTier;
     if (!root.dataset.built) {
@@ -176,7 +182,22 @@ function seg(name, list, current, label) {
     return `<div class="tv-seg" role="radiogroup" aria-label="${esc(label)}">${list.map(([v, t]) => `<button type="button" role="radio" aria-checked="${current === v}" data-map-${name}="${v}">${t}</button>`).join('')}</div>`;
 }
 
+function tabsHTML() {
+    return `<div class="tv-seg tvm-tabs" role="tablist" aria-label="MAP page">${TABS.map(([v, t]) => `<button type="button" role="tab" id="tvmTab-${v}" aria-selected="${m.tab === v}" aria-controls="tvmPanel" data-map-tab="${v}">${t}</button>`).join('')}</div>`;
+}
+
 function render() {
+    if (m.tab !== 'start') {
+        root.innerHTML = `
+<header class="tv-header">
+  <div><h1 class="tv-h1">MAP tests</h1><p class="tv-sub">${m.tab === 'reps' ? 'The picture-to-number changes MAP asks for, strand by strand, and the skills that practise each.' : 'The MAP task types by strand and RIT band, with the skills that practise each. Tick skills, then make a practice link or print.'}</p></div>
+  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-map-act="todo">${icon('list', 18)}<span>Skills to be made</span></button></div>
+</header>
+${tabsHTML()}
+<div id="tvmPanel" class="tvm-panel" role="tabpanel" aria-labelledby="tvmTab-${m.tab}"></div>`;
+        renderMapTasks(root.querySelector('#tvmPanel'), m.tab);
+        return;
+    }
     const tier = TIERS.find((t) => t[0] === m.tier);
     const mode = MODES.find((x) => x[0] === m.mode);
     const n = skillCount();
@@ -192,7 +213,8 @@ function render() {
 <header class="tv-header">
   <div><h1 class="tv-h1">MAP tests</h1><p class="tv-sub">Adaptive MAP-style practice. Choose the level and what it covers, then start it here or send pupils a link.</p></div>
 </header>
-<div class="tvm-grid">
+${tabsHTML()}
+<div class="tvm-grid" id="tvmPanel" role="tabpanel" aria-labelledby="tvmTab-start">
   <div class="tv-col">
     <section class="tv-card" aria-labelledby="tvmTestH">
       <h2 class="tv-h2" id="tvmTestH">Test</h2>
@@ -264,6 +286,7 @@ async function onAct(act) {
         case 'all-bands': m.bands = bandsFor(m.tier).slice(); changed(); refocus('[data-map-act="all-bands"]'); return;
         case 'no-bands': m.bands = []; changed(); refocus('[data-map-act="no-bands"]'); return;
         case 'settings': window.tvGo?.('settings'); return;
+        case 'todo': window.tvGo?.('todo'); return;
         case 'adaptive': {
             const on = !(state.adaptiveModeEnabled === true);
             if (typeof window.setAdaptiveModeEnabled === 'function') window.setAdaptiveModeEnabled(on);
@@ -304,6 +327,7 @@ function wire() {
         const b = e.target.closest('button');
         if (!b || !root.contains(b)) return;
         const d = b.dataset;
+        if (d.mapTab) { if (d.mapTab !== m.tab) { m.tab = d.mapTab; persist(); render(); } refocus(`[data-map-tab="${d.mapTab}"]`); return; }
         if (d.mapTier) { if (d.mapTier !== m.tier) { setTier(d.mapTier); changed(); } refocus(`[data-map-tier="${d.mapTier}"]`); return; }
         if (d.mapMode) {
             if (d.mapMode !== m.mode) { m.mode = d.mapMode; changed(); }
@@ -335,9 +359,9 @@ function wire() {
     // Arrow keys move within a segmented control, as radio groups do.
     root.addEventListener('keydown', (e) => {
         if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
-        const btn = e.target.closest('[role="radio"]');
+        const btn = e.target.closest('[role="radio"], [role="tab"]');
         if (!btn) return;
-        const group = [...btn.parentElement.querySelectorAll('[role="radio"]')];
+        const group = [...btn.parentElement.querySelectorAll(`[role="${btn.getAttribute('role')}"]`)];
         const i = group.indexOf(btn);
         const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
         const next = group[(i + step + group.length) % group.length];

@@ -157,6 +157,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.evaluate(() => window.tvGo('map'));
     await sleep(300);
     check(await onScreen('map'), 'map: screen not shown');
+    // The MAP page opens on its task views; the test settings are the "Start a MAP test" tab.
+    if (await page.$('[data-map-tab="start"][aria-selected="false"]')) { await page.click('[data-map-tab="start"]'); await sleep(200); }
     await page.click('[data-map-tier="k2"]');
     await page.click('[data-map-mode="simulation"]');
     await page.click('[data-map-domain="G"]');
