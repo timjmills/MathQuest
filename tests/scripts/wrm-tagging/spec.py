@@ -299,7 +299,7 @@ st('Y1.B2.S14', d=[P(S5,'crossing out from amounts 6 to 10 (the pictures skill s
    b=['sub_10_pictures'], r=[(SWP,'take-away stories')])
 st('Y1.B2.S15', d=[P(S5,'amounts 6 to 10 (stops at 5)'), P(SWP,'a pictured take-away as a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank')], v='partial',
    m='pictured take-away from amounts to 10 (how many left), as a Kindergarten response (no word-work columns, sign row or label bank)', b=['sub_10_pictures', 'k_story'], r=[(S10,'the same facts as numbers')])
-st('Y1.B2.S16', d=[F(NLS, range=10), F(NLS2, range=10)])
+st('Y1.B2.S16', d=[F(NLS, range=10, unknown='answer'), F(NLS2, range=10)], n='nl_sub {unknown:\'answer\'}: the result is always the unknown (8 − 3 = ?); start- and change-unknown are 1.OA.D.8.')
 st('Y1.B2.S17', d=[P(A10,'adding or subtracting only 1 or 2 (counting on or back by 1 or 2)', notation=['across'])], v='partial', m='+1, +2, −1, −2 as a fluency set', b=['add_sub_1_2'])
 # Y1.B3 Shape
 st('Y1.B3.S1', d=[F(N3D), F(M3D)])
@@ -341,8 +341,8 @@ st('Y1.B5.S4', d=[F(DND, forms=[0])], n='Doubles 1 + 1 to 10 + 10.')
 st('Y1.B5.S5', d=[F(DND, forms=[1, 2])], n='Doubles plus one and minus one.')
 st('Y1.B5.S6', d=[P(S20N,'using the bond 7 − 3 to do 17 − 3 (a ten and ones picture); the skill is abstract', band=20, notation=['across'])], v='partial',
    m='subtracting ones from a teen number using a known bond', b=['ones_bonds_teen'])
-st('Y1.B5.S7', d=[F(NLS, range=20), F(NLS2, range=20)], n='At Max Number 20 both draw a 0-20 line (15 − 3, 16 − 6, 17 − 6): count back along it.',
-   p=[(CS,'Y1.B1.S8 / Y1.B4.S7 count back: the main building block',{'band':20,'dir':'back'}),(NLS,'Y1.B2.S16 subtract on a 0-10 line',{'range':10}),(NLS2,'Y1.B2.S16 count back on a 0-10 line',{'range':10})])
+st('Y1.B5.S7', d=[F(NLS, range=20, unknown='answer'), F(NLS2, range=20)], n='At Max Number 20 both draw a 0-20 line (15 − 3, 16 − 6, 17 − 6): count back along it.',
+   p=[(CS,'Y1.B1.S8 / Y1.B4.S7 count back: the main building block',{'band':20,'dir':'back'}),(NLS,'Y1.B2.S16 subtract on a 0-10 line',{'range':10,'unknown':'answer'}),(NLS2,'Y1.B2.S16 count back on a 0-10 line',{'range':10})])
 st('Y1.B5.S8', d=[P(CMPW,'finding the difference by comparing two bars or a number line', range=10)], v='partial', m='difference as comparison (bars, line)', b=['difference'])
 st('Y1.B5.S9', d=[F(NFA, band=20)], r=[(FF,'the same family within 10')])
 st('Y1.B5.S10', d=[F(CLZ, range=20), F(MAS, range=20)], n='Max Number 20: missing_add_sub deals 12 − __ = 7 and 7 + 9; cloze_addition deals "make 16".')
@@ -391,7 +391,9 @@ st('Y1.B9.S7', d=[F(DND, forms=[0]), F(DBL, band=20)])
 st('Y1.B9.S8', d=[F(SHG, band=12)])
 st('Y1.B9.S9', d=[P(SHG,'sharing one at a time between a given number of groups (how many in each)', band=12)], v='partial', m='sharing (how many each)', b=['share_group'])
 # Y1.B10 Fractions
-st('Y1.B10.S1', d=[F(PART, parts=[0])], n='Halves only (parts 0).')
+st('Y1.B10.S1', d=[P(PART,'halves only (parts 0), but half the items ask for the typed fraction 1/2, and no item shows an unequal split', parts=[0])], v='partial',
+   m='recognising a half as one of 2 equal parts, and equal or not equal, without written fraction notation (half the items ask for a typed 1/2)', b=['halves_quarters_only'],
+   r=[(HALF,'half of a shape, then half of a quantity (to 10)',{'band':10})])
 st('Y1.B10.S2', d=[P(SHF,'halves only (denominator family 2 also deals quarters and eighths)', denoms=[2])], v='partial', m='finding (shading) a half of a shape only', b=['halves_quarters_only'])
 st('Y1.B10.S3', d=[P(FOS,'recognising whether a set is split into two equal groups; and with denoms [2] its missing-numerator form still deals ?/3, ?/5 and ?/6 (4 of 12 items: the option leaks, a generator bug)', denoms=[2], range=10)], v='partial',
    m='is this set in halves? (two equal groups or not); the live option leaks thirds, fifths and sixths', b=['half_quarter'],
@@ -400,7 +402,8 @@ st('Y1.B10.S3', d=[P(FOS,'recognising whether a set is split into two equal grou
 st('Y1.B10.S4', d=[F(HALF, band=10, range=10)], n='halve: "Half of 8" within 10.',
    p=[(DBL,'Y1.B9.S7 doubles: halving undoes a double',{'band':20}),(SHG,'Y1.B9.S9 share into 2 equal groups',{'band':12})],
    r=[(FOS,'a fraction of a set; with denoms [2] it leaks thirds and fifths, so it is not direct',{'denoms':[2],'range':10})])
-st('Y1.B10.S5', d=[F(PART, parts=[2])], n='Fourths only (parts 2).')
+st('Y1.B10.S5', d=[P(PART,'fourths only (parts 2), but half the items ask for typed 1/4, 2/4 or 3/4, and no item shows an unequal split', parts=[2])], v='partial',
+   m='recognising a quarter as one of 4 equal parts, and equal or not equal, without written fraction notation (half the items ask for typed 1/4, 2/4, 3/4)', b=['halves_quarters_only'])
 st('Y1.B10.S6', d=[P(SHF,'quarters only (family 2 also deals halves and eighths)', denoms=[2])], v='partial', m='finding (shading) a quarter of a shape only', b=['halves_quarters_only'])
 st('Y1.B10.S7', d=[P(FOS,'recognising a set split into four equal groups; with denoms [2] the missing-numerator form leaks ?/3, ?/5 and ?/6 (a generator bug)', denoms=[2], range=10)], v='partial',
    m='is this set in quarters? (four equal groups or not); the live option leaks thirds, fifths and sixths', b=['half_quarter'],
@@ -611,8 +614,8 @@ FIT = {
  A10: [(10, {'notation': ['across']})], S10: [(10, {'notation': ['across']})],
  A20N: [(20, {'band': 20, 'notation': ['across']})], S20N: [(20, {'band': 20, 'notation': ['across']})],
  A3: [(10, {'band': 10, 'notation': ['across']}), (20, {'band': 20, 'notation': ['across']})],
- NLA: [(10, {'range': 10}), (20, {'range': 20})], NLA2: [(10, {'range': 10}), (20, {'range': 20})],
- NLS: [(10, {'range': 10}), (20, {'range': 20})], NLS2: [(10, {'range': 10}), (20, {'range': 20})],
+ NLA: [(10, {'range': 10}), (20, {'range': 20})], NLA2: [(10, {'range': 10, 'unknown': 'answer'}), (20, {'range': 20, 'unknown': 'answer'})],
+ NLS: [(10, {'range': 10, 'unknown': 'answer'}), (20, {'range': 20, 'unknown': 'answer'})], NLS2: [(10, {'range': 10}), (20, {'range': 20})],
  MAS: [(10, {'range': 10}), (20, {'range': 20})], CLZ: [(10, {'range': 10}), (20, {'range': 20})], CMPW: [(10, {'range': 10}), (20, {'range': 20})],
  FF: [(10, {'range': 10})], FFS: [(10, {'range': 10})], NFA: [(10, {'band': 10}), (20, {'band': 20})],
  DND: [(20, {'forms': [0]})], DBL: [(20, {'band': 20})], HALF: [(10, {'band': 10}), (20, {'band': 20})],
@@ -670,7 +673,7 @@ addpre('Y1.B14.S5', (CLK, 'the numbers on the clock face', {'task': 'numerals'})
 # word-work cells always print a + − × ÷ operation bank; shape_pattern, equal_or_unequal_groups and fact_family_sort need typed
 # words; shade_fraction / fraction_of_set {denoms:[2]} also deal quarters, eighths (and leak thirds, fifths, sixths);
 # bar_graph_intro asks "which has the most?" with a typed category name.
-NOLINK = {AWP, AWPP, SWP, SWPP, SP, EQG, FFS, SHF, FOS, 'measurement:bar_graph_intro'}
+NOLINK = {AWP, AWPP, SWP, SWPP, SP, EQG, FFS, SHF, FOS, 'measurement:bar_graph_intro', A3}   # add_three: a 3-addend sum is 1.OA.A.2
 R_NOLINK = NOLINK | {CMPW}
 for _s in ('Y1.B2.S14', 'Y1.B2.S15'):
     addpre(_s, (CS, 'R.B11.S6 / Y1.B1.S9 1 less: take away one', {'band': 10, 'dir': 'back'}), (CO, 'Y1.B1.S2 count what is left', {'band': 10}))
@@ -678,8 +681,8 @@ for _s in ('Y1.B2.S14', 'Y1.B2.S15'):
 PIC = 'measurement:pictograph_intro'; BARI = 'measurement:bar_graph_intro'; NLAV = 'addition:nl_add'; A10NR = 'addition:add_10_no_regroup'
 SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'measurement:time_match_clock'; EQS2 = 'addition:equal_sign'
 EXTRA = {
- 'sort': [(PIC, 'the sorted groups shown as rows of pictures and counted (K.MD.B.3)', {})],
- 'compare': [(PIC, 'compare two rows of pictures: which has more', {})],
+ 'sort': [(PIC, 'the sorted groups as rows of a picture graph, counted', {'forms': [0]})],
+ 'compare': [(PIC, 'count two rows of a picture graph', {'forms': [0]})],
  'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10})],
  'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10}), (EQS2, 'is the sentence true? the = sign', {'range': 10})],
  'oddeven': [(SEO, 'circle the even or the odd numbers to 10', {'range': 10})],
@@ -759,3 +762,16 @@ prepre('Y1.B9.S4', (CG, 'Y1.B1.S11 compare two groups: are they the same?', {'ba
 S['Y1.B9.S9']['p'] += [(HALF, 'R.B16.S5 sharing between two is halving (to 10)', {'band': 10})]
 S['Y1.B6.S3']['xr'] += [B10]   # base10_build {band:50}: past the step's own count of rods (critic scans count rods, not tens)
 S['R.B16.S6']['xp'] += [S5]   # take-away is not a building block of doubles
+
+# ---------------- Round 6 (critic R-Y1 r5) ----------------
+for _s in ('Y1.B12.S6', 'Y1.B12.S7'): S[_s]['xr'] += [PIC]   # 2-digit compare: not a picture graph of small counts
+for _s in ('R.B9.S7', 'R.B9.S8'): S[_s]['r'] += [(A5, 'a double is two equal groups combined', {})]
+S['R.B9.S5']['r'] += [(A5, 'the two parts combined into the whole', {})]
+S['Y1.B10.S2']['r'] += [(HALF, 'half of a shape, then half of a quantity (to 10)', {'band': 10})]
+for _s in ('Y1.B4.S2', 'Y1.B4.S3', 'Y1.B4.S4', 'Y1.B4.S5', 'Y1.B4.S6'):
+    S[_s]['xp'] += [NSF, HCF]   # counting 50-100 on a track is not a building block of teen numbers (critic r5 M2)
+    prepre(_s, (CS, 'Y1.B4.S7 count on to 20', {'band': 20, 'dir': 'forward'}))
+for _s in ('Y1.B4.S3', 'Y1.B4.S4', 'Y1.B4.S5', 'Y1.B4.S6'): S[_s]['xp'] += [TFV]
+for _s in ('Y1.B10.S4', 'Y1.B10.S6', 'Y1.B10.S7', 'Y1.B10.S8'): S[_s]['xp'] += [PART]   # parts [2] with forms [0] always answers 4
+prepre('Y1.B12.S4', (NSF, 'Y1.B12.S1 the number track to 100 (school week 10)', {'step': 1, 'range': 100}), (HCF, 'Y1.B12.S1 the hundred square to 100', {'band': 100}),
+       (NSF, 'Y1.B6.S1 the number track to 50', {'step': 1, 'range': 50}))

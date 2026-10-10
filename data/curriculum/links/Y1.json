@@ -40,7 +40,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+     "why": "the sorted groups as rows of a picture graph, counted",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "Pre: 2 only; the earlier steps R.B1.S6, R.B1.S3, R.B1.S2 have no live skill yet (see preBuild)."
@@ -565,7 +570,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": ""
@@ -619,7 +629,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": ""
@@ -683,7 +698,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": ""
@@ -727,7 +747,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = only."
@@ -774,7 +799,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "placevalue:order_least_to_greatest is not tagged: its lowest band (99) orders 2-digit numbers only."
@@ -847,13 +877,6 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W11)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
@@ -863,7 +886,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (a pre-skill here); number_families_add (addition sentences are taught from week 14); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_sub_fact_family (addition sentences are taught from week 14)."
+   "note": "Related: none; the other forms of this idea are make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); number_families_add (addition sentences are taught from week 14); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_20_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S2": {
    "title": "Part-whole model",
@@ -892,13 +915,6 @@
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W11)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
@@ -908,7 +924,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are number_families_add (addition sentences are taught from week 14); make_ten (a pre-skill here); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_sub_fact_family (addition sentences are taught from week 14)."
+   "note": "Related: none; the other forms of this idea are number_families_add (addition sentences are taught from week 14); make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_20_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S3": {
    "title": "Write number sentences",
@@ -939,13 +955,6 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W11)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
@@ -955,7 +964,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are sub_5_pictures (a direct skill here); add_wp_10 (left out here (rules 8 and 18)); add_5_pictures (a direct skill here); sub_wp_10 (left out here (rules 8 and 18)); add_sub_fact_family (addition sentences are taught from week 14)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (add_5_pictures, sub_5_pictures); the other earlier skills on this idea do not fit this step (add_three: addition sentences are taught from week 14; add_wp_10: it uses x or ÷; double: it deals numbers to 20, past this step (5); doubles_near_doubles: it deals numbers to 20, past this step (5); make_ten: differences (how many more) is taught from week 18; sub_wp_10: it uses x or ÷); the earlier steps R.B11.S4, R.B9.S10, R.B7.S8 have no live skill yet (see preBuild). Related: none; the other forms of this idea are sub_5_pictures (a direct skill here); add_wp_10 (left out here (rules 8 and 18)); add_5_pictures (a direct skill here); sub_wp_10 (left out here (rules 8 and 18)); add_sub_fact_family (addition sentences are taught from week 14)."
   },
   "Y1.B2.S4": {
    "title": "Fact families - addition facts",
@@ -1029,13 +1038,6 @@
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W13)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W13)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W13)",
      "opts": {
@@ -1061,7 +1063,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (a pre-skill here); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); add_20_no_regroup (addition sentences are taught from week 14); add_wp_10_plain (left out here (rules 8 and 18)); nl_sub (subtraction sentences are taught from week 14)."
+   "note": "Related: none; the other forms of this idea are make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); add_20_no_regroup (addition sentences are taught from week 14); sub_20_no_regroup (subtraction sentences are taught from week 14); add_10_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S6": {
    "title": "Systematic number bonds within 10",
@@ -1085,13 +1087,6 @@
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W13)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W13)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W13)",
      "opts": {
@@ -1101,7 +1096,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are number_bonds (a pre-skill here); make_ten (a pre-skill here); add_20_no_regroup (addition sentences are taught from week 14); add_wp_10_plain (left out here (rules 8 and 18)); nl_sub (subtraction sentences are taught from week 14)."
+   "note": "Related: none; the other forms of this idea are number_bonds (a pre-skill here); make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); add_20_no_regroup (addition sentences are taught from week 14); sub_20_no_regroup (subtraction sentences are taught from week 14); add_10_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S7": {
    "title": "Number bonds to 10",
@@ -1142,16 +1137,6 @@
      "opts": {
       "range": 10
      }
-    },
-    {
-     "key": "addition:add_three",
-     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
-     "opts": {
-      "band": 10,
-      "notation": [
-       "across"
-      ]
-     }
     }
    ],
    "preBuild": [
@@ -1159,19 +1144,19 @@
    ],
    "related": [
     {
-     "key": "subtraction:nl_sub",
-     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
-     "opts": {
-      "range": 10
-     }
-    },
-    {
-     "key": "addition:add_10_mixed",
-     "why": "a later step on this idea: Y1.B2.S17 Add or subtract 1 or 2",
+     "key": "addition:add_10_no_regroup",
+     "why": "the two parts written as an addition sentence",
      "opts": {
       "notation": [
        "across"
       ]
+     }
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "the parts as two jumps on a 0-10 line",
+     "opts": {
+      "range": 10
      }
     }
    ],
@@ -1201,8 +1186,8 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W14)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W14)",
      "opts": {
       "band": 10
      }
@@ -1221,7 +1206,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are add_10_mixed (it deals numbers to 10, past this step (5)); add_wp_10 (left out here (rules 8 and 18)); number_line_add (taught at an earlier step (Y1.B4.S9), but not a building block of this step); add_wp_10_plain (left out here (rules 8 and 18)); nl_sub (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are add_10_mixed (it deals numbers to 10, past this step (5)); add_wp_10 (left out here (rules 8 and 18)); number_line_add (taught at an earlier step (Y1.B4.S9), but not a building block of this step); add_wp_10_plain (left out here (rules 8 and 18)); add_20_no_regroup (it deals numbers to 20, past this step (5))."
   },
   "Y1.B2.S9": {
    "title": "Addition - add more",
@@ -1280,8 +1265,8 @@
      }
     },
     {
-     "key": "subtraction:nl_sub",
-     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "key": "addition:nl_add",
+     "why": "the same addition as jumps on a 0-10 line",
      "opts": {
       "range": 10
      }
@@ -1353,8 +1338,8 @@
      }
     },
     {
-     "key": "subtraction:nl_sub",
-     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "key": "addition:nl_add",
+     "why": "the same addition as jumps on a 0-10 line",
      "opts": {
       "range": 10
      }
@@ -1397,13 +1382,6 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W12)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
@@ -1413,7 +1391,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (a pre-skill here); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_wp_10_plain (left out here (rules 8 and 18))."
+   "note": "Related: none; the other forms of this idea are make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); number_bonds (a direct skill here); missing_add_sub (subtraction sentences are taught from week 14); add_20_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S12": {
    "title": "Subtraction - find a part",
@@ -1456,13 +1434,6 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W12)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:number_bonds",
      "why": "Y1.B2.S11 Find a part (earlier, same idea: bond)",
      "opts": {
@@ -1480,7 +1451,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (a pre-skill here); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); cloze_addition (addition sentences are taught from week 14); number_bonds (a direct skill here); add_wp_10_plain (left out here (rules 8 and 18))."
+   "note": "Related: none; the other forms of this idea are make_ten (taught at an earlier step (R.B11.S8), but differences (how many more) is taught from week 18); number_families_add (taught at an earlier step (Y1.B2.S4), but addition sentences are taught from week 14); cloze_addition (addition sentences are taught from week 14); number_bonds (a direct skill here); add_20_no_regroup (addition sentences are taught from week 14)."
   },
   "Y1.B2.S13": {
    "title": "Fact families - the eight facts",
@@ -1520,7 +1491,7 @@
     },
     {
      "key": "subtraction:missing_add_sub",
-     "why": "Y1.B2.S12 Subtraction - find a part (an earlier step; the same idea)",
+     "why": "Y1.B2.S12 Subtraction - find a part (an earlier step; the same idea in another form: Missing Numbers (+/−), at this step's size)",
      "opts": {
       "range": 10
      }
@@ -1530,14 +1501,7 @@
    "related": [
     {
      "key": "addition:cloze_addition",
-     "why": "the next step on this idea: Y1.B5.S10 Missing number problems",
-     "opts": {
-      "range": 10
-     }
-    },
-    {
-     "key": "subtraction:nl_sub",
-     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "why": "the same idea in another form: Pick the Missing Addends, at this step's size",
      "opts": {
       "range": 10
      }
@@ -1590,7 +1554,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are sub_wp_10 (left out here (rules 8 and 18)); sub_5_pictures (a direct skill here); nl_sub (it deals numbers to 10, past this step (5)); number_line_sub (taught at an earlier step (Y1.B4.S9), but not a building block of this step); add_wp_10_plain (left out here (rules 8 and 18))."
+   "note": "Related: none; the other forms of this idea are sub_wp_10 (left out here (rules 8 and 18)); sub_5_pictures (a direct skill here); nl_sub (it deals numbers to 10, past this step (5)); number_line_sub (taught at an earlier step (Y1.B4.S9), but not a building block of this step); comparison_word (differences (how many more) is taught from week 18)."
   },
   "Y1.B2.S15": {
    "title": "Subtraction - take away (How many left )",
@@ -1663,14 +1627,8 @@
      "key": "subtraction:nl_sub",
      "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line",
      "opts": {
-      "range": 10
-     }
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
-     "opts": {
-      "range": 10
+      "range": 10,
+      "unknown": "answer"
      }
     }
    ],
@@ -1682,7 +1640,8 @@
     {
      "key": "subtraction:nl_sub",
      "opts": {
-      "range": 10
+      "range": 10,
+      "unknown": "answer"
      }
     },
     {
@@ -1705,8 +1664,8 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W16)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W16)",
      "opts": {
       "band": 10
      }
@@ -1717,25 +1676,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:comparison_word",
-     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
-     "opts": {
-      "range": 10
-     }
-    },
-    {
-     "key": "addition:add_10_mixed",
-     "why": "a later step on this idea: Y1.B2.S17 Add or subtract 1 or 2",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "nl_sub {unknown:'answer'}: the result is always the unknown (8 − 3 = ?); start- and change-unknown are 1.OA.D.8. Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but not a building block of this step); nl_sub (a direct skill here); number_line_sub (a direct skill here); comparison_word (differences (how many more) is taught from week 18)."
   },
   "Y1.B2.S17": {
    "title": "Add or subtract 1 or 2",
@@ -1765,8 +1707,8 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W16)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W16)",
      "opts": {
       "band": 10
      }
@@ -1859,7 +1801,7 @@
     "shape_3d_tasks"
    ],
    "related": [],
-   "note": "Related: none; the other forms of this idea are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Related: none; the other forms of this idea are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here)."
   },
   "Y1.B3.S2": {
    "title": "Sort 3-D shapes",
@@ -1903,7 +1845,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Related: none; no live skill sorts 3-D shapes in another form. Related: none; the other forms of this idea are shape_name_match_2d (left out here (rules 8 and 18))."
+   "note": "Related: none; no live skill sorts 3-D shapes in another form."
   },
   "Y1.B3.S3": {
    "title": "Recognise and name 2-D shapes",
@@ -2144,7 +2086,7 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (an earlier step; the same idea)",
+     "why": "Y1.B1.S8 Count backwards within 10 (an earlier step; the same idea in another form: Number Sequence: Fill Missing (Grid), at this step's size)",
      "opts": {
       "step": 1,
       "dir": "back",
@@ -2156,16 +2098,8 @@
    "related": [
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "why": "the same idea in another form: Hundreds Chart - Find the Missing Number (Visual), at this step's size",
      "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "placevalue:more_less_10",
-     "why": "a later step on this idea: Y1.B4.S7 1 more and 1 less",
-     "opts": {
-      "step": 1,
       "band": 20
      }
     }
@@ -2190,6 +2124,14 @@
     "teen_structure"
    ],
    "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 count on to 20",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
+    },
     {
      "key": "counting:count_objects",
      "why": "R.B11.S1 Find 9 and 10 (school prior learning, week W21)",
@@ -2218,26 +2160,9 @@
      "opts": {
       "band": 90
      }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "step": 1,
-      "range": 100
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "band": 100
-     }
     }
    ],
-   "preBuild": [
-    "subitise"
-   ],
+   "preBuild": [],
    "related": [],
    "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); teen_compose (a pre-skill here); ten_frame_build_teen (a pre-skill here); base10_build (it deals numbers to 19, past this step (10)); unit_form (it deals numbers to 98, past this step (10))."
   },
@@ -2267,18 +2192,19 @@
    ],
    "pre": [
     {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 count on to 20",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
+    },
+    {
      "key": "counting:count_objects",
      "why": "R.B11.S1 Find 9 and 10 (school prior learning, week W21)",
      "opts": {
       "band": 10,
       "objects": "frame"
-     }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (school prior learning, week W21)",
-     "opts": {
-      "band": 10
      }
     },
     {
@@ -2296,25 +2222,10 @@
      }
     },
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (earlier, same idea: tens)",
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (earlier, same idea: tens)",
      "opts": {
-      "band": 90
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "step": 1,
-      "range": 100
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "band": 100
+      "band": 10
      }
     }
    ],
@@ -2356,18 +2267,19 @@
    ],
    "pre": [
     {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 count on to 20",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
+    },
+    {
      "key": "counting:count_objects",
      "why": "R.B11.S1 Find 9 and 10 (school prior learning, week W21)",
      "opts": {
       "band": 10,
       "objects": "frame"
-     }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (school prior learning, week W21)",
-     "opts": {
-      "band": 10
      }
     },
     {
@@ -2385,25 +2297,10 @@
      }
     },
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (earlier, same idea: tens)",
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (earlier, same idea: tens)",
      "opts": {
-      "band": 90
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "step": 1,
-      "range": 100
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "band": 100
+      "band": 10
      }
     }
    ],
@@ -2445,18 +2342,19 @@
    ],
    "pre": [
     {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 count on to 20",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
+    },
+    {
      "key": "counting:count_objects",
      "why": "R.B11.S1 Find 9 and 10 (school prior learning, week W21)",
      "opts": {
       "band": 10,
       "objects": "frame"
-     }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (school prior learning, week W21)",
-     "opts": {
-      "band": 10
      }
     },
     {
@@ -2474,25 +2372,10 @@
      }
     },
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (earlier, same idea: tens)",
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (earlier, same idea: tens)",
      "opts": {
-      "band": 90
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "step": 1,
-      "range": 100
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "band": 100
+      "band": 10
      }
     }
    ],
@@ -2527,6 +2410,14 @@
    ],
    "pre": [
     {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 count on to 20",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
+    },
+    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W22)",
      "opts": {
@@ -2548,25 +2439,10 @@
      }
     },
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (earlier, same idea: tens)",
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 Count within 20 (earlier, same idea: tens)",
      "opts": {
-      "band": 90
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "step": 1,
-      "range": 100
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (earlier, same idea: tens)",
-     "opts": {
-      "band": 100
+      "band": 20
      }
     }
    ],
@@ -2574,7 +2450,7 @@
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the next step on this idea: Y1.B6.S4 Groups of tens and ones",
+     "why": "the same idea in another form: Build a Number with Base-10 Blocks, at this step's size",
      "opts": {
       "band": 20
      }
@@ -2819,7 +2695,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = only."
@@ -2862,7 +2743,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "placevalue:order_least_to_greatest is not tagged: its lowest band (99) orders 2-digit numbers only."
@@ -2941,8 +2827,15 @@
      }
     },
     {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "key": "addition:nl_add",
+     "why": "the same addition as jumps on a 0-10 line",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:equal_sign",
+     "why": "is the sentence true? the = sign",
      "opts": {
       "range": 10
      }
@@ -2979,13 +2872,6 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W16)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W16)",
      "opts": {
@@ -2997,16 +2883,6 @@
      "why": "Y1.B2.S12 Subtraction - find a part (earlier, same idea: bond)",
      "opts": {
       "range": 10
-     }
-    },
-    {
-     "key": "addition:add_three",
-     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
-     "opts": {
-      "band": 10,
-      "notation": [
-       "across"
-      ]
      }
     },
     {
@@ -3032,8 +2908,17 @@
      }
     },
     {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "key": "addition:add_10_no_regroup",
+     "why": "the two parts written as an addition sentence",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "the parts as two jumps on a 0-10 line",
      "opts": {
       "range": 10
      }
@@ -3071,13 +2956,6 @@
      "why": "Y1.B4 teen numbers on two frames",
      "opts": {
       "band": 19
-     }
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W17)",
-     "opts": {
-      "band": 10
      }
     },
     {
@@ -3120,8 +2998,17 @@
      }
     },
     {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "key": "addition:add_10_no_regroup",
+     "why": "the two parts written as an addition sentence",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "the parts as two jumps on a 0-10 line",
      "opts": {
       "range": 10
      }
@@ -3161,34 +3048,19 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (earlier, same idea: bond)",
-     "opts": {
-      "band": 20
-     }
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "subtraction:sub_20_no_regroup",
-     "why": "a later step on this idea: Y1.B5.S6 Subtract ones using number bonds",
+     "key": "addition:add_20_no_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (earlier, same idea: bond)",
      "opts": {
       "band": 20,
       "notation": [
        "across"
       ]
      }
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
-     "opts": {
-      "range": 10
-     }
     }
    ],
-   "note": "Doubles 1 + 1 to 10 + 10."
+   "preBuild": [],
+   "related": [],
+   "note": "Doubles 1 + 1 to 10 + 10. Related: none; the other forms of this idea are double (a pre-skill here); halve (halves and quarters are taught from week 36); doubles_near_doubles (a direct skill here)."
   },
   "Y1.B5.S5": {
    "title": "Near doubles",
@@ -3225,34 +3097,19 @@
      }
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (earlier, same idea: bond)",
-     "opts": {
-      "band": 20
-     }
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "subtraction:sub_20_no_regroup",
-     "why": "a later step on this idea: Y1.B5.S6 Subtract ones using number bonds",
+     "key": "addition:add_20_no_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (earlier, same idea: bond)",
      "opts": {
       "band": 20,
       "notation": [
        "across"
       ]
      }
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
-     "opts": {
-      "range": 10
-     }
     }
    ],
-   "note": "Doubles plus one and minus one."
+   "preBuild": [],
+   "related": [],
+   "note": "Doubles plus one and minus one. Related: none; the other forms of this idea are double (a pre-skill here); halve (halves and quarters are taught from week 36); doubles_near_doubles (a direct skill here)."
   },
   "Y1.B5.S6": {
    "title": "Subtract ones using number bonds",
@@ -3311,30 +3168,29 @@
      }
     },
     {
-     "key": "addition:add_three",
-     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
-      "band": 10,
-      "notation": [
-       "across"
-      ]
+      "band": 10
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:comparison_word",
-     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "key": "addition:add_10_no_regroup",
+     "why": "the two parts written as an addition sentence",
      "opts": {
-      "range": 10
+      "notation": [
+       "across"
+      ]
      }
     },
     {
-     "key": "addition:cloze_addition",
-     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
+     "key": "addition:nl_add",
+     "why": "the parts as two jumps on a 0-10 line",
      "opts": {
-      "range": 20
+      "range": 10
      }
     }
    ],
@@ -3346,7 +3202,8 @@
     {
      "key": "subtraction:nl_sub",
      "opts": {
-      "range": 20
+      "range": 20,
+      "unknown": "answer"
      }
     },
     {
@@ -3373,7 +3230,8 @@
      "key": "subtraction:nl_sub",
      "why": "Y1.B2.S16 subtract on a 0-10 line",
      "opts": {
-      "range": 10
+      "range": 10,
+      "unknown": "answer"
      }
     },
     {
@@ -3402,13 +3260,6 @@
      "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
      "opts": {
       "range": 10
-     }
-    },
-    {
-     "key": "addition:cloze_addition",
-     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
-     "opts": {
-      "range": 20
      }
     }
    ],
@@ -3451,7 +3302,8 @@
      "key": "subtraction:nl_sub",
      "why": "Y1.B5.S7 Subtraction - counting back (earlier, same idea: sub)",
      "opts": {
-      "range": 20
+      "range": 20,
+      "unknown": "answer"
      }
     },
     {
@@ -3463,16 +3315,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:cloze_addition",
-     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
-     "opts": {
-      "range": 10
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; the other forms of this idea are compare_groups (a pre-skill here)."
   },
   "Y1.B5.S9": {
    "title": "Related facts",
@@ -3995,7 +3839,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 14); place_on_number_line (a direct skill here); base10_build (an earlier WRM step teaches it, but the school teaches it after this week)."
+   "note": "Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 14); place_on_number_line (a direct skill here)."
   },
   "Y1.B6.S7": {
    "title": "Estimate on a number line to 50",
@@ -4044,7 +3888,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 14); place_on_number_line (a direct skill here); base10_build (an earlier WRM step teaches it, but the school teaches it after this week)."
+   "note": "Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 14); place_on_number_line (a direct skill here)."
   },
   "Y1.B6.S8": {
    "title": "1 more, 1 less",
@@ -4096,7 +3940,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_sequence (a pre-skill here); more_less_10 (a direct skill here); base10_build (an earlier WRM step teaches it, but the school teaches it after this week)."
+   "note": "Related: none; the other forms of this idea are count_sequence (a pre-skill here); more_less_10 (a direct skill here)."
   },
   "Y1.B7.S1": {
    "title": "Compare lengths and heights",
@@ -4539,7 +4383,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are tens_foundation_visual (a pre-skill here); skip_count_line (a direct skill here); equal_or_unequal_groups (left out here (rules 8 and 18)); arrays_groups (arrays are taught from week 20)."
+   "note": "Related: none; the other forms of this idea are tens_foundation_visual (a pre-skill here); skip_count_line (a direct skill here)."
   },
   "Y1.B9.S3": {
    "title": "Count in 5s",
@@ -4876,20 +4720,23 @@
   },
   "Y1.B10.S1": {
    "title": "Recognise a half of an object or a shape",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:partition_shapes",
      "opts": {
       "parts": [
        0
       ]
-     }
+     },
+     "missing": "halves only (parts 0), but half the items ask for the typed fraction 1/2, and no item shows an unequal split"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "recognising a half as one of 2 equal parts, and equal or not equal, without written fraction notation (half the items ask for a typed 1/2)",
+   "build": [
+    "halves_quarters_only"
+   ],
    "pre": [
     {
      "key": "division:share_into_groups",
@@ -4927,14 +4774,13 @@
    "related": [
     {
      "key": "patterns:halve",
-     "why": "a later step on this idea: Y1.B10.S4 Find a half of a quantity",
+     "why": "half of a shape, then half of a quantity (to 10)",
      "opts": {
-      "band": 10,
-      "range": 10
+      "band": 10
      }
     }
    ],
-   "note": "Halves only (parts 0)."
+   "note": ""
   },
   "Y1.B10.S2": {
    "title": "Find a half of an object or a shape",
@@ -4985,10 +4831,9 @@
    "related": [
     {
      "key": "patterns:halve",
-     "why": "a later step on this idea: Y1.B10.S4 Find a half of a quantity",
+     "why": "half of a shape, then half of a quantity (to 10)",
      "opts": {
-      "band": 10,
-      "range": 10
+      "band": 10
      }
     }
    ],
@@ -5071,37 +4916,31 @@
      "opts": {
       "band": 12
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (earlier, same idea: fracshape)",
-     "opts": {
-      "parts": [
-       2
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "halve: \"Half of 8\" within 10. Related: none; the other forms of this idea are fraction_of_set (left out here (rules 8 and 18)); double (a pre-skill here)."
+   "note": "halve: \"Half of 8\" within 10. Pre: 2 only; the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions; partition_shapes: its opts deal only 2 different item(s); shade_fraction: it shows fractions). Related: none; the other forms of this idea are fraction_of_set (left out here (rules 8 and 18)); double (a pre-skill here)."
   },
   "Y1.B10.S5": {
    "title": "Recognise a quarter of an object or a shape",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:partition_shapes",
      "opts": {
       "parts": [
        2
       ]
-     }
+     },
+     "missing": "fourths only (parts 2), but half the items ask for typed 1/4, 2/4 or 3/4, and no item shows an unequal split"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "recognising a quarter as one of 4 equal parts, and equal or not equal, without written fraction notation (half the items ask for typed 1/4, 2/4, 3/4)",
+   "build": [
+    "halves_quarters_only"
+   ],
    "pre": [
     {
      "key": "shapes_early:name_2d_shapes",
@@ -5130,7 +4969,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Fourths only (parts 2). Pre: 2 only; the earlier steps on this idea use this step's own skill (partition_shapes); the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions; shade_fraction: it shows fractions). Related: none; the other forms of this idea are shade_fraction (left out here (rules 8 and 18)); halve (an earlier WRM step teaches it, but the school teaches it after this week)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (partition_shapes); the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions; shade_fraction: it shows fractions). Related: none; the other forms of this idea are shade_fraction (left out here (rules 8 and 18))."
   },
   "Y1.B10.S6": {
    "title": "Find a quarter of an object or a shape",
@@ -5153,15 +4992,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (earlier, same idea: fracshape)",
-     "opts": {
-      "parts": [
-       2
-      ]
-     }
-    },
-    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fracqty)",
      "opts": {
@@ -5172,7 +5002,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shade_fraction); the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions). Related: none; the other forms of this idea are partition_shapes (a pre-skill here); fraction_of_set (left out here (rules 8 and 18))."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shade_fraction); the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions; partition_shapes: its opts deal only 2 different item(s)). Related: none; the other forms of this idea are partition_shapes (taught at an earlier step (Y1.B10.S5), but not a building block of this step); fraction_of_set (left out here (rules 8 and 18))."
   },
   "Y1.B10.S7": {
    "title": "Recognise a quarter of a quantity",
@@ -5196,15 +5026,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 a quarter of a shape: four equal parts",
-     "opts": {
-      "parts": [
-       2
-      ]
-     }
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 make equal groups",
      "opts": {
@@ -5222,7 +5043,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are halve (a pre-skill here); shade_fraction (left out here (rules 8 and 18)); fraction_of_set (a direct skill here)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the other earlier skills on this idea do not fit this step (partition_shapes: its opts deal only 2 different item(s); shade_fraction: it shows fractions). Related: none; the other forms of this idea are halve (a pre-skill here); shade_fraction (left out here (rules 8 and 18)); fraction_of_set (a direct skill here)."
   },
   "Y1.B10.S8": {
    "title": "Find a quarter of a quantity",
@@ -5259,20 +5080,11 @@
       "band": 10,
       "range": 10
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (earlier, same idea: fracshape)",
-     "opts": {
-      "parts": [
-       2
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are halve (a pre-skill here); shade_fraction (left out here (rules 8 and 18))."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the other earlier skills on this idea do not fit this step (partition_shapes: its opts deal only 2 different item(s); shade_fraction: it shows fractions). Related: none; the other forms of this idea are halve (a pre-skill here); shade_fraction (left out here (rules 8 and 18))."
   },
   "Y1.B11.S1": {
    "title": "Describe turns",
@@ -5595,13 +5407,6 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "a later step on this idea: Y1.B12.S6 Compare numbers with the same number of tens",
-     "opts": {
-      "band": 99
-     }
     }
    ],
    "note": ""
@@ -5686,13 +5491,6 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "a later step on this idea: Y1.B12.S6 Compare numbers with the same number of tens",
-     "opts": {
-      "band": 99
-     }
     }
    ],
    "note": ""
@@ -5770,16 +5568,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "placevalue:compare",
-     "why": "a later step on this idea: Y1.B12.S6 Compare numbers with the same number of tens",
-     "opts": {
-      "band": 99
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; the other forms of this idea are tens_foundation_visual (a pre-skill here); unit_form (a direct skill here); base10_build (a direct skill here)."
   },
   "Y1.B12.S4": {
    "title": "The number line to 100",
@@ -5801,18 +5591,18 @@
    ],
    "pre": [
     {
-     "key": "counting:count_sequence",
-     "why": "R.B11.S5 1 more (school prior learning, week W10)",
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B12.S1 the number track to 100 (school week 10)",
      "opts": {
-      "band": 10,
-      "dir": "forward"
+      "step": 1,
+      "range": 100
      }
     },
     {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S9 Make arrangements of 10 (school prior learning, week W10)",
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y1.B12.S1 the hundred square to 100",
      "opts": {
-      "band": 10
+      "band": 100
      }
     },
     {
@@ -5824,16 +5614,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "placevalue:compare",
-     "why": "a later step on this idea: Y1.B12.S6 Compare numbers with the same number of tens",
-     "opts": {
-      "band": 99
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; the other forms of this idea are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 14)."
   },
   "Y1.B12.S5": {
    "title": "1 more, 1 less",
@@ -5895,7 +5677,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_sequence (a pre-skill here); base10_build (an earlier WRM step teaches it, but the school teaches it after this week); unit_form (an earlier WRM step teaches it, but the school teaches it after this week); compare (it deals numbers to 98, past 50 at week 9)."
+   "note": "Related: none; the other forms of this idea are count_sequence (a pre-skill here)."
   },
   "Y1.B12.S6": {
    "title": "Compare numbers with the same number of tens",
@@ -5950,10 +5732,6 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
     }
    ],
    "note": ""
@@ -6016,10 +5794,6 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
     }
    ],
    "note": ""
@@ -6357,7 +6131,7 @@
     "day_order"
    ],
    "related": [],
-   "note": "Related: no live skill orders the months; the days-of-the-week build (time_talk) is the same idea. Pre: 0 only; the earlier steps Y1.B14.S2, R.B10.S6, R.B10.S5 have no live skill yet (see preBuild). Related: none; the other forms of this idea are time_hour (left out here (rules 8 and 18)); time_half_hour (left out here (rules 8 and 18)); time_match_clock (left out here (rules 8 and 18))."
+   "note": "Related: no live skill orders the months; the days-of-the-week build (time_talk) is the same idea. Pre: 0 only; the earlier steps Y1.B14.S2, R.B10.S6, R.B10.S5 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S4": {
    "title": "Hours, minutes and seconds",
@@ -7173,11 +6947,13 @@
    ],
    "why": "the denominator family 2 also deals quarters and eighths",
    "steps": [
+    "Y1.B10.S1",
     "Y1.B10.S2",
+    "Y1.B10.S5",
     "Y1.B10.S6",
     "Y1.B10.S8"
    ],
-   "closes": "Y1.B10.S2: finding (shading) a half of a shape only; Y1.B10.S6: finding (shading) a quarter of a shape only; Y1.B10.S8: finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths)",
+   "closes": "Y1.B10.S1: recognising a half as one of 2 equal parts, and equal or not equal, without written fraction notation (half the items ask for a typed 1/2); Y1.B10.S2: finding (shading) a half of a shape only; Y1.B10.S5: recognising a quarter as one of 4 equal parts, and equal or not equal, without written fraction notation (half the items ask for typed 1/4, 2/4, 3/4); Y1.B10.S6: finding (shading) a quarter of a shape only; Y1.B10.S8: finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths)",
    "reused": false
   },
   "half_quarter": {
@@ -7673,6 +7449,12 @@
    "why": "dot_array_mult deals 6 × 8 arrays with ×: past the step; kept as related"
   },
   {
+   "key": "shapes_early:partition_shapes",
+   "step": "Y1.B10.S1",
+   "action": "partial",
+   "why": "halves only (parts 0), but half the items ask for the typed fraction 1/2, and no item shows an unequal split"
+  },
+  {
    "key": "fractions:shade_fraction",
    "step": "Y1.B10.S2",
    "action": "partial",
@@ -7683,6 +7465,12 @@
    "step": "Y1.B10.S4",
    "action": "remove",
    "why": "does not teach this step: tagged full but no generated item matches the step"
+  },
+  {
+   "key": "shapes_early:partition_shapes",
+   "step": "Y1.B10.S5",
+   "action": "partial",
+   "why": "fourths only (parts 2), but half the items ask for typed 1/4, 2/4 or 3/4, and no item shows an unequal split"
   },
   {
    "key": "fractions:shade_fraction",

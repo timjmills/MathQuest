@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 5)
+# R and Y1: generated items per step (wave 2 tagging, round 6)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -861,9 +861,9 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Omar has 8 shells. Omar gives 3 shells to Kofi. How many shells does Omar have left? / A=5 / number / {lines:[Omar has 8 shells.,Omar gives 3 shells to Kofi.,How many shells does Omar have left?],steps:[{a:8,b:3,
 
 ### Y1.B2.S16 Subtraction on a number line — **full**
-- full `subtraction:nl_sub` opts `{"range":10}` (6 generated; Max Number 10)
+- full `subtraction:nl_sub` opts `{"range":10,"unknown":"answer"}` (6 generated; Max Number 10)
   - 6 − 4 = ? / A=2 / number / {min:0,max:10,start:6,add:4,op:-,unknown:result}
-  - 8 − ? = 3 / A=5 / number / {min:0,max:10,start:8,add:5,op:-,unknown:b}
+  - 8 − 5 = ? / A=3 / number / {min:0,max:10,start:8,add:5,op:-,unknown:result}
   - 4 − 1 = ? / A=3 / number / {min:0,max:10,start:4,add:1,op:-,unknown:result}
 - full `subtraction:number_line_sub` opts `{"range":10}` (6 generated; Max Number 10)
   - Use the number line: 7 − 5 = ? / A=2 / number / {min:0,max:10,start:7,add:5,op:-,unknown:result}
@@ -1032,9 +1032,9 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - 9 − 3 = ? / A=6 / number
 
 ### Y1.B5.S7 Subtraction - counting back — **full**
-- full `subtraction:nl_sub` opts `{"range":20}` (6 generated; Max Number 20)
+- full `subtraction:nl_sub` opts `{"range":20,"unknown":"answer"}` (6 generated; Max Number 20)
   - 11 − 8 = ? / A=3 / number / {min:0,max:20,start:11,add:8,op:-,unknown:result}
-  - 16 − ? = 9 / A=7 / number / {min:0,max:20,start:16,add:7,op:-,unknown:b}
+  - 16 − 7 = ? / A=9 / number / {min:0,max:20,start:16,add:7,op:-,unknown:result}
   - 7 − 1 = ? / A=6 / number / {min:0,max:20,start:7,add:1,op:-,unknown:result}
 - full `subtraction:number_line_sub` opts `{"range":20}` (6 generated; Max Number 20)
   - Use the number line: 12 − 8 = ? / A=4 / number / {min:0,max:20,start:12,add:8,op:-,unknown:result}
@@ -1222,8 +1222,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - There are 12 counters. Make groups of 3. How many groups are there? / A=4 / number / {kind:share,n:12,size:3,ans:4}
   - There are 9 counters. Make groups of 3. How many groups are there? / A=3 / number / {kind:share,n:9,size:3,ans:3}
 
-### Y1.B10.S1 Recognise a half of an object or a shape — **full**
-- full `shapes_early:partition_shapes` opts `{"parts":[0]}` (6 generated; Max Number not read)
+### Y1.B10.S1 Recognise a half of an object or a shape — **partial** (missing: recognising a half as one of 2 equal parts, and equal or not equal, without written fraction notation (half the items ask for a typed 1/2))
+- partial `shapes_early:partition_shapes` opts `{"parts":[0]}` (6 generated; Max Number not read)
   - What fraction of the shape is shaded? / A="1/2" / text
   - How many equal parts is this shape divided into? / A=2 / number
   - How many equal parts is this shape divided into? / A=2 / number
@@ -1246,8 +1246,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Half of 8 / A=4 / number
   - Half of 2 / A=1 / number
 
-### Y1.B10.S5 Recognise a quarter of an object or a shape — **full**
-- full `shapes_early:partition_shapes` opts `{"parts":[2]}` (6 generated; Max Number not read)
+### Y1.B10.S5 Recognise a quarter of an object or a shape — **partial** (missing: recognising a quarter as one of 4 equal parts, and equal or not equal, without written fraction notation (half the items ask for typed 1/4, 2/4, 3/4))
+- partial `shapes_early:partition_shapes` opts `{"parts":[2]}` (6 generated; Max Number not read)
   - What fraction of the shape is shaded? / A="3/4" / text
   - How many equal parts is this shape divided into? / A=4 / number
   - How many equal parts is this shape divided into? / A=4 / number

@@ -109,12 +109,14 @@ def dealt(k, o):
 NUMCAT = re.compile(r'^(counting|composing|comparing|addition|subtraction|placevalue|number_sense|patterns:(double|halve|skip)|division|measurement:money|measurement:coin)')
 BADFLAGS = ('times', 'parallel', 'vert', 'column', 'coord', 'word', 'poly', 'units', 'frac')
 # Reception links stay pictured (critic r4 D1): no symbol-only equations, number lines, missing-number or three-addend sums
+R_WRITTEN = re.compile(r'^(measurement:(time_|clock_)|multiplication:)')   # critic r5 N3
 R_EQ = re.compile(r'^(addition:(nl_add|number_line_add|add_three|add_10_no_regroup|add_10_mixed|cloze_addition|number_families_add|add_sub_fact_family|add_20|equal_sign|add_facts)|subtraction:(nl_sub|number_line_sub|missing_add_sub|sub_10|sub_20))')
 def content_why(k, o, step):
     """Rule 18 content / layout: the one content reason a link cannot be used, or None."""
     if k in FIT and not FIT[k]: return 'its content is past this grade'
     if 'name_match' in k: return 'it drags written names'
     if step.startswith('R.') and R_EQ.match(k): return 'it is a symbol equation or number line, not a Reception response'
+    if step.startswith('R.') and R_WRITTEN.match(k): return 'it asks for a written Kindergarten answer (clock times, groups-of sentences)'
     d = md(k, o)
     if d.get('distinct', 24) < 3: return f"its opts deal only {d.get('distinct')} different item(s)"
     f = d['flags']
@@ -167,7 +169,7 @@ def lcap_c(c): return max(c * 1.5, c + 2)
 # Rule 19: the first-taught Kindergarten week of each content type, read from the Kindergarten sheet (0 = taught in Reception).
 CONTENT_WEEKS = {'number lines': 5, 'tens as rods': 8, 'counting in 10s': 9, 'number sentences': 11, 'coins': 11, 'addition sentences': 14,
                  'subtraction sentences': 14, 'equal groups': 19, 'arrays': 20, 'measuring with units': 24, 'counting in 2s and 5s': 33,
-                 'notes (bills)': 35, 'clock time': 36, 'halves and quarters': 36, '< > symbols': 4}
+                 'notes (bills)': 35, 'differences (how many more)': 18, 'clock time': 36, 'halves and quarters': 36, '< > symbols': 4}
 SENT = re.compile(r'^(addition:(nl_add|number_line_add|add_three|add_10_no_regroup|add_10_mixed|cloze_addition|number_families_add|add_sub_fact_family|add_20|equal_sign|add_facts)|subtraction:(nl_sub|number_line_sub|missing_add_sub|sub_10|sub_20))')
 def ctypes(k, o):
     """The rule-19 content types a skill+opts deals (key-based, plus the critic's per-item classes on >= 3 of 24 items)."""
@@ -187,6 +189,7 @@ def ctypes(k, o):
     if hit('clock') or FIXED.match(k): t.add('clock time')
     if hit('frac') or re.match(r'^(fractions:|patterns:halve|shapes_early:partition)', k): t.add('halves and quarters')
     if hit('lt') or k.startswith('placevalue:compare'): t.add('< > symbols')
+    if hit('diff'): t.add('differences (how many more)')
     return sorted(t)
 def week_limit(w): return 20 if w < 8 else 50 if w < 10 else 100
 def week_why(k, o, step):
@@ -200,7 +203,8 @@ def week_why(k, o, step):
 def size_why(k, o, step, why=''):
     if FIXED.match(k): return None
     c = ceil_for(step, why)
-    return f'it deals numbers to {dealt(k, o)}, past this step ({c})' if dealt(k, o) > lcap_c(c) else None
+    if dealt(k, o) <= lcap_c(c): return None
+    return 'a counting skill; this step has no numbers' if c == 0 else f'it deals numbers to {dealt(k, o)}, past this step ({c})'
 def misfit(k, o, step, why=''):
     """The ONE reason a link does not fit this step (content, school week or size), or None."""
     return content_why(k, o, step) or week_why(k, o, step) or size_why(k, o, step, why)
@@ -213,6 +217,15 @@ def fit(k, step, why=''):
 def fit_reason(k, step, why=''):
     rows = [o for c, o in FIT[k]] if k in FIT and FIT[k] else [{}]
     return misfit(k, rows[0], step, why) or 'it does not fit this step'
+# A related why must say what the link's items do (critic r5 N1 / N2): checked when the file is generated.
+FALSE_WHY = [(re.compile(r'which has more|one jump'), lambda k, o: True),
+             (re.compile(r'rows of a picture graph'), lambda k, o: md(k, o).get('c19', {}).get('diff', 0) > 0)]
+def check_claims(step, rel):
+    for e in rel:
+        m = re.search(r'(?:next|later) step on this idea: ((?:R|Y1)\.B\d+\.S\d+)', e['why'])
+        assert not m or related_topic(step, m.group(1)) == 2, (step, e)   # a later step must be the same sub-idea
+        for rx, bad in FALSE_WHY:
+            assert not (rx.search(e['why']) and bad(e['key'], e.get('opts', {}))), (step, e)
 def split(e):
     return (e[0], e[1], e[2] if len(e) > 2 else None)
 TAUGHT = {}   # key -> [(step, opts)] in curriculum order
@@ -314,13 +327,17 @@ def build(step):
             k2, why, o = split(e); addr(k2, why, o)
     # the next steps' skills when they carry the same idea forward (rule 4/10: a reason beyond "same block")
     later = [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2]
+    def add_later(x, k, o, lead):
+        # cite the later step only when its own opts fit here; a refitted link is the same idea at this step's size
+        if fits(k, o, step): addr(k, f"{lead}: {fmt_step(x)}", o)
+        else: addr(k, f"the same idea in another form: {label(k)}, at this step's size", None)
     for x in later[:3]:
-        for k, o in dentries(x): addr(k, f"the next step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
-    if len(rel) < 2:   # a later step on the same idea whose skill is new (not taught yet): the next form a pupil meets
-        for x in [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2 or (related_topic(step, x) and info[x]['block'] == s['block'])]:
+        for k, o in dentries(x): add_later(x, k, o, 'the next step on this idea')
+    if len(rel) < 2:   # a later step on the SAME sub-idea (critic r5 N1: never a family-only step) whose skill is not taught yet
+        for x in [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2]:
             if len(rel) >= 2: break
             for k, o in dentries(x):
-                if not earlier(k): addr(k, f"a later step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
+                if not earlier(k): add_later(x, k, o, 'a later step on this idea')
     if len(rel) < 2:
         for e in EXTRA.get(topic(step), []):
             k, why, o = split(e); addr(k, why, o)
@@ -348,7 +365,8 @@ def build(step):
                 live_c = [x for x in cands if S[x]['d']][:4]
                 parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')
             add_note(f"Pre: {len(pre)} only; " + '; '.join(parts) + '.')
-    if not rel:
+    check_claims(step, rel)
+    if not rel and 'Related:' not in note:
         rr = {k: r for k, r in rej.items() if r}
         if rr:
             add_note('Related: none; the other forms of this idea are ' + '; '.join(f"{k.split(':')[1]} ({r})" for k, r in list(rr.items())[:5]) + '.')

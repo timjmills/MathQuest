@@ -14,7 +14,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre-number step; no existing skill matches pictures. Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the other forms of this idea are compare_groups (it deals numbers to 5, past this step (0)); classify_count (it deals numbers to 3, past this step (0)); pictograph_intro (it deals numbers to 5, past this step (0))."
+   "note": "Pre-number step; no existing skill matches pictures. Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the other forms of this idea are compare_groups (a counting skill; this step has no numbers); classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S2": {
    "title": "Match pictures and objects",
@@ -28,7 +28,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (it deals numbers to 3, past this step (0)); pictograph_intro (it deals numbers to 5, past this step (0))."
+   "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S3": {
    "title": "Identify a set",
@@ -44,7 +44,7 @@
     "match_same"
    ],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (it deals numbers to 3, past this step (0)); pictograph_intro (it deals numbers to 5, past this step (0))."
+   "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S4": {
    "title": "Sort objects to a type",
@@ -79,7 +79,12 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+     "why": "the sorted groups as rows of a picture graph, counted",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -125,7 +130,12 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+     "why": "the sorted groups as rows of a picture graph, counted",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -153,7 +163,7 @@
     "odd_one_out"
    ],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a pre-skill here); pictograph_intro (it deals numbers to 5, past this step (0))."
+   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a pre-skill here); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S7": {
    "title": "Compare amounts",
@@ -196,7 +206,12 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "Compare two groups to 5 by matching one to one (tap A or B). Pre: 2 only; this is the first step on this idea (compare) in the curriculum, so its pre-skills are building blocks from other ideas."
@@ -513,7 +528,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here); count_sequence (it deals numbers to 10, past this step (3)); number_word_form (it deals numbers to 20, past this step (3)); number_seq_fill (it deals numbers to 10, past this step (3))."
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here); number_word_form (it deals numbers to 20, past this step (3)); count_sequence (it deals numbers to 10, past this step (3)); number_seq_fill (it deals numbers to 10, past this step (3))."
   },
   "R.B3.S4": {
    "title": "1 more",
@@ -658,7 +673,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (3)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (it is a symbol equation or number line, not a Reception response); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
+   "note": "Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (3)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (left out here (rules 8 and 18)); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
   },
   "R.B4.S1": {
    "title": "Identify and name circles and triangles",
@@ -685,7 +700,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "a later step on this idea: R.B6.S2 Combine shapes with 4 sides",
+     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
      "opts": {
       "shapes": [
        0,
@@ -735,7 +750,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "the next step on this idea: R.B6.S2 Combine shapes with 4 sides",
+     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
      "opts": {
       "shapes": [
        0,
@@ -774,7 +789,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "the next step on this idea: R.B6.S2 Combine shapes with 4 sides",
+     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
      "opts": {
       "shapes": [
        0,
@@ -1102,7 +1117,7 @@
     "band_3"
    ],
    "related": [],
-   "note": "Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts. Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (it is a symbol equation or number line, not a Reception response); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
+   "note": "Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts. Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (left out here (rules 8 and 18)); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
   },
   "R.B5.S7": {
    "title": "Composition of 1 - 5",
@@ -1147,7 +1162,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (it is a symbol equation or number line, not a Reception response); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
+   "note": "Related: none; the other forms of this idea are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (left out here (rules 8 and 18)); missing_add_sub (it is a symbol equation or number line, not a Reception response)."
   },
   "R.B6.S1": {
    "title": "Identify and name shapes with 4 sides",
@@ -1189,7 +1204,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "the next step on this idea: R.B6.S2 Combine shapes with 4 sides",
+     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
      "opts": {
       "shapes": [
        0,
@@ -1285,7 +1300,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the clock-face skills read the time, a Year 1 (Y1.B14) idea, not the order of a day. Pre: 0 only; this is the first step on this idea (time) in the curriculum. Related: none; the other forms of this idea are time_hour (left out here (rules 8 and 18)); time_half_hour (left out here (rules 8 and 18)); time_match_clock (left out here (rules 8 and 18))."
+   "note": "Related: none; the clock-face skills read the time, a Year 1 (Y1.B14) idea, not the order of a day. Pre: 0 only; this is the first step on this idea (time) in the curriculum."
   },
   "R.B7.S1": {
    "title": "Introduce zero",
@@ -2023,15 +2038,15 @@
    "preBuild": [],
    "related": [
     {
+     "key": "addition:add_5_pictures",
+     "why": "the two parts combined into the whole"
+    },
+    {
      "key": "composing:make_ten",
      "why": "the same idea in another form: bonds to 10 on a frame",
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
     }
    ],
    "note": ""
@@ -2145,15 +2160,15 @@
    "preBuild": [],
    "related": [
     {
+     "key": "addition:add_5_pictures",
+     "why": "a double is two equal groups combined"
+    },
+    {
      "key": "patterns:halve",
      "why": "the inverse: halve",
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
     }
    ],
    "note": ""
@@ -2202,15 +2217,15 @@
    "preBuild": [],
    "related": [
     {
+     "key": "addition:add_5_pictures",
+     "why": "a double is two equal groups combined"
+    },
+    {
      "key": "patterns:halve",
      "why": "the inverse: halve",
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
     }
    ],
    "note": ""
@@ -2489,17 +2504,8 @@
    "preBuild": [
     "day_order"
    ],
-   "related": [
-    {
-     "key": "measurement:time_hour",
-     "why": "a later step on this idea: Y1.B14.S5 Tell the time to the hour"
-    },
-    {
-     "key": "measurement:time_half_hour",
-     "why": "a later step on this idea: Y1.B14.S6 Tell the time to the half hour"
-    }
-   ],
-   "note": "Pre: 0 only; the earlier steps R.B6.S4 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Pre: 0 only; the earlier steps R.B6.S4 have no live skill yet (see preBuild). Related: none; the other forms of this idea are time_hour (it asks for a written Kindergarten answer (clock times, groups-of sentences)); time_half_hour (it asks for a written Kindergarten answer (clock times, groups-of sentences)); time_match_clock (it asks for a written Kindergarten answer (clock times, groups-of sentences))."
   },
   "R.B10.S6": {
    "title": "Order and sequence time",
@@ -2514,17 +2520,8 @@
    "preBuild": [
     "time_talk"
    ],
-   "related": [
-    {
-     "key": "measurement:time_hour",
-     "why": "a later step on this idea: Y1.B14.S5 Tell the time to the hour"
-    },
-    {
-     "key": "measurement:time_half_hour",
-     "why": "a later step on this idea: Y1.B14.S6 Tell the time to the half hour"
-    }
-   ],
-   "note": "Pre: 0 only; the earlier steps R.B10.S5, R.B6.S4 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Pre: 0 only; the earlier steps R.B10.S5, R.B6.S4 have no live skill yet (see preBuild). Related: none; the other forms of this idea are time_hour (it asks for a written Kindergarten answer (clock times, groups-of sentences)); time_half_hour (it asks for a written Kindergarten answer (clock times, groups-of sentences)); time_match_clock (it asks for a written Kindergarten answer (clock times, groups-of sentences))."
   },
   "R.B11.S1": {
    "title": "Find 9 and 10",
@@ -2636,7 +2633,12 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "compare two rows of pictures: which has more"
+     "why": "count two rows of a picture graph",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = (81 _ 52), none within 10."
@@ -2739,13 +2741,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "composing:make_ten",
-     "why": "a later step on this idea: R.B11.S8 Bonds to 10 (2 parts)",
-     "opts": {
-      "band": 10
-     }
-    },
     {
      "key": "counting:number_seq_fill",
      "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
@@ -2964,7 +2959,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "make_ten: the frame shows n, how many more make 10. Related: none; the other forms of this idea are number_bonds (a pre-skill here); ten_frame_build (a pre-skill here); add_three (it is a symbol equation or number line, not a Reception response); missing_add_sub (it is a symbol equation or number line, not a Reception response); make_ten (a direct skill here)."
+   "note": "make_ten: the frame shows n, how many more make 10. Related: none; the other forms of this idea are number_bonds (a pre-skill here); ten_frame_build (a pre-skill here); add_three (left out here (rules 8 and 18)); missing_add_sub (it is a symbol equation or number line, not a Reception response); make_ten (a direct skill here)."
   },
   "R.B11.S9": {
    "title": "Make arrangements of 10",
@@ -3017,7 +3012,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are add_three (it is a symbol equation or number line, not a Reception response); number_bonds (a pre-skill here); missing_add_sub (it is a symbol equation or number line, not a Reception response); add_20_no_regroup (it is a symbol equation or number line, not a Reception response); sub_20_no_regroup (it is a symbol equation or number line, not a Reception response)."
+   "note": "Related: none; the other forms of this idea are add_three (left out here (rules 8 and 18)); number_bonds (a pre-skill here); missing_add_sub (it is a symbol equation or number line, not a Reception response); add_20_no_regroup (it is a symbol equation or number line, not a Reception response); sub_20_no_regroup (it is a symbol equation or number line, not a Reception response)."
   },
   "R.B11.S10": {
    "title": "Bonds to 10 (3 parts)",
@@ -3273,7 +3268,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Tap every cube / sphere ... (forms 1). Related: none in Reception; the written-name match (shape_name_match_3d) is a drag of written words, a Year 1 response. Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B6.S3, R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are shape_name_match_3d (its content is past this grade); name_3d_shapes (a direct skill here)."
+   "note": "Tap every cube / sphere ... (forms 1). Related: none in Reception; the written-name match (shape_name_match_3d) is a drag of written words, a Year 1 response. Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B6.S3, R.B4.S3 have no live skill yet (see preBuild)."
   },
   "R.B12.S2": {
    "title": "Find 2-D shapes within 3-D shapes",
@@ -3585,7 +3580,7 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea)",
+     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea in another form: Count Objects (1-20) (Visual), at this step's size)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -3603,7 +3598,7 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "why": "the same idea in another form: Number Sequence: Fill Missing (Grid), at this step's size",
      "opts": {
       "step": 1,
       "range": 10
@@ -3611,7 +3606,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "why": "the same idea in another form: Hundreds Chart - Find the Missing Number (Visual), at this step's size",
      "opts": {
       "band": 10
      }
@@ -3758,7 +3753,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "why": "the same idea in another form: Hundreds Chart - Find the Missing Number (Visual), at this step's size",
      "opts": {
       "band": 30
      }
@@ -4595,16 +4590,6 @@
      "opts": {
       "band": 12
      }
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "a later step on this idea: Y1.B9.S5 Add equal groups",
-     "opts": {
-      "forms": [
-       1
-      ],
-      "range": 10
-     }
     }
    ],
    "note": ""
@@ -4709,7 +4694,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are arrays_groups (it deals numbers to 25, past this step (12)); equal_or_unequal_groups (left out here (rules 8 and 18)); share_into_groups (a direct skill here)."
+   "note": "Related: none; the other forms of this idea are arrays_groups (it asks for a written Kindergarten answer (clock times, groups-of sentences)); equal_or_unequal_groups (left out here (rules 8 and 18)); share_into_groups (a direct skill here)."
   },
   "R.B16.S4": {
    "title": "Grouping",
