@@ -1156,6 +1156,807 @@
     }
    ],
    "note": ""
+  },
+  "Y4.B2.S1": {
+   "title": "Add and subtract 1s, 10s, 100s and 1,000s",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_sub_100s",
+     "missing": "adding/subtracting 1s, 10s and 1,000s, and any of them to a 4-digit number (3,452 + 300); it deals only 100s to about 1,000"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "missing": "only 1 more/less of each unit, not adding several (3,452 + 3,000)",
+     "opts": {
+      "step": 1000
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding and subtracting multiples of 1, 10, 100 and 1,000 to and from 4-digit numbers, including crossing a boundary",
+   "build": [
+    "add_sub_place_units",
+    "add_sub_patterns"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (prior learning wk W14)",
+     "opts": {
+      "band": 500
+     }
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y3.B2.S3 Add and subtract 10s (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "Y3.B2.S1 Apply number bonds within 10 (prior learning wk W14)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W14)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W14)"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (lower grade, same CCSS cluster)",
+     "opts": {
+      "step": 0
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_10k_no_regroup",
+     "why": "the next step: column addition"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "thinking of 300 as 3 hundreds",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "counting on in 10s, 100s, 1,000s"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S2": {
+   "title": "Add up to two 4-digit numbers - no exchange",
+   "direct": [
+    {
+     "key": "addition:add_10k_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "Y3.B2.S11 Add two numbers (no exchange) (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W14)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W14)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "preBuild": [
+    "add_sub_place_units"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_10k_no_regroup",
+     "why": "the inverse, same layout"
+    },
+    {
+     "key": "addition:add_column_multi",
+     "why": "adding more than two numbers in columns"
+    },
+    {
+     "key": "addition:add_wp_10k_plain",
+     "why": "the same sums in word problems"
+    },
+    {
+     "key": "addition:add_missing_digit",
+     "why": "reasoning about digits in the column"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S3": {
+   "title": "Add two 4-digit numbers - one exchange",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_10k_regroup",
+     "missing": "items cannot be held to exactly ONE exchange; the skill deals any number of exchanges"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page where every item has exactly one exchange (in any one column)",
+   "build": [
+    "exchange_count_add"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_10k_no_regroup",
+     "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (step before in the block)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W14)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "the inverse with exchange"
+    },
+    {
+     "key": "addition:add_wp_10k_plain",
+     "why": "word problems with 4-digit sums"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "estimate before adding",
+     "opts": {
+      "place": 1000
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S4": {
+   "title": "Add two 4-digit numbers - more than one exchange",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_10k_regroup",
+     "missing": "items cannot be held to MORE THAN ONE exchange; many items have only one"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page where every item has two or more exchanges (including a chain such as 2,999 + 1)",
+   "build": [
+    "exchange_count_add"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (prior learning wk W15)",
+     "opts": {
+      "band": 1000
+     }
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_column_multi",
+     "why": "three or four numbers, more exchanges"
+    },
+    {
+     "key": "addition:add_missing_digit",
+     "why": "reasoning about carried digits"
+    },
+    {
+     "key": "addition:add_wp_10k",
+     "why": "word problems"
+    }
+   ],
+   "note": "Existing tag lists add_10k_regroup as full for S3 and S4; it is partial for both until the exchange-count option exists."
+  },
+  "Y4.B2.S5": {
+   "title": "Subtract two 4-digit numbers - no exchange",
+   "direct": [
+    {
+     "key": "subtraction:sub_10k_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_10k_no_regroup",
+     "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "Y1.B2.S15 Subtraction - take away (How many left ) (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "check by adding"
+    },
+    {
+     "key": "subtraction:sub_wp_10k_plain",
+     "why": "word problems"
+    },
+    {
+     "key": "subtraction:sub_missing_digit",
+     "why": "digits in the column"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S6": {
+   "title": "Subtract two 4-digit numbers - one exchange",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "missing": "items cannot be held to exactly ONE exchange"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page where every item has exactly one exchange",
+   "build": [
+    "exchange_count_sub"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_10k_no_regroup",
+     "why": "Y4.B2.S5 Subtract two 4-digit numbers - no exchange (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "the inverse with exchange"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "check by adding"
+    },
+    {
+     "key": "subtraction:sub_wp_10k_plain",
+     "why": "word problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S7": {
+   "title": "Subtract two 4-digit numbers - more than one exchange",
+   "direct": [
+    {
+     "key": "subtraction:sub_across_zeros",
+     "opts": {
+      "band": 10000
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "missing": "items cannot be held to MORE THAN ONE exchange"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "two or more exchanges in numbers without zeros (5,342 − 2,868)",
+   "build": [
+    "exchange_count_sub"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (prior learning wk W16)",
+     "opts": {
+      "band": 1000
+     }
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "the checking step"
+    },
+    {
+     "key": "subtraction:sub_missing_digit",
+     "why": "digits in the column"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "a mental alternative (Y4.B2.S8)"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S8": {
+   "title": "Efficient subtraction",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:compensation",
+     "missing": "only 2-digit numbers; no counting on, constant difference or \"choose the method\" with 4-digit numbers (7,000 − 2,999)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "choosing an efficient method for 4-digit subtraction: counting on, constant difference, compensating, column",
+   "build": [
+    "mental_add_sub",
+    "vis_strategy_pictures"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_across_zeros",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (step before in the block)",
+     "opts": {
+      "band": 10000
+     }
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y3.B2.S10 Make connections (prior learning wk W16)",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (prior learning wk W16)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "the column method it is compared with"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "bridging as a mental method"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "counting on is the inverse"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B2.S9": {
+   "title": "Estimate answers",
+   "direct": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "opts": {
+      "place": 1000,
+      "task": "reasonable"
+     }
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "opts": {
+      "place": 100
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W16)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S11 Estimate on a number line to 1,000 (prior learning wk W16)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:estimate_diff",
+     "why": "differences only"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "which place to round to"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "the next step: checking"
+    }
+   ],
+   "note": "Existing partial tag becomes full with place 1,000 and task \"Is the answer reasonable?\"."
+  },
+  "Y4.B2.S10": {
+   "title": "Checking strategies",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "missing": "2-digit items only; no checking an addition by subtracting, no 4-digit numbers, no checking by estimating"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "using the inverse to check 4-digit additions and subtractions both ways, and estimating to check",
+   "build": [
+    "inverse_check"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y4.B2.S9 Estimate answers (step before in the block)",
+     "opts": {
+      "place": 1000,
+      "task": "reasonable"
+     }
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "the same inverse check for division"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "the four related facts"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "the bar model that shows why the inverse works"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B3.S1": {
+   "title": "What is area",
+   "direct": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "missing": "covers a shape with squares but never names \"area\" or compares surfaces"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "area as the amount of surface covered: comparing two surfaces by covering, and why squares (not circles) tile",
+   "build": [
+    "area_compare"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W18)"
+    },
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3.B5.S10 What is perimeter (prior learning wk W18)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3.B5.S11 Measure perimeter (prior learning wk W18)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W18)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 Count within 20 (prior learning wk W18)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "rows of squares as an array"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "cutting a shape into equal parts"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "area by multiplying, the Grade 3 build that follows"
+    }
+   ],
+   "note": "area_unit_squares counts squares; the \"what is area\" comparing idea is in the area_compare proposal."
+  },
+  "Y4.B3.S2": {
+   "title": "Count squares",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "missing": "whole squares in rectangles and L-shapes only; WRM counts half squares too"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting squares where shapes include half squares (two halves make one)",
+   "build": [
+    "area_half_squares"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "Y4.B3.S1 What is area (step before in the block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W18)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 Count within 20 (prior learning wk W18)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area",
+     "why": "area by multiplying (3.MD.C.7)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "counting edges on the same grid"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "count rows of squares"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B3.S3": {
+   "title": "Make shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "missing": "fills a given rectangle; does not ask for different shapes with the same area"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making several different rectilinear shapes with a given number of squares (area stays the same)",
+   "build": [
+    "area_compare"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S2 Count squares (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W18)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W18)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y1.B1.S13 Compare numbers (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 99
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "same area, different perimeter"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "L, T, U shapes"
+    },
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "why": "rectangles with the same area are factor pairs (Y4.B5.S1)"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B3.S4": {
+   "title": "Compare areas",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing and ordering the areas of shapes by counting squares (which is larger, by how much)",
+   "build": [
+    "area_compare"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S2 Count squares (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "Y4.B3.S3 Make shapes (step before in the block)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y1.B1.S13 Compare numbers (prior learning wk W19)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W19)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area",
+     "why": "computing area to compare"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "compare perimeters on the same shapes"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "\"how many more\" comparison in another form",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1284,6 +2085,166 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "add_sub_place_units": {
+   "kind": "option",
+   "skill": "addition:add_sub_100s",
+   "option": "task \"1s, 10s, 100s or 1,000s to a 4-digit number\" and band 9,999",
+   "name": "Add and Subtract 1s, 10s, 100s and 1,000s (option)",
+   "teaches": "adding and subtracting a multiple of one place value to a 4-digit number (3,452 + 300, 6,105 − 4,000) with and without crossing a boundary",
+   "representation": "equation cell (3,452 + 300 = □) with an optional place-value chart above it, the changing column outlined in black; one answer box",
+   "family": "addition",
+   "ccss": [
+    "3.NBT.A.2",
+    "4.NBT.B.4"
+   ],
+   "why": "add_sub_100s deals only 100s to about 1,000; the WRM step opens the 4-digit block",
+   "steps": [
+    "Y4.B2.S1",
+    "Y4.B2.S2"
+   ],
+   "reused": false
+  },
+  "add_sub_patterns": {
+   "kind": "new",
+   "skill": "addition:add_sub_patterns",
+   "name": "Spot the Pattern (+/−)",
+   "teaches": "using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same",
+   "representation": "a three-row fact ladder with the first row done; complete the others",
+   "family": "operations",
+   "steps": [
+    "Y4.B2.S1",
+    "Y3.B2.S10",
+    "Y3.B2.S2",
+    "Y3.B2.S5"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "exchange_count_add": {
+   "kind": "option",
+   "skill": "addition:add_10k_regroup",
+   "option": "exchanges: exactly one / two or more",
+   "name": "How Many Exchanges? Addition (option)",
+   "teaches": "column addition held to exactly one exchange, or to two or more exchanges, so the WRM one-exchange and more-than-one-exchange steps are separate pages",
+   "representation": "the existing stack cell with regroup boxes (structural, every level); only the dealing changes",
+   "family": "addition",
+   "ccss": [
+    "3.NBT.A.2",
+    "4.NBT.B.4"
+   ],
+   "why": "WRM splits one exchange from several (P-1: one new thing per step); the skill mixes them",
+   "steps": [
+    "Y4.B2.S3",
+    "Y4.B2.S4"
+   ],
+   "reused": false
+  },
+  "exchange_count_sub": {
+   "kind": "option",
+   "skill": "subtraction:sub_10k_regroup",
+   "option": "exchanges: exactly one / two or more",
+   "name": "How Many Exchanges? Subtraction (option)",
+   "teaches": "column subtraction held to exactly one exchange, or to two or more exchanges (not only across zeros)",
+   "representation": "the existing stack cell with exchange boxes; only the dealing changes",
+   "family": "subtraction",
+   "ccss": [
+    "3.NBT.A.2",
+    "4.NBT.B.4"
+   ],
+   "why": "WRM splits one exchange from several; the skill mixes them",
+   "steps": [
+    "Y4.B2.S6",
+    "Y4.B2.S7"
+   ],
+   "reused": false
+  },
+  "mental_add_sub": {
+   "kind": "new",
+   "skill": "addition:mental_strategies",
+   "name": "Mental Addition and Subtraction",
+   "teaches": "mental strategies for large numbers: partitioning, counting on, compensating, near multiples",
+   "representation": "a strategy prompt (round and adjust) beside each calculation",
+   "family": "operations",
+   "steps": [
+    "Y4.B2.S8",
+    "Y5.B2.S1"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "vis_strategy_pictures": {
+   "lane": "algebra",
+   "kind": "option",
+   "name": "Strategy Pictures: Doubles and Constant Difference",
+   "build": "`support: 'pictures'` on doubles and halves (before → after picture pairs, dice / fingers pairs, double or not a double) and `model: 'shift'` on compensation (two short lines with matching hops; the constant difference)",
+   "hosts": [
+    "patterns:double",
+    "patterns:halve",
+    "number_sense:doubles_near_doubles",
+    "number_sense:compensation"
+   ],
+   "templates": [
+    "number-line"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/gen-algebraic.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B2.S8"
+   ],
+   "reused": true,
+   "source": "VISUAL_BUILDS"
+  },
+  "inverse_check": {
+   "kind": "option",
+   "skill": "subtraction:sub_check_by_adding",
+   "option": "large numbers and addition",
+   "name": "Inverse Operations (option)",
+   "teaches": "using the inverse to check and to find missing numbers in addition and subtraction with 5- and 6-digit numbers",
+   "representation": "band option to 1,000,000 and an \"addition checked by subtracting\" variant",
+   "family": "operations",
+   "steps": [
+    "Y4.B2.S10",
+    "Y5.B2.S5"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "area_compare": {
+   "kind": "new",
+   "skill": "area_perimeter:compare_areas",
+   "name": "Make and Compare Areas",
+   "teaches": "making shapes with a given area from squares and comparing areas by counting squares",
+   "representation": "two shapes on squared paper; circle the larger area or draw a shape of 6 squares",
+   "family": "measurement",
+   "steps": [
+    "Y4.B3.S1",
+    "Y4.B3.S3",
+    "Y4.B3.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "area_half_squares": {
+   "kind": "option",
+   "skill": "area_perimeter:area_unit_squares",
+   "option": "form \"with half squares\"",
+   "name": "Count Squares and Half Squares (option)",
+   "teaches": "finding the area of shapes on a square grid where some squares are cut in half on the diagonal (two halves make one square)",
+   "representation": "black-line square grid in the boxed cell; the shape outlined with the heavy line, half squares cut on the diagonal; answer slot \"__ squares\"; the single grey optional for the shape fill",
+   "family": "area_perimeter",
+   "ccss": [
+    "3.MD.C.6",
+    "3.MD.C.5"
+   ],
+   "why": "WRM Count squares includes half squares; the skill deals whole squares only",
+   "steps": [
+    "Y4.B3.S2"
+   ],
+   "reused": false
   }
  },
  "tagFixes": [
@@ -1370,6 +2331,72 @@
    "step": "Y4.B1.S1",
    "action": "remove",
    "why": "unit form is the partition step (Y4.B1.S2), not representing"
+  },
+  {
+   "key": "addition:add_10k_regroup",
+   "step": "Y4.B2.S3",
+   "action": "partial",
+   "why": "cannot hold a page to exactly one exchange"
+  },
+  {
+   "key": "addition:add_10k_regroup",
+   "step": "Y4.B2.S4",
+   "action": "partial",
+   "why": "cannot hold a page to more than one exchange"
+  },
+  {
+   "key": "subtraction:sub_10k_regroup",
+   "step": "Y4.B2.S6",
+   "action": "partial",
+   "why": "cannot hold a page to exactly one exchange"
+  },
+  {
+   "key": "subtraction:sub_10k_regroup",
+   "step": "Y4.B2.S7",
+   "action": "partial",
+   "why": "cannot hold a page to more than one exchange"
+  },
+  {
+   "key": "number_sense:compensation",
+   "step": "Y4.B2.S8",
+   "action": "partial",
+   "why": "2-digit only; the step is 4-digit efficient subtraction"
+  },
+  {
+   "key": "number_sense:estimate_sums_diffs",
+   "step": "Y4.B2.S9",
+   "action": "add",
+   "why": "re-tag as FULL with place 1,000 and task reasonable"
+  },
+  {
+   "key": "subtraction:sub_check_by_adding",
+   "step": "Y4.B2.S10",
+   "action": "partial",
+   "why": "2-digit subtraction only; the step checks 4-digit sums and differences both ways"
+  },
+  {
+   "key": "addition:add_sub_100s",
+   "step": "Y4.B2.S1",
+   "action": "partial",
+   "why": "kept partial; missing clause now names 1s, 10s, 1,000s on 4-digit numbers"
+  },
+  {
+   "key": "area_perimeter:area_unit_squares",
+   "step": "Y4.B3.S2",
+   "action": "partial",
+   "why": "no half squares"
+  },
+  {
+   "key": "area_perimeter:area_unit_squares",
+   "step": "Y4.B3.S1",
+   "action": "add",
+   "why": "kept as direct (forms rectangles) but the step verdict is partial: comparing surfaces is missing"
+  },
+  {
+   "key": "shapes_early:compose_rect_from_squares",
+   "step": "Y4.B3.S1",
+   "action": "add",
+   "why": "covering a rectangle with unit squares is the \"what is area\" model (partial)"
   }
  ]
 }
