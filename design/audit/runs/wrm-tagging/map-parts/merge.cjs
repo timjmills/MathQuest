@@ -45,13 +45,15 @@ rows.forEach((r, i) => {
     if (!STRANDS.has(r.strand)) errs.push(`${at}: bad strand ${r.strand}`);
     if ((r.status === 'partial' || r.status === 'missing') && !r.proposal) errs.push(`${at}: ${r.status} without proposal`);
     if (r.proposal && !proposals[r.proposal]) errs.push(`${at}: unknown proposal ${r.proposal}`);
+    // "also": further proposals the row needs (a row closed by two builds, or a build its proposal depends on).
+    for (const id of r.also || []) if (!proposals[id]) errs.push(`${at}: unknown also-proposal ${id}`);
     // Owner 2026-10-10: every gap is written as the skill that fills it, and the row says what that skill adds.
     if ((r.status === 'partial' || r.status === 'missing') && !(r.closes && r.closes.length > 20)) errs.push(`${at}: gap row without "closes" (what the proposed skill adds)`);
     for (const k of r.skills || []) if (!live(k)) errs.push(`${at}: skill ${k} not a live skill key`);
 });
 const norm = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const seenTask = {}; rows.forEach((r, i) => { const k = r.strand + '|' + norm(r.task); if (seenTask[k] !== undefined) errs.push(`row ${i} "${r.task}": duplicates row ${seenTask[k]}`); else seenTask[k] = i; });
-const used = new Set(rows.map(r => r.proposal).filter(Boolean));
+const used = new Set(rows.flatMap(r => [r.proposal, ...(r.also || [])]).filter(Boolean));
 for (const [id, p] of Object.entries(proposals)) {
     if (!used.has(id)) errs.push(`proposal ${id} not used by any row`);
     for (const k of (p.reused ? ['name'] : ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'map'])) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);

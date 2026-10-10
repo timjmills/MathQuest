@@ -9,7 +9,8 @@ const ST = ['exists-ok', 'exists-regrade', 'partial', 'missing'];
 const STRANDS = ['Number & place value', 'Operations & algebra', 'Multiplication & division', 'Fractions & decimals', 'Measurement', 'Geometry', 'Data & graphing'];
 const cnt = rs => ST.map(s => rs.filter(r => r.status === s).length);
 const esc = s => String(s == null ? '' : s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
-const pn = id => id ? `\`${id}\` ${esc(P[id].name)}${P[id].reused ? ' (reused)' : ' (new)'}` : '';
+const pn1 = id => id ? `\`${id}\` ${esc(P[id].name)}${P[id].reused ? ' (reused)' : ' (new)'}` : '';
+const pn = (id, r) => [pn1(id), ...((r && r.also) || []).map(a => '+ ' + pn1(a))].filter(Boolean).join('<br>');
 const L = [];
 L.push(fs.readFileSync(path.join(__dirname, 'report-head.md'), 'utf8').trim(), '');
 const pr = Object.values(P), reused = pr.filter(p => p.reused).length;
@@ -26,23 +27,23 @@ const PLAN = fs.readFileSync(path.join(ROOT, 'design/MASTER_PLAN.md'), 'utf8');
 for (const r of rows.filter(r => r.source === '6.2')) {
     const key = r.task.slice(0, 18).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const m = PLAN.match(new RegExp('^\\| ' + key + '[^|]*\\| ([^|]*)\\|', 'm'));
-    L.push(`| ${esc(r.task)} | ${m ? esc(m[1].trim()) : ''} | **${r.status}** | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal)} | ${esc(r.note)} |`);
+    L.push(`| ${esc(r.task)} | ${m ? esc(m[1].trim()) : ''} | **${r.status}** | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal, r)} | ${esc(r.note)} |`);
 }
 L.push('', '## New gaps found beyond the 6.2 table (strand walk)', '');
 for (const s of STRANDS) {
     const rs = rows.filter(r => r.strand === s && r.source === 'strand-walk' && r.status !== 'exists-ok');
     if (!rs.length) continue;
     L.push(`### ${s}`, '', '| Task | RIT | Status | Skill to make | What it adds |', '|---|---|---|---|---|');
-    for (const r of rs) L.push(`| ${esc(r.task)} | ${esc(r.ritBand)} | ${r.status} | ${pn(r.proposal)} | ${esc(r.closes)} |`);
+    for (const r of rs) L.push(`| ${esc(r.task)} | ${esc(r.ritBand)} | ${r.status} | ${pn(r.proposal, r)} | ${esc(r.closes)} |`);
     L.push('');
 }
 L.push('## The 6.4 "match the two" audit', '', '| Pair | Strand | Status | Skills | Skill to make | What it adds |', '|---|---|---|---|---|---|');
-for (const r of rows.filter(r => r.source === '6.4')) L.push(`| ${esc(r.task)} | ${r.strand} | ${r.status} | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal)} | ${esc(r.closes)} |`);
+for (const r of rows.filter(r => r.source === '6.4')) L.push(`| ${esc(r.task)} | ${r.strand} | ${r.status} | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal, r)} | ${esc(r.closes)} |`);
 L.push('', '## Re-grades (not builds)', '', 'Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lanes). These are in `MAP.json` `regrades`, not in `proposals`.', '', '| Skill | MAP tasks it serves |', '|---|---|');
 for (const [k, ts] of Object.entries(d.regrades || {})) L.push(`| \`${k}\` | ${ts.map(esc).join('; ')} |`);
 L.push('', '## Skills yet to be made (every new proposal, in full)', '');
 for (const [id, p] of Object.entries(P).filter(([, p]) => !p.reused)) {
-    const gaps = rows.filter(r => r.proposal === id);
+    const gaps = rows.filter(r => r.proposal === id || (r.also || []).includes(id));
     L.push(`### \`${id}\` — ${esc(p.name)}`, '',
         `- **Builds:** ${p.kind === 'option' ? `option on \`${p.skill}\`: ${esc(p.option)}` : `new skill \`${p.skill}\``} (family ${p.family}; CCSS ${(p.ccss || []).join(', ')})`,
         `- **Teaches:** ${esc(p.teaches)}`,
