@@ -7,7 +7,7 @@ write the value of the underlined digit too" — "put a line at the bottom for t
 - New per-skill option in `js/modules/skill-options.js` `'placevalue:identify'`, APPENDED after the existing
   options (never reorder — share codes): `writeValue` (bool) "Also write the value of the underlined digit",
   default ON (owner request); Off keeps today's page.
-- Cell: under the three place words, one write-on line at the bottom of the cell: `Value: ______`
+- Cell: under the three place words, one LONG write-on line across the bottom of the cell, labelled exactly `Value` (owner: "with Value ____________" — the word Value, then a line running most of the cell width)
   (132, 3 underlined → 30; 539, 9 → 9; 891, 8 → 800). Kit write-on line (≥ 14 mm at M/L, same rhythm as
   other skills), Andika, black; the circle stays the first response, the value the second.
 - Answer key: the ring orange (as now) AND the value written orange on the line (AK rules).
