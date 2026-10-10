@@ -106,3 +106,11 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
     `representation` in a few words. No problem-type lists, level ladders, edge cases or misconceptions in this round — the
     full design of every proposal is the NEXT job, after the tagging passes its critics. Reuse an existing proposal only if
     it really does this; else write a new one.
+
+## MANDATORY after critic Y2–Y3 r2 (7.53 / 7.45)
+14. An EARLIER step's skill that the step builds on is a PRE-skill, never only "related". Rank pre by how directly it is a
+    building block (the main building block first), not by step distance; the cap of 8 must never push it out.
+15. Every step has at least 3 pre-skills where earlier learning exists (measurement steps too: ruler/compare/count before
+    measure; counting in 5s/10s before money and time) — or a note saying why not.
+16. `closes` is the STEP's exact missing clause, never the proposal's `teaches` copied.
+17. Check option values change what is dealt as intended (generate): e.g. money change needs `paid:'note'` + a band.
