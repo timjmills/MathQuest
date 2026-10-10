@@ -81,6 +81,8 @@ function wrapRows(n, rows0, boxW, gap, avail) {
     }
     return { rows: n, perRow: 1 };
 }
+/** The one-page sheet's air above and below a row; none where the role sizes the cell to the row (opener, critic r2 N4). */
+const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 0 : Number(p.vpad) > 0 ? Number(p.vpad) : 0);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
@@ -130,7 +132,11 @@ function geom(p, ctx) {
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
-    if (look === 'arcs' && p.lines) return linesGeom(p, ctx, { size, n, tabBody, tab, live, lblPt, lblChars, hasLbl, lblH });
+    // critic r2 N5: in a narrow (Model) cell a long step tab ("25,000") stands on its own line above the row, so the numbers keep
+    // the cell's width and wrap before they shrink; the lines below start after a short lane for the turn arrow
+    const tabAbove = narrowCols(p, ctx) > 1 && look === 'arcs' && tabBody > TAB_MM[size] + 1;
+    const above = (g) => (g && tabAbove ? Object.assign(g, { tabAbove: true }) : g);
+    if (look === 'arcs' && p.lines) return above(linesGeom(p, ctx, { size, n, tabBody, tab: tabAbove ? IN_MM : tab, live, lblPt, lblChars, hasLbl, lblH }));
     if (look === 'arcs' && p.compact && shape === 'box') {
         // Owner 2026-10-03: each box is its MINIMUM writing width (the widest number at the working size + a margin, never under
         // COMPACT_MIN_BOX) and the rest of the line is the gaps, so every jump arrow keeps >= 1 mm clear each side (COMPACT_MIN_GAP).
@@ -141,7 +147,7 @@ function geom(p, ctx) {
         }
     }
     if (look === 'arcs') {
-        const ga = arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab, baseH, live, lblPt, lblChars, hasLbl, lblH });
+        const ga = above(arcsGeom(p, ctx, { size, n, shape, gap, tabBody, tab: tabAbove ? IN_MM : tab, baseH, live, lblPt, lblChars, hasLbl, lblH }));
         // a row too wide for two numbers a line even at FLOOR_PT keeps its full-line geometry: it does not fit the narrow cell
         // (measured so), and the role gives the Model the whole width instead (opener: Steps underneath, LESSONS_LEARNED L11)
         return ga || geom(Object.assign({}, p0, { noWrap: true }), ctx);
@@ -200,7 +206,8 @@ export const FLOOR_PT = 9;
 const CLEAR_MM = 1.5;       // the jump arrow's clearance from each neighbour (owner mark-up 2026-10-03)
 const COMPACT_CLEAR_MM = 1.0;   // the one-page sheet and the Lines rows: at least 1 mm clear (coordinator 2026-10-03)
 const MIN_GAP = 2 * CLEAR_MM + 3.5;   // mm between two boxes, at least: a 3.5 mm arrow and its clearance
-const EXIT_MM = 7.5;        // the turn arrow that leaves a line (6 mm + its margin)
+const EXIT_MM = 7.5;
+const IN_MM = 7.5;          // the lane a line starts with when the step tab stands above the row (narrow Model cell)        // the turn arrow that leaves a line (6 mm + its margin)
 
 /**
  * ANSWER SPACES: LINES (owner 2026-10-03, an owner exception to SL-3, count rows only): "____ -> ____ -> ____". Each missing
@@ -232,7 +239,7 @@ function linesGeom(p, ctx, c) {
     if (!twin && gapFor(n, w, false) < minGap - 1e-6) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
         // a narrow (Model) cell: more lines before any digit shrinks
-        if (narrowCols(p, ctx) > 1) perRow = wrapRows(n, Math.ceil(n / perRow), w, minGap, (r) => live - tab - (r > 1 ? EXIT_MM : 0)).perRow;
+        if (narrowCols(p, ctx) > 1) perRow = Math.max(Math.min(2, n), wrapRows(n, Math.ceil(n / perRow), w, minGap, (r) => live - tab - (r > 1 ? EXIT_MM : 0)).perRow);   // never one number a line (critic r2 N3)
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
             pt = Math.max(FLOOR_PT, Math.min(basePt, (w - 2.4) / (chars * 0.56 * PT_MM)));
@@ -452,6 +459,7 @@ register('count-row', {
         const rowsHtml = [];
         const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab;
         const tabsCol = [];
+        if (g.tabAbove) rowsHtml.push(`<div class="k2-countrow-line k2-countrow-tabline" style="display:flex;margin-bottom:${L(ctx, 2.5)};">${stepTab(ctx, g, p.tab)}</div>`);
         for (let r = 0; r < g.rows; r++) {
             const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
             const arcs = '';
@@ -460,7 +468,7 @@ register('count-row', {
             const turns = g.look === 'arcs' && g.tab && g.rows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
-            const tabCol = g.tab ? (r === 0 ? stepTab(ctx, g, p.tab) : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
+            const tabCol = g.tab ? (r === 0 && !g.tabAbove ? stepTab(ctx, g, p.tab) : r === 0 ? `<span style="flex:none;width:${L(ctx, tabW)};"></span>` : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
             // screen twin (critic C2 r4): the step tab and the arrow column sit OUTSIDE the swiping row, in a fixed column beside it,
             // so no number or box can ever slide under them; wireSwipeRows (screen-cell.js) keeps each entry level with its line
             if (swipeTabs) { tabsCol.push(`<div data-mq-tabfor="${r}" style="display:flex;align-items:flex-end;${r ? `margin-top:${L(ctx, 2.5)};` : ''}">${tabCol}</div>`); }
@@ -489,7 +497,7 @@ register('count-row', {
                 + `<span class="k2-keys-type">After each number, press Space.</span><span class="k2-keys-touch">After each number, tap the next box.</span></div>`
             : '';
         const align = g.tab ? 'left' : 'center';
-        const vp = Number(p.vpad) > 0 ? Number(p.vpad) : 0;
+        const vp = vpadOf(p, ctx);
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
@@ -510,7 +518,7 @@ register('count-row', {
         const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
-        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (Number(p.vpad) > 0 ? Number(p.vpad) : 0)), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
+        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));
