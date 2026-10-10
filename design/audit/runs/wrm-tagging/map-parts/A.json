@@ -1,0 +1,1337 @@
+{
+ "rows": [
+  {
+   "task": "One-step equations (x + 9 = 13)",
+   "strand": "Operations & algebra",
+   "ritBand": "201-210",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "algebra:solve_eq_addsub",
+    "algebra:solve_unknown"
+   ],
+   "note": "Sampled: 'Solve: a − 3 = 36' number entry plus a drag-candidates-to-bins form; content right, needs the 8/10 re-grade.",
+   "proposal": "map_regrade_solve_eq_addsub"
+  },
+  {
+   "task": "Order whole numbers and decimals mixed",
+   "strand": "Number & place value",
+   "ritBand": "211-220",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "decimals:order_decimals",
+    "placevalue:order_least_to_greatest"
+   ],
+   "note": "order_decimals deals decimal-only sets (drag/ordering); order_least_to_greatest deals whole numbers only; no set mixes 7, 6.85, 7.1.",
+   "proposal": "map_order_whole_decimal_mixed"
+  },
+  {
+   "task": "Compare numbers: pick the lesser / greater",
+   "strand": "Number & place value",
+   "ritBand": "171-190",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "placevalue:compare",
+    "integers:compare_int"
+   ],
+   "note": "placevalue:compare deals only 'Compare: 722 ___ 892' symbol entry (200/200); compare_int has a 'click ALL greater than' multi-select, but whole numbers have no pick form.",
+   "proposal": "map_compare_pick"
+  },
+  {
+   "task": ">, <, =",
+   "strand": "Number & place value",
+   "ritBand": "161-200",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "placevalue:compare",
+    "integers:compare_int"
+   ],
+   "note": "compare deals >,<,= with a 33/200 share of '='; symbol entry is the MAP form. Re-grade only.",
+   "proposal": "map_regrade_compare"
+  },
+  {
+   "task": "Compare expressions without computing",
+   "strand": "Operations & algebra",
+   "ritBand": "201-220",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "order_of_operations:compare_expressions",
+    "algebra:compare_number_sentences"
+   ],
+   "note": "compare_expressions sampled: 'Compare: 6 × 6 + 1 ◻ 4 × 2 − 6' is evaluate-then-compare, MC answer; nothing asks reasoning without computing (37 + 25 ◻ 37 + 28). WRM compare_sentences proposal covers it.",
+   "proposal": "compare_sentences"
+  },
+  {
+   "task": "Order of operations e.g. 47 − (2 × 8)",
+   "strand": "Operations & algebra",
+   "ritBand": "211-230",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "order_of_operations:paren_simple",
+    "order_of_operations:oop_medium"
+   ],
+   "note": "paren_simple deals 34 × (70 − 28) number entry (products large); oop_medium mixes nested brackets and a click-ALL form. Content fits; re-grade and check paren_simple size at Size S.",
+   "proposal": "map_regrade_oop"
+  },
+  {
+   "task": "Multi-digit addition",
+   "strand": "Operations & algebra",
+   "ritBand": "181-220",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_1k_regroup",
+    "addition:add_10k_regroup"
+   ],
+   "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade.",
+   "proposal": "map_regrade_multidigit_add"
+  },
+  {
+   "task": "Base-ten model → number",
+   "strand": "Number & place value",
+   "ritBand": "161-190",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "composing:tens_foundation_visual",
+    "placevalue:place_value_disks",
+    "composing:base10_build"
+   ],
+   "note": "place_value_disks: 'What number do the disks show?' number entry; tens_foundation_visual asks only 'how many tens'. Base-10 block picture → number exists via base10_build reverse? Not sampled as a read form; disks fit. Re-grade.",
+   "proposal": "map_regrade_base10_read"
+  },
+  {
+   "task": "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "algebra:multi_step_word"
+   ],
+   "note": "Sampled: 'had 37, gave away 26, then found 36' — sub-add and add-sub both seen, number entry; no option chooses the change pattern.",
+   "proposal": "map_change_patterns"
+  },
+  {
+   "task": "Count objects to 20 / how many",
+   "strand": "Number & place value",
+   "ritBand": "131-150",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "counting:count_objects"
+   ],
+   "note": "Sampled 200: 'How many triangles' 3–20, number entry."
+  },
+  {
+   "task": "Count on / before / after a number",
+   "strand": "Number & place value",
+   "ritBand": "131-160",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "counting:count_sequence",
+    "counting:number_seq_fill"
+   ],
+   "note": "Next/before/after with visual, number entry."
+  },
+  {
+   "task": "Zero as a count; ordinal positions",
+   "strand": "Number & place value",
+   "ritBand": "131-150",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "note": "No skill deals zero items or 1st/2nd/3rd.",
+   "proposal": "ordinal"
+  },
+  {
+   "task": "Teen numbers as ten and ones",
+   "strand": "Number & place value",
+   "ritBand": "141-170",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "composing:teen_compose",
+    "composing:ten_frame_build_teen"
+   ],
+   "note": "10 + ones, ten-frame build."
+  },
+  {
+   "task": "Skip count by 2s, 5s, 10s, 100s",
+   "strand": "Number & place value",
+   "ritBand": "151-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "patterns:seq_2",
+    "patterns:seq_5",
+    "patterns:seq_10",
+    "patterns:count_by_step_up"
+   ],
+   "note": "Sequences and fill-in grids, number entry."
+  },
+  {
+   "task": "Odd and even (select all)",
+   "strand": "Number & place value",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "composing:select_even_odd",
+    "composing:odd_even"
+   ],
+   "note": "Sampled: 'Click ALL the EVEN numbers' multi-select, MAP form."
+  },
+  {
+   "task": "Hundreds / number chart missing numbers to 1,000",
+   "strand": "Number & place value",
+   "ritBand": "151-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "composing:hundreds_chart_fill",
+    "composing:number_chart_fill"
+   ],
+   "note": "Chart windows, number entry."
+  },
+  {
+   "task": "10 more / 10 less / 100 more / 100 less",
+   "strand": "Number & place value",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "placevalue:more_less_10",
+    "placevalue:more_less_100"
+   ],
+   "note": "Sampled 'What is 10 more than 52', entry."
+  },
+  {
+   "task": "Value of a digit / name the place",
+   "strand": "Number & place value",
+   "ritBand": "171-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "placevalue:value",
+    "placevalue:identify"
+   ],
+   "note": "Underlined digit worth, entry."
+  },
+  {
+   "task": "Digit is ten times the digit to its right",
+   "strand": "Number & place value",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "placevalue:value"
+   ],
+   "note": "value only asks the worth of one digit.",
+   "proposal": "value_ten_times"
+  },
+  {
+   "task": "Expanded form, standard form, unit form",
+   "strand": "Number & place value",
+   "ritBand": "171-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "placevalue:expand",
+    "placevalue:combine",
+    "placevalue:unit_form"
+   ],
+   "note": "'Write 654 in expanded form' entry; standard and unit forms exist."
+  },
+  {
+   "task": "Word form ↔ number to millions",
+   "strand": "Number & place value",
+   "ritBand": "181-210",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "placevalue:number_word_names",
+    "composing:number_word_form"
+   ],
+   "note": "number_word_names is MC only (200/200 'Which is the word name'); MAP also has number entry from words. Re-grade with an entry form.",
+   "proposal": "map_word_to_number_entry"
+  },
+  {
+   "task": "Place value to millions (7 digits)",
+   "strand": "Number & place value",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "placevalue:pv_digit_drag"
+   ],
+   "note": "Charts stop at 6 digits per band list.",
+   "proposal": "vis_pv_bands_millions"
+  },
+  {
+   "task": "Compare numbers with >, <, = (pictures, to 20)",
+   "strand": "Number & place value",
+   "ritBand": "151-170",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "placevalue:compare"
+   ],
+   "note": "compare starts at 3 digits in sampling.",
+   "proposal": "compare_small"
+  },
+  {
+   "task": "Order 3-4 whole numbers (drag)",
+   "strand": "Number & place value",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "placevalue:order_least_to_greatest",
+    "placevalue:order_greatest_to_least"
+   ],
+   "note": "Sampled ordering interactive (drag), MAP form."
+  },
+  {
+   "task": "Rounding to 10/100/1,000 and decimals",
+   "strand": "Number & place value",
+   "ritBand": "181-215",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_sense:nearest_10",
+    "number_sense:nearest_100",
+    "number_sense:rounding_visual",
+    "number_sense:round_sort_tenths"
+   ],
+   "note": "Number line rounding and sort forms, entry and drag."
+  },
+  {
+   "task": "Place a number on a number line (drag/tap)",
+   "strand": "Number & place value",
+   "ritBand": "171-200",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "number_sense:place_on_number_line"
+   ],
+   "note": "Sampled 'Tap 65 on the number line' — all lines 0–100; MAP uses other scales (0–1,000, by 5s).",
+   "proposal": "nl_20"
+  },
+  {
+   "task": "Read a number shown on a number line (which number is at the arrow)",
+   "strand": "Number & place value",
+   "ritBand": "171-200",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "number_sense:place_on_number_line"
+   ],
+   "note": "Only place, not read; covered by nl_20 read direction.",
+   "proposal": "nl_20"
+  },
+  {
+   "task": "Integers: compare, order, place on line",
+   "strand": "Number & place value",
+   "ritBand": "211-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "integers:compare_int",
+    "integers:order_negatives",
+    "integers:integer_nl_drag"
+   ],
+   "note": "compare_int multi-select and symbol; drag to line."
+  },
+  {
+   "task": "Roman numerals",
+   "strand": "Number & place value",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "note": "No skill.",
+   "proposal": "roman_100"
+  },
+  {
+   "task": "Money: count coins and bills",
+   "strand": "Number & place value",
+   "ritBand": "161-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "measurement:money_count"
+   ],
+   "note": "Sampled 'Count the coins. Write the total' entry (Measurement family; MAP puts money in Number/OA)."
+  },
+  {
+   "task": "Estimate sums and differences by rounding",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_sense:estimate_sum",
+    "number_sense:estimate_diff"
+   ],
+   "note": "Round each number then add, entry."
+  },
+  {
+   "task": "Add/sub within 20 fluency",
+   "strand": "Operations & algebra",
+   "ritBand": "151-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:add_facts",
+    "subtraction:sub_facts"
+   ],
+   "note": "Fact items, entry."
+  },
+  {
+   "task": "Add with pictures within 5/10",
+   "strand": "Operations & algebra",
+   "ritBand": "141-160",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:add_5_pictures",
+    "subtraction:sub_5_pictures"
+   ],
+   "note": "Picture add/sub, entry."
+  },
+  {
+   "task": "Join/separate result-unknown word problems",
+   "strand": "Operations & algebra",
+   "ritBand": "161-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:add_wp_20",
+    "subtraction:sub_wp_20"
+   ],
+   "note": "Sampled 'gets N more', 'takes N', entry."
+  },
+  {
+   "task": "Change-unknown and start-unknown word problems",
+   "strand": "Operations & algebra",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "subtraction:unknown_start_wp"
+   ],
+   "note": "Sampled 'had some cards. Then collected…' start-unknown; change-unknown appears in missing_add_sub stories? Only equations. Start-unknown OK."
+  },
+  {
+   "task": "Change-unknown word problems (had 5, got some, now 12)",
+   "strand": "Operations & algebra",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "subtraction:missing_add_sub"
+   ],
+   "note": "missing_add_sub deals bare equations; no story with the change unknown.",
+   "proposal": "map_change_unknown_story"
+  },
+  {
+   "task": "Compare word problems (how many more/fewer)",
+   "strand": "Operations & algebra",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:comparison_word"
+   ],
+   "note": "Sampled 200 difference-unknown, entry. Bigger/smaller-unknown not seen."
+  },
+  {
+   "task": "Compare problems with bigger or smaller unknown",
+   "strand": "Operations & algebra",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "addition:comparison_word"
+   ],
+   "note": "comparison_word asks only the difference.",
+   "proposal": "map_compare_bigger_unknown"
+  },
+  {
+   "task": "Part-whole (put together / take apart, both addends unknown)",
+   "strand": "Operations & algebra",
+   "ritBand": "151-180",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "composing:number_bonds"
+   ],
+   "note": "number_bonds visual; no part-whole model skill with stories.",
+   "proposal": "part_whole"
+  },
+  {
+   "task": "Missing addend / missing number in +/− equation",
+   "strand": "Operations & algebra",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "subtraction:missing_add_sub",
+    "addition:cloze_addition"
+   ],
+   "note": "Sampled all six positions of the unknown, entry; cloze bank pick."
+  },
+  {
+   "task": "Meaning of the equal sign (true/false equations)",
+   "strand": "Operations & algebra",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "addition:equal_sign"
+   ],
+   "note": "BROKEN: equal_sign samples '19 + 5 = ?' column addition — no true/false items at all.",
+   "proposal": "equal_sign_repair"
+  },
+  {
+   "task": "Balance equations (7 + 5 = __ + 3)",
+   "strand": "Operations & algebra",
+   "ritBand": "191-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "algebra:balance_addsub"
+   ],
+   "note": "MAP-labelled form, entry."
+  },
+  {
+   "task": "Add three numbers / properties of addition",
+   "strand": "Operations & algebra",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:add_three"
+   ],
+   "note": "Add three, entry."
+  },
+  {
+   "task": "Identify the property (commutative/associative) / equivalent sum",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "note": "No skill asks which equation shows the same sum, or names a property.",
+   "proposal": "map_properties_equivalent"
+  },
+  {
+   "task": "Fact families / related facts",
+   "strand": "Operations & algebra",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "addition:add_sub_fact_family",
+    "addition:fact_family_sort"
+   ],
+   "note": "Fact family inputs and sort."
+  },
+  {
+   "task": "Input-output / function tables",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "algebra:function_table_easy"
+   ],
+   "note": "'Use the rule. Fill in the table.' entry."
+  },
+  {
+   "task": "Find the rule of an input-output table",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "algebra:function_table_easy"
+   ],
+   "note": "function_table_easy gives the rule; nothing asks the rule.",
+   "proposal": "function_machine"
+  },
+  {
+   "task": "Number patterns: extend / missing terms",
+   "strand": "Operations & algebra",
+   "ritBand": "181-205",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "patterns:number_pattern",
+    "patterns:number_patterns_rule"
+   ],
+   "note": "Fill missing terms + drag order, entry."
+  },
+  {
+   "task": "Shape / repeating patterns",
+   "strand": "Operations & algebra",
+   "ritBand": "141-170",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "patterns:shape_pattern"
+   ],
+   "note": "Shape patterns visual."
+  },
+  {
+   "task": "Two patterns, find relationship",
+   "strand": "Operations & algebra",
+   "ritBand": "211-225",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "patterns:pattern_relationship"
+   ],
+   "note": "Exists."
+  },
+  {
+   "task": "Write an expression from words (variable)",
+   "strand": "Operations & algebra",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "algebra:write_expression"
+   ],
+   "note": "Sampled entry 'n − 3' + click-ALL form."
+  },
+  {
+   "task": "Write a numerical expression with brackets from words",
+   "strand": "Operations & algebra",
+   "ritBand": "211-225",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "algebra:write_expression"
+   ],
+   "note": "Only variable expressions.",
+   "proposal": "write_numeric_expression"
+  },
+  {
+   "task": "Evaluate expressions with variables",
+   "strand": "Operations & algebra",
+   "ritBand": "211-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "algebra:evaluate_expression"
+   ],
+   "note": "Exists."
+  },
+  {
+   "task": "Inequalities: true/false, solutions on a line",
+   "strand": "Operations & algebra",
+   "ritBand": "211-230",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "algebra:inequalities"
+   ],
+   "note": "Sampled bins, drag marker, true/false; no write-from-words.",
+   "proposal": "inequality_write_graph"
+  },
+  {
+   "task": "Tape diagram / bar model problems",
+   "strand": "Operations & algebra",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "algebra:tape_diagram"
+   ],
+   "note": "Bar model with story, entry."
+  },
+  {
+   "task": "Add/sub 10s and 100s mentally",
+   "strand": "Operations & algebra",
+   "ritBand": "171-195",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "addition:add_sub_10s",
+    "addition:add_sub_100s"
+   ],
+   "note": "Fixed forms; any multiple of 10 not dealt.",
+   "proposal": "tens_any"
+  },
+  {
+   "task": "Subtract across zeros / multi-digit subtraction",
+   "strand": "Operations & algebra",
+   "ritBand": "191-215",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "subtraction:sub_across_zeros",
+    "subtraction:sub_1k_regroup"
+   ],
+   "note": "Column stack, entry."
+  },
+  {
+   "task": "Match: picture <-> equation (addition/subtraction)",
+   "strand": "Operations & algebra",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "addition:add_5_pictures"
+   ],
+   "note": "Picture → answer only; no 'write/choose the equation for the picture'.",
+   "proposal": "pictures_to_sentence"
+  },
+  {
+   "task": "Match: model <-> number (base-ten / place-value)",
+   "strand": "Number & place value",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "placevalue:place_value_disks",
+    "composing:base10_build"
+   ],
+   "note": "model→number (disks read) and number→model (build) both exist, but no pair-matching item (match each model to its number).",
+   "proposal": "map_match_model_number"
+  },
+  {
+   "task": "Match: story <-> operation / equation",
+   "strand": "Operations & algebra",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "algebra:write_equation",
+    "addition:add_wp_20"
+   ],
+   "note": "Stories ask for the answer; no item asks which equation (or operation) fits the story.",
+   "proposal": "map_story_equation_match"
+  },
+  {
+   "task": "Match: number line <-> number",
+   "strand": "Number & place value",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "number_sense:place_on_number_line"
+   ],
+   "note": "Place exists (0–100 only); read-the-point direction missing.",
+   "proposal": "nl_20"
+  },
+  {
+   "task": "Match: number line <-> addition/subtraction equation",
+   "strand": "Operations & algebra",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "addition:number_line_add",
+    "subtraction:number_line_sub"
+   ],
+   "note": "Jumps on a line with the equation."
+  },
+  {
+   "task": "Match: word form <-> number",
+   "strand": "Number & place value",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "exists-regrade",
+   "skills": [
+    "placevalue:number_word_names"
+   ],
+   "note": "MC only.",
+   "proposal": "map_word_to_number_entry"
+  },
+  {
+   "task": "Match: expanded form <-> standard form",
+   "strand": "Number & place value",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "placevalue:expand",
+    "placevalue:combine"
+   ],
+   "note": "Both directions, entry."
+  },
+  {
+   "task": "Match: table <-> rule (input-output)",
+   "strand": "Operations & algebra",
+   "ritBand": "161-200",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "algebra:function_table_easy"
+   ],
+   "note": "See find-the-rule row.",
+   "proposal": "function_machine"
+  }
+ ],
+ "proposals": {
+  "map_regrade_solve_eq_addsub": {
+   "kind": "option",
+   "skill": "algebra:solve_eq_addsub",
+   "option": "re-grade (no new content)",
+   "name": "One-Step Equations re-grade",
+   "teaches": "Solve x + a = b and x − a = b with the unknown in any position",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation with an answer box for the letter; screen: number entry (MAP number-entry), the bin-sort form kept as a second form",
+   "family": "algebra",
+   "ccss": [
+    "6.EE.B.7",
+    "1.OA.D.8"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "201-210",
+    "taskType": "number entry"
+   },
+   "why": "Exists but has not been graded to the 8/10 rubric on every host",
+   "reused": false
+  },
+  "map_order_whole_decimal_mixed": {
+   "kind": "option",
+   "skill": "decimals:order_decimals",
+   "option": "pool: whole numbers and decimals mixed (7, 6.85, 7.1, 0.9)",
+   "name": "Order Whole Numbers and Decimals Together",
+   "teaches": "Order a set that mixes whole numbers and decimals with different numbers of places",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number cards in a row with ordered answer slots and a place-value chart pane aligned on the decimal point; screen: drag the cards into order (ordering), never MC",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.A.3b",
+    "4.NF.C.7"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "211-220",
+    "taskType": "drag to order"
+   },
+   "why": "MAP sets mix whole numbers and decimals; the trap (6.85 > 7 because it is longer) is never dealt today",
+   "reused": false
+  },
+  "map_compare_pick": {
+   "kind": "option",
+   "skill": "placevalue:compare",
+   "option": "form: pick the greater / lesser (2–4 numbers; click one, or ring it on paper)",
+   "name": "Which Is Greater? Which Is Less?",
+   "teaches": "Choose the greatest or least of 2–4 whole numbers by comparing place by place",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 2–4 numbers in equal boxes, pupil rings one on paper; screen: click the number (MAP click/select item), with the words greater/less bolded",
+   "family": "placevalue",
+   "ccss": [
+    "2.NBT.A.4",
+    "1.NBT.B.3",
+    "4.NBT.A.2"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "171-190",
+    "taskType": "click to select"
+   },
+   "why": "MAP asks 'which number is greater' as a select item; we only deal the symbol",
+   "reused": false
+  },
+  "map_regrade_compare": {
+   "kind": "option",
+   "skill": "placevalue:compare",
+   "option": "re-grade (no new content)",
+   "name": "Compare Numbers re-grade",
+   "teaches": "Compare two numbers with >, <, =",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two numbers with a symbol box between; screen: symbol entry",
+   "family": "placevalue",
+   "ccss": [
+    "1.NBT.B.3",
+    "2.NBT.A.4",
+    "4.NBT.A.2"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "161-200",
+    "taskType": "symbol select"
+   },
+   "why": "Exists; not yet graded 8/10 on every host",
+   "reused": false
+  },
+  "compare_sentences": {
+   "kind": "new",
+   "skill": "algebra:compare_number_sentences",
+   "name": "Compare Number Sentences",
+   "teaches": "Compare two expressions by seeing what changed (37 + 25 vs 37 + 28) without working them out",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two expressions in one row with a symbol box; a 'Why?' line from a sentence bank; screen: symbol entry + sentence-bank pick",
+   "family": "algebra",
+   "ccss": [
+    "2.NBT.B.9",
+    "3.OA.D.9",
+    "5.OA.A.2"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "191-220",
+    "taskType": "symbol select, reason without computing"
+   },
+   "why": "MAP 'without calculating' items; compare_expressions only evaluates",
+   "reused": true
+  },
+  "map_regrade_oop": {
+   "kind": "option",
+   "skill": "order_of_operations:paren_simple",
+   "option": "re-grade; band 'MAP' keeping results within 100 (47 − (2 × 8))",
+   "name": "Simple Parentheses re-grade",
+   "teaches": "Evaluate a two-operation expression with one set of parentheses",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step underlined and a working line; screen: number entry",
+   "family": "order_of_operations",
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "211-230",
+    "taskType": "number entry"
+   },
+   "why": "Sampled products to 1,400; MAP items are small-number structure checks",
+   "reused": false
+  },
+  "map_regrade_multidigit_add": {
+   "kind": "option",
+   "skill": "addition:add_1k_regroup",
+   "option": "re-grade (whole add_*_regroup ladder)",
+   "name": "Multi-Digit Addition re-grade",
+   "teaches": "Column addition with regrouping",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; stack cell with regroup boxes; screen: digit entry in the stack",
+   "family": "addition",
+   "ccss": [
+    "2.NBT.B.7",
+    "4.NBT.B.4"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "181-220",
+    "taskType": "number entry"
+   },
+   "why": "Exists; ladder not yet graded 8/10",
+   "reused": false
+  },
+  "map_regrade_base10_read": {
+   "kind": "option",
+   "skill": "placevalue:place_value_disks",
+   "option": "re-grade; add base-10 blocks (rods/flats) as an alternate picture",
+   "name": "Read a Base-Ten Model re-grade",
+   "teaches": "Read the number shown by a base-ten model",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; block or disk picture over an answer box; screen: number entry",
+   "family": "placevalue",
+   "ccss": [
+    "1.NBT.B.2",
+    "2.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "161-190",
+    "taskType": "number entry"
+   },
+   "why": "MAP shows blocks (rods/flats), our read form only shows disks",
+   "reused": false
+  },
+  "map_change_patterns": {
+   "kind": "option",
+   "skill": "algebra:multi_step_word",
+   "option": "pattern: add-add / add-sub / sub-add / sub-sub (default all four, equal weight)",
+   "name": "Two-Step Change Stories (choose the pattern)",
+   "teaches": "Two successive changes to a start amount, the teacher choosing which change patterns",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Then strip (structural) and answer box; screen: number entry",
+   "family": "algebra",
+   "ccss": [
+    "2.OA.A.1",
+    "3.OA.D.8"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "191-210",
+    "taskType": "number entry"
+   },
+   "why": "Owner asked for the teacher option; re-grade with it",
+   "reused": false
+  },
+  "ordinal": {
+   "kind": "new",
+   "skill": "counting:ordinal_numbers",
+   "name": "1st, 2nd, 3rd",
+   "teaches": "Ordinal position words",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a row of objects, ring the 3rd; screen: click the object",
+   "family": "counting",
+   "ccss": [
+    "K.CC.B.4"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "141-160",
+    "taskType": "click the nth object"
+   },
+   "why": "MAP K-1 asks for the nth object; nothing deals ordinals",
+   "reused": true
+  },
+  "value_ten_times": {
+   "kind": "option",
+   "skill": "placevalue:value",
+   "name": "Ten Times the Value (option)",
+   "teaches": "Compare the value of the same digit in two places",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number with two digits underlined and 'is ___ times' box; screen: number entry",
+   "family": "placevalue",
+   "ccss": [
+    "4.NBT.A.1",
+    "5.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "201-215",
+    "taskType": "number entry / select"
+   },
+   "why": "MAP 4.NBT.1 item",
+   "reused": true,
+   "option": "form \"ten times / one tenth\""
+  },
+  "map_word_to_number_entry": {
+   "kind": "option",
+   "skill": "placevalue:number_word_names",
+   "option": "direction: words → digits (number entry)",
+   "name": "Write the Number from Its Name",
+   "teaches": "Write the numeral for a number name up to 1,000,000",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name in words over a digit-box row with comma separators; screen: number entry",
+   "family": "placevalue",
+   "ccss": [
+    "2.NBT.A.3",
+    "4.NBT.A.2"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "181-210",
+    "taskType": "number entry"
+   },
+   "why": "MC-only today; a production form fits",
+   "reused": false
+  },
+  "vis_pv_bands_millions": {
+   "kind": "band",
+   "skill": null,
+   "name": "Widen Place Value to 7 Digits (millions)",
+   "teaches": "Read/write millions",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 7-column chart cell; screen: drag digits",
+   "family": "placevalue",
+   "ccss": [
+    "4.NBT.A.2",
+    "5.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "201-220",
+    "taskType": "drag digits into chart"
+   },
+   "why": "MAP grade 4-5 uses millions",
+   "reused": true
+  },
+  "compare_small": {
+   "kind": "option",
+   "skill": "placevalue:compare",
+   "name": "Compare Numbers to 10 and 20 (option)",
+   "teaches": "Compare small numbers with pictures",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two pictured sets, symbol box; screen: symbol entry",
+   "family": "placevalue",
+   "ccss": [
+    "K.CC.C.7",
+    "1.NBT.B.3"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "151-170",
+    "taskType": "symbol select"
+   },
+   "why": "MAP K-1 compare items",
+   "reused": true,
+   "option": "band 10/20 and pictures"
+  },
+  "nl_20": {
+   "kind": "new",
+   "skill": "number_sense:number_line_scales",
+   "name": "Numbers on a Number Line (any scale)",
+   "teaches": "Read and place numbers on lines of any scale",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with labelled ends and unlabelled ticks; screen: drag the marker",
+   "family": "number_sense",
+   "ccss": [
+    "2.MD.B.6",
+    "3.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "171-200",
+    "taskType": "drag/click point on number line"
+   },
+   "why": "place_on_number_line only uses 0–100",
+   "reused": true
+  },
+  "roman_100": {
+   "kind": "new",
+   "skill": "placevalue:roman_numerals",
+   "name": "Roman Numerals",
+   "teaches": "Read Roman numerals to 100",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; numeral in a box, answer box; screen: entry",
+   "family": "placevalue",
+   "ccss": [
+    "4.NBT.A.2"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "191-210",
+    "taskType": "number entry"
+   },
+   "why": "Appears in some MAP continuums (low frequency) — owner may drop",
+   "reused": true
+  },
+  "map_change_unknown_story": {
+   "kind": "option",
+   "skill": "subtraction:unknown_start_wp",
+   "option": "unknown: change (start known, result known)",
+   "name": "How Many Were Added? (change unknown)",
+   "teaches": "Join/separate stories where the change is unknown",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Now strip, the Then box empty; screen: number entry",
+   "family": "subtraction",
+   "ccss": [
+    "1.OA.A.1",
+    "2.OA.A.1"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "171-190",
+    "taskType": "number entry"
+   },
+   "why": "CGI change-unknown is a MAP problem type with no skill",
+   "reused": false
+  },
+  "map_compare_bigger_unknown": {
+   "kind": "option",
+   "skill": "addition:comparison_word",
+   "option": "unknown: bigger / smaller quantity",
+   "name": "Compare Stories: Find the Bigger or Smaller Amount",
+   "teaches": "'Zoe has 4 more than Owen, who has 7' — find the unknown quantity",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a two-bar comparison model (structural), answer box; screen: number entry",
+   "family": "addition",
+   "ccss": [
+    "1.OA.A.1",
+    "2.OA.A.1"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "181-200",
+    "taskType": "number entry"
+   },
+   "why": "The hardest CGI compare forms are MAP items; not dealt",
+   "reused": false
+  },
+  "part_whole": {
+   "kind": "new",
+   "skill": "composing:part_whole_model",
+   "name": "Part-Whole Model",
+   "teaches": "Part-whole with any part unknown",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; cherry/bar part-whole diagram; screen: number entry",
+   "family": "composing",
+   "ccss": [
+    "K.OA.A.3",
+    "1.OA.A.1"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "151-180",
+    "taskType": "number entry in model"
+   },
+   "why": "Put-together/take-apart types",
+   "reused": true
+  },
+  "equal_sign_repair": {
+   "kind": "repair",
+   "skill": "addition:equal_sign",
+   "name": "True/False Equations repair",
+   "teaches": "Equal sign means 'same as' (6 = 6, 4 + 1 = 5 + 0)",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation in a box, ring True/False; screen: two-button True/False (the response is binary)",
+   "family": "addition",
+   "ccss": [
+    "1.OA.D.7"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "181-200",
+    "taskType": "true/false select"
+   },
+   "why": "Skill contradicts its name",
+   "reused": true
+  },
+  "map_properties_equivalent": {
+   "kind": "new",
+   "skill": "algebra:properties_of_operations",
+   "name": "Same Answer? Properties of Operations",
+   "teaches": "Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; one expression and a missing box in the rewritten expression (production); select-all form for 'which are equal'; screen: number entry, multi-select only for the select-all form",
+   "family": "algebra",
+   "ccss": [
+    "1.OA.B.3",
+    "3.OA.B.5"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "191-210",
+    "taskType": "number entry / select all"
+   },
+   "why": "MAP asks property recognition; no skill",
+   "reused": false
+  },
+  "function_machine": {
+   "kind": "new",
+   "skill": "algebra:function_machines",
+   "name": "Function Machines",
+   "teaches": "Find and apply rules",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; machine diagram with in/out; screen: entry",
+   "family": "algebra",
+   "ccss": [
+    "3.OA.D.9",
+    "4.OA.C.5"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "191-210",
+    "taskType": "rule entry"
+   },
+   "why": "MAP 'what is the rule' items",
+   "reused": true
+  },
+  "write_numeric_expression": {
+   "kind": "option",
+   "skill": "algebra:write_expression",
+   "name": "Write Numerical Expressions (option)",
+   "teaches": "Words → 2 × (8 + 7)",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; words above an expression-entry row; screen: build-the-expression tiles",
+   "family": "algebra",
+   "ccss": [
+    "5.OA.A.2"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "211-225",
+    "taskType": "expression entry"
+   },
+   "why": "MAP 5.OA.2",
+   "reused": true,
+   "option": "numbers only, with brackets"
+  },
+  "inequality_write_graph": {
+   "kind": "option",
+   "skill": "algebra:inequalities",
+   "name": "Write and Graph Inequalities (option)",
+   "teaches": "x > c from words, open/closed circle",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with circle and ray; screen: click the circle type and drag the ray",
+   "family": "algebra",
+   "ccss": [
+    "6.EE.B.8"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "211-230",
+    "taskType": "graph on number line"
+   },
+   "why": "MAP graphing item",
+   "reused": true,
+   "option": "write from words + graph"
+  },
+  "tens_any": {
+   "kind": "option",
+   "skill": "addition:add_sub_10s",
+   "name": "Add and Subtract Multiples of 10 (option)",
+   "teaches": "70 − 30, 34 + 20",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation cell, entry; screen: entry",
+   "family": "addition",
+   "ccss": [
+    "1.NBT.C.4",
+    "1.NBT.C.6"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "171-195",
+    "taskType": "number entry"
+   },
+   "why": "MAP 1.NBT.6",
+   "reused": true,
+   "option": "task: any multiple of 10"
+  },
+  "pictures_to_sentence": {
+   "kind": "option",
+   "skill": "addition:add_5_pictures",
+   "name": "Write the Number Sentence (option)",
+   "teaches": "Picture → 3 + 2 = 5",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; picture over a three-box sentence frame; screen: fill the boxes (production, not MC)",
+   "family": "addition",
+   "ccss": [
+    "K.OA.A.1",
+    "1.OA.A.1"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "141-170",
+    "taskType": "equation entry from a picture"
+   },
+   "why": "6.4 picture↔equation for OA",
+   "reused": true,
+   "option": "response \"write the number sentence\""
+  },
+  "map_match_model_number": {
+   "kind": "option",
+   "skill": "placevalue:place_value_disks",
+   "option": "form: match 3 models to 3 numbers",
+   "name": "Match the Model to the Number",
+   "teaches": "Pair each base-ten model with its number, incl. near-misses (304 vs 340)",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three models left, three numbers right, pupil writes the letter beside each number; screen: drag each number onto its model",
+   "family": "placevalue",
+   "ccss": [
+    "1.NBT.B.2",
+    "2.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Number & place value",
+    "ritBand": "161-190",
+    "taskType": "drag to match"
+   },
+   "why": "6.4 match form for model↔number",
+   "reused": false
+  },
+  "map_story_equation_match": {
+   "kind": "option",
+   "skill": "algebra:write_equation",
+   "option": "form: write the equation for an add/sub story (no solving), with the unknown as a box",
+   "name": "Write the Equation for the Story",
+   "teaches": "Represent a story with an equation using a symbol for the unknown (9 + ? = 14)",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a sentence frame with operation box and digit boxes; screen: fill the frame (tiles), never MC",
+   "family": "algebra",
+   "ccss": [
+    "1.OA.A.1",
+    "2.OA.A.1",
+    "3.OA.D.8"
+   ],
+   "map": {
+    "strand": "Operations & algebra",
+    "ritBand": "171-200",
+    "taskType": "choose/build the equation"
+   },
+   "why": "MAP 'which equation shows the story'; 6.4 story↔operation",
+   "reused": false
+  }
+ }
+}

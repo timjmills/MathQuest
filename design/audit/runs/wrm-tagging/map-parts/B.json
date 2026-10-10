@@ -1,0 +1,1537 @@
+{
+ "rows": [
+  {
+   "task": "Ratios from pictures",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "conversions:ratio_intro",
+    "conversions:equiv_ratios"
+   ],
+   "proposal": "map_ratio_picture",
+   "note": "Sampled 4 each: ratio_intro/equiv_ratios are text-only (\"5 boys and 3 girls\"), no picture form. Still partial."
+  },
+  {
+   "task": "Equal sharing from a visual (\"share N among M\")",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "division:share_into_groups",
+    "fraction_operations:frac_as_division"
+   ],
+   "proposal": "map_share_among",
+   "note": "share_into_groups sampled 4: all \"make groups of k, how many groups\" (quotitive); no partitive share-among with counters."
+  },
+  {
+   "task": "Division by making equal groups (drag)",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.2",
+   "status": "partial",
+   "skills": [
+    "division:share_into_groups",
+    "division:div_remainders"
+   ],
+   "proposal": "map_groups_drag",
+   "note": "share_into_groups answerType=number (count); div_remainders is \"ring groups\" on paper, text entry on screen; no drag."
+  },
+  {
+   "task": "Picture <-> multiplication equation",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:arrays_groups",
+    "multiplication:dot_array_mult",
+    "multiplication:repeated_add_to_mult"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "arrays_groups is inline-blanks \"rows of _ make _\"; dot_array_mult number entry. Picture->total exists; picture->equation symbol form and equation->picture missing."
+  },
+  {
+   "task": "Compare / order decimals",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "decimals:compare_decimal",
+    "decimals:compare_thousandths",
+    "decimals:order_decimals"
+   ],
+   "proposal": "dec_compare_model",
+   "note": "Sampled: symbol choice, dnd order, multi-select \"click all less than\". MAP-like forms present; needs re-grade, and the model support is a reused proposal."
+  },
+  {
+   "task": "Fraction multiplication with visual models",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "fraction_operations:mult_frac_frac",
+    "fraction_operations:mult_frac_whole",
+    "fraction_operations:mult_scaling"
+   ],
+   "proposal": "mult_mixed_int",
+   "note": "Sampled: frac-model cell text entry, dnd sort by size, multi-select equal expressions. Sound; re-grade. Mixed-number × whole still missing (reused)."
+  },
+  {
+   "task": "Adding decimals",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "decimals:add_decimal"
+   ],
+   "proposal": "decimal_models",
+   "note": "col-arith decimal column add, tenths and hundredths sampled. Re-grade; no decimal model support (reused proposal)."
+  },
+  {
+   "task": "Equal groups total",
+   "strand": "Multiplication & division",
+   "ritBand": "171-190",
+   "source": "6.2",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:arrays_groups",
+    "multiplication:mult_word_problems",
+    "multiplication:repeated_add_to_mult"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "arrays_groups \"groups of\" picture + mult_word_problems \"boxes each has\" sampled: total is dealt. Needs re-grade only."
+  },
+  {
+   "task": "Equal or unequal groups",
+   "strand": "Multiplication & division",
+   "ritBand": "171-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:equal_or_unequal_groups"
+   ],
+   "note": "Sampled: decide multiply/add from a picture of groups."
+  },
+  {
+   "task": "Make equal groups (early, K-2 sharing)",
+   "strand": "Multiplication & division",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "share_group",
+   "note": "No early share/group skill; WRM share_group reused."
+  },
+  {
+   "task": "Repeated addition <-> multiplication",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:repeated_add_to_mult"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "Sampled: \"6+6+6+6+6 = 5 × 6 = ?\" — the equation is given; pupil only computes. Writing the × form is not asked."
+  },
+  {
+   "task": "Multiplication facts 0-10",
+   "strand": "Multiplication & division",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:mult_facts",
+    "multiplication:multiply"
+   ],
+   "note": "Fact cells, number entry."
+  },
+  {
+   "task": "Division facts",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:div_facts"
+   ],
+   "note": "Number entry."
+  },
+  {
+   "task": "Unknown factor in × / ÷ equation",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:missing_mult_div"
+   ],
+   "note": "Sampled \"99 ÷ ___ = 11\", \"___ × 4 = 12\"."
+  },
+  {
+   "task": "Fact families / relate × and ÷",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:mult_div_fact_family",
+    "multiplication:number_families_mult"
+   ],
+   "note": "Fact-family and number-family inputs."
+  },
+  {
+   "task": "Properties of multiplication (commutative, distributive, zero)",
+   "strand": "Multiplication & division",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:mult_properties"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "Sampled: property items are number entry; no array showing the split (distributive with picture)."
+  },
+  {
+   "task": "Multiplication on a number line (hops)",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:nl_mult"
+   ],
+   "note": "hop-line cell, number entry."
+  },
+  {
+   "task": "Multiplication word problems (equal groups)",
+   "strand": "Multiplication & division",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:mult_word_problems",
+    "multiplication:mult_word_problems_plain"
+   ],
+   "note": "Story-work cell sampled."
+  },
+  {
+   "task": "Division word problems",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:div_word_problems",
+    "division:div_word_problems_plain"
+   ],
+   "note": "Story-work cell."
+  },
+  {
+   "task": "Choose the equation for a × / ÷ story",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "multiplication:mult_word_problems"
+   ],
+   "proposal": "map_equation_story",
+   "note": "Stories return only the number; no equation-choice/build form."
+  },
+  {
+   "task": "Multiplicative comparison (times as many)",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:mult_comparison",
+    "multiplication:mult_comparison_plain"
+   ],
+   "proposal": "comparison_statements",
+   "note": "Sampled: both unknown-product and unknown-multiplier; statement<->equation missing (reused)."
+  },
+  {
+   "task": "Multiply by 10, 100, multiples of 10",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:mult_zeros"
+   ],
+   "note": "Sampled \"3 × 100\"."
+  },
+  {
+   "task": "Multi-digit × 1-digit / 2-digit × 2-digit (area model)",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "multiplication:area_model_mult",
+    "multiplication:area_model_mult_hard"
+   ],
+   "note": "area-model answerType."
+  },
+  {
+   "task": "Multi-digit multiplication (standard algorithm, 4-digit × 1)",
+   "strand": "Multiplication & division",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "multiplication:multiply",
+    "multiplication:area_model_mult"
+   ],
+   "proposal": "long_mult",
+   "note": "4-digit × 2-digit long multiplication not dealt; WRM long_mult reused."
+  },
+  {
+   "task": "Division with remainders",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:div_remainders",
+    "division:box_division_easy",
+    "division:box_division_hard"
+   ],
+   "note": "Sampled \"Ring groups of 5... 4 R 3\"."
+  },
+  {
+   "task": "Interpret the remainder in context",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:remainder_interpret",
+    "division:remainder_contexts"
+   ],
+   "note": "Sampled cars-needed (round up) and left over."
+  },
+  {
+   "task": "Multi-digit division (area model / partial quotients)",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "division:area_model_div_2by1",
+    "division:area_model_div_3by1"
+   ],
+   "note": "Area model division."
+  },
+  {
+   "task": "Divide by 2-digit divisor with remainders",
+   "strand": "Multiplication & division",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "division:long_div_2digit"
+   ],
+   "proposal": "long_div_rem",
+   "note": "Exact quotients only."
+  },
+  {
+   "task": "Factors and factor pairs",
+   "strand": "Multiplication & division",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:factors_identify",
+    "number_theory:factor_tchart_easy",
+    "number_theory:factor_links_easy"
+   ],
+   "note": "Circle all, T-chart drag."
+  },
+  {
+   "task": "Multiples",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:multiples"
+   ],
+   "note": "Fill, list, click-all forms sampled."
+  },
+  {
+   "task": "Prime and composite",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:prime_composite"
+   ],
+   "note": "Choice, dnd sort sampled."
+  },
+  {
+   "task": "GCF / LCM",
+   "strand": "Multiplication & division",
+   "ritBand": "211-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:gcf_easy",
+    "number_theory:gcf_hard",
+    "number_theory:lcm"
+   ],
+   "note": "Number entry."
+  },
+  {
+   "task": "Divisibility",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:divisibility_sort"
+   ],
+   "note": "divisibility-sort drag."
+  },
+  {
+   "task": "Multiply three numbers / associative",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "mult_three",
+   "note": "No three-factor skill; WRM proposal reused."
+  },
+  {
+   "task": "Estimate products and quotients",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "division:div_fix_estimate"
+   ],
+   "proposal": "map_mult_estimate",
+   "note": "Only long-division estimate fix; no estimate-a-product item."
+  },
+  {
+   "task": "Equal parts / halves and quarters of shapes",
+   "strand": "Fractions & decimals",
+   "ritBand": "161-180",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "fraction_parts",
+   "note": "No equal/unequal parts skill; WRM fraction_parts reused."
+  },
+  {
+   "task": "Identify fraction of a shape (area model)",
+   "strand": "Fractions & decimals",
+   "ritBand": "181-190",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:identify",
+    "fractions:write_fraction",
+    "fractions:shade_fraction"
+   ],
+   "note": "Sampled: write shaded fraction, which model shows."
+  },
+  {
+   "task": "Unit fractions / build a fraction from unit fractions",
+   "strand": "Fractions & decimals",
+   "ritBand": "181-190",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "fraction_operations:decompose_fractions",
+    "composing:compose_whole"
+   ],
+   "proposal": "map_frac_unit_build",
+   "note": "compose_whole builds 1 only; decompose is a grade 4 sum form."
+  },
+  {
+   "task": "Fraction of a set",
+   "strand": "Fractions & decimals",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:fraction_of_set",
+    "fractions:fraction_of_set_hard"
+   ],
+   "note": "Sampled: compute, click 3/3 of, missing numerator."
+  },
+  {
+   "task": "Place a fraction on a number line (drag)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:fraction_nl_drag",
+    "fractions:mixed_nl_drag",
+    "composing:fraction_number_line"
+   ],
+   "note": "nl-drag cell, click tick."
+  },
+  {
+   "task": "Read a fraction at a point on a number line",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "composing:fraction_number_line"
+   ],
+   "note": "Sampled \"What fraction is at the arrow?\" fraction-input."
+  },
+  {
+   "task": "Whole numbers as fractions",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "composing:whole_as_fraction"
+   ],
+   "note": "Sampled 6/6, 2/1."
+  },
+  {
+   "task": "Equivalent fractions (models and number)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:equiv_frac_visual",
+    "fractions:select_equiv_frac",
+    "fractions:equivalent"
+   ],
+   "note": "Sampled visual write and =/≠."
+  },
+  {
+   "task": "Compare fractions (same whole, models)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:compare"
+   ],
+   "note": "Sampled symbol with models."
+  },
+  {
+   "task": "Compare fractions with benchmark 1/2",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "fractions:benchmark_fractions",
+    "fractions:compare_frac_lcd"
+   ],
+   "proposal": "map_frac_compare_reason",
+   "note": "Benchmark exists as placement only; compare via 1/2 not dealt."
+  },
+  {
+   "task": "Order fractions",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:order_fractions",
+    "fractions:order_frac_numline"
+   ],
+   "note": "Ordering forms."
+  },
+  {
+   "task": "Fractions greater than 1 from models",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "fractions:mixed_improper_visual"
+   ],
+   "proposal": "frac_beyond_1",
+   "note": "Pizza model only."
+  },
+  {
+   "task": "Mixed numbers <-> improper fractions",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fractions:improper_mixed",
+    "fractions:mixed_improper_visual"
+   ],
+   "note": "Sampled 25/6, 5/2."
+  },
+  {
+   "task": "Add / subtract fractions like denominators",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:add_fractions_like",
+    "fraction_operations:sub_fractions_like"
+   ],
+   "note": "frac-model cell."
+  },
+  {
+   "task": "Add / subtract mixed numbers",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:add_mixed_like",
+    "fraction_operations:sub_mixed_like"
+   ],
+   "note": "Like denominators."
+  },
+  {
+   "task": "Add / subtract unlike denominators",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:add_frac_unlike",
+    "fraction_operations:sub_frac_unlike"
+   ],
+   "note": "Sampled 1/8 + 5/12."
+  },
+  {
+   "task": "Fraction word problems (+/-)",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:frac_word_problems",
+    "fraction_operations:frac_word_problems_plain"
+   ],
+   "note": "Sampled pie/cake stories."
+  },
+  {
+   "task": "Fraction as division (a/b = a ÷ b)",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:frac_as_division",
+    "fraction_operations:frac_as_div_word"
+   ],
+   "note": "Share pizzas sampled."
+  },
+  {
+   "task": "Fraction of an amount / fraction as operator",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "fractions:fraction_of_set"
+   ],
+   "proposal": "frac_operator",
+   "note": "Sets only, no bar-model amount."
+  },
+  {
+   "task": "Divide unit fraction by whole / whole by unit fraction",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:div_unit_fraction"
+   ],
+   "note": "Sampled 4 ÷ 1/3."
+  },
+  {
+   "task": "Divide fraction by fraction",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "div_frac_frac",
+   "note": "Not dealt."
+  },
+  {
+   "task": "Multiplication as scaling",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "fraction_operations:mult_scaling"
+   ],
+   "note": "Present."
+  },
+  {
+   "task": "Tenths and hundredths: fraction <-> decimal",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "conversions:f_to_d",
+    "conversions:d_to_f",
+    "fraction_operations:frac_10_100"
+   ],
+   "note": "Sampled 7/100 -> 0.07, dnd bins."
+  },
+  {
+   "task": "Decimal place value (value of a digit)",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "decimal_pv",
+   "note": "No decimals:decimal_place_value skill."
+  },
+  {
+   "task": "Decimal on a number line (place)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "decimals:decimal_nl_drag"
+   ],
+   "note": "nl-drag sampled."
+  },
+  {
+   "task": "Compare decimals to thousandths",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "decimals:compare_thousandths"
+   ],
+   "note": "Present."
+  },
+  {
+   "task": "Round decimals",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "decimals:round_decimals",
+    "decimals:round_thousandths",
+    "number_sense:round_sort_tenths"
+   ],
+   "note": "Sampled nearest tenth/hundredth."
+  },
+  {
+   "task": "Subtract decimals",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "decimals:sub_decimal"
+   ],
+   "note": "Column."
+  },
+  {
+   "task": "Multiply decimals (by whole, by decimal)",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "decimals:mult_decimal"
+   ],
+   "proposal": "mult_dec_dec",
+   "note": "Sampled: decimal × whole only."
+  },
+  {
+   "task": "Divide decimals",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "decimals:div_decimal"
+   ],
+   "note": "Sampled 15.5 ÷ 5, 2.4 ÷ 0.2."
+  },
+  {
+   "task": "Powers of ten with decimals and exponents",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "multiplication:mult_zeros"
+   ],
+   "proposal": "map_power10_exponent",
+   "note": "mult_zeros whole-number only."
+  },
+  {
+   "task": "Percent from a grid",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "conversions:percent_visual"
+   ],
+   "note": "Sampled percent shaded, click all 25%."
+  },
+  {
+   "task": "Fraction/decimal/percent conversions and order",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "conversions:f_to_p",
+    "conversions:d_to_p",
+    "conversions:order_fdp"
+   ],
+   "note": "Present."
+  },
+  {
+   "task": "Percent of a number",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "conversions:percent_of_number"
+   ],
+   "proposal": "map_percent_of_grid_bar",
+   "note": "Text only; no bar model."
+  },
+  {
+   "task": "Unit rate",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "conversions:unit_rate_intro"
+   ],
+   "note": "Sampled pages per day."
+  },
+  {
+   "task": "Ratio tables / equivalent ratios",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "conversions:ratio_tables",
+    "conversions:equiv_ratios",
+    "conversions:double_num_line"
+   ],
+   "note": "Missing-value forms."
+  },
+  {
+   "task": "Ratio word problems with bar model",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "ratio_problems",
+   "note": "Reused WRM proposal."
+  },
+  {
+   "task": "Line plot with fractions",
+   "strand": "Fractions & decimals",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "graphs:line_plot_fractions"
+   ],
+   "note": "Data strand overlap; sampled."
+  },
+  {
+   "task": "Match: picture <-> equation (multiplication)",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "multiplication:arrays_groups",
+    "multiplication:dot_array_mult"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "Picture -> total exists; picture <-> equation match in either direction missing."
+  },
+  {
+   "task": "Match: array <-> multiplication",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "multiplication:arrays_groups",
+    "multiplication:dot_array_mult"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "Same gap; array given, equation not produced; equation -> array not dealt."
+  },
+  {
+   "task": "Match: story <-> operation (× / ÷)",
+   "strand": "Multiplication & division",
+   "ritBand": "191-200",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "multiplication:mult_word_problems",
+    "division:div_word_problems"
+   ],
+   "proposal": "map_equation_story",
+   "note": "No story -> equation form."
+  },
+  {
+   "task": "Match: number line <-> multiplication (hops)",
+   "strand": "Multiplication & division",
+   "ritBand": "181-190",
+   "source": "6.4",
+   "status": "exists-regrade",
+   "skills": [
+    "multiplication:nl_mult",
+    "division:nl_div"
+   ],
+   "proposal": "map_array_to_eq",
+   "note": "Hop line -> product exists; write the × equation from hops is not asked (covered by the same \"write the equation\" option)."
+  },
+  {
+   "task": "Match: model <-> number (fraction models)",
+   "strand": "Fractions & decimals",
+   "ritBand": "181-190",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "fractions:identify",
+    "fractions:shade_fraction"
+   ],
+   "proposal": "map_frac_model_match",
+   "note": "One model each way; no many-to-many match."
+  },
+  {
+   "task": "Match: model <-> number (decimal grids)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "conversions:percent_visual"
+   ],
+   "proposal": "map_decimal_grid",
+   "note": "Only percent grid."
+  },
+  {
+   "task": "Match: number line <-> number (fractions)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "composing:fraction_number_line",
+    "fractions:fraction_nl_drag"
+   ],
+   "note": "Both read-the-point and place."
+  },
+  {
+   "task": "Match: number line <-> number (decimals)",
+   "strand": "Fractions & decimals",
+   "ritBand": "191-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "decimals:decimal_nl_drag"
+   ],
+   "proposal": "map_nl_read_decimal",
+   "note": "Place only, no read."
+  },
+  {
+   "task": "Match: story <-> operation (fractions)",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "6.4",
+   "status": "missing",
+   "skills": [
+    "fraction_operations:frac_word_problems",
+    "fraction_operations:frac_mult_word"
+   ],
+   "proposal": "map_frac_story_op",
+   "note": "Stories answer only."
+  }
+ ],
+ "proposals": {
+  "map_ratio_picture": {
+   "kind": "option",
+   "skill": "conversions:ratio_intro",
+   "option": "form \"from a picture\"",
+   "name": "Ratios from a Picture (option)",
+   "teaches": "Write the ratio of two kinds of object shown in a picture (part:part and part:whole), then an equivalent ratio from grouped pictures",
+   "representation": "B&W boxed cell: two rows of outline/solid shapes (circles, squares) counted in place, no colour coding; answer slots \"___ : ___\". Screen: two number boxes around a fixed colon (production), never MC",
+   "family": "ratio",
+   "ccss": [
+    "6.RP.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "221-230",
+    "taskType": "picture -> ratio, number entry"
+   },
+   "why": "ratio_intro and equiv_ratios are text-only; MAP shows a picture of objects and asks for the ratio",
+   "reused": false
+  },
+  "map_share_among": {
+   "kind": "option",
+   "skill": "division:share_into_groups",
+   "option": "mode \"share among M\"",
+   "name": "Share N Among M Equally (option)",
+   "teaches": "Partitive division: deal N counters one at a time into M circles and write how many in each (the twin of the existing \"groups of\" quotitive form)",
+   "representation": "B&W cell: N counters in a row above M empty outline circles; answer \"___ in each group\" plus the ÷ equation. Screen: drag counters into the circles, then type the number in each",
+   "family": "division",
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "181-190",
+    "taskType": "drag to share, number entry"
+   },
+   "why": "share_into_groups deals only \"make groups of k, how many groups\"; MAP also asks \"share N among M\"",
+   "reused": false
+  },
+  "map_groups_drag": {
+   "kind": "option",
+   "skill": "division:share_into_groups",
+   "option": "response \"drag\"",
+   "name": "Make Equal Groups by Dragging (option)",
+   "teaches": "Make the groups on screen by dragging counters into rings, then answer the quotient",
+   "representation": "Paper: unchanged ring-the-groups cell. Screen: counters are draggable into outline rings that snap; checked when every ring holds the same count, then the quotient box opens",
+   "family": "division",
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "181-190",
+    "taskType": "drag objects into groups"
+   },
+   "why": "MAP division items let the pupil drag objects into groups; today the screen form is count-only",
+   "reused": false
+  },
+  "map_array_to_eq": {
+   "kind": "option",
+   "skill": "multiplication:arrays_groups",
+   "option": "form \"write the equation\"",
+   "name": "Picture to Multiplication Equation (option)",
+   "teaches": "Look at an array or equal groups and write the full equation ___ × ___ = ___ (and the reverse: given an equation, choose/draw the matching array)",
+   "representation": "B&W dot array or ringed groups in the cell; three slots ___ × ___ = ___. Reverse: equation given, pupil marks rows/columns on a dot grid. Screen: three number boxes; reverse = click-to-shade grid rows",
+   "family": "multiplication",
+   "ccss": [
+    "3.OA.A.1"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "181-190",
+    "taskType": "picture -> equation; equation -> picture"
+   },
+   "why": "arrays_groups uses a sentence frame \"rows of make in all\"; MAP shows a picture and asks which/what equation, and the reverse direction is not dealt",
+   "reused": false
+  },
+  "map_equation_story": {
+   "kind": "option",
+   "skill": "multiplication:mult_word_problems",
+   "option": "form \"choose the equation\"",
+   "name": "Story to Equation (option)",
+   "teaches": "Read a short multiplication/division story and write the equation that matches (with ? for the unknown), before solving",
+   "representation": "B&W word-work cell; the answer is an equation built from a tile bank (numbers, ×, ÷, =, ?). Screen: drag tiles into an equation frame (production, not MC)",
+   "family": "multiplication",
+   "ccss": [
+    "3.OA.A.3",
+    "4.OA.A.2"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "191-200",
+    "taskType": "story -> equation, drag tiles"
+   },
+   "why": "Every story skill asks only for the answer; MAP asks which equation represents the story",
+   "reused": false
+  },
+  "map_frac_model_match": {
+   "kind": "option",
+   "skill": "fractions:identify",
+   "option": "form \"match model and fraction\"",
+   "name": "Match Fraction Models and Numbers (option)",
+   "teaches": "Match each fraction model (area, bar, set) to its fraction from a bank, both directions",
+   "representation": "B&W cell with 3-4 outline models and a bank of fractions; pupil writes the letter/fraction under each. Screen: drag fraction tiles onto models",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "181-190",
+    "taskType": "drag to match model <-> number"
+   },
+   "why": "identify deals one model at a time (write or MC); MAP match-the-two form missing",
+   "reused": false
+  },
+  "map_decimal_grid": {
+   "kind": "new",
+   "skill": "decimals:decimal_grid_model",
+   "name": "Decimal Grids and Numbers",
+   "teaches": "Read a tenths strip or hundred square as a decimal and fraction, shade a grid for a given decimal, and match grids to decimals",
+   "representation": "B&W 10×10 outline grid with solid-black shading (single grey for partial if needed); answer slots 0.___ and ___/100. Screen: number entry; shade by clicking cells for the reverse",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.6",
+    "4.NF.C.5"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "191-200",
+    "taskType": "model -> decimal, click to shade"
+   },
+   "why": "No decimal skill reads or shades a decimal grid (percent_visual does percent only)",
+   "reused": false
+  },
+  "map_nl_read_decimal": {
+   "kind": "option",
+   "skill": "decimals:decimal_nl_drag",
+   "option": "task \"read the point\"",
+   "name": "Read a Decimal on a Number Line (option)",
+   "teaches": "Name the decimal at a marked point on a tenths/hundredths line (the reverse of placing)",
+   "representation": "B&W nl-place cell with an arrow above a tick; answer slot under the arrow. Screen: number entry",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "191-200",
+    "taskType": "number line -> number, number entry"
+   },
+   "why": "decimal_nl_drag only places; fractions have both directions, decimals do not",
+   "reused": false
+  },
+  "map_frac_unit_build": {
+   "kind": "option",
+   "skill": "fractions:shade_fraction",
+   "option": "form \"build from unit fractions\"",
+   "name": "Build a Fraction from Unit Fractions (option)",
+   "teaches": "Count unit fractions: 3/4 is 3 parts of size 1/4; write the fraction as a sum of unit fractions from a picture",
+   "representation": "B&W bar model; slots ___/___ = 1/_ + 1/_ + 1/_. Screen: number boxes",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.1",
+    "4.NF.B.3b"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "181-190",
+    "taskType": "model -> number"
+   },
+   "why": "decompose_fractions covers 4th grade; unit-fraction counting at grade 3 MAP band not dealt from a picture",
+   "reused": false
+  },
+  "map_frac_story_op": {
+   "kind": "option",
+   "skill": "fraction_operations:frac_word_problems",
+   "option": "form \"choose the operation\"",
+   "name": "Fraction Story to Expression (option)",
+   "teaches": "Write the expression for a fraction story (add, subtract, multiply) before solving",
+   "representation": "B&W word-work cell; answer = expression from a tile bank. Screen: drag tiles into an expression frame",
+   "family": "fraction operations",
+   "ccss": [
+    "4.NF.B.3d",
+    "5.NF.B.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "story -> operation, drag tiles"
+   },
+   "why": "Fraction stories ask only for the result; MAP asks which expression models the story",
+   "reused": false
+  },
+  "map_power10_exponent": {
+   "kind": "new",
+   "skill": "decimals:powers_of_ten",
+   "name": "Powers of Ten: Patterns and Exponents",
+   "teaches": "Multiply and divide whole numbers and decimals by 10, 100, 1000 and 10^n; explain the zeros/point shift; write 10^3 = 1000",
+   "representation": "B&W place-value chart cell with arrows showing the digits move; answer number slot. Screen: number entry",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.A.2",
+    "5.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "number entry"
+   },
+   "why": "mult_zeros is whole-number only; dec_missing (placevalue:place_value_10x) is missing-number only; exponent notation not dealt",
+   "reused": false
+  },
+  "map_frac_compare_reason": {
+   "kind": "option",
+   "skill": "fractions:compare",
+   "option": "support \"benchmark 1/2\"",
+   "name": "Compare Fractions Using 1/2 (option)",
+   "teaches": "Compare two fractions by placing each against 1/2 or 1 (no common denominator)",
+   "representation": "B&W cell with a 0-1/2-1 line under both fractions; answer symbol. Screen: symbol picker",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.A.2"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "201-210",
+    "taskType": "select symbol"
+   },
+   "why": "compare uses models of same whole only; benchmark reasoning is a MAP 201-210 task",
+   "reused": false
+  },
+  "map_percent_of_grid_bar": {
+   "kind": "option",
+   "skill": "conversions:percent_of_number",
+   "option": "support \"percent bar\"",
+   "name": "Percent of a Number with a Bar (option)",
+   "teaches": "Find 10%, 25%, 50% of a number from a percent bar model",
+   "representation": "B&W bar split in 10 or 4 equal parts with 0%/100% labels; slot for the part. Screen: number entry",
+   "family": "conversions",
+   "ccss": [
+    "6.RP.A.3c"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "221-230",
+    "taskType": "model -> number"
+   },
+   "why": "percent_of_number is text-only",
+   "reused": false
+  },
+  "decimal_pv": {
+   "kind": "new",
+   "skill": "decimals:decimal_place_value",
+   "name": "Tenths and Hundredths in a Place-Value Chart",
+   "teaches": "Decimal place value: value of a digit in tenths/hundredths",
+   "representation": "B&W place-value chart cell; number entry on screen",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "191-210",
+    "taskType": "value of the digit, number entry"
+   },
+   "why": "MAP asks the value of a decimal digit; no decimal place-value skill exists",
+   "reused": true
+  },
+  "frac_operator": {
+   "kind": "new",
+   "skill": "fractions:fraction_as_operator",
+   "name": "Fractions as Operators",
+   "teaches": "Fraction of an amount as an operator",
+   "representation": "B&W bar model cell; number entry",
+   "family": "fractions",
+   "ccss": [
+    "5.NF.B.4a"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "201-210",
+    "taskType": "number entry"
+   },
+   "why": "Fraction of an amount beyond sets",
+   "reused": true
+  },
+  "div_frac_frac": {
+   "kind": "new",
+   "skill": "fraction_operations:div_frac_frac",
+   "name": "Divide Fractions by Fractions",
+   "teaches": "Fraction ÷ fraction",
+   "representation": "B&W bar model cell; fraction entry",
+   "family": "fraction operations",
+   "ccss": [
+    "6.NS.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "221-230",
+    "taskType": "number entry"
+   },
+   "why": "Top MAP 3-5 band reaches 6th-grade fraction division",
+   "reused": true
+  },
+  "comparison_statements": {
+   "kind": "option",
+   "skill": "multiplication:mult_comparison",
+   "option": "form \"statement <-> equation\"",
+   "name": "Times as Many: Statements and Equations (option)",
+   "teaches": "Comparison sentence <-> equation",
+   "representation": "B&W cell; equation slots",
+   "family": "multiplication",
+   "ccss": [
+    "4.OA.A.1"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "201-210",
+    "taskType": "sentence -> equation"
+   },
+   "why": "MAP asks which equation matches \"35 is 5 times as many as 7\"",
+   "reused": true
+  },
+  "long_div_rem": {
+   "kind": "option",
+   "skill": "division:long_div_2digit",
+   "option": "remainders",
+   "name": "Long Division with Remainders (option)",
+   "teaches": "2-digit divisor with remainders",
+   "representation": "B&W long-division cell; number entry",
+   "family": "division",
+   "ccss": [
+    "6.NS.B.2",
+    "5.NBT.B.6"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "211-220",
+    "taskType": "number entry"
+   },
+   "why": "long_div_2digit deals exact quotients only",
+   "reused": true
+  },
+  "dec_compare_model": {
+   "kind": "option",
+   "skill": "decimals:compare_decimal",
+   "option": "support \"hundred squares\"",
+   "name": "Compare Decimals With Models (option)",
+   "teaches": "Compare decimals with hundred squares",
+   "representation": "B&W hundred-square beside each decimal; symbol entry",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.7"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "201-210",
+    "taskType": "model -> compare"
+   },
+   "why": "compare_decimal is abstract only",
+   "reused": true
+  },
+  "decimal_models": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "option": "support \"decimal model\"",
+   "name": "Decimal Operations With Models (option)",
+   "teaches": "Decimal add with hundred-square model",
+   "representation": "B&W hundred squares beside the column",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "201-210",
+    "taskType": "model -> number"
+   },
+   "why": "MAP shows decimal models for adding",
+   "reused": true
+  },
+  "ratio_problems": {
+   "kind": "new",
+   "skill": "conversions:ratio_problems_bar",
+   "name": "Ratio and Proportion Problems",
+   "teaches": "Ratio word problems with bar models",
+   "representation": "B&W bar model; number entry",
+   "family": "ratio",
+   "ccss": [
+    "6.RP.A.3"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "221-230",
+    "taskType": "number entry"
+   },
+   "why": "ratio stories with tape diagrams",
+   "reused": true
+  },
+  "mult_mixed_int": {
+   "kind": "option",
+   "skill": "fraction_operations:mult_frac_whole",
+   "option": "mixed numbers",
+   "name": "Multiply a Mixed Number by an Integer (option)",
+   "teaches": "Mixed number × whole",
+   "representation": "B&W frac-model; fraction entry",
+   "family": "fraction operations",
+   "ccss": [
+    "5.NF.B.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "number entry"
+   },
+   "why": "not dealt today",
+   "reused": true
+  },
+  "frac_beyond_1": {
+   "kind": "new",
+   "skill": "fractions:mixed_numbers_intro",
+   "name": "Fractions Beyond 1",
+   "teaches": "Fractions greater than 1 from models",
+   "representation": "B&W several-wholes model; fraction entry",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.3c",
+    "4.NF.B.3"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "191-200",
+    "taskType": "model -> number"
+   },
+   "why": "models of several wholes not dealt",
+   "reused": true
+  },
+  "map_mult_estimate": {
+   "kind": "new",
+   "skill": "multiplication:estimate_products",
+   "name": "Estimate Products and Quotients",
+   "teaches": "Round factors to friendly numbers to estimate a product or quotient and judge if an answer is reasonable",
+   "representation": "B&W cell: \"≈ ___ × ___ = ___\" slots under the problem. Screen: number boxes",
+   "family": "multiplication",
+   "ccss": [
+    "4.OA.A.3",
+    "5.NBT.B.6"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "201-210",
+    "taskType": "number entry, reasonableness"
+   },
+   "why": "MAP asks for the best estimate; no skill deals estimation of × or ÷",
+   "reused": false
+  },
+  "mult_dec_dec": {
+   "kind": "option",
+   "skill": "decimals:mult_decimal",
+   "option": "factors \"decimal × decimal\"",
+   "name": "Multiply Decimals by Decimals (option)",
+   "teaches": "decimal × decimal with the standard algorithm",
+   "representation": "B&W stack cell; number entry",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "number entry"
+   },
+   "why": "mult_decimal deals decimal × whole only",
+   "reused": true
+  },
+  "share_group": {
+   "kind": "new",
+   "skill": "division:share_and_group_early",
+   "name": "Share and Make Groups",
+   "teaches": "Make equal groups (early, K-2 sharing)",
+   "representation": "B&W boxed cell per WORKSHEET_DESIGN_STANDARD; production answer on screen (number entry / drag), not MC",
+   "family": "division",
+   "ccss": [
+    "2.OA.C.4"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "161-180",
+    "taskType": "number entry / drag"
+   },
+   "why": "No early share/group skill; WRM share_group reused.",
+   "reused": true
+  },
+  "long_mult": {
+   "kind": "new",
+   "skill": "multiplication:long_multiplication_4x2",
+   "name": "Long Multiplication and Division (4-digit)",
+   "teaches": "Multi-digit multiplication (standard algorithm, 4-digit × 1)",
+   "representation": "B&W boxed cell per WORKSHEET_DESIGN_STANDARD; production answer on screen (number entry / drag), not MC",
+   "family": "multiplication",
+   "ccss": [
+    "5.NBT.B.5"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "211-220",
+    "taskType": "number entry / drag"
+   },
+   "why": "4-digit × 2-digit long multiplication not dealt; WRM long_mult reused.",
+   "reused": true
+  },
+  "mult_three": {
+   "kind": "new",
+   "skill": "multiplication:multiply_three_numbers",
+   "name": "Multiply Three Numbers",
+   "teaches": "Multiply three numbers / associative",
+   "representation": "B&W boxed cell per WORKSHEET_DESIGN_STANDARD; production answer on screen (number entry / drag), not MC",
+   "family": "multiplication",
+   "ccss": [
+    "3.OA.B.5"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "201-210",
+    "taskType": "number entry / drag"
+   },
+   "why": "No three-factor skill; WRM proposal reused.",
+   "reused": true
+  },
+  "fraction_parts": {
+   "kind": "new",
+   "skill": "fractions:equal_parts",
+   "name": "Equal and Unequal Parts",
+   "teaches": "Equal parts / halves and quarters of shapes",
+   "representation": "B&W boxed cell per WORKSHEET_DESIGN_STANDARD; production answer on screen (number entry / drag), not MC",
+   "family": "fractions",
+   "ccss": [
+    "2.G.A.3"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "161-180",
+    "taskType": "number entry / drag"
+   },
+   "why": "No equal/unequal parts skill; WRM fraction_parts reused.",
+   "reused": true
+  }
+ }
+}
