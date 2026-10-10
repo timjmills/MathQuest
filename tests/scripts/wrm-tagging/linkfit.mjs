@@ -9,7 +9,10 @@
 //   CONTENT (any link): negative numbers; coordinates past 10; customary units (Y4 is metric and US money only);
 //                       decimals before the first decimal step (W29) except money; a fraction compare with neither a
 //                       common numerator nor a common denominator (Grade 3 compares only those); degrees; a column (stack)
-//                       3-digit × before its step (W36), any column ÷, or a long-division layout.
+//                       3-digit × before its step (W36), any column ÷, or a long-division layout; later-grade concepts
+//                       (triangle area, percent, GCF/simplify, ratio, prime/composite, reflection in an axis, 2-digit ×
+//                       2-digit) and times-tables the school has not taught by the step's week. Numbers are read from the
+//                       text, every part of the answer, the visual and the payload; 20 print-path items per link.
 // usage: node linkfit.mjs [--all]
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
@@ -22,23 +25,25 @@ const wrm = JSON.parse(fs.readFileSync(R + 'data/curriculum/wrm-steps.json', 'ut
 const d = JSON.parse(fs.readFileSync(R + 'data/curriculum/links/Y4.json', 'utf8'));
 const ALL = process.argv.includes('--all');
 const titles = {}; for (const y of wrm.years) for (const b of y.blocks) for (const s of b.steps) titles[s.id] = s.title;
-const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&#?\w+;/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
 const NUM = /(\d{1,3}(?:,\d{3})+(?!\d)|\d+)(\.\d+)?/g;
 const TIME = /^measurement:(time|elapsed|clock|order_clocks)/;   // clock payloads hold minutes (19:00 = 1140)
 const DECOY = new Set(['number_sense:estimate_sums_diffs{"place":1000,"task":"reasonable"}']);
 const WK_FIRST_DECIMAL = 'W29';
+const N_ITEMS = 20;   // G6: margins show up late (estimate_sums_diffs reaches 16,000 only after item 8)
 const cache = new Map();
 function probe(key, opts, range) {
   const id = key + JSON.stringify(opts) + range; if (cache.has(id)) return cache.get(id);
   const [c, k] = key.split(':'); let max = 0, ex = ''; const items = [];
-  for (let i = 0; i < 8; i++) {
-    let q; try { q = g.generateQuestionFor({ category: c, skill: k, opts, range, seed: 9100 + i * 17, itemIndex: i, itemCount: 8 }); } catch (e) { items.push({ err: e.message }); continue; }
+  for (let i = 0; i < N_ITEMS; i++) {
+    let q; try { q = g.generateQuestionFor({ category: c, skill: k, opts, range, seed: 9100 + i * 17, itemIndex: i, itemCount: N_ITEMS }); } catch (e) { items.push({ err: e.message }); continue; }
     if (!q) continue;
     const text = strip(q.text), a = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans), pay = q.cell ? JSON.stringify(q.cell.payload) : '';
-    items.push({ text, a, pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
+    items.push({ text, a: strip(a), pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
     let t = text;
     if (/"[xy]":/.test(a)) t += ' ' + [...a.matchAll(/"[xy]":(\d+)/g)].map(m => m[1]).join(' ');
-    else if (!/,/.test(a)) t += ' ' + strip(a);
+    else t += ' ' + strip(a).split(/[,;]/).join(' ');   // G1: dual answers ("P=136, A=1156") and lists: every comma separates
+    if (!TIME.test(key) && !/coord/.test(k)) t += ' ' + strip(q.visual);           // G1: numbers drawn only in the visual
     if (pay && !/money|coin/.test(k)) t += ' ' + [...pay.matchAll(/:(-?\d+(?:\.\d+)?)[,}\]]/g)].map(m => m[1]).join(' ');   // money payloads are in cents
     for (const m of t.matchAll(NUM)) { const n = Number(m[1].replace(/,/g, '')); if (n > max) { max = n; ex = text.trim().slice(0, 60); } }
   }
@@ -60,21 +65,67 @@ function citedCeil(sid, why) {
   if (yr === 'Y4') return (wkOf(ref) && wkOf(sid) && wkOf(ref) <= wkOf(sid)) ? own[ref] || 0 : 0;   // only if taught by now
   return titleCeil(titles[ref] || '') || YEAR_RANGE[yr] || 0;
 }
-const CUST = /\b(ounces?|oz|pounds?|lbs?|yards?|inch(es)?|feet|foot|ft|miles?|gallons?|quarts?|pints?|cups?|°F|fahrenheit)\b/i;
+const CUST = /\b(ounces?|oz|pounds?|lbs?|yards?|yd|inch(es)?|feet|foot|ft|miles?|gallons?|gal|quarts?|qt|pints?|pt|cups?|fahrenheit|tons?)\b|°\s*F\b/i;   // G2: °F
 const FRAC = /\b(\d+)\/(\d+)\b/g;
+const MONEY = /\$|¢|\bdollars?\b|\bmoney\b|\bprices?\b|\bcosts?\b|\bspend|\bchange\b/i;   // G3: not "centimetre" or "percent"
+// tables the school has taught by a week: Y3 0, 1, 2, 3, 4, 5, 8, 10; Y4 adds 6 (W01), 7 and 9 (W02), 11 and 12 (W03)
+const tablesBy = wk => { const t = new Set([0, 1, 2, 3, 4, 5, 8, 10]); if (wk >= 'W01') t.add(6); if (wk >= 'W02') { t.add(7); t.add(9); } if (wk >= 'W03') { t.add(11); t.add(12); } return t; };
+// Rule 19: the week the school first teaches each content type in Grade 3 (xlsx; earlier grades' content is met)
+const FIRST = [
+  ['mixed numbers / fractions past 1', 'W07', (e, said) => /\b\d+ \d+\/\d+\b/.test(said)],
+  ['angles', 'W27', (e, said) => /^angles_lines:(identify_angles|measure_angles|additive_angles)/.test(e.key) || /\b(acute|obtuse|right angle)/i.test(said)],
+  ['hundredths', 'W31', (e, said) => !/money|coin/.test(e.key) && /\/100\b|\b0\.\d\d\b|hundredth/i.test(said)],
+  ['decimals', 'W29', (e, said) => /(?<![\d,])\d+\.\d+/.test(said) && !/money|coin/.test(e.key)],
+  ['column 3-digit × 1-digit', 'W36', (e, said, r) => r.items.some(i => i.tpl === 'stack' && /"op":"[×x*]"/.test(i.pay) && /"operands":\[\d{3,}/.test(i.pay))],
+  ['coordinates / axes', 'W37', (e, said) => /^coordinates:/.test(e.key) || /coordinates|[xy]-axis/i.test(said)],
+];
+function firstTaught(sid, e, r, role) {
+  const wk = wkOf(sid) || 'W99', said = r.items.map(i => `${i.text || ''} ${i.a || ''}`).join(' | ');
+  const out = FIRST.filter(([n, w, f]) => (role === 'pre' || n === 'hundredths') && wk < w && f(e, said, r)).map(([n, w]) => `rule 19: ${n} first taught ${w}, step is ${wk}`);
+  const ref = role === 'pre' ? (String(e.why).match(/^Y4\.B\d+\.S\d+/) || [])[0] : null;
+  if (ref && wkOf(ref) && wkOf(ref) > wk) out.push(`rule 19: cites ${ref}, taught ${wkOf(ref)}, after this step (${wk})`);
+  return out;
+}
 function content(sid, e, r) {
-  const out = [], wk = wkOf(sid) || 'W99', all = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.pay || ''} ${i.vis || ''}`).join(' '), texts = r.items.map(i => i.text || '').join(' ');
+  const out = [], wk = wkOf(sid) || 'W99';
+  const all = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.pay || ''} ${i.vis || ''}`).join(' | ');
+  const said = r.items.map(i => `${i.text || ''} ${i.a || ''}`).join(' | ');                 // G3: text AND answer
   if (r.items.some(i => i.err)) out.push('generation error');
-  if (/(?<![\d\w)])[−-]\d/.test(texts) || /"[xy]":-\d/.test(all)) out.push('negative numbers');
-  if (/coord/.test(e.key)) { const n = [...all.matchAll(/"[xy]":(-?\d+)/g), ...texts.matchAll(/\((-?\d+), (-?\d+)\)/g)].flatMap(m => m.slice(1).filter(Boolean).map(Number)); if (n.length && Math.max(...n.map(Math.abs)) > 10) out.push(`coordinates past 10 (${Math.max(...n.map(Math.abs))})`); }
+  if (/(?<![\d\w)])[−-]\d/.test(said) || /"[xy]":-\d/.test(all)) out.push('negative numbers');
+  if (/coord/.test(e.key)) { const n = [...all.matchAll(/"[xy]":(-?\d+)/g), ...all.matchAll(/\((-?\d+), ?(-?\d+)\)/g)].flatMap(m => m.slice(1).filter(Boolean).map(Number)); if (n.length && Math.max(...n.map(Math.abs)) > 10) out.push(`coordinates past 10 (${Math.max(...n.map(Math.abs))})`); }
   const cu = all.match(CUST); if (cu) out.push(`customary unit "${cu[0]}"`);
-  if (wk < WK_FIRST_DECIMAL && /(?<![\d,])\d+\.\d+/.test(texts) && !/money|\$|¢|cent|dollar/i.test(all)) out.push(`decimals in ${wk} (before ${WK_FIRST_DECIMAL})`);
-  if (/\d+\s*°(?!F)/.test(texts)) out.push('degrees');
-  for (const i of r.items) {
-    const fr = [...(i.text || '').matchAll(FRAC)];
-    if (fr.length >= 2 && /compar|order|greater|smallest|largest|<|>/i.test(i.text)) {
+  if (wk < WK_FIRST_DECIMAL && /(?<![\d,])\d+\.\d+/.test(said) && !MONEY.test(all) && !/money|coin/.test(e.key)) out.push(`decimals in ${wk} (before ${WK_FIRST_DECIMAL})`);
+  if ((/\d+\s*°(?!\s*[FC])/.test(all) || /\bdegrees\b(?! (Celsius|C\b))/.test(said)) && !/temperature/.test(e.key)) out.push('angle measured in degrees (4.MD.C)');
+  for (const i of r.items) {                                                                    // G4: fractions in the visual / payload too
+    const src = `${i.text || ''} ${i.vis || ''} ${i.pay || ''}`;
+    const fr = [...src.matchAll(FRAC), ...(i.pay || '').matchAll(/"n(?:um)?":(\d+),"d(?:en)?":(\d+)/g)];
+    if (fr.length >= 2 && /compar|order|greater|smaller|smallest|largest|biggest|<|>/i.test(i.text || '')) {
       const nums = new Set(fr.map(m => m[1])), dens = new Set(fr.map(m => m[2]));
-      if (nums.size > 1 && dens.size > 1) { out.push(`unlike-fraction compare: ${i.text.slice(0, 50)}`); break; }
+      if (nums.size > 1 && dens.size > 1) { out.push(`unlike-fraction compare: ${(i.text || '').slice(0, 50)}`); break; }
+    }
+  }
+  // Grade 3 denominators: 2, 3, 4, 5, 6, 8, 10, 12 (and 100 from the decimal blocks, W29)
+  const dens = [...all.matchAll(/\b\d+\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 12 && !(x === 100 && wk >= WK_FIRST_DECIMAL));
+  if (dens.length) out.push(`denominator ${Math.max(...dens)} (Grade 3 stops at twelfths)`);
+  // G5: concepts from a later grade
+  if (/triangle/i.test(said) && /\barea\b/i.test(said)) out.push('triangle area (6.G.A.1)');
+  if (/%|\bpercent/i.test(all)) out.push('percent (6.RP)');
+  if (/\bGCF\b|greatest common|simplif/i.test(said)) out.push('GCF / simplifying');
+  if (/\bratio\b|x value|y value/i.test(said)) out.push('ratio tables (6.RP)');
+  if (/\bprime\b|composite number|prime or composite/i.test(said)) out.push('prime / composite (4.OA.B.4)');
+  if (/[xy]-axis/i.test(said) && /reflect/i.test(said)) out.push('reflection in an axis');
+  for (const i of r.items) {
+    const m = (i.text || '').match(/\b(\d{2,})\s*[×x]\s*(\d{2,})\b/) || ((i.vis || '').match(/first row is done|second row/i) ? ['', '10', '10'] : null);
+    const p10 = x => [10, 100, 1000].includes(+x);
+    if (m && (+m[1] > 12 || +m[2] > 12) && !p10(m[1]) && !p10(m[2])) { out.push(`2-digit × 2-digit (${m[0] || 'long multiplication'})`); break; }
+  }
+  if (wk < 'W03' && /multiplication|division/.test(e.key.split(':')[0])) {
+    const taught = tablesBy(wk);
+    for (const i of r.items) {
+      const facts = [...`${i.text || ''} ${i.a || ''}`.matchAll(/\b(\d{1,2})\s*×\s*(\d{1,2})\b/g)].map(m => [+m[1], +m[2]]).concat(
+        [...`${i.text || ''}`.matchAll(/\b(\d{1,3})\s*÷\s*(\d{1,2})\b/g)].map(m => [+m[2], +m[2]]));
+      const bad = facts.find(([x, y]) => x <= 12 && y <= 12 && !taught.has(x) && !taught.has(y));
+      if (bad) { out.push(`table not taught by ${wk}: ${bad.join(' × ')}`); break; }
     }
   }
   if (r.items.some(i => i.tpl === 'stack' && /"op":"[÷/]"/.test(i.pay))) out.push('column ÷ layout');
@@ -93,7 +144,7 @@ for (const [sid, s] of Object.entries(d.steps)) {
     const limit = Math.max(1.5 * base, 100);
     const tag = `${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}`;
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
-    for (const c of content(sid, e, r)) { fails.push(`${tag}: ${c}`); nContent++; }
+    for (const c of [...content(sid, e, r), ...firstTaught(sid, e, r, role)]) { fails.push(`${tag}: ${c}`); nContent++; }
   }
   bad += fails.length;
   if (fails.length || ALL) console.log(`${sid} [${wkOf(sid) || '—'}] own ceiling ${own[sid]}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);

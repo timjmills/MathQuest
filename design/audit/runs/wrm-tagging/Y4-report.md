@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 6
+# Wave 2 tagging: Y4 (Grade 3) report, round 7
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **548 / 275** (round 6); every step has at least 3 pre and 1 related; 0 keys in both |
-| Option checks | — | — | Round 6: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 823 links misfit, on size or content** (`linkfit.mjs`, the critic's definitions; per-step result in `Y4-linkfit.txt`) |
+| Pre / related entries | 528 / — | 570 / 319 | **539 / 241** (round 7). Every step has at least 1 related and at least 3 pre, except B12.S6 (2 pre; its note says why). 0 keys in both |
+| Option checks | — | — | Round 7: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 780 links misfit** on size, content, layout or rule-19 school week (`linkfit.mjs`, 20 items a link; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,108 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 7 (after critic r6: 30 links on 25 steps; plus rule 19)
+All changes are in `spec_zz_x_r7.py`, and every change is to a link. The 29 new or changed links are generated at the end
+of `Y4-items.md`.
+
+**The critic's list**
+- **A.**
+  - `area_perimeter {band:20}` on B6.S3 and B6.S4.
+  - `temperature` dropped on B13.S3 after the scans. `{forms:[1]}` (°C) still tripped the critic's degree pattern.
+  - Dropped: `order_fdp` (B9.S6), `estimate_frac_ops` (B7.S15), and `estimate_sums_diffs {place:1000}` on B1.S16, B1.S17
+    and B2.S3. That last skill ignores `range`.
+- **B.** Later-grade concepts dropped:
+  - `area` (triangles) on B3.S1, S2, S4 and B6.S4;
+  - `percent_visual` on B8.S7, S8, B9.S2 and S8;
+  - `simplify` and `ratio_tables` on B7.S10;
+  - `mult_placeholder_zero` on B5.S3;
+  - `geo_reflect` on B12.S7 and S8, and also on B14.S4 and S5, because reflection in an axis is WRM Y6;
+  - `prime_composite` on B5.S1.
+
+  `add_decimal` is now 1 decimal place on B9.S3 and S4, as the coordinator directed. The critic had suggested dropping
+  it.
+- **C.**
+  - `mult_chart {task:'fill', constant:[n]}` on B4.S3, S5 and S8.
+  - `mult_chart_easy` dropped on B4.S3, S5 and S8.
+  - B4.S11 is now `mult_chart {task:'fill', constant:[1]}`, labelled "the 1 row".
+- **D.** B9.S8 → `fractions:equivalent {denoms:[2], forms:[0]}`, which deals halves and quarters only: 16ths come with the
+  other forms.
+- **Labels and pre-skills.**
+  - B13.S4's coordinate pre now cites B14.S1, taught the same week (W37).
+  - B12.S8's related coordinate link is labelled "a later step (W38)".
+  - Kind-P labels on a Y4 step now give that step's own week.
+- **Rule 19 (pre-skills met by the school week).** B12.S6 loses `classify_quads` (W28 > W27) and B14.S3 loses
+  `coordinate_q1` (W38 > W29). B14.S3 gains `perimeter_grid` (W19) as a pre-skill.
+
+**`linkfit.mjs` gaps closed (G1–G6), plus rule 19.**
+- **G1.** Numbers are read from every part of the answer ("P=136, A=1156") and from the visual. HTML entities are
+  stripped.
+- **G2.** °F is found.
+- **G3.** Decimals and negatives are read from the answer too. Money is exempt by `$`, ¢, dollar or price, not by
+  "cent".
+- **G4.** Fraction compares are read from the visual and the payload.
+- **G5.** Later-grade concept guards: triangle area, percent, GCF/simplify, ratio tables, prime/composite, reflection
+  in an axis, 2-digit × 2-digit (× 10/100/1,000 excepted), angles in degrees, denominators past 12 (/100 is allowed from
+  W29).
+- **G6.** 20 print-path items per link.
+- **Rule 19.**
+  - A pre link never cites a Y4 step the school teaches after this step's week.
+  - Tables follow the weeks they are taught:
+    - Y3 tables are 0, 1, 2, 3, 4, 5, 8 and 10;
+    - ×6 is taught in W01;
+    - ×7 and ×9 in W02;
+    - ×11 and ×12 in W03.
+  - First-taught weeks gate pre links:
+    - mixed numbers W07;
+    - angles W27;
+    - decimals W29;
+    - hundredths W31 (this one gates related links too);
+    - column 3-digit × W36;
+    - coordinates and axes W37.
+- **Pre ordering.** `build.py` orders each pre list by school week: the main building block first, then this year's
+  steps (nearest week first), then lower-grade learning.
+
+**Found by the closed check and fixed**
+- **Tables taught too early:** `nl_mult` (9 × 9 in W01) on B4.S2; `multiples` (11s) on B4.S1, S2, S7 and B5.S1.
+- **Size:**
+  - `skip_count_line` (100s) dropped on B4.S1.
+  - `div_word_problems {range:100}` on B4.S8.
+  - `composite_shapes` dropped on B3.S3.
+  - `multi_step_word` and `word_problems_mixed_plain` dropped on B5.S14 and B10.S6.
+  - `area_polygon_decompose {band:50}` on B6.S5–S7.
+  - `remainder_interpret` dropped on B7.S8.
+  - The "reasonable?" decoy (110,420) dropped on B2.S10.
+- **Content:**
+  - `round_fractions` (decimal keys, W10) dropped on B7.S12.
+  - `equiv_frac_visual` (15ths–24ths) → `select_equiv_frac` on B7.S6, S7, S8, and `equivalent {denoms:[2], forms:[0]}` on
+    B7.S10.
+  - `equiv_frac_nv {denoms:[2,3]}` on B7.S9.
+- **Hundredths before W31:**
+  - `mixed_number_sense` dropped (B1.S17).
+  - `frac_10_100` dropped on B8.S1.
+  - `d_to_f` (0.25, 0.75) dropped on B8.S3, S4 and S5; it is now `decimal_nl_drag` as B8.S1's related link.
+  - `f_to_d` dropped on B8.S5.
+- **Degrees:** `identify_angles` dropped as a pre-skill on B12.S1, S4, S5 and S6 (see the defects below). Perpendicular
+  lines carry the right angle instead.
+
+**Scan results**
+- `linkfit.mjs`: 0 of 780 links misfit.
+- `optcheck`: 355 opts entries, 0 problems. `optchange`: 0 non-default values that change nothing.
+- The critic's `full.mjs` and `scan6.mjs` flag only "denominator > 12": 13 links whose denominator is 100. Each is on a
+  hundredths or decimal step taught in W31 or later (B8.S6–B10.S1), where /100 is the content.
+- `scan7.mjs` flags the same 13, plus 7 "size" lines that are parse artefacts:
+  - `[749,779]` is an answer list read as 749,779;
+  - `"920,975,988"` is three 3-digit numbers read as one number;
+  - `10229` is the `&#10229;` back-arrow entity in `count_by_tables`'s visual.
+
+**Generator defects for the lead** (each one blocks a link that would otherwise fit):
+1. `equiv_frac_visual` ignores `denoms`: it deals the same items with any value.
+2. `area` has no rectangle-only option: triangles come in on every form.
+3. `estimate_sums_diffs` ignores `range`.
+4. `identify_angles {labels:'none'}` still prints a degree key in its visual ("Right = 90°, Obtuse 90°-180°").
+5. `d_to_f {forms:[0]}` deals quarters (0.25, 0.75), and there is no tenths-only conversion.
+6. `unit_conversion_word` shows customary keys on metric and time pages (round 6).
 
 ## Changes in round 6 (after critic r5: FAIL on the extended rule 18; links only)
 All changes are in `spec_zz_w_r6.py`. The 48 new or changed links are generated at the end of `Y4-items.md`.

@@ -255,6 +255,14 @@
      "why": "Y3.B1.S4 Hundreds (lower grade, same CCSS cluster)"
     },
     {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S3 Number line to 1,000 (step before in the block, wk W18)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    },
+    {
      "key": "composing:base10_regroup",
      "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     },
@@ -266,14 +274,6 @@
        0
       ],
       "range": 1000
-     }
-    },
-    {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S3 Number line to 1,000 (step before in the block, wk W18)",
-     "opts": {
-      "span": 100,
-      "band": 1000
      }
     }
    ],
@@ -796,13 +796,6 @@
      }
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y3.B1.S13 Order numbers to 1,000 (prior learning wk W34)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
      "key": "placevalue:place_value_disks",
      "why": "Y4.B1.S5 Represent numbers to 10,000 (taught earlier this year, wk W33)",
      "opts": {
@@ -815,6 +808,13 @@
      "opts": {
       "span": 1000,
       "band": 10000
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 999
      }
     },
     {
@@ -1070,13 +1070,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "rounding to 100 to estimate",
-     "opts": {
-      "place": 100
-     }
-    },
-    {
      "key": "number_sense:rounding_table",
      "why": "the same number rounded to 10 and 100"
     }
@@ -1109,19 +1102,19 @@
      "why": "Y4.B1.S15 Round to the nearest 100 (taught the same school week, W13)"
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (taught earlier this year, wk W12)",
-     "opts": {
-      "span": 1000,
-      "band": 10000
-     }
-    },
-    {
      "key": "number_sense:rounding_visual",
      "why": "Y4.B1.S15 Round to the nearest 100 (taught the same school week, W13)",
      "opts": {
       "place": 100,
       "band": 1000
+     }
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (taught earlier this year, wk W12)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
      }
     },
     {
@@ -1137,13 +1130,6 @@
     {
      "key": "number_sense:rounding_table",
      "why": "the next step: 10, 100 and 1,000 together"
-    },
-    {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "rounding to 1,000 to estimate",
-     "opts": {
-      "place": 1000
-     }
     }
    ],
    "note": ""
@@ -1187,6 +1173,14 @@
      "why": "Y4.B1.S15 Round to the nearest 100 (taught the same school week, W13)"
     },
     {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (taught the same school week, W13)"
+    },
+    {
+     "key": "number_sense:round_sort_1000",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (taught the same school week, W13)"
+    },
+    {
      "key": "number_sense:nearest_10",
      "why": "Y4.B1.S14 Round to the nearest 10 (taught earlier this year, wk W12)"
     },
@@ -1197,28 +1191,13 @@
       "span": 100,
       "band": 1000
      }
-    },
-    {
-     "key": "number_sense:round_nl_thousands",
-     "why": "Y4.B1.S16 Round to the nearest 1,000 (taught the same school week, W13)"
-    },
-    {
-     "key": "number_sense:round_sort_1000",
-     "why": "Y4.B1.S16 Round to the nearest 1,000 (taught the same school week, W13)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "number_sense:mixed_number_sense",
-     "why": "mixed rounding review"
-    },
-    {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "the next block uses rounding to estimate",
-     "opts": {
-      "place": 1000
-     }
+     "key": "number_sense:round_sort_100",
+     "why": "sorting numbers by the hundred they round to"
     }
    ],
    "note": "Generated: rounding_table {places:[10,100,1000], blank:\"row\"} rounds one 4-digit number to 10, 100 and 1,000 (6,745 → 6,750; 6,700; 7,000); the column form rounds four numbers to one place. rounding_table {} only reaches 10 and 100 on 3-digit numbers."
@@ -1403,13 +1382,6 @@
     {
      "key": "addition:add_wp_10k_plain",
      "why": "word problems with 4-digit sums"
-    },
-    {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "estimate before adding",
-     "opts": {
-      "place": 1000
-     }
     }
    ],
    "note": "",
@@ -1504,12 +1476,12 @@
      "why": "Y3.B2.S12 Subtract two numbers (no exchange) (prior learning wk W15)"
     },
     {
-     "key": "subtraction:sub_100_no_regroup",
-     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W15)"
-    },
-    {
      "key": "addition:add_10k_no_regroup",
      "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (taught earlier this year, wk W14)"
+    },
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W15)"
     }
    ],
    "preBuild": [],
@@ -1819,28 +1791,20 @@
    ],
    "pre": [
     {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "Y4.B2.S9 Estimate answers (taught the same school week, W16)",
-     "opts": {
-      "place": 1000,
-      "task": "reasonable"
-     }
-    },
-    {
      "key": "subtraction:missing_add_sub",
      "why": "Y2.B2.S21 Missing number problems (lower grade, same CCSS cluster)"
     },
     {
-     "key": "addition:add_sub_fact_family",
-     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (taught the same school week, W16)"
     },
     {
      "key": "addition:add_10k_regroup",
      "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (taught earlier this year, wk W15)"
     },
     {
-     "key": "subtraction:sub_10k_regroup",
-     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (taught the same school week, W16)"
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
     },
     {
      "key": "addition:number_families_add",
@@ -1924,16 +1888,6 @@
     {
      "key": "shapes_early:partition_shapes",
      "why": "cutting a shape into equal parts"
-    },
-    {
-     "key": "area_perimeter:area",
-     "why": "area by multiplying, the Grade 3 build that follows",
-     "opts": {
-      "forms": [
-       0
-      ],
-      "band": 10
-     }
     }
    ],
    "note": "area_unit_squares counts squares; the \"what is area\" comparing idea is in the area_compare proposal.",
@@ -1982,16 +1936,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:area",
-     "why": "area by multiplying (3.MD.C.7)",
-     "opts": {
-      "forms": [
-       0
-      ],
-      "band": 10
-     }
-    },
     {
      "key": "area_perimeter:perimeter_grid",
      "why": "counting edges on the same grid"
@@ -2048,10 +1992,6 @@
      "why": "same area, different perimeter"
     },
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "L, T, U shapes"
-    },
-    {
      "key": "number_theory:factor_tchart_easy",
      "why": "rectangles with the same area are factor pairs (Y4.B5.S1)"
     }
@@ -2093,16 +2033,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:area",
-     "why": "computing area to compare",
-     "opts": {
-      "forms": [
-       0
-      ],
-      "band": 10
-     }
-    },
     {
      "key": "area_perimeter:perimeter_grid",
      "why": "compare perimeters on the same shapes"
@@ -2180,12 +2110,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of other numbers (no table option: it mixes 6, 7, 8 …)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "counting in 3s on a line"
+     "key": "multiplication:mult_chart",
+     "why": "the 3 row of the chart: the multiples written as products",
+     "opts": {
+      "task": "fill",
+      "constant": [
+       3
+      ]
+     }
     }
    ],
    "note": "Generated: number_theory:multiples has no table option and dealt multiples of 8, 6, 10, 7, 9 — moved to related."
@@ -2278,14 +2210,6 @@
     {
      "key": "multiplication:mult_word_problems",
      "why": "equal-groups stories with 6 in a group"
-    },
-    {
-     "key": "multiplication:nl_mult",
-     "why": "jumps of 6 on a number line"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "multiples of 6"
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 6 they are full."
@@ -2380,7 +2304,10 @@
      "key": "multiplication:mult_chart",
      "why": "the 6 row of the chart",
      "opts": {
-      "task": "fill"
+      "task": "fill",
+      "constant": [
+       6
+      ]
      }
     },
     {
@@ -2389,10 +2316,6 @@
      "opts": {
       "range": 100
      }
-    },
-    {
-     "key": "multiplication:mult_chart_easy",
-     "why": "missing products on the chart"
     }
    ],
    "note": "Direct: mult_facts and div_facts with constant [6] (generated: every item is a 6× or ÷6 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
@@ -2444,6 +2367,15 @@
     },
     {
      "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S3 6 times-table and division facts (taught the same school week, W02)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
      "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
      "opts": {
       "constant": [
@@ -2462,15 +2394,6 @@
     {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S3 6 times-table and division facts (taught the same school week, W02)",
-     "opts": {
-      "constant": [
-       6
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -2580,16 +2503,15 @@
      "key": "multiplication:mult_chart",
      "why": "the 9 row of the chart",
      "opts": {
-      "task": "fill"
+      "task": "fill",
+      "constant": [
+       9
+      ]
      }
     },
     {
      "key": "division:div_word_problems",
      "why": "sharing and grouping stories"
-    },
-    {
-     "key": "multiplication:mult_chart_easy",
-     "why": "missing products on the chart"
     },
     {
      "key": "multiplication:mult_div_fact_family",
@@ -2640,6 +2562,17 @@
      }
     },
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S2 Multiply and divide by 6 (taught earlier this year, wk W01)",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
+    },
+    {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
      "opts": {
@@ -2658,17 +2591,6 @@
     {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y4.B4.S2 Multiply and divide by 6 (taught earlier this year, wk W01)",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -2743,6 +2665,17 @@
     },
     {
      "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (taught the same school week, W02)",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
      "why": "Y3.B3.S11 The 4 times-table (prior learning wk W02)",
      "opts": {
       "constant": [
@@ -2761,17 +2694,6 @@
     {
      "key": "multiplication:arrays_groups",
      "why": "Y1.B9.S5 Add equal groups (prior learning wk W02)"
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (taught the same school week, W02)",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -2783,10 +2705,6 @@
     {
      "key": "multiplication:nl_mult",
      "why": "jumps of 7 on a number line"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "multiples of 7"
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 7 they are full."
@@ -2879,16 +2797,18 @@
      "key": "multiplication:mult_chart",
      "why": "the 7 row of the chart",
      "opts": {
-      "task": "fill"
+      "task": "fill",
+      "constant": [
+       7
+      ]
      }
     },
     {
      "key": "division:div_word_problems",
-     "why": "sharing and grouping stories"
-    },
-    {
-     "key": "multiplication:mult_chart_easy",
-     "why": "missing products on the chart"
+     "why": "sharing and grouping stories",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "multiplication:mult_div_fact_family",
@@ -2941,6 +2861,15 @@
     },
     {
      "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S8 7 times-table and division facts (taught the same school week, W03)",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
      "why": "the ×1 facts (taught with Y4.B4.S11 in the same school week W03)",
      "opts": {
       "constant": [
@@ -2954,15 +2883,6 @@
      "opts": {
       "forms": [
        1
-      ]
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S8 7 times-table and division facts (taught the same school week, W03)",
-     "opts": {
-      "constant": [
-       7
       ]
      }
     }
@@ -3035,24 +2955,6 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the ×1 facts (taught with Y4.B4.S11 in the same school week W03)",
-     "opts": {
-      "constant": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "multiplication:mult_properties",
-     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
      "why": "Y4.B4.S8 7 times-table and division facts (taught the same school week, W03)",
      "opts": {
       "constant": [
@@ -3066,6 +2968,24 @@
      "opts": {
       "constant": [
        6
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "the ×1 facts (taught with Y4.B4.S11 in the same school week W03)",
+     "opts": {
+      "constant": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
+     "opts": {
+      "forms": [
+       1
       ]
      }
     },
@@ -3163,7 +3083,13 @@
     },
     {
      "key": "multiplication:mult_chart",
-     "why": "the 0 and 1 rows"
+     "why": "the 1 row of the chart: n × 1 = n",
+     "opts": {
+      "task": "fill",
+      "constant": [
+       1
+      ]
+     }
     }
    ],
    "note": ""
@@ -3335,6 +3261,10 @@
      "why": "Y3.B3.S2 Use arrays (prior learning wk W05)"
     },
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+    },
+    {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W05)"
     },
@@ -3342,10 +3272,6 @@
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)",
      "maxNumber": 100
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
     },
     {
      "key": "division:share_into_groups",
@@ -3359,16 +3285,8 @@
      "why": "factor pairs drawn as links"
     },
     {
-     "key": "number_theory:prime_composite",
-     "why": "numbers with only one factor pair"
-    },
-    {
      "key": "area_perimeter:area_unit_squares",
      "why": "rectangles of a given area are factor pairs"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "the inverse idea"
     }
    ],
    "note": ""
@@ -3406,6 +3324,16 @@
      "why": "Y4.B5.S1 Factor pairs (taught the same school week, W05)"
     },
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S11 Multiply by 1 and 0 (taught earlier this year, wk W03)",
+     "opts": {
+      "constant": [
+       10
+      ],
+      "band": 100
+     }
+    },
+    {
      "key": "multiplication:mult_zeros",
      "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W05)",
      "opts": {
@@ -3422,16 +3350,6 @@
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)",
      "maxNumber": 100
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S11 Multiply by 1 and 0 (taught earlier this year, wk W03)",
-     "opts": {
-      "constant": [
-       10
-      ],
-      "band": 100
-     }
     }
    ],
    "preBuild": [],
@@ -3529,10 +3447,6 @@
        0
       ]
      }
-    },
-    {
-     "key": "multiplication:mult_placeholder_zero",
-     "why": "the placeholder zero"
     }
    ],
    "note": "mult_zeros with form ×10 only; existing partial tags become full with opts."
@@ -3708,6 +3622,17 @@
      }
     },
     {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (taught earlier this year, wk W17)",
+     "opts": {
+      "op": "x",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    },
+    {
      "key": "division:div_facts",
      "why": "Y2.B5.S14 Divide by 10 (prior learning wk W35)",
      "opts": {
@@ -3719,17 +3644,6 @@
     {
      "key": "placevalue:value",
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W35)"
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S4 Multiply by 100 (taught earlier this year, wk W17)",
-     "opts": {
-      "op": "x",
-      "power": [
-       100
-      ],
-      "band": 10000
-     }
     }
    ],
    "preBuild": [],
@@ -3927,7 +3841,7 @@
    "pre": [
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts – multiplication and division (prior learning wk W17)",
+     "why": "Y4.B5.S7 Related facts – multiplication and division (taught the same school week, W17; on the prior-learning list of wk W17)",
      "opts": {
       "forms": [
        2
@@ -4002,19 +3916,19 @@
      }
     },
     {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W36)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
      "key": "multiplication:mult_zeros",
      "why": "Y4.B5.S4 Multiply by 100 (taught earlier this year, wk W17)",
      "opts": {
       "forms": [
        1
       ]
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W36)",
+     "opts": {
+      "band": 999
      }
     },
     {
@@ -4221,6 +4135,13 @@
      }
     },
     {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (taught the same school week, W36)",
+     "opts": {
+      "tiles": 31
+     }
+    },
+    {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W36)"
     },
@@ -4229,13 +4150,6 @@
      "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W36)",
      "opts": {
       "band": 999
-     }
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (taught the same school week, W36)",
-     "opts": {
-      "tiles": 31
      }
     }
    ],
@@ -4286,10 +4200,6 @@
     {
      "key": "probability:probability_basic",
      "why": "listing outcomes"
-    },
-    {
-     "key": "algebra:multi_step_word",
-     "why": "reasoning with two quantities"
     }
    ],
    "note": "",
@@ -4477,6 +4387,18 @@
      }
     },
     {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S6 Divide by 100 (taught earlier this year, wk W35)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100
+      ],
+      "band": 10000
+     }
+    },
+    {
      "key": "multiplication:multiply",
      "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (prior learning wk W36)",
      "opts": {
@@ -4488,18 +4410,6 @@
      "why": "Y3.B1.S6 Partition numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 9999
-     }
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S6 Divide by 100 (taught earlier this year, wk W35)",
-     "opts": {
-      "op": "/",
-      "power": [
-       10,
-       100
-      ],
-      "band": 10000
      }
     }
    ],
@@ -4556,7 +4466,10 @@
    "related": [
     {
      "key": "area_perimeter:area_perimeter",
-     "why": "area and perimeter of the same shape"
+     "why": "area and perimeter of the same shape",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "area_perimeter:perimeter",
@@ -4617,18 +4530,11 @@
    "preBuild": [],
    "related": [
     {
-     "key": "area_perimeter:area",
-     "why": "area of the same rectangle",
-     "opts": {
-      "forms": [
-       0
-      ],
-      "band": 10
-     }
-    },
-    {
      "key": "area_perimeter:area_perimeter",
-     "why": "both measures together"
+     "why": "both measures together",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "note": "Existing partial tag becomes full: forms \"find the perimeter\" and \"find a missing side\" are the WRM step."
@@ -4676,7 +4582,10 @@
    "related": [
     {
      "key": "area_perimeter:area_polygon_decompose",
-     "why": "area of the same L/T/U shapes"
+     "why": "area of the same L/T/U shapes",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "area_perimeter:area_unit_squares",
@@ -4714,10 +4623,6 @@
      }
     },
     {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W20)"
-    },
-    {
      "key": "area_perimeter:perimeter",
      "why": "Y4.B6.S4 Perimeter of a rectangle (taught the same school week, W20)",
      "opts": {
@@ -4725,6 +4630,10 @@
        1
       ]
      }
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W20)"
     },
     {
      "key": "algebra:tape_diagram",
@@ -4738,7 +4647,10 @@
    "related": [
     {
      "key": "area_perimeter:area_polygon_decompose",
-     "why": "splitting the same shapes into rectangles"
+     "why": "splitting the same shapes into rectangles",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "subtraction:sub_100_mixed",
@@ -4803,7 +4715,10 @@
    "related": [
     {
      "key": "area_perimeter:area_polygon_decompose",
-     "why": "area of the same shapes"
+     "why": "area of the same shapes",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": "",
@@ -4844,18 +4759,6 @@
      }
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
-    },
-    {
-     "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2/Gr.1 Count sides on 2D shapes (prior learning list; no WRM step id in our data)"
-    },
-    {
      "key": "area_perimeter:composite_shapes",
      "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)",
      "opts": {
@@ -4865,8 +4768,20 @@
      }
     },
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+    },
+    {
      "key": "division:div_facts",
      "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2/Gr.1 Count sides on 2D shapes (prior learning list; no WRM step id in our data)"
     }
    ],
    "preBuild": [],
@@ -5184,6 +5099,10 @@
      "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
     },
     {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
+    },
+    {
      "key": "fractions:graph_fractions",
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W08)"
     },
@@ -5194,10 +5113,6 @@
     {
      "key": "number_sense:place_on_number_line",
      "why": "Y1.B4.S8 The number line to 20 (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     }
    ],
    "preBuild": [
@@ -5246,15 +5161,15 @@
      "why": "Y3.B6.S2 Compare and order unit fractions (prior learning wk W08)"
     },
     {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
+    },
+    {
      "key": "placevalue:compare",
      "why": "Y2.B1.S13 Compare numbers (lower grade, same CCSS cluster)",
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     }
    ],
    "preBuild": [],
@@ -5306,6 +5221,10 @@
      "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     },
     {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
+    },
+    {
      "key": "composing:fraction_number_line",
      "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
     },
@@ -5314,12 +5233,8 @@
      "why": "Y3.B6.S4 Understand the whole (prior learning wk W09)"
     },
     {
-     "key": "fractions:equiv_frac_visual",
+     "key": "fractions:select_equiv_frac",
      "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W09)"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     }
    ],
    "preBuild": [
@@ -5353,6 +5268,10 @@
      "why": "Y4.B7.S6 Understand improper fractions (taught the same school week, W09)"
     },
     {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
+    },
+    {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     },
@@ -5361,12 +5280,8 @@
      "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
     },
     {
-     "key": "fractions:equiv_frac_visual",
+     "key": "fractions:select_equiv_frac",
      "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W09)"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     }
    ],
    "preBuild": [],
@@ -5408,34 +5323,31 @@
      "why": "Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)"
     },
     {
-     "key": "division:div_remainders",
-     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     },
     {
      "key": "division:div_facts",
      "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
     },
     {
-     "key": "fractions:equiv_frac_visual",
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "fractions:select_equiv_frac",
      "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W10)"
     },
     {
      "key": "fraction_operations:add_fractions_like",
      "why": "Y3.B8.S1 Add fractions (prior learning wk W10)"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "division:remainder_interpret",
-     "why": "the remainder becomes the fraction",
-     "opts": {
-      "range": 100
-     }
+     "key": "composing:whole_as_fraction",
+     "why": "4/4 = 1 whole: the groups an improper fraction is split into"
     }
    ],
    "note": "Generated improper_mixed {}: both directions on one page. Owner said yes to a one-direction option.",
@@ -5471,23 +5383,29 @@
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W09)"
     },
     {
-     "key": "fractions:fraction_nl_drag",
-     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     },
     {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     },
     {
-     "key": "fractions:mixed_nl_drag",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
+     "key": "fractions:fraction_nl_drag",
+     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "fractions:equiv_frac_nv",
-     "why": "equivalent fractions without pictures"
+     "why": "equivalent fractions without pictures",
+     "opts": {
+      "denoms": [
+       2,
+       3
+      ]
+     }
     },
     {
      "key": "fractions:select_equiv_frac",
@@ -5536,8 +5454,16 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y3.B6.S10 Equivalent fractions as bar models (prior learning wk W10)"
+     "key": "fractions:equivalent",
+     "why": "Y3.B6.S10 Equivalent fractions as bar models (prior learning wk W10)",
+     "opts": {
+      "denoms": [
+       2
+      ],
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "multiplication:mult_facts",
@@ -5557,12 +5483,8 @@
    ],
    "related": [
     {
-     "key": "fractions:simplify",
-     "why": "the family read backwards"
-    },
-    {
-     "key": "conversions:ratio_tables",
-     "why": "the same multiplicative pattern later"
+     "key": "composing:fraction_number_line",
+     "why": "equivalent fractions name the same point on a number line"
     }
    ],
    "note": ""
@@ -5651,7 +5573,7 @@
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (prior learning wk W10)"
+     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (taught earlier this year, wk W09; on the prior-learning list of wk W10)"
     },
     {
      "key": "fractions:mixed_nl_drag",
@@ -5669,10 +5591,6 @@
     {
      "key": "fraction_operations:frac_word_problems",
      "why": "stories"
-    },
-    {
-     "key": "fractions:round_fractions",
-     "why": "estimating with mixed numbers"
     }
    ],
    "note": "",
@@ -5758,16 +5676,16 @@
      "why": "Y4.B7.S13 Subtract two fractions (taught the same school week, W11)"
     },
     {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (taught earlier this year, wk W09)"
+    },
+    {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     },
     {
      "key": "composing:compose_whole",
      "why": "Y3.B6.S4 Understand the whole (prior learning wk W11)"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (taught earlier this year, wk W09)"
     }
    ],
    "preBuild": [],
@@ -5836,8 +5754,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:estimate_frac_ops",
-     "why": "estimate the difference"
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a 0-3 line: subtracting is counting back along it"
     }
    ],
    "note": "sub_break_whole is an option on sub_mixed_like (\"breaking the whole\"): set to never it gives this step, set to always it gives Y5.B4.S16.",
@@ -5878,6 +5796,10 @@
      "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W30)"
     },
     {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
+    },
+    {
      "key": "fractions:shade_fraction",
      "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W30)"
     },
@@ -5888,21 +5810,16 @@
     {
      "key": "shapes_early:partition_shapes",
      "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W30)"
-    },
-    {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (taught earlier this year, wk W07)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "conversions:d_to_f",
-     "why": "the same tenth as a decimal (next step)"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "tenths as hundredths (Y4.B8.S7)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "the same tenths placed on a 0-1 line (the next steps)",
+     "opts": {
+      "ticks": "some"
+     }
     },
     {
      "key": "decimals:decimal_nl_drag",
@@ -6042,15 +5959,6 @@
      }
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S2 Tenths as decimals (taught the same school week, W30)",
-     "opts": {
-      "denoms": [
-       5
-      ]
-     }
-    },
-    {
      "key": "placevalue:value",
      "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W30)"
     },
@@ -6114,8 +6022,8 @@
      "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W30)"
     },
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (taught the same school week, W30)"
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -6124,10 +6032,6 @@
     {
      "key": "fractions:fraction_nl_drag",
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30)"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     }
    ],
    "preBuild": [
@@ -6181,10 +6085,6 @@
    ],
    "pre": [
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (taught the same school week, W30)"
-    },
-    {
      "key": "division:div_facts",
      "why": "Y2.B5.S14 Divide by 10 (prior learning wk W30)",
      "opts": {
@@ -6194,16 +6094,12 @@
      }
     },
     {
-     "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W30)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S2 Tenths as decimals (taught the same school week, W30)"
-    },
-    {
      "key": "decimals:decimal_nl_drag",
      "why": "Y4.B8.S4 Tenths on a number line (taught the same school week, W30)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W30)"
     }
    ],
    "preBuild": [
@@ -6359,10 +6255,6 @@
      "why": "tenths to hundredths without pictures"
     },
     {
-     "key": "conversions:percent_visual",
-     "why": "the hundred grid as percent later"
-    },
-    {
      "key": "conversions:f_to_d",
      "why": "hundredths as decimals (next step)"
     }
@@ -6422,19 +6314,19 @@
      "why": "Y4.B8.S7 Hundredths as fractions (taught the same school week, W31)"
     },
     {
-     "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "fractions:write_fraction",
      "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
      "opts": {
       "denoms": [
        5
       ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 99
      }
     }
    ],
@@ -6454,10 +6346,6 @@
     {
      "key": "measurement:money_notation",
      "why": "cents are hundredths of a dollar"
-    },
-    {
-     "key": "conversions:percent_visual",
-     "why": "hundred grid"
     }
    ],
    "note": "",
@@ -6655,16 +6543,16 @@
      "why": "Y4.B7.S11 Add two or more fractions (taught earlier this year, wk W10)"
     },
     {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)"
+    },
+    {
      "key": "composing:make_ten",
      "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W31)"
     },
     {
      "key": "composing:number_bonds",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W31)"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)"
     },
     {
      "key": "composing:compose_whole",
@@ -6746,10 +6634,6 @@
      }
     },
     {
-     "key": "conversions:percent_visual",
-     "why": "hundred grid"
-    },
-    {
      "key": "decimals:sub_decimal",
      "why": "1 − 0.36"
     }
@@ -6821,7 +6705,7 @@
      "key": "decimals:add_decimal",
      "why": "recombine the parts",
      "opts": {
-      "decimals": 2,
+      "decimals": 1,
       "range": 100
      },
      "maxNumber": 10
@@ -6891,7 +6775,7 @@
      "key": "decimals:add_decimal",
      "why": "adding the parts",
      "opts": {
-      "decimals": 2,
+      "decimals": 1,
       "range": 100
      },
      "maxNumber": 10
@@ -7019,19 +6903,19 @@
      "maxNumber": 10
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y3.B1.S13 Order numbers to 1,000 (lower grade, same idea)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
      "key": "conversions:f_to_d",
      "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)",
      "opts": {
       "denoms": [
        5
       ]
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (lower grade, same idea)",
+     "opts": {
+      "band": 999
      }
     }
    ],
@@ -7040,10 +6924,6 @@
     {
      "key": "decimals:decimal_nl_drag",
      "why": "order shown on a line"
-    },
-    {
-     "key": "conversions:order_fdp",
-     "why": "ordering mixed forms later"
     }
    ],
    "note": "decimals 2 and Max Number 10 hold the page to hundredths below 10.",
@@ -7149,16 +7029,24 @@
    ],
    "pre": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W33)"
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)"
+     "key": "fractions:equivalent",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (lower grade, same idea)",
+     "opts": {
+      "denoms": [
+       2
+      ],
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "fraction_operations:frac_10_100",
      "why": "Y4.B8.S7 Hundredths as fractions (taught earlier this year, wk W31)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)"
     },
     {
      "key": "fractions:benchmark_fractions",
@@ -7170,10 +7058,6 @@
     {
      "key": "measurement:coin_value",
      "why": "quarters and half dollars"
-    },
-    {
-     "key": "conversions:percent_visual",
-     "why": "halves and quarters as percents"
     },
     {
      "key": "conversions:d_to_f",
@@ -7212,12 +7096,12 @@
      "why": "Y3.B9.S1 Pounds and pence (prior learning wk W37)"
     },
     {
-     "key": "measurement:coin_value",
-     "why": "Y1.B13.S2 Recognise coins (lower grade, same CCSS cluster)"
-    },
-    {
      "key": "conversions:f_to_d",
      "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [
@@ -7374,19 +7258,12 @@
      "why": "Y3.B9.S3 Add money (lower grade, same idea)"
     },
     {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "Y3.B2.S20 Estimate answers (prior learning wk W17)",
-     "opts": {
-      "place": 100
-     }
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (taught earlier this year, wk W12)"
     },
     {
      "key": "measurement:money_notation",
      "why": "Y3.B9.S1 Pounds and pence (prior learning wk W17)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (taught earlier this year, wk W12)"
     },
     {
      "key": "number_sense:estimate_products",
@@ -7517,15 +7394,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:multi_step_word",
-     "why": "two-step problems with other contexts"
-    },
-    {
-     "key": "number_ops_mixed:word_problems_mixed_plain",
-     "why": "mixed word problems",
-     "maxNumber": 100
-    },
-    {
      "key": "measurement:enough_money",
      "why": "enough money?"
     }
@@ -7568,7 +7436,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 7s (days in weeks) and 12s (months in years), the counts the conversions use (Y4.B4 times-tables)",
+     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)",
      "opts": {
       "constant": [
        7,
@@ -7628,15 +7496,6 @@
      "why": "Y3.B10.S2 Tell the time to 5 minutes (prior learning wk W23)"
     },
     {
-     "key": "measurement:time_fives_ring",
-     "why": "Y2.B9.S6 Minutes in an hour (prior learning wk W23)"
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)",
-     "maxNumber": 100
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y4.B4.S3 6 times-table and division facts (taught earlier this year, wk W02)",
      "opts": {
@@ -7644,6 +7503,15 @@
        6
       ]
      }
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "Y2.B9.S6 Minutes in an hour (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)",
+     "maxNumber": 100
     }
    ],
    "preBuild": [
@@ -7835,16 +7703,16 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S2 Right angles (prior learning wk W37)"
-    },
-    {
      "key": "measurement:clock_parts",
      "why": "Y1.B14.S6 Tell the time to the half hour (lower grade, same CCSS cluster)"
     },
     {
      "key": "shapes_early:shape_positions",
      "why": "Y2.B11.S1 Language of position (prior learning wk W37)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -7972,10 +7840,6 @@
    "build": [],
    "pre": [
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 Identify angles (taught earlier this year, wk W27)"
-    },
-    {
      "key": "shapes_early:name_2d_shapes",
      "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
     },
@@ -8029,10 +7893,6 @@
     {
      "key": "angles_lines:identify_lines",
      "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 Identify angles (taught earlier this year, wk W27)"
     }
    ],
    "preBuild": [],
@@ -8072,12 +7932,8 @@
      "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W27)"
     },
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S2 Right angles (prior learning wk W27)"
-    },
-    {
-     "key": "shapes_classify:classify_quads",
-     "why": "Y4.B12.S5 Quadrilaterals (taught later this year, wk W28; the building block this step uses, so meet it first)"
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -8093,7 +7949,7 @@
      "why": "symmetry of regular polygons"
     }
    ],
-   "note": "",
+   "note": "Pre-skills are few: Polygons (W27) comes before Quadrilaterals (W28) and Triangles in the school order, and the Identify angles skill prints degrees (a display defect), so naming shapes and parallel and perpendicular lines are the met building blocks.",
    "envision": [
     {
      "proposal": "polygons",
@@ -8127,20 +7983,16 @@
      "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
     },
     {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
-    },
-    {
      "key": "shapes_classify:classify_quads",
      "why": "Y4.B12.S5 Quadrilaterals (taught the same school week, W28)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "coordinates:geo_reflect",
-     "why": "reflection of a shape"
-    },
     {
      "key": "shapes_classify:classify_triangles",
      "why": "symmetry of isosceles and equilateral triangles"
@@ -8163,23 +8015,19 @@
      "why": "Y4.B12.S7 Lines of symmetry (taught the same school week, W28)"
     },
     {
-     "key": "angles_lines:symmetry",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
-    },
-    {
      "key": "area_perimeter:perimeter_grid",
      "why": "Y4.B6.S3 Perimeter on a grid (taught earlier this year, wk W19)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "coordinates:geo_reflect",
-     "why": "reflections"
-    },
-    {
      "key": "coordinates:coordinate_q1",
-     "why": "grid positions",
+     "why": "a later step (W38): positions on a grid named by coordinates",
      "maxNumber": 10
     }
    ],
@@ -8354,8 +8202,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "measurement:temperature",
-     "why": "temperature over a day is the usual context"
+     "key": "graphs:tally_chart",
+     "why": "the table of values a line graph is drawn from"
     }
    ],
    "note": "5.G.A.2 preview, taught as enrichment W37.",
@@ -8391,13 +8239,13 @@
      }
     },
     {
-     "key": "graphs:build_bar_graph",
-     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W37)"
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 Describe position using coordinates (taught the same school week, W37)",
+     "maxNumber": 10
     },
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (taught later this year, wk W38; the building block this step uses, so meet it first)",
-     "maxNumber": 10
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W37)"
     }
    ],
    "preBuild": [],
@@ -8555,13 +8403,12 @@
    ],
    "pre": [
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (taught later this year, wk W38; the building block this step uses, so meet it first)",
-     "maxNumber": 10
-    },
-    {
      "key": "shapes_classify:classify_quads",
      "why": "Y4.B12.S5 Quadrilaterals (taught earlier this year, wk W28)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S3 Perimeter on a grid (taught earlier this year, wk W19)"
     },
     {
      "key": "shapes_early:shape_positions",
@@ -8576,10 +8423,6 @@
      "key": "coordinates:coord_distance_q1",
      "why": "side lengths from coordinates",
      "maxNumber": 10
-    },
-    {
-     "key": "area_perimeter:perimeter_grid",
-     "why": "perimeter on a grid"
     }
    ],
    "note": "translate_grid lists this step; translating is S4/S5, so drawing shapes needs its own option.",
@@ -8616,7 +8459,7 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)",
+     "why": "Y4.B14.S2 Plot coordinates (taught the same school week, W38; on the prior-learning list of wk W38)",
      "maxNumber": 10
     },
     {
@@ -8629,8 +8472,8 @@
    ],
    "related": [
     {
-     "key": "coordinates:geo_reflect",
-     "why": "reflection, another transformation"
+     "key": "area_perimeter:perimeter_grid",
+     "why": "shapes drawn on the same squared grid, counted square by square"
     }
    ],
    "note": "",
@@ -8662,7 +8505,7 @@
    "pre": [
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)",
+     "why": "Y4.B14.S2 Plot coordinates (taught the same school week, W38; on the prior-learning list of wk W38)",
      "maxNumber": 10
     },
     {
@@ -8676,10 +8519,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "coordinates:geo_reflect",
-     "why": "reflection"
-    },
     {
      "key": "coordinates:coord_distance_q1",
      "why": "distance moved",

@@ -39,6 +39,10 @@ def mx(e, key, o):
 
 def why_for(sid, ref, kind):
     t = steps[ref]['title'] if ref in steps else ''
+    if kind == 'P' and ref.startswith('Y4.') and ref in steps:
+        # a Y4 step on the school's prior-learning list: say when THAT step is taught, not this step's week
+        wk = ns.get('WK_OVERRIDE', {}).get(sid) or prior.get(sid, {}).get('wk')
+        return why_for(sid, ref, 'B')[:-1] + f"; on the prior-learning list of wk {wk})"
     if kind == 'P':
         wk = ns.get('WK_OVERRIDE', {}).get(sid) or prior.get(sid, {}).get('wk')
         return f"{ref} {t or ''} (prior learning wk {wk})".replace('  ', ' ')
@@ -97,6 +101,14 @@ for sp in ns['STEPS']:
         e = {'key': key, 'why': w}
         if o: e['opts'] = o
         rel.append(mx(e, key, o))
+    # Rule 19: after the main building block, the earlier-step tiers follow the SCHOOL's week order (nearest first);
+    # lower-grade prior learning comes after this year's steps, in its ranked order
+    def _wk(p):
+        m = re.match(r'^(Y4\.B\d+\.S\d+)', p['why']); return (ns.get('WK_OVERRIDE', {}).get(m.group(1)) or prior.get(m.group(1), {}).get('wk') or '') if m else ''
+    if len(pre) > 2:
+        head, rest = pre[:1], pre[1:]
+        y4 = sorted([p for p in rest if _wk(p)], key=_wk, reverse=True)
+        pre = head + y4 + [p for p in rest if not _wk(p)]
     if len(pre) > 8 or len(rel) > 8: errs.append(sid + ' too many pre/related')
     # BRIEF rule 10: a key is never in both pre and related, whatever its options
     both = {p['key'] for p in pre} & {r['key'] for r in rel}
