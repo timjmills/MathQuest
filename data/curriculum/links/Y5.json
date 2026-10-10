@@ -162,10 +162,6 @@
      "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
     },
     {
-     "key": "placevalue:place_value_disks",
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
-    },
-    {
      "key": "placevalue:expand",
      "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
     }
@@ -231,10 +227,6 @@
     {
      "key": "placevalue:expand",
      "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
-    },
-    {
-     "key": "placevalue:place_value_disks",
-     "why": "Y4.B1.S4 Thousands (prior learning wk W06)"
     },
     {
      "key": "placevalue:unit_form",
@@ -409,10 +401,6 @@
      "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W06)"
     },
     {
-     "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (prior learning wk W07)"
-    },
-    {
      "key": "placevalue:more_less_10",
      "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W07)"
     },
@@ -538,10 +526,6 @@
      "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07)"
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W07)"
-    },
-    {
      "key": "placevalue:more_less_100",
      "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W07)"
     },
@@ -609,14 +593,6 @@
      "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
     },
     {
-     "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W07)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y1.B1.S13 Compare numbers (prior learning wk W07)"
-    },
-    {
      "key": "placevalue:pv_digit_drag",
      "why": "Y5.B1.S3 Numbers to 100,000 (earlier Y5 step)"
     },
@@ -678,20 +654,8 @@
      "why": "Y5.B1.S10 Compare and order numbers to 100,000 (previous step)"
     },
     {
-     "key": "placevalue:compare",
-     "why": "Y4.B1.S11 Compare numbers to 10,000 (prior learning wk W07)"
-    },
-    {
      "key": "placevalue:order_least_to_greatest",
      "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W07)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y1.B1.S13 Compare numbers (prior learning wk W07)"
     },
     {
      "key": "placevalue:pv_digit_drag",
@@ -1021,10 +985,6 @@
      "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (prior learning wk W08)"
     },
     {
-     "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W08)"
-    },
-    {
      "key": "addition:add_10k_no_regroup",
      "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (prior learning wk W08)"
     },
@@ -1080,12 +1040,6 @@
     {
      "key": "subtraction:sub_1m_regroup",
      "opts": {}
-    },
-    {
-     "key": "subtraction:sub_across_zeros",
-     "opts": {
-      "band": 10000
-     }
     }
    ],
    "partial": [],
@@ -1094,24 +1048,20 @@
    "build": [],
    "pre": [
     {
+     "key": "addition:add_1m_mixed",
+     "why": "Y5.B2.S2 Add whole numbers with more than four digits (previous step)"
+    },
+    {
      "key": "subtraction:sub_10k_regroup",
      "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09)"
     },
     {
      "key": "subtraction:sub_across_zeros",
-     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09)"
-    },
-    {
-     "key": "subtraction:sub_10k_regroup",
-     "why": "Y4.B2.S6 Subtract two 4-digit numbers - one exchange (prior learning wk W09)"
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09): exchanging across zeros, ≤ 4 digits"
     },
     {
      "key": "subtraction:sub_10k_no_regroup",
      "why": "Y4.B2.S5 Subtract two 4-digit numbers - no exchange (prior learning wk W09)"
-    },
-    {
-     "key": "addition:add_1m_mixed",
-     "why": "Y5.B2.S2 Add whole numbers with more than four digits (previous step)"
     },
     {
      "key": "subtraction:number_line_sub",
@@ -1224,10 +1174,6 @@
      "why": "Y4.B2.S10 Checking strategies (prior learning wk W09)"
     },
     {
-     "key": "subtraction:sub_check_by_adding",
-     "why": "Y3.B2.S21 Inverse operations (prior learning wk W09)"
-    },
-    {
      "key": "addition:number_families_add",
      "why": "Y2.B2.S3 Related facts (prior learning wk W09)"
     },
@@ -1281,7 +1227,7 @@
    "verdict": "partial",
    "missing": "two-step +/− problems with 4- to 6-digit numbers drawn as bar models",
    "build": [
-    "multi_step_big",
+    "multi_step_four_ops",
     "vis_bar_family"
    ],
    "pre": [
@@ -1333,7 +1279,7 @@
      "why": "stories with an unknown"
     }
    ],
-   "note": ""
+   "note": "Build: multi_step_four_ops with its band ladder extended to 1,000,000 (do not add a second size option to multi_step_word)."
   },
   "Y5.B2.S7": {
    "title": "Compare calculations",
@@ -1423,10 +1369,6 @@
     {
      "key": "subtraction:sub_check_by_adding",
      "why": "Y3.B2.S21 Inverse operations (prior learning wk W01)"
-    },
-    {
-     "key": "subtraction:sub_check_by_adding",
-     "why": "Y5.B2.S5 Inverse operations (addition and subtraction) (earlier Y5 step)"
     },
     {
      "key": "algebra:tape_diagram",
@@ -1536,10 +1478,6 @@
     {
      "key": "number_theory:multiples",
      "why": "Y5.B3.S1 Multiples (previous step)"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "Y3.B3.S3 Multiples of 2 (prior learning wk W01)"
     },
     {
      "key": "multiplication:count_by_tables",
@@ -1909,10 +1847,6 @@
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
-    },
-    {
      "key": "placevalue:unit_form",
      "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
     },
@@ -1967,14 +1901,6 @@
      "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (previous step)"
     },
     {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S5 Divide by 10 (prior learning wk W10)"
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S6 Divide by 100 (prior learning wk W10)"
-    },
-    {
      "key": "division:div_facts",
      "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
     },
@@ -2009,11 +1935,12 @@
    "direct": [],
    "partial": [
     {
-     "key": "number_theory:divisibility_sort",
-     "missing": "multiples of 100 and 1,000 and generating them: it sorts by 2, 5 and 10 only",
+     "key": "multiplication:mult_zeros",
+     "missing": "× 1,000 and recognising / generating multiples of 100 and 1,000 (is 45,300 a multiple of 100?)",
      "opts": {
-      "step": [
-       0
+      "forms": [
+       0,
+       1
       ]
      }
     }
@@ -2039,21 +1966,17 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (previous step)"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "Y5.B3.S1 Multiples (earlier Y5 step)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of a 1-digit number"
+     "key": "number_theory:divisibility_sort",
+     "why": "divisible by 10 (mixed with 2 and 5)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "multiply by a multiple of ten"
+     "key": "number_theory:multiples",
+     "why": "multiples of a 1-digit number"
     },
     {
      "key": "placevalue:more_less_100",
@@ -2064,7 +1987,7 @@
      "why": "the nearest multiple of 1,000"
     }
    ],
-   "note": "The school teaches this in week W02 beside Y5.B3.S4."
+   "note": "The school teaches this in week W02 beside Y5.B3.S4. FLAG: reused mult_multiples was internally inconsistent (skill mult_zeros vs representation on number_theory:multiples); output re-states it on mult_zeros only."
   },
   "Y5.B4.S1": {
    "title": "Find fractions equivalent to a unit fraction",
@@ -3359,14 +3282,6 @@
      "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
     },
     {
-     "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (prior learning wk W11)"
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S8 Informal written methods for multiplication (prior learning wk W11)"
-    },
-    {
      "key": "multiplication:mult_zeros",
      "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W11)"
     },
@@ -3495,10 +3410,6 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (earlier Y5 step)"
     }
    ],
    "preBuild": [],
@@ -3544,16 +3455,16 @@
    ],
    "pre": [
     {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step): option tiles 22"
+    },
+    {
      "key": "multiplication:multiply",
      "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step)"
     },
     {
      "key": "multiplication:area_model_mult_hard",
      "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (earlier Y5 step)"
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (earlier Y5 step)"
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3884,10 +3795,6 @@
      }
     },
     {
-     "key": "division:div_remainders",
-     "opts": {}
-    },
-    {
      "key": "division:remainder_too_big",
      "opts": {}
     }
@@ -3898,10 +3805,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:divide",
-     "why": "Y5.B5.S8 Divide a 4-digit number by a 1-digit number (previous step)"
-    },
-    {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W12)"
     },
@@ -3910,16 +3813,8 @@
      "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
     },
     {
-     "key": "division:div_remainders",
-     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W12)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "R.B16.S4 Grouping (prior learning wk W12)"
     }
    ],
    "preBuild": [],
@@ -5586,13 +5481,7 @@
    "direct": [
     {
      "key": "area_perimeter:perimeter",
-     "opts": {
-      "perimeter": [
-       "standard",
-       "missing",
-       "word"
-      ]
-     }
+     "opts": {}
     },
     {
      "key": "area_perimeter:perimeter_grid",
@@ -5680,11 +5569,13 @@
     {
      "key": "subtraction:subtract",
      "why": "missing side = whole side − known part (lower grade, same cluster CCSS 3.NBT.A.2)"
+    },
+    {
+     "key": "addition:add",
+     "why": "add six side lengths (lower grade, same cluster CCSS 3.NBT.A.2)"
     }
    ],
-   "preBuild": [
-    "missing_lengths"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "area_perimeter:area_polygon_decompose",
@@ -5751,13 +5642,7 @@
    "direct": [
     {
      "key": "area_perimeter:area",
-     "opts": {
-      "area": [
-       "standard",
-       "missing",
-       "word"
-      ]
-     }
+     "opts": {}
     },
     {
      "key": "area_perimeter:area_unit_squares",
@@ -5821,8 +5706,8 @@
     {
      "key": "area_perimeter:composite_shapes",
      "opts": {
-      "composite_shapes": [
-       "dual_pa"
+      "forms": [
+       1
       ]
      }
     }
@@ -6154,9 +6039,7 @@
      "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same cluster CCSS 4.G.A.1)"
     }
    ],
-   "preBuild": [
-    "turns_angles"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:time_quarter",
@@ -6456,8 +6339,13 @@
   "Y5.B10.S9": {
    "title": "Regular and irregular polygons",
    "direct": [],
-   "partial": [],
-   "verdict": "gap",
+   "partial": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "missing": "names triangles to hexagons but never regular vs irregular, and no heptagon/octagon"
+    }
+   ],
+   "verdict": "partial",
    "missing": "naming polygons by sides and telling regular (equal sides and angles) from irregular",
    "build": [
     "polygons"
@@ -6466,10 +6354,6 @@
     {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "count sides (prior learning)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "name 2-D shapes (prior learning)"
     },
     {
      "key": "shapes_classify:classify_quads",
@@ -6652,6 +6536,14 @@
     {
      "key": "coordinates:geo_translate",
      "why": "Y4.B14.S5 Describe translation on a grid (lower grade)"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y4.B14.S3 Draw 2-D shapes on a grid (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "position words left/right/up/down (prior learning)"
     }
    ],
    "preBuild": [],
@@ -6665,7 +6557,7 @@
      "why": "another transformation"
     }
    ],
-   "note": ""
+   "note": "OVERLAP for the lead: VISUAL_BUILDS vis_migrate_coordinates already moves geo_translate onto coord-grid with the image drawn and the move described; if built that way it closes Y5.B11.S3/S4 without the new translate_grid skill id. Merge translate_grid into that migration (preferred) or keep one of them."
   },
   "Y5.B11.S4": {
    "title": "Translation with coordinates",
@@ -7593,9 +7485,7 @@
      "why": "Y5.B13.S1 Understand negative numbers"
     }
    ],
-   "preBuild": [
-    "negative_count"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "integers:add_int",
@@ -7689,9 +7579,7 @@
      "why": "difference as distance (lower grade)"
     }
    ],
-   "preBuild": [
-    "negative_count"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "integers:abs_value",
@@ -7714,7 +7602,7 @@
    "partial": [
     {
      "key": "measurement:unit_conversions",
-     "missing": "kg→g and km→m, some reverse; no mixed units (2 kg 300 g)"
+     "missing": "with units [0] (metric) converts kg↔g, m↔cm, L↔mL both ways; no mixed units (2 kg 300 g) and km is absent"
     },
     {
      "key": "measurement:length_metric",
@@ -7770,7 +7658,7 @@
    "partial": [
     {
      "key": "measurement:capacity",
-     "missing": "L→mL only one way; no mixed units (1 l 250 ml)"
+     "missing": "with units [1] (metric) converts L↔mL both ways; no mixed units (1 l 250 ml)"
     },
     {
      "key": "measurement:length_metric",
@@ -7797,8 +7685,8 @@
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade)"
     },
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y3.B5.S2 Measure in millimetres (lower grade)"
+     "key": "measurement:unit_conversions",
+     "why": "Y5.B14.S1 Kilograms and kilometres (previous step): the ×1,000 rule"
     }
    ],
    "preBuild": [
@@ -7819,13 +7707,12 @@
   },
   "Y5.B14.S3": {
    "title": "Convert units of length",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:unit_conversions",
-     "opts": {}
-    }
-   ],
-   "partial": [
+     "missing": "units [0] (metric) gives m↔cm both ways but mixes mass and capacity items into a length page; no km, no mixed units"
+    },
     {
      "key": "measurement:length_metric",
      "missing": "larger→smaller only, no mixed units"
@@ -7844,7 +7731,11 @@
    "pre": [
     {
      "key": "measurement:length_metric",
-     "why": "Y5.B14.S2 Millimetres (previous step)"
+     "why": "Y5.B14.S2 Millimetres and millilitres (previous step); Y3.B5.S4 m, cm, mm (lower grade)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "measure before converting (lower grade)"
     },
     {
      "key": "multiplication:mult_zeros",
@@ -7853,10 +7744,6 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
-    },
-    {
-     "key": "measurement:length_metric",
-     "why": "Y3.B5.S4 Metres, centimetres and millimetres (lower grade)"
     }
    ],
    "preBuild": [],
@@ -7977,7 +7864,6 @@
     }
    ],
    "preBuild": [
-    "timetables",
     "time_convert"
    ],
    "related": [
@@ -8055,9 +7941,7 @@
      "why": "arrays (prior learning)"
     }
    ],
-   "preBuild": [
-    "volume_cubes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:compare",
@@ -8089,9 +7973,7 @@
      "why": "arrays (prior learning)"
     }
    ],
-   "preBuild": [
-    "volume_cubes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:estimate_length",
@@ -8120,6 +8002,10 @@
    ],
    "pre": [
     {
+     "key": "measurement:estimate_length",
+     "why": "estimating with a benchmark in another measure"
+    },
+    {
      "key": "measurement:mass_volume_liquid",
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade, same cluster CCSS 3.MD.A.2)"
     },
@@ -8133,12 +8019,12 @@
    ],
    "related": [
     {
-     "key": "measurement:estimate_length",
-     "why": "estimating lengths"
-    },
-    {
      "key": "measurement:unit_conversions",
      "why": "l↔ml"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "read a jug after estimating"
     }
    ],
    "note": "volume_cubes also lists this step; capacity estimation is a separate option, so the lead may drop Y5.B15.S4 from volume_cubes."
@@ -8473,24 +8359,6 @@
    ],
    "why": "closes Y5.B2.S5 Inverse operations (addition and subtraction); Y5.B2.S8 Find missing numbers (existing wrm_props entry, reused)"
   },
-  "multi_step_big": {
-   "kind": "option",
-   "skill": "algebra:multi_step_word",
-   "option": "numbers to 1,000,000 (4- to 6-digit quantities)",
-   "name": "Multi-Step Problems With Large Numbers (option)",
-   "teaches": "two-step addition and subtraction stories with 4- to 6-digit numbers (populations, distances, money), each step drawn as a bar",
-   "representation": "B&W boxed cell: the short story, a two-row bar model with the known parts in Andika digits and ? on the unknown, two answer boxes (step 1, step 2); key fills the bars",
-   "family": "algebra",
-   "steps": [
-    "Y5.B2.S6"
-   ],
-   "ccss": [
-    "4.OA.A.3",
-    "4.NBT.B.4"
-   ],
-   "why": "multi_step_word and tape_diagram deal only small numbers, so Y5 large-number problems are not produced",
-   "reused": false
-  },
   "vis_bar_family": {
    "lane": "operations",
    "kind": "template",
@@ -8586,12 +8454,13 @@
    "option": "multiples of 10, 100, 1,000",
    "name": "Multiples of 10, 100 and 1,000 (option)",
    "teaches": "recognising and generating multiples of 10, 100 and 1,000",
-   "representation": "a \"is it a multiple of\" task on number_theory:multiples with base 10/100/1,000",
+   "representation": "a new form on mult_zeros: \"Is it a multiple of 10 / 100 / 1,000?\" tick-box cell and \"write the next multiples of 1,000\" track, B&W boxed cell, Andika digits",
    "family": "operations",
    "steps": [
     "Y5.B3.S10"
    ],
    "reused": true,
+   "inconsistencyFlag": "the existing entry hosts the option on multiplication:mult_zeros but its representation described a task on number_theory:multiples; rewritten here to one host (mult_zeros). Lead: fix the WRM_PROPOSALS entry.",
    "ccss": [
     "4.OA.B.4"
    ],
@@ -8730,16 +8599,19 @@
    ],
    "after": [],
    "steps": [
+    "Y5.B2.S6",
     "Y5.B5.S6",
     "Y5.B5.S11"
    ],
    "reused": true,
+   "extendNote": "extend its number ladder (within 100 -> 1,000) on to 1,000,000 for Y5.B2.S6 (4- to 6-digit +/- two-step stories)",
    "ccss": [
+    "4.NBT.B.4",
     "4.OA.A.2",
     "4.OA.A.3"
    ],
    "representation": "× then −; ÷ then +; write the equation with n; remainder decides the answer; is the answer reasonable? (round)",
-   "why": "closes Y5.B5.S6 Solve problems with multiplication; Y5.B5.S11 Solve problems with multiplication and division (existing std_props entry, reused)"
+   "why": "closes Y5.B2.S6 Multi-step addition and subtraction problems; Y5.B5.S6 Solve problems with multiplication; Y5.B5.S11 Solve problems with multiplication and division (existing std_props entry, reused)"
   },
   "vis_division_layouts": {
    "lane": "operations",
@@ -9836,18 +9708,6 @@
    "why": "band 9,999: 4 thousands 3 hundreds ..."
   },
   {
-   "key": "placevalue:pv_digit_drag",
-   "step": "Y5.B1.S2",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 9,999"
-  },
-  {
-   "key": "placevalue:expand",
-   "step": "Y5.B1.S2",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 9,999"
-  },
-  {
    "key": "placevalue:value",
    "step": "Y5.B1.S3",
    "action": "add",
@@ -9890,12 +9750,6 @@
    "why": "partial: multiplies by powers of ten but never names them or relates 10 hundreds = 1,000"
   },
   {
-   "key": "placevalue:expand",
-   "step": "Y5.B1.S8",
-   "action": "add",
-   "why": "upgrade the partial tag: band 999,999 is the standard partition; the step stays partial for flexible partitioning"
-  },
-  {
    "key": "number_sense:round_nl_hundred_thousands",
    "step": "Y5.B1.S9",
    "action": "add",
@@ -9908,34 +9762,10 @@
    "why": "partial: spans stop at one thousand to the next"
   },
   {
-   "key": "placevalue:compare",
-   "step": "Y5.B1.S10",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 99,999"
-  },
-  {
-   "key": "placevalue:order_least_to_greatest",
-   "step": "Y5.B1.S10",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 99,999"
-  },
-  {
    "key": "placevalue:order_greatest_to_least",
    "step": "Y5.B1.S10",
    "action": "add",
    "why": "band 99,999: order greatest first"
-  },
-  {
-   "key": "placevalue:compare",
-   "step": "Y5.B1.S11",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 999,999"
-  },
-  {
-   "key": "placevalue:order_least_to_greatest",
-   "step": "Y5.B1.S11",
-   "action": "add",
-   "why": "upgrade the partial tag to full with band 999,999"
   },
   {
    "key": "placevalue:order_greatest_to_least",
@@ -9998,12 +9828,6 @@
    "why": "6-digit column subtraction with exchanges"
   },
   {
-   "key": "subtraction:sub_across_zeros",
-   "step": "Y5.B2.S3",
-   "action": "add",
-   "why": "exchanging across zeros in large numbers (band 10,000)"
-  },
-  {
    "key": "algebra:multi_step_word",
    "step": "Y5.B2.S6",
    "action": "partial",
@@ -10046,28 +9870,10 @@
    "why": "partial: evaluates cubes (forms Cubes) without the cube picture"
   },
   {
-   "key": "placevalue:place_value_10x",
-   "step": "Y5.B3.S8",
-   "action": "add",
-   "why": "upgrade the partial tag: option op × with powers 10, 100, 1,000 is the whole step"
-  },
-  {
    "key": "multiplication:mult_zeros",
    "step": "Y5.B3.S8",
    "action": "add",
    "why": "× 10 and × 100 forms"
-  },
-  {
-   "key": "placevalue:place_value_10x",
-   "step": "Y5.B3.S9",
-   "action": "add",
-   "why": "upgrade the partial tag: option op ÷ with powers 10, 100, 1,000 is the whole step"
-  },
-  {
-   "key": "number_theory:divisibility_sort",
-   "step": "Y5.B3.S10",
-   "action": "add",
-   "why": "partial: multiples of 10 (divisible by 10) only"
   },
   {
    "key": "multiplication:area_model_mult",
@@ -10076,28 +9882,10 @@
    "why": "partial: area model to 3-digit × 1-digit"
   },
   {
-   "key": "multiplication:area_model_mult_hard",
-   "step": "Y5.B5.S2",
-   "action": "add",
-   "why": "upgrade the partial tag: tiles 22 is exactly the 2 × 2 grid"
-  },
-  {
-   "key": "multiplication:multiply",
-   "step": "Y5.B5.S3",
-   "action": "add",
-   "why": "upgrade the partial tag: tiles 22 deals 2-digit × 2-digit column multiplication"
-  },
-  {
    "key": "multiplication:mult_placeholder_zero",
    "step": "Y5.B5.S3",
    "action": "partial",
    "why": "partial: only the placeholder digit of row two is asked"
-  },
-  {
-   "key": "multiplication:area_model_mult_hard",
-   "step": "Y5.B5.S4",
-   "action": "add",
-   "why": "upgrade the partial tag: tiles 23 is the 2 × 3 grid (3-digit × 2-digit)"
   },
   {
    "key": "multiplication:mult_placeholder_zero",
@@ -10152,6 +9940,30 @@
    "step": "Y5.B5.S11",
    "action": "partial",
    "why": "partial: table-fact stories only"
+  },
+  {
+   "key": "placevalue:number_word_names",
+   "step": "Y5.B1.S5",
+   "action": "partial",
+   "why": "partial: choose-one-of-four word names; writing the words is never produced"
+  },
+  {
+   "key": "number_sense:estimate_sums_diffs",
+   "step": "Y5.B2.S4",
+   "action": "partial",
+   "why": "partial: places stop at 1,000; no 5- and 6-digit numbers"
+  },
+  {
+   "key": "multiplication:mult_zeros",
+   "step": "Y5.B3.S10",
+   "action": "add",
+   "why": "partial: generates ×10 and ×100 multiples; no ×1,000 or \"is it a multiple of 100/1,000?\""
+  },
+  {
+   "key": "division:div_remainders",
+   "step": "Y5.B5.S9",
+   "action": "remove",
+   "why": "Y3-level (2-digit ÷ 1-digit with ringed groups); a pre-skill, not this step"
   },
   {
    "key": "fractions:equiv_frac_visual",
@@ -10310,6 +10122,12 @@
    "why": "direct: perimeter of rectangles on squared paper"
   },
   {
+   "key": "area_perimeter:composite_shapes",
+   "step": "Y5.B8.S2",
+   "action": "partial",
+   "why": "every side labelled; never finds missing lengths first"
+  },
+  {
    "key": "area_perimeter:perimeter_grid",
    "step": "Y5.B8.S2",
    "action": "add",
@@ -10352,10 +10170,10 @@
    "why": "multiple-choice closest match, no protractor reading"
   },
   {
-   "key": "angles_lines:additive_angles",
-   "step": "Y5.B10.S6",
-   "action": "partial",
-   "why": "two parts only (existing partial tag confirmed)"
+   "key": "shapes_early:name_2d_shapes",
+   "step": "Y5.B10.S9",
+   "action": "add",
+   "why": "partial: names polygons, no regular/irregular"
   },
   {
    "key": "shapes_early:name_3d_shapes",
@@ -10394,6 +10212,12 @@
    "why": "no mixed units, smaller→larger thin (existing tag is full)"
   },
   {
+   "key": "measurement:length_metric",
+   "step": "Y5.B14.S1",
+   "action": "partial",
+   "why": "km→m only, larger to smaller, no mixed units"
+  },
+  {
    "key": "measurement:unit_conversion_word",
    "step": "Y5.B14.S1",
    "action": "add",
@@ -10403,7 +10227,13 @@
    "key": "measurement:capacity",
    "step": "Y5.B14.S2",
    "action": "partial",
-   "why": "L→mL one way; existing partial tag confirmed"
+   "why": "existing tag is FULL (note mL): no mixed units l/ml; use units [1] to drop customary"
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y5.B14.S2",
+   "action": "partial",
+   "why": "existing tag is FULL (note mm): cm→mm one way, no mixed units, no measuring in mm"
   },
   {
    "key": "measurement:length_metric",
@@ -10421,7 +10251,7 @@
    "key": "measurement:unit_conversions",
    "step": "Y5.B14.S3",
    "action": "add",
-   "why": "direct: metric length both ways (m↔cm, cm↔mm)"
+   "why": "partial: units [0] metric both ways, but mixes mass/capacity into length"
   },
   {
    "key": "measurement:unit_conversion_word",
