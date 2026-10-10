@@ -4,7 +4,8 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
-    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, CURATED_YEARS } from '../../js/modules/wrm-links.js';
+    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
+import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit } from '../../js/modules/build-queue.js';
 
 let fails = 0;
 const ok = (c, msg) => { if (!c) { fails += 1; console.log('FAIL', msg); } };
@@ -59,10 +60,56 @@ ok(proposalName('pattern_make') === 'Make a Pattern', 'WRM_PROPOSALS name');
 ok(linksFor('2:D1:2').source === 'rules', 'absent step falls back to rules');
 clearCurated();
 ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
-// the curated year files on disk and CURATED_YEARS agree
+// the curated files on disk and data/curriculum/links/index.json agree
 const dir = new URL('../../data/curriculum/links/', import.meta.url);
-const onDisk = existsSync(dir) ? readdirSync(dir).filter((f) => /^(R|Y[1-6])\.json$/.test(f)).map((f) => f.replace('.json', '')).sort() : [];
-ok(JSON.stringify(onDisk) === JSON.stringify([...CURATED_YEARS].sort()), `CURATED_YEARS ${JSON.stringify(CURATED_YEARS)} = files on disk ${JSON.stringify(onDisk)}`);
+const files = existsSync(dir) ? readdirSync(dir) : [];
+const onDisk = files.filter((f) => /^(R|Y[1-6])\.json$/.test(f)).map((f) => f.replace('.json', '')).sort();
+const idx = JSON.parse(readFileSync(new URL('index.json', dir)));
+ok(JSON.stringify(onDisk) === JSON.stringify([...idx.years].sort()), `index.json years ${JSON.stringify(idx.years)} = files on disk ${JSON.stringify(onDisk)}`);
+ok(!!idx.map === files.includes('MAP.json'), `index.json map ${idx.map} = MAP.json on disk ${files.includes('MAP.json')}`);
+
+// representation pairs and strands
+ok(REP_PAIRS.length === 8, 'eight representation pairs');
+const strandNames = MAP_STRANDS.map((x) => x[1]);
+ok(strandNames.length === 7, 'seven MAP strands');
+for (const p of REP_PAIRS) {
+    for (const [st, rec] of Object.entries(p.strands)) {
+        ok(strandNames.includes(st), `${p.id}: strand ${st}`);
+        ok(rec.skills.length + rec.build.length > 0, `${p.id}/${st}: skills or a build`);
+        for (const k of rec.skills) ok(/^[a-z_]+:[a-z0-9_]+$/.test(k), `${p.id}: key ${k}`);
+    }
+}
+ok(strandOfKey('multiplication:arrays_groups') === 'Multiplication & division' && strandOfKey('graphs:bar_graph') === 'Data & graphing', 'strandOfKey');
+ok(repPairsOfText('Read the clock and write the time in words').includes('clock-words'), 'repPairsOfText clock');
+
+// the build queue (Skills to be made)
+ok(gradesOfText('2-4').join() === '2,3,4' && gradesOfText('PK-K').join() === 'PK,K', 'gradesOfText');
+ok(gradeOfCode('M.EE.3.NF.1') === '3' && gradeOfCode('8.G.A.5') === '6' && gradeOfCode('K.CC.A.1') === 'K', 'gradeOfCode');
+ok(gradeOfRit('141-150') === 'K' && gradeOfRit('211-220') === '5', 'gradeOfRit');
+const Q0 = buildQueue();
+ok(Q0.items.length > 200 && Q0.totals.all === Q0.items.length, `queue without links files: ${Q0.items.length}`);
+ok(Q0.totals.bySource.CCSS > 0 && Q0.totals.bySource.EE > 0 && Q0.totals.bySource.WRM > 0 && Q0.totals.bySource.MAP === 0, 'queue sources without MAP.json');
+ok(new Set(Q0.items.map((e) => e.id)).size === Q0.items.length, 'queue de-duplicated');
+for (const e of Q0.items) {
+    ok(e.name && e.teaches && e.closes.length && e.representation, `${e.id}: short spec complete`);
+    ok(['new', 'option', 'other'].includes(e.kind) && e.sources.length, `${e.id}: kind + source`);
+}
+const fx = JSON.parse(readFileSync(new URL('../fixtures/wrm-links-sample.json', import.meta.url)));
+const mapFx = { rows: [{ task: 'Fixture task', strand: 'Geometry', ritBand: '181-190', status: 'missing', skills: [], proposal: 'fixture_map_one' }],
+    proposals: { fixture_map_one: { kind: 'option', skill: 'shapes_early:shape_attributes', name: 'Fixture MAP option', teaches: 'pick the shape with 4 sides',
+        representation: 'shapes in boxes, ring one', ccss: ['2.G.A.1'], map: [{ strand: 'Geometry', ritBand: '181-190', taskType: 'click to select' }], why: 'MAP asks it' },
+    fixture_pv_model: { kind: 'new', name: 'ignored second name', teaches: 'x', representation: 'y', why: 'also MAP' } } };
+const Q1 = buildQueue({ curated: [fx], map: mapFx });
+const one = Q1.items.find((e) => e.id === 'fixture_map_one');
+ok(one && one.sources.join() === 'MAP' && one.grades.join() === '2' && one.domain === 'G' && one.map[0].ritBand === '181-190', 'MAP proposal');
+const both = Q1.items.find((e) => e.id === 'fixture_pv_model');
+ok(both && both.sources.join() === 'WRM,MAP' && both.name === 'Fixture place value model', 'curated + MAP merged on one id, first name kept');
+ok(Q1.items.filter((e) => passes(e, { sources: new Set(['MAP']) })).length === 2, 'filter by source');
+ok(Q1.items.filter((e) => passes(e, { q: 'fixture map option' })).length === 1, 'filter by search');
+ok(Q1.items.filter((e) => passes(e, { grades: new Set(['2']), domains: new Set(['G']), kinds: new Set(['option']) })).some((e) => e.id === 'fixture_map_one'), 'filter grade+domain+kind');
+const csv = toCSV(Q1.items.slice(0, 5)).split('\r\n');
+ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
+
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');
 ok(searchLessons('3.NF.A.1').length > 0, 'search by CCSS code');

@@ -34,9 +34,10 @@ import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWit
 import { renderLibraryScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
 import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
+import { renderTodoScreen, openTodo } from './teacher-todo.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
-const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'quizzes', 'map', 'settings', 'progress'];
+const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
 // (the legacy views stay for their old entry points; pupils never reach the navigator).
 const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
@@ -217,6 +218,7 @@ function start() {
     // Hooks for modules that must not import the teacher view: the skill options popover draws
     // a live sample, and the classic print entry points open the Print screen instead.
     window.tvMountSample = mountSample;
+    window.tvOpenTodo = openTodo;
     window.tvOpenPrintWith = (skills) => { openPrintWith(skills); tvGo('print'); };
 
     // A legacy panel or modal opening or closing re-decides what may take focus.
@@ -328,7 +330,7 @@ function renderHome(el) {
     el.innerHTML = `
 <header class="tv-header">
   <div><h1 class="tv-h1">${greeting()}</h1><p class="tv-sub">${esc(today)}</p></div>
-  <div class="tv-header-actions"><a class="tv-btn tv-btn-ghost" href="help/teacher-online.html" target="_blank" rel="noopener">${icon('book', 20)}<span>Teacher help</span></a></div>
+  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-home-go="todo">${icon('list', 20)}<span>Skills to be made</span></button><a class="tv-btn tv-btn-ghost" href="help/teacher-online.html" target="_blank" rel="noopener">${icon('book', 20)}<span>Teacher help</span></a></div>
 </header>
 <section class="tv-grid-3" aria-label="Start a job">
   ${job('sets', 'send', 'Send a skill set', 'Pick the skills and the rules, then give pupils a link or a code to open on their own device.', 'New skill set', true)}
@@ -988,6 +990,7 @@ const RENDER = {
     run: renderRun,
     library: renderLibraryScreen,
     wrm: renderWrmScreen,
+    todo: renderTodoScreen,
     map: renderMapScreen,
     quizzes: renderQuizzes,
     settings: renderSettings,

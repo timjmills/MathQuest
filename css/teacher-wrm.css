@@ -136,3 +136,67 @@
 html.dark body.teacher-mode .tvw-tag.tvw-power { background: #4a3a12; color: #ffe2a3; }
 html.dark body.teacher-mode .tvw-tag.tvw-part { background: #4a1f1c; color: #ffc4be; }
 .tvw-thumbbtn .tvp-frame { display: block; width: 100%; }
+
+/* ---------------------------------------------------------------- 2026-10-10: verdict, "To be built" links */
+.tvw-tag.tvw-verdict-tag.is-full { background: #e3f4e8; color: #1d6b37; }
+.tvw-tag.tvw-verdict-tag.is-part { background: #fdecea; color: var(--tv-danger); }
+.tvw-tag.tvw-verdict-tag.is-gap { background: var(--tv-danger); color: #fff; }
+html.dark body.teacher-mode .tvw-tag.tvw-verdict-tag.is-full { background: #183d24; color: #bfeccc; }
+html.dark body.teacher-mode .tvw-tag.tvw-verdict-tag.is-part { background: #4a1f1c; color: #ffc4be; }
+.tvw-tbb { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-style: normal; }
+.tvw-tbb-link {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 1px dashed var(--tv-border);
+    border-radius: 8px; background: transparent; color: var(--tv-accent); font: inherit; font-weight: 600; cursor: pointer; text-align: left;
+}
+.tvw-tbb-link:hover, .tvw-tbb-link:focus-visible { background: var(--tv-accent-tint); }
+
+/* ---------------------------------------------------------------- Skills to be made (teacher-todo.js) */
+.tvt-body { display: flex; flex-direction: column; gap: 14px; }
+.tvt-totals { display: flex; flex-wrap: wrap; gap: 10px; }
+.tvt-total { display: flex; align-items: baseline; gap: 6px; padding: 10px 14px; background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; font-size: 14px; color: var(--tv-text-2); }
+.tvt-big { font-size: 24px; line-height: 28px; font-weight: 700; color: var(--tv-text); font-variant-numeric: tabular-nums; }
+.tvt-total-src { flex-wrap: wrap; gap: 12px; align-items: center; }
+.tvt-total-src b { color: var(--tv-text); }
+.tvt-filters { display: flex; flex-direction: column; gap: 8px; }
+.tvt-row2 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tvt-sel { display: flex; align-items: center; gap: 8px; }
+.tvt-sel .tv-select { min-height: 44px; }
+.tvt-search { flex: 1 1 320px; min-width: 0; }
+.tvt-chip { min-height: 44px; }
+.tvt-count { margin: 0; font-size: 14px; color: var(--tv-caption); }
+.tvt-grade { display: flex; flex-direction: column; gap: 6px; }
+.tvt-grade-h { margin: 8px 0 0; }
+.tvt-dom-h { margin: 6px 0 2px; font-size: 15px; line-height: 20px; font-weight: 700; color: var(--tv-text-2); }
+.tvt-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.tvt-item { border: 1px solid var(--tv-rule); border-radius: 10px; background: var(--tv-surface); }
+.tvt-item.is-open { border-color: var(--tv-border); }
+.tvt-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px 12px; border: 0; background: transparent; text-align: left; cursor: pointer; color: var(--tv-text); font: inherit; border-radius: 10px; }
+.tvt-row:hover { background: var(--tv-subtle-2); }
+.tvt-chev { flex: none; display: inline-flex; transition: transform 120ms ease; color: var(--tv-caption); }
+.tvt-item.is-open .tvt-chev { transform: rotate(90deg); }
+.tvt-name { flex: 1; min-width: 0; font-size: 15px; line-height: 20px; font-weight: 600; }
+.tvt-badges { flex: none; display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px; max-width: 50%; }
+.tvt-kind.is-new { background: #e3eefc; color: #1e4f8f; }
+.tvt-kind.is-option { background: #efe8fb; color: #5a3a8e; }
+.tvt-src { background: transparent; border: 1px solid var(--tv-border); }
+.tvt-gr { font-size: 12px; font-weight: 600; color: var(--tv-caption); min-width: 52px; text-align: right; }
+.tvt-spec { padding: 0 16px 14px 40px; }
+.tvt-dl { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 14px; line-height: 20px; }
+.tvt-dl dt { font-weight: 700; color: var(--tv-text-2); }
+.tvt-dl dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.tvt-codes { display: flex; flex-wrap: wrap; gap: 4px; }
+.tvt-ul { margin: 0; padding-left: 18px; }
+.tvt-step { min-height: 44px; padding: 0 10px; border: 1px solid var(--tv-accent); border-radius: 8px; background: transparent; color: var(--tv-accent); font: 500 13px/16px var(--tv-mono); cursor: pointer; }
+.tvt-step:hover, .tvt-step:focus-visible { background: var(--tv-accent-tint); }
+html.dark body.teacher-mode .tvt-kind.is-new { background: #1c3352; color: #cfe2ff; }
+html.dark body.teacher-mode .tvt-kind.is-option { background: #33264d; color: #e3d4ff; }
+@media (max-width: 760px) { .tvt-dl { grid-template-columns: minmax(0, 1fr); } .tvt-badges { max-width: none; } .tvt-row { flex-wrap: wrap; } .tvt-spec { padding-left: 16px; } }
+
+/* ---------------------------------------------------------------- MAP page browse views (teacher-map-tasks.js) */
+.tvm-tabs { margin: 0 0 16px; align-self: flex-start; }
+.tvm-panel { display: flex; flex-direction: column; gap: 14px; }
+.tvmk-find { display: flex; flex-direction: column; gap: 8px; }
+.tvmk-find .tv-cap { margin: 0; }
+.tvmk-detail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tvm-tabs > button { min-height: 44px; padding: 0 16px; white-space: nowrap; }
+.tvm-tabs > button[aria-selected="true"] { border-color: var(--tv-selected); background: var(--tv-surface); color: var(--tv-text); font-weight: 700; }

@@ -18,10 +18,10 @@
 // it and Back works. The sequence and link data (~350 KB with standards) load the first time the
 // screen opens, never at boot.
 
-import { state } from './state.js';
-import { icon, esc, toast, copyText, findSkill, levelText, loadSetIntoQueue, currentSet } from './teacher-ui.js';
-import { printSkills } from './teacher-print.js';
-import { skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
+import { icon, esc } from './teacher-ui.js';
+import { skillView } from './teacher-preview.js';
+import { createPicker, liveKey, toBeBuiltHTML } from './teacher-skillpick.js';
+import { loadLinksData } from './links-data.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -33,31 +33,44 @@ const STRAND = { S: 'Standard', P: 'Priority', I: 'Intervention' };
 const GROUPS = [
     ['direct', 'Skills that teach this lesson', 'Practise the lesson itself.'],
     ['prereq', 'Skills to do first', 'Earlier learning this lesson builds on — from the week\'s support-block lessons and the lessons just before it.'],
-    ['related', 'Skills that go with it', 'Same standard, or the next lessons in this unit.'],
+    ['related', 'Skills that go with it', 'Same idea in another form, or the next lessons in this unit.'],
 ];
+const VERDICT = {
+    full: ['Fully taught', 'is-full'],
+    partial: ['Covers part', 'is-part'],
+    gap: ['No skill yet', 'is-gap'],
+};
 
 const v = {
     grade: '', unit: '', lesson: '',  // lesson key
-    view: skillView(),
-    ticked: new Set(),               // 'categoryId|skillId'
-    link: '',                        // the last practice link made
-    linkNote: '',
     query: '',
 };
 let links = null;                    // linksFor(current lesson)
+const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDetail() });
 
 function load() {
     if (L) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(async ([a, b]) => {
+        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js'), loadLinksData()]).then(([a, b, data]) => {
+            // Curated links (data/curriculum/links/<YEAR>.json, when present) win over the computed rules.
+            for (const y of Object.values(data.years)) a.addCuratedYear(y);
             L = a; SEQ = b;
-            // Curated links (data/curriculum/links/<YEAR>.json): only the years the module lists, so a
-            // missing file never costs a failed request.
-            await Promise.all((L.CURATED_YEARS || []).map((y) => fetch(`data/curriculum/links/${y}.json`)
-                .then((r) => (r.ok ? r.json() : null)).then((d) => L.addCuratedYear(d)).catch(() => null)));
         }).catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
     }
     return loading;
+}
+
+/** Open the screen at a White Rose step (from the Skills to be made screen). False when no lesson teaches it. */
+export function openWrmStep(stepId) {
+    return load().then(() => {
+        const l = L && L.allLessons().find((x) => x.step === stepId);
+        if (!l) return false;
+        Object.assign(v, { grade: l.grade, unit: l.unit, lesson: l.key });
+        pick.reset();
+        writeHash(false);
+        window.tvGo?.('wrm');
+        return true;
+    });
 }
 
 /* ================================================================= hash */
@@ -98,14 +111,13 @@ function gradeRec() { return grades().find((g) => g.id === v.grade) || null; }
 function unitsOf(gid) { const g = grades().find((x) => x.id === gid); return g ? g.units : []; }
 function unitRec() { return unitsOf(v.grade).find((u) => u.id === v.unit) || null; }
 function lessonsOf(u) { return u.lessons.map((_, i) => L.lessonByKey(`${v.grade}:${u.id}:${i + 1}`)); }
-const live = (key) => { const [c, s] = key.split(':'); return !!findSkill(c, s); };
-const k2p = (key) => key.replace(':', '|');
+const live = liveKey;
 
-function directCount(lesson) {
-    if (!lesson.step) return 0;
-    const c = L.curatedFor(lesson.step);
-    if (c) return (c.direct || []).length + (c.partial || []).length;
-    return L.linksFor(lesson, { live }).direct.length;
+/** { n, verdict } for a lesson row: the curated record when present, else the computed rules. */
+function rowFacts(lesson) {
+    if (!lesson.step) return { n: 0, verdict: 'gap' };
+    const r = L.linksFor(lesson, { live });
+    return { n: r.direct.length, verdict: r.verdict };
 }
 
 /* ================================================================= render */
@@ -115,11 +127,12 @@ export function renderWrmScreen(el) {
     if (!el.dataset.built) {
         el.dataset.built = '1';
         el.innerHTML = `<header class="tv-header"><div><h1 class="tv-h1">White Rose lessons</h1>
-          <p class="tv-sub">Choose a grade, a unit and a lesson to see the skills that teach it. Tick skills, then make a practice link or print.</p></div></header>
+          <p class="tv-sub">Choose a grade, a unit and a lesson to see the skills that teach it. Tick skills, then make a practice link or print.</p></div>
+          <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-w-todo="1">${icon('list', 18)}<span>Skills to be made</span></button></div></header>
           <div class="tvw-body" id="tvwBody"><p class="tv-cap">Loading the lessons…</p></div>`;
         wire(el);
     }
-    v.view = skillView();
+    pick.view = skillView();
     load().then(() => {
         if (!L) { el.querySelector('#tvwBody').innerHTML = '<p class="tv-cap">Could not load the lessons. Reload the page to try again.</p>'; return; }
         if (wrmHashActive()) readHash();
@@ -135,7 +148,7 @@ export function wrmOnHashChange() {
     if (!L || !root || !root.isConnected) return;
     const before = `${v.grade}|${v.unit}|${v.lesson}`;
     readHash();
-    if (`${v.grade}|${v.unit}|${v.lesson}` !== before) { v.ticked.clear(); v.link = ''; draw(); }
+    if (`${v.grade}|${v.unit}|${v.lesson}` !== before) { pick.reset(); draw(); }
 }
 
 function draw() {
@@ -157,7 +170,7 @@ function draw() {
         <nav class="tv-card tv-flush tvw-lessons" aria-labelledby="tvwUnitTitle" id="tvwLessons">${lessonListHTML()}</nav>
         <section class="tvw-detail" id="tvwDetail" aria-live="polite">${detailHTML()}</section>
       </div>`;
-    afterDetail();
+    pick.after(root.querySelector('#tvwDetail'));
     const cur = body.querySelector('.tvw-lesson[aria-current="true"]');
     if (cur) cur.scrollIntoView({ block: 'nearest' });
 }
@@ -175,14 +188,15 @@ function unitChips() {
 }
 
 function lessonRowHTML(l) {
-    const n = directCount(l);
-    const gap = l.type === 'build' ? 'CCSS lesson to be built' : !l.step ? 'Not a White Rose step' : n ? '' : 'No skill yet';
+    const f = rowFacts(l);
+    const gap = l.type === 'build' ? 'CCSS lesson to be built' : !l.step ? 'Not a White Rose step' : f.n ? '' : 'No skill yet';
     const meta = [l.weeks.length ? l.weeks[0] : '', l.strands ? l.strands.split('').join(' ') : ''].filter(Boolean).join(' · ');
-    return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}"${l.key === v.lesson ? ' aria-current="true"' : ''}>
+    const part = gap ? '' : f.verdict === 'partial' ? ' <span class="tvw-tag tvw-part">Covers part</span>' : ' <span class="tvw-tag tvw-verdict-tag is-full">Full</span>';
+    return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${gap ? 'gap' : f.verdict}"${l.key === v.lesson ? ' aria-current="true"' : ''}>
       <span class="tvw-n">${l.n}</span>
       <span class="tvw-lt"><span class="tvw-lt-title">${esc(l.title)}</span>
-        <span class="tvw-lt-meta">${esc(meta)}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(l.from)}</span>` : ''}</span></span>
-      <span class="tvw-count${gap ? ' is-gap' : ''}">${gap ? esc(gap) : `${n} skill${n === 1 ? '' : 's'}`}</span></button></li>`;
+        <span class="tvw-lt-meta">${esc(meta)}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(l.from)}</span>` : ''}${part}</span></span>
+      <span class="tvw-count${gap ? ' is-gap' : ''}">${gap ? esc(gap) : `${f.n} skill${f.n === 1 ? '' : 's'}`}</span></button></li>`;
 }
 
 function lessonListHTML() {
@@ -202,23 +216,27 @@ function detailHTML() {
     const l = v.lesson ? L.lessonByKey(v.lesson) : null;
     if (!l) {
         links = null;
+        pick.setGroups({});
         return `<div class="tv-card tvw-empty"><span class="tv-empty-icon" aria-hidden="true">${icon('book', 22)}</span>
           <div class="tv-h3">Choose a lesson</div><p class="tv-cap">Pick a lesson on the left, or find one with the search box. You will see the skills that teach it, the skills to do first and the skills that go with it.</p></div>`;
     }
     links = L.linksFor(l, { live });
+    pick.setGroups({ direct: links.direct, prereq: links.prereq, related: links.related });
     const files = l.step ? (SEQ.WRM_STEP_FILES[l.step] || []) : [];
     const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label === 'Open lesson' ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
     const ee = (links.step && links.step.ee) || [];
     const strands = l.strands.split('').map((s) => STRAND[s]).filter(Boolean);
+    const vd = l.type === 'build' ? null : VERDICT[links.verdict];
     const verdict = l.type === 'build'
         ? 'A CCSS lesson the school is still to write — there is no White Rose lesson for it.'
-        : links.verdict === 'full' ? '' : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `: not yet ${esc(links.missing)}` : ''}.` : 'No skill teaches this lesson yet.';
-    const build = links.build.length ? `<p class="tvw-tbb">To be built: ${links.build.map((id) => esc(L.proposalName(id))).join(', ')}</p>` : '';
+        : links.verdict === 'full' ? 'The skills below teach every part of this lesson.'
+            : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `. Not yet: ${esc(links.missing)}` : '.'}` : 'No skill teaches this lesson yet.';
     const u = unitRec();
     return `<div class="tv-card tvw-head">
         <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(u.id === 'E' ? 'Enrichment' : `${u.id} ${L.domainName(u.domain)}`)}${l.weeks.length ? ` · Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}` : ''}</p>
         <h2 class="tv-h2 tvw-title"><span class="tvw-title-n">Lesson ${l.n}</span> ${esc(l.title)}</h2>
         <div class="tvw-tags">
+          ${vd ? `<span class="tvw-tag tvw-verdict-tag ${vd[1]}" data-w-verdict-tag="${links.verdict}">${vd[0]}</span>` : ''}
           ${l.power ? '<span class="tvw-tag tvw-power">Power standard</span>' : ''}
           ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(l.from)} — teach it from that grade's files</span>` : ''}
           ${l.type === 'enrich' ? '<span class="tvw-tag">Enrichment (after MAP)</span>' : ''}
@@ -227,168 +245,29 @@ function detailHTML() {
           ${ee.slice(0, 3).map((c) => `<span class="tvw-tag tvw-code tvw-ee">${esc(c.replace(/^M\./, ''))}</span>`).join('')}
         </div>
         ${files.length ? `<div class="tvw-files">${fileBtn(files[0], 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
-        ${verdict ? `<p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>` : ''}${build}
+        <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalName)}
       </div>
-      <div class="tvw-quick" role="group" aria-label="Tick a group of skills">
-        <span class="tvw-pick-h">Tick</span>
-        <button type="button" class="tv-btn tv-btn-sm" data-w-quick="direct">All teaching skills</button>
-        <button type="button" class="tv-btn tv-btn-sm" data-w-quick="prereq">Do-first skills</button>
-        <button type="button" class="tv-btn tv-btn-sm" data-w-quick="related">Go-with skills</button>
-        <button type="button" class="tv-btn tv-btn-sm" data-w-quick="all">Everything</button>
-        <button type="button" class="tv-btn tv-btn-sm tv-btn-ghost" data-w-quick="none">Clear</button>
-        <span class="tvw-viewtog">${viewToggleHTML(v.view)}</span>
-      </div>
-      ${GROUPS.map(([g, h, cap]) => groupHTML(g, h, cap)).join('')}
-      <div class="tv-actionbar tvw-bar" id="tvwBar">${barHTML()}</div>`;
+      ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
+      ${GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalName, 'Still to make') : '')).join('')}
+      ${pick.barWrapHTML()}`;
 }
 
-function groupHTML(g, h, cap) {
-    const list = links[g];
-    const n = list.length;
-    const allOn = n && list.every((x) => v.ticked.has(k2p(x.key)));
-    const empty = g === 'direct'
-        ? (L.lessonByKey(v.lesson).type === 'build' ? 'No skill yet: this lesson is still to be written.' : 'No skill teaches this lesson yet. The skills below still help.')
-        : g === 'prereq' ? 'No earlier skills found for this lesson.' : 'No other skills share this lesson\'s standard.';
-    const pre = g === 'prereq' && links.preBuild.length ? `<p class="tvw-tbb">To be built: ${links.preBuild.map((id) => esc(L.proposalName(id))).join(', ')}</p>` : '';
-    return `<section class="tvw-group" aria-labelledby="tvwH-${g}" data-w-group="${g}">
-      <div class="tvw-group-head"><div><h3 class="tv-h3" id="tvwH-${g}">${h} <span class="tvw-n-sm">${n}</span></h3><p class="tv-cap">${cap}</p></div>
-        ${n ? `<button type="button" class="tv-check" role="checkbox" aria-checked="${allOn}" data-w-all="${g}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>Select all</span></button>` : ''}</div>
-      ${n ? (v.view === 'thumbs' ? `<ul class="tvw-cards" role="list">${list.map((x) => cardHTML(x, g)).join('')}</ul>` : `<ul class="tvw-rows" role="list">${list.map((x) => rowHTML(x, g)).join('')}</ul>`) : `<p class="tvw-none">${empty}</p>`}${pre}
-    </section>`;
-}
-
-function skillBits(x) {
-    const [c, s] = x.key.split(':');
-    const sk = findSkill(c, s);
-    return { c, s, sk, p: k2p(x.key), on: v.ticked.has(k2p(x.key)), opts: x.opts && Object.keys(x.opts).length ? x.opts : null };
-}
-
-function tickHTML(b, label) {
-    return `<button type="button" class="tv-check tvw-tick" role="checkbox" aria-checked="${b.on}" data-w-tick="${esc(b.p)}" aria-label="Tick ${esc(label)}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
-}
-
-function quickHTML(b, label) {
-    return `<span class="tvw-q"><button type="button" class="tv-btn tv-btn-sm" data-w-one="link" data-w-key="${esc(b.p)}" aria-label="Practice link for ${esc(label)}">${icon('link', 16)}<span>Practice</span></button>
-      <button type="button" class="tv-btn tv-btn-sm" data-w-one="print" data-w-key="${esc(b.p)}" aria-label="Print ${esc(label)}">${icon('print', 16)}<span>Print</span></button></span>`;
-}
-
-function why(x, g) {
-    if (g === 'direct') return x.partial ? ` · <span class="tvw-tag tvw-part">Covers part</span> <span class="tvw-why">${esc(x.partial)}</span>` : '';
-    return x.why ? ` · <span class="tvw-why">${esc(x.why)}</span>` : '';
-}
-
-function cardHTML(x, g) {
-    const b = skillBits(x);
-    const label = b.sk ? b.sk.label : x.key;
-    const o = b.opts ? ` data-tvp-opts="${esc(JSON.stringify(b.opts))}"` : '';
-    return `<li class="tvw-card${b.on ? ' is-on' : ''}">
-      <div class="tvw-card-top">${tickHTML(b, label)}<span class="tvw-card-name">${esc(label)}</span></div>
-      <button type="button" class="tvw-thumbbtn" data-w-tick="${esc(b.p)}" aria-hidden="true" tabindex="-1"><span class="tvp-frame tvp-thumb" data-tvp-lazy="${esc(b.p)}"${o}></span></button>
-      <p class="tvw-card-meta">${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x, g)}</p>
-      ${quickHTML(b, label)}</li>`;
-}
-
-function rowHTML(x, g) {
-    const b = skillBits(x);
-    const label = b.sk ? b.sk.label : x.key;
-    return `<li class="tvw-row${b.on ? ' is-on' : ''}"${tvpAttrs(b.c, b.s, b.opts)}>${tickHTML(b, label)}
-      <span class="tvw-row-main" data-tvp-anchor><span class="tvw-row-name">${esc(label)}</span><span class="tvw-row-meta">${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x, g)}</span></span>
-      ${infoButtonHTML(label)}${quickHTML(b, label)}</li>`;
-}
-
-function barHTML() {
-    const n = v.ticked.size;
-    // One row, so the bar stays short on a 768 px Chromebook screen: once a link is made, the link
-    // box takes the place of the count (the count stays in the box's label).
-    const count = n ? `${n} skill${n === 1 ? '' : 's'} ticked` : 'Tick the skills you want';
-    const left = v.link
-        ? `<div class="tvw-linkbox"><label class="tvw-link-l" for="tvwLink">${esc(v.linkNote || 'Practice link for pupils')}</label>
-            <div class="tvw-linkrow"><input id="tvwLink" class="tv-input tvw-link" readonly value="${esc(v.link)}">
-            <button type="button" class="tv-btn" data-w-act="copy">${icon('copy', 18)}<span>Copy</span></button></div></div>`
-        : `<div class="tv-actionbar-text"><div class="tv-h3">${count}</div>
-            <p class="tv-cap">${n > 1 ? 'They will be mixed together.' : n ? 'One skill.' : 'Then make a practice link or print.'}</p></div>`;
-    return `${left}
-      <div class="tv-row tvw-bar-btns">
-        <button type="button" class="tv-btn tv-btn-primary" data-w-act="link"${n ? '' : ' aria-disabled="true"'}>${icon('link', 18)}<span>Practice link</span></button>
-        <button type="button" class="tv-btn" data-w-act="print"${n ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>Print</span></button></div>`;
-}
-
-function afterDetail() {
-    const d = root.querySelector('#tvwDetail');
-    if (d && v.view === 'thumbs') lazyThumbs(d, null);
+function emptyText(g, l) {
+    if (g === 'direct') return l.type === 'build' ? 'No skill yet: this lesson is still to be written.' : 'No skill teaches this lesson yet. The skills below still help.';
+    return g === 'prereq' ? 'No earlier skills found for this lesson.' : 'No other skills share this lesson\'s standard.';
 }
 
 function redrawDetail() {
     const d = root.querySelector('#tvwDetail');
     d.innerHTML = detailHTML();
-    afterDetail();
-}
-
-function redrawBar() {
-    const bar = root.querySelector('#tvwBar');
-    if (bar) bar.innerHTML = barHTML();
+    pick.after(d);
 }
 
 /* ================================================================= actions */
 
-function itemsFor(keys) {
-    const all = links ? [...links.direct, ...links.prereq, ...links.related] : [];
-    return keys.map((p) => {
-        const [c, s] = p.split('|');
-        const hit = all.find((x) => x.key === `${c}:${s}`);
-        const item = { categoryId: c, skillId: s, weight: 1 };
-        if (hit && hit.opts && Object.keys(hit.opts).length) item.opts = hit.opts;
-        return item;
-    }).filter((x) => findSkill(x.categoryId, x.skillId));
-}
-
-/** A pupil link for these skills through the app's existing share flow (stable share codes). */
-function makeLink(items) {
-    const before = currentSet().map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, weight: x.weight, opts: x.opts }));
-    const prevSettings = state.shareSettings;
-    const prevType = state.shareLinkType;
-    let link = '';
-    loadSetIntoQueue({ skills: items });
-    try {
-        state.shareSettings = { timer: '?', problemCount: '?', gameMode: 'practice', range: '?', decimals: '?', quickStartLocked: '?' };
-        state.shareLinkType = 'direct';
-        link = window.generateShareableLink ? window.generateShareableLink() : '';
-    } catch (e) {
-        link = '';
-    } finally {
-        loadSetIntoQueue({ skills: before });
-        state.shareSettings = prevSettings;
-        state.shareLinkType = prevType;
-    }
-    return link;
-}
-
-async function doLink(keys) {
-    const items = itemsFor(keys);
-    if (!items.length) { toast('Tick at least one skill first'); return; }
-    v.link = makeLink(items);
-    v.linkNote = `Practice link · ${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''} · copied`;
-    redrawBar();
-    if (!v.link) { toast('Could not make a link'); return; }
-    toast((await copyText(v.link)) ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
-    root.querySelector('#tvwLink')?.select();
-}
-
-function doPrint(keys) {
-    const items = itemsFor(keys);
-    if (!items.length) { toast('Tick at least one skill first'); return; }
-    printSkills(items);
-    window.tvGo?.('print');
-}
-
-function tickGroup(g, on) {
-    const list = g === 'all' ? [...links.direct, ...links.prereq, ...links.related] : links[g] || [];
-    for (const x of list) { if (on) v.ticked.add(k2p(x.key)); else v.ticked.delete(k2p(x.key)); }
-}
-
 function choose(patch, focusSel) {
     Object.assign(v, patch);
-    v.ticked.clear(); v.link = '';
+    pick.reset();
     writeHash(false);
     draw();
     if (focusSel) root.querySelector(focusSel)?.focus();
@@ -406,8 +285,10 @@ function searchHits(box, q) {
 function wire(el) {
     el.addEventListener('click', (e) => {
         const t = e.target.closest('button, a');
-        if (!t || !el.contains(t) || !L) return;
+        if (!t || !el.contains(t)) return;
         const d = t.dataset;
+        if (d.wTodo) { window.tvGo?.('todo'); return; }
+        if (!L) return;
         if (d.wGrade) { choose({ grade: d.wGrade, unit: (unitsOf(d.wGrade)[0] || {}).id || '', lesson: '' }, `[data-w-grade="${d.wGrade}"]`); return; }
         if (d.wUnit) { choose({ unit: d.wUnit, lesson: '' }, `[data-w-unit="${d.wUnit}"]`); return; }
         if (d.wLesson) {
@@ -421,40 +302,7 @@ function wire(el) {
             choose({ grade: l.grade, unit: l.unit, lesson: l.key }, '#tvwDetail .tvw-title');
             return;
         }
-        if (d.wTick) {
-            if (v.ticked.has(d.wTick)) v.ticked.delete(d.wTick); else v.ticked.add(d.wTick);
-            v.link = '';
-            const sel = `.tvw-tick[data-w-tick="${CSS.escape(d.wTick)}"]`;
-            redrawDetail();
-            root.querySelector(sel)?.focus();
-            return;
-        }
-        if (d.wAll) {
-            const list = links[d.wAll];
-            tickGroup(d.wAll, !list.every((x) => v.ticked.has(k2p(x.key))));
-            v.link = '';
-            redrawDetail();
-            root.querySelector(`[data-w-all="${d.wAll}"]`)?.focus();
-            return;
-        }
-        if (d.wQuick) {
-            if (d.wQuick === 'none') v.ticked.clear(); else { v.ticked.clear(); tickGroup(d.wQuick, true); }
-            v.link = '';
-            redrawDetail();
-            root.querySelector(`[data-w-quick="${d.wQuick}"]`)?.focus();
-            return;
-        }
-        if (d.wOne === 'link') { doLink([d.wKey]); return; }
-        if (d.wOne === 'print') { doPrint([d.wKey]); return; }
-        if (d.wAct === 'link') { doLink([...v.ticked]); return; }
-        if (d.wAct === 'print') { doPrint([...v.ticked]); return; }
-        if (d.wAct === 'copy') { copyText(v.link).then((ok) => toast(ok ? 'Practice link copied' : 'Select the link and copy it')); return; }
-        if (d.act === 'skill-view' && d.view) {
-            v.view = d.view === 'thumbs' ? 'thumbs' : 'list';
-            setSkillView(v.view);
-            redrawDetail();
-            root.querySelector(`[data-act="skill-view"][data-view="${v.view}"]`)?.focus();
-        }
+        pick.handle(t);
     });
     el.addEventListener('input', (e) => {
         if (e.target.id !== 'tvwSearch' || !L) return;

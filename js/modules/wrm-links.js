@@ -28,9 +28,9 @@ import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
 // verdict, missing, build / preBuild proposal ids, pre and related. The page fetches the year files
 // and hands them in with addCuratedYear(); a missing year or step falls back to the rules below.
-// The years whose curated file exists (the page fetches only these, so a missing file never costs a
-// failed request). Add a year here in the same change that adds its file; ws-wrm-page-unit checks both agree.
-export const CURATED_YEARS = [];
+// Which files exist is data/curriculum/links/index.json (links-data.js reads it, so a missing file never
+// costs a failed request). Add a year there in the same change that adds its file; ws-wrm-page-unit
+// checks both agree.
 const CURATED = new Map();       // step id -> record
 const CURATED_PROPOSALS = {};    // proposal id -> { name, ... }
 export function addCuratedYear(data) {
@@ -243,4 +243,75 @@ export function searchLessons(text, limit = 12) {
     }
     scored.sort((a, b) => b.s - a.s);
     return scored.slice(0, limit).map((x) => x.l);
+}
+
+
+/* =================================================================== MAP strands and representation pairs */
+// The seven MAP practice strands (MASTER_PLAN 6.3) and which skill categories practise each. A MAP.json
+// row names its own strand; this table is for skills and the fallback when MAP.json is absent.
+export const MAP_STRANDS = [
+    ['npv', 'Number & place value', ['counting', 'comparing', 'composing', 'placevalue', 'number_sense', 'integers', 'counting_mixed']],
+    ['opa', 'Operations & algebra', ['addition', 'subtraction', 'number_ops_mixed', 'patterns', 'algebra', 'order_of_operations']],
+    ['md', 'Multiplication & division', ['multiplication', 'division', 'number_theory']],
+    ['fd', 'Fractions & decimals', ['fractions', 'fraction_operations', 'decimals', 'conversions']],
+    ['meas', 'Measurement', ['measurement', 'area_perimeter']],
+    ['geo', 'Geometry', ['shapes_early', 'shapes_classify', 'angles_lines', 'coordinates']],
+    ['data', 'Data & graphing', ['graphs', 'data_analysis', 'probability']],
+];
+export function strandOfKey(key) {
+    const cat = String(key || '').split(':')[0];
+    const s = MAP_STRANDS.find((x) => x[2].includes(cat));
+    return s ? s[1] : '';
+}
+
+/**
+ * The eight "match the two" representation changes MAP asks for (MASTER_PLAN 6.4), per strand: the live
+ * skills that practise the change and the build-list entries that would close what is missing. A small
+ * hand map (checked against the MAP audit's 6.4 rows, 2026-10-10); a strand a change does not belong to
+ * is simply absent. `match` finds the change in a proposal's text, for the "Skills to be made" filter.
+ * Correct it here: the MAP page and the filter both read it.
+ */
+export const REP_PAIRS = [
+    { id: 'picture-equation', label: 'Picture ↔ equation', match: /(picture|drawing|pictured).{0,60}(equation|number sentence)|(equation|number sentence).{0,60}(picture|drawing)/i, strands: {
+        'Operations & algebra': { skills: ['addition:add_5_pictures', 'subtraction:sub_5_pictures'], build: [['pictures_to_sentence', 'Pictures to number sentences']] },
+        'Multiplication & division': { skills: ['multiplication:arrays_groups', 'multiplication:dot_array_mult'], build: [['map_array_to_eq', 'Match an array or groups to its equation']] },
+        'Fractions & decimals': { skills: ['fraction_operations:decompose_fractions', 'fraction_operations:add_fractions_like'], build: [['map_frac_unit_build', 'Fraction model to unit-fraction sum']] },
+        'Measurement': { skills: ['area_perimeter:area_distributive_visual'], build: [['map_area_equation', 'Area picture to its equation']] },
+    } },
+    { id: 'model-number', label: 'Model ↔ number', match: /(base[- ]?ten|base-10|place[- ]value dis[ck]|fraction (bar|circle|model|strip)|hundred square|decimal grid|unit cubes|ten[- ]frame|counters)/i, strands: {
+        'Number & place value': { skills: ['placevalue:place_value_disks', 'composing:base10_build', 'composing:tens_foundation_visual'], build: [['map_match_model_number', 'Match a base-ten model to its number']] },
+        'Fractions & decimals': { skills: ['fractions:identify', 'fractions:shade_fraction', 'conversions:percent_visual'], build: [['map_frac_model_match', 'Match a fraction model to its fraction'], ['map_decimal_grid', 'Decimal grids to decimals']] },
+        'Measurement': { skills: ['area_perimeter:volume'], build: [['volume_cubes', 'Volume by counting cubes']] },
+    } },
+    { id: 'graph-sentence', label: 'Graph ↔ sentence', match: /(graph|pictograph|bar chart|line plot|tally|chart).{0,80}(sentence|statement|true|claim)/i, strands: {
+        'Data & graphing': { skills: ['graphs:bar_graph', 'graphs:pictograph', 'graphs:line_plot'], build: [['map_graph_sentence', 'Which sentence matches the graph?']] },
+    } },
+    { id: 'story-operation', label: 'Story ↔ operation', match: /(story|word problem|context).{0,80}(equation|operation|expression|number sentence)|(equation|expression|number sentence).{0,80}(story|word problem)/i, strands: {
+        'Operations & algebra': { skills: ['algebra:build_expr_addsub', 'algebra:write_equation', 'addition:add_word_problems', 'subtraction:sub_word_problems'], build: [['map_story_equation_addsub', 'Choose the equation for a story (+ −)']] },
+        'Multiplication & division': { skills: ['algebra:build_expr_multdiv', 'multiplication:mult_word_problems', 'division:div_word_problems'], build: [['map_story_equation_multdiv', 'Choose the equation for a story (× ÷)']] },
+        'Fractions & decimals': { skills: ['fraction_operations:frac_word_problems', 'fraction_operations:frac_mult_word'], build: [['map_story_equation_frac', 'Choose the equation for a fraction story']] },
+        'Measurement': { skills: ['measurement:money_change', 'area_perimeter:perimeter'], build: [] },
+    } },
+    { id: 'shape-property', label: 'Shape ↔ property', match: /(shape|polygon|quadrilateral|triangle|solid|3-?d|2-?d).{0,80}(propert|attribute|sides|vertices|faces|edges|classify|sort)/i, strands: {
+        'Geometry': { skills: ['shapes_early:shape_attributes', 'shapes_early:compose_from_attributes', 'shapes_classify:classify_quads'], build: [] },
+    } },
+    { id: 'numberline-number', label: 'Number line ↔ number', match: /number line|ruler|thermometer|scale/i, strands: {
+        'Number & place value': { skills: ['number_sense:place_on_number_line', 'integers:integer_nl_drag'], build: [['nl_20', 'Numbers on a number line (any scale)']] },
+        'Operations & algebra': { skills: ['addition:number_line_add', 'subtraction:number_line_sub'], build: [['map_nl_jumps_equation_addsub', 'Number-line jumps to the equation (+ −)']] },
+        'Multiplication & division': { skills: ['multiplication:nl_mult', 'division:nl_div'], build: [['map_nl_hops_equation', 'Number-line hops to the equation (× ÷)']] },
+        'Fractions & decimals': { skills: ['composing:fraction_number_line', 'fractions:fraction_nl_drag', 'decimals:decimal_nl_drag'], build: [['map_nl_read_decimal', 'Read a decimal on a number line']] },
+        'Measurement': { skills: ['measurement:reading_ruler', 'measurement:reading_ruler_hard', 'measurement:temperature'], build: [] },
+    } },
+    { id: 'clock-words', label: 'Clock ↔ time words', match: /(clock|o'clock|half past|quarter (past|to))/i, strands: {
+        'Measurement': { skills: ['measurement:time_hour', 'measurement:time_5min', 'measurement:time_match_clock', 'measurement:time_analog_digital'], build: [] },
+    } },
+    { id: 'array-mult', label: 'Array ↔ multiplication', match: /\barrays?\b/i, strands: {
+        'Multiplication & division': { skills: ['multiplication:arrays_groups', 'multiplication:dot_array_mult'], build: [['map_array_to_eq', 'Match an array or groups to its equation']] },
+    } },
+];
+
+/** The pair ids whose `match` finds the text (a proposal's name + teaches + representation + task). */
+export function repPairsOfText(text) {
+    const t = String(text || '');
+    return REP_PAIRS.filter((p) => p.match.test(t)).map((p) => p.id);
 }
