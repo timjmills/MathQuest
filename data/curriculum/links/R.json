@@ -3241,6 +3241,306 @@
     }
    ],
    "note": ""
+  },
+  "R.B13.S1": {
+   "title": "Build numbers beyond 10 (10 -13)",
+   "direct": [
+    {
+     "key": "composing:teen_compose",
+     "opts": {
+      "band": 15
+     }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {
+      "band": 15
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B13.S2 Continue patterns beyond 10 (10-13)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "next step: R.B13.S2 Continue patterns beyond 10 (10-13)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: R.B13.S6 Verbal counting patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B13.S2": {
+   "title": "Continue patterns beyond 10 (10-13)",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:teen_compose",
+     "why": "next step: R.B13.S3 Build numbers beyond 10 (14-20)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "next step: R.B13.S3 Build numbers beyond 10 (14-20)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same CCSS K.CC.A.2 in R.B13.S6 Verbal counting patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B13.S3": {
+   "title": "Build numbers beyond 10 (14-20)",
+   "direct": [
+    {
+     "key": "composing:teen_compose",
+     "opts": {
+      "band": 19
+     }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {
+      "band": 19
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (the step before in this block)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B13.S4 Continue patterns beyond 10 (14-20)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "next step: R.B13.S4 Continue patterns beyond 10 (14-20)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: R.B13.S6 Verbal counting patterns"
+    }
+   ],
+   "note": "14-20; 20 itself is the teen_structure option."
+  },
+  "R.B13.S4": {
+   "title": "Continue patterns beyond 10 (14-20)",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:seq_10",
+     "why": "same CCSS K.CC.A.2 in R.B13.S6 Verbal counting patterns"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B13.S5": {
+   "title": "Verbal counting beyond 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1
+     },
+     "missing": "saying the counting sequence aloud past 20; the skill fills a written track"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "oral counting past 20 (the written track is the only check)",
+   "build": [
+    "consolidate"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S4 Continue patterns beyond 10 (14-20) (the step before in this block)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:seq_10",
+     "why": "next step: R.B13.S6 Verbal counting patterns"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B13.S2 Continue patterns beyond 10 (10-13)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B13.S6": {
+   "title": "Verbal counting patterns",
+   "direct": [
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1
+     }
+    },
+    {
+     "key": "patterns:seq_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S4 Continue patterns beyond 10 (14-20) (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "consolidate"
+   ],
+   "related": [
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B13.S2 Continue patterns beyond 10 (10-13)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3564,6 +3864,22 @@
    "ccss": [
     "K.G.A.3",
     "K.G.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "consolidate": {
+   "kind": "new",
+   "skill": "counting:number_sense_review",
+   "name": "Number Sense Review",
+   "teaches": "consolidating counting, cardinality, composition and patterns to 10 (Reception year review)",
+   "representation": "a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content)",
+   "family": "counting",
+   "steps": [
+    "R.B13.S5"
+   ],
+   "ccss": [
+    "K.CC.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
