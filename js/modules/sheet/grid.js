@@ -39,7 +39,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     const out = cells.map((c, i) => {
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
-        return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '' });
+        return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '', keyAttr: item.keyAttr || '' });
     });
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     const used = cells.length + (spanFirst ? cols - 1 : 0);

@@ -85,7 +85,7 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **Fade supports** (all → mixed → none), three named modes (owner 2026-10-03): **Faded problems** — a support is removed every N problems (e.g. every 3); **Faded page** — the fade runs across one page; **Faded packet** — the fade runs across 2, 3, 4, 5 … pages | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
 | 4.2 | Mixed worksheet: per-skill weights (equal by default) and "Mix in prerequisite skills" (all listed, none ticked) | built on the teacher-UI branch, not live |
 | 4.3 | Quiz worksheet: mixed with points (each / by type / per question), built from CCSS / EE / WRM step or unit, standards breakdown on the key | built on the teacher-UI branch, not live |
-| 4.4 | Answer key: at the end **or** after each page; **short** (answer list) **or** mirror layout; answers in **reddish orange** | one on/off switch; keys always after all pages; mirror only; black (`--ws-ink`) |
+| 4.4 | Answer key: at the end **or** after each page; **short** (answer list) **or** mirror layout; answers in **reddish orange** | BUILT 2026-10-03: Page setup > Answer key: placement (At the end / After each page) and style (Page copy / Short); `buildSheet(req.key = {on, placement, style})`, boolean still accepted; answers `#C2410C` (INK-31). Later: "start each key on a new sheet" for duplex |
 | 4.5 | Other page types leave the UI; old codes and printouts still decode | — |
 | 4.6 | Critic on the three papers and their keys | — |
 

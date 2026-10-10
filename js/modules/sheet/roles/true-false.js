@@ -34,6 +34,8 @@ export function prepare(it, info = {}) {
     const shown = isFalse ? wrong.value : correct;
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '', 'tf-ans': correct }, correct);
+    // the short key's line (critic r1, B2): the judgement, then the answer the frame asks for
+    key.short = `${isFalse ? 'False' : 'True'}; ${correct}`;
     // 09-A mock-up: the frame restates the problem ("6 x 7 = ____."), so the pupil writes the
     // true answer beside its own question; a skill with no operation says "The answer is ____."
     const ops = operandsOf(it.q || {});
