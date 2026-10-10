@@ -2,6 +2,932 @@
  "year": "Y5",
  "generatedBy": "wave2-tagging",
  "steps": {
+  "Y5.B1.S1": {
+   "title": "Roman numerals to 1,000",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and writing Roman numerals to 1,000 (I, V, X, L, C, D, M; additive and subtractive pairs; years) - no Roman-numeral skill exists",
+   "build": [
+    "roman_1000"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade): a numeral is read by adding its parts, as Roman numerals are"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W01)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [
+    "roman_12",
+    "roman_100"
+   ],
+   "related": [
+    {
+     "key": "placevalue:combine",
+     "why": "add the parts to make the number - the additive rule behind CLX = 100 + 50 + 10"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "another way of writing the same number (words)"
+    }
+   ],
+   "note": "Non-CCSS (UK National Curriculum) enrichment; the school may use the day for extra place value. Prior-learning lessons Y3.B10.S1 Roman numerals to 12 and Y4.B1.S13 Roman numerals have no skill: roman_12 / roman_100."
+  },
+  "Y5.B1.S2": {
+   "title": "Numbers to 10,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y4.B1.S2 Partition numbers to 1,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit in a 4-digit number"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "name the place of a digit"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "standard form from the parts"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "the number in words"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "compare 4-digit numbers (Y5.B1.S10)"
+    }
+   ],
+   "note": "School week W05 is an assessment week; prior learning taken from Y4.B1."
+  },
+  "Y5.B1.S3": {
+   "title": "Numbers to 100,000",
+   "direct": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 99999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "opts": {
+      "band": 99999
+     }
+    },
+    {
+     "key": "placevalue:identify",
+     "opts": {
+      "band": 99999
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:place_value_disks",
+     "missing": "counters to 100,000: its bands stop at 9,999",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "building and reading the number with place-value counters / base-10 (place_value_disks stops at 9,999); the 5-digit place-value chart with counters",
+   "build": [
+    "vis_pv_bands_millions"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "partition a 5-digit number (Y5.B1.S8)"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "5-digit numbers in words"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "compare to 100,000 (Y5.B1.S10)"
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "why": "round within 100,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B1.S4": {
+   "title": "Numbers to 1,000,000",
+   "direct": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:identify",
+     "opts": {
+      "band": 999999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "building and reading the number with place-value counters / base-10 (place_value_disks stops at 9,999; nothing builds 6-digit numbers with counters); the period-grouped chart (Thousands | Ones)",
+   "build": [
+    "vis_pv_bands_millions"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S3 Numbers to 100,000 (previous step)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S4 Thousands (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:number_word_names",
+     "why": "read and write to 1,000,000 (Y5.B1.S5)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "partition to 1,000,000 (Y5.B1.S8)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "standard form to 1,000,000"
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "why": "a 6-digit number on a line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B1.S5": {
+   "title": "Read and write numbers to 1,000,000",
+   "direct": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999,
+      "source": "word"
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:number_word_names",
+     "missing": "writing the words: it only chooses among four printed word names (reading direction is fine)",
+     "opts": {
+      "band": 999999
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "writing a 6-digit number in words (from a word bank); number_word_names is choose-one-of-four, so the write direction is recognition only",
+   "build": [
+    "pv_words_write"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_word_form",
+     "why": "Y2.B1.S6 Write numbers to 100 in words (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (previous step)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "the parts named in the words"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "standard form from parts"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of each digit"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "place names (thousands, hundred thousands)"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B1.S6": {
+   "title": "Powers of 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:place_value_10x",
+     "missing": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "naming 10, 100, 1,000 ... 1,000,000 as powers of ten and the \"10 of these make one of the next\" relationship (how many 1,000s in 100,000)",
+   "build": [
+    "pv10_exponents",
+    "value_ten_times",
+    "vis_gattegno"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W06)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S5 Read and write numbers to 1,000,000 (previous step)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit: each place 10 times the next"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "rename (47 tens) with option rename=more"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "× 10, × 100"
+    },
+    {
+     "key": "order_of_operations:exponents_simple",
+     "why": "power notation (above grade)"
+    }
+   ],
+   "note": "4.NBT.A.1 (each place 10 times the place to its right); exponents are Grade 5 (5.NBT.A.2)."
+  },
+  "Y5.B1.S7": {
+   "title": "10 100 1,000 10,000 100,000 more or less",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:more_less_100",
+     "missing": "10,000 and 100,000 more or less (steps stop at 1,000; numbers to 10,000)",
+     "opts": {
+      "step": 1000
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "10,000 and 100,000 more or less, and numbers above 10,000",
+   "build": [
+    "pv_more_less_big",
+    "vis_more_less_table"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "add and subtract 100s"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "add and subtract 10s"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the other way of changing by a power of ten"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "which digit changes"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B1.S8": {
+   "title": "Partition numbers to 1,000,000",
+   "direct": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:combine",
+     "opts": {
+      "band": 999999,
+      "order": "scrambled"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "flexible (non-standard) partitioning of 6-digit numbers (250,000 = 150,000 + 100,000) and the part-whole / bar model",
+   "build": [
+    "flex_partition"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "rename a place (option rename=more)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "the value of each part"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "numbers to 1,000,000 in a chart"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "part-whole bar"
+    }
+   ],
+   "note": "Prior-learning Y4.B1.S7 Flexible partitioning has no skill: flex_partition (preBuild) closes it and, extended to 6 digits, this step."
+  },
+  "Y5.B1.S9": {
+   "title": "Number line to 1,000,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "missing": "reading the number at an arrow and estimating on 0-1,000,000 lines; it only marks a given number between two hundred-thousands to round it"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "lines beyond one thousand to the next (spans stop at 1,000; numbers to 10,000)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "number lines to 1,000,000 with intervals of 100,000 / 10,000 / 1,000: number at an arrow, mark a number, estimate on a line with only the ends",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "why": "a 5-digit number on a line"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "a 4-digit number on a line"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "compare by position on the line"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "order along a line"
+    }
+   ],
+   "note": "Prior-learning Y4.B1.S10 Estimate on a number line to 10,000 has no skill (nl_20)."
+  },
+  "Y5.B1.S10": {
+   "title": "Compare and order numbers to 100,000",
+   "direct": [
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 99999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {
+      "band": 99999
+     }
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "opts": {
+      "band": 99999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y1.B1.S13 Compare numbers (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S3 Numbers to 100,000 (earlier Y5 step)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y5.B1.S3 Numbers to 100,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:value",
+     "why": "the first place that differs decides"
+    },
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "why": "numbers placed on a line"
+    },
+    {
+     "key": "integers:order_negatives",
+     "why": "ordering continues past zero (Y5.B13)"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "compare numbers given in words"
+    }
+   ],
+   "note": "Counters / number-line comparison pictures come with vis_pv_bands_millions and nl_20; the comparison itself is fully dealt."
+  },
+  "Y5.B1.S11": {
+   "title": "Compare and order numbers to 1,000,000",
+   "direct": [
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "opts": {
+      "band": 999999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y5.B1.S10 Compare and order numbers to 100,000 (previous step)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y1.B1.S13 Compare numbers (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:value",
+     "why": "the first place that differs decides"
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "why": "numbers placed on a line"
+    },
+    {
+     "key": "integers:order_negatives",
+     "why": "ordering continues past zero (Y5.B13)"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "compare numbers given in words"
+    }
+   ],
+   "note": "Counters / number-line comparison pictures come with vis_pv_bands_millions and nl_20; the comparison itself is fully dealt."
+  },
+  "Y5.B1.S12": {
+   "title": "Round to the nearest 10, 100 or 1,000",
+   "direct": [
+    {
+     "key": "number_sense:nearest_10",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:round_sort_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:between_tens",
+     "why": "Y4.B1.S14 Round to the nearest 10 (lower grade, same cluster CCSS 3.NBT.A.1)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_1000",
+     "why": "sort by the rounded value"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "round on a number line (place 1,000)"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "use rounding to estimate (Y5.B2.S4)"
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "why": "next step: within 100,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B1.S13": {
+   "title": "Round within 100,000",
+   "direct": [
+    {
+     "key": "number_sense:nearest_10000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_sort_10000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (previous step)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (previous step)"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S3 Numbers to 100,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:rounding_table",
+     "why": "one number rounded to several places"
+    },
+    {
+     "key": "number_sense:nearest_100000",
+     "why": "next step"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "compare to 100,000"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "estimate with rounded numbers"
+    }
+   ],
+   "note": "School week W08."
+  },
+  "Y5.B1.S14": {
+   "title": "Round within 1,000,000",
+   "direct": [
+    {
+     "key": "number_sense:nearest_100000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_sort_100000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_10000",
+     "why": "Y5.B1.S13 Round within 100,000 (previous step)"
+    },
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "why": "Y5.B1.S13 Round within 100,000 (previous step)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (earlier Y5 step)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:nearest_million",
+     "why": "Y6 rounding to 1,000,000"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "several places at once"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "compare to 1,000,000"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "estimate with rounded numbers (Y5.B2.S4)"
+    }
+   ],
+   "note": ""
+  },
   "Y5.B4.S1": {
    "title": "Find fractions equivalent to a unit fraction",
    "direct": [
@@ -5328,6 +6254,281 @@
   }
  },
  "proposals": {
+  "roman_1000": {
+   "kind": "option",
+   "skill": "placevalue:roman_numerals",
+   "option": "to 1,000",
+   "name": "Roman Numerals to 1,000 (option)",
+   "teaches": "reading and writing Roman numerals to 1,000 (D, M) and years",
+   "representation": "a band option on the roman_100 proposal",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B1.S1"
+   ],
+   "reused": true,
+   "ccss": [],
+   "why": "closes Y5.B1.S1 Roman numerals to 1,000 (existing wrm_props entry, reused)"
+  },
+  "vis_pv_bands_millions": {
+   "lane": "placevalue",
+   "kind": "band",
+   "name": "Widen Place Value to 7 Digits (millions)",
+   "build": "bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`",
+   "hosts": [
+    "placevalue:place_value_disks",
+    "placevalue:pv_disks_build",
+    "placevalue:compare",
+    "placevalue:expand",
+    "placevalue:number_word_names",
+    "number_sense:rounding_visual"
+   ],
+   "templates": [
+    "pv"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/gen-pv.js",
+    "js/modules/sheet/cells/pv.js"
+   ],
+   "after": [
+    "big_numbers"
+   ],
+   "steps": [
+    "Y5.B1.S3",
+    "Y5.B1.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.2"
+   ],
+   "skill": "placevalue:place_value_disks",
+   "family": "placevalue",
+   "teaches": "bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`",
+   "representation": "bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`",
+   "why": "closes Y5.B1.S3 Numbers to 100,000; Y5.B1.S4 Numbers to 1,000,000 (existing vis_builds entry, reused)"
+  },
+  "pv_words_write": {
+   "kind": "option",
+   "skill": "placevalue:number_word_names",
+   "option": "response \"write the words\" (word-bank strip: one, two ... hundred, thousand)",
+   "name": "Write Numbers in Words (option)",
+   "teaches": "writing a number to 1,000,000 in words, the thousands period then the ones period, choosing words from a printed bank",
+   "representation": "B&W boxed cell: the numeral in big Andika digits in a Thousands | Ones period chart, two write-on lines (thousands part / ones part) and a word bank strip under the cell; key writes the words",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B1.S5"
+   ],
+   "ccss": [
+    "4.NBT.A.2"
+   ],
+   "why": "number_word_names only offers four printed names, so writing the words is never produced",
+   "reused": false
+  },
+  "pv10_exponents": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "notation \"powers written with exponents\" (× 10³) and task \"compare powers of ten by counting zeros\"",
+   "name": "Powers of Ten With Exponents (option)",
+   "grade": "5",
+   "family": "placevalue",
+   "standards": [
+    "5.NBT.A.2"
+   ],
+   "ee": [
+    "M.EE.5.NBT.2"
+   ],
+   "teaches": "the pattern of zeros and of the decimal point when multiplying or dividing by powers of 10, written with whole-number exponents",
+   "problemTypes": [
+    "4.2 × 10² = ?",
+    "write 1,000 as 10³",
+    "how many zeros in 10⁵?",
+    "which is greater: 10³ or 1,000 ÷ 10?",
+    "explain the shift (bank)"
+   ],
+   "templates": [
+    "pv-support"
+   ],
+   "newTemplates": [],
+   "answer": "write the number or the exponent",
+   "ladder": "O2 whole numbers → decimals → divide · O3 shift arrows → none · O6 chart / plain",
+   "misconceptions": [
+    "10³ = 30",
+    "moves the point the wrong way when dividing"
+   ],
+   "wrmSteps": [
+    "Y5.B1.S6"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B1.S6"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "5.NBT.A.2"
+   ],
+   "representation": "4.2 × 10² = ?; write 1,000 as 10³; how many zeros in 10⁵?; which is greater: 10³ or 1,000 ÷ 10?; explain the shift (bank)",
+   "why": "closes Y5.B1.S6 Powers of 10 (existing std_props entry, reused)"
+  },
+  "value_ten_times": {
+   "kind": "option",
+   "skill": "placevalue:value",
+   "option": "form \"ten times / one tenth\": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10)",
+   "name": "Ten Times the Place to the Right (option)",
+   "grade": "4-5",
+   "family": "placevalue",
+   "standards": [
+    "4.NBT.A.1",
+    "5.NBT.A.1"
+   ],
+   "ee": [],
+   "teaches": "a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left",
+   "problemTypes": [
+    "how many times greater is the 4 in 4,300 than the 4 in 430?",
+    "700 ÷ 70 = ?",
+    "the 3 in 0.3 is 1/10 of the 3 in 3",
+    "which digit is worth ten times more?"
+   ],
+   "templates": [
+    "pv",
+    "pv-support"
+   ],
+   "newTemplates": [],
+   "answer": "write 10, 100 or 1/10",
+   "ladder": "O2 adjacent places → two places apart → decimals (Grade 5) · O3 chart with the shift arrows → none · O6 chart / numbers",
+   "misconceptions": [
+    "the value is the digit",
+    "answers \"one more place\" instead of ×10"
+   ],
+   "wrmSteps": [
+    "Y4.B1.S2"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B1.S6"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "5.NBT.A.2"
+   ],
+   "representation": "how many times greater is the 4 in 4,300 than the 4 in 430?; 700 ÷ 70 = ?; the 3 in 0.3 is 1/10 of the 3 in 3; which digit is worth ten times more?",
+   "why": "closes Y5.B1.S6 Powers of 10 (existing std_props entry, reused)"
+  },
+  "vis_gattegno": {
+   "lane": "placevalue",
+   "kind": "template",
+   "name": "Gattegno Chart",
+   "build": "a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: 'read' | 'ring' | 'shift'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*",
+   "hosts": [
+    "placevalue:place_value_10x",
+    "placevalue:more_less_100"
+   ],
+   "templates": [],
+   "newTemplates": [
+    "gattegno"
+   ],
+   "files": [
+    "js/modules/sheet/cells/gattegno.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B1.S6",
+    "Y5.B1.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "5.NBT.A.2"
+   ],
+   "skill": "placevalue:place_value_10x",
+   "family": "placevalue",
+   "teaches": "a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: 'read' | 'ring' | 'shift'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*",
+   "representation": "a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: 'read' | 'ring' | 'shift'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*",
+   "why": "closes Y5.B1.S6 Powers of 10; Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (existing vis_builds entry, reused)"
+  },
+  "pv_more_less_big": {
+   "kind": "option",
+   "skill": "placevalue:more_less_100",
+   "option": "10,000 and 100,000",
+   "name": "10,000 and 100,000 More or Less (option)",
+   "teaches": "finding 10, 100, 1,000, 10,000 and 100,000 more or less than a number to 1,000,000",
+   "representation": "step values 10,000 and 100,000 on more_less_100",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B1.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1"
+   ],
+   "why": "closes Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (existing wrm_props entry, reused)"
+  },
+  "vis_more_less_table": {
+   "lane": "placevalue",
+   "kind": "option",
+   "name": "\"−n | Number | +n\" Table",
+   "build": "`layout: 'table' | 'strip'` on more_less_10 / 100: a row of three boxes (n less, the number, n more)",
+   "hosts": [
+    "placevalue:more_less_10",
+    "placevalue:more_less_100"
+   ],
+   "templates": [
+    "pv"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/gen-pv.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B1.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1"
+   ],
+   "skill": "placevalue:more_less_10",
+   "family": "placevalue",
+   "teaches": "`layout: 'table' | 'strip'` on more_less_10 / 100: a row of three boxes (n less, the number, n more)",
+   "representation": "`layout: 'table' | 'strip'` on more_less_10 / 100: a row of three boxes (n less, the number, n more)",
+   "why": "closes Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (existing vis_builds entry, reused)"
+  },
+  "flex_partition": {
+   "kind": "new",
+   "skill": "placevalue:flexible_partition",
+   "name": "Partition Numbers Flexibly",
+   "teaches": "partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models",
+   "representation": "a part-whole diagram with one part given; base-10 picture beside it; write the other part",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B1.S8"
+   ],
+   "improves": [
+    "Y3.B1.S2"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.2"
+   ],
+   "why": "closes Y5.B1.S8 Partition numbers to 1,000,000 (existing wrm_props entry, reused)"
+  },
+  "nl_20": {
+   "kind": "new",
+   "skill": "number_sense:number_line_scales",
+   "name": "Numbers on a Number Line (any scale)",
+   "teaches": "the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled",
+   "representation": "a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B1.S9"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.2"
+   ],
+   "why": "closes Y5.B1.S9 Number line to 1,000,000 (existing wrm_props entry, reused)"
+  },
   "equiv_from_unit": {
    "kind": "option",
    "skill": "fractions:equivalent",
@@ -6298,6 +7499,156 @@
   }
  },
  "tagFixes": [
+  {
+   "key": "placevalue:place_value_disks",
+   "step": "Y5.B1.S2",
+   "action": "add",
+   "why": "band 9,999: read thousands, hundreds, tens and ones counters"
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y5.B1.S2",
+   "action": "add",
+   "why": "band 9,999: 4 thousands 3 hundreds ..."
+  },
+  {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y5.B1.S2",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 9,999"
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y5.B1.S2",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 9,999"
+  },
+  {
+   "key": "placevalue:value",
+   "step": "Y5.B1.S3",
+   "action": "add",
+   "why": "band 99,999: value of each digit of a 5-digit number"
+  },
+  {
+   "key": "placevalue:identify",
+   "step": "Y5.B1.S3",
+   "action": "add",
+   "why": "band 99,999: name the place (ten thousands)"
+  },
+  {
+   "key": "placevalue:place_value_disks",
+   "step": "Y5.B1.S3",
+   "action": "add",
+   "why": "partial: counters only to 9,999"
+  },
+  {
+   "key": "placevalue:value",
+   "step": "Y5.B1.S4",
+   "action": "add",
+   "why": "band 999,999"
+  },
+  {
+   "key": "placevalue:identify",
+   "step": "Y5.B1.S4",
+   "action": "add",
+   "why": "band 999,999: hundred thousands place"
+  },
+  {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y5.B1.S5",
+   "action": "add",
+   "why": "source word, band 999,999: read the word name, write the numeral"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y5.B1.S6",
+   "action": "partial",
+   "why": "partial: multiplies by powers of ten but never names them or relates 10 hundreds = 1,000"
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y5.B1.S8",
+   "action": "add",
+   "why": "upgrade the partial tag: band 999,999 is the standard partition; the step stays partial for flexible partitioning"
+  },
+  {
+   "key": "number_sense:round_nl_hundred_thousands",
+   "step": "Y5.B1.S9",
+   "action": "add",
+   "why": "partial: marks a 6-digit number between two hundred-thousands; no arrow reading or estimating"
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y5.B1.S9",
+   "action": "add",
+   "why": "partial: spans stop at one thousand to the next"
+  },
+  {
+   "key": "placevalue:compare",
+   "step": "Y5.B1.S10",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 99,999"
+  },
+  {
+   "key": "placevalue:order_least_to_greatest",
+   "step": "Y5.B1.S10",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 99,999"
+  },
+  {
+   "key": "placevalue:order_greatest_to_least",
+   "step": "Y5.B1.S10",
+   "action": "add",
+   "why": "band 99,999: order greatest first"
+  },
+  {
+   "key": "placevalue:compare",
+   "step": "Y5.B1.S11",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 999,999"
+  },
+  {
+   "key": "placevalue:order_least_to_greatest",
+   "step": "Y5.B1.S11",
+   "action": "add",
+   "why": "upgrade the partial tag to full with band 999,999"
+  },
+  {
+   "key": "placevalue:order_greatest_to_least",
+   "step": "Y5.B1.S11",
+   "action": "add",
+   "why": "band 999,999: order greatest first"
+  },
+  {
+   "key": "number_sense:nearest_10",
+   "step": "Y5.B1.S12",
+   "action": "add",
+   "why": "teaches rounding to the nearest 10 / 100 / 1,000 named in the step"
+  },
+  {
+   "key": "number_sense:nearest_100",
+   "step": "Y5.B1.S12",
+   "action": "add",
+   "why": "teaches rounding to the nearest 10 / 100 / 1,000 named in the step"
+  },
+  {
+   "key": "number_sense:round_nl_thousands",
+   "step": "Y5.B1.S12",
+   "action": "add",
+   "why": "teaches rounding to the nearest 10 / 100 / 1,000 named in the step"
+  },
+  {
+   "key": "number_sense:nearest_1000",
+   "step": "Y5.B1.S13",
+   "action": "add",
+   "why": "rounding a 5-digit number to the nearest 1,000 is part of \"within 100,000\""
+  },
+  {
+   "key": "number_sense:nearest_10000",
+   "step": "Y5.B1.S14",
+   "action": "add",
+   "why": "6-digit numbers rounded to 10,000 are part of \"within 1,000,000\""
+  },
   {
    "key": "fractions:equiv_frac_visual",
    "step": "Y5.B4.S1",
