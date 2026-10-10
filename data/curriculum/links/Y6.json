@@ -1,0 +1,1826 @@
+{
+ "year": "Y6",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "Y6.B10.S1": {
+   "title": "Shapes - same area",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_perimeter",
+     "missing": "finds area and perimeter of one rectangle only; never sets shapes of the same area side by side to compare perimeters, or rectilinear shapes on squared paper"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing shapes (including rectilinear shapes on squared paper) that have the same area but different perimeters, and the reverse",
+   "build": [
+    "same_area"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y5.B8.S1 / Y3.B5.S12 Perimeter (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S1-S2 What is area / count squares (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3/Y4 perimeter on a grid, same 3.MD.D.8 cluster"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y4.B6.S2 / Y5.B14.S3 metric lengths (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "rectilinear shapes whose area and perimeter are both found (dual_pa form)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "perimeter by counting unit edges on squared paper, the representation this step uses"
+    },
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "next idea: area of L/T/U shapes"
+    },
+    {
+     "key": "area_perimeter:mixed_area_perimeter",
+     "why": "mixed review of area and perimeter"
+    }
+   ],
+   "note": "Partial, not gap: area_perimeter supplies the two measurements, but the step is the comparison across shapes."
+  },
+  "Y6.B10.S2": {
+   "title": "Area and perimeter",
+   "direct": [
+    {
+     "key": "area_perimeter:area_perimeter",
+     "opts": {}
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y5.B8.S1 Perimeter of rectangles (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S1-S2 Count squares (prior learning wk W22)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "perimeter on a grid, 3.MD.D.8 cluster"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "split a rectilinear shape into rectangles to find its area"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "perimeter only, incl. missing side"
+    },
+    {
+     "key": "area_perimeter:mixed_area_perimeter",
+     "why": "mixed review"
+    },
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "area as a sum of two rectangles"
+    }
+   ],
+   "note": "Full on the core lesson (area and perimeter of rectangles and rectilinear shapes); the same-area comparison is closed under S1 by same_area."
+  },
+  "Y6.B10.S3": {
+   "title": "Area of a triangle – counting squares",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting whole and half squares to find the area of a triangle on squared paper",
+   "build": [
+    "area_triangle_grid"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S1-S2 Count squares (prior learning wk W23)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 half of a shape (prior learning wk W23)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W23)"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23)"
+    },
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "Y5.B8.S5 compound shapes (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "area_estimate"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:area_triangle",
+     "why": "next steps S4-S5: the same area by b x h / 2"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "area of rectangles by counting squares"
+    }
+   ],
+   "note": "area_triangle does not count squares at all, so gap; area_estimate (Y5 whole/half squares) is the missing pre-skill."
+  },
+  "Y6.B10.S4": {
+   "title": "Area of a right-angled triangle",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_triangle",
+     "missing": "deals right-angled triangles by (b x h) / 2 with the formula given; never shows the triangle as half of its surrounding rectangle on a grid"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "seeing a right-angled triangle as half of a rectangle (grid and dashed rectangle) before using the formula",
+   "build": [
+    "area_triangle_grid"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 half of a shape (prior learning wk W23)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S2 Count squares (prior learning wk W23)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 right-angled triangles (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "area_triangle_grid"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "area by splitting shapes, the same decompose idea"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "area of compound shapes"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "b x h then halve"
+    }
+   ],
+   "note": "The skill computes correctly but skips the WRM reasoning (half the rectangle); kept partial rather than full."
+  },
+  "Y6.B10.S5": {
+   "title": "Area of any triangle",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_triangle",
+     "missing": "right-angled triangles only; no acute or obtuse triangles with a dashed perpendicular height, and no choosing the right height"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "area of acute and obtuse triangles using the perpendicular height (dashed), including choosing the correct height",
+   "build": [
+    "area_triangle_grid"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_triangle",
+     "why": "Y6.B10.S4 right-angled triangles (previous step)"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W23)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular lines, needed for the height"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "decomposing shapes for area"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "compound shapes"
+    },
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "area as a sum of parts"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B10.S6": {
+   "title": "Area of a parallelogram",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "area of a parallelogram as base x perpendicular height (cut and move a triangle)",
+   "build": [
+    "parallelogram"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23)"
+    },
+    {
+     "key": "area_perimeter:area_triangle",
+     "why": "Y6.B10.S4-S5 area of a triangle (previous steps)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "parallelograms by property"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S2 Count squares (prior learning wk W23)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular height"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "cut-and-rearrange idea"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "compound area"
+    },
+    {
+     "key": "area_perimeter:area_triangle",
+     "why": "triangle as half a parallelogram"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B10.S7": {
+   "title": "Volume - counting cubes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "volume as the number of unit cubes in a drawn solid (cm3), including hidden cubes",
+   "build": [
+    "volume_cubes"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S1-S2 counting unit squares (prior learning wk W25)"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W25)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4 multiply three numbers (prior learning wk W25)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "3-D shape vocabulary"
+    }
+   ],
+   "preBuild": [
+    "volume_cubes"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:volume",
+     "why": "next step: volume of a cuboid by l x w x h"
+    },
+    {
+     "key": "area_perimeter:volume_composite",
+     "why": "solids built from cuboids"
+    }
+   ],
+   "note": "Y5.B15 volume steps are also untaught, so pupils meet cube counting here for the first time; volume_cubes is both the build and the pre-skill."
+  },
+  "Y6.B10.S8": {
+   "title": "Volume of a cuboid",
+   "direct": [
+    {
+     "key": "area_perimeter:volume",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W25)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S1 counting squares (prior learning wk W25)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4 multiply three numbers (prior learning wk W25)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "multi-digit products for larger cuboids"
+    }
+   ],
+   "preBuild": [
+    "volume_cubes"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:volume_composite",
+     "why": "composite solids (to be repaired: STANDARD_PROPOSALS volume_composite_repair)"
+    },
+    {
+     "key": "coordinates:net_surface_area",
+     "why": "surface area of a cuboid from its net"
+    }
+   ],
+   "note": "volume teaches find the volume, a missing edge from the volume, and stories; that is the whole WRM lesson."
+  },
+  "Y6.B11.S1": {
+   "title": "Line graphs",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and interpreting a line graph (values, change over time, differences between points)",
+   "build": [
+    "line_graph"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y5.B11.S1 Read and plot coordinates (prior learning wk W30)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts: reading a scale"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "plotting points on a grid"
+    },
+    {
+     "key": "graphs:line_plot",
+     "why": "reading data on a scaled axis"
+    }
+   ],
+   "preBuild": [
+    "line_graph"
+   ],
+   "related": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "the same data shown as bars"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "plot the points before joining them"
+    },
+    {
+     "key": "graphs:line_plot_fractions",
+     "why": "data on a number line"
+    }
+   ],
+   "note": "The school prior list for W30 is about shape, not graphs; the Y4/Y5 line graph steps are also gaps, so line_graph is its own pre-skill."
+  },
+  "Y6.B11.S2": {
+   "title": "Dual bar charts",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and drawing a dual bar chart with a key that compares two data sets",
+   "build": [
+    "dual_bar"
+   ],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3.B12.S3 / Y4.B13.S1 Interpret bar charts (prior learning wk W26)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W26)"
+    },
+    {
+     "key": "graphs:pictograph",
+     "why": "Y2.B10.S7 Interpret pictograms (prior learning wk W26)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3.B12.S3 bar chart intro (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "single-set bar chart"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "draw bars"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "collecting the data"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B11.S3": {
+   "title": "Read and interpret pie charts",
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:pie_chart",
+     "missing": "reads printed percentages only; never asks what fraction of the whole a sector is, or how many from a total (e.g. 1/4 of 40)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading a pie chart as fractions of the whole and finding amounts from the total",
+   "build": [
+    "pie"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Fraction of an amount (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S13 Recognise fractions of a shape (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S5 quarters of a circle (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 equivalent fractions (prior learning wk W37)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S6 non-unit fraction of an amount (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "the same part of a whole as a percent"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "next step: pie charts with percentages"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "the same data as bars"
+    }
+   ],
+   "note": "Existing tag kept as partial: the live pie_chart is a percent chart, so the fractions lesson is only touched."
+  },
+  "Y6.B11.S4": {
+   "title": "Pie charts with percentages",
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:pie_chart",
+     "missing": "reads a labelled percent and adds two sectors; never finds the amount from a percent and a total (25% of 80 people)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding how many a percentage sector represents from a total",
+   "build": [
+    "pie"
+   ],
+   "pre": [
+    {
+     "key": "conversions:percent_of_number",
+     "why": "percent of an amount (6.RP.A.3)"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (prior learning wk W37)"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 fractions to percentages (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 fraction of an amount (prior learning wk W37)"
+    },
+    {
+     "key": "graphs:pie_chart",
+     "why": "Y6.B11.S3 previous step"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:p_to_f",
+     "why": "percent as a fraction of the circle"
+    },
+    {
+     "key": "conversions:find_whole_from_pct",
+     "why": "find the total from a part"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "same data as bars"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B11.S5": {
+   "title": "Draw pie charts",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "drawing a pie chart: total -> degrees per item (360) -> measure each sector with a protractor",
+   "build": [
+    "pie"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S1/S4 measure angles (prior learning wk W26)"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "angles around a point total 360 degrees"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "fraction of 360"
+    },
+    {
+     "key": "graphs:pie_chart",
+     "why": "Y6.B11.S3-S4 reading pie charts"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [
+    "draw_angles"
+   ],
+   "related": [
+    {
+     "key": "graphs:pie_chart",
+     "why": "read the chart you drew"
+    },
+    {
+     "key": "conversions:percent_of_number",
+     "why": "percent of 360"
+    }
+   ],
+   "note": "Print-first: drawing needs a protractor; the key shows the sector angles."
+  },
+  "Y6.B11.S6": {
+   "title": "The mean",
+   "direct": [
+    {
+     "key": "data_analysis:mean",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "finding a missing value from a given mean, and the mean as levelling",
+   "build": [
+    "mean_missing",
+    "vis_mean_levelling"
+   ],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "why": "Y1.B9.S9 sharing / equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "addition:add_column_multi",
+     "why": "add a list of numbers for the total"
+    },
+    {
+     "key": "division:divide",
+     "why": "total divided by the count"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13 interpret charts (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "data_analysis:median",
+     "why": "another measure of centre"
+    },
+    {
+     "key": "data_analysis:mode",
+     "why": "another average"
+    },
+    {
+     "key": "data_analysis:range",
+     "why": "spread of the same data"
+    },
+    {
+     "key": "graphs:line_plot_fractions",
+     "why": "5.MD.B.2 fair share on a line plot"
+    }
+   ],
+   "note": "Mean is taught directly (direct, not partial), but the step is partial because the missing-value and levelling parts of the WRM lesson are not dealt."
+  },
+  "Y6.B12.S1": {
+   "title": "Measure and classify angles",
+   "direct": [
+    {
+     "key": "angles_lines:identify_angles",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "angles_lines:measure_angles",
+     "missing": "multiple choice among multiples of 30 and 45 degrees; no reading a protractor to the nearest degree"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring any angle to the nearest degree with a protractor; classifying reflex angles",
+   "build": [
+    "protractor_read",
+    "reflex_angles"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 / Y5.B10.S2 Identify angles (prior learning wk W27)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W27)"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6 angles around a point (prior learning wk W27)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3/Y4 reading a scale (prior learning wk W27)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "next step: calculate angles"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular lines and right angles"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "classify triangles by angles"
+    }
+   ],
+   "note": "identify_angles is direct for classifying (acute/right/obtuse/straight) but has no reflex; measuring is only estimation-MC."
+  },
+  "Y6.B12.S2": {
+   "title": "Calculate angles",
+   "direct": [
+    {
+     "key": "angles_lines:additive_angles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6-S7 angles around a point / on a line (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Identify angles (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W28)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "missing number in a subtraction from 90/180/360"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "measure to check"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "name the angle found"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "next: angles in a triangle"
+    }
+   ],
+   "note": "Full: additive_angles with all three wholes (90, 180, 360) is exactly the WRM lesson of finding missing angles in a right angle, on a line and around a point."
+  },
+  "Y6.B12.S3": {
+   "title": "Vertically opposite angles",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "vertically opposite angles are equal; using them with angles on a line",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6-S7 angles around a point and on a line (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 / Y5.B10.S2 Identify angles (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "missing angle on a line / at a point"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "triangle types used in angle problems"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "check a calculated angle by measuring"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B12.S4": {
+   "title": "Angles in a triangle",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "angles in a triangle sum to 180 degrees (tear-and-place, then calculate the third angle)",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6-S7 angles around a point and on a line (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 / Y5.B10.S2 Identify angles (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "missing angle on a line / at a point"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "triangle types used in angle problems"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "check a calculated angle by measuring"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B12.S5": {
+   "title": "Angles in a triangle – special cases",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "missing": "names isosceles/equilateral/right triangles but never uses their equal angles or the right angle to find a missing angle"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "missing angles in isosceles, equilateral and right-angled triangles using their properties",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W30)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W30)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 parallel and perpendicular (prior learning wk W30)"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y6.B12.S2 calculate angles"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "angles on a line"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "properties of quadrilaterals"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "equal angles from a line of symmetry"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B12.S6": {
+   "title": "Angles in a triangle – missing angles",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding missing angles in triangles, including multi-step problems with angles on a line",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6-S7 angles around a point and on a line (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 / Y5.B10.S2 Identify angles (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "missing angle on a line / at a point"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "triangle types used in angle problems"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "check a calculated angle by measuring"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B12.S7": {
+   "title": "Angles in quadrilaterals",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "angles in a quadrilateral sum to 360 degrees; find the missing angle",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6 angles around a point = 360 degrees"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Identify angles"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "quadrilateral properties"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "full turn 360"
+    }
+   ],
+   "note": "Week W29 has no prior-learning lessons in the school file (assessment week); pre-skills taken from the Y5 angle steps."
+  },
+  "Y6.B12.S8": {
+   "title": "Angles in polygons",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "sum of interior angles of a polygon by splitting into triangles; each angle of a regular polygon",
+   "build": [
+    "angle_rules"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6 angles around a point (prior learning wk W27)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Identify angles (prior learning wk W27)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "polygons and their sides"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "triangles inside the polygon"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "angle sums"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B12.S9": {
+   "title": "Circles",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "naming radius, diameter and circumference; diameter = 2 x radius",
+   "build": [
+    "circles"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 circles"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "doubling the radius"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "halving the diameter"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "measure a radius"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "a diameter is a line of symmetry"
+    }
+   ],
+   "note": "No CCSS (circle parts are 7.G.B.4 vocabulary); week W29 has no prior list."
+  },
+  "Y6.B12.S10": {
+   "title": "Draw shapes accurately",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "drawing triangles and quadrilaterals accurately from given lengths and angles with ruler and protractor",
+   "build": [
+    "draw_accurately"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles (prior learning wk W30)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (prior learning wk W30)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 Parallel and perpendicular (prior learning wk W30)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning wk W30)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [
+    "draw_angles"
+   ],
+   "related": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "name the shape drawn"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "check the drawing"
+    }
+   ],
+   "note": "Print-first skill; on screen it can only check a measurement of the drawn shape."
+  },
+  "Y6.B12.S11": {
+   "title": "Nets of 3-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_classify:net_identify",
+     "missing": "matches a net to its solid by multiple choice; never draws, completes or checks a net"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing or completing nets and deciding whether a net folds into the solid",
+   "build": [
+    "net_draw"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S8-S10 faces, edges, vertices (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 / Y3.B11.S9 name 3-D shapes (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 match 3-D shape names (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:net_surface_area",
+     "why": "surface area from a net"
+    },
+    {
+     "key": "shapes_classify:cross_section_3d",
+     "why": "faces and slices of solids"
+    },
+    {
+     "key": "area_perimeter:volume",
+     "why": "cuboids"
+    }
+   ],
+   "note": "Existing tag kept but downgraded to partial (see tagFixes)."
+  },
+  "Y6.B13.S1": {
+   "title": "The first quadrant",
+   "direct": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "opts": {}
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1-S2 / Y5.B11.S1 coordinates (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 counting in steps along an axis (prior learning wk W13)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "reading a number line scale"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "plot vertices and find side lengths"
+    },
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "distance between two points"
+    },
+    {
+     "key": "coordinates:coordinate_all",
+     "why": "next step: four quadrants"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B13.S2": {
+   "title": "Read and plot points in four quadrants",
+   "direct": [
+    {
+     "key": "coordinates:coordinate_all",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 / Y5.B11.S1 Read and plot coordinates (prior learning wk W31)"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 negative numbers (prior learning wk W31)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "negative numbers on a number line, needed for the axes"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "Y6.B13.S1 first quadrant (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "integers:number_line_int",
+     "why": "each axis is a number line with negatives"
+    },
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "points across an axis"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "shapes from coordinates"
+    }
+   ],
+   "note": "coordinate_all reads and plots in all four quadrants; that is the whole lesson."
+  },
+  "Y6.B13.S3": {
+   "title": "Solve problems with coordinates",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:coord_polygon",
+     "missing": "first quadrant; side lengths and perimeter only, no missing vertex"
+    },
+    {
+     "key": "coordinates:coordinate_all",
+     "missing": "reads and plots single points; no problems (missing vertex, same x/y, distance across an axis)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "missing vertices and coordinate reasoning problems in four quadrants",
+   "build": [
+    "four_quadrants"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 / Y5.B11.S1 Read and plot coordinates (prior learning wk W31)"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 negative numbers (prior learning wk W31)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "negative numbers on a number line, needed for the axes"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
+    },
+    {
+     "key": "coordinates:coordinate_all",
+     "why": "Y6.B13.S2 previous step"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "distance between points with the same x or y"
+    },
+    {
+     "key": "integers:abs_value",
+     "why": "distance across an axis"
+    }
+   ],
+   "note": "Existing tag on coord_polygon was already partial; coordinate_all added as partial too."
+  },
+  "Y6.B13.S4": {
+   "title": "Translations",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_translate",
+     "missing": "multiple choice: pick the translated image; no drawing the image, no describing the translation, no new coordinates"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing a translation in four quadrants, describing it (left/right, up/down) and writing new coordinates",
+   "build": [
+    "translate_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 / Y5.B11.S1 Read and plot coordinates (prior learning wk W31)"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 negative numbers (prior learning wk W31)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "negative numbers on a number line, needed for the axes"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
+    },
+    {
+     "key": "coordinates:geo_translate",
+     "why": "Y5.B11.S3-S4 translations (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "next step: reflections"
+    },
+    {
+     "key": "coordinates:geo_rotate",
+     "why": "the third transformation"
+    }
+   ],
+   "note": "Existing full tag downgraded to partial (tagFixes); the WRM step is a production item, so MC cannot stand in."
+  },
+  "Y6.B13.S5": {
+   "title": "Reflections",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_reflect",
+     "missing": "multiple choice over the x- or y-axis; no drawing the reflection or writing its coordinates"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing a reflection in the axes and writing the new coordinates",
+   "build": [
+    "reflect_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 / Y5.B11.S1 Read and plot coordinates (prior learning wk W31)"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 negative numbers (prior learning wk W31)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "negative numbers on a number line, needed for the axes"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
+    },
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "Y5.B11.S6 reflection (prior learning wk W31)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "lines of symmetry and mirror lines"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:geo_translate",
+     "why": "translation"
+    },
+    {
+     "key": "integers:opposite_numbers",
+     "why": "a reflected coordinate changes sign"
+    }
+   ],
+   "note": ""
+  }
+ },
+ "proposals": {
+  "angle_rules": {
+   "kind": "new",
+   "skill": "angles_lines:angle_rules",
+   "name": "Angle Rules",
+   "teaches": "vertically opposite angles, angles in a triangle (180°), in a quadrilateral (360°), in polygons, and special triangles",
+   "representation": "a diagram with some angles given; write the missing angle",
+   "family": "geometry",
+   "steps": [
+    "Y6.B12.S3",
+    "Y6.B12.S4",
+    "Y6.B12.S5",
+    "Y6.B12.S6",
+    "Y6.B12.S7",
+    "Y6.B12.S8"
+   ],
+   "ccss": [
+    "4.MD.C.7",
+    "4.G.A.2"
+   ],
+   "why": "additive_angles stops at angles that share a vertex on a line/point; no skill uses vertically opposite angles or interior angle sums.",
+   "reused": true
+  },
+  "area_estimate": {
+   "kind": "new",
+   "skill": "area_perimeter:estimate_area",
+   "name": "Estimate Area",
+   "teaches": "estimating the area of irregular shapes by counting whole and half squares",
+   "representation": "an irregular blob on squared paper; count whole and part squares; write the estimate",
+   "family": "measurement",
+   "steps": [
+    "Y6.B10.S3"
+   ],
+   "ccss": [
+    "3.MD.C.6"
+   ],
+   "why": "Pre-skill for S3: counting whole and part squares is the Y5 skill the triangle counting builds on.",
+   "reused": true
+  },
+  "area_triangle_grid": {
+   "kind": "option",
+   "skill": "area_perimeter:area_triangle",
+   "name": "Area of Triangles (option)",
+   "teaches": "the area of a triangle by counting squares, then as half a rectangle for right-angled and any triangles",
+   "representation": "grid and \"half the rectangle\" supports on area_triangle",
+   "family": "measurement",
+   "option": "counting squares and right-angled",
+   "steps": [
+    "Y6.B10.S3",
+    "Y6.B10.S4",
+    "Y6.B10.S5"
+   ],
+   "ccss": [
+    "3.MD.C.6",
+    "3.MD.C.7",
+    "6.G.A.1"
+   ],
+   "why": "area_triangle deals only right-angled triangles by formula; counting squares, the half-rectangle picture and non-right triangles with a dashed perpendicular height are missing.",
+   "reused": true
+  },
+  "circles": {
+   "kind": "new",
+   "skill": "shapes_classify:parts_of_a_circle",
+   "name": "Parts of a Circle",
+   "teaches": "radius, diameter and circumference; diameter = 2 × radius",
+   "representation": "a circle with a marked line; write radius or diameter",
+   "family": "geometry",
+   "steps": [
+    "Y6.B12.S9"
+   ],
+   "ccss": [],
+   "why": "No live skill names radius, diameter or circumference.",
+   "reused": true
+  },
+  "draw_accurately": {
+   "kind": "new",
+   "skill": "angles_lines:draw_shapes_accurately",
+   "name": "Draw Shapes Accurately",
+   "teaches": "drawing triangles and quadrilaterals from given lengths and angles with ruler and protractor",
+   "representation": "a sketch with measurements; print-first skill with a key drawing",
+   "family": "geometry",
+   "steps": [
+    "Y6.B12.S10"
+   ],
+   "ccss": [
+    "4.G.A.1",
+    "4.MD.C.6"
+   ],
+   "why": "No skill asks pupils to draw a shape from lengths and angles.",
+   "reused": true
+  },
+  "draw_angles": {
+   "kind": "new",
+   "skill": "angles_lines:draw_angles",
+   "name": "Draw Angles and Lines",
+   "teaches": "drawing angles of a given size with a protractor and lines of a given length",
+   "representation": "a protractor picture with a base line; the key shows the angle drawn; print-first skill",
+   "family": "geometry",
+   "steps": [
+    "Y6.B11.S5",
+    "Y6.B12.S1",
+    "Y6.B12.S10"
+   ],
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "why": "Pre-skill: drawing an angle of a given size with a protractor is needed to draw pie-chart sectors and shapes.",
+   "reused": true
+  },
+  "dual_bar": {
+   "kind": "new",
+   "skill": "graphs:dual_bar_charts",
+   "name": "Dual Bar Charts",
+   "teaches": "reading and drawing dual bar charts that compare two sets of data",
+   "representation": "a dual bar chart with a key; answer comparison questions",
+   "family": "data",
+   "steps": [
+    "Y6.B11.S2"
+   ],
+   "ccss": [
+    "3.MD.B.3"
+   ],
+   "why": "bar_graph shows one data set; no key with two bars per category.",
+   "reused": true
+  },
+  "four_quadrants": {
+   "kind": "option",
+   "skill": "coordinates:coordinate_all",
+   "name": "Coordinates in Four Quadrants (option)",
+   "teaches": "reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints)",
+   "representation": "a task option on coordinate_all",
+   "family": "geometry",
+   "option": "problems",
+   "steps": [
+    "Y6.B13.S3"
+   ],
+   "ccss": [
+    "5.G.A.2",
+    "6.NS.C.8",
+    "6.G.A.3"
+   ],
+   "why": "coord_polygon works in the first quadrant on side lengths only; missing vertices and coordinate problems across four quadrants are not dealt.",
+   "reused": true
+  },
+  "line_graph": {
+   "kind": "new",
+   "skill": "graphs:line_graphs",
+   "name": "Line Graphs",
+   "teaches": "reading and drawing line graphs that show change over time",
+   "representation": "a line graph on a grid with labelled axes; read values, find differences, or plot the points",
+   "family": "data",
+   "steps": [
+    "Y6.B11.S1"
+   ],
+   "ccss": [
+    "5.G.A.2",
+    "4.MD.B.4"
+   ],
+   "why": "No live line graph skill; coordinate_graph plots points but never reads a joined line of data.",
+   "reused": true
+  },
+  "mean_missing": {
+   "kind": "option",
+   "skill": "data_analysis:mean",
+   "name": "find a missing value",
+   "teaches": "Find a Missing Value From the Mean (option)",
+   "representation": "using the mean x number of items = total to find a missing value, and the mean in a context",
+   "family": "a boxed list of numbers with one blank box and \"mean = 6\"; write the total, then the missing number",
+   "steps": "data",
+   "ccss": [
+    "Y6.B11.S6"
+   ],
+   "why": [
+    "5.MD.B.2",
+    "6.SP.B.5c"
+   ],
+   "reused": false,
+   "option": "mean only asks for the mean of a list; the WRM step also finds a missing value from a given mean."
+  },
+  "net_draw": {
+   "kind": "option",
+   "skill": "shapes_classify:net_identify",
+   "name": "complete or check the net",
+   "teaches": "Complete the Net (option)",
+   "representation": "deciding whether a net folds into a cube or cuboid, and completing a net by adding the missing face",
+   "family": "a net on squared paper with one face missing; shade where the face goes, or tick Yes / No for \"folds into a cube\"",
+   "steps": "geometry",
+   "ccss": [
+    "Y6.B12.S11"
+   ],
+   "why": [
+    "6.G.A.4"
+   ],
+   "reused": false,
+   "option": "net_identify only matches a net to its solid (multiple choice); WRM also draws and checks nets."
+  },
+  "parallelogram": {
+   "kind": "new",
+   "skill": "area_perimeter:area_parallelogram",
+   "name": "Area of a Parallelogram",
+   "teaches": "area of a parallelogram as base × perpendicular height, by cutting and moving a triangle",
+   "representation": "a parallelogram on squared paper with the height dashed; write the area",
+   "family": "measurement",
+   "steps": [
+    "Y6.B10.S6"
+   ],
+   "ccss": [
+    "3.MD.C.7",
+    "6.G.A.1"
+   ],
+   "why": "No live skill deals the area of a parallelogram.",
+   "reused": true
+  },
+  "pie": {
+   "kind": "new",
+   "skill": "graphs:pie_charts_read_draw",
+   "name": "Pie Charts",
+   "teaches": "reading pie charts with fractions and percentages and drawing them from angles (360°)",
+   "representation": "a circle divided into sectors with fraction/percent labels; option: draw from a table",
+   "family": "data",
+   "steps": [
+    "Y6.B11.S3",
+    "Y6.B11.S4",
+    "Y6.B11.S5"
+   ],
+   "ccss": [
+    "6.RP.A.3",
+    "4.MD.C.6",
+    "4.MD.C.7"
+   ],
+   "why": "pie_chart only reads a printed percent; reading fractions of a whole, amounts from a total, and drawing from angles are missing.",
+   "reused": true
+  },
+  "protractor_read": {
+   "kind": "option",
+   "skill": "angles_lines:measure_angles",
+   "name": "Measure With a Protractor (option)",
+   "teaches": "measuring angles in whole degrees with a protractor: which scale, from 0",
+   "family": "geometry",
+   "option": "form \"read the protractor\": a protractor drawn over the angle; write the degrees (not multiple choice)",
+   "representation": "",
+   "steps": [
+    "Y6.B12.S1"
+   ],
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "why": "measure_angles is multiple choice over multiples of 30/45; WRM measures any angle to the nearest degree with a protractor.",
+   "reused": true
+  },
+  "reflect_grid": {
+   "kind": "new",
+   "skill": "coordinates:reflect_on_grid",
+   "name": "Reflect on a Grid",
+   "teaches": "reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes",
+   "representation": "a grid with a dashed mirror line and a shape; draw the reflection; key shows it",
+   "family": "geometry",
+   "steps": [
+    "Y6.B13.S5"
+   ],
+   "ccss": [
+    "5.G.A.1",
+    "6.NS.C.6b"
+   ],
+   "why": "geo_reflect is multiple choice over the axes; Y6 draws the reflection and writes the new coordinates.",
+   "reused": true
+  },
+  "reflex_angles": {
+   "kind": "option",
+   "skill": "angles_lines:identify_angles",
+   "name": "reflex angles",
+   "teaches": "Reflex Angles (option)",
+   "representation": "naming reflex angles (more than 180 degrees) alongside acute, right, obtuse and straight",
+   "family": "an angle with the arc drawn on the outside; tick the name from a word bank",
+   "steps": "geometry",
+   "ccss": [
+    "Y6.B12.S1"
+   ],
+   "why": [
+    "4.MD.C.5"
+   ],
+   "reused": false,
+   "option": "identify_angles offers right, acute, obtuse and straight but not reflex, which Y6 classifies."
+  },
+  "same_area": {
+   "kind": "new",
+   "skill": "area_perimeter:same_area_different_perimeter",
+   "name": "Same Area, Different Perimeter",
+   "teaches": "shapes with the same area but different perimeters, and the reverse",
+   "representation": "shapes on squared paper; write area and perimeter for each; circle the pair that match",
+   "family": "measurement",
+   "steps": [
+    "Y6.B10.S1"
+   ],
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "why": "No skill compares several shapes with equal area and different perimeters (or the reverse); area_perimeter does one rectangle at a time.",
+   "reused": true
+  },
+  "translate_grid": {
+   "kind": "new",
+   "skill": "coordinates:translate_on_grid",
+   "name": "Translate on a Grid",
+   "teaches": "translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up)",
+   "representation": "a coordinate grid with a shape and its image; write the translation or draw the image",
+   "family": "geometry",
+   "steps": [
+    "Y6.B13.S4"
+   ],
+   "ccss": [
+    "5.G.A.1",
+    "8.G.A.1"
+   ],
+   "why": "geo_translate is multiple choice; Y6 needs the image drawn in four quadrants and the translation described (and new coordinates written).",
+   "reused": true
+  },
+  "vis_mean_levelling": {
+   "kind": "option",
+   "name": "The Mean as Levelling",
+   "representation": "`support: 'level'` on the mean: objects per person → pooled → equal rows; towers levelled",
+   "steps": [
+    "Y6.B11.S6"
+   ],
+   "ccss": [
+    "6.SP.A.3"
+   ],
+   "why": "The WRM lesson introduces the mean as levelling towers; the visual option is already listed.",
+   "reused": true,
+   "skill": "data_analysis:mean",
+   "option": "support: 'level'",
+   "teaches": "the mean as levelling: pool the objects and share them into equal rows or towers",
+   "family": "data"
+  },
+  "volume_cubes": {
+   "kind": "new",
+   "skill": "area_perimeter:volume_counting_cubes",
+   "name": "Volume by Counting Cubes",
+   "teaches": "volume as the number of unit cubes (cm³), comparing volumes and estimating volume and capacity",
+   "representation": "isometric drawings of cube solids; write how many cubes / cm³; option: which has more",
+   "family": "measurement",
+   "steps": [
+    "Y6.B10.S7"
+   ],
+   "ccss": [
+    "5.MD.C.3",
+    "5.MD.C.4"
+   ],
+   "why": "No live skill counts unit cubes in a drawn solid; volume starts at l x w x h.",
+   "reused": true
+  }
+ },
+ "tagFixes": [
+  {
+   "key": "shapes_classify:net_identify",
+   "step": "Y6.B12.S11",
+   "action": "partial",
+   "why": "multiple-choice identification only; the step also draws and checks nets"
+  },
+  {
+   "key": "angles_lines:measure_angles",
+   "step": "Y6.B12.S1",
+   "action": "partial",
+   "why": "multiple choice among multiples of 30/45 degrees; no protractor to the nearest degree"
+  },
+  {
+   "key": "coordinates:geo_translate",
+   "step": "Y6.B13.S4",
+   "action": "partial",
+   "why": "MC only; drawing and describing the translation are missing"
+  },
+  {
+   "key": "coordinates:geo_reflect",
+   "step": "Y6.B13.S5",
+   "action": "partial",
+   "why": "MC only; drawing the reflection and writing coordinates are missing"
+  },
+  {
+   "key": "coordinates:coordinate_all",
+   "step": "Y6.B13.S3",
+   "action": "partial",
+   "why": "reads/plots points but no coordinate problems"
+  }
+ ]
+}
