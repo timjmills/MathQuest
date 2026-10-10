@@ -63,7 +63,12 @@ node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 608 c
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)
+node tests/scripts/ws-search-terms.cjs       # GATE: every skill is findable (>= 5 search terms, 230+ real queries hit their top 5)
 ```
+
+**A new skill must get search terms (`js/modules/search-terms.js`: a `CONCEPT_RULES` hit, plus `SKILL_TERMS` when its
+label is vague) in the same change; `ws-search-terms` is the gate.** Every skill search box calls `js/modules/skill-finder.js`
+(thesaurus + standards + WRM + grade, ranked label > concept > code > misspelling); never add a search that matches labels only.
 
 The code count is live: appending a skill id raises it and is safe. A count that **falls**, or any
 "changed" / "MOVED" / "DELETED" line, is the failure (the pinned baseline is the gate, not the number).
