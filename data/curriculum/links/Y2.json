@@ -954,11 +954,19 @@
    "build": [],
    "pre": [
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W05)"
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 / Y2.B1.S15 counting in 2s: counting in equal steps"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 / Y2.B1.S15 counting in 5s"
     },
     {
      "key": "patterns:seq_10",
+     "why": "Y2.B1.S15 counting in 10s"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
      "why": "Y1.B12.S2 Tens to 100 (prior learning wk W05)"
     },
     {
@@ -976,10 +984,6 @@
     {
      "key": "placevalue:compare",
      "why": "Y2.B1.S13 Compare numbers (earlier in the block)"
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y2.B1.S12 Compare objects (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -1723,6 +1727,18 @@
    "build": [],
    "pre": [
     {
+     "key": "patterns:seq_10",
+     "why": "Y2.B1.S15 counting on and back in 10s"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 tens and ones: one more tens rod is 10 more"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 the tens digit is the digit that changes"
+    },
+    {
      "key": "subtraction:sub_50_regroup",
      "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (step before in the block)"
     },
@@ -1741,18 +1757,6 @@
     {
      "key": "composing:number_bonds",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W07)"
-    },
-    {
-     "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (earlier in the block)"
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (earlier in the block)"
-    },
-    {
-     "key": "addition:add_three",
-     "why": "Y2.B2.S7 Add three 1-digit numbers (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -7922,7 +7926,7 @@
    "key": "fractions:shade_fraction",
    "step": "Y2.B8.S4",
    "action": "remove",
-   "why": "items generated with every option do not teach this step"
+   "why": "denoms [2] is the halves family: it also deals 4/8 and 5/8, not a page of 1/2 (kept as related)"
   },
   {
    "key": "fractions:fraction_of_set",

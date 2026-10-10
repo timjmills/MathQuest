@@ -468,7 +468,7 @@ export const r3 = {
   'Y3.B8.S2': { direct: [], partials: [P('fraction_operations:sub_fractions_like', 'subtracts within a whole with a bar picture, but "differences less than 1/2" sort items are mixed in; a page of subtraction only is not available', { denoms: [2, 3, 5] }),
       P('fraction_operations:sub_frac_like_nv', 'forms [0] is plain subtraction, but the compare-to-1/2 sort items are still mixed in and the families deal eighths and tenths', { denoms: [2, 3, 5], forms: [0] })],
     verdict: 'partial', build: ['within_whole'] },
-  'Y2.B8.S4': { partials: [], related: [R('fractions:shade_fraction', 'shading 1/2 of a shape (denoms [2]): the same half shown on a shape'), R('composing:compose_whole', 'two halves make a whole')] },
+  'Y2.B8.S4': { partials: [], why: { 'fractions:shade_fraction': 'denoms [2] is the halves family: it also deals 4/8 and 5/8, not a page of 1/2 (kept as related)', 'fractions:fraction_of_set': 'ignores denoms in its missing-numerator items (generator bug): cannot be narrowed to halves' }, related: [R('fractions:shade_fraction', 'shading 1/2 of a shape (denoms [2]): the same half shown on a shape'), R('composing:compose_whole', 'two halves make a whole')] },
   'Y2.B8.S6': { partials: [P('fractions:shade_fraction', 'the halves family (1/2, 1/4, 3/4, eighths): a page of quarters only is not available, and a quarter of a quantity (1/4 of 12) is not dealt', { denoms: [2] })] },
   'Y2.B8.S8': { partials: [P('fractions:shade_fraction', 'the thirds family also deals sixths and twelfths: a page of 1/3 of a shape only is not available, and a third of a quantity (1/3 of 12) is not dealt', { denoms: [3] })] },
   // related noise named by the critic: hand related only (relOnly), sharing the idea
@@ -484,6 +484,8 @@ export const r3 = {
   'Y3.B4.S1': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the multiples of 10 are the 10s count'), C('placevalue:unit_form', 'Y3.B1.S8 ten tens = 1 hundred: 12 tens = 120')] },
   'Y2.B4.S1': { core: [C('patterns:seq_5', 'Y1.B9.S3 counting in 5s: counting 5-cent coins'), C('patterns:seq_10', 'Y1.B9.S2 counting in 10s: counting 10-cent coins')] },
   'Y2.B11.S1': { preOnly: true, pre: [R('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming the shapes whose positions are described'), R('shapes_early:name_3d_shapes', 'Y1.B3.S1 naming the objects (cube, ball) placed on, under, next to'), R('counting:count_objects', 'Y1.B1.S2 counting along a row: "the 3rd from the left"'), R('comparing:compare_objects', 'Y1.B7.S1 comparing words (taller, nearer): the same describing language')] },
+  'Y2.B1.S16': { core: [C('patterns:seq_2', 'Y1.B9.S1 / Y2.B1.S15 counting in 2s: counting in equal steps'), C('patterns:seq_5', 'Y1.B9.S3 / Y2.B1.S15 counting in 5s'), C('patterns:seq_10', 'Y2.B1.S15 counting in 10s')], dropPre: ['comparing:compare_groups'] },
+  'Y2.B2.S13': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting on and back in 10s'), C('composing:base10_build', 'Y2.B1.S3 tens and ones: one more tens rod is 10 more'), C('placevalue:identify', 'Y2.B1.S4 the tens digit is the digit that changes')] },
   // S7: measurement steps keep a real ladder (rule 15)
   'Y3.B7.S7': { core: [C('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug (the same skill at Y2, forms [0])')] },
 };
