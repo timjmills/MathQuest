@@ -265,3 +265,4 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-10: answer-key options deployed (e58f15fa via 498d8710): critic r5 PASS, full gates green (c2phone passed on rerun, print-lint at its 463/33 baseline), stamp OK, live serves the new modules.
 - 2026-10-10 White Rose page (recommended answers kept, per owner): the 13 lessons that map to another year's WRM step stay mapped and are listed in MAPPING_REPORT; Kindergarten's two duplicate titles (1 more, 1 less; Partition into tens and ones) resolve to the nearest block.
 - 2026-10-10: WRM tagging Y4 PASSED critic r13 (every graded step 9, no defects; independent merge simulation 0 problems; build reproducible). Lane frozen after three optional tidy-ups; waits for the lead merge.
+- 2026-10-10: WRM tagging R + Y1 PASSED critic r12 (both 8.00, every graded step 8; independent merge simulation 0 problems). Lane frozen after four text tidy-ups; waits for the lead merge.
