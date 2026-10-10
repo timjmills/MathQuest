@@ -3627,6 +3627,801 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B4.S1": {
+   "title": "Count money - pence",
+   "direct": [
+    {
+     "key": "measurement:money_count",
+     "opts": {}
+    },
+    {
+     "key": "measurement:coin_value",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "same standard 2.MD.C.8: Do the Coins Make the Amount?"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S2": {
+   "title": "Count money - pounds (notes and coins)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_count",
+     "missing": "counting notes"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting notes",
+   "build": [
+    "money_uk"
+   ],
+   "pre": [
+    {
+     "key": "measurement:coin_value",
+     "why": "Y2.B4.S1 Count money - pence (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "same standard 2.MD.C.8: Do the Coins Make the Amount?"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S3": {
+   "title": "Count money - pounds and pence",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_count",
+     "missing": "counting notes and coins together as dollars and cents"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting notes and coins together as dollars and cents",
+   "build": [
+    "money_uk"
+   ],
+   "pre": [
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "Y2.B4.S4 Choose notes and coins (next step)"
+    },
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "same standard 2.MD.C.8: Do the Coins Make the Amount?"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S4": {
+   "title": "Choose notes and coins",
+   "direct": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S3 Count money - pounds and pence (step before in the block)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W33)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W33)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (next step)"
+    },
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S5": {
+   "title": "Make the same amount",
+   "direct": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "Y2.B4.S4 Choose notes and coins (step before in the block)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W32)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W32)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "Y2.B4.S6 Compare amounts of money (next step)"
+    },
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S6": {
+   "title": "Compare amounts of money",
+   "direct": [
+    {
+     "key": "measurement:money_compare",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (step before in the block)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W08)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W08)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:money",
+     "why": "Y2.B4.S7 Calculate with money (next step)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (next step)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same standard 1.NBT.B.3: Compare Numbers (>, <, =)"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same cluster 1.NBT.B.2b: Teen Numbers: 10 + Ones (Visual)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same cluster 1.NBT.B.2b: Build a Teen Number on Two Ten Frames"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S7": {
+   "title": "Calculate with money",
+   "direct": [
+    {
+     "key": "measurement:money",
+     "opts": {}
+    },
+    {
+     "key": "measurement:enough_money",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_compare",
+     "why": "Y2.B4.S6 Compare amounts of money (step before in the block)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W33)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W33)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (next step)"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "same standard 2.MD.C.8: Find the Change"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S8": {
+   "title": "Make a pound",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "missing": "making exactly one dollar (100 cents) in different ways"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making exactly one dollar (100 cents) in different ways",
+   "build": [
+    "money_uk"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money",
+     "why": "Y2.B4.S7 Calculate with money (step before in the block)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (step before in the block)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S1 Unitising (prior learning wk W34)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:money_change",
+     "why": "Y2.B4.S9 Find change (next step)"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S9": {
+   "title": "Find change",
+   "direct": [
+    {
+     "key": "measurement:money_change",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (step before in the block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "lower-grade skill on K.OA.A.3 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "lower-grade skill on K.OA.A.4 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.A.1)"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "lower-grade skill on K.OA.A.2 (same domain as 1.OA.A.1)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_word_problems",
+     "why": "same standard 1.OA.A.1: Addition Word Problems"
+    },
+    {
+     "key": "addition:add_word_problems_plain",
+     "why": "same standard 1.OA.A.1: Addition Word Problems (No Pictures)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same standard 1.OA.A.1: How Many More/Fewer? (Visual)"
+    },
+    {
+     "key": "addition:add_wp_20",
+     "why": "same standard 1.OA.A.1: Addition Word Problems (within 20)"
+    },
+    {
+     "key": "addition:add_wp_20_plain",
+     "why": "same standard 1.OA.A.1: Addition Word Problems (within 20, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_word_problems",
+     "why": "same standard 1.OA.A.1: Subtraction Word Problems"
+    },
+    {
+     "key": "subtraction:sub_word_problems_plain",
+     "why": "same standard 1.OA.A.1: Subtraction Word Problems (No Pictures)"
+    },
+    {
+     "key": "subtraction:unknown_start_wp",
+     "why": "same standard 1.OA.A.1: Unknown Start Word Problems (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B4.S10": {
+   "title": "Two-step problems",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "two-step money word problems (buy two items, then find the change)",
+   "build": [
+    "money_2step"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_change",
+     "why": "Y2.B4.S9 Find change (step before in the block)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S1 Unitising (prior learning wk W34)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:money",
+     "why": "same standard 2.MD.C.8: Add Money"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "same standard 2.MD.C.8: Do the Coins Make the Amount?"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "same standard 2.MD.C.8: Is There Enough Money?"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    },
+    {
+     "key": "addition:add_word_problems",
+     "why": "same standard 2.OA.A.1: Addition Word Problems"
+    },
+    {
+     "key": "addition:add_word_problems_plain",
+     "why": "same standard 2.OA.A.1: Addition Word Problems (No Pictures)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3985,6 +4780,63 @@
    "ccss": [
     "1.G.A.1",
     "2.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_uk": {
+   "kind": "option",
+   "skill": "measurement:money_count",
+   "option": "notes and cents",
+   "name": "Count Money (option)",
+   "teaches": "counting notes and coins together and in dollars and cents, choosing coins to make an amount, making the same amount two ways",
+   "representation": "options on money_count / equiv_coin_sets: notes, dollars-and-cents mode, \"make it two ways\"",
+   "family": "measurement",
+   "steps": [
+    "Y2.B4.S2",
+    "Y2.B4.S3",
+    "Y2.B4.S8"
+   ],
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "nonstandard_mass": {
+   "kind": "new",
+   "skill": "measurement:measure_mass_cubes",
+   "name": "Measure Mass with Cubes",
+   "teaches": "measuring mass with non-standard units (cubes, marbles) on a balance, and comparing masses by the count",
+   "representation": "a drawn balance with an object in one pan and cubes in the other; write how many cubes",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S2",
+    "Y1.B8.S3"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_2step": {
+   "kind": "new",
+   "skill": "measurement:money_two_step",
+   "name": "Two-Step Money Problems",
+   "teaches": "two-step money word problems (buy two items, then find the change)",
+   "representation": "a price list drawn as tags plus a short story; bar model support level",
+   "family": "measurement",
+   "steps": [
+    "Y2.B4.S10",
+    "Y3.B9.S4",
+    "Y4.B10.S6"
+   ],
+   "ccss": [
+    "2.MD.C.8",
+    "2.OA.A.1",
+    "4.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
