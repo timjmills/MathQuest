@@ -4422,6 +4422,1386 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B5.S1": {
+   "title": "Recognise equal groups",
+   "direct": [
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W27)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W27)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W27)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W27)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W27)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W27)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W27)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W27)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same cluster 3.OA.A.3: Division Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S2": {
+   "title": "Make equal groups",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "recognising, making and adding equal groups, and doubles as two equal groups",
+   "build": [
+    "equal_groups_early"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y2.B5.S1 Recognise equal groups (step before in the block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W28)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W28)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same cluster 3.OA.A.3: Division Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S3": {
+   "title": "Add equal groups",
+   "direct": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {
+      "note": "groups"
+     }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same cluster 2.OA.C.3: Odd or Even? (Visual)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "same cluster 2.OA.C.3: Circle the Even or Odd Numbers (MAP)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same cluster 2.OA.C.3: Halving"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S4": {
+   "title": "Introduce the multiplication symbol",
+   "direct": [
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S3 Add equal groups (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same cluster 3.OA.A.3: Division Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S5": {
+   "title": "Multiplication sentences",
+   "direct": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S4 Introduce the multiplication symbol (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same cluster 3.OA.A.3: Division Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S6": {
+   "title": "Use arrays",
+   "direct": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {
+      "note": "arrays"
+     }
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "same cluster 2.OA.C.3: Circle the Even or Odd Numbers (MAP)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same cluster 2.OA.C.3: Halving"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S7": {
+   "title": "Make equal groups – grouping",
+   "direct": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (step before in the block)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (step before in the block)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same standard 3.OA.A.2: Halving"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same cluster 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S8": {
+   "title": "Make equal groups – sharing",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:share_into_groups",
+     "missing": "sharing into a given number of groups (how many in each)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sharing into a given number of groups (how many in each)",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (next step)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (next step)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same standard 3.OA.A.2: Halving"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same cluster 3.OA.A.1: Multiplication Number Line (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S9": {
+   "title": "The 2 times-table",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "note": "constant 2"
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "note": "2"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (step before in the block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (next step)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same standard 2.OA.C.3: Odd or Even? (Visual)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "same standard 2.OA.C.3: Circle the Even or Odd Numbers (MAP)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same standard 2.OA.C.3: Halving"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "same standard 3.OA.C.7: Basic Multiplication"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "same standard 3.OA.C.7: Multiplication Fact Families"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same standard 3.OA.C.7: Number Families (Multiply & Divide)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "same standard 3.OA.C.7: Multiplication Chart (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S10": {
+   "title": "Divide by 2",
+   "direct": [
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "note": "divide by 2"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W30)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W30)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (next step)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "same standard 3.OA.C.7: Basic Multiplication"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "same standard 3.OA.C.7: Multiplication Fact Families"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same standard 3.OA.C.7: Number Families (Multiply & Divide)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S11": {
+   "title": "Doubling and halving",
+   "direct": [
+    {
+     "key": "patterns:double",
+     "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W30)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W30)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:select_even_odd",
+     "why": "Y2.B5.S12 Odd and even numbers (next step)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "same standard 3.OA.A.1: Arrays & Equal Groups (Visual)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "same standard 3.OA.A.1: Dot Array Multiplication (B&W)"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "same standard 3.OA.A.1: Write Repeated Addition as Multiplication (Visual)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S12": {
+   "title": "Odd and even numbers",
+   "direct": [
+    {
+     "key": "composing:odd_even",
+     "opts": {}
+    },
+    {
+     "key": "composing:select_even_odd",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (step before in the block)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (prior learning wk W30)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W30)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (next step)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (next step)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "same cluster 2.OA.C.4: Arrays & Equal Groups (Visual)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "same cluster 2.OA.C.4: Dot Array Multiplication (B&W)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "same cluster 2.OA.C.4: Write Repeated Addition as Multiplication (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S13": {
+   "title": "The 10 times-table",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "note": "constant 10"
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "note": "10"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (step before in the block)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "Y2.B5.S12 Odd and even numbers (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (next step)"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same standard 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same standard 2.NBT.A.2: Count by 2s"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same standard 2.NBT.A.2: Count-By Fill-In (1-12)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same standard 2.NBT.A.2: Skip Counting Number Line (Visual)"
+    },
+    {
+     "key": "patterns:skip_count_grid",
+     "why": "same standard 2.NBT.A.2: Skip Counting Grid (Visual)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "same standard 2.NBT.A.2: Count Up by Step (Grid)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S14": {
+   "title": "Divide by 10",
+   "direct": [
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "note": "divide by 10"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same standard 3.OA.A.2: Halving"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "same standard 3.OA.C.7: Basic Multiplication"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "same standard 3.OA.C.7: Multiplication Fact Families"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same standard 3.OA.C.7: Number Families (Multiply & Divide)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S15": {
+   "title": "The 5 times-table",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "note": "constant 5"
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "note": "5"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same standard 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same standard 2.NBT.A.2: Count by 2s"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same standard 2.NBT.A.2: Count-By Fill-In (1-12)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same standard 2.NBT.A.2: Skip Counting Number Line (Visual)"
+    },
+    {
+     "key": "patterns:skip_count_grid",
+     "why": "same standard 2.NBT.A.2: Skip Counting Grid (Visual)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "same standard 2.NBT.A.2: Count Up by Step (Grid)"
+    },
+    {
+     "key": "patterns:count_by_step_down",
+     "why": "same standard 2.NBT.A.2: Count Down by Step (Grid)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S16": {
+   "title": "Divide by 5",
+   "direct": [
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "note": "divide by 5"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 The 5 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S15 The 5 times-table (step before in the block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "Y2.B5.S17 The 5 and 10 times-tables (next step)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same standard 3.OA.A.2: Halving"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "same standard 3.OA.C.7: Basic Multiplication"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "same standard 3.OA.C.7: Multiplication Fact Families"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B5.S17": {
+   "title": "The 5 and 10 times-tables",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "note": "tables 5 and 10"
+     }
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S16 Divide by 5 (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same standard 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same standard 2.NBT.A.2: Count by 2s"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same standard 2.NBT.A.2: Count-By Fill-In (1-12)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same standard 2.NBT.A.2: Skip Counting Number Line (Visual)"
+    },
+    {
+     "key": "patterns:skip_count_grid",
+     "why": "same standard 2.NBT.A.2: Skip Counting Grid (Visual)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "same standard 2.NBT.A.2: Count Up by Step (Grid)"
+    },
+    {
+     "key": "patterns:count_by_step_down",
+     "why": "same standard 2.NBT.A.2: Count Down by Step (Grid)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -4837,6 +6217,53 @@
     "2.MD.C.8",
     "2.OA.A.1",
     "4.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "share_group": {
+   "kind": "new",
+   "skill": "division:share_and_group_early",
+   "name": "Share and Make Groups",
+   "teaches": "sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly",
+   "representation": "counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair",
+   "family": "operations",
+   "steps": [
+    "R.B9.S6",
+    "R.B9.S8",
+    "R.B11.S10",
+    "R.B11.S12",
+    "R.B11.S13",
+    "R.B14.S2",
+    "R.B14.S4",
+    "R.B16.S1",
+    "R.B16.S2",
+    "R.B16.S3",
+    "R.B16.S5",
+    "Y1.B9.S9",
+    "Y2.B5.S8"
+   ],
+   "ccss": [
+    "K.OA.A.1",
+    "K.OA.A.4",
+    "K.OA.A.2",
+    "3.OA.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "equal_groups_early": {
+   "kind": "new",
+   "skill": "multiplication:make_equal_groups",
+   "name": "Make Equal Groups",
+   "teaches": "recognising, making and adding equal groups, and doubles as two equal groups",
+   "representation": "groups drawn in rings; tick equal or not, write groups of and the repeated addition",
+   "family": "operations",
+   "steps": [
+    "Y2.B5.S2"
+   ],
+   "ccss": [
+    "3.OA.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
