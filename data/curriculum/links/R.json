@@ -1528,6 +1528,127 @@
     }
    ],
    "note": ""
+  },
+  "R.B8.S1": {
+   "title": "Compare mass",
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same CCSS K.MD.A.2 in R.B10.S2 Compare length"
+    }
+   ],
+   "note": ""
+  },
+  "R.B8.S2": {
+   "title": "Find a balance",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {},
+     "missing": "equal mass: a level, balanced scale"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "balance: making both sides equal",
+   "build": [
+    "balance"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same CCSS K.MD.A.2 in R.B10.S2 Compare length"
+    }
+   ],
+   "note": ""
+  },
+  "R.B8.S3": {
+   "title": "Explore capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "capacity language: full, empty, nearly full, half full",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "balance"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same CCSS K.MD.A.1 in R.B10.S1 Explore length"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: R.B8.S1 Compare mass"
+    }
+   ],
+   "note": ""
+  },
+  "R.B8.S4": {
+   "title": "Compare capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing what two containers hold",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (the step before in this block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "balance"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same CCSS K.MD.A.2 in R.B10.S2 Compare length"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: R.B8.S1 Compare mass"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1602,9 +1723,12 @@
    "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
    "family": "measurement",
    "steps": [
-    "R.B2.S3"
+    "R.B2.S3",
+    "R.B8.S3",
+    "R.B8.S4"
    ],
    "ccss": [
+    "K.MD.A.1",
     "K.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -1724,6 +1848,22 @@
     "K.CC.A.3",
     "K.CC.B.4",
     "K.CC.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "balance": {
+   "kind": "new",
+   "skill": "measurement:balance_scales",
+   "name": "Balanced or Not?",
+   "teaches": "a balance scale shows heavier, lighter or equal (balanced) mass",
+   "representation": "a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced",
+   "family": "measurement",
+   "steps": [
+    "R.B8.S2"
+   ],
+   "ccss": [
+    "K.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
