@@ -485,7 +485,7 @@ export const r3 = {
   'Y2.B4.S1': { core: [C('patterns:seq_5', 'Y1.B9.S3 counting in 5s: counting 5-cent coins'), C('patterns:seq_10', 'Y1.B9.S2 counting in 10s: counting 10-cent coins')] },
   'Y2.B11.S1': { preOnly: true, pre: [R('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming the shapes whose positions are described'), R('shapes_early:name_3d_shapes', 'Y1.B3.S1 naming the objects (cube, ball) placed on, under, next to'), R('counting:count_objects', 'Y1.B1.S2 counting along a row: "the 3rd from the left"'), R('comparing:compare_objects', 'Y1.B7.S1 comparing words (taller, nearer): the same describing language')] },
   'Y2.B1.S16': { core: [C('patterns:seq_2', 'Y1.B9.S1 / Y2.B1.S15 counting in 2s: counting in equal steps'), C('patterns:seq_5', 'Y1.B9.S3 / Y2.B1.S15 counting in 5s'), C('patterns:seq_10', 'Y2.B1.S15 counting in 10s')], dropPre: ['comparing:compare_groups'] },
-  'Y2.B2.S13': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting on and back in 10s'), C('composing:base10_build', 'Y2.B1.S3 tens and ones: one more tens rod is 10 more'), C('placevalue:identify', 'Y2.B1.S4 the tens digit is the digit that changes')] },
+  'Y2.B2.S13': { core: [C('patterns:seq_10', 'counting on and back in 10s from any number (36, 46, 56): the 10 more, 10 less pattern'), C('composing:base10_build', 'Y2.B1.S3 tens and ones: one more tens rod is 10 more'), C('placevalue:identify', 'Y2.B1.S4 the tens digit is the digit that changes')] },
   // S7: measurement steps keep a real ladder (rule 15)
   'Y3.B7.S7': { core: [C('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug (the same skill at Y2, forms [0])')] },
 };
@@ -649,7 +649,7 @@ export const linkFix = {
   'Y3.B1.S1': { 'multiplication:count_by_tables': null }, 'Y3.B1.S2': { 'multiplication:count_by_tables': null },
   'Y3.B1.S5': { 'multiplication:count_by_tables': null },
 };
-relR3['Y2.B5.S12'] = [...(relR3['Y2.B5.S12'] || []), R('counting:number_seq_fill', 'counting in 2s fills in the even numbers', { step: 2, range: 20 })];
+relR3['Y2.B5.S12'] = [...(relR3['Y2.B5.S12'] || []), R('counting:number_seq_fill', 'counting on in 2s from any number: the even and odd numbers in order', { step: 2, range: 20 })];
 relR3['Y2.B7.S4'] = [R('algebra:tape_diagram', 'a bar model of two masses and their total', { band: 50 }), R('algebra:multi_step_word', 'two-step stories in other contexts', { band: 50 })];
 relR3['Y2.B7.S8'] = [R('algebra:tape_diagram', 'a bar model of two capacities and their total', { band: 50 }), R('algebra:multi_step_word', 'two-step stories in other contexts', { band: 50 })];
 relR3['Y2.B7.S5'] = [R('fractions:shade_fraction', 'half full is a half of the container (Y2.B8 halves)', { denoms: [2] })];
@@ -1070,7 +1070,7 @@ Object.assign(r3, {
   'Y3.B1.S14': { ...(r3['Y3.B1.S14'] || {}), preOnly: true, pre: [R('patterns:seq_10', 'Y2.B1.S15 counting in 10s'), R('multiplication:mult_facts', 'Y2.B5.S15 the 5 times-table: 50 is 5 tens', { constant: [5] }), R('placevalue:more_less_100', 'Y3.B1.S4 counting in 100s: 100 is two 50s', { step: 100 })] },
   'Y2.B5.S12': { ...(r3['Y2.B5.S12'] || {}) },
 });
-relR3['Y2.B5.S12'] = [R('counting:number_seq_fill', 'counting in 2s along a number track: the even and odd numbers in order', { step: 2, range: 20 })];
+relR3['Y2.B5.S12'] = [R('counting:number_seq_fill', 'counting on in 2s from any number along a number track: the even and odd numbers in order', { step: 2, range: 20 })];
 linkFix['Y3.B7.S3'] = { ...linkFix['Y3.B7.S3'], 'multiplication:count_by_tables': ZR(100) };
 extraPre['Y3.B7.S3'] = [R('measurement:heavier_lighter_visual', 'Y2.B7.S1 heavier and lighter'), R('multiplication:count_by_tables', 'counting in 100s to read a kg scale marked in 100 g', ZR(100))];
 const RN = (id, n) => { r3[id] = { ...(r3[id] || {}), relNote: n }; };
@@ -1145,7 +1145,7 @@ linkFix['Y3.B3.S13'] = { ...(linkFix['Y3.B3.S13'] || {}), 'division:nl_div': { c
 // the missing-factor link is swapped year-wide to div_facts; here the step already holds its own mixed div_facts link
 for (const id of ['Y3.B3.S7', 'Y3.B3.S10', 'Y3.B3.S13']) linkFix[id] = { ...(linkFix[id] || {}), 'division:missing_mult_div': null };
 // r9: Y3.B5.S4 deals length_metric forms 0-2 itself, so the next step's form 0 is the step's own content, not a related idea
-linkFix['Y3.B5.S4'] = { ...(linkFix['Y3.B5.S4'] || {}), 'measurement:length_metric': null };
+// (r10: the generator's related subset rule now drops it; the r9 linkFix also dropped the pre rung, so it is gone)
 // r9 (critic r8 N4c): Y3.B1.S3 Number line to 100 keeps only 2-digit building blocks (no 3-digit compare, order or more/less)
 r3['Y3.B1.S3'] = { ...(r3['Y3.B1.S3'] || {}), dropPre: ['placevalue:more_less_100', 'placevalue:order_greatest_to_least'],
   core: [C('placevalue:compare', 'Y2.B1.S13 comparing 2-digit numbers: the greater one sits further along the line', { band: 99 }),
@@ -1153,3 +1153,57 @@ r3['Y3.B1.S3'] = { ...(r3['Y3.B1.S3'] || {}), dropPre: ['placevalue:more_less_10
     C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the tens marked on the line', { band: 50 })] };
 // r9: Y2.B5.S12 Odd and even keeps its own related list; dividing by 10 (Y2.B5.S14) is not the odd/even idea (÷2 is pre)
 r3['Y2.B5.S12'] = { ...(r3['Y2.B5.S12'] || {}), relOnly: true, related: [...((r3['Y2.B5.S12'] || {}).related || []), ...(relR3['Y2.B5.S12'] || [])] };
+
+// ======================= round 10 (critic Y2-Y3 r9: lower rungs as pre, count-from-0 links, merge clauses) =======================
+// N7: share_into_groups deals grouping only (80/80 "Make groups of M. How many groups?"): partial here, as on Y2.B5.S8
+r3['Y3.B3.S5'] = { ...r3['Y3.B3.S5'], direct: [], partials: [P('division:share_into_groups', 'grouping only (make groups of M, how many groups); sharing into a given number of groups is not dealt', { band: 12 }), ...r3['Y3.B3.S5'].partials] };
+// the 5s and 10s coin counts are one count_by_tables link now: a third building block for counting coins
+r3['Y2.B4.S1'] = { ...(r3['Y2.B4.S1'] || {}), core: [...((r3['Y2.B4.S1'] || {}).core || []), C('addition:add_three', 'Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10): the values of three coins together')] };
+// ---- r10 step rows (critic r9 §7 B) ----
+const NL100 = { span: 10, band: 100 }; const NL1000 = { span: 100, band: 1000 };
+const CROWS = (...ns) => ({ rows: ns.map(n => ({ step: n, start: 'zero', dir: 'up' })) });
+// number-line building blocks (N6). Y3.B1.S3 and Y2.B1.S11 deal the same 0-100 line their earlier step deals (selfPre)
+r3['Y3.B1.S3'] = { ...r3['Y3.B1.S3'], selfPre: ['number_sense:place_on_number_line'], relOnly: true,
+  core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 tens and ones on the number line to 100 (Grade 1): the same line, met again', NL100),
+    C('placevalue:compare', 'Y2.B1.S13 comparing 2-digit numbers: the greater one sits further along the line', { band: 99 }),
+    C('placevalue:order_least_to_greatest', 'Y2.B1.S14 ordering 2-digit numbers: the order the line shows', { band: 99 }),
+    C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 10s from 0: the tens marked on the line', CROWS(10))],
+  related: [R('number_sense:place_on_number_line', 'Y3.B1.S10 number line to 1,000 (the same week, W13): the line in hundreds', NL1000)] };
+r3['Y3.B1.S10'] = { ...(r3['Y3.B1.S10'] || {}), dropPre: ['comparing:compare_groups'],
+  core: [C('number_sense:place_on_number_line', 'Y3.B1.S3 the number line to 100 (taught earlier, the same week W13): tens marked on the line', NL100),
+    C('multiplication:count_by_tables', 'Y3.B1.S4 counting in 100s from 0: the hundreds marked on the line', CROWS(100))] };
+r3['Y3.B1.S11'] = { ...(r3['Y3.B1.S11'] || {}), dropPre: ['comparing:compare_groups'],
+  core: [C('number_sense:place_on_number_line', 'Y2.B1.S11 estimating on a line to 100 (Grade 1): the same judging by eye, with tens', NL100),
+    C('multiplication:count_by_tables', 'Y3.B1.S4 counting in 100s from 0: the hundreds marked on the line', CROWS(100))] };
+r3['Y2.B1.S11'] = { ...r3['Y2.B1.S11'], selfPre: ['number_sense:place_on_number_line'],
+  core: [C('number_sense:place_on_number_line', 'Y1.B12.S4 the number line to 100: placing a number before estimating it', NL100),
+    C('composing:tens_foundation_visual', 'Y1.B12.S2 tens to 100: the tens marked on the line'),
+    C('counting:number_seq_fill', 'Y1.B12.S1 counting to 100 in order', { range: 100 })] };
+// count from 0, never seq_N, where the why cites a count step (N5)
+r3['Y2.B1.S16'] = { ...r3['Y2.B1.S16'], core: [C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 (W4, the step before)', CROWS(2, 5, 10))] };
+r3['Y2.B5.S15'] = { ...(r3['Y2.B5.S15'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S13 the 10 times-table (the same week, W26): 5 × 4 is half of 10 × 4', { constant: [10] }),
+  C('multiplication:count_by_tables', 'Y1.B9.S3 / Y1.B9.S2 counting in 5s and 10s from 0', CROWS(5, 10))] };
+r3['Y3.B4.S1'] = { ...r3['Y3.B4.S1'], core: [C('multiplication:mult_facts', 'Y2.B5.S13 the 10 times-table (Grade 1): 7 × 10 = 70', { constant: [10] }),
+  ...r3['Y3.B4.S1'].core.filter(c => !/seq_10$/.test(c.key))] };
+r3['Y3.B3.S8'] = { ...(r3['Y3.B3.S8'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S9/S13/S15 the 2, 5 and 10 times-tables (Grade 1; the 2 times-table is on the W11 list)', { constant: [2, 5, 10] })] };
+r3['Y3.B8.S4'] = { ...(r3['Y3.B8.S4'] || {}), dropPre: ['fractions:shade_fraction'],
+  core: [C('division:div_facts', 'Y2.B5.S10-S16 / Y3.B3.S7-S10 dividing by the table: 1/3 of 12 is 12 ÷ 3', { constant: [2, 3, 4, 5] })] };
+r3['Y3.B7.S4'] = { ...r3['Y3.B7.S4'], dropPre: ['number_sense:place_on_number_line'],
+  core: [C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): the same exchange in another unit', { forms: [1] }),
+    C('placevalue:unit_form', 'Y3.B1.S8 1,000 = 10 hundreds: the 1,000 in 1 kg = 1,000 g', { band: 999 })] };
+for (const id of ['Y2.B7.S4', 'Y2.B7.S8']) r3[id] = { ...(r3[id] || {}), core: [...((r3[id] || {}).core || []),
+  C('multiplication:mult_facts', 'Y2.B5 the 2, 5 and 10 times-tables (W26-29): multiplying a measure', { constant: [2, 5, 10] }),
+  C('division:div_facts', 'Y2.B5.S10-S16 dividing by 2, 5 and 10 (W30-31): sharing a measure', { constant: [2, 5, 10] })] };
+for (const id of ['Y2.B7.S2', 'Y2.B7.S3']) relR3[id] = [...(relR3[id] || []), R('measurement:mass_volume_liquid', 'Y2.B7.S6/S7 reading a millilitre or litre scale (a later step, W35-36): the same scale reading', { forms: [0] })];
+r3['Y2.B10.S7'] = { ...(r3['Y2.B10.S7'] || {}), note: 'pictograph {range:50, scale:[0,1,2]} reads keys of 2, 5 and 10; about 1 "in all" question in 16 totals more than 120 (up to 200), above the Grade 1 range: the skill has no option that caps the total',
+  core: [C('multiplication:count_by_tables', 'Y1.B9.S1-S3 counting in 2s, 5s and 10s from 0: reading a key', CROWS(2, 5, 10))] };
+r3['Y3.B4.S9'] = { ...r3['Y3.B4.S9'], direct: [D('division:div_remainders', { constant: [2, 3, 4, 5, 8] })],
+  core: [C('division:div_facts', 'Y3.B3.S7/S10/S13 dividing by 3, 4 and 8 (W31)', { constant: [3, 4, 8] })] };
+r3['Y3.B11.S6'] = { ...r3['Y3.B11.S6'], core: r3['Y3.B11.S6'].core.map(c => c.key === 'angles_lines:identify_angles' ? C(c.key, 'Y3.B11.S3 compare angles (the same week, W29): perpendicular lines meet at a right angle', c.opts) : c) };
+linkFix['Y3.B11.S2'] = { ...(linkFix['Y3.B11.S2'] || {}), 'angles_lines:identify_angles': null };
+// N5b: share_into_groups deals grouping only
+Object.assign(whyText, { 'division:share_into_groups': 'making equal groups (grouping): ring the counters in groups of a size' });
+// A5: these hand notes named only part of the later steps; the computed note (key + opts, every later step) replaces them
+for (const id of ['Y3.B4.S9', 'Y3.B6.S7']) if (r3[id]) delete r3[id].relNote;
+for (const id of ['Y2.B7.S2', 'Y2.B7.S3']) relR3[id] = relR3[id].map(r => r.key === 'measurement:mass_volume_liquid' ? R(r.key, 'Y2.B7.S6 reading a millilitre scale (a later step, W36): the same scale reading', { forms: [0] }) : r);
+r3['Y2.B10.S7'].core = [C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key', CROWS(2, 5, 10))];

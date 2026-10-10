@@ -138,7 +138,8 @@ function descWhy(k,o,sid,old){const src=taughtAt(k,sid,o);const ot=optsText(k,o)
   return `${OV.whyText?.[k]||cleanLabel(k)}${ot?' ('+ot+')':''}${reason?': '+reason:''}${tail}`;}
 // r9: two opts of one key share no content when their table / part / denominator / form lists are disjoint
 // (mult_facts {constant:[5,10]} and {constant:[2]}); only then may a key sit in both pre and related
-function disjointOpts(a,b){const L=o=>{o=o||{};for(const f of ['constant','parts','denoms','forms'])if(Array.isArray(o[f]))return [f,o[f]];if(Array.isArray(o.rows))return ['rows',o.rows.map(r=>r.step)];return null;};
+function disjointOpts(a,b){if(a&&b&&a.span!=null&&b.span!=null&&a.span!==b.span)return true; // r10: a 0-100 line in tens and a 0-1,000 line in hundreds
+  const L=o=>{o=o||{};for(const f of ['constant','parts','denoms','forms'])if(Array.isArray(o[f]))return [f,o[f]];if(Array.isArray(o.rows))return ['rows',o.rows.map(r=>r.step)];return null;};
   const x=L(a),y=L(b);return !!(x&&y&&x[0]===y[0]&&!x[1].some(v=>y[1].includes(v)));}
 function whyMismatch(e){const w=String(e.why).split('(')[0];const o=e.opts||{};const tabs=o.constant||(o.rows||[]).map(x=>x.step);
   const named=[...w.matchAll(/(?:counting in (\d+)s|dividing by (\d+)|multiplying by (\d+)|the (\d+) times-table|Divide by (\d+)|Multiply by (\d+))/g)].map(m=>+(m[1]||m[2]||m[3]||m[4]||m[5]||m[6]));
@@ -157,6 +158,14 @@ function whyMismatch(e){const w=String(e.why).split('(')[0];const o=e.opts||{};c
 const UNITS=[[/\bmillilit|\bmL\b|\bml\b/i,/mL|ml\b|millil/i],[/\bkilogram|\bkg\b/i,/kg|kilogram/i],[/\bgrams?\b/i,/\bg\b|gram/i],[/\bmm\b|millimet/i,/mm\b|millimet/i],[/\bcm\b|centimet/i,/cm\b|centimet/i],[/\bmetres?\b|\bm and cm/i,/\d\s?m\b|metre|meter/i],[/\blitres?\b/i,/\bL\b|litre|liter/i],[/quarter past|quarter to/i,/:15|:45|quarter/i],[/\bthirds?\b/i,/\/3\b|third|"d":3/],[/\bquarters?\b/i,/\/4\b|quarter|"d":4/],[/\bpictogra/i,/pictogra|picto/i],[/\btally/i,/tally/i],[/\bnumber line/i,/number line|"ticks"|numberline|nl/i],[/\bdollars?|\$|cents?\b|¢/i,/\$|¢|cent|dollar/i]];
 // r8 (A2): a count step is dealt when a number-track / count-row payload steps by it (values [10,12,14,16] = 2s)
 function payloadStep(its,n){for(const q of its)for(const m of String(q.p).matchAll(/\[(\d+(?:,\d+){2,})\]/g)){const v=m[1].split(',').map(Number);const d=v.slice(1).map((x,i)=>Math.abs(x-v[i]));if(d.every(x=>x===n))return true;}return false;}
+// r10 (critic r9 N5a): a why that cites a count from 0 must deal >= 90% of its items on the multiples of that count
+const COUNTKEY=/^(patterns:(seq_\d+|skip_count_line)|multiplication:count_by_tables|counting:number_seq_fill|composing:hundreds_chart_fill)$/;
+const COUNTCITE=/\bCount in (2|5|10)s\b|counting in (2|5|10)s|\bTens to 100\b|\b(Y1\.B9\.S[123]|Y1\.B12\.S2|Y2\.B1\.S15)\b/i;
+function countNs(why){const w=String(why);const ns=new Set();for(const m of w.matchAll(/\b(?:count(?:ing)? in|count by)\s+((?:\d+s?(?:,\s*|\s+and\s+|\s*\/\s*)?)+)/gi))for(const d of m[1].matchAll(/\d+/g))ns.add(+d[0]);
+  if(/Tens to 100|Y1\.B12\.S2/i.test(w))ns.add(10);if(/Y1\.B9\.S1\b/.test(w))ns.add(2);if(/Y1\.B9\.S2\b/.test(w))ns.add(10);if(/Y1\.B9\.S3\b/.test(w))ns.add(5);if(/Y2\.B1\.S15\b/.test(w)&&!ns.size)[2,5,10].forEach(n=>ns.add(n));return [...ns].filter(n=>[2,3,4,5,8,10,50,100].includes(n));}
+function countMultFrac(e,ns){const its=markerHits.items(e.key,e.opts||{}).slice(0,60);if(!its.length||!ns.length)return 1;let ok=0;
+  for(const q of its){let p=null;try{p=q.p?JSON.parse(q.p):null;}catch(_){}const nums=Array.isArray(p?.values)?p.values.filter(x=>typeof x==='number'):[...(q.to+' '+q.a).replace(/\bt\d+\b/g,'').matchAll(/\d+/g)].map(x=>+x[0]);
+    if(nums.length&&ns.some(n=>nums.every(x=>x%n===0)))ok++;}return ok/its.length;}
 function whyContentBad(e){const head=String(e.why).split('—')[0].split(/\(Y\d|\(prior|\(earlier|\(taught/)[0].split(':')[0].replace(/\b(is |as )?(the )?same (exchange|idea|calculation|compare|count|language)\b[\s\S]*/i,'').replace(/\b(like|as in)\b[\s\S]*/i,'');const its=markerHits.items(e.key,e.opts||{}).slice(0,60);if(!its.length)return [];
   const txt=its.map(q=>q.to+' '+q.a+' '+q.p+' '+(q.v||'')).join(' \n ');const mx=Math.max(...its.map(q=>Math.max(0,...[...(q.t+' '+q.a).replace(/\d{1,2}:\d\d/g,'').replace(/\d+(?:,\d+){2,}/g,x=>x.replace(/,/g,' '))/* r9: an ordering answer "236,511,961" is a list, not one number */.replace(/(\d),(\d{3})(?!\d)/g,'$1$2').matchAll(/\d+/g)].map(m=>+m[0]))));const bad=[];const isTime=/^measurement:(time|elapsed|clock)/.test(e.key);
   for(const m of head.matchAll(/(?:within|to|up to) (\d[\d,]*)/gi)){const n=+m[1].replace(/,/g,'');if(mx>n*1.05&&n>=10)bad.push(m[0]);}
@@ -180,7 +189,8 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   const why=o.why||{};
   for(const t of T){const k=resolve(t.key);const inD=direct.find(d=>d.key===k),inP=partial.find(p=>p.key===k);
     if(!k||(!inD&&!inP))out.tagFixes.push({key:t.key,step:s.id,action:'remove',why:why[t.key]||o.removeWhy||'items generated with every option do not teach this step'});
-    else if(inP&&!t.partial)out.tagFixes.push({key:k,step:s.id,action:'partial',why:inP.missing});}
+    // r10 (critic r9 N7): a partial whose clause changed is re-emitted too, so the merged SKILL_WRM clause equals this file's
+    else if(inP&&(!t.partial||t.partial!==inP.missing))out.tagFixes.push({key:k,step:s.id,action:'partial',why:inP.missing});}
   for(const d of direct)if(!T.find(t=>resolve(t.key)===d.key&&!t.partial))out.tagFixes.push({key:d.key,step:s.id,action:'add',why:why[d.key]||('teaches the step with opts '+JSON.stringify(d.opts))});
   for(const p of partial)if(!T.find(t=>resolve(t.key)===p.key))out.tagFixes.push({key:p.key,step:s.id,action:'add',why:'partial: '+p.missing});
   let build=o.build?[...o.build]:[...(propsOf[s.id]||[])];
@@ -202,12 +212,18 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // its opts are empty, or equal one of the direct's opts, or the direct has no opts. mult_facts {constant:[4]} is a
   // different ladder step from the direct mult_facts {constant:[8]}.
   const dOpts={};for(const d of [...direct,...partial])(dOpts[d.key]??=[]).push(JSON.stringify(d.opts||{}));
-  const isDirect=(k,op)=>{if(!allDirect.has(k))return false;const js=JSON.stringify(op||{});if(js==='{}'||dOpts[k].includes('{}')||dOpts[k].includes(js))return true;return false;};
+  // r10: a direct with {} takes the skill's DEFAULTS, so a link with other explicit opts is another rung (key + opts, as the critic's scans read it)
+  const isDirect=(k,op)=>{if(!allDirect.has(k))return false;const js=JSON.stringify(op||{});if(js==='{}'||dOpts[k].includes(js))return true;return false;};
   // r9 (N4a): a PRE whose opts contain a direct's own parts / tables / denominators would deal the step itself
-  const ARR=['parts','constant','denoms'];
+  const ARR=['parts','constant','denoms','forms']; // r10: forms too (length_metric {forms:[0,1,2]} holds the step's own form 1)
   // related: a link that contains the step's own parts / denominators / forms deals the step itself (mixed table facts stay)
-  const isDirectRel=(k,op)=>{if(isDirect(k,op))return true;if(!allDirect.has(k)||!op)return false;return [...direct,...partial].filter(d=>d.key===k).some(d=>['parts','denoms','forms'].some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&d.opts[a].every(v=>op[a].includes(v))));};
-  const isDirectPre=(k,op)=>{if(isDirect(k,op))return true;if(!allDirect.has(k)||!op)return false;return [...direct,...partial].filter(d=>d.key===k).some(d=>ARR.some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&d.opts[a].every(v=>op[a].includes(v))));};
+  // r10: a related link whose parts / denoms / forms lie inside the direct's is the step's own content (length_metric form 0 on forms 0-2)
+  const isDirectRel=(k,op)=>{if(isDirect(k,op))return true;if(!allDirect.has(k)||!op)return false;return [...direct,...partial].filter(d=>d.key===k).some(d=>['parts','denoms','forms'].some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&(d.opts[a].every(v=>op[a].includes(v))||op[a].every(v=>d.opts[a].includes(v)))));};
+  // r10 (critic r9 N6): for pre, a link with opts under a direct that takes every option ({}) is a lower rung, not the step itself
+  const RS=o=>Array.isArray(o?.rows)?o.rows.map(r=>r.step):null; // count rows compare by their steps
+  // o.selfPre: a PARTIAL skill whose dealt content is exactly an earlier step's (the number line to 100 on an estimating step)
+  const isDirectPre=(k,op)=>{if(!allDirect.has(k))return false;if((o.selfPre||[]).includes(k)&&!direct.some(d=>d.key===k))return false;const js=JSON.stringify(op||{});if(js==='{}'||dOpts[k].includes(js))return true;if(!op)return false;
+    return [...direct,...partial].filter(d=>d.key===k).some(d=>ARR.some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&d.opts[a].every(v=>op[a].includes(v)))||(RS(d.opts)&&RS(op)&&RS(d.opts).every(v=>RS(op).includes(v))));};
   const pre=[],preBuild=[];
   const cands=[];let ord=0;
   const dropPre=new Set((o.dropPre||[]).map(resolve));
@@ -216,7 +232,17 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   const cand=(k,why,tier,opts)=>{k=resolve(k);if(okKey(k,opts))cands.push({key:k,why,tier,ord:ord++,...(opts?{opts}:{})});};
   const addPB=pid=>{if(build.includes(pid)||preBuild.includes(pid)||preBuild.length>=3)return;preBuild.push(pid);usedProps.add(pid);};
   for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])cand(p.key,p.why,0,p.opts);
+  // r10 (critic r9 N6): automatic candidates carry the cited step's own opts, so a lower rung of a direct key (same key,
+  // other opts) survives isDirectPre instead of being dropped as the step's own skill
   for(const p of o.core||[])cand(p.key,p.why,1,p.opts);
+  // r10 (critic r9 N6, rule 14): the lower rung of each of the step's own skills. The latest step taught before this one (this
+  // year by school week, else the year before) that deals the same key with OTHER opts is a building block; isDirectPre still
+  // drops a rung whose opts are the step's own or a superset of them.
+  if(!o.noRung)for(const d of [...direct,...partial]){const pool=order.filter(id=>id!==s.id&&(id.startsWith(YEAR+'.')?taughtBefore(id,s.id):id.startsWith(prevYear+'.'))&&allOf(id).includes(d.key));
+    const so=x=>stepOptsFor(x,d.key)||{};const rungs=pool.filter(x=>JSON.stringify(so(x))!==JSON.stringify(d.opts||{})&&Object.keys(so(x)).length&&!isDirectPre(d.key,so(x)));
+    rungs.sort((x,y)=>{const sx=x.startsWith(YEAR+'.')?1:0,sy=y.startsWith(YEAR+'.')?1:0;return sx-sy||(sx?((SWK[x]??0)-(SWK[y]??0)):0)||(order.indexOf(x)-order.indexOf(y));});
+    const r=rungs.pop();if(!r)continue;const same=r.startsWith(YEAR+'.');
+    cand(d.key,`${r.split('.').slice(0,3).join('.')} ${stepById[r].title} (${same?'taught earlier, W'+SWK[r]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear)}): this step's skill as it was met then`,1,so(r));}
   // rule 14: a related key that is the skill of an EARLIER step of this year is a building block -> pre
   // r8 (A4): relOnly with its own related list (even []) replaces extraRelated and relR3
   const handRelAll=o.relOnly&&o.related?[...o.related]:[...(o.related||[]),...(OV.extraRelated?.[s.id]||[]),...(OV.relR3?.[s.id]||[])];
@@ -230,17 +256,17 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    const wk=lessonWeek[s.id];const ps=wk?priorSteps(wk):[];
    const kept=ps.filter(x=>stepById[x.id]&&feeds(s,stepById[x.id])&&order.indexOf(x.id)<order.indexOf(s.id)&&taughtBefore(x.id,s.id))
      .map(x=>({...x,same:topic(stepById[x.id])===topic(s)?0:1,dist:order.indexOf(s.id)-order.indexOf(x.id)})).sort((a,b)=>a.same-b.same||a.dist-b.dist);
-   if(prev&&topic(prev)===topic(s))for(const k of allOf(prev.id).slice(0,2))cand(k,`${prev.id} ${prev.title} (taught before this step${prev.block===s.block?' in the block':''})`,1);
+   if(prev&&topic(prev)===topic(s))for(const k of allOf(prev.id).slice(0,2))cand(k,`${prev.id} ${prev.title} (taught before this step${prev.block===s.block?' in the block':''})`,1,stepOptsFor(prev.id,k)||undefined);
    for(const x of kept){const st=stepById[x.id];const ks=allOf(x.id);
      if(!ks.length){if(topic(st)===topic(s))for(const pid of propsOf[x.id]||[])addPB(pid);continue;}
-     for(const k of ks.slice(0,2))cand(k,`${x.id} ${st.title} (prior learning wk ${wk})`,x.same?5:3);}
+     for(const k of ks.slice(0,2))cand(k,`${x.id} ${st.title} (prior learning wk ${wk})`,x.same?5:3,stepOptsFor(x.id,k)||undefined);}
    // r8 (A1, rule 19): every block step TAUGHT EARLIER (school week), nearest week first, whatever its WRM position
-   {let n=0;for(const st of b.steps.filter(x=>x.id!==s.id&&x.id!==prev?.id&&topic(x)===topic(s)&&taughtBefore(x.id,s.id)).sort((a,c)=>((SWK[c.id]??0)-(SWK[a.id]??0))||(order.indexOf(c.id)-order.indexOf(a.id)))){if(n>=3)break;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (taught earlier, W${SWK[st.id]})`,4);}}
+   {let n=0;for(const st of b.steps.filter(x=>x.id!==s.id&&x.id!==prev?.id&&topic(x)===topic(s)&&taughtBefore(x.id,s.id)).sort((a,c)=>((SWK[c.id]??0)-(SWK[a.id]??0))||(order.indexOf(c.id)-order.indexOf(a.id)))){if(n>=3)break;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (taught earlier, W${SWK[st.id]})`,4,stepOptsFor(st.id,k)||undefined);}}
   }
   const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=14)continue;seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{})});}};
   take();
   if(pre.length<3&&prevYear&&!o.preOnly){const py=W.years.find(y=>y.id===prevYear);const cand6=py.blocks.flatMap(bb=>bb.steps).filter(st=>topic(st)===topic(s)).reverse();
-    let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0,null)||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6);n++;}
+    let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0,stepOptsFor(st.id,k0))||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6,stepOptsFor(st.id,k0)||undefined);n++;}
     take();}
   if(pre.length<3){for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(cands.find(c=>c.key===k))continue;cand(k,l.why+' (topic ladder)',7,l.opts);take();if(pre.length>=3)break;}}
   for(const pid of o.preBuild||[])addPB(pid);
@@ -298,11 +324,28 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}};if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
   // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
   for(const e of pre){for(const x of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0]))if(x.startsWith(YEAR+'.')&&!taughtBefore(x,s.id)){const q=x.replace(/\./g,'\\.');e.why=e.why.replace(new RegExp('\\s*/\\s*'+q),'').replace(new RegExp(q+'\\s*/\\s*'),'');}}
+  // r10 (critic r9 N5a): seq_2/5/10 count on from ANY number ("16, 26, 36"); a link that cites a count from 0 ("Count in 10s",
+  // "Tens to 100", the count steps Y1.B9.S1-S3 / Y1.B12.S2 / Y2.B1.S15) is the true count, count_by_tables from zero.
+  // Rows of several such links in one list merge into one count_by_tables link.
+  for(const list of [pre,related])for(let j=0;j<list.length;j++){const e=list[j];const m=/^patterns:(?:seq_(2|5|10)|skip_count_line)$/.exec(e.key);if(!m||!COUNTCITE.test(e.why)||/from any number|counting on/i.test(e.why))continue;
+    // skip_count_line also jumps on from any number: it becomes the count from 0 its why names
+    const N=m[1]?+m[1]:countNs(e.why)[0];if(!N)continue;const row={step:N,start:'zero',dir:'up'};if(list===pre&&isDirectPre('multiplication:count_by_tables',{rows:[row]})){list.splice(j,1);j--;continue;}
+    // a row always holds 12 numbers (0 ... 110 in 10s): above 100 before Grade 1 counts past 100 (Y2.B1.S15, W4), so it is dropped there
+    if(YEAR==='Y2'&&N*11>100&&(SWK[s.id]??999)<(SWK['Y2.B1.S15']??0)){list.splice(j,1);j--;continue;}const ex=list.find((x,i)=>i!==j&&x.key==='multiplication:count_by_tables');
+    if(ex){const rows=[...(ex.opts?.rows||[])];if(!rows.some(r=>r.step===row.step)){rows.push(row);rows.sort((x,y)=>x.step-y.step);if(!(list===pre&&isDirectPre(ex.key,{...(ex.opts||{}),rows}))){ex.opts={...(ex.opts||{}),rows};const ns=rows.map(r=>r.step);const ci=[...new Set([...String(ex.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g),...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]))];
+      ex.why=`counting in ${ns.slice(0,-1).join(', ')}${ns.length>1?' and ':''}${ns[ns.length-1]}s from 0${ci.length?' ('+ci.join(', ')+')':''}`;}}list.splice(j,1);j--;continue;}
+    {const own=order.find(id=>id.startsWith(YEAR+'.')&&id!==s.id&&taughtBefore(id,s.id)&&allOf(id).includes('multiplication:count_by_tables')&&(stepOptsFor(id,'multiplication:count_by_tables')?.rows||[]).some(r=>r.step===N&&r.start==='zero'));
+     const ci=[...new Set([...[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]),...(own?[own]:[])])];const tail=String(e.why).replace(/\([^)]*\)/g,'').split(':').slice(1).join(':').trim().replace(/\b(the )?tens on the line\b/,'the tens marked on the line');
+     list[j]={key:'multiplication:count_by_tables',opts:{rows:[row]},why:`${ci.length?ci.join(' / ')+' ':''}counting in ${N}s from 0${tail?': '+tail:''}`};}}
+  {const pk=new Set(pre.map(x=>x.key));for(let j=related.length-1;j>=0;j--)if(related[j].key==='multiplication:count_by_tables'&&pk.has(related[j].key)&&!pre.filter(x=>x.key===related[j].key).every(x=>disjointOpts(x.opts,related[j].opts)))related.splice(j,1);}
   for(const e of [...pre,...related]){if(e.swapped&&e.why.includes('[rule'))e.why=descWhy(e.key,e.opts,s.id,e.why);delete e.swapped;
     e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');
     // r7: a cited step whose own opts for this key differ from the link's: cite the step that uses these opts instead
     if(e.opts&&Object.keys(e.opts).length&&!/\((next step|a later step|taught earlier|taught later|the same week)/.test(e.why))for(const c of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0])){const so=stepOptsFor(c,e.key);if(JSON.stringify(so||{})!==JSON.stringify(e.opts)){const t=taughtAt(e.key,s.id,e.opts);if(t&&t!==c&&JSON.stringify(stepOptsFor(t,e.key))===JSON.stringify(e.opts))e.why=e.why.replace(c,t).replace(stepById[c].title,stepById[t].title);}}
     if(whyMismatch(e))e.why=descWhy(e.key,e.opts,s.id,e.why);
+    // r10 (critic r9 N5b): share_into_groups deals GROUPING only ("Make groups of M. How many groups?"): never cite a sharing step
+    if(e.key==='division:share_into_groups'&&/shar/i.test(e.why))e.why=(YEAR==='Y2'?'Y1.B9.S8':'Y2.B5.S7')+' making equal groups (grouping): ring the counters in groups of a size';
+    if(COUNTKEY.test(e.key)&&COUNTCITE.test(e.why)&&!/from any number|counting on/i.test(e.why)){const ns=countNs(e.why);const fr=countMultFrac(e,ns);if(fr<0.9){console.error('COUNTCHECK',s.id,e.key,JSON.stringify(e.opts),'counts',ns.join('/'),'multiples',fr.toFixed(2),'|',e.why.slice(0,80));process.exitCode=1;}}
     if(whyContentBad(e).length)console.error('WHYBAD',s.id,e.key,JSON.stringify(e.opts),whyContentBad(e).join(','),'|',e.why.slice(0,80));}
   pre.splice(8);related.splice(6);
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
@@ -313,21 +356,24 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // are not linked (already linked here; content first taught later, rule 19; a gap step). A later step whose skill is
   // free to link would have been linked above, so the build reports one as an error (the notecheck rule).
   let relNoteAuto='';
+  // an earlier-taught step of this year that deals key k with these same opts
+  const esOpts=(k,op)=>order.find(id=>id.startsWith(YEAR+'.')&&id!==s.id&&taughtBefore(id,s.id)&&allOf(id).includes(k)&&JSON.stringify(stepOptsFor(id,k)||{})===JSON.stringify(op||{}))||null;
   if(!related.length){const have=new Set([...pre,...direct,...partial].map(e=>e.key+JSON.stringify(e.opts||{})));const haveK=new Set([...pre,...direct,...partial].map(e=>e.key));
     const later=b.steps.filter(x=>x.id!==s.id&&!taughtBefore(x.id,s.id)).sort((a,c)=>((SWK[a.id]??999)-(SWK[c.id]??999)));const why=[];
     for(const st of later){const sk=[...(OV.steps[st.id]?.direct||[]),...(OV.steps[st.id]?.partials||[]),...(OV.r3?.[st.id]?.direct||[]),...(OV.r3?.[st.id]?.partials||[])];
       const keys=allOf(st.id);if(!keys.length){why.push(`${st.id} ${st.title} (W${SWK[st.id]}) has no skill yet`);continue;}
       const reasons=[];for(const k of keys){const op=stepOptsFor(st.id,k)||{};const hits=markerHits(k,op,s.id);
         const swp=SW[k]&&(!SW[k].only||SW[k].only.test(s.id))&&(!SW[k].not||!SW[k].not.test(s.id))&&SW[k].to!==k?SW[k]:null;
-        if(haveK.has(k))reasons.push(`${k.split(':')[1]} is already linked here`);
+        // r10 (critic r9 A5): already linked by key AND opts (mass_volume_liquid forms 1 linked does not cover the later forms 0)
+        if(have.has(k+JSON.stringify(op))||(haveK.has(k)&&!Object.keys(op).length))reasons.push(`${k.split(':')[1]} is already linked here`);
         else if(hits.length)reasons.push(`${k.split(':')[1]} deals ${hits[0].m} content first taught ${hits[0].mw===999?'in a later grade':'W'+hits[0].mw} (rule 19)`);
         else if(swp)reasons.push(`${k.split(':')[1]} deals content above this grade (rule 18), so it is not linked`);
-        else if(earlierStep(k,s.id,true))reasons.push(`${k.split(':')[1]} is already taught in ${earlierStep(k,s.id,true)} (W${SWK[earlierStep(k,s.id,true)]}), before this step: earlier learning, not a next step`);
+        else if(esOpts(k,op))reasons.push(`${k.split(':')[1]} is already taught in ${esOpts(k,op)} (W${SWK[esOpts(k,op)]}), before this step: earlier learning, not a next step`);
         else if(topic(st)!==topic(s))reasons.push(`${k.split(':')[1]} is another topic`);
         else{reasons.push(`${k.split(':')[1]} is FREE`);console.error('NOTECHECK',s.id,'later',st.id,k,'could be related');}}
       if(reasons.every(r=>/already linked here/.test(r)))continue; // nothing to explain
       why.push(`${st.id} (W${SWK[st.id]}): ${[...new Set(reasons)].join('; ')}`);if(why.length>=4)break;}
-    relNoteAuto='no related skill: '+(why.length?'the later-taught steps of the block are '+why.join(' | '):(later.length?'every later-taught step of the block uses skills already linked here':'no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)'));}
+    relNoteAuto='no related skill: '+(why.length?'the later-taught steps of the block are '+why.join(' | '):(later.length?'every later-taught step of the block uses skills already linked here':'no step of the block is taught after this one'));}
   if(!related.length&&!o.relNote&&!relNoteAuto)console.error('NOREL(after linkFix)',s.id,s.title);
   if(pre.length<3)console.error('THINPRE(after linkFix)',s.id,s.title,pre.length);
   for(const id of build)usedProps.add(id);
@@ -358,6 +404,8 @@ for(const s of Object.values(out.steps))for(const x of [...s.direct,...s.partial
 for(const s of Object.values(out.steps))for(const d of s.direct)if('note' in (d.opts||{}))throw new Error('note in opts '+d.key);
 fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(out,null,1)+'\n');
+// r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
+{const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
 const c={full:0,partial:0,gap:0};for(const s of Object.values(out.steps))c[s.verdict]++;
 const pr=Object.values(out.proposals);
 console.log(YEAR,Object.keys(out.steps).length,'steps',JSON.stringify(c),'proposals new',pr.filter(p=>!p.reused).length,'reused',pr.filter(p=>p.reused).length,'tagFixes',out.tagFixes.length,'unreviewed',missingReview.length);

@@ -35,13 +35,6 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
      "key": "counting:number_seq_fill",
      "why": "filling in the missing numbers of a number track — Y1.B12.S1 Count from 50 to 100",
      "opts": {
@@ -114,6 +107,13 @@
      "opts": {}
     },
     {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S1 Numbers to 20 (taught earlier, W1): this step's skill as it was met then",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "composing:teen_compose",
      "why": "Y2.B1.S1 Numbers to 20 (taught before this step in the block)",
      "opts": {}
@@ -129,13 +129,6 @@
      "key": "composing:tens_foundation_visual",
      "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)",
-     "opts": {
-      "band": 50
-     }
     },
     {
      "key": "counting:number_seq_fill",
@@ -198,17 +191,17 @@
    "build": [],
    "pre": [
     {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S1 Numbers to 20 (taught earlier, W1): this step's skill as it was met then",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "placevalue:unit_form",
      "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W01)",
      "opts": {
       "band": 99
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)",
-     "opts": {
-      "band": 50
      }
     },
     {
@@ -308,13 +301,6 @@
      }
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
      "key": "counting:number_seq_fill",
      "why": "filling in the missing numbers of a number track — Y1.B12.S1 Count from 50 to 100",
      "opts": {
@@ -336,6 +322,11 @@
     {
      "key": "composing:teen_compose",
      "why": "Y1.B4.S4 Understand 14, 15 and 16 (prior learning wk W01)",
+     "opts": {}
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W01)",
      "opts": {}
     }
    ],
@@ -406,13 +397,6 @@
      "key": "composing:tens_foundation_visual",
      "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
-     "opts": {
-      "band": 50
-     }
     },
     {
      "key": "composing:teen_compose",
@@ -494,13 +478,6 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
      "key": "composing:teen_compose",
      "why": "Y1.B4.S3 Understand 11, 12 and 13 (prior learning wk W02)",
      "opts": {}
@@ -573,13 +550,6 @@
      "key": "composing:tens_foundation_visual",
      "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
-     "opts": {
-      "band": 50
-     }
     },
     {
      "key": "composing:teen_compose",
@@ -656,13 +626,6 @@
      "key": "composing:tens_foundation_visual",
      "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)",
-     "opts": {
-      "band": 50
-     }
     },
     {
      "key": "composing:teen_compose",
@@ -899,11 +862,17 @@
    ],
    "pre": [
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 counting in 10s: the tens on the line",
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 the number line to 100: placing a number before estimating it",
      "opts": {
-      "band": 50
+      "span": 10,
+      "band": 100
      }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 tens to 100: the tens marked on the line",
+     "opts": {}
     },
     {
      "key": "counting:number_seq_fill",
@@ -1275,24 +1244,26 @@
    "build": [],
    "pre": [
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 / Y2.B1.S15 counting in 2s: counting in equal steps",
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 (W4, the step before)",
      "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 / Y2.B1.S15 counting in 5s",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y2.B1.S15 counting in 10s",
-     "opts": {
-      "band": 50
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     },
     {
@@ -1577,11 +1548,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W05)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y1.B12.S2 / Y2.B1.S15 counting in 10s from 0"
     },
     {
      "key": "counting:number_seq_fill",
@@ -1638,6 +1615,13 @@
    ],
    "pre": [
     {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (taught earlier, W7): this step's skill as it was met then",
+     "opts": {
+      "step": 10
+     }
+    },
+    {
      "key": "addition:number_families_add",
      "why": "Y2.B2.S3 Related facts (taught before this step in the block)",
      "opts": {}
@@ -1675,15 +1659,6 @@
      "key": "number_sense:make_a_ten",
      "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -2216,7 +2191,7 @@
    "pre": [
     {
      "key": "patterns:seq_10",
-     "why": "Y2.B1.S15 counting on and back in 10s",
+     "why": "counting on and back in 10s from any number (36, 46, 56): the 10 more, 10 less pattern",
      "opts": {
       "band": 50
      }
@@ -2996,6 +2971,15 @@
    "build": [],
    "pre": [
     {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (taught earlier, W13): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)",
      "opts": {}
@@ -3003,11 +2987,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "Y1.B3.S1 naming 3-D shapes (topic ladder)",
      "opts": {}
     }
    ],
@@ -3158,7 +3137,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
+   "note": "no related skill: no step of the block is taught after this one"
   },
   "Y2.B3.S7": {
    "title": "Sort 2-D shapes",
@@ -3330,6 +3309,15 @@
      "opts": {}
     },
     {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S8 Count faces on 3-D shapes (taught earlier, W14): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)",
      "opts": {}
@@ -3387,6 +3375,15 @@
      "key": "shapes_early:name_3d_shapes",
      "why": "Y1.B3.S1 naming 3-D shapes",
      "opts": {}
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S9 Count edges on 3-D shapes (taught earlier, W14): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -3581,18 +3578,9 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 counting in 5s: counting 5-cent coins",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 counting in 10s: counting 10-cent coins",
-     "opts": {
-      "band": 50
-     }
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10): the values of three coins together",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -3655,6 +3643,14 @@
      }
     },
     {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S1 Count money - pence (taught earlier, W32): this step's skill as it was met then",
+     "opts": {
+      "currency": "usd",
+      "kind": "like"
+     }
+    },
+    {
      "key": "measurement:coin_value",
      "why": "Y2.B4.S1 Count money - pence (taught before this step in the block)",
      "opts": {
@@ -3687,16 +3683,15 @@
    ],
    "related": [
     {
-     "key": "measurement:money_count",
-     "why": "Y2.B4.S3 Count money - pounds and pence (next step, W32: the same idea one step further)",
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (next step, W32: the same idea one step further)",
      "opts": {
-      "currency": "usd",
-      "kind": "both"
+      "currency": "usd"
      }
     },
     {
-     "key": "measurement:equiv_coin_sets",
-     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
+     "key": "measurement:make_change_least_coins",
+     "why": "Y2.B4.S4 Choose notes and coins (a later step, W33: the same idea one step further)",
      "opts": {
       "currency": "usd"
      }
@@ -3741,6 +3736,14 @@
         "dir": "up"
        }
       ]
+     }
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S2 Count money - pounds (notes and coins) (taught earlier, W32): this step's skill as it was met then",
+     "opts": {
+      "currency": "usd",
+      "kind": "note"
      }
     },
     {
@@ -4134,6 +4137,13 @@
      }
     },
     {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (taught earlier, W32): this step's skill as it was met then",
+     "opts": {
+      "currency": "usd"
+     }
+    },
+    {
      "key": "measurement:money",
      "why": "Y2.B4.S7 Calculate with money (taught before this step in the block)",
      "opts": {
@@ -4167,16 +4177,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W34)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "Y1.B2.S10 Addition problems (prior learning wk W34)",
-     "opts": {}
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y2.B5.S13 / Y2.B5.S13 counting in 10s from 0"
     }
    ],
    "preBuild": [],
@@ -4390,19 +4401,6 @@
        2
       ]
      }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
-     }
     }
    ],
    "note": ""
@@ -4461,11 +4459,27 @@
      }
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W28)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s"
     }
    ],
    "preBuild": [],
@@ -4537,25 +4551,42 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W28)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S17 The 5 and 10 times-tables (taught earlier, W26)",
+     "opts": {
+      "constant": [
+       5,
+       10
+      ]
      }
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (prior learning wk W28)",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -4605,6 +4636,13 @@
      }
     },
     {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (taught earlier, W28): this step's skill as it was met then",
+     "opts": {
+      "band": 25
+     }
+    },
+    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S3 Add equal groups (taught before this step in the block)",
      "opts": {
@@ -4643,13 +4681,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -4699,6 +4730,15 @@
      }
     },
     {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S3 Add equal groups (taught earlier, W28): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (taught before this step in the block)",
      "opts": {
@@ -4735,13 +4775,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -4782,6 +4815,15 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S3 Add equal groups (taught earlier, W28): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "multiplication:repeated_add_to_mult",
      "why": "an array row by row is a repeated addition (earlier step this builds on: Y2.B5.S3 Add equal groups)",
      "opts": {
@@ -4790,7 +4832,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W29)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -4813,11 +4855,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y1.B9.S1 / Y2.B1.S15 counting in 2s from 0"
     }
    ],
    "preBuild": [],
@@ -4828,19 +4876,6 @@
      "opts": {
       "constant": [
        2
-      ]
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
       ]
      }
     }
@@ -4901,11 +4936,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y1.B9.S1 / Y2.B1.S15 counting in 2s from 0"
     }
    ],
    "preBuild": [],
@@ -4916,19 +4957,6 @@
      "opts": {
       "constant": [
        2
-      ]
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
       ]
      }
     }
@@ -4987,11 +5015,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y1.B9.S1 / Y2.B1.S15 counting in 2s from 0"
     }
    ],
    "preBuild": [],
@@ -5002,19 +5036,6 @@
      "opts": {
       "constant": [
        2
-      ]
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
       ]
      }
     }
@@ -5051,8 +5072,31 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S17 The 5 and 10 times-tables (taught earlier, W26): this step's skill as it was met then",
+     "opts": {
+      "constant": [
+       5,
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S15 The 5 times-table (taught earlier, W26): this step's skill as it was met then",
+     "opts": {
+      "rows": [
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "division:share_into_groups",
-     "why": "Y2.B5.S8 Make equal groups – sharing (taught before this step in the block)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5086,18 +5130,6 @@
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W29)",
      "opts": {
       "band": 25
-     }
-    },
-    {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)",
-     "opts": {}
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
-     "opts": {
-      "band": 50
      }
     }
    ],
@@ -5163,7 +5195,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5184,13 +5216,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W30)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
-     "opts": {
-      "band": 50
-     }
     },
     {
      "key": "multiplication:arrays_groups",
@@ -5256,7 +5281,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5272,11 +5297,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y2.B5.S9 / Y2.B5.S9 counting in 2s from 0"
     },
     {
      "key": "multiplication:mult_facts",
@@ -5336,7 +5367,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W30)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5352,11 +5383,17 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y2.B5.S9 / Y2.B5.S9 counting in 2s from 0"
     },
     {
      "key": "division:div_facts",
@@ -5381,7 +5418,7 @@
    "related": [
     {
      "key": "counting:number_seq_fill",
-     "why": "counting in 2s along a number track: the even and odd numbers in order",
+     "why": "counting on in 2s from any number along a number track: the even and odd numbers in order",
      "opts": {
       "step": 2,
       "range": 20
@@ -5420,10 +5457,21 @@
    "build": [],
    "pre": [
     {
-     "key": "patterns:seq_10",
-     "why": "Y2.B1.S15 counting in 10s: the 10 times-table is the count of 10s",
+     "key": "multiplication:count_by_tables",
+     "why": "counting in equal steps from 0 (counting in 3s, 5s from 0) — Y2.B1.S16 Count in 3s",
      "opts": {
-      "band": 50
+      "rows": [
+       {
+        "step": 3,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     },
     {
@@ -5456,13 +5504,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -5473,19 +5514,6 @@
      "opts": {
       "constant": [
        5
-      ]
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S15 The 5 times-table (next step, W26: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 5,
-        "start": "zero",
-        "dir": "up"
-       }
       ]
      }
     }
@@ -5519,8 +5547,17 @@
      }
     },
     {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (taught earlier, W30): this step's skill as it was met then",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    },
+    {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5543,18 +5580,22 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)",
-     "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "counting in equal steps from 0 (counting in 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s"
     },
     {
      "key": "patterns:double",
@@ -5608,6 +5649,28 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 the 10 times-table (the same week, W26): 5 × 4 is half of 10 × 4",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (taught earlier, W26): this step's skill as it was met then",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W26)",
      "opts": {
@@ -5637,20 +5700,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -5690,8 +5739,17 @@
      }
     },
     {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (taught earlier, W31): this step's skill as it was met then",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -5714,18 +5772,22 @@
      "opts": {}
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)",
+     "key": "multiplication:count_by_tables",
      "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)",
-     "opts": {
-      "band": 50
-     }
+      "rows": [
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "counting in equal steps from 0 (counting in 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s"
     },
     {
      "key": "patterns:double",
@@ -5737,7 +5799,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
+   "note": "no related skill: no step of the block is taught after this one"
   },
   "Y2.B5.S17": {
    "title": "The 5 and 10 times-tables",
@@ -5767,12 +5829,26 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 The 5 times-table (taught earlier, W26): this step's skill as it was met then",
+     "opts": {
+      "constant": [
+       5
+      ]
+     }
+    },
+    {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S15 The 5 times-table (taught before this step in the block)",
+     "why": "counting in equal steps from 0 (counting in 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
         "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
         "start": "zero",
         "dir": "up"
        }
@@ -5809,20 +5885,6 @@
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W26)",
      "opts": {}
-    },
-    {
-     "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 Count in 5s (prior learning wk W26)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -5832,16 +5894,6 @@
      "why": "counting 5-cent and 10-cent coins",
      "opts": {
       "currency": "usd"
-     }
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "counting in 5s as jumps on a number line",
-     "opts": {
-      "step": [
-       0
-      ],
-      "band": 50
      }
     }
    ],
@@ -6241,8 +6293,18 @@
    "preBuild": [
     "nonstandard_mass"
    ],
-   "related": [],
-   "note": "no related skill: the later-taught steps of the block are Y2.B7.S4 Four operations with mass (W35) has no skill yet | Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
+   "related": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S6 reading a millilitre scale (a later step, W36): the same scale reading",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B7.S3": {
    "title": "Measure in kilograms",
@@ -6304,8 +6366,18 @@
    "preBuild": [
     "nonstandard_mass"
    ],
-   "related": [],
-   "note": "no related skill: the later-taught steps of the block are Y2.B7.S4 Four operations with mass (W35) has no skill yet | Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
+   "related": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S6 reading a millilitre scale (a later step, W36): the same scale reading",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B7.S4": {
    "title": "Four operations with mass",
@@ -6340,6 +6412,28 @@
      "key": "measurement:heavier_lighter_visual",
      "why": "Y2.B7.S1 heavier and lighter",
      "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5 the 2, 5 and 10 times-tables (W26-29): multiplying a measure",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10-S16 dividing by 2, 5 and 10 (W30-31): sharing a measure",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -6453,9 +6547,13 @@
      }
     },
     {
-     "key": "comparing:compare_objects",
-     "why": "Y1.B7.S1 the compare language (more, less) (topic ladder)",
-     "opts": {}
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S3 Measure in kilograms (taught earlier, W35): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -6491,32 +6589,18 @@
      "opts": {}
     },
     {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S3 Measure in kilograms (taught earlier, W35): this step's skill as it was met then",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "comparing:compare_objects",
      "why": "Y1.B7.S1 the compare language (more, less) (topic ladder)",
      "opts": {}
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 to read the jug marks (topic ladder)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 5,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 10,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
-     }
     }
    ],
    "preBuild": [
@@ -6554,6 +6638,28 @@
      "key": "subtraction:sub_wp_100",
      "why": "subtraction stories within 100",
      "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5 the 2, 5 and 10 times-tables (W26-29): multiplying a measure",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10-S16 dividing by 2, 5 and 10 (W30-31): sharing a measure",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -6753,7 +6859,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -6807,7 +6913,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -6870,7 +6976,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -6926,7 +7032,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -6971,7 +7077,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7014,16 +7120,18 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S7 Recognise a third (taught before this step in the block)",
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
      "opts": {
       "parts": [
-       1
+       0,
+       1,
+       2
       ]
      }
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7073,7 +7181,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7148,7 +7256,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7202,8 +7310,14 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)",
-     "opts": {}
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "opts": {
+      "parts": [
+       0,
+       1,
+       2
+      ]
+     }
     },
     {
      "key": "patterns:halve",
@@ -7214,7 +7328,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7274,7 +7388,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7342,7 +7456,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7397,7 +7511,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7456,7 +7570,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)",
+     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {
       "band": 12
      }
@@ -7719,6 +7833,13 @@
         "dir": "up"
        }
       ]
+     }
+    },
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S4 Tell time to the hour (taught earlier, W37): this step's skill as it was met then",
+     "opts": {
+      "stimulus": "words-past"
      }
     },
     {
@@ -8194,6 +8315,29 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "graphs:build_pictograph",
      "why": "Y2.B10.S6 Draw pictograms (2, 5 and 10) (taught before this step in the block)",
      "opts": {}
@@ -8217,7 +8361,7 @@
      "opts": {}
     }
    ],
-   "note": ""
+   "note": "pictograph {range:50, scale:[0,1,2]} reads keys of 2, 5 and 10; about 1 \"in all\" question in 16 totals more than 120 (up to 200), above the Grade 1 range: the skill has no option that caps the total"
   },
   "Y2.B11.S1": {
    "title": "Language of position",
@@ -9680,6 +9824,24 @@
    "why": "partial: grouping loose objects into tens to count them (the skill shows ready-made tens rods)"
   },
   {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y2.B1.S9",
+   "action": "partial",
+   "why": "counting in 10s along a whole 0-100 line marked in tens (the line spans one ten)"
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y2.B1.S10",
+   "action": "partial",
+   "why": "a whole 0-100 line counted in tens then ones (the line spans one ten)"
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y2.B1.S11",
+   "action": "partial",
+   "why": "estimating on a 0-100 line with only the ends marked (every tick is drawn)"
+  },
+  {
    "key": "placevalue:order_least_to_greatest",
    "step": "Y2.B1.S14",
    "action": "partial",
@@ -9758,6 +9920,12 @@
    "why": "items mix 1-digit + 1-digit and 2-digit + 2-digit; 2-digit + 1-digit across a ten (38 + 5) is not alone on a page"
   },
   {
+   "key": "number_sense:make_a_ten",
+   "step": "Y2.B2.S9",
+   "action": "partial",
+   "why": "bridges 10 within 20 only, not a 2-digit number across the next ten"
+  },
+  {
    "key": "subtraction:sub_50_regroup",
    "step": "Y2.B2.S12",
    "action": "partial",
@@ -9798,6 +9966,12 @@
    "step": "Y2.B3.S5",
    "action": "partial",
    "why": "draws every line of symmetry, diagonals included; a vertical line only is not available"
+  },
+  {
+   "key": "shapes_early:compose_from_attributes",
+   "step": "Y2.B3.S7",
+   "action": "partial",
+   "why": "sorts by attributes that include right angles and parallel sides (\"4 right angles\", \"no parallel sides\"), which Grade 1 never meets; sorting 2-D shapes into labelled groups by number of sides or corners is not dealt"
   },
   {
    "key": "shapes_early:count_edges_faces_vertices",
@@ -9842,6 +10016,12 @@
    "why": "asks \"is there enough?\" (a compare), not a calculation: kept as related"
   },
   {
+   "key": "measurement:equiv_coin_sets",
+   "step": "Y2.B4.S8",
+   "action": "partial",
+   "why": "checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked"
+  },
+  {
    "key": "comparing:compare_objects",
    "step": "Y2.B6.S3",
    "action": "partial",
@@ -9864,6 +10044,24 @@
    "step": "Y2.B7.S1",
    "action": "partial",
    "why": "picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and \"equal mass / the same as\", are not dealt"
+  },
+  {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y2.B7.S2",
+   "action": "partial",
+   "why": "reads one kind of g scale (and some kg items); reading scales in grams with different steps is not dealt"
+  },
+  {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y2.B7.S3",
+   "action": "partial",
+   "why": "mostly grams; reading a kilogram scale is not dealt"
+  },
+  {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y2.B7.S7",
+   "action": "partial",
+   "why": "reads millilitres only; reading a jug in litres is not dealt"
   },
   {
    "key": "fractions:shade_fraction",

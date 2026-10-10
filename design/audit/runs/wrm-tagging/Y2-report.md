@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 9
+# Wave 2 tagging: Year 2 (US Grade 1) — round 10
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,9 +6,48 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 124 | 63 | 36 | 25 | 10 | 37 | 52 | 75 |
+| 124 | 63 | 36 | 25 | 10 | 37 | 61 | 75 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 10 (after critic Y2–Y3 r9, 7.81 / 7.78): lower rungs, counts from 0, the merge check
+
+- **A1 (N6, lower rungs)**: automatic pre candidates carry the cited step's own opts (`cand(…, stepOptsFor(id, k))`), and
+  each of the step's skills gets its latest earlier-taught rung (same key, other opts; this year by school week, else the
+  year before) as a tier-1 pre, "…: this step's skill as it was met then". A direct with `{}` takes the skill's defaults,
+  so a link with other explicit opts is another rung; a pre whose parts / tables / denominators / forms / count rows are
+  a superset of the step's own is still excluded, and a related link inside the step's own forms is excluded.
+- **A2 (N5a, counts from 0)**: a `seq_2/5/10` or `skip_count_line` link whose why cites a count from 0 ("Count in Ns",
+  "Tens to 100", Y1.B9.S1–S3, Y1.B12.S2, Y2.B1.S15) becomes `count_by_tables {rows:[{step:N, start:'zero', dir:'up'}]}`,
+  citing the earlier-taught owner of that row; several merge into one row list. `seq_N` stays only with a "counting on
+  from any number" why. New build check `COUNTCHECK`: a count link whose why cites a count from 0 must deal ≥ 90% of its
+  items on the multiples (payload values read); 0 at build. Before Y2.B1.S15 (W4) a 10s row (0 … 110) is above the
+  Grade 1 range, so it is not linked there (tens to 100 stays as `tens_foundation_visual`).
+- **A3 (N5b)**: every `share_into_groups` why that named sharing now reads "Y1.B9.S8 / Y2.B5.S7 making equal groups
+  (grouping): ring the counters in groups of a size"; `whyText` added.
+- **A4 (N7, merge)**: a partial whose clause differs from `SKILL_WRM` now emits a `partial` tagFix (22 clause fixes).
+  New `tests/scripts/wrm-tagging/mergecheck23.mjs`, run by the build on every write (`MERGE` lines, exit 1): it applies
+  the tagFixes to the live `SKILL_WRM` and asserts every direct is full, every partial carries this file's clause,
+  nothing else is tagged, every step's coverage equals its verdict, and no partial or gap step lists a direct skill.
+  **mergecheck Y2 0 / Y3 0 problems**; the critic's `mergesim` 0 issues.
+- **A5 (N1)**: the note check reads key + opts ("already linked" and "already taught earlier" both compare opts) and runs
+  wherever related is empty; the unchecked tail "(the skills that share the idea are taught earlier (pre))" is gone; the
+  hand notes on Y3.B4.S9 and Y3.B6.S7 are replaced by computed ones.
+- **A6 (linkscan)**: the column check is role-aware: pre at tolerance 0, related at 2 weeks.
+- **Steps (Y2)**: Y2.B1.S11 leads with the number line to 100 (Y1.B12.S4 content, `selfPre`) and tens to 100; Y2.B1.S16
+  counting in 2s, 5s and 10s from 0 (Y2.B1.S15, the step before); Y2.B5.S15 ×10 (the same week) and the 10s count from
+  0; the 43 `seq_N` "Count in Ns" links are counts from 0; Y2.B7.S4/S8 ×/÷ by 2, 5 and 10; Y2.B7.S2/S3 related
+  millilitre scale reading (Y2.B7.S6, W36); Y2.B10.S7 counting in 2s, 5s and 10s from 0 for the key, and a note on totals
+  to 200 (no total-cap option); Y2.B2.S13 keeps `seq_10` as counting on from any number.
+- **Scans** (critic r9 scripts on the rebuilt files): `mergesim` 0 issues, own `mergecheck` 0 / 0, `seqscan` only the 3
+  "counting on from any number" `seq_10` links (allowed by the fix table), `notecheck` 0, `nextscan2` 0, `nextscan` 0,
+  `labwhy` 0, `labwhy2` 0 / 0, `prewk` 0, `optcheck` 0, `whyscan` A 0 (B 128 = all related links to later-taught steps;
+  C 102 = its known false positives, now mostly count rows whose values sit in the payload, which `COUNTCHECK` reads),
+  `linkscan` week mode OK, `graphrange` only Y2.B10.S7 (noted on the step). `samekey` 8, each proven: the Y2.B8
+  fraction rungs are swapped out year-wide (they deal eighths, rule 18, `partition_shapes` stands in); Y3.B6.S5's
+  `compare {forms:[0]}` is swapped out (unlike denominators); Y3.B3.S5, Y3.B5.S5 and Y3.B11.S3's "rungs" are supersets of
+  the step's own opts (the step itself). `range` adds only the joined-digit `order_*` artifact. Both files rebuild
+  byte-identical.
 
 ## Round 9 (after critic Y2–Y3 r8, 7.79 / 7.81): per-step notes, why ownership, building blocks
 
