@@ -1991,21 +1991,17 @@
   },
   "Y5.B4.S1": {
    "title": "Find fractions equivalent to a unit fraction",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:equiv_frac_visual",
-     "opts": {}
+     "missing": "starting fractions mix unit and non-unit; no unit-fraction-only control or fraction wall"
     },
     {
      "key": "fractions:equivalent",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
+     "missing": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control (use opts {\"forms\": [0]})"
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "no control to start every item from a UNIT fraction (1/3 = __/12): the equivalence skills mix unit and non-unit starting fractions, and the fraction-wall / bar model that finds all equivalents of 1/n at once is not dealt",
    "build": [
@@ -2017,28 +2013,24 @@
      "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W15)"
     },
     {
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S9 Equivalent fractions on a number line (prior learning wk W15)"
+    },
+    {
      "key": "composing:compose_whole",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
     },
     {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
-    },
-    {
      "key": "fractions:write_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "fractions:identify",
      "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W15)"
     }
    ],
    "preBuild": [],
@@ -2088,12 +2080,8 @@
    "build": [],
    "pre": [
     {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S9 Equivalent fractions on a number line (prior learning wk W15)"
     },
     {
      "key": "fractions:shade_fraction",
@@ -2102,14 +2090,6 @@
     {
      "key": "fractions:write_fraction",
      "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "fractions:identify",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
     }
    ],
    "preBuild": [],
@@ -2163,28 +2143,12 @@
      "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (previous step)"
     },
     {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S9 Equivalent fractions on a number line (prior learning wk W15)"
     },
     {
      "key": "fractions:shade_fraction",
      "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "fractions:identify",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
     }
    ],
    "preBuild": [],
@@ -2226,36 +2190,24 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:select_equiv_frac",
-     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole: 1 = 4/4 (prior learning wk W16)"
     },
     {
      "key": "composing:compose_whole",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
     },
     {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line (lower grade, same cluster CCSS 4.NF.B.3)"
     },
     {
-     "key": "fractions:compare",
-     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+     "key": "multiplication:mult_facts",
+     "why": "times tables: wholes × denominator"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "division with remainders gives wholes and the fraction left"
     }
    ],
    "preBuild": [
@@ -2299,36 +2251,12 @@
    "build": [],
    "pre": [
     {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
-    },
-    {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
-    },
-    {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
     },
     {
-     "key": "fractions:compare",
-     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:order_fractions",
-     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+     "key": "multiplication:mult_facts",
+     "why": "times tables: wholes × denominator"
     }
    ],
    "preBuild": [],
@@ -2370,36 +2298,24 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y5.B4.S5 Convert mixed numbers to improper fractions (previous step)"
-    },
-    {
-     "key": "fractions:mixed_improper_visual",
-     "why": "Y5.B4.S5 Convert mixed numbers to improper fractions (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
-    },
-    {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (earlier step: common denominator)"
     },
     {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 (earlier step)"
     },
     {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+     "key": "fractions:benchmark_fractions",
+     "why": "compare with 1/2 (lower grade, same cluster CCSS 4.NF.A.2)"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "fractions on a number line (lower grade, CCSS 3.NF.A.2)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S4 fractions on a number line (prior learning wk W16)"
     }
    ],
    "preBuild": [],
@@ -2445,28 +2361,12 @@
      "why": "Y5.B4.S6 Compare fractions less than 1 (previous step)"
     },
     {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
-    },
-    {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+     "why": "Y5.B4.S2 (earlier step: common denominator)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+     "key": "fractions:benchmark_fractions",
+     "why": "benchmarks 0, 1/2, 1 (CCSS 4.NF.A.2)"
     }
    ],
    "preBuild": [],
@@ -2505,32 +2405,16 @@
      "why": "Y5.B4.S7 Order fractions less than 1 (previous step)"
     },
     {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W17)"
-    },
-    {
      "key": "fractions:compare",
-     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+     "why": "Y5.B4.S6 Compare fractions less than 1 (earlier step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+     "why": "Y5.B4.S4–S5 convert improper/mixed (earlier steps)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line (CCSS 4.NF.B.3)"
     }
    ],
    "preBuild": [
@@ -2582,36 +2466,20 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:compare",
-     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
-    },
-    {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+     "why": "Y5.B4.S4 rename sums beyond 1 (earlier step)"
+    },
+    {
+     "key": "fraction_operations:decompose_fractions",
+     "why": "fraction as a sum of unit fractions (CCSS 4.NF.B.3a)"
     },
     {
      "key": "composing:fraction_number_line",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:order_fractions",
-     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W17)"
+     "why": "Y4.B7.S4 fractions on a number line (prior learning wk W17)"
     },
     {
      "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W17)"
+     "why": "Y3.B6 unit fractions (prior learning wk W17)"
     }
    ],
    "preBuild": [],
@@ -2659,32 +2527,16 @@
      "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
     },
     {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
-    },
-    {
      "key": "fraction_operations:add_frac_like_nv",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
-    },
-    {
-     "key": "fractions:compare",
-     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+     "why": "Y5.B4.S9 (previous step)"
     },
     {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+     "why": "Y5.B4.S2 equivalent fractions (earlier step)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -2738,36 +2590,12 @@
    "build": [],
    "pre": [
     {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W18)"
-    },
-    {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+     "why": "Y5.B4.S4 convert the total (earlier step)"
     },
     {
-     "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
-    },
-    {
-     "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
-    },
-    {
-     "key": "fractions:graph_fractions",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -2815,32 +2643,16 @@
      "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
     },
     {
-     "key": "fraction_operations:add_frac_unlike_nv",
-     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
-    },
-    {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+     "why": "Y5.B4.S9 (earlier step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+     "why": "Y5.B4.S4 (earlier step)"
     },
     {
-     "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line (CCSS 4.NF.B.3)"
     }
    ],
    "preBuild": [],
@@ -2890,36 +2702,16 @@
    "build": [],
    "pre": [
     {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "Y5.B4.S11 (earlier step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+     "why": "Y5.B4.S5 (earlier step)"
     },
     {
      "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
-    },
-    {
-     "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
-    },
-    {
-     "key": "fractions:graph_fractions",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+     "why": "Y5.B4.S5 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -2945,64 +2737,42 @@
   },
   "Y5.B4.S14": {
    "title": "Subtract fractions",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:sub_fractions_like",
-     "opts": {}
+     "missing": "same denominator, minuend always within 1; no whole or improper minuend"
     },
     {
      "key": "fraction_operations:sub_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "missing": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4) (use opts {\"denoms\": [2]})"
     },
     {
      "key": "fraction_operations:sub_frac_unlike_nv",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "missing": "numbers only; minuend within 1, no whole or improper minuend (use opts {\"denoms\": [2]})"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "subtracting from a whole or an improper fraction with related denominators (2 − 3/4, 7/4 − 1/2): every dealt item stays within 1",
+   "build": [
+    "frac_whole_minuend"
+   ],
    "pre": [
     {
      "key": "fraction_operations:add_mixed_like",
      "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
     },
     {
-     "key": "fraction_operations:add_mixed_unlike",
-     "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like_nv",
-     "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
-    },
-    {
      "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+     "why": "Y5.B4.S9 same-denominator subtraction (earlier step)"
     },
     {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 (earlier step)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+     "key": "composing:whole_as_fraction",
+     "why": "1 = 4/4 for subtracting from a whole (CCSS 3.NF.A.3c)"
     }
    ],
    "preBuild": [],
@@ -3046,36 +2816,20 @@
    ],
    "pre": [
     {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y5.B4.S14 Subtract fractions (previous step)"
-    },
-    {
      "key": "fraction_operations:sub_frac_unlike",
      "why": "Y5.B4.S14 Subtract fractions (previous step)"
     },
     {
-     "key": "fraction_operations:sub_frac_unlike_nv",
-     "why": "Y5.B4.S14 Subtract fractions (previous step)"
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S14 (previous step)"
     },
     {
      "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+     "why": "Y5.B4.S13 inverse (earlier step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "Y5.B4.S4 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -3120,32 +2874,16 @@
      "why": "Y5.B4.S15 Subtract from a mixed number (previous step)"
     },
     {
-     "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S5 1 whole = 5/5 (earlier step)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "1 = n/n (CCSS 3.NF.A.3c)"
     },
     {
      "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
-    },
-    {
-     "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
-    },
-    {
-     "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+     "why": "Y5.B4.S14 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -3195,36 +2933,16 @@
    "build": [],
    "pre": [
     {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y5.B4.S13 inverse (earlier step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W16)"
+     "why": "Y5.B4.S5 (earlier step)"
     },
     {
      "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W16)"
-    },
-    {
-     "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:compare",
-     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+     "why": "Y5.B4.S5 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -3993,36 +3711,24 @@
    ],
    "pre": [
     {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
-    },
-    {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "Y5.B4.S9 same-denominator addition = repeated addition (prior learning wk W19)"
     },
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "repeated addition as multiplication (prior learning wk W19)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+     "key": "multiplication:arrays_groups",
+     "why": "equal groups (prior learning wk W19)"
     },
     {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+     "key": "fraction_operations:decompose_fractions",
+     "why": "3/5 = 1/5 + 1/5 + 1/5 (CCSS 4.NF.B.3b)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 products beyond 1 (prior learning wk W19)"
     }
    ],
    "preBuild": [],
@@ -4064,36 +3770,16 @@
    "build": [],
    "pre": [
     {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
-    },
-    {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "Y5.B4.S9 repeated addition (prior learning wk W19)"
     },
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "repeated addition (prior learning wk W19)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 (prior learning wk W19)"
     }
    ],
    "preBuild": [],
@@ -4133,31 +3819,19 @@
     },
     {
      "key": "fraction_operations:mult_frac_whole_nv",
-     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (previous step)"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+     "why": "Y5.B6.S2 (previous step)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
+     "why": "Y5.B4.S5 convert mixed to improper (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y5.B4.S13 repeated addition of mixed numbers (prior learning wk W19)"
     },
     {
      "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+     "why": "equal groups (prior learning wk W19)"
     }
    ],
    "preBuild": [],
@@ -4204,28 +3878,24 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
-    },
-    {
-     "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S2 fraction × integer (earlier step)"
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+     "why": "equal sharing (prior learning wk W20)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "divide by the denominator (prior learning wk W20)"
     },
     {
      "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
+     "why": "parts of a whole (prior learning wk W20)"
     },
     {
      "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+     "why": "halving (prior learning wk W20)"
     }
    ],
    "preBuild": [],
@@ -4277,31 +3947,15 @@
     },
     {
      "key": "fractions:fraction_of_set_nv",
-     "why": "Y5.B6.S4 Calculate a fraction of a quantity (previous step)"
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+     "why": "Y5.B6.S4 (previous step)"
     },
     {
      "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+     "why": "divide by the denominator (prior learning wk W20)"
     },
     {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B9.S8 Halves and quarters as decimals (prior learning wk W21)"
+     "key": "multiplication:mult_zeros",
+     "why": "multiplying the part (prior learning wk W20)"
     }
    ],
    "preBuild": [],
@@ -4345,32 +3999,16 @@
      "why": "Y5.B6.S5 Fraction of an amount (previous step)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:fraction_of_set",
-     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
-    },
-    {
      "key": "fractions:fraction_of_set_nv",
-     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
+     "why": "Y5.B6.S4 (earlier step)"
     },
     {
-     "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+     "key": "division:missing_mult_div",
+     "why": "inverse operations (CCSS 3.OA.A.4)"
     },
     {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+     "key": "multiplication:mult_zeros",
+     "why": "multiplying back to the whole (prior learning wk W20)"
     }
    ],
    "preBuild": [],
@@ -4414,32 +4052,16 @@
      "why": "Y5.B6.S6 Find the whole (previous step)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
-    },
-    {
      "key": "fractions:fraction_of_set_hard",
-     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+     "why": "Y5.B6.S5 (earlier step)"
     },
     {
-     "key": "fractions:fraction_of_set",
-     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "Y5.B6.S2 fraction × integer (earlier step)"
     },
     {
      "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+     "why": "÷ by the denominator (prior learning wk W20)"
     }
    ],
    "preBuild": [],
@@ -4483,20 +4105,20 @@
    ],
    "pre": [
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B9.S8 Halves and quarters as decimals (prior learning wk W21)"
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
     },
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W21)"
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 Tenths as decimals (prior learning wk W21)"
     },
     {
      "key": "fractions:write_fraction",
      "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
     },
     {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+     "key": "placevalue:value",
+     "why": "whole-number place value (CCSS 4.NBT.A.2)"
     },
     {
      "key": "fractions:equivalent",
@@ -4528,21 +4150,17 @@
   },
   "Y5.B7.S2": {
    "title": "Equivalent fractions and decimals (tenths)",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "conversions:f_to_d",
-     "opts": {
-      "denoms": [
-       5
-      ]
-     }
+     "missing": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip (use opts {\"denoms\": [5]})"
     },
     {
      "key": "conversions:d_to_f",
-     "opts": {}
+     "missing": "mixes tenths with hundredths and 0.75 = 3/4; no tenths-only page"
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d {denoms:[5]} still mixes hundredths; d_to_f mixes 0.75 = 3/4)",
    "build": [
@@ -4555,15 +4173,11 @@
     },
     {
      "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W21)"
-    },
-    {
-     "key": "fractions:write_fraction",
      "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
     },
     {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 (prior learning wk W21)"
     },
     {
      "key": "fractions:equivalent",
@@ -4623,28 +4237,8 @@
      "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W21)"
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
-    },
-    {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
-    },
-    {
-     "key": "decimals:order_decimals",
-     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+     "why": "Y4.B7.S10 (prior learning wk W21)"
     }
    ],
    "preBuild": [
@@ -4692,32 +4286,12 @@
      "why": "Y5.B7.S3 Equivalent fractions and decimals (hundredths) (previous step)"
     },
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W21)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
-    },
-    {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+     "why": "Y4.B7.S10 scale to /10 or /100 (prior learning wk W21)"
     },
     {
-     "key": "decimals:order_decimals",
-     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+     "key": "fractions:simplify",
+     "why": "simplest form (CCSS 4.NF.A.1)"
     }
    ],
    "preBuild": [],
@@ -4762,32 +4336,12 @@
      "why": "Y5.B7.S4 Equivalent fractions and decimals (previous step)"
     },
     {
-     "key": "decimals:order_decimals",
-     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
-    },
-    {
      "key": "fraction_operations:frac_10_100",
      "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
     },
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+     "key": "placevalue:value",
+     "why": "place value of digits (CCSS 4.NBT.A.2)"
     }
    ],
    "preBuild": [
@@ -4837,28 +4391,12 @@
      "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W12)"
     },
     {
-     "key": "division:box_division_easy",
-     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
+     "key": "placevalue:pv_digit_drag",
+     "why": "digits in a place-value chart (CCSS 4.NBT.A.2)"
     },
     {
-     "key": "division:div_remainders",
-     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
-    },
-    {
-     "key": "division:area_model_div_2by1",
-     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (prior learning wk W12)"
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W12)"
-    },
-    {
-     "key": "division:area_model_div_3by1",
-     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
-    },
-    {
-     "key": "division:box_division_hard",
-     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+     "key": "placevalue:value",
+     "why": "value of a digit (CCSS 4.NBT.A.2)"
     }
    ],
    "preBuild": [
@@ -4882,7 +4420,7 @@
      "why": "decimal to fraction"
     }
    ],
-   "note": ""
+   "note": "The W12 xlsx prior list (division) is off-topic for thousandths and was dropped."
   },
   "Y5.B7.S7": {
    "title": "Thousandths on a place value chart",
@@ -4900,31 +4438,19 @@
     },
     {
      "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+     "why": "Y5.B7.S5 Thousandths as fractions (earlier step)"
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+     "key": "placevalue:pv_digit_drag",
+     "why": "whole-number place-value chart (CCSS 4.NBT.A.2)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit (CCSS 4.NBT.A.2)"
     },
     {
      "key": "fraction_operations:frac_10_100",
      "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
-    },
-    {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
     }
    ],
    "preBuild": [
@@ -4948,56 +4474,46 @@
      "why": "round"
     }
    ],
-   "note": ""
+   "note": "The W13 xlsx prior list (column addition) is off-topic and was dropped."
   },
   "Y5.B7.S8": {
    "title": "Order and compare decimals (same number of decimal places)",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "decimals:compare_decimal",
-     "opts": {}
+     "missing": "pairs usually differ in the whole part (6.88 vs 0.43), so decimal digits are rarely compared; no same-dp control"
     },
     {
      "key": "decimals:order_decimals",
-     "opts": {}
+     "missing": "at 2 dp mixes 1 and 2 dp (6.88, 7.7); no same-dp control"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page where every number has the same number of decimal places and the same whole part (0.47 vs 0.43; 3.6, 3.2, 3.9): order_decimals at 2 dp mixes 1 and 2 dp, compare_decimal pairs usually differ in the whole part",
+   "build": [
+    "dec_dp_match"
+   ],
    "pre": [
     {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S6–S7 thousandths (earlier steps)"
+    },
+    {
      "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+     "why": "Y5.B7.S5 (earlier step)"
     },
     {
      "key": "decimals:decimal_nl_drag",
      "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
-    },
-    {
      "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+     "why": "compare whole numbers (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 (prior learning wk W22)"
     }
    ],
    "preBuild": [],
@@ -5019,7 +4535,7 @@
      "why": "mixed forms"
     }
    ],
-   "note": "Set Decimal Places to 1 or 2 for same-dp items; the generator gives the same dp per page at 1 dp. At 2 dp some pairs differ (4.4 vs 4.6 fine; 6.88 vs 0.43)."
+   "note": ""
   },
   "Y5.B7.S9": {
    "title": "Order and compare any decimals with up to 3 decimal places",
@@ -5043,32 +4559,12 @@
      "why": "Y5.B7.S8 Order and compare decimals (same number of decimal places) (previous step)"
     },
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
-    },
-    {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
+     "why": "Y4.B8.S4 (prior learning wk W22)"
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+     "key": "placevalue:compare",
+     "why": "compare whole numbers (prior learning wk W22)"
     }
    ],
    "preBuild": [],
@@ -5107,32 +4603,20 @@
      "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (previous step)"
     },
     {
-     "key": "decimals:order_decimals",
-     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (previous step)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
-    },
-    {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:round_nl_thousands",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:rounding_table",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+     "why": "Y4.B8.S4 decimals on a number line (prior learning wk W35)"
     },
     {
      "key": "number_sense:rounding_visual",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+     "why": "rounding on a number line (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "rounding table (prior learning wk W35)"
     }
    ],
    "preBuild": [],
@@ -5175,7 +4659,7 @@
    "partial": [
     {
      "key": "decimals:round_thousandths",
-     "missing": "{\"Round to the nearest\": tenth} rounds 3-dp numbers within 1 only, no number line"
+     "missing": "{forms:[0]} (nearest tenth) rounds 3-dp numbers within 1 only, no number line"
     }
    ],
    "verdict": "full",
@@ -5183,36 +4667,20 @@
    "build": [],
    "pre": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
-    },
-    {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:round_nl_thousands",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:rounding_table",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+     "why": "Y4.B8.S4 decimals on a number line (prior learning wk W35)"
     },
     {
      "key": "number_sense:rounding_visual",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+     "why": "rounding on a number line (prior learning wk W35)"
     },
     {
-     "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+     "key": "decimals:compare_decimal",
+     "why": "Y5.B7.S8 (earlier step)"
     },
     {
-     "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+     "key": "number_sense:nearest_10",
+     "why": "round to the nearest 10 (prior learning wk W35)"
     }
    ],
    "preBuild": [],
@@ -5246,36 +4714,20 @@
    "build": [],
    "pre": [
     {
-     "key": "decimals:round_decimals",
-     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
-    },
-    {
-     "key": "number_sense:round_sort_tenths",
-     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
-    },
-    {
-     "key": "decimals:round_thousandths",
-     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
-    },
-    {
-     "key": "decimals:order_decimals",
-     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y5.B7.S3 hundredths (earlier step)"
     },
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+     "why": "Y5.B7.S3 (earlier step, prior learning wk W22)"
     },
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+     "key": "conversions:d_to_f",
+     "why": "Y5.B7.S3 (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y5.B7.S8 (prior learning wk W22)"
     }
    ],
    "preBuild": [],
@@ -5321,32 +4773,16 @@
      "why": "Y5.B7.S12 Understand percentages (previous step)"
     },
     {
-     "key": "decimals:order_decimals",
-     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+     "key": "fractions:equivalent",
+     "why": "scale to /100 (CCSS 4.NF.A.1)"
     },
     {
      "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+     "why": "Y5.B7.S3 (prior learning wk W22)"
     },
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
+     "key": "fractions:simplify",
+     "why": "simplest form (CCSS 4.NF.A.1)"
     }
    ],
    "preBuild": [],
@@ -5393,7 +4829,15 @@
     },
     {
      "key": "conversions:p_to_f",
-     "why": "Y5.B7.S13 Percentages as fractions (previous step)"
+     "why": "Y5.B7.S13 (previous step)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y5.B7.S3 hundredths as decimals (earlier step)"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -5444,15 +4888,15 @@
    "pre": [
     {
      "key": "conversions:p_to_d",
-     "why": "Y5.B7.S14 Percentages as decimals (previous step)"
+     "why": "Y5.B7.S14 (previous step)"
     },
     {
      "key": "conversions:p_to_f",
-     "why": "Y5.B7.S13 Percentages as fractions (earlier step)"
+     "why": "Y5.B7.S13 (earlier step)"
     },
     {
      "key": "conversions:percent_visual",
-     "why": "Y5.B7.S12 Understand percentages (earlier step)"
+     "why": "Y5.B7.S12 (earlier step)"
     }
    ],
    "preBuild": [],
@@ -6685,36 +6129,20 @@
    ],
    "pre": [
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+     "key": "composing:number_bonds",
+     "why": "the whole-number fact (prior learning wk W13)"
     },
     {
-     "key": "conversions:f_to_d",
+     "key": "composing:make_ten",
+     "why": "Y2.B1 Bonds to 10 (prior learning wk W13)"
+    },
+    {
+     "key": "conversions:d_to_f",
      "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
     },
     {
      "key": "fraction_operations:frac_10_100",
      "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
-    },
-    {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
-    },
-    {
-     "key": "composing:number_bonds",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
     }
    ],
    "preBuild": [
@@ -6747,36 +6175,20 @@
    ],
    "pre": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
+     "key": "composing:make_ten",
+     "why": "bonds to 10 (lower grade, same idea)"
     },
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
+     "key": "composing:number_bonds",
+     "why": "number bonds (lower grade)"
     },
     {
-     "key": "number_sense:round_nl_thousands",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+     "key": "conversions:d_to_f",
+     "why": "tenths and hundredths (Y5.B7.S3)"
     },
     {
-     "key": "number_sense:rounding_table",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:rounding_visual",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y5.B7.S3 hundredths (earlier block)"
     }
    ],
    "preBuild": [
@@ -6800,7 +6212,7 @@
      "why": "number line"
     }
    ],
-   "note": ""
+   "note": "The W35 xlsx prior list (rounding review) is off-topic and was dropped."
   },
   "Y5.B12.S3": {
    "title": "Add and subtract decimals across 1",
@@ -6818,43 +6230,31 @@
    "verdict": "partial",
    "missing": "adding and subtracting decimals that cross 1 (0.8 + 0.5 = 1.3; 1.2 − 0.4) with a model (counters/number line) rather than only the column",
    "build": [
+    "dec_across_one",
     "decimal_models"
    ],
    "pre": [
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+     "key": "composing:make_ten",
+     "why": "Y2.B1 Bonds to 10: bridging (prior learning wk W13)"
     },
     {
      "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+     "why": "Y3 Add two numbers (across a 10) (prior learning wk W13)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 (prior learning wk W13)"
     },
     {
-     "key": "composing:number_bonds",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "decimals on a number line (CCSS 4.NF.C.6)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_known_facts",
+    "decimal_whole"
+   ],
    "related": [
     {
      "key": "decimals:mixed_decimals",
@@ -6877,13 +6277,13 @@
   },
   "Y5.B12.S4": {
    "title": "Add decimals with the same number of decimal places",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "decimals:add_decimal",
-     "opts": {}
+     "missing": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (4.53 + 4.4)"
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "same-number-of-dp control at 2 and 3 dp (Decimal Places 1 gives tenths only; at 2–3 dp items mix 4.53 + 4.4)",
    "build": [
@@ -6892,36 +6292,20 @@
    ],
    "pre": [
     {
-     "key": "decimals:sub_decimal",
-     "why": "Y5.B12.S3 Add and subtract decimals across 1 (previous step)"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
-    },
-    {
      "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+     "why": "Y4 Add two 4-digit numbers with exchange (prior learning wk W13)"
     },
     {
      "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+     "why": "Y3 Add two numbers (across a 10) (prior learning wk W13)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 (prior learning wk W13)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "decimal place value (Y5.B7.S8)"
     }
    ],
    "preBuild": [],
@@ -6943,13 +6327,13 @@
   },
   "Y5.B12.S5": {
    "title": "Subtract decimals with the same number of decimal places",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "decimals:sub_decimal",
-     "opts": {}
+     "missing": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (43.53 − 41.4)"
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "same-number-of-dp control at 2 and 3 dp (only Decimal Places 1 guarantees it)",
    "build": [
@@ -6962,12 +6346,12 @@
      "why": "Y5.B12.S4 Add decimals with the same number of decimal places (previous step)"
     },
     {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (lower grade, same cluster CCSS 4.NF.C.7)"
+     "key": "subtraction:sub_10k_regroup",
+     "why": "column subtraction with exchange (prior learning wk W14)"
     },
     {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3 column methods (lower grade, same cluster CCSS 3.NBT.A.2)"
+     "key": "decimals:compare_decimal",
+     "why": "decimal place value (Y5.B7.S8)"
     }
    ],
    "preBuild": [],
@@ -7012,7 +6396,11 @@
     },
     {
      "key": "decimals:compare_thousandths",
-     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (place-holder zero)"
+     "why": "Y5.B7.S9 place-holder zero: 0.450 = 0.45 (earlier block)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "column addition with exchange (prior learning wk W14)"
     }
    ],
    "preBuild": [],
@@ -7056,8 +6444,12 @@
      "why": "Y5.B12.S6 Add decimals with different numbers of decimal places (previous step)"
     },
     {
+     "key": "subtraction:sub_across_zeros",
+     "why": "5 − 1.23 exchanges across zeros (CCSS 4.NBT.B.4)"
+    },
+    {
      "key": "decimals:compare_thousandths",
-     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (place-holder zero)"
+     "why": "Y5.B7.S9 place-holder zero (earlier block)"
     }
    ],
    "preBuild": [],
@@ -7096,8 +6488,12 @@
      "why": "Y5.B12.S7 Subtract decimals with different numbers of decimal places (previous step)"
     },
     {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S6 (earlier step)"
+    },
+    {
      "key": "decimals:round_decimals",
-     "why": "Y5.B7.S11 Round to 1 decimal place (rounding to adjust)"
+     "why": "Y5.B7.S11 round to adjust (earlier block)"
     }
    ],
    "preBuild": [],
@@ -7133,19 +6529,23 @@
    "pre": [
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y4 count in steps (lower grade, same cluster CCSS 4.OA.C.5)"
+     "why": "count up in steps (lower grade, same cluster CCSS 4.OA.C.5)"
     },
     {
      "key": "patterns:count_by_step_down",
-     "why": "Y4 count back in steps (lower grade, same cluster CCSS 4.OA.C.5)"
+     "why": "count back in steps (CCSS 4.OA.C.5)"
     },
     {
      "key": "patterns:number_pattern",
-     "why": "find the rule of a sequence (lower grade, same cluster CCSS 4.OA.C.5)"
+     "why": "find the rule (CCSS 4.OA.C.5)"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S4 adding a decimal step (earlier step)"
     },
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same cluster CCSS 4.NF.C.6)"
+     "why": "Y4.B8.S4 decimals on a number line"
     }
    ],
    "preBuild": [],
@@ -7190,32 +6590,20 @@
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
     },
     {
-     "key": "placevalue:identify",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
-    },
-    {
-     "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
-    },
-    {
      "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+     "why": "value of a digit (prior learning wk W10)"
     },
     {
-     "key": "patterns:seq_10",
-     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
+     "key": "placevalue:pv_digit_drag",
+     "why": "place-value chart (CCSS 4.NBT.A.1)"
     },
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
+     "key": "patterns:count_by_powers_of_10",
+     "why": "powers of 10 (CCSS 5.NBT.A.2)"
     },
     {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+     "key": "conversions:d_to_f",
+     "why": "decimal places (Y5.B7)"
     }
    ],
    "preBuild": [],
@@ -7256,36 +6644,16 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
-    },
-    {
-     "key": "placevalue:identify",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
-    },
-    {
-     "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
-    },
-    {
-     "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
-    },
-    {
      "key": "division:div_facts",
      "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
     },
     {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+     "key": "placevalue:value",
+     "why": "value of a digit (prior learning wk W10)"
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+     "key": "decimals:compare_thousandths",
+     "why": "thousandths (Y5.B7.S6)"
     }
    ],
    "preBuild": [],
@@ -7321,31 +6689,18 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B12.S11 Divide by 10, 100 and 1,000 (previous step)"
+     "why": "Y5.B12.S10–S11 Multiply/Divide by 10, 100 and 1,000 (previous step)",
+     "opts": {
+      "decimals": true
+     }
     },
     {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (prior learning wk W36)"
+     "key": "division:missing_mult_div",
+     "why": "missing numbers in × and ÷ (CCSS 3.OA.A.4)"
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W36)"
-    },
-    {
-     "key": "graphs:build_bar_graph",
-     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W36)"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W36)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W36)"
-    },
-    {
-     "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S7 Measure capacity and volume in millilitres (prior learning wk W36)"
+     "why": "× multiples of 10 (CCSS 4.NBT.B.5)"
     }
    ],
    "preBuild": [],
@@ -7367,7 +6722,7 @@
      "why": "decimal ÷"
     }
    ],
-   "note": ""
+   "note": "The W36 xlsx prior list (enrichment: graphs, measures) is off-topic and was dropped."
   },
   "Y5.B13.S1": {
    "title": "Understand negative numbers",
@@ -8759,6 +8114,27 @@
    ],
    "reused": false
   },
+  "frac_whole_minuend": {
+   "kind": "option",
+   "skill": "fraction_operations:sub_frac_unlike",
+   "also": [
+    "fraction_operations:sub_fractions_like",
+    "fraction_operations:sub_frac_unlike_nv"
+   ],
+   "option": "minuend \"a whole number\" / \"an improper fraction\"",
+   "name": "Subtract a Fraction From a Whole or an Improper Fraction (option)",
+   "teaches": "subtracting a fraction from a whole number (2 − 3/4 = 1 1/4) and from an improper fraction with related denominators (7/4 − 1/2 = 5/4)",
+   "representation": "boxed cell: the whole(s) drawn as bars split into the denominator, the parts taken away crossed out; write the answer in a fraction or mixed-number slot",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "why": "WRM Y5.B4.S14 subtracts from wholes and improper fractions; every dealt item stays within 1",
+   "steps": [
+    "Y5.B4.S14"
+   ],
+   "reused": false
+  },
   "sub_break_whole": {
    "kind": "option",
    "skill": "fraction_operations:sub_mixed_like",
@@ -8881,10 +8257,12 @@
    "family": "decimals",
    "steps": [
     "Y5.B7.S1",
-    "Y5.B12.S2"
+    "Y5.B12.S2",
+    "Y5.B12.S3"
    ],
    "reused": true,
    "ccss": [
+    "4.NBT.B.4",
     "4.NF.C.6",
     "5.NBT.B.7"
    ],
@@ -8933,6 +8311,33 @@
    ],
    "why": "closes the listed Y5 steps"
   },
+  "dec_dp_match": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "also": [
+    "decimals:sub_decimal",
+    "decimals:compare_decimal",
+    "decimals:order_decimals"
+   ],
+   "option": "decimal places \"same\" / \"different\" (place-holder zero shown in the column); on compare/order also \"same whole part\"",
+   "name": "Add and Subtract Decimals: Same or Different Decimal Places (option)",
+   "teaches": "column addition and subtraction of decimals where both numbers have the same number of decimal places, then different (3.4 + 1.25 written as 3.40 + 1.25; 5 − 1.23)",
+   "representation": "the existing stack cell with decimal points aligned in one column; on \"different\" the place-holder 0 is drawn in grey as a hint that fades",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.B.7",
+    "4.NBT.B.4"
+   ],
+   "why": "WRM separates same-dp and different-dp steps (add/sub B12.S4–S7, compare/order B7.S8); today the Decimal Places setting mixes them at 2–3 dp and compare pairs differ in the whole part",
+   "steps": [
+    "Y5.B7.S8",
+    "Y5.B12.S4",
+    "Y5.B12.S5",
+    "Y5.B12.S6",
+    "Y5.B12.S7"
+   ],
+   "reused": false
+  },
   "round_whole": {
    "kind": "option",
    "skill": "decimals:round_decimals",
@@ -8960,6 +8365,7 @@
    "steps": [
     "Y5.B12.S1",
     "Y5.B12.S2",
+    "Y5.B12.S3",
     "Y5.B12.S8"
    ],
    "reused": true,
@@ -8968,6 +8374,27 @@
     "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
+  },
+  "dec_across_one": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "also": [
+    "decimals:sub_decimal"
+   ],
+   "option": "items \"within 1\" / \"across 1\" with a number-line or place-value-counter support",
+   "name": "Add and Subtract Decimals Across 1 (option)",
+   "teaches": "adding and subtracting tenths and hundredths that bridge 1 (0.8 + 0.5 = 1.3; 1.2 − 0.4 = 0.8), first by bridging through 1 on a number line, then in the column",
+   "representation": "boxed cell: a 0–2 number line in tenths with the jump to 1 drawn, then the equation with an answer box; the line fades to none",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.B.7",
+    "4.NF.C.6"
+   ],
+   "why": "decimal_models adds pictures but no across-1 item control; add_decimal crosses 1 only at random",
+   "steps": [
+    "Y5.B12.S3"
+   ],
+   "reused": false
   },
   "decimal_models": {
    "kind": "option",
@@ -9023,30 +8450,6 @@
    ],
    "why": "closes the listed Y5 steps",
    "representation": "add with hundred squares, then the column; subtract with an exchange of a tenth; multiply a decimal by a whole with an area model; which model matches the column?"
-  },
-  "dec_dp_match": {
-   "kind": "option",
-   "skill": "decimals:add_decimal",
-   "also": [
-    "decimals:sub_decimal"
-   ],
-   "option": "decimal places \"same\" / \"different\" (place-holder zero shown in the column)",
-   "name": "Add and Subtract Decimals: Same or Different Decimal Places (option)",
-   "teaches": "column addition and subtraction of decimals where both numbers have the same number of decimal places, then different (3.4 + 1.25 written as 3.40 + 1.25; 5 − 1.23)",
-   "representation": "the existing stack cell with decimal points aligned in one column; on \"different\" the place-holder 0 is drawn in grey as a hint that fades",
-   "family": "decimals",
-   "ccss": [
-    "5.NBT.B.7",
-    "4.NBT.B.4"
-   ],
-   "why": "WRM separates same-dp and different-dp steps; today the Decimal Places setting mixes them at 2–3 dp",
-   "steps": [
-    "Y5.B12.S4",
-    "Y5.B12.S5",
-    "Y5.B12.S6",
-    "Y5.B12.S7"
-   ],
-   "reused": false
   },
   "dec_sequence": {
    "kind": "new",
@@ -9969,7 +9372,13 @@
    "key": "fractions:equiv_frac_visual",
    "step": "Y5.B4.S1",
    "action": "add",
-   "why": "teaches the step"
+   "why": "partial: starting fractions mix unit and non-unit; no unit-fraction-only control or fraction wall"
+  },
+  {
+   "key": "fractions:equivalent",
+   "step": "Y5.B4.S1",
+   "action": "partial",
+   "why": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control (use opts {\"forms\": [0]})"
   },
   {
    "key": "fractions:equiv_frac_nv",
@@ -10002,6 +9411,12 @@
    "why": "teaches the step"
   },
   {
+   "key": "fraction_operations:add_frac_unlike",
+   "step": "Y5.B4.S10",
+   "action": "partial",
+   "why": "no \"total within 1\" control: with one denominator family ({denoms:[2]} etc.) the denominators are related as WRM wants, but sums over 1 are mixed in"
+  },
+  {
    "key": "fraction_operations:add_frac_unlike_nv",
    "step": "Y5.B4.S10",
    "action": "add",
@@ -10032,10 +9447,22 @@
    "why": "teaches the step"
   },
   {
+   "key": "fraction_operations:sub_fractions_like",
+   "step": "Y5.B4.S14",
+   "action": "partial",
+   "why": "same denominator, minuend always within 1; no whole or improper minuend"
+  },
+  {
+   "key": "fraction_operations:sub_frac_unlike",
+   "step": "Y5.B4.S14",
+   "action": "partial",
+   "why": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4) (use opts {\"denoms\": [2]})"
+  },
+  {
    "key": "fraction_operations:sub_frac_unlike_nv",
    "step": "Y5.B4.S14",
    "action": "add",
-   "why": "teaches the step with opts {\"denoms\": [2]}"
+   "why": "partial: numbers only; minuend within 1, no whole or improper minuend (use opts {\"denoms\": [2]})"
   },
   {
    "key": "fraction_operations:sub_mixed_like",
@@ -10056,10 +9483,22 @@
    "why": "teaches the step"
   },
   {
+   "key": "fraction_operations:mult_frac_whole",
+   "step": "Y5.B6.S1",
+   "action": "partial",
+   "why": "unit and non-unit fractions mixed; no unit-fraction-only control (1/5 × 3 as repeated addition)"
+  },
+  {
    "key": "fraction_operations:mult_frac_whole_nv",
    "step": "Y5.B6.S1",
    "action": "add",
    "why": "partial: numbers only; unit and non-unit fractions mixed, no unit-only control"
+  },
+  {
+   "key": "fractions:fraction_of_set_hard_nv",
+   "step": "Y5.B6.S6",
+   "action": "partial",
+   "why": "{forms:[1]} deals \"3/7 of a number is 12\" in numbers only; the bar model that shows the whole is missing"
   },
   {
    "key": "fractions:fraction_of_set_nv",
@@ -10080,16 +9519,46 @@
    "why": "writes tenths and hundredths as fractions; no place-value chart or counters"
   },
   {
+   "key": "conversions:f_to_d",
+   "step": "Y5.B7.S2",
+   "action": "partial",
+   "why": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip (use opts {\"denoms\": [5]})"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y5.B7.S2",
+   "action": "partial",
+   "why": "mixes tenths with hundredths and 0.75 = 3/4; no tenths-only page"
+  },
+  {
    "key": "conversions:d_to_f",
    "step": "Y5.B7.S3",
    "action": "add",
    "why": "teaches the step"
   },
   {
+   "key": "decimals:compare_decimal",
+   "step": "Y5.B7.S8",
+   "action": "partial",
+   "why": "pairs usually differ in the whole part (6.88 vs 0.43), so decimal digits are rarely compared; no same-dp control"
+  },
+  {
+   "key": "decimals:order_decimals",
+   "step": "Y5.B7.S8",
+   "action": "partial",
+   "why": "at 2 dp mixes 1 and 2 dp (6.88, 7.7); no same-dp control"
+  },
+  {
    "key": "decimals:round_decimals",
    "step": "Y5.B7.S11",
    "action": "add",
    "why": "teaches the step with opts {\"precision\": [0]}"
+  },
+  {
+   "key": "decimals:round_thousandths",
+   "step": "Y5.B7.S11",
+   "action": "partial",
+   "why": "{forms:[0]} (nearest tenth) rounds 3-dp numbers within 1 only, no number line"
   },
   {
    "key": "conversions:f_to_d",
@@ -10108,6 +9577,30 @@
    "step": "Y5.B12.S3",
    "action": "partial",
    "why": "column items cross 1 at random; no across-1 control or model"
+  },
+  {
+   "key": "decimals:add_decimal",
+   "step": "Y5.B12.S4",
+   "action": "partial",
+   "why": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (4.53 + 4.4)"
+  },
+  {
+   "key": "decimals:sub_decimal",
+   "step": "Y5.B12.S5",
+   "action": "partial",
+   "why": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (43.53 − 41.4)"
+  },
+  {
+   "key": "decimals:add_decimal",
+   "step": "Y5.B12.S6",
+   "action": "partial",
+   "why": "different-dp pairs only some of the time at Decimal Places 2–3; no \"always different, place holder 0\" page"
+  },
+  {
+   "key": "decimals:sub_decimal",
+   "step": "Y5.B12.S7",
+   "action": "partial",
+   "why": "different-dp pairs only some of the time; no \"always different\" page (5 − 1.23, 3.4 − 1.25)"
   },
   {
    "key": "area_perimeter:perimeter",
