@@ -1465,6 +1465,488 @@
    ],
    "note": "mult_zeros and mult_properties only teach the Y3/Y4 roots of this; the Y6 reasoning (adjust by one group, scale by 10) is not dealt."
   },
+  "Y6.B3.S1": {
+   "title": "Equivalent fractions and simplifying",
+   "direct": [
+    {
+     "key": "fractions:equivalent",
+     "opts": {}
+    },
+    {
+     "key": "fractions:simplify",
+     "opts": {}
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y5.B4.S1 Find fractions equivalent to a unit fraction"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "Y6.B2.S2 Common factors"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "factors of numerator and denominator"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "circle the equivalent fractions"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "numbers only"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "use equivalents to compare (Y6.B3.S3)"
+    }
+   ],
+   "note": "School W14 prior entry is a test week; pre-skills come from Y5.B4."
+  },
+  "Y6.B3.S2": {
+   "title": "Equivalent fractions on a number line",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:graph_fractions",
+     "missing": "equivalent fractions as the same point on two lines"
+    },
+    {
+     "key": "fractions:order_frac_numline",
+     "missing": "equivalence on stacked lines"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "equivalent fractions shown as the same point on stacked (double) number lines",
+   "build": [
+    "frac_nl_equiv"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "place a fraction on a number line"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y6.B3.S1 Equivalent fractions (previous step)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "equivalence with bars"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "fractions past 1 on a line"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "0, 1/2, 1 on a line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "placing fractions"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplest form"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B3.S3": {
+   "title": "Compare and order (denominator)",
+   "direct": [
+    {
+     "key": "fractions:compare_frac_lcd",
+     "opts": {}
+    },
+    {
+     "key": "fractions:order_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y5.B4.S7 Order fractions less than 1 (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 equivalents (prior learning wk W15)"
+    },
+    {
+     "key": "number_theory:lcm",
+     "why": "Y5.B3.S2 Common multiples (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "equivalence with bars"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "order on a number line"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "compare with 1/2"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "compare with bars"
+    }
+   ],
+   "note": "Prior list is attached to W15 in the xlsx; compare_frac_lcd is the common-denominator method the step names."
+  },
+  "Y6.B3.S4": {
+   "title": "Compare and order (numerator)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:compare",
+     "missing": "comparing by the same numerator (3/5 > 3/7) and by making numerators common"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing and ordering fractions by making the numerators the same",
+   "build": [
+    "compare_numerator"
+   ],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y5.B4.S7 Order fractions less than 1 (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find equivalent fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "Y6.B3.S3 Compare by denominator (previous step)"
+    },
+    {
+     "key": "number_theory:lcm",
+     "why": "Y5.B3.S2 Common multiples (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "compare with a benchmark"
+    },
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "order on a line"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "unit fractions: more parts, smaller part"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B3.S5": {
+   "title": "Add and subtract simple fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (prior learning wk W15)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S9 (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 equivalents (prior learning wk W15)"
+    },
+    {
+     "key": "number_theory:lcm",
+     "why": "Y5.B3.S2 Common multiples (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "common denominators"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "why": "the same without pictures (next step)"
+    },
+    {
+     "key": "fractions:fraction_bar_ops",
+     "why": "fraction bars"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate first"
+    }
+   ],
+   "note": "Visual skills deal related denominators (2/4, 3/6, 5/10) and unrelated ones; the bar model gives the \"one denominator a multiple of the other\" first step."
+  },
+  "Y6.B3.S6": {
+   "title": "Add and subtract any two fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "Y5.B4.S10 Add fractions within 1 (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "why": "Y6.B3.S5 previous step"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 Convert improper fractions to mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "number_theory:lcm",
+     "why": "common multiples"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "why": "mixed numbers next"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplify the answer"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B3.S7": {
+   "title": "Add mixed numbers",
+   "direct": [
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y5.B4.S13 Add two mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 Convert improper fractions to mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y5.B4.S4 (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "why": "Y6.B3.S6 previous step"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "why": "inverse (next step)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a line"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "round mixed numbers to estimate"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B3.S8": {
+   "title": "Subtract mixed numbers",
+   "direct": [
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y5.B4.S17 Subtract two mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like_nv",
+     "why": "Y5.B4.S16 Subtract from a mixed number - breaking the whole (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "why": "Y6.B3.S7 previous step"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_mixed_unlike_nv",
+     "why": "inverse"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a line"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate"
+    }
+   ],
+   "note": "sub_mixed_unlike deals items that need a whole exchanged (hint \"borrow 1 whole\") as well as ones that do not."
+  },
+  "Y6.B3.S9": {
+   "title": "Multi-step problems",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:frac_word_problems",
+     "missing": "two or more steps and unlike denominators with a reasonableness check (one-step stories)"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "missing": "two-step stories"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "multi-step word problems adding and subtracting fractions and mixed numbers, with a bar model",
+   "build": [
+    "frac_multistep",
+    "frac_wp_unlike"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:frac_word_problems",
+     "why": "one-step fraction stories"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "why": "Y6.B3.S7 Add mixed numbers"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "why": "Y6.B3.S8 Subtract mixed numbers"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar models for multi-step stories"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate to check"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_word_problems_plain",
+     "why": "stories without pictures"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "multi-step stories with whole numbers"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "benchmark estimates (5.NF.A.2)"
+    }
+   ],
+   "note": ""
+  },
   "Y6.B5.S1": {
    "title": "Metric measures",
    "direct": [
@@ -3895,6 +4377,24 @@
    "why": "No live skill names radius, diameter or circumference.",
    "reused": true
   },
+  "compare_numerator": {
+   "kind": "option",
+   "skill": "fractions:compare",
+   "option": "same numerator",
+   "name": "Compare Fractions by Numerator (option)",
+   "teaches": "comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators",
+   "representation": "a comparison-type option on compare/order",
+   "family": "fractions",
+   "steps": [
+    "Y6.B3.S4"
+   ],
+   "ccss": [
+    "4.NF.A.2",
+    "3.NF.A.3d"
+   ],
+   "why": "Compare skills convert to a common denominator; none teaches the same-numerator strategy (3/5 > 3/7) or a common numerator.",
+   "reused": true
+  },
   "div_factors": {
    "kind": "new",
    "skill": "division:divide_using_factors",
@@ -3997,6 +4497,57 @@
     "6.G.A.3"
    ],
    "why": "coord_polygon works in the first quadrant on side lengths only; missing vertices and coordinate problems across four quadrants are not dealt.",
+   "reused": true
+  },
+  "frac_multistep": {
+   "kind": "new",
+   "skill": "fraction_operations:fraction_multi_step_problems",
+   "name": "Multi-Step Fraction Problems",
+   "teaches": "multi-step word problems with adding and subtracting fractions, using a bar model",
+   "representation": "a bar model with the steps; write each step's answer",
+   "family": "fractions",
+   "steps": [
+    "Y6.B3.S9"
+   ],
+   "ccss": [
+    "5.NF.A.2"
+   ],
+   "why": "frac_word_problems are one step; no two-step fraction story with a bar model.",
+   "reused": true
+  },
+  "frac_nl_equiv": {
+   "kind": "option",
+   "skill": "fractions:equiv_frac_visual",
+   "option": "number lines",
+   "name": "Equivalent Fractions on a Number Line (option)",
+   "teaches": "equivalent fractions shown on stacked number lines",
+   "representation": "a double number-line representation option",
+   "family": "fractions",
+   "steps": [
+    "Y6.B3.S2"
+   ],
+   "ccss": [
+    "4.NF.A.1",
+    "3.NF.A.3a"
+   ],
+   "why": "No skill shows equivalent fractions as the same point on stacked number lines.",
+   "reused": true
+  },
+  "frac_wp_unlike": {
+   "kind": "option",
+   "skill": "fraction_operations:frac_word_problems",
+   "option": "denominators \"unlike\" and task \"is the answer reasonable?\" (benchmark estimate)",
+   "name": "Fraction Word Problems With Unlike Denominators (option)",
+   "teaches": "adding and subtracting fractions with unlike denominators in context, and checking with benchmarks (2/5 + 1/2 cannot be 3/7)",
+   "family": "fractions",
+   "representation": "write the fraction; tick reasonable / not",
+   "steps": [
+    "Y6.B3.S9"
+   ],
+   "ccss": [
+    "5.NF.A.2"
+   ],
+   "why": "Fraction stories with unlike denominators and a reasonableness check close the 5.NF.A.2 half of the step.",
    "reused": true
   },
   "known_facts": {
@@ -4794,6 +5345,18 @@
    "step": "Y6.B2.S16",
    "action": "partial",
    "why": "Rounds and multiplies; no reasonableness check across four operations."
+  },
+  {
+   "key": "fractions:equiv_frac_visual",
+   "step": "Y6.B3.S1",
+   "action": "add",
+   "why": "Equivalent fractions with bars."
+  },
+  {
+   "key": "fraction_operations:frac_word_problems",
+   "step": "Y6.B3.S9",
+   "action": "partial",
+   "why": "One-step stories only."
   },
   {
    "key": "measurement:capacity",
