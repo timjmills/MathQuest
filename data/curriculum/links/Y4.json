@@ -5475,6 +5475,1581 @@
     }
    ],
    "note": "WRM (1) and (2) are no-exchange and exchange; sub_mixed_like samples include exchange (5 1/6 − 2 2/6), so full."
+  },
+  "Y4.B8.S1": {
+   "title": "Tenths as fractions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:write_fraction",
+     "missing": "tenths are mixed with fifths and hundredths; no tenths-only page and no counting in tenths past 1",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "tenths only: a whole cut into 10 equal parts, writing n/10, and counting in tenths on a line past 1",
+   "build": [
+    "tenths_only",
+    "frac_count"
+   ],
+   "pre": [
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W29)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W29)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W29)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "the same tenth as a decimal (next step)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths as hundredths (Y4.B8.S7)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "tenths on a line"
+    }
+   ],
+   "note": "frac_10_100 (tenths written as hundredths) is the hundredths step, not this one: tag fix."
+  },
+  "Y4.B8.S2": {
+   "title": "Tenths as decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:f_to_d",
+     "missing": "mixes fifths and hundredths with tenths; no tenths model",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "conversions:d_to_f",
+     "missing": "mixes fifths (0.6 = 3/5); no tenths-only page"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "tenths only, both ways (3/10 = 0.3), with a tenths strip, including numbers past 1 (1.3)",
+   "build": [
+    "dec_fraction_basics"
+   ],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (step before in the block)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W29)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W29)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "tenths_only"
+   ],
+   "related": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "tenths on a number line (Y4.B8.S4)"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "dimes as tenths of a dollar"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "comparing tenths"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S3": {
+   "title": "Tenths on a place value chart",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "tenths in a place-value chart (ones . tenths) with counters, reading and writing the number",
+   "build": [
+    "decimal_pv",
+    "vis_pv_decimal_places"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W29)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 Tenths as decimals (step before in the block)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "dec_fraction_basics"
+   ],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "the same chart for whole numbers"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "tenths on a line"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "digits moving into the tenths column",
+     "opts": {
+      "decimals": true
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S4": {
+   "title": "Tenths on a number line",
+   "direct": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W30)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [
+    "dec_fraction_basics"
+   ],
+   "related": [
+    {
+     "key": "decimals:round_decimals",
+     "why": "rounding uses the same line"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a line"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "position shows which is greater"
+    }
+   ],
+   "note": "decimal_nl_drag samples are tenths on 0-1; numbers past 1 should be checked by the critic."
+  },
+  "Y4.B8.S5": {
+   "title": "Divide a 1-digit number by 10",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 (lower grade, same CCSS cluster)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "band": 10000
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W30)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W30)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "7 ÷ 10 = 7/10 = 0.7"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "mm to cm (÷10)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "tenths on a line"
+    }
+   ],
+   "note": "Needs the decimals option ON; verify the generator gives 1-digit ÷ 10 = 0.n items."
+  },
+  "Y4.B8.S6": {
+   "title": "Divide a 2-digit number by 10",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B8.S5 Divide a 1-digit number by 10 (step before in the block)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "band": 1000
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W31)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W31)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the inverse",
+     "opts": {
+      "op": "x",
+      "power": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "cents as tenths and hundredths"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S7": {
+   "title": "Hundredths as fractions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "missing": "tenths renamed as hundredths; never reads hundredths from a hundred square or counts in hundredths"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "hundredths as fractions read from a hundred square (37/100) and counted on a line",
+   "build": [
+    "vis_hundred_square",
+    "dec_fraction_basics"
+   ],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same CCSS cluster)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (step before in the block)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W31)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (prior learning wk W31)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y2.B1.S9 10s on the number line to 100 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_10_100_nv",
+     "why": "tenths to hundredths without pictures"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "the hundred grid as percent later"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "hundredths as decimals (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S8": {
+   "title": "Hundredths as decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:f_to_d",
+     "missing": "hundredths mixed with fifths and tenths; no hundred-square model",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "conversions:d_to_f",
+     "missing": "mixes fifths; no hundredths-only page"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "hundredths both ways (37/100 = 0.37, 0.07 = 7/100) with a hundred square, held to hundredths",
+   "build": [
+    "dec_fraction_basics",
+    "vis_hundred_square"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (step before in the block)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same CCSS cluster)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "comparing hundredths"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "cents are hundredths of a dollar"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred grid"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S9": {
+   "title": "Hundredths on a place value chart",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "hundredths in a place-value chart (ones . tenths hundredths) with counters, and exchanging 10 hundredths for 1 tenth",
+   "build": [
+    "decimal_pv",
+    "vis_pv_decimal_places"
+   ],
+   "pre": [
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (step before in the block)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "whole-number partition in the same chart"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "dollars, dimes, cents"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "compare digit by digit"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B8.S10": {
+   "title": "Divide a 1- or 2-digit number by 100",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (step before in the block)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S6 Divide by 100 (lower grade, same CCSS cluster)",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W32)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W32)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:length_metric",
+     "why": "cm to m (÷100)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "cents to dollars (÷100)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "7/100 = 0.07"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S1": {
+   "title": "Make a whole with tenths",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "making 1 whole from tenths (0.3 + 0.7 = 1) with a tenths strip and a part-whole model",
+   "build": [
+    "decimal_whole"
+   ],
+   "pre": [
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W31)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W31)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "dec_fraction_basics"
+   ],
+   "related": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "adding decimals"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "3/10 + 7/10 = 1"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "change from $1"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S2": {
+   "title": "Make a whole with hundredths",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "making 1 whole from hundredths (0.36 + 0.64 = 1) with a hundred square",
+   "build": [
+    "decimal_whole",
+    "vis_hundred_square"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W32)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W32)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W32)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "decimal_whole"
+   ],
+   "related": [
+    {
+     "key": "measurement:money_change",
+     "why": "change from $1.00"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred grid"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "1 − 0.36"
+    }
+   ],
+   "note": "Bonds to 100 (Y3.B2.S19) are the key pre-skill and have no skill yet."
+  },
+  "Y4.B9.S3": {
+   "title": "Partition decimals",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "partitioning a decimal into ones, tenths and hundredths (3.45 = 3 + 0.4 + 0.05) with a place-value chart",
+   "build": [
+    "decimal_pv"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W32)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "compare by place"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "$3.45 = 3 dollars 4 dimes 5 cents"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "recombine the parts"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S4": {
+   "title": "Flexibly partition decimals",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "partitioning decimals in more than one way (3.45 = 3.4 + 0.05 = 2 + 1.45) with a part-whole model",
+   "build": [
+    "decimal_pv"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S7 Flexible partitioning of numbers to 1,000 (prior learning wk W33)",
+     "opts": {
+      "band": 999,
+      "rename": "more"
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S7 Flexibly partition numbers to 100 (prior learning wk W33)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv",
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "adding the parts"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "money made in different ways"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S5": {
+   "title": "Compare decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:compare_decimal",
+     "missing": "deals up to thousandths and mixed lengths; cannot be held to 1 or 2 decimal places, no models"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing decimals with one or two decimal places (0.4 vs 0.38) with hundred-square models",
+   "build": [
+    "dec_compare_2dp",
+    "dec_compare_model"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W32)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:order_decimals",
+     "why": "the next step"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "comparing money amounts"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "comparing fractions"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S6": {
+   "title": "Order decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:order_decimals",
+     "missing": "deals up to thousandths; cannot be held to 1 or 2 decimal places"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering decimals with up to two decimal places, including whole-number parts",
+   "build": [
+    "dec_order_2dp"
+   ],
+   "pre": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (step before in the block)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y4.B1.S12 Order numbers to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y2.B1.S14 Order objects and numbers (prior learning wk W32)",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "order shown on a line"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "ordering mixed forms later"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "ordering prices"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S7": {
+   "title": "Round to the nearest whole number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:round_decimals",
+     "missing": "rounds to the nearest tenth/hundredth; never to the nearest whole number"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "rounding a decimal with one or two places to the nearest whole number on a number line",
+   "build": [
+    "round_whole",
+    "vis_round_line_decimals"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S14 Round to the nearest 10 (lower grade, same CCSS cluster)",
+     "opts": {
+      "place": 10
+     }
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W33)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_tenths",
+     "why": "rounding sort"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "rounding mixed numbers"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "estimating by rounding"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B9.S8": {
+   "title": "Halves and quarters as decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:f_to_d",
+     "missing": "halves and quarters mixed with eighths; no hundred-square model",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75 (and 0.5 = 5/10 = 50/100) with a hundred square",
+   "build": [
+    "dec_fraction_basics"
+   ],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W33)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:coin_value",
+     "why": "quarters and half dollars"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "halves and quarters as percents"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "the reverse"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B10.S1": {
+   "title": "Write money using decimals",
+   "direct": [
+    {
+     "key": "measurement:money_notation",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "why": "Y3.B9.S1 Pounds and pence (prior learning wk W37)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "money_convert"
+   ],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "comparing amounts"
+    },
+    {
+     "key": "measurement:money",
+     "why": "adding amounts"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "the same amount in other coins"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B10.S2": {
+   "title": "Convert between pounds and pence",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_notation",
+     "missing": "writes the amount shown; never converts 345¢ ↔ $3.45"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "converting between cents and dollars-and-cents both ways",
+   "build": [
+    "money_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S3 Count money - pounds and pence (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "Y3.B9.S5 Find change (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B8.S10 Divide a 1- or 2-digit number by 100 (lower grade, same CCSS cluster)",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "compare after converting"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "another ×100 / ÷100 conversion"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "cents as hundredths"
+    }
+   ],
+   "note": "School swaps pounds and pence for dollars and cents."
+  },
+  "Y4.B10.S3": {
+   "title": "Compare amounts of money",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_compare",
+     "missing": "compares two sets of coins; not written amounts ($2.35 vs 189¢) or ordering three amounts"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing and ordering amounts written in $ and ¢ notation",
+   "build": [
+    "money_compare_written"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_notation",
+     "why": "Y3.B9.S1 Pounds and pence (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S2 Count money - pounds (notes and coins) (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [
+    "money_convert"
+   ],
+   "related": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "comparing decimals"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "is there enough?"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "ordering"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B10.S4": {
+   "title": "Estimate with money",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "estimating totals and change by rounding prices to the nearest dollar",
+   "build": [
+    "money_estimate"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W17)",
+     "opts": {
+      "place": 100
+     }
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "Y3.B9.S1 Pounds and pence (prior learning wk W17)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "Y3.B2.S20 Estimate answers (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "round_whole"
+   ],
+   "related": [
+    {
+     "key": "measurement:enough_money",
+     "why": "is there enough money?"
+    },
+    {
+     "key": "measurement:money",
+     "why": "exact totals"
+    },
+    {
+     "key": "decimals:round_decimals",
+     "why": "rounding decimals"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B10.S5": {
+   "title": "Calculate with money",
+   "direct": [
+    {
+     "key": "measurement:money",
+     "opts": {}
+    },
+    {
+     "key": "measurement:money_change",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "which costs more"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "adding decimals"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "multiple items at one price"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B10.S6": {
+   "title": "Solve problems with money",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money",
+     "missing": "one-step totals only"
+    },
+    {
+     "key": "measurement:money_change",
+     "missing": "one-step change only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "two-step money word problems (buy three items then find the change)",
+   "build": [
+    "money_2step"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_compare",
+     "why": "Y2.B4.S6 Compare amounts of money (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "Y3.B9.S1 Pounds and pence (prior learning wk W22)"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y3.B2.S19 Complements to 100 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step problems with other contexts"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed_plain",
+     "why": "mixed word problems"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "enough money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B11.S1": {
+   "title": "Years, months, weeks and days",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting between years, months, weeks and days (and days in each month, leap years)",
+   "build": [
+    "time_calendar"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S6 Years, months and days (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)",
+     "opts": {
+      "constant": [
+       7,
+       12
+      ]
+     }
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "day_order",
+    "time_calendar"
+   ],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "other conversions"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "conversion tables"
+    },
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "time intervals"
+    }
+   ],
+   "note": "The xlsx prior list (Days of the week, Months of the year, Y3 Years, months and days) maps to no live skill."
+  },
+  "Y4.B11.S2": {
+   "title": "Hours, minutes and seconds",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting between hours, minutes and seconds (and comparing durations given in different units)",
+   "build": [
+    "time_calendar",
+    "time_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_5min",
+     "why": "Y3.B10.S2 Tell the time to 5 minutes (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "Y2.B9.S6 Minutes in an hour (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S3 6 times-table and division facts (lower grade, same CCSS cluster)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    }
+   ],
+   "preBuild": [
+    "time_units"
+   ],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "its \"hr → min\" items"
+    },
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "durations"
+    },
+    {
+     "key": "measurement:time_1min",
+     "why": "minutes on the clock"
+    }
+   ],
+   "note": "unit_conversion_word deals some hr → min items among customary units; not a cover."
+  },
+  "Y4.B11.S3": {
+   "title": "Convert between analogue and digital times",
+   "direct": [
+    {
+     "key": "measurement:time_analog_digital",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_match_clock",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_1min",
+     "why": "Y3.B10.S3 Tell the time to the minute (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_5min",
+     "why": "Y3.B10.S2 Tell the time to 5 minutes (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "Y1.B14.S6 Tell the time to the half hour (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S5 Use a.m. and p.m (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "ordering digital times"
+    },
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "time later"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "quarter past/to wording"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B11.S4": {
+   "title": "Convert to the 24 hour clock",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting 12-hour times (a.m./p.m.) to the 24-hour clock",
+   "build": [
+    "time_24h_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "Y4.B11.S3 Convert between analogue and digital times (step before in the block)"
+    },
+    {
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S5 Use a.m. and p.m (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "time intervals"
+    },
+    {
+     "key": "measurement:time_1min",
+     "why": "reading the clock"
+    }
+   ],
+   "note": "The US school uses a.m./p.m.; 24-hour time is a WRM/UK step (owner question)."
+  },
+  "Y4.B11.S5": {
+   "title": "Convert from the 24 hour clock",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting 24-hour times to 12-hour times with a.m./p.m.",
+   "build": [
+    "time_24h_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S5 Use a.m. and p.m (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "Y4.B11.S3 Convert between analogue and digital times (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "subtraction:sub_20_mixed",
+     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "time intervals"
+    },
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "ordering times"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5550,6 +7125,7 @@
    "family": "placevalue",
    "steps": [
     "Y4.B1.S7",
+    "Y4.B9.S4",
     "Y2.B1.S7",
     "Y3.B1.S7"
    ],
@@ -5974,6 +7550,7 @@
     "Y4.B7.S4",
     "Y4.B7.S6",
     "Y4.B7.S9",
+    "Y4.B8.S1",
     "Y2.B8.S15",
     "Y3.B6.S8",
     "Y3.B6.S9"
@@ -6069,6 +7646,390 @@
     "Y4.B7.S14",
     "Y4.B7.S15",
     "Y5.B4.S16"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "tenths_only": {
+   "kind": "option",
+   "skill": "fractions:write_fraction",
+   "option": "denominators \"tenths only\" and wholes past 1",
+   "name": "Tenths as Fractions (option)",
+   "teaches": "a whole cut into 10 equal parts: write the tenths shaded, count in tenths, and go past one whole (13/10)",
+   "representation": "a 10-part strip (black outline, the single grey for shaded parts) in the boxed cell, one fraction slot (stacked numerator/denominator boxes); optional 0-2 line marked in tenths",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.1",
+    "4.NF.C.6"
+   ],
+   "why": "the \"fifths, tenths, hundredths\" family mixes fifths and hundredths with tenths",
+   "steps": [
+    "Y4.B8.S1",
+    "Y4.B8.S2"
+   ],
+   "reused": false
+  },
+  "dec_fraction_basics": {
+   "kind": "option",
+   "skill": "conversions:f_to_d",
+   "option": "set \"tenths\", \"hundredths\", \"halves and quarters\" (and the mirror on d_to_f)",
+   "name": "Tenths, Hundredths, Halves and Quarters as Decimals (option)",
+   "teaches": "writing tenths and hundredths as decimals and back, and 1/2, 1/4, 3/4 as 0.5, 0.25, 0.75, each with its model",
+   "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades); one decimal box with a fixed decimal point",
+   "family": "conversions",
+   "ccss": [
+    "4.NF.C.6",
+    "3.NF.A.1"
+   ],
+   "why": "f_to_d/d_to_f mix fifths and denominators; WRM teaches tenths, hundredths and halves/quarters as separate steps",
+   "steps": [
+    "Y4.B8.S2",
+    "Y4.B8.S3",
+    "Y4.B8.S4",
+    "Y4.B8.S7",
+    "Y4.B8.S8",
+    "Y4.B9.S1",
+    "Y4.B9.S8"
+   ],
+   "reused": false
+  },
+  "decimal_pv": {
+   "kind": "new",
+   "skill": "decimals:decimal_place_value",
+   "name": "Tenths and Hundredths in a Place-Value Chart",
+   "teaches": "tenths and hundredths as decimals in a place-value chart, with counters and base-10 (flat = 1)",
+   "representation": "a place-value chart with counters; write the decimal; option: partition 0.36 = 0.3 + 0.06",
+   "family": "decimals",
+   "steps": [
+    "Y4.B8.S3",
+    "Y4.B8.S5",
+    "Y4.B8.S9",
+    "Y4.B9.S3",
+    "Y4.B9.S4",
+    "Y4.B9.S5"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "vis_pv_decimal_places": {
+   "lane": "placevalue",
+   "kind": "template",
+   "name": "Decimal Places in the Place-Value Chart",
+   "build": "pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane",
+   "hosts": [
+    "placevalue:place_value_disks",
+    "placevalue:pv_disks_build",
+    "placevalue:value",
+    "placevalue:expand",
+    "placevalue:compare"
+   ],
+   "templates": [
+    "pv",
+    "pv-support"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/sheet/cells/pv.js",
+    "js/modules/pv-support-cell.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B8.S3",
+    "Y4.B8.S9"
+   ],
+   "reused": true,
+   "source": "VISUAL_BUILDS"
+  },
+  "vis_hundred_square": {
+   "lane": "fractions",
+   "kind": "template",
+   "name": "Hundred Square as One Whole (and the thousand square)",
+   "build": "a new hundred-square template: a 10 × 10 square as one whole (columns = tenths, cells = hundredths), shade or read, `labels: 'decimal' | 'fraction' | 'percent'`, two squares for more than 1, `grid: 1000`, and the two-tone complement mode the operations entry bonds_100 uses",
+   "hosts": [
+    "conversions:percent_visual",
+    "fraction_operations:frac_10_100",
+    "decimals:decimal_place_value"
+   ],
+   "templates": [],
+   "newTemplates": [
+    "hundred-square"
+   ],
+   "files": [
+    "js/modules/sheet/cells/hundred-square.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B8.S7",
+    "Y4.B8.S8",
+    "Y4.B9.S2"
+   ],
+   "reused": true,
+   "source": "VISUAL_BUILDS"
+  },
+  "decimal_whole": {
+   "kind": "new",
+   "skill": "decimals:make_a_whole",
+   "name": "Make a Whole with Decimals",
+   "teaches": "complements to 1 with tenths and hundredths (0.3 + 0.7, 0.45 + 0.55)",
+   "representation": "a tenths strip or hundred square with part shaded; write the missing part",
+   "family": "decimals",
+   "steps": [
+    "Y4.B9.S1",
+    "Y4.B9.S2"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "dec_compare_2dp": {
+   "kind": "option",
+   "skill": "decimals:compare_decimal",
+   "option": "places \"1 or 2\" (no thousandths)",
+   "name": "Compare Decimals to Hundredths (option)",
+   "teaches": "comparing decimals with one or two decimal places, including different lengths (0.4 vs 0.38)",
+   "representation": "compare cell: two decimals with a boxed sign slot; optional hundred squares beside each (dec_compare_model)",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.7"
+   ],
+   "why": "compare_decimal deals thousandths; Grade 3/Y4 stops at hundredths",
+   "steps": [
+    "Y4.B9.S5"
+   ],
+   "reused": false
+  },
+  "dec_compare_model": {
+   "kind": "option",
+   "skill": "decimals:compare_decimal",
+   "option": "support \"hundred squares\" beside each decimal and items \"same whole?\"",
+   "name": "Compare Decimals With Models (option)",
+   "grade": "4",
+   "family": "decimals",
+   "standards": [
+    "4.NF.C.7"
+   ],
+   "ee": [],
+   "teaches": "comparing decimals to hundredths by reasoning about size, with a hundred-square model, and only when they refer to the same whole",
+   "problemTypes": [
+    "shade both, then compare",
+    "0.5 vs 0.45 with squares",
+    "same whole?",
+    "justify: which picture proves it?"
+   ],
+   "templates": [
+    "frac-model",
+    "compare"
+   ],
+   "newTemplates": [],
+   "answer": "write <, > or =",
+   "ladder": "O2 tenths → hundredths → mixed · O3 squares shaded → outline → none · O6 squares / strips",
+   "misconceptions": [
+    "0.45 > 0.5 because 45 > 5",
+    "more digits means bigger"
+   ],
+   "wrmSteps": [
+    "Y4.B9.S5"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B9.S5"
+   ],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS"
+  },
+  "dec_order_2dp": {
+   "kind": "option",
+   "skill": "decimals:order_decimals",
+   "option": "places \"1 or 2\"",
+   "name": "Order Decimals to Hundredths (option)",
+   "teaches": "ordering three to five decimals with up to two places",
+   "representation": "order cell: numbers in boxed cards, answer slots in a row; optional 0-1 or 0-10 line",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.7"
+   ],
+   "why": "order_decimals deals thousandths",
+   "steps": [
+    "Y4.B9.S6"
+   ],
+   "reused": false
+  },
+  "round_whole": {
+   "kind": "option",
+   "skill": "decimals:round_decimals",
+   "option": "nearest whole",
+   "name": "Round Decimals to the Nearest Whole (option)",
+   "teaches": "rounding a 1-dp or 2-dp decimal to the nearest whole number on a number line",
+   "representation": "a \"nearest whole\" target option with a number-line support",
+   "family": "decimals",
+   "steps": [
+    "Y4.B9.S7",
+    "Y4.B10.S4",
+    "Y5.B7.S10"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "vis_round_line_decimals": {
+   "lane": "placevalue",
+   "kind": "option",
+   "name": "Rounding Lines for Decimals",
+   "build": "round-line / round-chart / round-pv take decimals (to 1 and 2 dp) and `hops: 'bounds'` (hops to each bound, bounds circled) and `task: 'ends'`",
+   "hosts": [
+    "number_sense:rounding_visual",
+    "number_sense:round_nl_thousands",
+    "decimals:round_decimals"
+   ],
+   "templates": [
+    "pv"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/sheet/cells/panes/extras.js",
+    "js/modules/sheet/cells/pv.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B9.S7"
+   ],
+   "reused": true,
+   "source": "VISUAL_BUILDS"
+  },
+  "money_convert": {
+   "kind": "option",
+   "skill": "measurement:money_notation",
+   "option": "convert",
+   "name": "Dollars and Cents (option)",
+   "teaches": "converting between cents and dollars-and-cents (345 cents = $3.45) and recording money",
+   "representation": "option: cents to dollars and back",
+   "family": "measurement",
+   "steps": [
+    "Y4.B10.S1",
+    "Y4.B10.S2",
+    "Y4.B10.S3",
+    "Y3.B9.S2"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "money_compare_written": {
+   "kind": "option",
+   "skill": "measurement:money_compare",
+   "option": "form \"written amounts\" and task \"order three\"",
+   "name": "Compare Amounts Written in $ and ¢ (option)",
+   "teaches": "comparing and ordering amounts written as $2.35, 189¢, $1 and 9¢, converting to one unit first",
+   "representation": "compare cell: two price tags (black outline) with a boxed sign slot; order form: three tags and three answer boxes",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.C.8",
+    "4.MD.A.2"
+   ],
+   "why": "money_compare deals coin pictures only",
+   "steps": [
+    "Y4.B10.S3"
+   ],
+   "reused": false
+  },
+  "money_estimate": {
+   "kind": "new",
+   "skill": "measurement:estimate_with_money",
+   "name": "Estimate with Money",
+   "teaches": "rounding prices to the nearest dollar to estimate totals and change",
+   "representation": "a price list; write the rounded prices and the estimate",
+   "family": "measurement",
+   "steps": [
+    "Y4.B10.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "money_2step": {
+   "kind": "new",
+   "skill": "measurement:money_two_step",
+   "name": "Two-Step Money Problems",
+   "teaches": "two-step money word problems (buy two items, then find the change)",
+   "representation": "a price list drawn as tags plus a short story; bar model support level",
+   "family": "measurement",
+   "steps": [
+    "Y4.B10.S6",
+    "Y2.B4.S10",
+    "Y3.B9.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "time_calendar": {
+   "kind": "new",
+   "skill": "measurement:calendar_and_units",
+   "name": "Years, Months, Days, Hours",
+   "teaches": "converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years",
+   "representation": "a calendar page or conversion table; fill the missing values",
+   "family": "measurement",
+   "steps": [
+    "Y4.B11.S1",
+    "Y4.B11.S2",
+    "Y3.B10.S10",
+    "Y3.B10.S11",
+    "Y3.B10.S6",
+    "Y3.B10.S7"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "day_order": {
+   "kind": "new",
+   "skill": "measurement:order_events",
+   "name": "First, Next, Then",
+   "teaches": "sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then)",
+   "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
+   "family": "measurement",
+   "steps": [
+    "Y4.B11.S1",
+    "R.B10.S6",
+    "R.B6.S4",
+    "Y1.B14.S1"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "time_convert": {
+   "kind": "option",
+   "skill": "measurement:unit_conversion_word",
+   "option": "time",
+   "name": "Convert Units of Time (option)",
+   "teaches": "converting between seconds, minutes, hours, days, weeks, months and years",
+   "representation": "a time-only unit option",
+   "family": "measurement",
+   "steps": [
+    "Y4.B11.S2",
+    "Y5.B14.S5"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "time_units": {
+   "kind": "new",
+   "skill": "measurement:hours_minutes_seconds",
+   "name": "Hours, Minutes or Seconds?",
+   "teaches": "a sense of time units: which activities take seconds, minutes or hours",
+   "representation": "activity pictures with a unit word bank; option: longer/shorter",
+   "family": "measurement",
+   "steps": [
+    "Y4.B11.S2",
+    "Y1.B14.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "time_24h_convert": {
+   "kind": "new",
+   "skill": "measurement:twenty_four_hour_clock",
+   "name": "The 24-Hour Clock",
+   "teaches": "converting between 12-hour and 24-hour times and between analogue and digital",
+   "representation": "an analogue clock beside a 24-hour display; write the time; option: a.m./p.m. to 24-hour",
+   "family": "measurement",
+   "steps": [
+    "Y4.B11.S4",
+    "Y4.B11.S5"
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
@@ -6398,6 +8359,78 @@
    "step": "Y4.B7.S6",
    "action": "add",
    "why": "kept: improper fractions shown and named"
+  },
+  {
+   "key": "fraction_operations:frac_10_100",
+   "step": "Y4.B8.S1",
+   "action": "remove",
+   "why": "tenths as hundredths is Y4.B8.S7, not tenths as fractions"
+  },
+  {
+   "key": "fractions:write_fraction",
+   "step": "Y4.B8.S1",
+   "action": "partial",
+   "why": "kept partial with denoms [5]"
+  },
+  {
+   "key": "fraction_operations:frac_10_100",
+   "step": "Y4.B8.S7",
+   "action": "partial",
+   "why": "renames tenths as hundredths; does not read hundredths from a hundred square"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y4.B8.S2",
+   "action": "partial",
+   "why": "mixes fifths"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y4.B8.S8",
+   "action": "partial",
+   "why": "mixes fifths"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B8.S5",
+   "action": "add",
+   "why": "re-tag as FULL with op ÷, power [10], decimals on (S6 same; S10 power [100])"
+  },
+  {
+   "key": "decimals:compare_decimal",
+   "step": "Y4.B9.S5",
+   "action": "partial",
+   "why": "thousandths; cannot be held to hundredths"
+  },
+  {
+   "key": "decimals:order_decimals",
+   "step": "Y4.B9.S6",
+   "action": "partial",
+   "why": "thousandths"
+  },
+  {
+   "key": "decimals:round_decimals",
+   "step": "Y4.B9.S7",
+   "action": "add",
+   "why": "missing partial tag: rounding decimals, but not to the whole"
+  },
+  {
+   "key": "measurement:money",
+   "step": "Y4.B10.S6",
+   "action": "add",
+   "why": "missing partial tag (one-step only)"
+  },
+  {
+   "key": "measurement:money_compare",
+   "step": "Y4.B10.S3",
+   "action": "partial",
+   "why": "coin sets only, not written amounts"
+  },
+  {
+   "key": "measurement:money_notation",
+   "step": "Y4.B10.S2",
+   "action": "add",
+   "why": "missing partial tag"
   }
  ]
 }
