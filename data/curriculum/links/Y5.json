@@ -1,0 +1,6528 @@
+{
+ "year": "Y5",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "Y5.B4.S1": {
+   "title": "Find fractions equivalent to a unit fraction",
+   "direct": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "opts": {}
+    },
+    {
+     "key": "fractions:equivalent",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "no control to start every item from a UNIT fraction (1/3 = __/12): the equivalence skills mix unit and non-unit starting fractions, and the fraction-wall / bar model that finds all equivalents of 1/n at once is not dealt",
+   "build": [
+    "equiv_from_unit"
+   ],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W15)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "same equivalence, numbers only, yes/no and sort"
+    },
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "recognise equivalents (next step Y5.B4.S3)"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "the inverse: simplify to the unit fraction"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "equivalence tenths/hundredths (4.NF.C.5)"
+    }
+   ],
+   "note": "equiv_frac_nv deals yes/no and sort only; tagged here today, kept as related."
+  },
+  "Y5.B4.S2": {
+   "title": "Find fractions equivalent to a non-unit fraction",
+   "direct": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "opts": {}
+    },
+    {
+     "key": "fractions:equivalent",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "recognise equivalents (next step)"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "inverse: simplify"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "uses equivalents to compare"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths as hundredths"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S3": {
+   "title": "Recognise equivalent fractions",
+   "direct": [
+    {
+     "key": "fractions:select_equiv_frac",
+     "opts": {}
+    },
+    {
+     "key": "fractions:equivalent",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (previous step)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "equivalence with models"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplest form"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "comparing uses equivalents"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths and hundredths equivalents"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S4": {
+   "title": "Convert improper fractions to mixed numbers",
+   "direct": [
+    {
+     "key": "fractions:improper_mixed",
+     "opts": {}
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y5.B4.S3 Recognise equivalent fractions (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "frac_beyond_1"
+   ],
+   "related": [
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "mixed numbers to the nearest whole"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "sums beyond 1 are converted"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "comparing fractions"
+    }
+   ],
+   "note": "improper_mixed has no direction control; mixed_improper_visual asks both forms of a drawn amount."
+  },
+  "Y5.B4.S5": {
+   "title": "Convert mixed numbers to improper fractions",
+   "direct": [
+    {
+     "key": "fractions:improper_mixed",
+     "opts": {}
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "products beyond 1"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "exchanging a whole uses the improper form"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "mixed numbers to the nearest whole"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S6": {
+   "title": "Compare fractions less than 1",
+   "direct": [
+    {
+     "key": "fractions:compare",
+     "opts": {}
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S5 Convert mixed numbers to improper fractions (previous step)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y5.B4.S5 Convert mixed numbers to improper fractions (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "compare with 0, 1/2, 1"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "next step: order"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "size on a number line"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "same reasoning with decimals"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S7": {
+   "title": "Order fractions less than 1",
+   "direct": [
+    {
+     "key": "fractions:order_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (previous step)"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "order on a number line"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "includes ordering drag items"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "benchmark reasoning"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "order decimals"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S8": {
+   "title": "Compare and order fractions greater than 1",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill compares or orders improper fractions and mixed numbers (all compare/order skills deal fractions below 1)",
+   "build": [
+    "frac_compare_gt1"
+   ],
+   "pre": [
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y5.B4.S7 Order fractions less than 1 (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "frac_beyond_1"
+   ],
+   "related": [
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "convert before comparing"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "mixed numbers near wholes"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "order below 1"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S9": {
+   "title": "Add and subtract fractions with the same denominator",
+   "direct": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:decompose_fractions",
+     "why": "fraction as a sum of unit fractions"
+    },
+    {
+     "key": "fraction_operations:frac_word_problems",
+     "why": "in stories"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "next steps: related denominators"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "mixed numbers"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S10": {
+   "title": "Add fractions within 1",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "missing": "no \"total within 1\" control: with one denominator family ({denoms:[2]} etc.) the denominators are related as WRM wants, but sums over 1 are mixed in"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "missing": "numbers only; no total-within-1 control, sums over 1 mixed in"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page of related-denominator additions whose total stays within 1 (1/4 + 3/8) with the bar model",
+   "build": [
+    "frac_total_band"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y4.B7.S5 Compare and order mixed numbers (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:equivalent",
+     "why": "convert to the common denominator"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "same denominator"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "why": "inverse"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate first"
+    }
+   ],
+   "note": "Use opts {\"denoms\":[2]} (or [3] / [5]) to keep denominators related."
+  },
+  "Y5.B4.S11": {
+   "title": "Add fractions with total greater than 1",
+   "direct": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:improper_mixed",
+     "why": "convert the total to a mixed number"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "why": "inverse"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "why": "next: mixed numbers"
+    },
+    {
+     "key": "fraction_operations:estimate_frac_ops",
+     "why": "estimate first"
+    }
+   ],
+   "note": "denoms takes one family per page ([2] halves/quarters/eighths, [3], [5]); any one family keeps denominators related."
+  },
+  "Y5.B4.S12": {
+   "title": "Add to a mixed number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "missing": "deals mixed + mixed only; no \"mixed number + proper fraction\" form (2 1/4 + 3/4)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "missing": "deals mixed + mixed only (related denominators with {denoms:[2]}); no mixed + proper fraction form"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding a proper fraction to a mixed number (3 1/5 + 2/5; 2 1/4 + 5/8), including crossing the next whole",
+   "build": [
+    "mixed_plus_frac"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_mixed_like_nv",
+     "why": "numbers-only mixed addition"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "renaming the total"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "inverse"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "count on along a line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S13": {
+   "title": "Add two mixed numbers",
+   "direct": [
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "fraction_operations:add_mixed_like_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "inverse"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "the improper-fraction method"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "why": "in stories"
+    },
+    {
+     "key": "fraction_operations:mixed_fraction_ops",
+     "why": "mixed review"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S14": {
+   "title": "Subtract fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike_nv",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike",
+     "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like_nv",
+     "why": "Y5.B4.S13 Add two mixed numbers (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "inverse"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "common denominator"
+    },
+    {
+     "key": "fraction_operations:frac_word_problems",
+     "why": "in stories"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "next: mixed numbers"
+    }
+   ],
+   "note": "WRM includes subtracting from a whole/improper fraction; sub_fractions_like covers same denominator, {denoms:[one family]} keeps the others related."
+  },
+  "Y5.B4.S15": {
+   "title": "Subtract from a mixed number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "missing": "deals mixed − mixed; no \"mixed number − proper fraction\" form without exchange (3 4/5 − 2/5)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "missing": "deals mixed − mixed only (related denominators with {denoms:[2]}); no mixed − proper fraction form"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "subtracting a proper fraction from a mixed number (3 4/5 − 2/5; 4 3/4 − 3/8) with no exchange",
+   "build": [
+    "mixed_plus_frac"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S14 Subtract fractions (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "why": "Y5.B4.S14 Subtract fractions (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike_nv",
+     "why": "Y5.B4.S14 Subtract fractions (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:sub_mixed_like_nv",
+     "why": "numbers-only mixed subtraction"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "inverse"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "renaming"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "count back along a line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S16": {
+   "title": "Subtract from a mixed number - breaking the whole",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "missing": "exchange items occur only by chance (5 1/6 − 2 2/6); no page that always exchanges, and no mixed − fraction form"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page that always breaks a whole (3 1/5 − 4/5) with the bar/exchange model",
+   "build": [
+    "sub_break_whole",
+    "mixed_plus_frac"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "why": "Y5.B4.S15 Subtract from a mixed number (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y4.B7.S13 Subtract two fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W18)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:improper_mixed",
+     "why": "1 whole = 5/5"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like_nv",
+     "why": "numbers only"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "why": "related denominators"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "inverse"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B4.S17": {
+   "title": "Subtract two mixed numbers",
+   "direct": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (prior learning wk W16)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "inverse"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "why": "in stories"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "the improper-fraction method"
+    },
+    {
+     "key": "fraction_operations:mixed_fraction_ops",
+     "why": "mixed review"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S1": {
+   "title": "Multiply a unit fraction by an integer",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "missing": "unit and non-unit fractions mixed; no unit-fraction-only control (1/5 × 3 as repeated addition)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "missing": "numbers only; unit and non-unit fractions mixed, no unit-only control"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page of unit fraction × integer only, shown as repeated addition on a bar (1/5 × 3 = 1/5 + 1/5 + 1/5)",
+   "build": [
+    "mult_unit_frac_int"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:decompose_fractions",
+     "why": "unit fractions as repeated addition"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "repeated addition"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "1/n of an amount"
+    },
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "size of the product"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S2": {
+   "title": "Multiply a non-unit fraction by an integer",
+   "direct": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:decompose_fractions",
+     "why": "3/5 = 1/5+1/5+1/5"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "products beyond 1 as mixed numbers"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "in stories"
+    },
+    {
+     "key": "fraction_operations:mult_frac_frac",
+     "why": "next grade: fraction × fraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S3": {
+   "title": "Multiply a mixed number by an integer",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill multiplies a mixed number by an integer (2 1/3 × 4)",
+   "build": [
+    "mult_mixed_int"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (previous step)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (previous step)"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "why": "Y4.B7.S15 Subtract from mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (prior learning wk W19)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "fraction × integer"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "convert first"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "repeated addition of mixed numbers"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "in stories"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S4": {
+   "title": "Calculate a fraction of a quantity",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {}
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "larger amounts"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "fraction × whole"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "fraction of a shape"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "divide by the denominator"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S5": {
+   "title": "Fraction of an amount",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "opts": {}
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (previous step)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (previous step)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B9.S8 Halves and quarters as decimals (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "smaller amounts"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "in stories"
+    },
+    {
+     "key": "conversions:percent_of_number",
+     "why": "percent of an amount"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "fraction × whole"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S6": {
+   "title": "Find the whole",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "missing": "{forms:[1]} deals \"3/7 of a number is 12\" in numbers only; the bar model that shows the whole is missing"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding the whole with a bar model (3/5 is 24: draw the bar, one part is 8, the whole is 40)",
+   "build": [
+    "frac_find_whole"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y5.B6.S5 Fraction of an amount (previous step)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:find_whole_from_pct",
+     "why": "same idea with percent"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "fraction of an amount, forward"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "unit fraction of an amount"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "inverse operations"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B6.S7": {
+   "title": "Use fractions as operators",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "missing": "\"Click ALL expressions equal to 1/6 of 30\" items touch the operator idea; no write-it-both-ways item"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "no skill shows a fraction as an operator (2/5 of 30 = 30 ÷ 5 × 2 = 2/5 × 30)",
+   "build": [
+    "frac_operator"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S6 Find the whole (previous step)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y3.B8.S6 Reasoning with fractions of an amount (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (prior learning wk W20)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S8 Find a third (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "fraction of an amount"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "fraction × whole"
+    },
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "multiplying as scaling"
+    },
+    {
+     "key": "conversions:percent_of_number",
+     "why": "percent as an operator"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S1": {
+   "title": "Decimals up to 2 decimal places",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "missing": "tenths on a 0–1 line only; no hundredths and no place-value chart"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "missing": "writes tenths and hundredths as fractions; no place-value chart or counters"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "decimals to 2 dp on a place-value chart with counters, partitioned (0.36 = 0.3 + 0.06), and hundredths on a number line",
+   "build": [
+    "decimal_pv"
+   ],
+   "pre": [
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B9.S8 Halves and quarters as decimals (prior learning wk W21)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "decimal_whole"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths as hundredths"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "compare"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "fraction to decimal"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S2": {
+   "title": "Equivalent fractions and decimals (tenths)",
+   "direct": [
+    {
+     "key": "conversions:f_to_d",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "conversions:d_to_f",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d {denoms:[5]} still mixes hundredths; d_to_f mixes 0.75 = 3/4)",
+   "build": [
+    "fd_place_band"
+   ],
+   "pre": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y5.B7.S1 Decimals up to 2 decimal places (previous step)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "tenths on a number line"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths as hundredths"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "to percent"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S3": {
+   "title": "Equivalent fractions and decimals (hundredths)",
+   "direct": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "opts": {}
+    },
+    {
+     "key": "conversions:f_to_d",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "conversions:d_to_f",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:frac_10_100_nv",
+     "why": "numbers only"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square = per cent"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "compare hundredths"
+    },
+    {
+     "key": "conversions:p_to_d",
+     "why": "percent as hundredths"
+    }
+   ],
+   "note": "frac_10_100 carries the tenths/hundredths grids; f_to_d deals /100 items like 7/100 = 0.07."
+  },
+  "Y5.B7.S4": {
+   "title": "Equivalent fractions and decimals",
+   "direct": [
+    {
+     "key": "conversions:f_to_d",
+     "opts": {}
+    },
+    {
+     "key": "conversions:d_to_f",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y5.B7.S3 Equivalent fractions and decimals (hundredths) (previous step)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W21)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:equivalent",
+     "why": "scale to /10 or /100 first"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "order mixed forms"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "fraction to percent"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplest form"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S5": {
+   "title": "Thousandths as fractions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:d_to_f",
+     "missing": "tenths and hundredths only; no thousandths (0.007 = 7/1000)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "thousandths as fractions (x/1000) with a place-value chart and a thousandths model",
+   "build": [
+    "thousandths_pv",
+    "fd_place_band"
+   ],
+   "pre": [
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y5.B7.S4 Equivalent fractions and decimals (previous step)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "thousandths compared"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "tenths as hundredths"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "why": "rounding thousandths"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "÷ 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S6": {
+   "title": "Thousandths as decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:compare_thousandths",
+     "missing": "reads 3-dp decimals but never writes a thousandths fraction or chart as a decimal"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "writing thousandths as decimals (7/1000 = 0.007; 3 tenths 4 hundredths 2 thousandths = 0.342)",
+   "build": [
+    "thousandths_pv"
+   ],
+   "pre": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y5.B7.S5 Thousandths as fractions (previous step)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W12)"
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (prior learning wk W12)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts - multiplication and division (prior learning wk W12)"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:round_thousandths",
+     "why": "rounding thousandths"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "ordering to 3 dp"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "÷ 1,000 gives thousandths"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "decimal to fraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S7": {
+   "title": "Thousandths on a place value chart",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill shows thousandths on a place-value chart (counters / digits in Ones . Tenths Hundredths Thousandths)",
+   "build": [
+    "thousandths_pv"
+   ],
+   "pre": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S6 Thousandths as decimals (previous step)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the shift chart moves digits into thousandths"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "compare"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "order"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "why": "round"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S8": {
+   "title": "Order and compare decimals (same number of decimal places)",
+   "direct": [
+    {
+     "key": "decimals:compare_decimal",
+     "opts": {}
+    },
+    {
+     "key": "decimals:order_decimals",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "3 dp"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "on a number line"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "compare fractions"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "mixed forms"
+    }
+   ],
+   "note": "Set Decimal Places to 1 or 2 for same-dp items; the generator gives the same dp per page at 1 dp. At 2 dp some pairs differ (4.4 vs 4.6 fine; 6.88 vs 0.43)."
+  },
+  "Y5.B7.S9": {
+   "title": "Order and compare any decimals with up to 3 decimal places",
+   "direct": [
+    {
+     "key": "decimals:compare_thousandths",
+     "opts": {}
+    },
+    {
+     "key": "decimals:order_decimals",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y5.B7.S8 Order and compare decimals (same number of decimal places) (previous step)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "2 dp"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "why": "rounding"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "mixed forms"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "number line"
+    }
+   ],
+   "note": "order_decimals at Decimal Places 3 mixes 1–3 dp (6.88, 0.425, 7.7)."
+  },
+  "Y5.B7.S10": {
+   "title": "Round to the nearest whole number",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill rounds a decimal to the nearest WHOLE number (3.7 → 4); round_decimals offers tenth/hundredth only",
+   "build": [
+    "round_whole"
+   ],
+   "pre": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (previous step)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (previous step)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:round_decimals",
+     "why": "round to a tenth"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "mixed numbers to the nearest whole"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "rounding on a number line"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "decimals on a line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S11": {
+   "title": "Round to 1 decimal place",
+   "direct": [
+    {
+     "key": "decimals:round_decimals",
+     "opts": {
+      "precision": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "number_sense:round_sort_tenths",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "decimals:round_thousandths",
+     "missing": "{\"Round to the nearest\": tenth} rounds 3-dp numbers within 1 only, no number line"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_hundredths",
+     "why": "to a hundredth"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "number line"
+    },
+    {
+     "key": "fractions:round_fractions",
+     "why": "round mixed numbers"
+    }
+   ],
+   "note": "round_decimals {precision:[0]} = nearest tenth, with the number line and midpoint."
+  },
+  "Y5.B7.S12": {
+   "title": "Understand percentages",
+   "direct": [
+    {
+     "key": "conversions:percent_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "decimals:round_decimals",
+     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
+    },
+    {
+     "key": "number_sense:round_sort_tenths",
+     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "why": "Y5.B7.S11 Round to 1 decimal place (previous step)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:f_to_p",
+     "why": "fraction to percent"
+    },
+    {
+     "key": "conversions:d_to_p",
+     "why": "decimal to percent"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "hundredths"
+    },
+    {
+     "key": "conversions:percent_of_number",
+     "why": "next grade: percent of"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S13": {
+   "title": "Percentages as fractions",
+   "direct": [
+    {
+     "key": "conversions:f_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:p_to_f",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (previous step)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y4.B9.S6 Order decimals (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W22)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W22)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "scale to /100"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplify the fraction"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "mixed forms"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S14": {
+   "title": "Percentages as decimals",
+   "direct": [
+    {
+     "key": "conversions:d_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:p_to_d",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 Percentages as fractions (previous step)"
+    },
+    {
+     "key": "conversions:p_to_f",
+     "why": "Y5.B7.S13 Percentages as fractions (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "decimal to fraction"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "mixed forms"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "fraction to percent"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B7.S15": {
+   "title": "Equivalent fractions, decimals and percentages",
+   "direct": [
+    {
+     "key": "conversions:f_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:d_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:order_fdp",
+     "opts": {}
+    },
+    {
+     "key": "conversions:f_to_d",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:p_to_d",
+     "why": "Y5.B7.S14 Percentages as decimals (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    },
+    {
+     "key": "conversions:p_to_f",
+     "why": "percent to fraction"
+    },
+    {
+     "key": "conversions:p_to_d",
+     "why": "percent to decimal"
+    },
+    {
+     "key": "conversions:mixed_conversions",
+     "why": "mixed review"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B8.S1": {
+   "title": "Perimeter of rectangles",
+   "direct": [
+    {
+     "key": "area_perimeter:perimeter",
+     "opts": {
+      "perimeter": [
+       "standard",
+       "missing",
+       "word"
+      ]
+     }
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y4.B6.S4 Perimeter of a rectangle (lower grade, same cluster CCSS 3.MD.D.8)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S3 Perimeter on a grid (lower grade, same cluster CCSS 3.MD.D.8)"
+    },
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3.B5.S10 What is perimeter (lower grade, same cluster CCSS 3.MD.D.8)"
+    },
+    {
+     "key": "addition:add",
+     "why": "adding four side lengths (lower grade, same cluster CCSS 3.NBT.A.2)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "2 × (l + w) needs ×2 (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (next idea, same shape)"
+    },
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "both measures of one rectangle"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "Y5.B8.S2 rectilinear shapes (next step)"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "perimeter of a rectangle drawn on a coordinate grid"
+    }
+   ],
+   "note": "perimeter standard (find P), missing (find a side from P) and word variants cover the WRM lesson; perimeter_grid gives the counting-on-squares start."
+  },
+  "Y5.B8.S2": {
+   "title": "Perimeter of rectilinear shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:composite_shapes",
+     "missing": "every side is labelled, so the pupil never finds the missing lengths first"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "missing": "rectilinear (L) shapes by counting edges only, no labelled-length calculation"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding missing side lengths of a rectilinear shape from the given sides before adding the perimeter",
+   "build": [
+    "missing_lengths"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y5.B8.S1 Perimeter of rectangles (previous step)"
+    },
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3/Gr.2 What is perimeter? (prior learning wk W29)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S5 Perimeter of rectilinear shapes (lower grade, same cluster CCSS 3.MD.D.8)"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "missing side = whole side − known part (lower grade, same cluster CCSS 3.NBT.A.2)"
+    }
+   ],
+   "preBuild": [
+    "missing_lengths"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "same L/T/U shapes, area instead of perimeter"
+    },
+    {
+     "key": "area_perimeter:mixed_area_perimeter",
+     "why": "mixed review of the block"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B8.S3": {
+   "title": "Perimeter of polygons",
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "missing": "only triangles and rectangles with every side labelled; no pentagons/hexagons and no regular polygon from one side (5 × 7 cm)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "perimeter of any polygon (5+ sides) and of a regular polygon given one side and the number of sides",
+   "build": [
+    "regular_polygon"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3/Gr.2 What is perimeter? (prior learning wk W29)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y3/Gr.2 Calculate perimeter (prior learning wk W29)"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "Y5.B8.S2 Perimeter of rectilinear shapes (previous step)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "count the sides before multiplying (lower grade, same cluster CCSS 2.G.A.1)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "number of sides × side length (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "perimeter of rectangles"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "perimeter of a polygon drawn on a grid"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B8.S4": {
+   "title": "Area of rectangles",
+   "direct": [
+    {
+     "key": "area_perimeter:area",
+     "opts": {
+      "area": [
+       "standard",
+       "missing",
+       "word"
+      ]
+     }
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 What is area? / Count squares (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3/Gr.2 Use arrays (prior learning wk W29)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3/Gr.2 Use arrays (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "Y4/Gr.3 Make shapes (prior learning wk W29)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y5.B8.S1 Perimeter of rectangles (block start)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "area and perimeter of one rectangle"
+    },
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "split a rectangle to multiply"
+    },
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "Y5.B8.S5 compound shapes (next step)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "area model for multiplication"
+    }
+   ],
+   "note": "Units: skill writes square units/ft²; cm² and m² labels are the open area_tile_multiply option (STANDARD_PROPOSALS), not a WRM gap."
+  },
+  "Y5.B8.S5": {
+   "title": "Area of compound shapes",
+   "direct": [
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "opts": {}
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "opts": {
+      "composite_shapes": [
+       "dual_pa"
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles (previous step)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 Count squares (prior learning wk W29)"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "Y5.B8.S2 Perimeter of rectilinear shapes (same shapes)"
+    },
+    {
+     "key": "addition:add",
+     "why": "add the part areas (lower grade, same cluster CCSS 3.MD.C.7d)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "splitting a rectangle into two"
+    },
+    {
+     "key": "area_perimeter:volume_composite",
+     "why": "the same split idea in 3-D (Grade 5)"
+    },
+    {
+     "key": "area_perimeter:mixed_area_perimeter",
+     "why": "block review"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B8.S6": {
+   "title": "Estimate area",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "estimating the area of an irregular shape by counting whole squares and pairing part squares",
+   "build": [
+    "area_estimate"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 What is area? (prior learning wk W30)"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 Area of rectangles"
+    },
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "why": "Y5.B8.S5 Area of compound shapes (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:estimate_length",
+     "why": "estimating another measure"
+    },
+    {
+     "key": "area_perimeter:area_triangle",
+     "why": "half squares make a triangle area (Y6)"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B9.S1": {
+   "title": "Draw line graphs",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "plotting points from a table and joining them into a line graph with labelled axes and a scale",
+   "build": [
+    "line_graph"
+   ],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3/Gr.2 Draw bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "plot points on axes (lower grade, same cluster CCSS 5.G.A.1)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "plotting ordered pairs (same CCSS 5.G.A.2)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "first-quadrant points"
+    },
+    {
+     "key": "graphs:line_plot",
+     "why": "a line PLOT is not a line graph: name the difference"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "another chart of the same data"
+    }
+   ],
+   "note": "Line graphs are not in K-5 CCSS; tag 5.G.A.2 as the nearest. Owner: the school pairs 4.MD.B.4 line plots as a supplement (not a WRM step)."
+  },
+  "Y5.B9.S2": {
+   "title": "Read and interpret line graphs",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading values, intervals and differences from a line graph over time",
+   "build": [
+    "line_graph"
+   ],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3/Gr.2 Draw bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "plot points on axes (lower grade, same cluster CCSS 5.G.A.1)"
+    },
+    {
+     "key": "graphs:line_plot",
+     "why": "reading a scale on a number line (lower grade, same cluster CCSS 3.MD.B.4)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "plotting ordered pairs (same CCSS 5.G.A.2)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "first-quadrant points"
+    },
+    {
+     "key": "graphs:line_plot",
+     "why": "a line PLOT is not a line graph: name the difference"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "another chart of the same data"
+    }
+   ],
+   "note": "Line graphs are not in K-5 CCSS; tag 5.G.A.2 as the nearest. Owner: the school pairs 4.MD.B.4 line plots as a supplement (not a WRM step)."
+  },
+  "Y5.B9.S3": {
+   "title": "Read and interpret tables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading a data table (rows and columns) and answering one- and two-step questions from it",
+   "build": [
+    "table_data"
+   ],
+   "pre": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2/Gr.1 Make tally charts (prior learning wk W04)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W04)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W04)"
+    },
+    {
+     "key": "graphs:pictograph",
+     "why": "Y3.B12.S1 Interpret pictograms (lower grade, same cluster CCSS 3.MD.B.3)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "a tally chart is a two-column table"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "the same data as a chart"
+    },
+    {
+     "key": "graphs:mixed_graphs",
+     "why": "reading data in several forms"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B9.S4": {
+   "title": "Two-way tables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and completing two-way tables (row and column totals)",
+   "build": [
+    "two_way"
+   ],
+   "pre": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2/Gr.1 Make tally charts (prior learning wk W04)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3/Gr.2 Interpret bar charts (prior learning wk W04)"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "missing cell = total − known (lower grade, same cluster CCSS 3.NBT.A.2)"
+    }
+   ],
+   "preBuild": [
+    "table_data"
+   ],
+   "related": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "one-way table"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "chart of the same data"
+    }
+   ],
+   "note": "Pre-skill table_data (Y5.B9.S3) is itself unbuilt."
+  },
+  "Y5.B9.S5": {
+   "title": "Read and interpret timetables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading a bus/train timetable: times, durations and which service to catch",
+   "build": [
+    "timetables"
+   ],
+   "pre": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "Y3/Gr.2 Hours and minutes - use start and end times (prior learning wk W30)"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "Y3/Gr.2 Read time on a digital clock (prior learning wk W30)"
+    },
+    {
+     "key": "measurement:elapsed_find_start",
+     "why": "Y3/Gr.2 Hours and minutes (prior learning wk W30)"
+    },
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "Y3/Gr.2 Hours and minutes (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [
+    "table_data"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "durations between two times"
+    },
+    {
+     "key": "measurement:time_sense",
+     "why": "a.m. / p.m. on a timetable"
+    }
+   ],
+   "note": "Ctx prior list for this week was the W29 area lessons (school week mismatch); pre-skills taken from the time lessons the timetable needs."
+  },
+  "Y5.B10.S1": {
+   "title": "Understand and use degrees",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:measure_angles",
+     "missing": "gives degrees but only as a closest-match choice; never teaches the degree as 1/360 of a turn or 90°/180°/360° as quarter/half/full turn"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "missing": "names angle types; the degree facts (right = 90°, straight = 180°) appear only as captions"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the degree as a unit of turn: right angle 90°, straight line 180°, full turn 360°, and how many degrees in a fraction of a turn",
+   "build": [
+    "turns_angles"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y3/Gr.2 Right angles (prior learning)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same cluster CCSS 4.G.A.1)"
+    }
+   ],
+   "preBuild": [
+    "turns_angles"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_quarter",
+     "why": "quarter and half turns of the minute hand"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "angles that add to 90°/180°/360°"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S2": {
+   "title": "Classify angles",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:identify_angles",
+     "missing": "acute, right, obtuse and straight only; no reflex angles"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reflex angles (between 180° and 360°)",
+   "build": [
+    "reflex_angles"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 Identify angles (lower grade, same cluster CCSS 4.G.A.1)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S1 Understand and use degrees (previous step)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "angles inside shapes (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "classify triangles by their angles"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular lines make right angles"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "right angles in quadrilaterals"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S3": {
+   "title": "Estimate angles",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:measure_angles",
+     "missing": "closest-match choice gives the estimate; no benchmark reasoning (is it more or less than 90°?) and no written estimate"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "estimating an angle in degrees against 90° and 180° benchmarks and writing the estimate",
+   "build": [
+    "angle_estimate"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Classify angles (previous step)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S1 Understand and use degrees"
+    }
+   ],
+   "preBuild": [
+    "reflex_angles"
+   ],
+   "related": [
+    {
+     "key": "measurement:estimate_length",
+     "why": "estimating another measure"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "benchmark 90° plus a part"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S4": {
+   "title": "Measure angles up to 180°",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:measure_angles",
+     "missing": "closest-match multiple choice; no protractor, no reading the right scale, not to the nearest degree"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring an angle to the nearest degree with a protractor (choosing the scale that starts at 0)",
+   "build": [
+    "protractor_read"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S3 Estimate angles (previous step)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "reading a scale from 0 (prior learning)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "check: acute or obtuse?"
+    }
+   ],
+   "preBuild": [
+    "angle_estimate"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "measure two parts and add"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "reading another scale"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S5": {
+   "title": "Draw lines and angles accurately",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "drawing lines to the nearest mm and angles of a given size with a ruler and protractor",
+   "build": [
+    "draw_angles"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles up to 180° (previous step)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (lower grade)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "cm and mm"
+    }
+   ],
+   "preBuild": [
+    "protractor_read",
+    "ruler_cm"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "name the drawn angle"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "draw parallel and perpendicular lines"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S6": {
+   "title": "Calculate angles around a point",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:additive_angles",
+     "missing": "full-turn form gives two parts of 360°; no point diagram with three or more angles"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "several angles around a point summing to 360° (three or more parts, drawn as rays from a point)",
+   "build": [
+    "angles_point"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "two parts of 90° first (same skill, easier form)"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "360 − known parts (lower grade, same cluster CCSS 3.NBT.A.2)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "name the found angle"
+    },
+    {
+     "key": "graphs:pie_chart",
+     "why": "a full turn split into parts"
+    }
+   ],
+   "note": "Preview of 7.G.B.5; tag 4.MD.C.7."
+  },
+  "Y5.B10.S7": {
+   "title": "Calculate angles on a straight line",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:additive_angles",
+     "missing": "straight-angle form gives two parts of 180°; not three parts on a line"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "three or more angles on a straight line summing to 180°",
+   "build": [
+    "angles_point"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S6 Calculate angles around a point (previous step)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "a straight angle is 180°"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "check by measuring"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S8": {
+   "title": "Lengths and angles in shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding missing lengths and angles in rectangles, squares and regular polygons from their properties",
+   "build": [
+    "lengths_angles_shapes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (prior learning)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (prior learning)"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "Y5.B10.S7 Angles on a straight line (previous step)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "sides and vertices (prior learning)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "missing side from the perimeter"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_classify:hotspot_quads",
+     "why": "spot the quadrilaterals"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "missing lengths in rectilinear shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S9": {
+   "title": "Regular and irregular polygons",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "naming polygons by sides and telling regular (equal sides and angles) from irregular",
+   "build": [
+    "polygons"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "count sides (prior learning)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name 2-D shapes (prior learning)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (prior learning)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "equilateral = regular triangle (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_classify:hotspot_quads",
+     "why": "sort shapes by a property"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "shapes by attributes"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "a regular polygon has n lines of symmetry"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B10.S10": {
+   "title": "3-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "missing": "counts properties but does not name the solid from them"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "missing": "names basic solids; no triangular/pentagonal prisms or square-based vs triangular-based pyramids"
+    },
+    {
+     "key": "shapes_classify:net_identify",
+     "missing": "nets only; no 2-D views"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "naming prisms and pyramids (by base) from faces/edges/vertices and from 2-D faces and views",
+   "build": [
+    "shapes_3d_props"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (lower grade, same cluster CCSS 1.G.A.1)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "match names to 3-D shapes (prior learning)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name the faces (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:net_surface_area",
+     "why": "nets to surface area (Grade 6)"
+    },
+    {
+     "key": "shapes_classify:cross_section_3d",
+     "why": "2-D slices of 3-D shapes"
+    },
+    {
+     "key": "area_perimeter:volume",
+     "why": "Y5.B15 volume of cuboids"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B11.S1": {
+   "title": "Read and plot coordinates",
+   "direct": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 Describe position using coordinates (lower grade, same cluster CCSS 5.G.A.1)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "position words (prior learning)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "reading an axis as a number line"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "coordinate graphing"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "plot and join vertices"
+    },
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "distance between points"
+    }
+   ],
+   "note": "Read and plot both dealt (coord-input and coord-plot)."
+  },
+  "Y5.B11.S2": {
+   "title": "Problem solving with coordinates",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:coord_polygon",
+     "missing": "side lengths/perimeter of a given polygon; never the missing vertex of a rectangle or square"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding a missing vertex of a rectangle/square and points on a line from coordinates",
+   "build": [
+    "coord_missing_vertex"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y5.B11.S1 Read and plot coordinates (previous step)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "properties of rectangles and squares"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "horizontal/vertical distances"
+    },
+    {
+     "key": "coordinates:geo_translate",
+     "why": "Y5.B11.S3 Translation (next step)"
+    }
+   ],
+   "note": "translate_grid also lists this step; the missing-vertex task is the better fit, so the lead may drop Y5.B11.S2 from translate_grid."
+  },
+  "Y5.B11.S3": {
+   "title": "Translation",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_translate",
+     "missing": "picks the translated figure from four choices; never draws the image or writes the translation"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing a translated shape on a grid and describing a translation in words (3 right, 2 up)",
+   "build": [
+    "translate_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y5.B11.S1 Read and plot coordinates"
+    },
+    {
+     "key": "coordinates:geo_translate",
+     "why": "Y4.B14.S5 Describe translation on a grid (lower grade)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "another transformation"
+    },
+    {
+     "key": "coordinates:geo_rotate",
+     "why": "another transformation"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B11.S4": {
+   "title": "Translation with coordinates",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_translate",
+     "missing": "no coordinates written after the translation"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "writing the new coordinates of vertices after a translation",
+   "build": [
+    "translate_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:geo_translate",
+     "why": "Y5.B11.S3 Translation (previous step)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "read coordinates"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "polygon vertices as coordinates"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B11.S5": {
+   "title": "Lines of symmetry",
+   "direct": [
+    {
+     "key": "angles_lines:symmetry",
+     "opts": {}
+    },
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y4.B12.S7 Lines of symmetry (lower grade, same cluster CCSS 4.G.A.3)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "halves of shapes (lower grade)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "Y5.B11.S6 Reflection (next step)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "symmetry of quadrilaterals"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B11.S6": {
+   "title": "Reflection in horizontal and vertical lines",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_reflect",
+     "missing": "multiple choice over the x- or y-axis only; no drawing in a horizontal/vertical mirror line on squared paper"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing the reflection of a shape in a horizontal or vertical mirror line on a square grid",
+   "build": [
+    "reflect_grid"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "why": "Y5.B11.S5 Lines of symmetry (previous step)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "lines of symmetry"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "grid positions"
+    }
+   ],
+   "preBuild": [
+    "symmetry_complete"
+   ],
+   "related": [
+    {
+     "key": "coordinates:geo_translate",
+     "why": "another transformation"
+    },
+    {
+     "key": "coordinates:geo_rotate",
+     "why": "another transformation"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S1": {
+   "title": "Use known facts to add and subtract decimals within 1",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill adds/subtracts decimals within 1 from a known whole-number fact (3 + 4 = 7 so 0.3 + 0.4 = 0.7; 0.06 + 0.03)",
+   "build": [
+    "dec_known_facts"
+   ],
+   "pre": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "decimal_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "column method"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "column method"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "the whole-number fact"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S2": {
+   "title": "Complements to 1",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill finds decimal complements to 1 (0.3 + __ = 1; 0.64 + __ = 1)",
+   "build": [
+    "dec_known_facts"
+   ],
+   "pre": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W35)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W35)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "decimal_whole"
+   ],
+   "related": [
+    {
+     "key": "composing:make_ten",
+     "why": "bonds to 10"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "subtract from 1"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "hundred square"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "number line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S3": {
+   "title": "Add and subtract decimals across 1",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:add_decimal",
+     "missing": "column items cross 1 at random; no \"across 1\" control or number-line / place-value model"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "missing": "column items cross 1 at random; no across-1 control or model"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding and subtracting decimals that cross 1 (0.8 + 0.5 = 1.3; 1.2 − 0.4) with a model (counters/number line) rather than only the column",
+   "build": [
+    "decimal_models"
+   ],
+   "pre": [
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "decimal place value"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "number line"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "tenths"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S4": {
+   "title": "Add decimals with the same number of decimal places",
+   "direct": [
+    {
+     "key": "decimals:add_decimal",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "same-number-of-dp control at 2 and 3 dp (Decimal Places 1 gives tenths only; at 2–3 dp items mix 4.53 + 4.4)",
+   "build": [
+    "dec_dp_match",
+    "decimal_models"
+   ],
+   "pre": [
+    {
+     "key": "decimals:sub_decimal",
+     "why": "Y5.B12.S3 Add and subtract decimals across 1 (previous step)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:sub_decimal",
+     "why": "inverse"
+    },
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "column method"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S5": {
+   "title": "Subtract decimals with the same number of decimal places",
+   "direct": [
+    {
+     "key": "decimals:sub_decimal",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "same-number-of-dp control at 2 and 3 dp (only Decimal Places 1 guarantees it)",
+   "build": [
+    "dec_dp_match",
+    "decimal_models"
+   ],
+   "pre": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S4 Add decimals with the same number of decimal places (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "inverse"
+    },
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "place value"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "size"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S6": {
+   "title": "Add decimals with different numbers of decimal places",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:add_decimal",
+     "missing": "different-dp pairs only some of the time at Decimal Places 2–3; no \"always different, place holder 0\" page"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page that always adds decimals with different numbers of decimal places (3.4 + 1.25, writing 3.40)",
+   "build": [
+    "dec_dp_match"
+   ],
+   "pre": [
+    {
+     "key": "decimals:sub_decimal",
+     "why": "Y5.B12.S5 Subtract decimals with the same number of decimal places (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "0.450 = 0.45 place holder"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "inverse"
+    },
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "size"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S7": {
+   "title": "Subtract decimals with different numbers of decimal places",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:sub_decimal",
+     "missing": "different-dp pairs only some of the time; no \"always different\" page (5 − 1.23, 3.4 − 1.25)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page that always subtracts decimals with different numbers of decimal places, including from a whole",
+   "build": [
+    "dec_dp_match"
+   ],
+   "pre": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S6 Add decimals with different numbers of decimal places (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "place holder zero"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "inverse"
+    },
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "size"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S8": {
+   "title": "Efficient strategies for adding and subtracting decimals",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill teaches efficient strategies for decimals (round and adjust: 3.6 + 1.99 = 3.6 + 2 − 0.01; compensation)",
+   "build": [
+    "dec_known_facts"
+   ],
+   "pre": [
+    {
+     "key": "decimals:sub_decimal",
+     "why": "Y5.B12.S7 Subtract decimals with different numbers of decimal places (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "column method"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "column method"
+    },
+    {
+     "key": "decimals:round_decimals",
+     "why": "round to adjust"
+    },
+    {
+     "key": "decimals:mixed_decimals",
+     "why": "mixed review"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S9": {
+   "title": "Decimal sequences",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no skill continues or finds the rule of decimal sequences (0.2, 0.4, 0.6; 1.5, 1.25, 1.0)",
+   "build": [
+    "dec_sequence"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "whole-number sequences"
+    },
+    {
+     "key": "patterns:count_by_step_down",
+     "why": "counting down by a step"
+    },
+    {
+     "key": "patterns:number_pattern",
+     "why": "find the rule"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "decimals on a line"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B12.S10": {
+   "title": "Multiply by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "× multiples of 10"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "decimal ×"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "decimal place value"
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "powers of 10"
+    }
+   ],
+   "note": "decimals:true deals 34.1 × 10, 43.9 × 1,000 with the shift chart; exponent notation is grade 5 (pv10_exponents)."
+  },
+  "Y5.B12.S11": {
+   "title": "Divide by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:div_decimal",
+     "why": "decimal ÷"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "thousandths produced"
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "powers of 10"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "decimal to fraction"
+    }
+   ],
+   "note": "÷ 1,000 gives thousandths (439 ÷ 1,000 = 0.439)."
+  },
+  "Y5.B12.S12": {
+   "title": "Multiply and divide decimals - missing values",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "no missing-number items for × / ÷ by 10, 100, 1,000 (3.4 × __ = 340; __ ÷ 100 = 0.27)",
+   "build": [
+    "dec_missing"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B12.S11 Divide by 10, 100 and 1,000 (previous step)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4.B3.S2 Count squares (prior learning wk W36)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W36)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S7 Measure capacity and volume in millilitres (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the forward calculation"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing numbers in × and ÷"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "decimal ×"
+    },
+    {
+     "key": "decimals:div_decimal",
+     "why": "decimal ÷"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B13.S1": {
+   "title": "Understand negative numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "integers:number_line_int",
+     "missing": "reads a marked integer on a horizontal line; no context (temperature, below sea level)"
+    },
+    {
+     "key": "integers:integer_nl_drag",
+     "missing": "places integers; no context"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "negative numbers in context: temperatures below zero on a vertical thermometer, below sea level",
+   "build": [
+    "negative_count"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y2/Gr.1 compare numbers (prior learning)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "place numbers on a number line (prior learning)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "read a thermometer above 0 (prior learning)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "fill a counting sequence (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "integers:opposite_numbers",
+     "why": "opposites across 0"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 compare (later step)"
+    }
+   ],
+   "note": "Grade 6 CCSS preview (6.NS.C.6)."
+  },
+  "Y5.B13.S2": {
+   "title": "Count through zero in 1s",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting forwards and backwards through zero in 1s",
+   "build": [
+    "negative_count"
+   ],
+   "pre": [
+    {
+     "key": "integers:number_line_int",
+     "why": "Y5.B13.S1 Understand negative numbers (previous step)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "read a thermometer above 0 (prior learning)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "fill a counting sequence (prior learning)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "counting sequences (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "integers:integer_nl_drag",
+     "why": "place the numbers you count"
+    },
+    {
+     "key": "integers:add_int",
+     "why": "a jump through zero"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B13.S3": {
+   "title": "Count through zero in multiples",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting forwards and backwards through zero in 2s, 5s, 10s, 25s",
+   "build": [
+    "negative_count"
+   ],
+   "pre": [
+    {
+     "key": "patterns:seq_2",
+     "why": "count in 2s (prior learning)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "count in 5s (prior learning)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "count in 10s (prior learning)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "Y5.B13.S1 Understand negative numbers"
+    }
+   ],
+   "preBuild": [
+    "negative_count"
+   ],
+   "related": [
+    {
+     "key": "integers:add_int",
+     "why": "repeated jumps"
+    },
+    {
+     "key": "integers:integer_nl_drag",
+     "why": "place the numbers"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B13.S4": {
+   "title": "Compare and order negative numbers",
+   "direct": [
+    {
+     "key": "integers:compare_int",
+     "opts": {}
+    },
+    {
+     "key": "integers:order_negatives",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y2/Gr.1 compare numbers (prior learning)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "order numbers (prior learning)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "Y5.B13.S1 Understand negative numbers"
+    },
+    {
+     "key": "integers:integer_nl_drag",
+     "why": "place integers on a line"
+    }
+   ],
+   "preBuild": [
+    "negative_count"
+   ],
+   "related": [
+    {
+     "key": "integers:abs_value",
+     "why": "distance from 0"
+    },
+    {
+     "key": "integers:ordering_rationals",
+     "why": "ordering on a number line"
+    },
+    {
+     "key": "integers:opposite_numbers",
+     "why": "opposites"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B13.S5": {
+   "title": "Find the difference",
+   "direct": [],
+   "partial": [
+    {
+     "key": "integers:sub_int",
+     "missing": "formal a − b with negatives (Grade 7 notation); not the difference between a positive and a negative temperature by counting on a line"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding the difference between a positive and a negative number (temperature rise/fall) by counting through 0",
+   "build": [
+    "negative_count"
+   ],
+   "pre": [
+    {
+     "key": "integers:number_line_int",
+     "why": "Y5.B13.S1 Understand negative numbers"
+    },
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 Compare and order (previous step)"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "difference as distance (lower grade)"
+    }
+   ],
+   "preBuild": [
+    "negative_count"
+   ],
+   "related": [
+    {
+     "key": "integers:abs_value",
+     "why": "distance from 0"
+    },
+    {
+     "key": "integers:add_int",
+     "why": "the inverse jump"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "thermometer readings"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B14.S1": {
+   "title": "Kilograms and kilometres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversions",
+     "missing": "kg→g and km→m, some reverse; no mixed units (2 kg 300 g)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "missing": "km→m only, larger to smaller; no mixed units"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "metric kg/km stories, larger to smaller only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "kilo = 1000 both ways (3,000 g = 3 kg) and mixed units (2 km 400 m = 2,400 m; 2 kg 300 g)",
+   "build": [
+    "km_m",
+    "kg_g_convert"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S3 Measure mass in kilograms and grams (lower grade)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y4.B6.S2 Equivalent lengths km and m (lower grade)"
+    }
+   ],
+   "preBuild": [
+    "mass_scales"
+   ],
+   "related": [
+    {
+     "key": "measurement:capacity",
+     "why": "the same 1,000 rule for litres"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "× 1,000"
+    }
+   ],
+   "note": "Defect seen in sampling: length_metric at RANGE=1000 asked \"How many m are in 10 km?\" with answer 1000 (should be 10,000). Report to the measurement lane."
+  },
+  "Y5.B14.S2": {
+   "title": "Millimetres and millilitres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:capacity",
+     "missing": "L→mL only one way; no mixed units (1 l 250 ml)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "missing": "cm→mm, m→mm one direction; no measuring in mm or mixed units"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "millimetres and millilitres both ways and in mixed units (4 cm 3 mm = 43 mm; 1 l 250 ml = 1,250 ml)",
+   "build": [
+    "mm_cm_m",
+    "l_ml_convert"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B5.S2 Measure in millimetres (lower grade)"
+    }
+   ],
+   "preBuild": [
+    "ruler_cm",
+    "mass_scales"
+   ],
+   "related": [
+    {
+     "key": "measurement:unit_conversions",
+     "why": "other metric pairs"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "metric stories"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B14.S3": {
+   "title": "Convert units of length",
+   "direct": [
+    {
+     "key": "measurement:unit_conversions",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "measurement:length_metric",
+     "missing": "larger→smaller only, no mixed units"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "larger→smaller only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "converting lengths smaller→larger within one skill and with mixed units (1 m 35 cm = 135 cm; 2,500 m = 2 km 500 m)",
+   "build": [
+    "mm_cm_m",
+    "km_m"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y5.B14.S2 Millimetres (previous step)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S4 Metres, centimetres and millimetres (lower grade)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:length_customary",
+     "why": "customary lengths"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "measure, then convert"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B14.S4": {
+   "title": "Convert between metric and imperial units",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "approximate metric↔imperial conversions (inch ≈ 2.5 cm, kg ≈ 2.2 lb, pint ≈ 570 ml)",
+   "build": [
+    "metric_imperial"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_customary",
+     "why": "customary lengths (lower grade, same CCSS 4.MD.A.1)"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y5.B14.S3 Convert units of length (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:capacity",
+     "why": "customary capacity"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "customary stories"
+    }
+   ],
+   "note": "Supplements (customary units) are school lessons, not steps."
+  },
+  "Y5.B14.S5": {
+   "title": "Convert units of time",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "units Time: hr→min and hr→sec only; no days, weeks, months, years and no smaller→larger"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "seconds↔minutes↔hours↔days↔weeks↔months↔years both ways",
+   "build": [
+    "time_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "Y3/Gr.2 Hours and minutes - start and end times (prior learning)"
+    },
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "hours and minutes (prior learning)"
+    },
+    {
+     "key": "measurement:time_1min",
+     "why": "time to the minute (lower grade)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "× 60, × 24, × 7"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_start",
+     "why": "durations"
+    },
+    {
+     "key": "measurement:mixed_time",
+     "why": "mixed time"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B14.S6": {
+   "title": "Calculate with timetables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "calculating durations and arrival times from a timetable",
+   "build": [
+    "timetables"
+   ],
+   "pre": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "Y3/Gr.2 Hours and minutes - start and end times (prior learning)"
+    },
+    {
+     "key": "measurement:elapsed_find_start",
+     "why": "find the start time (prior learning)"
+    },
+    {
+     "key": "measurement:elapsed_mixed",
+     "why": "later times (prior learning)"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "Y5.B14.S5 Convert units of time (previous step)"
+    }
+   ],
+   "preBuild": [
+    "timetables",
+    "time_convert"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_sense",
+     "why": "a.m./p.m."
+    },
+    {
+     "key": "measurement:elapsed_visual_hard",
+     "why": "time between two clocks"
+    }
+   ],
+   "note": "Pre-skill timetables = Y5.B9.S5 (reading); this step adds calculation."
+  },
+  "Y5.B15.S1": {
+   "title": "Cubic centimetres",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "volume as the number of 1 cm³ cubes in a solid (counting cubes in drawn solids)",
+   "build": [
+    "volume_cubes"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 Count squares (prior learning)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "arrays (prior learning)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "arrays (prior learning)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3/Gr.2 Measure capacity and volume in millilitres (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:volume",
+     "why": "l × w × h (Grade 5 next)"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "area as squares, volume as cubes"
+    }
+   ],
+   "note": "area_perimeter:volume uses l × w × h; WRM Y5 counts cubes first. Not tagged direct."
+  },
+  "Y5.B15.S2": {
+   "title": "Compare volume",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing the volumes of two cube solids",
+   "build": [
+    "volume_cubes"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:volume",
+     "why": "after Y5.B15.S1 Cubic centimetres (previous step) - no counting skill yet"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 Count squares (prior learning)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "arrays (prior learning)"
+    }
+   ],
+   "preBuild": [
+    "volume_cubes"
+   ],
+   "related": [
+    {
+     "key": "placevalue:compare",
+     "why": "compare the two counts"
+    },
+    {
+     "key": "area_perimeter:volume",
+     "why": "compute instead of count"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B15.S3": {
+   "title": "Estimate volume",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "estimating the volume of an object in cm³ (or cubes) from a benchmark",
+   "build": [
+    "volume_cubes"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "Y4/Gr.3 Count squares (prior learning)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "arrays (prior learning)"
+    }
+   ],
+   "preBuild": [
+    "volume_cubes"
+   ],
+   "related": [
+    {
+     "key": "measurement:estimate_length",
+     "why": "estimate another measure"
+    },
+    {
+     "key": "area_perimeter:volume",
+     "why": "check by computing"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B15.S4": {
+   "title": "Estimate capacity",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:capacity",
+     "missing": "sorting containers into capacity bins and \"larger than 1 litre\"; no estimate written in ml or l"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l)",
+   "build": [
+    "capacity_estimate"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade, same cluster CCSS 3.MD.A.2)"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "Y5.B14.S2 Millilitres (earlier step)"
+    }
+   ],
+   "preBuild": [
+    "mass_scales"
+   ],
+   "related": [
+    {
+     "key": "measurement:estimate_length",
+     "why": "estimating lengths"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "l↔ml"
+    }
+   ],
+   "note": "volume_cubes also lists this step; capacity estimation is a separate option, so the lead may drop Y5.B15.S4 from volume_cubes."
+  }
+ },
+ "proposals": {
+  "equiv_from_unit": {
+   "kind": "option",
+   "skill": "fractions:equivalent",
+   "option": "start \"unit fraction\" (every item starts from 1/n) with a fraction-wall support",
+   "name": "Equivalent Fractions From a Unit Fraction (option)",
+   "teaches": "finding fractions equivalent to a unit fraction (1/3 = 2/6 = 3/9 = 4/12) by reading a fraction wall and by multiplying numerator and denominator by the same number",
+   "representation": "one boxed cell per item: a black-outline fraction wall row for 1/n above, a second row split into smaller equal parts; write the missing numerator or denominator in a box (1/3 = __/12); Andika, big digits; the wall fades to none",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.A.1"
+   ],
+   "why": "equivalent / equiv_frac_visual mix unit and non-unit starts, so the WRM unit-fraction lesson cannot be printed on its own",
+   "steps": [
+    "Y5.B4.S1"
+   ],
+   "reused": false
+  },
+  "frac_beyond_1": {
+   "kind": "new",
+   "skill": "fractions:mixed_numbers_intro",
+   "name": "Fractions Beyond 1",
+   "teaches": "counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line",
+   "representation": "bar and number-line models with wholes shaded; write the mixed number",
+   "family": "fractions",
+   "steps": [
+    "Y5.B4.S4",
+    "Y5.B4.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.A.2",
+    "4.NF.B.3"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "frac_compare_gt1": {
+   "kind": "option",
+   "skill": "fractions:compare",
+   "option": "greater than 1",
+   "name": "Compare and Order Fractions Greater Than 1 (option)",
+   "teaches": "comparing and ordering improper fractions and mixed numbers",
+   "representation": "a band option on compare / order_fractions",
+   "family": "fractions",
+   "steps": [
+    "Y5.B4.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.A.2"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "frac_total_band": {
+   "kind": "option",
+   "skill": "fraction_operations:add_frac_unlike",
+   "also": [
+    "fraction_operations:add_frac_unlike_nv"
+   ],
+   "option": "total \"within 1\" / \"greater than 1\"",
+   "name": "Add Fractions: Total Within 1 or Greater Than 1 (option)",
+   "teaches": "adding fractions with related denominators where the total stays within 1 (1/4 + 3/8 = 5/8), then where it passes 1 and is renamed as a mixed number",
+   "representation": "boxed cell: the sum with a bar model in eighths (black outline, one grey for shaded parts); write the numerator in the answer box; a second box for the mixed number on the >1 band",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.B.3",
+    "5.NF.A.1"
+   ],
+   "why": "WRM splits within-1 and over-1 into two steps; today the sums are mixed",
+   "steps": [
+    "Y5.B4.S10"
+   ],
+   "reused": false
+  },
+  "mixed_plus_frac": {
+   "kind": "option",
+   "skill": "fraction_operations:add_mixed_like",
+   "also": [
+    "fraction_operations:sub_mixed_like",
+    "fraction_operations:add_mixed_unlike",
+    "fraction_operations:sub_mixed_unlike"
+   ],
+   "option": "form \"mixed number ± fraction\" (no exchange / crossing a whole)",
+   "name": "Add or Subtract a Fraction and a Mixed Number (option)",
+   "teaches": "adding a proper fraction to a mixed number (2 1/4 + 3/8) and subtracting a proper fraction from a mixed number (3 4/5 − 2/5), first without, then with crossing a whole",
+   "representation": "boxed cell: wholes drawn as full bars and the fraction part as a partitioned bar; write the whole and the fraction in a mixed-number answer slot (two boxes)",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "why": "every mixed-number skill deals mixed ± mixed; WRM Y5.B4.S12/S15/S16 start from mixed ± fraction",
+   "steps": [
+    "Y5.B4.S12",
+    "Y5.B4.S15",
+    "Y5.B4.S16"
+   ],
+   "reused": false
+  },
+  "sub_break_whole": {
+   "kind": "option",
+   "skill": "fraction_operations:sub_mixed_like",
+   "option": "breaking the whole",
+   "name": "Subtract from a Mixed Number: Break the Whole (option)",
+   "teaches": "subtracting a fraction larger than the fractional part of a mixed number by exchanging one whole (3 1/5 − 4/5)",
+   "representation": "an \"exchange a whole\" band with a bar-model support",
+   "family": "fractions",
+   "steps": [
+    "Y5.B4.S16"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "mult_unit_frac_int": {
+   "kind": "option",
+   "skill": "fraction_operations:mult_frac_whole",
+   "also": [
+    "fraction_operations:mult_frac_whole_nv"
+   ],
+   "option": "fractions \"unit only\" with a repeated-addition bar",
+   "name": "Unit Fraction × Integer (option)",
+   "teaches": "multiplying a unit fraction by a whole number as repeated addition (1/5 × 3 = 1/5 + 1/5 + 1/5 = 3/5)",
+   "representation": "boxed cell: three copies of a 1/5 bar piece joined on one bar in fifths; write the repeated addition and the product in boxes",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.B.4a"
+   ],
+   "why": "mult_frac_whole mixes unit and non-unit fractions, so the first WRM step cannot be isolated",
+   "steps": [
+    "Y5.B6.S1"
+   ],
+   "reused": false
+  },
+  "mult_mixed_int": {
+   "kind": "option",
+   "skill": "fraction_operations:mult_frac_whole",
+   "option": "mixed numbers",
+   "name": "Multiply a Mixed Number by an Integer (option)",
+   "teaches": "multiplying a mixed number by a whole number (2 1/3 × 4)",
+   "representation": "a mixed-number band on mult_frac_whole",
+   "family": "fractions",
+   "steps": [
+    "Y5.B6.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.B.4"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "frac_find_whole": {
+   "kind": "option",
+   "skill": "fractions:fraction_of_set_hard_nv",
+   "option": "find the whole",
+   "name": "Fraction of an Amount: Find the Whole (option)",
+   "teaches": "finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?)",
+   "representation": "a \"find the whole\" task option with a bar model support",
+   "family": "fractions",
+   "steps": [
+    "Y5.B6.S6"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.B.4"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "frac_operator": {
+   "kind": "new",
+   "skill": "fractions:fraction_as_operator",
+   "name": "Fractions as Operators",
+   "teaches": "using a fraction as an operator (2/5 of 30 = 30 ÷ 5 × 2) and seeing that 1/4 of 20 = 20 ÷ 4 = 20 × 1/4",
+   "representation": "a bar model with the operator arrows; write the calculation both ways",
+   "family": "fractions",
+   "steps": [
+    "Y5.B6.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.B.4"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "decimal_pv": {
+   "kind": "new",
+   "skill": "decimals:decimal_place_value",
+   "name": "Tenths and Hundredths in a Place-Value Chart",
+   "teaches": "tenths and hundredths as decimals in a place-value chart, with counters and base-10 (flat = 1)",
+   "representation": "a place-value chart with counters; write the decimal; option: partition 0.36 = 0.3 + 0.06",
+   "family": "decimals",
+   "steps": [
+    "Y5.B7.S1",
+    "Y5.B7.S2",
+    "Y5.B7.S3",
+    "Y5.B7.S5",
+    "Y5.B7.S6",
+    "Y5.B7.S7",
+    "Y5.B12.S1"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "4.NBT.B.4",
+    "4.NF.C.6",
+    "5.NBT.A.3",
+    "5.NBT.B.7"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "decimal_whole": {
+   "kind": "new",
+   "skill": "decimals:make_a_whole",
+   "name": "Make a Whole with Decimals",
+   "teaches": "complements to 1 with tenths and hundredths (0.3 + 0.7, 0.45 + 0.55)",
+   "representation": "a tenths strip or hundred square with part shaded; write the missing part",
+   "family": "decimals",
+   "steps": [
+    "Y5.B7.S1",
+    "Y5.B12.S2"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.B.7"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "fd_place_band": {
+   "kind": "option",
+   "skill": "conversions:d_to_f",
+   "also": [
+    "conversions:f_to_d"
+   ],
+   "option": "place \"tenths\" / \"hundredths\" / \"thousandths\" with a tenths strip / hundred square support",
+   "name": "Fractions and Decimals by Place (option)",
+   "teaches": "writing tenths, then hundredths, then thousandths as both a fraction and a decimal (3/10 = 0.3; 27/100 = 0.27; 7/1000 = 0.007), without simplifying",
+   "representation": "boxed cell: a tenths strip or hundred square (black outline, grey shading) above; fraction slot and decimal slot side by side; strip fades to none",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.3"
+   ],
+   "why": "d_to_f / f_to_d mix tenths, hundredths and 3/4-type items and stop at hundredths",
+   "steps": [
+    "Y5.B7.S2",
+    "Y5.B7.S5"
+   ],
+   "reused": false
+  },
+  "thousandths_pv": {
+   "kind": "option",
+   "skill": "decimals:decimal_place_value",
+   "option": "thousandths",
+   "name": "Thousandths (option)",
+   "teaches": "thousandths as fractions and decimals and on a place-value chart",
+   "representation": "the decimal_pv proposal extended to 3 dp",
+   "family": "decimals",
+   "steps": [
+    "Y5.B7.S5",
+    "Y5.B7.S6",
+    "Y5.B7.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "4.NF.C.6",
+    "5.NBT.A.3"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "round_whole": {
+   "kind": "option",
+   "skill": "decimals:round_decimals",
+   "option": "nearest whole",
+   "name": "Round Decimals to the Nearest Whole (option)",
+   "teaches": "rounding a 1-dp or 2-dp decimal to the nearest whole number on a number line",
+   "representation": "a \"nearest whole\" target option with a number-line support",
+   "family": "decimals",
+   "steps": [
+    "Y5.B7.S10"
+   ],
+   "reused": true,
+   "ccss": [
+    "5.NBT.A.4"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "dec_known_facts": {
+   "kind": "new",
+   "skill": "decimals:decimal_known_facts",
+   "name": "Decimals from Known Facts",
+   "teaches": "adding and subtracting decimals within 1 using known facts (3 + 4 = 7 so 0.3 + 0.4 = 0.7), complements to 1 and efficient strategies",
+   "representation": "a fact and its decimal twin; write the answer; option: complements to 1",
+   "family": "decimals",
+   "steps": [
+    "Y5.B12.S1",
+    "Y5.B12.S2",
+    "Y5.B12.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4",
+    "5.NBT.B.7"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "decimal_models": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "also": [
+    "decimals:sub_decimal",
+    "decimals:mult_decimal"
+   ],
+   "option": "support \"decimal model\": hundred squares or place-value counters beside the column, and an area model for decimal × whole",
+   "name": "Decimal Operations With Models (option)",
+   "grade": "5",
+   "family": "decimals",
+   "standards": [
+    "5.NBT.B.7"
+   ],
+   "ee": [
+    "M.EE.5.NBT.7"
+   ],
+   "teaches": "adding, subtracting and multiplying decimals to hundredths with a drawn model that is related to the written method",
+   "problemTypes": [
+    "add with hundred squares, then the column",
+    "subtract with an exchange of a tenth",
+    "multiply a decimal by a whole with an area model",
+    "which model matches the column?"
+   ],
+   "templates": [
+    "stack",
+    "frac-model",
+    "pv"
+   ],
+   "newTemplates": [],
+   "answer": "write the answer in the column (the model is support)",
+   "ladder": "O2 tenths → hundredths → crossing 1 · O3 model with exchanges drawn → model only → none · O6 hundred squares / counters",
+   "misconceptions": [
+    "lines up the right-hand digits, not the points",
+    "0.3 + 0.45 = 0.48"
+   ],
+   "wrmSteps": [
+    "Y5.B12.S3"
+   ],
+   "after": [
+    "decimal_pv"
+   ],
+   "reused": true,
+   "steps": [
+    "Y5.B12.S3",
+    "Y5.B12.S4",
+    "Y5.B12.S5"
+   ],
+   "ccss": [
+    "4.NBT.B.4",
+    "5.NBT.B.7"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "dec_dp_match": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "also": [
+    "decimals:sub_decimal"
+   ],
+   "option": "decimal places \"same\" / \"different\" (place-holder zero shown in the column)",
+   "name": "Add and Subtract Decimals: Same or Different Decimal Places (option)",
+   "teaches": "column addition and subtraction of decimals where both numbers have the same number of decimal places, then different (3.4 + 1.25 written as 3.40 + 1.25; 5 − 1.23)",
+   "representation": "the existing stack cell with decimal points aligned in one column; on \"different\" the place-holder 0 is drawn in grey as a hint that fades",
+   "family": "decimals",
+   "ccss": [
+    "5.NBT.B.7",
+    "4.NBT.B.4"
+   ],
+   "why": "WRM separates same-dp and different-dp steps; today the Decimal Places setting mixes them at 2–3 dp",
+   "steps": [
+    "Y5.B12.S4",
+    "Y5.B12.S5",
+    "Y5.B12.S6",
+    "Y5.B12.S7"
+   ],
+   "reused": false
+  },
+  "dec_sequence": {
+   "kind": "new",
+   "skill": "patterns:decimal_sequences",
+   "name": "Decimal Sequences",
+   "teaches": "continuing and finding the rule of sequences with decimal steps (0.2, 0.4, 0.6 ... ; 1.5, 1.25, 1.0)",
+   "representation": "a number track with decimal steps; write the missing terms and the rule",
+   "family": "decimals",
+   "steps": [
+    "Y5.B12.S9"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.C.5",
+    "5.NBT.B.7"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "dec_missing": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "missing number",
+   "name": "Multiply and Divide Decimals: Missing Values (option)",
+   "teaches": "finding the missing number or the missing power of 10 (3.4 × __ = 340)",
+   "representation": "an \"unknown\" option on place_value_10x",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B12.S12"
+   ],
+   "reused": true,
+   "ccss": [
+    "5.NBT.A.2"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "missing_lengths": {
+   "kind": "new",
+   "skill": "area_perimeter:rectilinear_missing_sides",
+   "name": "Missing Lengths in Rectilinear Shapes",
+   "teaches": "finding missing side lengths in rectilinear shapes and then their perimeter",
+   "representation": "an L or T shape with some sides labelled; write the missing lengths",
+   "family": "measurement",
+   "steps": [
+    "Y5.B8.S2"
+   ],
+   "reused": true,
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "why": "closes Y5.B8.S2 Perimeter of rectilinear shapes (existing wrm_props entry, reused)"
+  },
+  "regular_polygon": {
+   "kind": "option",
+   "skill": "area_perimeter:perimeter",
+   "option": "regular polygons",
+   "name": "Perimeter of Regular Polygons (option)",
+   "teaches": "perimeter of regular polygons from one side (5 sides of 7 cm) and of any polygon",
+   "representation": "a polygon-type option on the perimeter skill",
+   "family": "measurement",
+   "steps": [
+    "Y5.B8.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "why": "closes Y5.B8.S3 Perimeter of polygons (existing wrm_props entry, reused)"
+  },
+  "area_estimate": {
+   "kind": "new",
+   "skill": "area_perimeter:estimate_area",
+   "name": "Estimate Area",
+   "teaches": "estimating the area of irregular shapes by counting whole and half squares",
+   "representation": "an irregular blob on squared paper; count whole and part squares; write the estimate",
+   "family": "measurement",
+   "steps": [
+    "Y5.B8.S6"
+   ],
+   "reused": true,
+   "ccss": [
+    "3.MD.C.6"
+   ],
+   "why": "closes Y5.B8.S6 Estimate area (existing wrm_props entry, reused)"
+  },
+  "line_graph": {
+   "kind": "new",
+   "skill": "graphs:line_graphs",
+   "name": "Line Graphs",
+   "teaches": "reading and drawing line graphs that show change over time",
+   "representation": "a line graph on a grid with labelled axes; read values, find differences, or plot the points",
+   "family": "data",
+   "steps": [
+    "Y5.B9.S1",
+    "Y5.B9.S2"
+   ],
+   "reused": true,
+   "ccss": [
+    "5.G.A.2"
+   ],
+   "why": "closes Y5.B9.S1 Draw line graphs; Y5.B9.S2 Read and interpret line graphs (existing wrm_props entry, reused)"
+  },
+  "table_data": {
+   "kind": "new",
+   "skill": "graphs:read_and_make_tables",
+   "name": "Tables",
+   "teaches": "reading and completing simple tables and tally-to-number tables",
+   "representation": "a two-column table with blanks; fill in the counts; answer one question",
+   "family": "data",
+   "steps": [
+    "Y5.B9.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.A.3"
+   ],
+   "why": "closes Y5.B9.S3 Read and interpret tables (existing wrm_props entry, reused)"
+  },
+  "two_way": {
+   "kind": "new",
+   "skill": "graphs:two_way_tables",
+   "name": "Two-Way Tables",
+   "teaches": "reading and completing two-way tables",
+   "representation": "a two-way table with blanks and totals; fill them in",
+   "family": "data",
+   "steps": [
+    "Y5.B9.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.A.3"
+   ],
+   "why": "closes Y5.B9.S4 Two-way tables (existing wrm_props entry, reused)"
+  },
+  "timetables": {
+   "kind": "new",
+   "skill": "measurement:read_timetables",
+   "name": "Timetables",
+   "teaches": "reading and calculating with bus and train timetables (times, durations, which bus)",
+   "representation": "a drawn timetable table; answer questions with times and durations",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S6",
+    "Y5.B9.S5"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.A.2"
+   ],
+   "why": "closes Y5.B14.S6 Calculate with timetables; Y5.B9.S5 Read and interpret timetables (existing wrm_props entry, reused)"
+  },
+  "turns_angles": {
+   "kind": "new",
+   "skill": "angles_lines:turns_and_angles",
+   "name": "Turns and Angles",
+   "teaches": "an angle as an amount of turn; right angles as quarter turns; comparing angles with a right angle (greater/less)",
+   "representation": "an angle tester (a square corner) beside each angle; tick greater, less or right angle",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S1"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "why": "closes Y5.B10.S1 Understand and use degrees (existing wrm_ext entry, reused)"
+  },
+  "reflex_angles": {
+   "kind": "option",
+   "skill": "angles_lines:identify_angles",
+   "option": "kinds: add \"Reflex\"",
+   "name": "Reflex Angles (option)",
+   "teaches": "naming reflex angles (more than 180°, less than 360°) beside acute, right, obtuse and straight",
+   "representation": "one angle per boxed cell drawn in black with its turn arc; write the name from a word bank (acute, right, obtuse, straight, reflex)",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S2"
+   ],
+   "ccss": [
+    "4.G.A.1",
+    "4.MD.C.5"
+   ],
+   "why": "identify_angles stops at straight; WRM Y5 classifies reflex angles",
+   "reused": false
+  },
+  "angle_estimate": {
+   "kind": "option",
+   "skill": "angles_lines:measure_angles",
+   "option": "form \"estimate\": acute/obtuse first, then write an estimate in degrees (accept ±15°)",
+   "name": "Estimate Angles (option)",
+   "teaches": "estimating an angle using the right angle and straight line as benchmarks",
+   "representation": "one angle per boxed cell with a dashed 90° guide; tick \"less than 90° / more than 90°\", then write the estimate in a box",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S3"
+   ],
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "why": "measure_angles is a 4-way closest match; WRM asks for a reasoned estimate",
+   "reused": false
+  },
+  "protractor_read": {
+   "kind": "option",
+   "skill": "angles_lines:measure_angles",
+   "option": "form \"read the protractor\": a protractor drawn over the angle; write the degrees (not multiple choice)",
+   "name": "Measure With a Protractor (option)",
+   "grade": "4",
+   "family": "geometry",
+   "standards": [
+    "4.MD.C.6"
+   ],
+   "ee": [],
+   "teaches": "measuring angles in whole degrees with a protractor: which scale, from 0",
+   "problemTypes": [
+    "read the angle on the protractor",
+    "which scale starts at 0?",
+    "is it acute or obtuse? (check the reading)",
+    "measure two angles and compare"
+   ],
+   "templates": [
+    "legacy"
+   ],
+   "newTemplates": [
+    "angle-kit"
+   ],
+   "answer": "write the angle in degrees",
+   "ladder": "O2 multiples of 10° → 5° → 1° · O3 the 0 of the scale ringed → none · O6 arm to the right / to the left",
+   "misconceptions": [
+    "reads the wrong scale (60° for 120°)",
+    "does not line up the base"
+   ],
+   "wrmSteps": [
+    "Y5.B10.S2",
+    "Y5.B10.S4"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B10.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.C.6"
+   ],
+   "why": "closes Y5.B10.S4 Measure angles up to 180° (existing std_props entry, reused)"
+  },
+  "draw_angles": {
+   "kind": "new",
+   "skill": "angles_lines:draw_angles",
+   "name": "Draw Angles and Lines",
+   "teaches": "drawing angles of a given size with a protractor and lines of a given length",
+   "representation": "a protractor picture with a base line; the key shows the angle drawn; print-first skill",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S5"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.G.A.1",
+    "4.MD.C.6"
+   ],
+   "why": "closes Y5.B10.S5 Draw lines and angles accurately (existing wrm_ext entry, reused)"
+  },
+  "ruler_cm": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "centimetres and millimetres",
+   "name": "Read a Centimetre Ruler (option)",
+   "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
+   "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture",
+   "family": "measurement",
+   "steps": [],
+   "reused": true,
+   "ccss": []
+  },
+  "angles_point": {
+   "kind": "option",
+   "skill": "angles_lines:additive_angles",
+   "option": "point and straight line",
+   "name": "Angles Around a Point and on a Line (option)",
+   "teaches": "angles on a straight line sum to 180°, around a point to 360°",
+   "representation": "diagram-type options on additive_angles",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S6",
+    "Y5.B10.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.C.7"
+   ],
+   "why": "closes Y5.B10.S6 Calculate angles around a point; Y5.B10.S7 Calculate angles on a straight line (existing wrm_props entry, reused)"
+  },
+  "lengths_angles_shapes": {
+   "kind": "new",
+   "skill": "shapes_classify:angles_in_shapes",
+   "name": "Lengths and Angles in Shapes",
+   "teaches": "using properties of rectangles, squares and regular polygons to find missing lengths and angles",
+   "representation": "a shape with marked equal sides and right angles; write the missing values",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.G.A.2",
+    "4.MD.C.7"
+   ],
+   "why": "closes Y5.B10.S8 Lengths and angles in shapes (existing wrm_props entry, reused)"
+  },
+  "polygons": {
+   "kind": "new",
+   "skill": "shapes_classify:regular_irregular_polygons",
+   "name": "Regular and Irregular Polygons",
+   "teaches": "naming polygons by the number of sides, and telling regular from irregular",
+   "representation": "polygon line drawings; write the name and tick regular / irregular",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S9"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.G.A.2",
+    "5.G.B.3"
+   ],
+   "why": "closes Y5.B10.S9 Regular and irregular polygons (existing wrm_props entry, reused)"
+  },
+  "shapes_3d_props": {
+   "kind": "new",
+   "skill": "shapes_classify:3d_shape_properties",
+   "name": "3-D Shapes: Names and Properties",
+   "teaches": "naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets",
+   "representation": "a 3-D shape drawing with a property table; option: which net makes it",
+   "family": "geometry",
+   "steps": [
+    "Y5.B10.S10"
+   ],
+   "reused": true,
+   "ccss": [
+    "1.G.A.1"
+   ],
+   "why": "closes Y5.B10.S10 3-D shapes (existing wrm_props entry, reused)"
+  },
+  "coord_missing_vertex": {
+   "kind": "option",
+   "skill": "coordinates:coord_polygon",
+   "option": "task \"missing vertex\": three vertices of a rectangle or square given; write the fourth",
+   "name": "Find the Missing Vertex (option)",
+   "teaches": "using equal sides and right angles to find a missing vertex on a first-quadrant grid",
+   "representation": "a B&W coordinate grid with three plotted, labelled vertices and dashed sides; write ( , ) in boxes",
+   "family": "geometry",
+   "steps": [
+    "Y5.B11.S2"
+   ],
+   "ccss": [
+    "5.G.A.1",
+    "4.G.A.2"
+   ],
+   "why": "coord_polygon only measures sides; WRM Y5 problem solving is the missing vertex",
+   "reused": false
+  },
+  "translate_grid": {
+   "kind": "new",
+   "skill": "coordinates:translate_on_grid",
+   "name": "Translate on a Grid",
+   "teaches": "translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up)",
+   "representation": "a coordinate grid with a shape and its image; write the translation or draw the image",
+   "family": "geometry",
+   "steps": [
+    "Y5.B11.S3",
+    "Y5.B11.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.G.A.1",
+    "5.G.A.1"
+   ],
+   "why": "closes Y5.B11.S3 Translation; Y5.B11.S4 Translation with coordinates (existing wrm_props entry, reused)"
+  },
+  "reflect_grid": {
+   "kind": "new",
+   "skill": "coordinates:reflect_on_grid",
+   "name": "Reflect on a Grid",
+   "teaches": "reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes",
+   "representation": "a grid with a dashed mirror line and a shape; draw the reflection; key shows it",
+   "family": "geometry",
+   "steps": [
+    "Y5.B11.S6"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.G.A.1",
+    "5.G.A.1"
+   ],
+   "why": "closes Y5.B11.S6 Reflection in horizontal and vertical lines (existing wrm_props entry, reused)"
+  },
+  "symmetry_complete": {
+   "kind": "new",
+   "skill": "angles_lines:complete_symmetric_shape",
+   "name": "Complete the Symmetric Shape",
+   "teaches": "using a vertical line of symmetry to complete a shape or pattern on a square grid",
+   "representation": "half a shape on squared paper beside a dashed mirror line; draw the other half",
+   "family": "geometry",
+   "steps": [],
+   "reused": true,
+   "ccss": []
+  },
+  "negative_count": {
+   "kind": "new",
+   "skill": "integers:count_through_zero",
+   "name": "Count Through Zero",
+   "teaches": "negative numbers in context (temperature), counting through zero in 1s and multiples, and the difference between a positive and a negative number",
+   "representation": "a vertical thermometer or number line; write the next numbers or the difference",
+   "family": "integers",
+   "steps": [
+    "Y5.B13.S1",
+    "Y5.B13.S2",
+    "Y5.B13.S3",
+    "Y5.B13.S5"
+   ],
+   "reused": true,
+   "ccss": [
+    "6.NS.C.6",
+    "6.NS.C.7"
+   ],
+   "why": "closes Y5.B13.S1 Understand negative numbers; Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference (existing wrm_ext entry, reused)"
+  },
+  "km_m": {
+   "kind": "option",
+   "skill": "measurement:length_metric",
+   "option": "km and m mixed",
+   "name": "Kilometres and Metres (option)",
+   "teaches": "measuring and converting km and m, including mixed units (2 km 300 m)",
+   "representation": "mixed-unit answer option",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S1",
+    "Y5.B14.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.A.1",
+    "5.MD.A.1"
+   ],
+   "why": "closes Y5.B14.S1 Kilograms and kilometres; Y5.B14.S3 Convert units of length (existing wrm_props entry, reused)"
+  },
+  "kg_g_convert": {
+   "kind": "option",
+   "skill": "measurement:unit_conversions",
+   "option": "units \"kg and g\": both directions and mixed units",
+   "name": "Kilograms and Grams (option)",
+   "teaches": "1 kg = 1,000 g: convert both ways and between mixed units (2 kg 350 g = 2,350 g)",
+   "representation": "one item per boxed cell: a fact box \"1 kg = 1,000 g\" and a sentence with answer boxes \"_ kg _ g\"",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S1"
+   ],
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "why": "no skill converts g→kg or mixed kg/g units",
+   "reused": false
+  },
+  "mm_cm_m": {
+   "kind": "option",
+   "skill": "measurement:length_metric",
+   "option": "mm and cm",
+   "name": "Metres, Centimetres, Millimetres (option)",
+   "teaches": "measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm)",
+   "representation": "ruler pictures in mm; mixed-unit answers (_ m _ cm)",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S2",
+    "Y5.B14.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.A.1",
+    "5.MD.A.1"
+   ],
+   "why": "closes Y5.B14.S2 Millimetres and millilitres; Y5.B14.S3 Convert units of length (existing wrm_ext entry, reused)"
+  },
+  "l_ml_convert": {
+   "kind": "option",
+   "skill": "measurement:capacity",
+   "option": "units \"l and ml\": both directions and mixed units",
+   "name": "Litres and Millilitres (option)",
+   "teaches": "1 l = 1,000 ml both ways and with mixed units",
+   "representation": "a drawn jug scale (black outline, single grey fill) and answer boxes \"_ l _ ml\" / \"_ ml\"",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S2"
+   ],
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "why": "capacity converts L→mL one way only and mixes in customary units",
+   "reused": false
+  },
+  "metric_imperial": {
+   "kind": "new",
+   "skill": "measurement:metric_imperial",
+   "name": "Metric and Imperial Units",
+   "teaches": "approximate conversions between metric and imperial units (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb)",
+   "representation": "a conversion fact box beside each question",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "why": "closes Y5.B14.S4 Convert between metric and imperial units (existing wrm_props entry, reused)"
+  },
+  "time_convert": {
+   "kind": "option",
+   "skill": "measurement:unit_conversion_word",
+   "option": "time",
+   "name": "Convert Units of Time (option)",
+   "teaches": "converting between seconds, minutes, hours, days, weeks, months and years",
+   "representation": "a time-only unit option",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S5"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "why": "closes Y5.B14.S5 Convert units of time (existing wrm_props entry, reused)"
+  },
+  "capacity_estimate": {
+   "kind": "option",
+   "skill": "measurement:capacity",
+   "option": "form \"estimate\": choose or write a sensible capacity in ml or l",
+   "name": "Estimate Capacity (option)",
+   "teaches": "estimating capacity with benchmarks (teaspoon 5 ml, cup 250 ml, bottle 1 l, bucket 10 l)",
+   "representation": "one black line drawing of a container per boxed cell beside a benchmark; circle one of three estimates or write it with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y5.B15.S4"
+   ],
+   "ccss": [
+    "3.MD.A.2",
+    "4.MD.A.1"
+   ],
+   "why": "capacity sorts containers but never writes an estimate in ml/l",
+   "reused": false
+  },
+  "volume_cubes": {
+   "kind": "new",
+   "skill": "area_perimeter:volume_counting_cubes",
+   "name": "Volume by Counting Cubes",
+   "teaches": "volume as the number of unit cubes (cm³), comparing volumes and estimating volume and capacity",
+   "representation": "isometric drawings of cube solids; write how many cubes / cm³; option: which has more",
+   "family": "measurement",
+   "steps": [
+    "Y5.B15.S1",
+    "Y5.B15.S2",
+    "Y5.B15.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "5.MD.C.3",
+    "5.MD.C.4"
+   ],
+   "why": "closes Y5.B15.S1 Cubic centimetres; Y5.B15.S2 Compare volume; Y5.B15.S3 Estimate volume (existing wrm_ext entry, reused)"
+  },
+  "mass_scales": {
+   "kind": "new",
+   "skill": "measurement:read_scales",
+   "name": "Read Scales (g, kg, ml, l)",
+   "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100",
+   "representation": "a drawn dial or jug scale; write the reading with the unit; option: scale step",
+   "family": "measurement",
+   "steps": [],
+   "reused": true,
+   "ccss": []
+  }
+ },
+ "tagFixes": [
+  {
+   "key": "fractions:equiv_frac_visual",
+   "step": "Y5.B4.S1",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fractions:equiv_frac_nv",
+   "step": "Y5.B4.S1",
+   "action": "remove",
+   "why": "deals only yes/no equivalence checks and sorting; cannot find an equivalent of a unit fraction"
+  },
+  {
+   "key": "fractions:equiv_frac_nv",
+   "step": "Y5.B4.S2",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fractions:equiv_frac_nv",
+   "step": "Y5.B4.S3",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fraction_operations:add_frac_like_nv",
+   "step": "Y5.B4.S9",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fraction_operations:sub_frac_like_nv",
+   "step": "Y5.B4.S9",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fraction_operations:add_frac_unlike_nv",
+   "step": "Y5.B4.S10",
+   "action": "add",
+   "why": "partial: numbers only; no total-within-1 control, sums over 1 mixed in"
+  },
+  {
+   "key": "fraction_operations:add_frac_unlike_nv",
+   "step": "Y5.B4.S11",
+   "action": "add",
+   "why": "teaches the step with opts {\"denoms\": [2]}"
+  },
+  {
+   "key": "fraction_operations:add_mixed_like",
+   "step": "Y5.B4.S12",
+   "action": "partial",
+   "why": "deals mixed + mixed only; no \"mixed number + proper fraction\" form (2 1/4 + 3/4)"
+  },
+  {
+   "key": "fraction_operations:add_mixed_unlike",
+   "step": "Y5.B4.S12",
+   "action": "partial",
+   "why": "deals mixed + mixed only (related denominators with {denoms:[2]}); no mixed + proper fraction form"
+  },
+  {
+   "key": "fraction_operations:add_mixed_like_nv",
+   "step": "Y5.B4.S13",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fraction_operations:sub_frac_unlike_nv",
+   "step": "Y5.B4.S14",
+   "action": "add",
+   "why": "teaches the step with opts {\"denoms\": [2]}"
+  },
+  {
+   "key": "fraction_operations:sub_mixed_like",
+   "step": "Y5.B4.S15",
+   "action": "partial",
+   "why": "deals mixed − mixed; no \"mixed number − proper fraction\" form without exchange (3 4/5 − 2/5)"
+  },
+  {
+   "key": "fraction_operations:sub_mixed_unlike",
+   "step": "Y5.B4.S15",
+   "action": "partial",
+   "why": "deals mixed − mixed only (related denominators with {denoms:[2]}); no mixed − proper fraction form"
+  },
+  {
+   "key": "fraction_operations:sub_mixed_like_nv",
+   "step": "Y5.B4.S17",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "fraction_operations:mult_frac_whole_nv",
+   "step": "Y5.B6.S1",
+   "action": "add",
+   "why": "partial: numbers only; unit and non-unit fractions mixed, no unit-only control"
+  },
+  {
+   "key": "fractions:fraction_of_set_nv",
+   "step": "Y5.B6.S7",
+   "action": "add",
+   "why": "partial: \"Click ALL expressions equal to 1/6 of 30\" items touch the operator idea; no write-it-both-ways item"
+  },
+  {
+   "key": "decimals:decimal_nl_drag",
+   "step": "Y5.B7.S1",
+   "action": "partial",
+   "why": "tenths on a 0–1 line only; no hundredths and no place-value chart"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y5.B7.S1",
+   "action": "partial",
+   "why": "writes tenths and hundredths as fractions; no place-value chart or counters"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y5.B7.S3",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "decimals:round_decimals",
+   "step": "Y5.B7.S11",
+   "action": "add",
+   "why": "teaches the step with opts {\"precision\": [0]}"
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y5.B7.S15",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "decimals:add_decimal",
+   "step": "Y5.B12.S3",
+   "action": "partial",
+   "why": "column items cross 1 at random; no \"across 1\" control or number-line / place-value model"
+  },
+  {
+   "key": "decimals:sub_decimal",
+   "step": "Y5.B12.S3",
+   "action": "partial",
+   "why": "column items cross 1 at random; no across-1 control or model"
+  },
+  {
+   "key": "area_perimeter:perimeter",
+   "step": "Y5.B8.S1",
+   "action": "add",
+   "why": "full: standard/missing/word variants teach perimeter of rectangles incl. missing side (existing tag is partial)"
+  },
+  {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y5.B8.S1",
+   "action": "add",
+   "why": "direct: perimeter of rectangles on squared paper"
+  },
+  {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y5.B8.S2",
+   "action": "add",
+   "why": "partial: L-shapes by counting edges, no missing lengths"
+  },
+  {
+   "key": "area_perimeter:area",
+   "step": "Y5.B8.S4",
+   "action": "add",
+   "why": "full: standard/missing/word variants teach l × w and the missing side (existing tag is partial)"
+  },
+  {
+   "key": "area_perimeter:area_unit_squares",
+   "step": "Y5.B8.S4",
+   "action": "add",
+   "why": "direct: count squares then multiply, the lesson opener"
+  },
+  {
+   "key": "angles_lines:identify_angles",
+   "step": "Y5.B10.S1",
+   "action": "partial",
+   "why": "names types but does not teach the degree as a unit of turn"
+  },
+  {
+   "key": "angles_lines:measure_angles",
+   "step": "Y5.B10.S1",
+   "action": "partial",
+   "why": "closest-match degrees only; no degree-as-turn teaching"
+  },
+  {
+   "key": "angles_lines:identify_angles",
+   "step": "Y5.B10.S2",
+   "action": "partial",
+   "why": "no reflex angles"
+  },
+  {
+   "key": "angles_lines:measure_angles",
+   "step": "Y5.B10.S4",
+   "action": "partial",
+   "why": "multiple-choice closest match, no protractor reading"
+  },
+  {
+   "key": "angles_lines:additive_angles",
+   "step": "Y5.B10.S6",
+   "action": "partial",
+   "why": "two parts only (existing partial tag confirmed)"
+  },
+  {
+   "key": "shapes_early:name_3d_shapes",
+   "step": "Y5.B10.S10",
+   "action": "add",
+   "why": "partial: names basic solids only"
+  },
+  {
+   "key": "shapes_classify:net_identify",
+   "step": "Y5.B10.S10",
+   "action": "add",
+   "why": "partial: nets of prisms/pyramids, no 2-D views"
+  },
+  {
+   "key": "coordinates:geo_translate",
+   "step": "Y5.B11.S3",
+   "action": "partial",
+   "why": "multiple choice only; no drawing or describing"
+  },
+  {
+   "key": "integers:number_line_int",
+   "step": "Y5.B13.S1",
+   "action": "partial",
+   "why": "number line reading only; no context"
+  },
+  {
+   "key": "integers:integer_nl_drag",
+   "step": "Y5.B13.S1",
+   "action": "partial",
+   "why": "placing only; no context"
+  },
+  {
+   "key": "measurement:unit_conversions",
+   "step": "Y5.B14.S1",
+   "action": "partial",
+   "why": "no mixed units, smaller→larger thin (existing tag is full)"
+  },
+  {
+   "key": "measurement:unit_conversion_word",
+   "step": "Y5.B14.S1",
+   "action": "add",
+   "why": "partial: one direction, no mixed units"
+  },
+  {
+   "key": "measurement:capacity",
+   "step": "Y5.B14.S2",
+   "action": "partial",
+   "why": "L→mL one way; existing partial tag confirmed"
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y5.B14.S3",
+   "action": "partial",
+   "why": "one direction, no mixed units (existing tag is full)"
+  },
+  {
+   "key": "measurement:unit_conversion_word",
+   "step": "Y5.B14.S3",
+   "action": "partial",
+   "why": "one direction (existing tag is full)"
+  },
+  {
+   "key": "measurement:unit_conversions",
+   "step": "Y5.B14.S3",
+   "action": "add",
+   "why": "direct: metric length both ways (m↔cm, cm↔mm)"
+  },
+  {
+   "key": "measurement:unit_conversion_word",
+   "step": "Y5.B14.S5",
+   "action": "add",
+   "why": "partial: units Time option, hours/minutes/seconds only"
+  }
+ ]
+}
