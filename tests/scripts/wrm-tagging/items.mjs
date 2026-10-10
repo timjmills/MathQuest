@@ -22,7 +22,7 @@ const a=process.argv.slice(2);
 if(a[0]==='--key'){console.log(a[1],'OPTS:',optSummary(a[1]));for(const l of items(a[1],a[2]?JSON.parse(a[2]):{},+a[3]||6))console.log('  '+l);process.exit(0);}
 if(a[0]==='--reads-range'){const out={};for(const k of a.slice(1)){const x=items(k,{range:10},6).join('\n'),y=items(k,{range:100},6).join('\n');out[k]=x!==y;}console.log(JSON.stringify(out));process.exit(0);}
 if(a[0]==='--links'){const years=a.slice(1).filter(x=>/^(R|Y\d)$/.test(x));const n=+(a.find(x=>/^\d+$/.test(x))||6);const mi=a.indexOf('--md');
-  const md=['# R and Y1: generated items per step (wave 2 tagging, round 6)','',
+  const md=['# R and Y1: generated items per step (wave 2 tagging, round 7)','',
   'Every direct and partial skill of every step, generated with the opts the links file gives: '+n+' items each (seeds 9100 + 17i), the first 3 shown.',
   '"Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).',
   'Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design/audit/runs/wrm-tagging/R-Y1-items.md`.'];

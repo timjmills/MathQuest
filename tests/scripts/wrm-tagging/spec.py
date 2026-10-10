@@ -158,7 +158,7 @@ st('R.B10.S6', v='gap', m='ordering events in time (first, next, then)', b=['day
 # R.B11 Building 9 and 10
 st('R.B11.S1', d=[P(CO,'groups of exactly 9 and 10: band 10 deals 1-10, mostly below 9', band=10, objects='frame')], v='partial',
    m='finding groups of exactly 9 and 10 (band 10 deals 1-10, mostly below 9)', b=['number_focus'])
-st('R.B11.S2', d=[F(CG, band=10, level=[1])], v='partial',
+st('R.B11.S2', d=[P(CG,'comparing two numerals to 10 (not groups) with more / fewer; the skill compares two groups of counters', band=10, level=[1])], v='partial',
    m='comparing two numerals to 10 (not groups) with more / fewer', b=['compare_small'],
    n='placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = (81 _ 52), none within 10.')
 st('R.B11.S3', d=[P(TFB,'9 and 10 only: band 10 builds 1-10', band=10)], v='partial', m='representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9)', b=['number_focus'])
@@ -381,7 +381,7 @@ st('Y1.B9.S2', d=[P(SKL,'10s alone on a page: the page mixes 2s, 5s and 10s, and
    p=[(TFV,'Y1.B6.S2 20, 30, 40 and 50 as tens (school week 8)',{'band':50}),(NSF,'Y1.B6.S1 count on in ones to 50 (week 8)',{'step':1,'range':50}),(HCF,'Y1.B6.S1 the hundred square to 50, gaps down one column',{'band':50,'gaps':'column'}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})])
 st('Y1.B9.S3', d=[P(SKL,'5s alone on a page; mixed with 2s and 10s, no hands', step=[0], band=50)], v='partial',
    m='counting in 5s from 0 on true multiples, a page of 5s alone', b=['multiples_from_0'],
-   p=[(TFV,'Y1.B9.S2 counting in 10s first: two 5s make each ten',{'band':50}),(DBL,'Y1.B9.S1 counting in equal steps: doubles',{'band':20}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})],
+   p=[(TFV,'Y1.B9.S2 counting in 10s first',{'band':50}),(DBL,'Y1.B9.S1 counting in equal steps: doubles',{'band':20}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})],
    n='The count-in-2s and count-in-10s steps (Y1.B9.S1, S2) use this same skill and options (skip_count_line has no single-count value), so their building blocks are listed instead.')
 st('Y1.B9.S4', d=[P(EQG,'saying "equal" or "not equal"; the skill asks the pupil to write "multiply" or "add"', step=6)], v='partial',
    m='deciding whether groups are equal and saying equal / not equal', b=['equal_groups_early'])
@@ -431,12 +431,12 @@ st('Y1.B12.S7', d=[F(PVC, band=99)])
 st('Y1.B13.S1', d=[P(TFV,'one coin standing for several ones (a rod is one ten, not money)', band=50), P(COIN,'one coin worth several 1s; the skill finds coins by value', currency='usd')], v='partial',
    m='unitising: one coin worth 5 or 10 is the same as 5 or 10 ones', b=['unitise_coins'])
 st('Y1.B13.S2', d=[F(COIN, currency='usd')], n='US coins: circle every coin worth n.',
-   p=[(CO,'Y1.B4.S1 count the coins one by one',{'band':20}),(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: nickels and dimes',{'step':[0],'band':50})], xp=[TFV])
+   p=[(CO,'Y1.B4.S1 count the coins one by one',{'band':20}),(SKL,'Y1.B9.S2 / S3 count in 2s, 5s and 10s: nickels and dimes',{'step':[0],'band':50})], xp=[TFV])
 st('Y1.B13.S3', d=[P(COIN,'naming each bill\'s value', currency='usd', task='order'), P(MON,'naming each bill\'s value; it counts bills', currency='usd', kind='note', band=100)], v='partial',
    m='recognising bills and naming each bill\'s value', b=['money_notes'],
-   p=[(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: 5- and 10-dollar bills',{'step':[0],'band':50}),(CO,'Y1.B4.S1 count the bills one by one',{'band':20})], xp=[TFV])
+   p=[(SKL,'Y1.B9.S2 / S3 count in 2s, 5s and 10s: 5- and 10-dollar bills',{'step':[0],'band':50}),(CO,'Y1.B4.S1 count the bills one by one',{'band':20})], xp=[TFV])
 st('Y1.B13.S4', d=[F(MON, currency='usd', kind='like', band=50, values=[1, 5, 10])], n='Count like coins (1, 5, 10 cents) to 50.',
-   p=[(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: the main building block',{'step':[0],'band':50})])
+   p=[(SKL,'Y1.B9.S2 / S3 count in 2s, 5s and 10s: the main building block',{'step':[0],'band':50})])
 # Y1.B14 Time
 st('Y1.B14.S1', v='gap', m='before and after; sequencing events', b=['day_order'])
 st('Y1.B14.S2', v='gap', m='days of the week in order', b=['time_talk'])
@@ -527,7 +527,7 @@ NEW = {
 S['R.B9.S6']['p'] += [(CO,'R.B9.S1 count the objects before pairing them',{'band':10,'objects':'frame'})]
 S['R.B1.S7']['p'] += [(CO,'count each group; matching one to one needs no count, so this is a light pre-skill',{'band':5})]
 S['Y1.B10.S1']['p'] += [(SHG,'R.B16 grouping into equal groups: equal parts',{'band':12})]
-S['Y1.B13.S1']['p'] += [(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: a nickel is five ones',{'step':[0],'band':50}),(CO,'Y1.B1.S2 count ones',{'band':20})]
+S['Y1.B13.S1']['p'] += [(SKL,'Y1.B9.S2 / S3 count in 2s, 5s and 10s: a nickel is five ones',{'step':[0],'band':50}),(CO,'Y1.B1.S2 count ones',{'band':20})]
 
 # Related by idea (rule 4/10): the same idea in another form, or its inverse. gen.py adds these after the hand-written ones.
 _f = 'the same idea in another form: '; _i = 'the inverse: '
@@ -626,7 +626,7 @@ FIT = {
  SWP: [(10, {})], A5: [(5, {})], S5: [(5, {})], EQG: [(30, {'forms': [0]})],
  MON: [(50, {'currency': 'usd', 'kind': 'like', 'band': 50, 'values': [1, 5, 10]}), (100, {'currency': 'usd', 'band': 100})],
  COIN: [(25, {'currency': 'usd'})], PNL: [(100, {'span': 10, 'band': 100})], NWF: [(20, {'range': 20})],
- SHF: [(20, {'denoms': [2]})], N2D: [(4, {'forms': [1], 'shapes': [0, 1, 2]})], N3D: [(100, {'forms': [1]})],
+ SHF: [(20, {'denoms': [2]})], N2D: [(4, {'forms': [1], 'shapes': [0, 1]}), (4, {'forms': [1], 'shapes': [0, 1, 2]})], N3D: [(100, {'forms': [1]})],
  # shapes (rule 18 content, critic r3): sides and corners of 3- and 4-sided shapes only; no octagons, angles, written-name drags
  ATT: [(4, {'forms': [0], 'band': 4})], SV2: [], CORN: [(4, {'band': 4})], HEX: [], M2D: [], M3D: [],
  CMP: [(4, {'shapes': [1]}), (4, {'shapes': [0, 1]}), (4, {'shapes': [0, 1, 2]})], PART: [(2, {'parts': [0], 'forms': [0]})],
@@ -683,8 +683,8 @@ SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'm
 EXTRA = {
  'sort': [(PIC, 'the sorted groups as rows of a picture graph, counted', {'forms': [0]})],
  'compare': [(PIC, 'count two rows of a picture graph', {'forms': [0]})],
- 'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10})],
- 'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10}), (EQS2, 'is the sentence true? the = sign', {'range': 10})],
+ 'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10, 'unknown': 'answer'})],
+ 'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10, 'unknown': 'answer'})],
  'oddeven': [(SEO, 'circle the even or the odd numbers to 10', {'range': 10})],
  'money': [(ECS, 'do these coins make the amount? (nickels, dimes, pennies)', {'currency': 'usd', 'band': 25, 'values': [1, 5, 10]})],
  'time': [(TMC, 'choose the clock that shows the time (hours and half hours)', {'precision': 30})],
@@ -702,7 +702,7 @@ addpre('Y1.B10.S3', (DBL, 'Y1.B9.S7 doubles: two equal groups', {'band': 20}))
 def prepre(step, *links): S[step]['p'] = list(links) + S[step]['p']
 prepre('Y1.B5.S1', (CS, 'Y1.B4.S7 count on within 20: the main building block', {'band': 20, 'dir': 'forward'}), (NSF, 'Y1.B4.S1 / R.B13.S4 a number track to 20', {'step': 1, 'range': 20}))
 prepre('R.B14.S2', (CS, 'R.B11.S5 one more: count on', {'band': 10, 'dir': 'forward'}), (NB, 'R.B11.S7 the two parts of 10', {'band': 10}))
-prepre('Y1.B5.S8', (CG, 'Y1.B1.S11 compare two groups: how many more', {'band': 10}))
+prepre('Y1.B5.S8', (CG, 'Y1.B1.S11 compare two groups: more, fewer, same', {'band': 10}))
 for _s in ('Y1.B8.S6', 'Y1.B8.S7'):
     prepre(_s, (MNS, 'Y1.B7.S2 measure with units (cubes): the same measuring, now with cups', {}), (CO, 'Y1.B4.S1 count the cups, to 20', {'band': 20}))
 prepre('Y1.B8.S4', (COB, 'R.B2.S1 / R.B10 compare: the compare words', {}), (HL, 'R.B8.S1 heavier / lighter', {}))
@@ -760,7 +760,6 @@ for _s in ('Y1.B12.S2', 'Y1.B13.S4', 'Y1.B9.S4'): S[_s]['pb'] += ['multiples_fro
 prepre('Y1.B13.S4', (TFV, 'Y1.B6.S2 20, 30, 40 and 50 as tens: a dime is ten', {'band': 50}))
 prepre('Y1.B9.S4', (CG, 'Y1.B1.S11 compare two groups: are they the same?', {'band': 10}))
 S['Y1.B9.S9']['p'] += [(HALF, 'R.B16.S5 sharing between two is halving (to 10)', {'band': 10})]
-S['Y1.B6.S3']['xr'] += [B10]   # base10_build {band:50}: past the step's own count of rods (critic scans count rods, not tens)
 S['R.B16.S6']['xp'] += [S5]   # take-away is not a building block of doubles
 
 # ---------------- Round 6 (critic R-Y1 r5) ----------------
@@ -775,3 +774,20 @@ for _s in ('Y1.B4.S3', 'Y1.B4.S4', 'Y1.B4.S5', 'Y1.B4.S6'): S[_s]['xp'] += [TFV]
 for _s in ('Y1.B10.S4', 'Y1.B10.S6', 'Y1.B10.S7', 'Y1.B10.S8'): S[_s]['xp'] += [PART]   # parts [2] with forms [0] always answers 4
 prepre('Y1.B12.S4', (NSF, 'Y1.B12.S1 the number track to 100 (school week 10)', {'step': 1, 'range': 100}), (HCF, 'Y1.B12.S1 the hundred square to 100', {'band': 100}),
        (NSF, 'Y1.B6.S1 the number track to 50', {'step': 1, 'range': 50}))
+
+# ---------------- Round 7 (critic R-Y1 r6) ----------------
+S['Y1.B5.S8']['r'] += [(PIC, 'the difference read off two picture rows: how many more', {'forms': [1]})]
+S['Y1.B6.S3']['r'] += [(B10, 'the next step on this idea: Y1.B6.S4 Groups of tens and ones', {'band': 50})]
+S['Y1.B2.S14']['r'] += [(NLS, 'the next step on this idea: Y1.B2.S16 Subtraction on a number line', {'range': 10, 'unknown': 'answer'})]
+S['Y1.B2.S8']['r'] += [(NLA2, 'the same addition as jumps on a 0-10 line', {'range': 10, 'unknown': 'answer'})]
+S['Y1.B5.S1']['xr'] += [EQS2]
+prepre('Y1.B12.S6', (UF, 'Y1.B12.S3 tens and ones: the main building block of comparing 2-digit numbers', {'band': 99}), (B10, 'Y1.B6.S4 groups of tens and ones', {'band': 50}))
+prepre('R.B13.S1', (CO, 'R.B11.S1 count a group to 10', {'band': 10, 'objects': 'frame'}))
+for _s, _b in (('R.B12.S1', ['shapes_world']), ('R.B15.S5', ['shape_3d_tasks', 'shapes_world']), ('R.B15.S6', ['shapes_world']),
+               ('Y1.B1.S1', ['match_same', 'odd_one_out']), ('Y1.B2.S3', ['subitise'])):
+    S[_s]['pb'] = _b + S[_s]['pb']
+NEW['half_or_not'] = dict(kind='option', skill='shapes_early:partition_shapes', option="ask: 'is_half' (and 'is_quarter'): equal and unequal splits, tick a half / not a half",
+   name='Is It a Half? (option)', teaches='look at a shape split by a line and tick "a half" or "not a half" (or "a quarter" / "not a quarter"); no fraction notation, no typed answer',
+   representation='one shape per cell split equally or unequally; two tick boxes labelled with words', family='fractions', ccss=['1.G.A.3'],
+   why='partition_shapes asks for typed 1/2, 1/4, 2/4, 3/4 in half its items and never shows an unequal split')
+for _s in ('Y1.B10.S1', 'Y1.B10.S5'): S[_s]['b'] = ['half_or_not']

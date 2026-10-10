@@ -60,10 +60,12 @@ SUBS = [  # (family, sub, regex on the step title) — first match wins; order m
     ('money', 'money', r'coin|note|money|unitis'),
     ('time', 'time', r'\btime\b|\bdays?\b|month|hours|before and after'),
     ('fraction', 'fracshape', r'(half|quarter) of an object'), ('fraction', 'fracqty', r'(half|quarter) of a quantity'),
+    ('count', 'subitise', r'subitis'), ('count', 'find', r'^find \d+(,| and| to)|^represent|count objects'),
     ('count', 'oral', r'verbal|patterns beyond'), ('pattern', 'pattern', r'pattern'),
     ('measure', 'mass', r'mass|balance|heavier'), ('measure', 'capacity', r'capacity|volume|full'),
     ('measure', 'length', r'length|height|size'),
     ('position', 'position', r'\bpositions?\b|map|turn|scene|visualis|instructions|ordinal'),
+    ('shape', 'compose', r'combine shapes|compose shapes|decompose|manipulate|copy 2-d|shape arrangements'),
     ('shape', 'shape3d', r'3-d'), ('shape', 'shape2d', r'shape|circle|triangle|2-d|sides'),
     ('groups', 'skip', r'count in \d'), ('groups', 'oddeven', r'odd|even|pairs'),
     ('groups', 'share', r'shar|equal groups|grouping|array'),
@@ -74,12 +76,13 @@ SUBS = [  # (family, sub, regex on the step title) — first match wins; order m
     ('sort', 'sort', r'sort|match objects|match pictures|identify a set'),
     ('count', 'more1', r'\b1 more|\b1 less'), ('count', 'nline', r'number line'),
     ('count', 'compare', r'compare|fewer|less than|order (objects and )?numbers|matching'),
-    ('count', 'tens', r'tens|beyond 10|understand 1|understand 20|within 20|count from|20, 30')]
+    ('count', 'sequence', r'count on|count backwards|count from|within 20'),
+    ('count', 'tens', r'tens|beyond 10|understand 1|understand 20|20, 30')]
 def topic2(step):
     t = info[step]['title'].lower()
     for fam, sub, rx in SUBS:
         if re.search(rx, t): return fam, sub
-    return 'count', 'count'
+    return 'count', 'other:' + step   # an unmatched title is its own idea (critic r6 N1r): never "the same idea" as another step
 def topic(step): return topic2(step)[1]
 def dom(c): return c.split('.')[1] if '.' in c else c
 def related_topic(a, b):
@@ -115,8 +118,11 @@ def content_why(k, o, step):
     """Rule 18 content / layout: the one content reason a link cannot be used, or None."""
     if k in FIT and not FIT[k]: return 'its content is past this grade'
     if 'name_match' in k: return 'it drags written names'
+    if k == 'shapes_early:partition_shapes' and o.get('forms') != [0]: return 'it asks for typed fraction notation (1/2, 3/4)'
     if step.startswith('R.') and R_EQ.match(k): return 'it is a symbol equation or number line, not a Reception response'
     if step.startswith('R.') and R_WRITTEN.match(k): return 'it asks for a written Kindergarten answer (clock times, groups-of sentences)'
+    if step.startswith('R.') and idx[step] < idx['R.B6.S1'] and md(k, o).get('c19', {}).get('quad', 0) >= 3:
+        return 'it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)'
     d = md(k, o)
     if d.get('distinct', 24) < 3: return f"its opts deal only {d.get('distinct')} different item(s)"
     f = d['flags']
@@ -144,8 +150,14 @@ def own2(x):
     direct and partial number skills deal."""
     c = max(title_nums(x) or [0])
     if x.startswith('R.'): return r_own(x)
+    c = max([c] + [int(m) for m in re.findall(r'(?:to|within) (\d+)', S[x]['m'])])   # the step's own missing clause ("totals to 10")
+    if c < 3:   # no number of its own: the block's "within N"
+        c = max([c] + [int(m) for m in re.findall(r'within (\d+)', info[x]['blockName'])])
     for k, o, miss in S[x]['d']:
-        if NUMCAT.match(k): c = max(c, dealt(k, o))
+        if miss is None and NUMCAT.match(k): c = max(c, dealt(k, o))   # a partial never sets the ceiling (critic r6 D4)
+    if c < 3:
+        for k, o, miss in S[x]['d']:
+            if NUMCAT.match(k): c = max(c, dealt(k, o))   # nothing else: what its skills deal
     return c
 def own1(x):
     c = max(title_nums(x) or [0])
@@ -224,6 +236,7 @@ def check_claims(step, rel):
     for e in rel:
         m = re.search(r'(?:next|later) step on this idea: ((?:R|Y1)\.B\d+\.S\d+)', e['why'])
         assert not m or related_topic(step, m.group(1)) == 2, (step, e)   # a later step must be the same sub-idea
+        if re.search(r':nl_(add|sub)$', e['key']): assert e.get('opts', {}).get('unknown') == 'answer', (step, e)
         for rx, bad in FALSE_WHY:
             assert not (rx.search(e['why']) and bad(e['key'], e.get('opts', {}))), (step, e)
 def split(e):
@@ -306,7 +319,7 @@ def build(step):
             x, eo = ex
             if related_topic(step, x) or any(k == e[0] for e in sp['r']):
                 use = eo if fits(k, eo, step, fmt_step(x)) else fit(k, step, fmt_step(x))
-                base = 'the same idea' if re.match(r'(the next|a later) step', why) else why
+                base = 'the same idea' if re.match(r'(the next|a later) step|the same idea in another form', why) else why
                 if use is not None and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
             rej[k] = 'taught at an earlier step (' + x + '), but ' + (misfit(k, eo, step, fmt_step(x)) or 'not a building block of this step')
             return
@@ -329,8 +342,16 @@ def build(step):
     later = [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2]
     def add_later(x, k, o, lead):
         # cite the later step only when its own opts fit here; a refitted link is the same idea at this step's size
-        if fits(k, o, step): addr(k, f"{lead}: {fmt_step(x)}", o)
-        else: addr(k, f"the same idea in another form: {label(k)}, at this step's size", None)
+        if fits(k, o, step): addr(k, f"{lead}: {fmt_step(x)}", o); return
+        o2 = fit(k, step)
+        if o2 is None: addr(k, '', None); return   # records the misfit reason
+        d = dealt(k, o2); t = max(title_nums(step) or [0])
+        if NUMCAT.match(k) and t and d < t:   # the refitted rung stops below the step's numbers: say so (critic r6 N4)
+            addr(k, f"the same idea in another form: {label(k)}, to {d} (this step continues past {d})", o2)
+        elif NUMCAT.match(k) and t and d >= t:
+            addr(k, f"the same idea in another form: {label(k)}, at this step's size (to {d})", o2)
+        else:   # no number to claim: name the form only
+            addr(k, f"the same idea in another form: {label(k)}", o2)
     for x in later[:3]:
         for k, o in dentries(x): add_later(x, k, o, 'the next step on this idea')
     if len(rel) < 2:   # a later step on the SAME sub-idea (critic r5 N1: never a family-only step) whose skill is not taught yet
@@ -360,7 +381,10 @@ def build(step):
             parts = []
             if why['own']: parts.append('the earlier steps on this idea use this step\'s own skill (' + ', '.join(sorted(why['own'])) + ')')
             if why['past']: parts.append('the other earlier skills on this idea do not fit this step (' + '; '.join(sorted(why['past'])) + ')')
-            if why['gap']: parts.append('the earlier steps ' + ', '.join(why['gap'][:3]) + ' have no live skill yet (see preBuild)')
+            gaps = [x for x in why['gap'] if related_topic(step, x) == 2][:3]
+            if gaps:
+                held = all(set(S[x]['b']) & (set(pb) | set(sp['b'])) for x in gaps)
+                parts.append('the earlier steps ' + ', '.join(gaps) + ' have no live skill yet' + (' (see preBuild)' if held else ''))
             if not parts:
                 live_c = [x for x in cands if S[x]['d']][:4]
                 parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')

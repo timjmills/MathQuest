@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 6)
+# R and Y1: generated items per step (wave 2 tagging, round 7)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -341,7 +341,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - How many dots are there? / A=5 / number / {kind:count,n:5,shape:circle,ans:5,objects:frame}
 
 ### R.B11.S2 Compare numbers to 10 — **partial** (missing: comparing two numerals to 10 (not groups) with more / fewer)
-- full `comparing:compare_groups` opts `{"band":10,"level":[1]}` (6 generated; Max Number not read)
+- partial `comparing:compare_groups` opts `{"band":10,"level":[1]}` (6 generated; Max Number not read)
   - Do the groups have the same number of counters? / A="not the same" / text / {a:6,b:4,labels:[Same,Not the same],values:[same,not the same],correct:1}
   - Which group has fewer counters? / A="B" / text / {a:9,b:6,labels:[A has fewer,B has fewer],values:[A,B],correct:1}
   - Which group has more counters? / A="B" / text / {a:3,b:4,labels:[A has more,B has more],values:[A,B],correct:1}

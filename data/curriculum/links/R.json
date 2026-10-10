@@ -14,7 +14,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre-number step; no existing skill matches pictures. Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the other forms of this idea are compare_groups (a counting skill; this step has no numbers); classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Pre-number step; no existing skill matches pictures. Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the other forms of this idea are compare_groups (a counting skill; this step has no numbers); classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S2": {
    "title": "Match pictures and objects",
@@ -28,7 +28,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S3": {
    "title": "Identify a set",
@@ -44,7 +44,7 @@
     "match_same"
    ],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a counting skill; this step has no numbers); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S4": {
    "title": "Sort objects to a type",
@@ -106,16 +106,7 @@
    "build": [
     "sort_groups"
    ],
-   "pre": [
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 Sort objects to a type (earlier, same idea: sort)",
-     "opts": {
-      "band": 3,
-      "tiles": 2
-     }
-    }
-   ],
+   "pre": [],
    "preBuild": [
     "odd_one_out",
     "match_same"
@@ -138,7 +129,7 @@
      }
     }
    ],
-   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
+   "note": "Pre: 0 only; the earlier steps on this idea use this step's own skill (classify_count); the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
   },
   "R.B1.S6": {
    "title": "Create sorting rules",
@@ -149,21 +140,13 @@
    "build": [
     "sort_groups"
    ],
-   "pre": [
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort and count one kind",
-     "opts": {
-      "band": 3
-     }
-    }
-   ],
+   "pre": [],
    "preBuild": [
     "match_same",
     "odd_one_out"
    ],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (a pre-skill here); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Pre: 0 only; the other earlier skills on this idea do not fit this step (classify_count: it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the other forms of this idea are classify_count (taught at an earlier step (R.B1.S5), but it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S7": {
    "title": "Compare amounts",
@@ -182,22 +165,7 @@
    "verdict": "full",
    "missing": "",
    "build": [],
-   "pre": [
-    {
-     "key": "counting:count_objects",
-     "why": "count each group; matching one to one needs no count, so this is a light pre-skill",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort and count one kind",
-     "opts": {
-      "band": 3
-     }
-    }
-   ],
+   "pre": [],
    "preBuild": [],
    "related": [
     {
@@ -214,7 +182,7 @@
      }
     }
    ],
-   "note": "Compare two groups to 5 by matching one to one (tap A or B). Pre: 2 only; this is the first step on this idea (compare) in the curriculum, so its pre-skills are building blocks from other ideas."
+   "note": "Compare two groups to 5 by matching one to one (tap A or B). Pre: 0 only; this is the first step on this idea (compare) in the curriculum."
   },
   "R.B2.S1": {
    "title": "Compare size",
@@ -321,8 +289,7 @@
       ],
       "shapes": [
        0,
-       1,
-       2
+       1
       ]
      }
     }
@@ -360,8 +327,7 @@
       ],
       "shapes": [
        0,
-       1,
-       2
+       1
       ]
      }
     }
@@ -380,7 +346,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 0 only; the other earlier skills on this idea do not fit this step (shape_pattern: it shows shapes past 4 sides). Related: none; the other forms of this idea are shape_pattern (left out here (rules 8 and 18))."
+   "note": "Pre: 0 only; the other earlier skills on this idea do not fit this step (shape_pattern: it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)). Related: none; the other forms of this idea are shape_pattern (left out here (rules 8 and 18))."
   },
   "R.B3.S1": {
    "title": "Find 1, 2 and 3",
@@ -402,13 +368,6 @@
    ],
    "pre": [
     {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 count one kind, to 3",
-     "opts": {
-      "band": 3
-     }
-    },
-    {
      "key": "comparing:compare_groups",
      "why": "R.B1.S7 Compare amounts (earlier, same idea: compare)",
      "opts": {
@@ -429,7 +388,7 @@
      }
     }
    ],
-   "note": "Pre: 2 only; every earlier step on this idea (R.B1.S7) is represented by its skill above."
+   "note": "Pre: 1 only; every earlier step on this idea (R.B1.S7) is represented by its skill above."
   },
   "R.B3.S2": {
    "title": "Subitise 1, 2 and 3",
@@ -453,7 +412,7 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B3.S1 Find 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S1 Find 1, 2 and 3 (earlier, same idea: find)",
      "opts": {
       "band": 5,
       "objects": "pictures"
@@ -509,13 +468,6 @@
      }
     },
     {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 count one kind, to 3",
-     "opts": {
-      "band": 3
-     }
-    },
-    {
      "key": "comparing:compare_groups",
      "why": "R.B1.S7 Compare amounts (earlier, same idea: compare)",
      "opts": {
@@ -528,7 +480,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here); number_word_form (it deals numbers to 20, past this step (3)); count_sequence (it deals numbers to 10, past this step (3)); number_seq_fill (it deals numbers to 10, past this step (3))."
+   "note": "Pre: 2 only; every earlier step on this idea (R.B3.S1, R.B3.S2, R.B1.S7) is represented by its skill above. Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here)."
   },
   "R.B3.S4": {
    "title": "1 more",
@@ -552,14 +504,14 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -602,14 +554,14 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -697,19 +649,8 @@
    "build": [],
    "pre": [],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    }
-   ],
-   "note": "Tap every circle / triangle (forms 1, shapes circles + triangles); ovals also appear as the circle family. Pre: 0 only; this is the first step on this idea (shape2d) in the curriculum."
+   "related": [],
+   "note": "Tap every circle / triangle (forms 1, shapes circles + triangles); ovals also appear as the circle family. Pre: 0 only; this is the first step on this idea (shape2d) in the curriculum. Related: none; the other forms of this idea are shape_name_match_2d (its content is past this grade); shape_corners_count (its opts deal only 2 different item(s)); shape_attributes (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); name_2d_shapes (a direct skill here)."
   },
   "R.B4.S2": {
    "title": "Compare circles and triangles",
@@ -747,19 +688,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    }
-   ],
-   "note": "Pre: 1 only; every earlier step on this idea (R.B4.S1) is represented by its skill above."
+   "related": [],
+   "note": "Pre: 1 only; every earlier step on this idea (R.B4.S1) is represented by its skill above. Related: none; the other forms of this idea are shape_corners_count (its opts deal only 2 different item(s)); name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (a direct skill here)."
   },
   "R.B4.S3": {
    "title": "Shapes in the environment",
@@ -786,19 +716,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    }
-   ],
-   "note": "Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices)."
+   "related": [],
+   "note": "Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)). Related: none; the other forms of this idea are name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade)."
   },
   "R.B4.S4": {
    "title": "Describe position",
@@ -855,17 +774,9 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: count)",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: find)",
      "opts": {
       "band": 5
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: count)",
-     "opts": {
-      "band": 5,
-      "objects": "dice"
      }
     },
     {
@@ -875,11 +786,19 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (earlier, same idea: subitise)",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); count_objects (a direct skill here)."
   },
   "R.B5.S2": {
    "title": "Subitise 4 and 5",
@@ -902,17 +821,10 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B5.S1 Find 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S1 Find 4 and 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
       "objects": "pictures"
-     }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: count)",
-     "opts": {
-      "band": 5
      }
     },
     {
@@ -922,11 +834,18 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (earlier, same idea: find)",
+     "opts": {
+      "band": 5
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); count_objects (a direct skill here)."
   },
   "R.B5.S3": {
    "title": "Represent 4 and 5",
@@ -948,10 +867,10 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S1 Find 4 and 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
-      "objects": "dice"
+      "objects": "pictures"
      }
     },
     {
@@ -975,7 +894,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here)."
   },
   "R.B5.S4": {
    "title": "1 more",
@@ -1007,14 +926,14 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -1047,14 +966,14 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -1201,19 +1120,8 @@
    "preBuild": [
     "shapes_world"
    ],
-   "related": [
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "the same idea in another form: Combine Shapes (Visual), at this step's size",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    }
-   ],
-   "note": "Tap every square / rectangle (forms 1, shapes squares and rectangles). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Tap every square / rectangle (forms 1, shapes squares and rectangles). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are shape_corners_count (its opts deal only 2 different item(s)); name_2d_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
   },
   "R.B6.S2": {
    "title": "Combine shapes with 4 sides",
@@ -1245,11 +1153,9 @@
      }
     }
    ],
-   "preBuild": [
-    "shapes_world"
-   ],
+   "preBuild": [],
    "related": [],
-   "note": "Two shapes make a square or rectangle (tap the answer). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); name_2d_shapes (a pre-skill here); compose_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Two shapes make a square or rectangle (tap the answer). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B6.S3": {
    "title": "Shapes in the environment",
@@ -1262,16 +1168,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    },
-    {
      "key": "shapes_early:name_2d_shapes",
      "why": "R.B6.S1 Identify and name shapes with 4 sides (earlier, same idea: shape2d)",
      "opts": {
@@ -1282,11 +1178,21 @@
        2
       ]
      }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
+     "opts": {
+      "shapes": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are name_2d_shapes (a pre-skill here); compose_shapes (a pre-skill here); compose_hexagon (its content is past this grade); shape_name_match_2d (its content is past this grade)."
+   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade)."
   },
   "R.B6.S4": {
    "title": "My day and night",
@@ -1313,32 +1219,32 @@
    ],
    "pre": [
     {
-     "key": "composing:ten_frame_build",
-     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5,
-      "objects": "dice"
-     }
-    },
-    {
      "key": "counting:count_sequence",
      "why": "R.B5.S5 1 less (earlier, same idea: more1)",
      "opts": {
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: find)",
+     "opts": {
+      "band": 5
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: subitise)",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a pre-skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B7.S2": {
    "title": "Find 0 to 5",
@@ -1361,17 +1267,9 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: count)",
+     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5,
-      "objects": "dice"
      }
     },
     {
@@ -1381,11 +1279,19 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S2 Subitise 4 and 5 (earlier, same idea: subitise)",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
   "R.B7.S3": {
    "title": "Subitise 0 to 5",
@@ -1408,17 +1314,10 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
       "objects": "pictures"
-     }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5
      }
     },
     {
@@ -1428,13 +1327,18 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (earlier, same idea: find)",
+     "opts": {
+      "band": 5
+     }
     }
    ],
-   "preBuild": [
-    "zero"
-   ],
+   "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step)."
   },
   "R.B7.S4": {
    "title": "Represent 0 to 5",
@@ -1456,10 +1360,10 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
-      "objects": "dice"
+      "objects": "pictures"
      }
     },
     {
@@ -1483,7 +1387,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here)."
   },
   "R.B7.S5": {
    "title": "1 more",
@@ -1515,14 +1419,14 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -1555,14 +1459,14 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -1644,15 +1548,8 @@
    ],
    "pre": [
     {
-     "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: subitise)",
      "opts": {
       "band": 5,
       "objects": "dice"
@@ -1664,11 +1561,19 @@
      "opts": {
       "band": 5
      }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B7.S6 1 less (earlier, same idea: more1)",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are number_bonds (a pre-skill here); count_objects (a pre-skill here); ten_frame_build (a pre-skill here); number_word_form (it deals numbers to 20, past this step (5)); number_seq_fill (it deals numbers to 10, past this step (5))."
+   "note": "Related: none; the other forms of this idea are number_bonds (a pre-skill here)."
   },
   "R.B8.S1": {
    "title": "Compare mass",
@@ -1690,7 +1595,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "\"Which is heavier?\" about two pictured objects; the balance comes in S2. Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
+   "note": "\"Which is heavier?\" about two pictured objects; the balance comes in S2. Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual). Related: none; the other forms of this idea are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
   },
   "R.B8.S2": {
    "title": "Find a balance",
@@ -1715,7 +1620,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual). Related: none; the other forms of this idea are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
   },
   "R.B8.S3": {
    "title": "Explore capacity",
@@ -1784,43 +1689,31 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5,
-      "objects": "dice"
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
       "objects": "pictures"
      }
-    }
-   ],
-   "preBuild": [
-    "subitise"
-   ],
-   "related": [
+    },
     {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
+     "key": "counting:count_sequence",
+     "why": "R.B7.S6 1 less (earlier, same idea: more1)",
      "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
+      "band": 10,
+      "dir": "back"
      }
     }
    ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
   "R.B9.S2": {
    "title": "Represent 6, 7 and 8",
@@ -1842,7 +1735,7 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -1850,7 +1743,7 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
@@ -1864,21 +1757,9 @@
      }
     }
    ],
-   "preBuild": [
-    "subitise"
-   ],
-   "related": [
-    {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
-     "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
-     }
-    }
-   ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a direct skill here)."
   },
   "R.B9.S3": {
    "title": "1 more",
@@ -1910,14 +1791,14 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -1967,14 +1848,14 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S1 Find 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -2304,30 +2185,20 @@
      }
     },
     {
-     "key": "composing:ten_frame_build",
-     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: count)",
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B9.S5 Composition of 6, 7 and 8 (earlier, same idea: bond)",
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "addition:add_5_pictures",
-     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)"
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
-     "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B10.S1": {
    "title": "Explore length",
@@ -2364,7 +2235,7 @@
      "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
     }
    ],
-   "note": "Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see preBuild)."
+   "note": "Pre: 2 only; every earlier step on this idea (R.B2.S1, R.B8.S2, R.B8.S1, R.B2.S2) is represented by its skill above."
   },
   "R.B10.S2": {
    "title": "Compare length",
@@ -2401,7 +2272,7 @@
      "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
     }
    ],
-   "note": "Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see preBuild)."
+   "note": "Pre: 2 only; every earlier step on this idea (R.B10.S1, R.B2.S1, R.B8.S2, R.B8.S1) is represented by its skill above."
   },
   "R.B10.S3": {
    "title": "Explore height",
@@ -2544,47 +2415,36 @@
    "pre": [
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: count)",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (earlier, same idea: find)",
      "opts": {
       "band": 10
      }
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: count)",
-     "opts": {
-      "band": 5,
-      "objects": "dice"
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S2 Find 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5,
       "objects": "pictures"
      }
-    }
-   ],
-   "preBuild": [
-    "subitise"
-   ],
-   "related": [
+    },
     {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
+     "key": "counting:count_sequence",
+     "why": "R.B9.S4 1 less (earlier, same idea: more1)",
      "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
+      "band": 10,
+      "dir": "back"
      }
     }
    ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "Related: none; the other forms of this idea are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
   "R.B11.S2": {
    "title": "Compare numbers to 10",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "comparing:compare_groups",
      "opts": {
@@ -2592,10 +2452,10 @@
       "level": [
        1
       ]
-     }
+     },
+     "missing": "comparing two numerals to 10 (not groups) with more / fewer; the skill compares two groups of counters"
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "comparing two numerals to 10 (not groups) with more / fewer",
    "build": [
@@ -2614,7 +2474,7 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: count)",
+     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: find)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -2663,7 +2523,7 @@
    "pre": [
     {
      "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: count)",
+     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: find)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -2671,7 +2531,7 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: count)",
+     "why": "R.B7.S4 Represent 0 to 5 (earlier, same idea: find)",
      "opts": {
       "band": 5
      }
@@ -2687,21 +2547,9 @@
      }
     }
    ],
-   "preBuild": [
-    "subitise"
-   ],
-   "related": [
-    {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
-     "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
-     }
-    }
-   ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here)."
   },
   "R.B11.S4": {
    "title": "Conceptual subitising to 10",
@@ -2714,18 +2562,18 @@
    ],
    "pre": [
     {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: count)",
+     "key": "counting:count_objects",
+     "why": "R.B7.S3 Subitise 0 to 5 (earlier, same idea: subitise)",
      "opts": {
-      "band": 10
+      "band": 5,
+      "objects": "dice"
      }
     },
     {
-     "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: count)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: find)",
      "opts": {
-      "band": 10,
-      "objects": "frame"
+      "band": 10
      }
     },
     {
@@ -2740,18 +2588,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
-     "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 10
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B11.S5": {
    "title": "1 more",
@@ -2782,7 +2620,7 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: count)",
+     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: find)",
      "opts": {
       "band": 10
      }
@@ -2840,7 +2678,7 @@
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: count)",
+     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: find)",
      "opts": {
       "band": 10
      }
@@ -3003,7 +2841,7 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea in another form: count a drawn group)",
+     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea)",
      "opts": {
       "band": 10,
       "objects": "frame"
@@ -3257,7 +3095,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -3266,9 +3104,11 @@
      }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "shapes_world"
+   ],
    "related": [],
-   "note": "Tap every cube / sphere ... (forms 1). Related: none in Reception; the written-name match (shape_name_match_3d) is a drag of written words, a Year 1 response. Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B6.S3, R.B4.S3 have no live skill yet (see preBuild)."
+   "note": "Tap every cube / sphere ... (forms 1). Related: none in Reception; the written-name match (shape_name_match_3d) is a drag of written words, a Year 1 response. Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices)."
   },
   "R.B12.S2": {
    "title": "Find 2-D shapes within 3-D shapes",
@@ -3291,7 +3131,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -3337,7 +3177,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -3383,7 +3223,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -3554,6 +3394,14 @@
    ],
    "pre": [
     {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 count a group to 10",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     }
+    },
+    {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
@@ -3567,24 +3415,6 @@
       "band": 10,
       "dir": "back"
      }
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "R.B11.S2 Compare numbers to 10 (earlier, same idea: compare)",
-     "opts": {
-      "band": 10,
-      "level": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea in another form: Count Objects (1-20) (Visual), at this step's size)",
-     "opts": {
-      "band": 10,
-      "objects": "frame"
-     }
     }
    ],
    "preBuild": [],
@@ -3594,21 +3424,6 @@
      "why": "the same idea in another form: base-10 blocks",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "the same idea in another form: Number Sequence: Fill Missing (Grid), at this step's size",
-     "opts": {
-      "step": 1,
-      "range": 10
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: Hundreds Chart - Find the Missing Number (Visual), at this step's size",
-     "opts": {
-      "band": 10
      }
     }
    ],
@@ -3734,11 +3549,10 @@
      }
     },
     {
-     "key": "counting:count_objects",
-     "why": "R.B11.S1 Find 9 and 10 (an earlier step; the same idea)",
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (an earlier step; the same idea)",
      "opts": {
-      "band": 10,
-      "objects": "frame"
+      "band": 10
      }
     }
    ],
@@ -3749,13 +3563,6 @@
      "why": "the same idea in another form: base-10 blocks",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: Hundreds Chart - Find the Missing Number (Visual), at this step's size",
-     "opts": {
-      "band": 30
      }
     }
    ],
@@ -4165,16 +3972,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    },
-    {
      "key": "shapes_early:name_2d_shapes",
      "why": "R.B6.S1 Identify and name shapes with 4 sides (earlier, same idea: shape2d)",
      "opts": {
@@ -4194,13 +3991,23 @@
        1
       ]
      }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: compose)",
+     "opts": {
+      "shapes": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "preBuild": [
     "shapes_world"
    ],
    "related": [],
-   "note": "Related: none; the other forms of this idea are name_2d_shapes (a pre-skill here); compose_shapes (a pre-skill here); compose_hexagon (its content is past this grade); shape_name_match_2d (its content is past this grade)."
+   "note": "Related: none; the other forms of this idea are name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
   },
   "R.B15.S2": {
    "title": "Rotate shapes",
@@ -4228,16 +4035,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (earlier, same idea: shape2d)",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
-    },
-    {
      "key": "shapes_early:name_2d_shapes",
      "why": "R.B6.S1 Identify and name shapes with 4 sides (earlier, same idea: shape2d)",
      "opts": {
@@ -4261,6 +4058,15 @@
        1
       ]
      }
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier, same idea: shape3d)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -4268,7 +4074,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Related: none; the other forms of this idea are shape_corners_count (its opts deal only 2 different item(s)); compose_shapes (a pre-skill here); compose_hexagon (its content is past this grade); shape_name_match_2d (its content is past this grade)."
+   "note": "Related: none; the other forms of this idea are shape_corners_count (its opts deal only 2 different item(s)); name_2d_shapes (a direct skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
   },
   "R.B15.S3": {
    "title": "Manipulate shapes",
@@ -4307,12 +4113,9 @@
      }
     }
    ],
-   "preBuild": [
-    "shape_3d_tasks",
-    "shapes_world"
-   ],
+   "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B15.S4": {
    "title": "Explain shape arrangements",
@@ -4354,11 +4157,9 @@
      }
     }
    ],
-   "preBuild": [
-    "shape_3d_tasks"
-   ],
+   "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices). Related: none; the other forms of this idea are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B15.S5": {
    "title": "Compose shapes",
@@ -4401,9 +4202,12 @@
      }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "shape_3d_tasks",
+    "shapes_world"
+   ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compose_hexagon (a direct skill here); compose_shapes (a direct skill here); name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices). Related: none; the other forms of this idea are compose_hexagon (a direct skill here); compose_shapes (a direct skill here)."
   },
   "R.B15.S6": {
    "title": "Decompose shapes",
@@ -4445,9 +4249,11 @@
      }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "shapes_world"
+   ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_hexagon: its content is past this grade; shape_attributes: it asks about vertices); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet (see preBuild). Related: none; the other forms of this idea are compose_hexagon (taught at an earlier step (R.B15.S5), but its content is past this grade); name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_hexagon: its content is past this grade; shape_attributes: it asks about vertices). Related: none; the other forms of this idea are compose_hexagon (taught at an earlier step (R.B15.S5), but its content is past this grade)."
   },
   "R.B15.S7": {
    "title": "Copy 2-D shape pictures",
@@ -4461,7 +4267,7 @@
    "pre": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B15.S6 Decompose shapes (earlier, same idea: shape2d)",
+     "why": "R.B15.S6 Decompose shapes (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -4495,7 +4301,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the other forms of this idea are compose_shapes (a pre-skill here); name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
+   "note": "Related: none; the other forms of this idea are compose_shapes (a pre-skill here)."
   },
   "R.B15.S8": {
    "title": "Find 2-D shapes within 3-D shapes",
@@ -4518,7 +4324,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "R.B15.S6 Decompose shapes (earlier, same idea: shape2d)",
+     "why": "R.B15.S6 Decompose shapes (earlier, same idea: compose)",
      "opts": {
       "shapes": [
        0,
@@ -5220,11 +5026,26 @@
        1
       ]
      }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (earlier, same idea: find)",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (earlier, same idea: find)",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Related: none; the other forms of this idea are count_objects (a pre-skill here); ten_frame_build (a pre-skill here)."
   },
   "R.B17.S10": {
    "title": "Create own maps from familiar places",
@@ -5359,11 +5180,9 @@
      "why": "R.B14.S3 take away"
     }
    ],
-   "preBuild": [
-    "subitise"
-   ],
+   "preBuild": [],
    "related": [],
-   "note": "A review step: no single skill; served by the consolidate review pool. Related: none; the other forms of this idea are shape_pattern (left out here (rules 8 and 18)); count_objects (a pre-skill here); ten_frame_build (taught at an earlier step (R.B11.S9), but not a building block of this step); number_word_form (it deals numbers to 20, past this step (10))."
+   "note": "A review step: no single skill; served by the consolidate review pool. Related: none; the other forms of this idea are shape_pattern (left out here (rules 8 and 18))."
   },
   "R.B18.S2": {
    "title": "Patterns and relationships",
@@ -6211,6 +6030,12 @@
    "step": "R.B11.S1",
    "action": "partial",
    "why": "groups of exactly 9 and 10: band 10 deals 1-10, mostly below 9"
+  },
+  {
+   "key": "comparing:compare_groups",
+   "step": "R.B11.S2",
+   "action": "partial",
+   "why": "comparing two numerals to 10 (not groups) with more / fewer; the skill compares two groups of counters"
   },
   {
    "key": "placevalue:compare",
