@@ -245,7 +245,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     },
     {
      "key": "patterns:count_by_step_up",
@@ -1316,7 +1316,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     },
     {
      "key": "composing:make_ten",
@@ -1375,7 +1375,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
    "preBuild": [],
@@ -1471,7 +1471,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
    "preBuild": [],
@@ -1534,7 +1534,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
    "preBuild": [],
@@ -2788,7 +2788,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S11",
+     "why": "the ×1 facts (taught with Y4.B4.S11 in the same school week W03)",
      "opts": {
       "constant": [
        1
@@ -2893,7 +2893,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S11",
+     "why": "the ×1 facts (taught with Y4.B4.S11 in the same school week W03)",
      "opts": {
       "constant": [
        1
@@ -3141,7 +3141,7 @@
     },
     {
      "key": "addition:add_three",
-     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+     "why": "adding three numbers (Grade 1, 1.OA.A.2), the additive form of the same regrouping idea"
     }
    ],
    "preBuild": [],
@@ -4002,7 +4002,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
    "preBuild": [],
@@ -4644,7 +4644,7 @@
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W21)"
+     "why": "Y2/Gr.1 Count sides on 2D shapes (prior learning list; no WRM step id in our data)"
     },
     {
      "key": "division:div_facts",
@@ -4689,7 +4689,7 @@
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (lower grade, same CCSS cluster)"
+     "why": "Y2/Gr.1 Count sides and vertices on 2D shapes (lower grade)"
     }
    ],
    "preBuild": [],
@@ -5258,7 +5258,7 @@
     },
     {
      "key": "addition:add_three",
-     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+     "why": "adding three numbers (Grade 1, 1.OA.A.2), the additive form of the same regrouping idea"
     }
    ],
    "preBuild": [],
@@ -6013,7 +6013,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
    "preBuild": [
@@ -6999,7 +6999,7 @@
     },
     {
      "key": "addition:add_20_mixed",
-     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+     "why": "adding to 20 fluently: 1 p.m. + 12 = 13:00 (Grade 1-2 fact fluency)"
     }
    ],
    "preBuild": [],
@@ -7035,7 +7035,7 @@
     },
     {
      "key": "subtraction:sub_20_mixed",
-     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+     "why": "subtracting within 20 fluently (Grade 1-2 fact fluency)"
     }
    ],
    "preBuild": [],
@@ -7047,6 +7047,806 @@
     {
      "key": "measurement:order_clocks_digital_asc",
      "why": "ordering times"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S1": {
+   "title": "Understand angles as turns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "angles as an amount of turn: quarter, half, three-quarter and whole turns, clockwise and anticlockwise, and a right angle as a quarter turn",
+   "build": [
+    "turns_angles"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y3.B11.S2 Right angles (prior learning wk W37)"
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "Y1.B14.S6 Tell the time to the half hour (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "turns"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "turn measured in degrees (Grade 4)"
+    },
+    {
+     "key": "coordinates:geo_rotate",
+     "why": "rotations of a shape"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "why": "angles that add up"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S2": {
+   "title": "Identify angles",
+   "direct": [
+    {
+     "key": "angles_lines:identify_angles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2/Gr.1 Count sides and vertices on 2D shapes (lower grade)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "turns_angles"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "estimating angle size"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "triangles by their angles"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular lines make right angles"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S3": {
+   "title": "Compare and order angles",
+   "direct": [],
+   "partial": [
+    {
+     "key": "angles_lines:identify_angles",
+     "missing": "names acute/right/obtuse; never compares two angles or orders three by size"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing and ordering angles by size (independent of line length)",
+   "build": [
+    "turns_angles"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "Y3.B11.S8 Draw polygons (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "turns_angles"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "measuring to compare"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "the ordering routine"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "angles inside triangles"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S4": {
+   "title": "Triangles",
+   "direct": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 Identify angles (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "Y3.B11.S8 Draw polygons (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "polygons"
+   ],
+   "related": [
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "the next step"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "shapes by attributes"
+    },
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "perimeter of a triangle"
+    }
+   ],
+   "note": "Classification by sides and angles is 4.G.A.2 content; WRM Y4 asks the same."
+  },
+  "Y4.B12.S5": {
+   "title": "Quadrilaterals",
+   "direct": [
+    {
+     "key": "shapes_classify:classify_quads",
+     "opts": {}
+    },
+    {
+     "key": "shapes_classify:hotspot_quads",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "Y4.B12.S4 Triangles (step before in the block)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (prior learning wk W28)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y4.B12.S2 Identify angles (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "attributes of shapes"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "rectangle perimeter"
+    },
+    {
+     "key": "shapes_classify:mixed_shapes",
+     "why": "mixed classification"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S6": {
+   "title": "Polygons",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "missing": "shapes by sides and corners; no regular vs irregular, no naming polygons by number of sides past 6"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "missing": "counts sides and vertices only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "naming polygons by their number of sides (pentagon … octagon) and sorting regular from irregular",
+   "build": [
+    "polygons"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W27)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y3.B11.S2 Right angles (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (step before in the block)"
+    }
+   ],
+   "preBuild": [
+    "shape_draw"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "perimeter of polygons (Y4.B6.S9)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "find shapes by attributes"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "symmetry of regular polygons"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B12.S7": {
+   "title": "Lines of symmetry",
+   "direct": [
+    {
+     "key": "angles_lines:symmetry",
+     "opts": {}
+    },
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (step before in the block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "reflection of a shape"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "symmetry of isosceles and equilateral triangles"
+    }
+   ],
+   "note": "Existing tags kept."
+  },
+  "Y4.B12.S8": {
+   "title": "Complete a symmetric figure",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "completing a symmetric figure on a square grid by reflecting it in a given line",
+   "build": [
+    "symmetry_complete"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "why": "Y4.B12.S7 Lines of symmetry (step before in the block)"
+    },
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S3 Perimeter on a grid (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "symmetry_complete"
+   ],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "reflections"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "grid positions"
+    }
+   ],
+   "note": "Y2.B3.S6 (Use lines of symmetry to complete shapes) is the prior step with the same proposal."
+  },
+  "Y4.B13.S1": {
+   "title": "Interpret charts",
+   "direct": [
+    {
+     "key": "graphs:bar_graph",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
+     "key": "graphs:pictograph",
+     "opts": {}
+    },
+    {
+     "key": "graphs:tally_chart",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W25)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W25)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W25)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W25)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S3 Block diagrams (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "two_way"
+   ],
+   "related": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "drawing pictographs"
+    },
+    {
+     "key": "graphs:line_plot",
+     "why": "line plots (3.MD.B.4)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "the next step: comparison, sum, difference",
+     "opts": {
+      "forms": [
+       2,
+       3
+      ]
+     }
+    }
+   ],
+   "note": "WRM charts include tables; graphs:tally_chart reads a table of tallies."
+  },
+  "Y4.B13.S2": {
+   "title": "Comparison, sum and difference",
+   "direct": [
+    {
+     "key": "graphs:bar_graph",
+     "opts": {
+      "forms": [
+       2,
+       3
+      ]
+     }
+    },
+    {
+     "key": "graphs:pictograph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts (step before in the block)",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W25)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W25)"
+    },
+    {
+     "key": "subtraction:sub_100_mixed",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "drawing the chart"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "how many more stories"
+    },
+    {
+     "key": "graphs:mixed_graphs",
+     "why": "mixed graph questions"
+    }
+   ],
+   "note": "bar_graph forms \"How many more?\" and \"The total of all the bars\" give comparison, sum and difference; the existing partial tag becomes full. line_graph lists this step (Y4.B13.S2) by mistake; it belongs to S3/S4."
+  },
+  "Y4.B13.S3": {
+   "title": "Interpret line graphs",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading a line graph: the value at a time, change between times, and when it was greatest",
+   "build": [
+    "line_graph"
+   ],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S2 Comparison, sum and difference (step before in the block)",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 Describe position using coordinates (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:line_plot",
+     "why": "line plots are a different chart"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "points on a grid"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "temperature over a day is the usual context"
+    }
+   ],
+   "note": "5.G.A.2 preview, taught as enrichment W37."
+  },
+  "Y4.B13.S4": {
+   "title": "Draw line graphs",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "drawing a line graph from a table: scale the axes, plot points, join them",
+   "build": [
+    "line_graph"
+   ],
+   "pre": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W37)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S2 Plot coordinates (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [
+    "line_graph"
+   ],
+   "related": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "drawing a bar chart from the same data"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "plotting points"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B14.S1": {
+   "title": "Describe position using coordinates",
+   "direct": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (prior learning wk W37)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "position_map"
+   ],
+   "related": [
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "graphing points"
+    },
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "distance between points"
+    }
+   ],
+   "note": "5.G.A.1 content; school enrichment W37."
+  },
+  "Y4.B14.S2": {
+   "title": "Plot coordinates",
+   "direct": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 Describe position (prior learning wk W38)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B1.S8 Count backwards within 10 (prior learning wk W38)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "plotting the vertices of a shape (next step)"
+    },
+    {
+     "key": "coordinates:coordinate_graph",
+     "why": "coordinate graphing"
+    }
+   ],
+   "note": "coordinate_q1 deals both \"read the coordinates\" and \"plot these points\"; full for S1 and S2."
+  },
+  "Y4.B14.S3": {
+   "title": "Draw 2-D shapes on a grid",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:coord_polygon",
+     "missing": "gives the vertices and asks side lengths/perimeter; never asks to plot and join, or to find the missing vertex"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "drawing a 2-D shape by plotting given vertices, and finding the missing vertex of a square or rectangle",
+   "build": [
+    "coord_polygon_draw"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S2 Plot coordinates (step before in the block)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "Y4.B12.S5 Quadrilaterals (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (prior learning wk W29)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "shape_draw"
+   ],
+   "related": [
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "side lengths from coordinates"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "perimeter on a grid"
+    }
+   ],
+   "note": "translate_grid lists this step; translating is S4/S5, so drawing shapes needs its own option."
+  },
+  "Y4.B14.S4": {
+   "title": "Translate on a grid",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_translate",
+     "missing": "multiple choice in four quadrants; the pupil never draws the translated shape on a first-quadrant grid"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "translating a point or shape on a first-quadrant grid by drawing it, and giving the new coordinates",
+   "build": [
+    "translate_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "Y4.B14.S3 Draw 2-D shapes on a grid (step before in the block)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B1.S8 Count backwards within 10 (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "movement"
+   ],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "reflection, another transformation"
+    },
+    {
+     "key": "coordinates:geo_rotate",
+     "why": "rotation"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "adding to the x and y coordinates"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B14.S5": {
+   "title": "Describe translation on a grid",
+   "direct": [],
+   "partial": [
+    {
+     "key": "coordinates:geo_translate",
+     "missing": "picks the image for a given translation; does not ask the pupil to describe a translation (3 right, 2 up)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "describing a translation from a shape and its image (\"__ right, __ up\")",
+   "build": [
+    "translate_grid"
+   ],
+   "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (prior learning wk W38)"
+    },
+    {
+     "key": "subtraction:sub_20_mixed",
+     "why": "subtracting within 20 fluently (Grade 1-2 fact fluency)"
+    }
+   ],
+   "preBuild": [
+    "translate_grid"
+   ],
+   "related": [
+    {
+     "key": "coordinates:geo_reflect",
+     "why": "reflection"
+    },
+    {
+     "key": "coordinates:coord_distance_q1",
+     "why": "distance moved"
     }
    ],
    "note": ""
@@ -7531,6 +8331,7 @@
    "family": "geometry",
    "steps": [
     "Y4.B6.S8",
+    "Y4.B12.S4",
     "Y4.B12.S6",
     "Y5.B10.S9"
    ],
@@ -8033,6 +8834,172 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "turns_angles": {
+   "kind": "new",
+   "skill": "angles_lines:turns_and_angles",
+   "name": "Turns and Angles",
+   "teaches": "an angle as an amount of turn; right angles as quarter turns; comparing angles with a right angle (greater/less)",
+   "representation": "an angle tester (a square corner) beside each angle; tick greater, less or right angle",
+   "family": "geometry",
+   "steps": [
+    "Y4.B12.S1",
+    "Y4.B12.S2",
+    "Y4.B12.S3",
+    "Y3.B11.S1",
+    "Y3.B11.S2",
+    "Y3.B11.S3"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "turns": {
+   "kind": "new",
+   "skill": "coordinates:whole_half_quarter_turns",
+   "name": "Whole, Half and Quarter Turns",
+   "teaches": "describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object",
+   "representation": "an arrow or object drawn before and after a turn; circle the turn from a word bank",
+   "family": "geometry",
+   "steps": [
+    "Y4.B12.S1",
+    "Y1.B11.S1",
+    "Y2.B11.S3"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "shape_draw": {
+   "kind": "new",
+   "skill": "shapes_early:draw_2d_shapes",
+   "name": "Draw 2-D Shapes",
+   "teaches": "drawing 2-D shapes on a dot grid from a name or a description (4 sides, 2 long and 2 short)",
+   "representation": "a square dot grid; draw the shape; the key shows one correct drawing",
+   "family": "geometry",
+   "steps": [
+    "Y4.B12.S6",
+    "Y4.B14.S3",
+    "Y2.B3.S4",
+    "Y3.B11.S8"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "symmetry_complete": {
+   "kind": "new",
+   "skill": "angles_lines:complete_symmetric_shape",
+   "name": "Complete the Symmetric Shape",
+   "teaches": "using a vertical line of symmetry to complete a shape or pattern on a square grid",
+   "representation": "half a shape on squared paper beside a dashed mirror line; draw the other half",
+   "family": "geometry",
+   "steps": [
+    "Y4.B12.S8",
+    "Y2.B3.S6"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "two_way": {
+   "kind": "new",
+   "skill": "graphs:two_way_tables",
+   "name": "Two-Way Tables",
+   "teaches": "reading and completing two-way tables",
+   "representation": "a two-way table with blanks and totals; fill them in",
+   "family": "data",
+   "steps": [
+    "Y4.B13.S1",
+    "Y3.B12.S6",
+    "Y5.B9.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "line_graph": {
+   "kind": "new",
+   "skill": "graphs:line_graphs",
+   "name": "Line Graphs",
+   "teaches": "reading and drawing line graphs that show change over time",
+   "representation": "a line graph on a grid with labelled axes; read values, find differences, or plot the points",
+   "family": "data",
+   "steps": [
+    "Y4.B13.S2",
+    "Y4.B13.S3",
+    "Y4.B13.S4",
+    "Y5.B9.S1",
+    "Y5.B9.S2",
+    "Y6.B11.S1"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "position_map": {
+   "kind": "new",
+   "skill": "shapes_early:position_and_maps",
+   "name": "Where Is It? Positions and Maps",
+   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
+   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
+   "family": "geometry",
+   "steps": [
+    "Y4.B14.S1",
+    "R.B17.S10",
+    "R.B17.S11",
+    "R.B17.S7",
+    "R.B17.S8",
+    "R.B17.S9",
+    "Y1.B11.S2",
+    "Y1.B11.S3"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "coord_polygon_draw": {
+   "kind": "option",
+   "skill": "coordinates:coord_polygon",
+   "option": "task \"plot and join\" and \"find the missing vertex\"",
+   "name": "Draw Shapes on a Coordinate Grid (option)",
+   "teaches": "plotting given vertices and joining them to draw a 2-D shape, and finding the missing vertex of a square or rectangle",
+   "representation": "first-quadrant grid in the boxed cell (black lines, axes labelled 0-10), plotted points as filled dots; answer \"( __ , __ )\" boxes",
+   "family": "coordinates",
+   "ccss": [
+    "5.G.A.1",
+    "3.G.A.1"
+   ],
+   "why": "coord_polygon gives the vertices and asks lengths; the WRM step is drawing the shape",
+   "steps": [
+    "Y4.B14.S3"
+   ],
+   "reused": false
+  },
+  "translate_grid": {
+   "kind": "new",
+   "skill": "coordinates:translate_on_grid",
+   "name": "Translate on a Grid",
+   "teaches": "translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up)",
+   "representation": "a coordinate grid with a shape and its image; write the translation or draw the image",
+   "family": "geometry",
+   "steps": [
+    "Y4.B14.S3",
+    "Y4.B14.S4",
+    "Y4.B14.S5",
+    "Y5.B11.S2",
+    "Y5.B11.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "movement": {
+   "kind": "new",
+   "skill": "coordinates:describe_movement",
+   "name": "Describe Movement",
+   "teaches": "describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns",
+   "representation": "a square grid with a start and an object; write the moves; option: follow a route",
+   "family": "geometry",
+   "steps": [
+    "Y4.B14.S4",
+    "Y2.B11.S2",
+    "Y2.B11.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
   }
  },
  "tagFixes": [
@@ -8431,6 +9398,36 @@
    "step": "Y4.B10.S2",
    "action": "add",
    "why": "missing partial tag"
+  },
+  {
+   "key": "angles_lines:identify_angles",
+   "step": "Y4.B12.S3",
+   "action": "partial",
+   "why": "kept partial: names angles, no compare/order"
+  },
+  {
+   "key": "shapes_early:shape_attributes",
+   "step": "Y4.B12.S6",
+   "action": "add",
+   "why": "missing partial tag for polygons"
+  },
+  {
+   "key": "graphs:bar_graph",
+   "step": "Y4.B13.S2",
+   "action": "add",
+   "why": "re-tag as FULL with forms [2, 3] (how many more, total)"
+  },
+  {
+   "key": "graphs:tally_chart",
+   "step": "Y4.B13.S1",
+   "action": "add",
+   "why": "missing tag: reading a table of tallies"
+  },
+  {
+   "key": "coordinates:geo_translate",
+   "step": "Y4.B14.S5",
+   "action": "partial",
+   "why": "multiple choice of the image; does not describe a translation"
   }
  ]
 }
