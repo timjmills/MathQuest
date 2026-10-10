@@ -1179,7 +1179,11 @@ function measureItems(items, { size, look, colsList }) {
             // A choose-all list of printed numerals wraps its options onto a second line in a
             // narrower column: wrapped text, not a collapse (critic fractions-key r3 R2: at L the
             // list took a full-width row of its own and left a fifth of the page blank).
-            if (it.q && it.q.printFormat === 'multi-select' && !it.q.printText && Array.isArray(it.q.options)
+            // The odd/even sort list ("Circle the even numbers. Cross out the odd numbers.") is
+            // the same row of printed numerals (critic fractions-key r3 R2 / R7: full-width list
+            // rows left mixed_composing pages with 27-60 % strips and 3 items).
+            const sortList = it.q && typeof it.q.printAnswer === 'string' && /^\s*Circle:.*;\s*Cross out:/.test(it.q.printAnswer);
+            if (it.q && it.q.printFormat === 'multi-select' && (!it.q.printText || sortList) && Array.isArray(it.q.options)
                 && !it.q.options.some((o) => o && (o.svg || o.image))) continue;
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;

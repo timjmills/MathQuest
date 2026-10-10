@@ -214,6 +214,17 @@ export function screenInstruction(text) {
  * in place. Only the FIRST text node can hold the sentence's verb; later nodes (after a
  * vocabulary link) are left alone so a noun ("in the circle") is never swapped as a verb.
  */
+/**
+ * Critic fractions-key r3/r4 R4: "Calculate: 1/2 + 1/2 = ?" over a fraction-sentence cell that
+ * draws the sentence says the item twice. Returns the operation's verb ("Add.") for such a line,
+ * or '' when the line is anything else. Used by screenTextLine (card) and the twin instruction
+ * (online worksheet, quiz), so every host says the item once.
+ */
+export function fracSentenceVerb(text) {
+    const m = String(text || '').replace(/\s+/g, ' ').trim().match(/^Calculate:\s*[\d\s/]+([+\u2212\-\u00d7\u00f7])\s*[\d\s/]+=\s*\?$/);
+    return m ? ({ '+': 'Add.', '\u2212': 'Subtract.', '-': 'Subtract.', '\u00d7': 'Multiply.', '\u00f7': 'Divide.' }[m[1]] || '') : '';
+}
+
 export function screenTextLine(el) {
     if (!el || typeof document === 'undefined') return;
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -252,12 +263,14 @@ export function screenTextLine(el) {
     // Critic fractions-key r3 R4: when the line sits over a fraction-sentence cell that already
     // draws the sentence ("Calculate: 1/2 + 1/2 = ?" above 1/2 + 1/2 = [ ]), the item is said
     // once: the line becomes the operation's verb, as the sheet's section line reads.
-    const calc = !el.children.length && String(el.textContent || '').trim().match(/^Calculate:\s*[\d\s/]+([+\u2212\-\u00d7\u00f7])\s*[\d\s/]+=\s*\?$/);
-    if (calc) {
+    // (the line may hold a vocabulary link or a screen-reader span around "Calculate": only an
+    // interactive or drawn child keeps it, critic fractions-key r4 R4 - quiz and worksheet)
+    const verb = !el.querySelector('input, select, button, textarea, svg, img') && fracSentenceVerb(el.textContent);
+    if (verb) {
         let host = el.parentElement;
         for (let up = 0; host && up < 3 && !host.querySelector('[data-fm-term]'); up++) host = host.parentElement;
         if (host && host.querySelector('[data-fm-term]')) {
-            el.textContent = { '+': 'Add.', '\u2212': 'Subtract.', '-': 'Subtract.', '\u00d7': 'Multiply.', '\u00f7': 'Divide.' }[calc[1]] || el.textContent;
+            el.textContent = verb;
             return;
         }
     }
@@ -3046,7 +3059,10 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
         const said = _normText(q.text);
         // `q.screenInstr`: a generator's own instruction for a twin that prints its whole sentence
         // (add_three: "Add." over `8 + 5 + 3 = [ ]`, never the sentence twice).
-        const instr = q.screenInstr ? q.screenInstr : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
+        // a fraction sentence the twin draws whole ("1/2 + 1/2 = [ ]") takes the operation's
+        // verb, never "Calculate: 1/2 + 1/2 = ?" above it (critic fractions-key r4 R4)
+        const fmVerb = /data-fm-term/.test(String(q.visual || '')) ? fracSentenceVerb(plainText(q.text)) : '';
+        const instr = q.screenInstr ? q.screenInstr : fmVerb ? fmVerb : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
             : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
                 : plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
