@@ -32,6 +32,7 @@
 const fs = require('fs');
 const path = require('path');
 const { open } = require('../lib/ws-harness.cjs');
+const { dotsBandCases } = require('../lib/refline-dots.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -183,6 +184,14 @@ async function startHost(page, host, c, k, seed) {
     };
     await chromeCheck('home screen 1366x650 (full header)', 1366, 650, null);
     await chromeCheck('play at 1366x960 (tall screen, full header)', 1366, 960, () => startHost(page, 'card', 'addition', 'add', 7));
+
+    // ---- the question dots and the number line (critic nl-r6 D1) ----
+    // A counted session (queue count / link N10, N20) pulls the dots into the card's top line; with
+    // the number line on they must not lie on it, and without it they stay where they were.
+    if (HOSTS.includes('card')) {
+        const dotFails = await dotsBandCases(page, { sizes: SIZES, log: (l) => console.log(l.trim()), shots: SHOTS });
+        fails.push(...dotFails);
+    }
 
     for (const size of SIZES) {
         await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });

@@ -202,7 +202,17 @@ export function syncPracticeRefLine(q, { categoryId = '', skillId = '', opts = n
     let html = '';
     // A pool's line is the teacher's, the same on every question: the item never widens it.
     try { html = bandHTML(skillLine(cat, sk, o, q && !pool ? [q] : []), card.clientWidth || 600); } catch (e) { html = ''; }
-    const el = mountRefLine(card, 'mqRefLine', html);
+    // Above the question-dots row when it sits right over the card (critic nl-r6 D1): on a wide
+    // short screen css/play-compact.css pulls that row down into the card's top line, so the band
+    // must come before it, or the dots land on the band's high tick labels.
+    let anchor = card;
+    const dots = document.getElementById('qDotsRow');
+    if (dots && dots.parentNode === card.parentNode) {
+        let prev = card.previousElementSibling;
+        if (prev && prev.id === 'mqRefLine') prev = prev.previousElementSibling;
+        if (prev === dots) anchor = dots;
+    }
+    const el = mountRefLine(anchor, 'mqRefLine', html);
     if (el) el.style.width = `${card.offsetWidth || card.clientWidth}px`;
 }
 

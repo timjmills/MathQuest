@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, open, waitFor, hideOverlays } = require('../lib/ws-harness.cjs');
+const { dotsBandCases } = require('../lib/refline-dots.cjs');
 
 const SHOTS = process.argv.includes('--shots');
 const SHOT_DIR = path.join(ROOT, 'tests', 'compliance', 'shots', 'support-numberline');
@@ -425,7 +426,10 @@ const SAMPLES = [
             const q = W.generateQuestionFor({ category: 'addition', skill: 'add_facts', seed: 3 });
             m.syncPracticeRefLine(q, { categoryId: 'addition', skillId: 'add_facts', opts: { nlOn: true } });
             const on = !!document.querySelector('#mqRefLine svg');
-            const before = document.getElementById('mqRefLine') && document.getElementById('mqRefLine').nextElementSibling && document.getElementById('mqRefLine').nextElementSibling.id;
+            // above the card; the question-dots row may sit between them (it rides in the card's top line, nl-r6 D1)
+            let nx = document.getElementById('mqRefLine') && document.getElementById('mqRefLine').nextElementSibling;
+            if (nx && nx.id === 'qDotsRow') nx = nx.nextElementSibling;
+            const before = nx && nx.id;
             m.syncPracticeRefLine(q, { categoryId: 'addition', skillId: 'add_facts', opts: {} });
             const off = !document.getElementById('mqRefLine');
             const qs = [1, 2, 3].map((i) => W.generateQuestionFor({ category: 'addition', skill: 'add_facts', seed: i }));
@@ -563,6 +567,13 @@ const SAMPLES = [
             check(r.q === `${c}:${s}` && r.card.length === 1 && (want ? want.test(r.card[0]) : r.card[0] === 'none'), `R5-D1 Direct link ${tag} (${code}): ${JSON.stringify(r)}`);
         }
         log(`  Direct link: ${Object.entries(link).map(([k, v]) => `${k} ${v.code} -> ${v.card.join('/')}`).join('; ')}`);
+
+        // critic nl-r6 D1: in a counted session (the queue's count, a link's N10 / N20) at Chromebook
+        // size the question dots ride in the card's top line; they must never lie on the band.
+        // Queue and Direct link, N10 and N20, line on and off, 1366x650 and 1280x600.
+        const dotFails = await dotsBandCases(page, { log });
+        dotFails.forEach((f) => check(false, f));
+        await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 2 });
 
         if (SHOTS) await shots(h);
         check(!h.problems.length, `console problems: ${JSON.stringify(h.problems.slice(0, 5))}`);
