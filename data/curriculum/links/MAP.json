@@ -2527,8 +2527,7 @@
    "skills": [
     "shapes_classify:net_identify"
    ],
-   "proposal": "shapes_3d_props",
-   "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade",
+   "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade; no residual build: net_identify already deals 'which net folds into', shapes_3d_props (property select-all) stays on rows 64/89 only",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
@@ -2613,7 +2612,7 @@
     "measurement:unit_conversion_word",
     "measurement:unit_conversions"
    ],
-   "proposal": "map_minutes_to_hours",
+   "proposal": "time_convert",
    "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
@@ -2826,7 +2825,7 @@
     "shapes_early:order_objects_length"
    ],
    "proposal": "compare_lengths",
-   "note": "no difference item",
+   "note": "no difference item; checked: compare_objects (--n 12 'which is longer' A/B only), order_objects_length — no difference",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
@@ -2903,7 +2902,7 @@
     "measurement:mass_volume_liquid"
    ],
    "proposal": "mass_scales",
-   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell",
+   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
@@ -2917,7 +2916,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "mass_ops",
-   "note": "none",
+   "note": "none; checked: unit_conversion_word, mass_volume_liquid, capacity (--n 12) — convert or read only, none add/subtract masses or volumes",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
@@ -2964,7 +2963,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "conversion_table",
-   "note": "none",
+   "note": "none; checked: capacity, unit_conversions, ratio_tables — no conversion-table item",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
@@ -3168,10 +3167,11 @@
    "source": "strand-walk",
    "status": "partial",
    "skills": [
-    "area_perimeter:perimeter"
+    "area_perimeter:perimeter",
+    "area_perimeter:area"
    ],
    "proposal": "missing_lengths",
-   "note": "about 1 in 3 perimeter items, rectangles only",
+   "note": "--n 12: perimeter 4/12 and area 4/12 give a missing side (rectangles only); residual = missing sides of rectilinear/polygon shapes (missing_lengths)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
@@ -3808,7 +3808,7 @@
    "skills": [
     "measurement:unit_conversions"
    ],
-   "proposal": "map_minutes_to_hours",
+   "proposal": "time_convert",
    "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
@@ -3940,6 +3940,88 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
+   }
+  },
+  {
+   "task": "Angle as a turn: degrees as a fraction of 360 (quarter turn = 90°)",
+   "strand": "Geometry",
+   "ritBand": "201-215",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "turns_angles",
+   "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
+   }
+  },
+  {
+   "task": "Area of a rectangle with fractional side lengths",
+   "strand": "Measurement",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "fraction_operations:frac_mult_word",
+    "fraction_operations:mult_frac_frac"
+   ],
+   "proposal": "map_frac_side_area",
+   "note": "--dist 200 frac_mult_word: 55 garden-area stories (product only); mult_frac_frac --n 12 'Calculate a/b × c/d' overlap model; no tiling with unit-fraction squares",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 5.NF.B.4b is in MAP's blueprint"
+   }
+  },
+  {
+   "task": "Match: measurement story ↔ operation (length / mass / money)",
+   "strand": "Measurement",
+   "ritBand": "181-200",
+   "source": "6.4",
+   "status": "partial",
+   "skills": [
+    "measurement:money_change",
+    "area_perimeter:perimeter"
+   ],
+   "proposal": "length_ops",
+   "note": "money_change and perimeter trim stories carry an operation; no length/mass add-subtract stories (checked unit_conversion_word, capacity, mass_volume_liquid --n 12: convert/read only); story→equation building itself lives on algebra:build_expr_* (parts A/B)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume' word problems"
+   }
+  },
+  {
+   "task": "Match: coordinate grid ↔ ordered pair",
+   "strand": "Geometry",
+   "ritBand": "201-220",
+   "source": "6.4",
+   "status": "exists-ok",
+   "skills": [
+    "coordinates:coordinate_graph",
+    "coordinates:coordinate_q1",
+    "coordinates:coordinate_all"
+   ],
+   "note": "coordinate_graph --n 12: both directions as production — 'What are the coordinates of point A?' (coord-input) and 'Plot point A at (5, 7)' (click grid)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: plot/name points on the coordinate plane, grade 5 band"
+   }
+  },
+  {
+   "task": "Match: data table ↔ graph (choose/complete the graph that shows the table)",
+   "strand": "Data & graphing",
+   "ritBand": "181-200",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "graphs:build_bar_graph",
+    "graphs:build_pictograph"
+   ],
+   "proposal": "table_data",
+   "note": "build_bar_graph/build_pictograph build a graph from given counts (production, better than MAP's choose-one); no item reads a two-column table first",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"
    }
   }
  ],
@@ -5699,29 +5781,6 @@
    "why": "area_unit_squares only asks to count one shape; MAP asks which of several pictures has the stated area",
    "reused": false
   },
-  "map_minutes_to_hours": {
-   "kind": "option",
-   "skill": "measurement:unit_conversion_word",
-   "option": "direction \"small → large\" for time: minutes → hours written three ways (90 min = 1 h 30 min = 1.5 h = 1 ½ h); multiples of 15 and 30",
-   "name": "Minutes to Hours (option)",
-   "teaches": "converting minutes to hours as h-and-min, a decimal and a mixed number",
-   "representation": "boxed cell with a 60-minute bar model under the question, answer slots \"__ h __ min\" and \"__ h\"; screen: number entry (decimal or mixed accepted)",
-   "family": "measurement",
-   "ccss": [
-    "4.MD.A.1",
-    "4.MD.A.2",
-    "5.MD.A.1"
-   ],
-   "map": [
-    {
-     "strand": "Measurement",
-     "ritBand": "201-210",
-     "taskType": "number entry; select equivalent"
-    }
-   ],
-   "why": "today unit_conversion_word only goes large → small (hr → min, min → sec, 200-item dist); MAP asks 90 min = 1.5 h. Extends WRM time_convert, which does not name the decimal/mixed form",
-   "reused": false
-  },
   "map_money_build": {
    "kind": "option",
    "skill": "measurement:money_count",
@@ -6971,6 +7030,233 @@
    ],
    "why": "MAP 2-5 sample item; no skill sorts by two attributes",
    "reused": false
+  },
+  "time_convert": {
+   "ccss": [
+    "4.MD.A.1",
+    "4.MD.A.2",
+    "5.MD.A.1"
+   ],
+   "why": "WRM time_convert (wrm.js) already plans the time option on unit_conversion_word; MAP adds the decimal/mixed-hours and choose-all clauses, so they join it instead of a duplicate",
+   "kind": "option",
+   "skill": "measurement:unit_conversion_word",
+   "option": "time",
+   "name": "Convert Units of Time (option)",
+   "teaches": "converting between seconds, minutes, hours, days, weeks, months and years",
+   "representation": "a time-only unit option",
+   "family": "measurement",
+   "steps": [
+    "Y5.B14.S5"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "201-220",
+     "taskType": "number entry; select all equivalent"
+    }
+   ],
+   "reused": true
+  },
+  "map_frac_side_area": {
+   "kind": "option",
+   "skill": "fraction_operations:mult_frac_frac",
+   "option": "form \"area\": a rectangle with fractional sides (e.g. 2/3 × 3/4 unit) drawn inside a unit square tiled by unit-fraction rectangles; count the tiles, then write the area as a product",
+   "name": "Area With Fractional Sides (option)",
+   "teaches": "finding the area of a rectangle with fractional side lengths by tiling with unit-fraction squares and showing it equals the product of the sides",
+   "representation": "boxed cell, B&W unit square with the rectangle's tiles outlined (single grey shade), slots \"__ tiles of 1/__ = __\" and \"__ × __ = __\"; screen: fraction number entry, never multiple choice",
+   "family": "fractions",
+   "ccss": [
+    "5.NF.B.4b"
+   ],
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "211-220",
+     "taskType": "area with fractional sides"
+    }
+   ],
+   "why": "frac_mult_word deals garden-area stories (55/200 dist) and mult_frac_frac an overlap model with no area framing; neither tiles with unit-fraction squares, the clause 5.NF.B.4b names",
+   "reused": false
+  },
+  "turns_angles": {
+   "ccss": [
+    "4.MD.C.5a",
+    "4.MD.C.5b"
+   ],
+   "why": "WRM turns_angles already planned (wrm.js); standards-audit gives 4.MD.C.5a/b a gap verdict",
+   "kind": "new",
+   "skill": "angles_lines:turns_and_angles",
+   "name": "Turns and Angles",
+   "teaches": "an angle as an amount of turn; right angles as quarter turns; comparing angles with a right angle (greater/less)",
+   "representation": "an angle tester (a square corner) beside each angle; tick greater, less or right angle",
+   "family": "geometry",
+   "steps": [
+    "Y3.B11.S1",
+    "Y3.B11.S2",
+    "Y3.B11.S3",
+    "Y4.B12.S1",
+    "Y4.B12.S3"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Geometry",
+     "ritBand": "201-215",
+     "taskType": "angle as a turn of a circle"
+    }
+   ],
+   "reused": true
   }
+ },
+ "regrades": {
+  "algebra:solve_eq_addsub": [
+   "One-step equations (x + 9 = 13)"
+  ],
+  "algebra:solve_unknown": [
+   "One-step equations (x + 9 = 13)"
+  ],
+  "placevalue:compare": [
+   ">, <, ="
+  ],
+  "integers:compare_int": [
+   ">, <, ="
+  ],
+  "order_of_operations:paren_simple": [
+   "Order of operations e.g. 47 − (2 × 8)"
+  ],
+  "order_of_operations:oop_medium": [
+   "Order of operations e.g. 47 − (2 × 8)"
+  ],
+  "addition:add_100_regroup": [
+   "Multi-digit addition"
+  ],
+  "addition:add_1k_regroup": [
+   "Multi-digit addition"
+  ],
+  "addition:add_10k_regroup": [
+   "Multi-digit addition"
+  ],
+  "composing:tens_foundation_visual": [
+   "Base-ten model → number"
+  ],
+  "placevalue:place_value_disks": [
+   "Base-ten model → number"
+  ],
+  "composing:base10_build": [
+   "Base-ten model → number"
+  ],
+  "algebra:multi_step_word": [
+   "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option"
+  ],
+  "placevalue:number_word_names": [
+   "Word form ↔ number to millions",
+   "Match: word form <-> number"
+  ],
+  "composing:number_word_form": [
+   "Word form ↔ number to millions"
+  ],
+  "number_sense:place_on_number_line": [
+   "Place a number on a number line (drag/tap)"
+  ],
+  "algebra:inequalities": [
+   "Inequalities: true/false, solutions on a line"
+  ],
+  "addition:add_sub_10s": [
+   "Add/sub 10s and 100s mentally"
+  ],
+  "addition:add_sub_100s": [
+   "Add/sub 10s and 100s mentally"
+  ],
+  "multiplication:arrays_groups": [
+   "Picture <-> multiplication equation",
+   "Equal groups total"
+  ],
+  "multiplication:dot_array_mult": [
+   "Picture <-> multiplication equation"
+  ],
+  "multiplication:repeated_add_to_mult": [
+   "Picture <-> multiplication equation",
+   "Equal groups total",
+   "Repeated addition <-> multiplication"
+  ],
+  "decimals:compare_decimal": [
+   "Compare / order decimals"
+  ],
+  "decimals:compare_thousandths": [
+   "Compare / order decimals"
+  ],
+  "decimals:order_decimals": [
+   "Compare / order decimals"
+  ],
+  "fraction_operations:mult_frac_frac": [
+   "Fraction multiplication with visual models"
+  ],
+  "fraction_operations:mult_frac_whole": [
+   "Fraction multiplication with visual models"
+  ],
+  "fraction_operations:mult_scaling": [
+   "Fraction multiplication with visual models"
+  ],
+  "decimals:add_decimal": [
+   "Adding decimals"
+  ],
+  "multiplication:mult_word_problems": [
+   "Equal groups total"
+  ],
+  "multiplication:mult_properties": [
+   "Properties of multiplication (commutative, distributive, zero)"
+  ],
+  "multiplication:mult_comparison": [
+   "Multiplicative comparison (times as many)"
+  ],
+  "multiplication:mult_comparison_plain": [
+   "Multiplicative comparison (times as many)"
+  ],
+  "conversions:percent_of_number": [
+   "Percent of a number"
+  ],
+  "multiplication:nl_mult": [
+   "Match: number line <-> multiplication (hops)"
+  ],
+  "division:nl_div": [
+   "Match: number line <-> multiplication (hops)"
+  ],
+  "shapes_classify:net_identify": [
+   "Nets of 3-D solids"
+  ],
+  "area_perimeter:perimeter": [
+   "Perimeter"
+  ],
+  "area_perimeter:perimeter_grid": [
+   "Perimeter"
+  ],
+  "area_perimeter:perimeter_intro": [
+   "Perimeter"
+  ],
+  "graphs:line_plot": [
+   "Line / dot plots",
+   "Line plot with fractions: operations (total, difference)"
+  ],
+  "graphs:line_plot_g2": [
+   "Line / dot plots"
+  ],
+  "graphs:line_plot_fractions": [
+   "Line / dot plots",
+   "Line plot with fractions: operations (total, difference)"
+  ],
+  "measurement:heavier_lighter_visual": [
+   "Heavier / lighter (K)",
+   "Heavier / lighter with B&W objects (emoji answer breaks print)"
+  ],
+  "angles_lines:measure_angles": [
+   "Measure an angle with a protractor"
+  ],
+  "coordinates:geo_reflect": [
+   "Reflections / translations on a grid"
+  ],
+  "coordinates:geo_translate": [
+   "Reflections / translations on a grid"
+  ]
  }
 }
