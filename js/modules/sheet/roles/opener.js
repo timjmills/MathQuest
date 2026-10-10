@@ -25,6 +25,8 @@ export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'opener';
 /** Item 7: the first item is the Model; it wraps to the half-width Model cell (count-row reads ctx.wrapToCell). */
 export const WRAP_TO_CELL = (index) => index === 0;
+/** critic r2 N4: a one-page count row's air (vpad, spread over the one-page SHEET) is not drawn here; the cell is the row's height. */
+export const TIGHT_ROWS = true;
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -62,15 +64,19 @@ function geometry(items, input) {
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
     const hand = first && first.template === 'count-row' ? m.strip : 0;
     while (iRows < 2 && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
+    // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a page of count rows - each a full-width line - takes a second
+    // Guided row where the page would otherwise end in a blank band; the Independent rows are fitted first, so none is lost
+    let gRows = 1;
+    if (first && first.template === 'count-row' && gc === 1 && used + gH + hand <= m.budget) { gRows = 2; used += gH; }
     const spare = Math.max(0, m.budget - used - hand);
-    const rowsThatGrow = 1 + iRows;
+    const rowsThatGrow = gRows + iRows;
     const grow = Math.min(8, spare / rowsThatGrow);
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, iRows, grow, overBudget: used > m.budget, used };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
 }
 
 export function counts(pools, input) {
     const g = geometry(pools.main || [], input);
-    return { main: (g.twoModels ? 2 : 1) + g.gc + g.iRows * g.gc };
+    return { main: (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc };
 }
 
 export function plan(input = {}) {
@@ -79,8 +85,9 @@ export function plan(input = {}) {
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
     const models = items.slice(0, nModel);
-    const guided = items.slice(nModel, nModel + g.gc);
-    const indep = items.slice(nModel + g.gc, nModel + g.gc + g.iRows * g.gc);
+    const nGuided = g.gc * g.gRows;
+    const guided = items.slice(nModel, nModel + nGuided);
+    const indep = items.slice(nModel + nGuided, nModel + nGuided + g.iRows * g.gc);
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
@@ -106,7 +113,7 @@ export function plan(input = {}) {
     } else sections.push(modelBandPart);
     sections.push({ kind: 'say', frame: oralFrameOf(items[0] || {}), digits: 2 });
     sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
-        content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: 1, cellH: g.gH + g.grow, labels: 'none' }) });
+        content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
     if (indep.length) {
         sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
             content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: g.iRows, cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
@@ -116,7 +123,7 @@ export function plan(input = {}) {
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: 1 + g.iRows, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 
