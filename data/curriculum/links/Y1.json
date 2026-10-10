@@ -6229,6 +6229,192 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B11.S1": {
+   "title": "Describe turns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "whole, half and quarter turns",
+   "build": [
+    "turns"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B17.S7 Give instructions to build (same CCSS K.G.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "next step: Y1.B11.S2 Describe position - left and right"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B11.S2": {
+   "title": "Describe position - left and right",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {},
+     "missing": "left and right (the skill does above / below / beside)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "left and right",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (prior learning wk W29)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W29)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes",
+    "turns"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y1.B11.S3": {
+   "title": "Describe position - forwards and backwards",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "forwards and backwards moves",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 Describe position (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [
+    "turns"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "position words"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B11.S4": {
+   "title": "Describe position - above and below",
+   "direct": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [
+    "position_map",
+    "turns"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y1.B11.S5": {
+   "title": "Ordinal numbers",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "ordinal numbers 1st, 2nd, 3rd ...",
+   "build": [
+    "ordinal"
+   ],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y1.B11.S4 Describe position - above and below (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "position_map"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "counting order"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: Y1.B11.S2 Describe position - left and right"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -6730,6 +6916,53 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "turns": {
+   "kind": "new",
+   "skill": "coordinates:whole_half_quarter_turns",
+   "name": "Whole, Half and Quarter Turns",
+   "teaches": "describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object",
+   "representation": "an arrow or object drawn before and after a turn; circle the turn from a word bank",
+   "family": "geometry",
+   "steps": [
+    "Y1.B11.S1"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "position_map": {
+   "kind": "new",
+   "skill": "shapes_early:position_and_maps",
+   "name": "Where Is It? Positions and Maps",
+   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
+   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
+   "family": "geometry",
+   "steps": [
+    "Y1.B11.S2",
+    "Y1.B11.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "ordinal": {
+   "kind": "new",
+   "skill": "counting:ordinal_numbers",
+   "name": "1st, 2nd, 3rd",
+   "teaches": "ordinal numbers (first to tenth) and their abbreviations for position in a line",
+   "representation": "a line of line-drawn children or objects with a start flag; circle the 3rd, write the position of the star",
+   "family": "counting",
+   "steps": [
+    "Y1.B11.S5"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -6774,6 +7007,12 @@
    "step": "Y1.B9.S3",
    "action": "add",
    "why": "teaches this step"
+  },
+  {
+   "key": "shapes_early:shape_positions",
+   "step": "Y1.B11.S2",
+   "action": "partial",
+   "why": "left and right (the skill does above / below / beside)"
   }
  ]
 }
