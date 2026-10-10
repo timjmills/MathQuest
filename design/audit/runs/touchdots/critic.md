@@ -811,3 +811,147 @@ What fails:
 
 Fix Q5-1 (the touch gesture flag), with a touch case in a gate. Q5-2 is a Minor fix and should ride along. Paper,
 card and worksheet need nothing more.
+
+---
+
+# Round 6 (focused re-check of Q5-1 and Q5-2, head 97177665, main merged at 6539c2d1)
+
+Independent critic. No code was edited. Probes and screenshots are scratch files only (not in the repo).
+Everything was run in the real app with puppeteer touchscreen taps and CDP `Input.dispatchTouchEvent`, not
+synthetic clicks.
+
+## Score table (round 6)
+
+| Version | C1 | C2 | C3 | C4 | Pass |
+|---|---|---|---|---|---|
+| Print S / M / L, all roles in scope, pupil + key | 9 | 9 | 9 | 9 | yes (paper code untouched since r5) |
+| Practice card, 1366 × 650 and 1280 × 600, mouse + touch + keyboard | 8 | 9 | 8 | 8 | **yes** |
+| Online worksheet, same | 8 | 9 | 8 | 8 | **yes** |
+| Quiz, same | 8 | 9 | **8** | 8 | **yes** (Q5-1 closed) |
+
+## Verdict: PASS
+
+All four hosts score 8 or more on all four criteria at Chromebook size. Q6-1 and Q6-2 below are Minor or nits.
+They do not block, and they can ride with the next touch of these files.
+
+## Q5-1 — closed
+
+**What was measured.** Instant feedback, a typed one-box answer, then ONE real touch tap on Next. The quiz moves on
+every time, on wrong and right answers. Previous then shows the feedback and the ladder.
+- **Skills:** add_facts, subtract, mult_facts, div_facts, nearest_100 and value.
+- **Sizes:** 1366 × 650 and 1280 × 600.
+- **Tap paths:** puppeteer `touchscreen.tap` and the raw CDP touchStart / touchEnd. That is 48 / 48 per CPU setting.
+- **CPU throttle:** 1×, 4× and 8×. All 48 / 48 pass, even at 8×.
+
+**The pre-fix tree fails the same probe.** This is the lane with `quiz-take.js` and `touch-tap.js` from 6539c2d1,
+served through `MQ_ROOT`.
+- All 48 touch cases fail: the index stays 0.
+- A fast double tap also leaves the old item's feedback drawn on the next question.
+
+**The regression hunt:**
+
+| Case | Result |
+|---|---|
+| Enter after typing | The feedback shows in 3–11 ms. The focus goes to `body`. That is the same on the pre-fix tree (pre-existing, not lane). |
+| Tab after typing | The feedback shows in 1–6 ms. The focus is on Next. |
+| Mouse click on Next after typing, wrong and right | Moves on the first time. |
+| Touch tap on a blank page, on the problem cell, on Flag | The feedback shows in 136–229 ms (it is drawn after the click lands). It is still there 1.5 s later. Flag toggles. |
+| Touch drag / scroll that ends with no click | It does not blur the box, so nothing is deferred. Enter afterwards shows the feedback in 23–169 ms. |
+| Fast double tap on Next (90 ms apart) | Moves on twice (index 2). No stray feedback on the new question. Q1's feedback is kept. |
+| End-of-quiz feedback, by tap or by Enter | Nothing shows: no feedback line and no ladder marks. |
+| Review & Submit, then Back, then back to Q1 | Q1 keeps its feedback. |
+| Multi-box items (time_quarter, write_fraction): tap each box, type, tap Next | Moves on. Previous shows the feedback. |
+
+The guard `cellEl.dataset.flatIdx === flatIdx` stops a deferred refresh from drawing on the next question. The 700 /
+800 ms timing held at 8× CPU.
+
+## Q5-2 — closed
+
+The stack is add_column_multi with the teacher's touch. Each run starts at scroll 0, then makes the first real tap on a
+numeral:
+
+| Host and size | Line before the tap | Bar top | Scroll | Line after the tap | Start again under its own centre |
+|---|---|---|---|---|---|
+| Card 1366 | 544–588 | 592 | 0 | 544–588 | yes |
+| Card 1366, after a wrong answer | 619–663 | 594 | 76 | 543–587 | yes |
+| Card 1280 | 544–588 | 544 | 50 | 494–538 | yes |
+| Card 1280, after a wrong answer | 619–663 | 544 | 126 | 493–537 | yes |
+| Quiz 1366 | 514–558 | 580 | 0 | 514–558 | yes |
+| Quiz 1366, after a wrong answer | 583–627 | 587 | 47 | 536–580 | yes |
+| Quiz 1280 | 514–558 | 537 | 27 | 487–531 | yes |
+| Quiz 1280, after a wrong answer | 583–627 | 537 | 97 | 486–530 | yes |
+
+- **The scroll is the least move.** Each scroll equals the overlap plus about 6 px.
+- **It never goes past the element's own top.** The numerals stay on screen, at a top of 179 to 231.
+- **Later counts do not move the page.** Three more taps kept the same scroll every time.
+
+**The quiz ladder message is shown whole after a real wrong answer.** The answer was typed into the digit boxes, then
+Enter:
+- 1366: the message is at 540–580, above the bar at 587;
+- 1280: the message is at 490–530, above the bar at 537.
+
+## Gates (head 97177665)
+
+All gates were run one at a time.
+
+| Gate | Result |
+|---|---|
+| ws-touch-tap | **OK** |
+| ws-chromebook-fit | **OK**: 12 / 12 "touch Next ok" |
+| ws-touchdots | OK |
+| ws-support-ladder | OK |
+| ws-screen-answer | OK |
+| ws-teacher-quiz | OK |
+| wave1-a3-wrongdigits | OK |
+| ws-boot-smoke | OK |
+
+**The new gate cases fail on the pre-fix code** (6539c2d1's `quiz-take.js` and `touch-tap.js`, served through
+`MQ_ROOT`):
+- **ws-touch-tap: FAIL.** All 12 `realQuizTapNext` cases fail with "did not move on (index 0)". The `realStack` quiz
+  pass fails 3 "after the first tap at the page top" checks. The two "ladder message … shows whole" checks fail
+  (message 607–647 and 637–677, bar 537 / 587).
+- **ws-chromebook-fit `--hosts quiz`: FAIL.** All 12 "touch Next" cases fail.
+
+The JS syntax check passes for both modules. The diff since r5 touches only `quiz-take.js`, `touch-tap.js` and two
+gates, so paper is unchanged by construction: no `sheet/` or `print-*` file imports either module. The gate-rewritten
+wave1-A3 screenshots were restored.
+
+**Merge.** A throwaway `git merge-tree` into the current `claude/sweet-newton-c8wrv1` (5ff15129) is clean, with no
+conflicts. Nothing was pushed to that branch.
+
+## Defects (round 6)
+
+**Q6-1 · Minor (pre-existing, not lane-introduced) · card, column stack, after a wrong Check: the ladder message is
+under the pinned Hint / Check bar.**
+
+Measured with add_column_multi and touch: the answer was typed with real taps, then a real tap on Check.
+- **1366 × 650:** `#feedbackArea` "Not yet. Now use the arrow too." is at 675–729, and the bar top is at 594.
+- **1280 × 600:** the message is at the same place, and the bar top is at 544.
+- The page does not scroll, so the message is hidden until the pupil scrolls. The arrow and the red box are visible.
+- The pre-fix tree is identical, and r5 missed this.
+
+Fix: the same `clearOfPinnedBar` call the quiz now makes, on `#feedbackArea` after a wrong answer, bounded as in Q6-2.
+
+**Q6-2 · Nit · `clearOfPinnedBar` ignores the pinned TOP bar (header bottom 74 px).**
+
+Two places scroll content under the header:
+- the quiz wrong-answer scroll at 1280 × 600 (97–147 px);
+- the card first count after a wrong answer at 1280 × 600 (126 px).
+
+The effect on add_column_multi:
+- At 1280 × 600 on the quiz, the rung the message names ("Now use the arrow too.") has its Start arrow at 0–28, under
+  the header. The pupil reads "use the arrow" and has to scroll up to see it.
+- At 1366 only the word "Start" is clipped. The arrow itself is visible.
+
+At 1280 × 600 the cell, the message and the bar cannot all fit, so something has to give. Fix: clamp the scroll so
+the cell's top stays below the pinned header. Where they cannot all fit, prefer the drawn rung (the arrow) over the
+message's last line. Or put the message in the empty reserved count-line row just under the cell; that row is about
+80 px of blank on a stack.
+
+## Lead / owner question
+
+At 1280 × 600 a quiz stack with the arrow rung cannot show the arrow, the stack and the message all at once. Which
+should stay on screen?
+- (a) the arrow and the stack (the message may need a scroll);
+- (b) the message, as now;
+- (c) move the message into the reserved count-line row so that both fit. **Suggested: (c).**
