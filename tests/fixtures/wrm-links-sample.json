@@ -1,0 +1,7 @@
+{ "year": "Y3", "generatedBy": "test fixture (not real curated data)", "steps": {
+  "Y3.B1.S1": { "title": "Represent numbers to 100",
+    "direct": [{"key": "placevalue:value", "opts": {}}], "partial": [{"key": "placevalue:expand", "missing": "no part-whole model"}],
+    "verdict": "partial", "missing": "part-whole model", "build": ["fixture_pv_model"],
+    "pre": [{"key": "counting:count_objects", "why": "fixture"}, {"key": "placevalue:value", "why": "dup of direct, must drop"}],
+    "preBuild": ["pattern_make"], "related": [{"key": "patterns:seq_10", "why": "fixture"}], "note": "" } },
+  "proposals": { "fixture_pv_model": { "name": "Fixture place value model", "reused": false } } }
