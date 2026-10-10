@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 9)
+# R and Y1: generated items per step (wave 2 tagging, round 10)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -535,8 +535,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Click ALL the circles. / A=["opt1","opt3"] / multi-select-check
   - Click ALL the triangles. / A=["opt3"] / multi-select-check
 
-### R.B15.S3 Manipulate shapes — **full**
-- full `shapes_early:compose_shapes` opts `{}` (6 generated; Max Number not read)
+### R.B15.S3 Manipulate shapes — **partial** (missing: turning or flipping a shape so it fits a space)
+- partial `shapes_early:compose_shapes` opts `{}` (6 generated; Max Number not read)
   - What shape do you make when you put these two shapes together? / A="Square" / multiple-choice
   - What shape do you make when you put these two shapes together? / A="Triangle" / multiple-choice
   - What shape do you make when you put these two shapes together? / A="Rectangle" / multiple-choice

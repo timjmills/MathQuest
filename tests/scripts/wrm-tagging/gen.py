@@ -60,6 +60,7 @@ SUBS = [  # (family, sub, regex on the step title) — first match wins; order m
     ('money', 'money', r'coin|note|money|unitis'),
     ('time', 'time', r'\btime\b|\bdays?\b|month|hours|before and after'),
     ('fraction', 'fracshape', r'(half|quarter) of an object'), ('fraction', 'fracqty', r'(half|quarter) of a quantity'),
+    ('position', 'position', r'\bpositions?\b|map|turn|scene|visualis|instructions|ordinal'),
     ('count', 'subitise', r'subitis'), ('count', 'find', r'^find \d+(,| and| to)|^represent|count objects'),
     ('count', 'oral', r'verbal|patterns beyond'), ('pattern', 'pattern', r'pattern'),
     ('measure', 'mass', r'mass|balance|heavier'), ('measure', 'capacity', r'capacity|volume|full'),
@@ -84,6 +85,8 @@ def topic2(step):
         if re.search(rx, t): return fam, sub
     return 'count', 'other:' + step   # an unmatched title is its own idea (critic r6 N1r): never "the same idea" as another step
 def topic(step): return topic2(step)[1]
+for _x in order:   # critic r9 D16: a map / position / turn title is never a counting idea
+    if re.search(r'\bmaps?\b|\bpositions?\b|\bturns?\b', info[_x]['title'].lower()): assert topic2(_x)[0] == 'position', (_x, topic2(_x))
 def dom(c): return c.split('.')[1] if '.' in c else c
 def related_topic(a, b):
     (fa, sa), (fb, sb) = topic2(a), topic2(b)
@@ -297,7 +300,9 @@ def build(step):
             o = fit(k, step, why) if k not in own else None
             if o is None: return False
         if sig(k, o) in seen: return False
-        if k in seen_keys and k not in own: return False
+        if k in seen_keys and k not in own:
+            # a second rung of a key already listed only when it changes the representation (critic r9: frame vs dice)
+            if (o or {}).get('objects') in {(p.get('opts') or {}).get('objects') for p in pre if p['key'] == k}: return False
         seen.add(sig(k, o)); seen_keys.add(k); e = {'key': k, 'why': why}
         if o: e['opts'] = o
         pre.append(e); return True
@@ -417,6 +422,13 @@ def build(step):
                 own_b = all(set(S[x]['b']) <= set(sp['b']) for x in gaps)
                 held = all(set(S[x]['b']) & set(pb) for x in gaps)
                 parts.append('the earlier steps ' + ', '.join(gaps) + ' have no live skill yet' + (' (see build)' if own_b else ' (see preBuild)' if held else ''))
+            nb = []   # neighbouring-idea skills seen and rejected: name them, so a short list never reads as complete (critic r9)
+            for x in [c for c in cands if related_topic(step, c) == 1 and S[c]['d']]:
+                for k, o in dentries(x):
+                    kk = k.split(':')[1]
+                    if k in {p['key'] for p in pre} or k in own or kk in nb: continue
+                    nb.append(kk)
+            if nb: parts.append('the neighbouring-idea skills of earlier steps (' + ', '.join(nb[:6]) + ') are not judged building blocks of this step (spec.BLOCKS)')
             if not parts:
                 live_c = [x for x in cands if S[x]['d'] and related_topic(step, x) == 2][:4]
                 pk = {p['key'] for p in pre} | own

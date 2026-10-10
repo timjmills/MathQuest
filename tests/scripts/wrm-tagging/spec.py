@@ -215,7 +215,7 @@ st('R.B14.S4', d=[P(S5,'finding how many were taken away (change unknown)')], v=
 st('R.B15.S1', v='gap', m='selecting a shape for a purpose (it rolls, it stacks, it fits); no live skill asks this', b=['shape_3d_tasks'])
 st('R.B15.S2', d=[P(N2D,'recognising a shape when it is turned; the skill taps shapes by name (circles, triangles, squares and rectangles here)', forms=[1], shapes=[0, 1, 2])], v='partial', m='recognising a turned shape as the same shape', b=['defining_attributes'],
    p=[(N2D,'R.B6.S1 / R.B4.S1 name the shape first')])
-st('R.B15.S3', d=[F(CMP)])
+st('R.B15.S3', d=[P(CMP,'turning or flipping a shape so it fits a space; the skill only puts two shapes together')], v='partial', m='turning or flipping a shape so it fits a space', b=['shape_fit_turn'])
 st('R.B15.S4', d=[P(CMP,'explaining an arrangement of shapes')], v='partial', m='describing how shapes are arranged', b=['scenes'])
 st('R.B15.S5', d=[F(CMP), F(HEX)])
 st('R.B15.S6', d=[P(CMP,'decomposing: finding the shapes inside a shape (the skill only composes)')], v='partial', m='decomposing a shape into smaller shapes', b=['decompose_shapes'])
@@ -666,7 +666,7 @@ for _s in ('R.B12.S5', 'R.B12.S6', 'R.B12.S7', 'R.B17.S1', 'R.B17.S2', 'R.B17.S3
     addpre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the pattern', {'forms': [1]}))
 for _s in ('R.B8.S1', 'R.B8.S2'): addpre(_s, (COB, 'R.B2.S1 / R.B10 compare by size: the compare words', {}))
 for _s in ('R.B10.S1', 'R.B10.S2'): addpre(_s, (HL, 'R.B2.S2 / R.B8.S1 compare two objects (mass): the compare words', {}))
-for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S4 sort and count one kind', {'band': 3}))
+for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S4 sort and count one kind (pictures)', {'band': 3, 'objects': 'pictures'}))
 addpre('Y1.B14.S5', (CLK, 'the numbers on the clock face', {'task': 'numerals'}), (CS, 'Y1.B4.S7 the order of the numbers to 20 (1 to 12 on the clock)', {'band': 20, 'dir': 'forward'}))
 # Rule 18 content and layout: skills whose response or content no PK / K pupil meets, never a pre / related link in R or Y1
 # (they may still be a step's own direct or partial skill, with the defect named there):
@@ -682,7 +682,7 @@ PIC = 'measurement:pictograph_intro'; BARI = 'measurement:bar_graph_intro'; NLAV
 SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'measurement:time_match_clock'; EQS2 = 'addition:equal_sign'
 EXTRA = {
  'sort': [(PIC, 'the sorted groups as rows of a picture graph, counted', {'forms': [0]})],
- 'compare': [(PIC, 'count two rows of a picture graph', {'forms': [0]})],
+ 'compare': [(PIC, 'count a row of a picture graph', {'forms': [0]})],
  'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the bond as a jump on a 0-10 line (a + b = ?)', {'range': 10, 'unknown': 'answer'})],
  'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10, 'unknown': 'answer'})],
  'oddeven': [(SEO, 'circle the even or the odd numbers (numbers to 20: the skill\'s floor is 20)', {'range': 10})],
@@ -717,8 +717,8 @@ for _s in ('R.B11.S11', 'R.B11.S12'):
     prepre(_s, (CO, 'R.B9.S1 / R.B11.S1 count each group', {'band': 10, 'objects': 'frame'}), (CG, 'R.B1.S7 the two groups are the same', {'band': 10}))
     S[_s]['xp'] += [A3]
 S['R.B14.S2']['xp'] += [A3]
-prepre('R.B3.S3', (CO, 'R.B3.S1 find groups of 1, 2 and 3', {'band': 5, 'objects': 'pictures'}), (CC, 'R.B1.S4 count one kind, to 3', {'band': 3}))
-prepre('R.B3.S1', (CC, 'R.B1.S4 count one kind, to 3', {'band': 3}))
+prepre('R.B3.S3', (CO, 'R.B3.S1 find groups of 1, 2 and 3', {'band': 5, 'objects': 'pictures'}), (CC, 'R.B1.S4 count one kind, to 3 (pictures)', {'band': 3, 'objects': 'pictures'}))
+prepre('R.B3.S1', (CC, 'R.B1.S4 count one kind, to 3 (pictures)', {'band': 3, 'objects': 'pictures'}))
 prepre('Y1.B1.S6', (CS, 'R.B13.S4 count on past 10', {'band': 20, 'dir': 'forward'}), (NSF, 'R.B13.S2 / S4 a number track to 20', {'step': 1, 'range': 20}))
 prepre('Y1.B2.S9', (CS, 'Y1.B1.S6 count on from any number', {'band': 10, 'dir': 'forward'}))
 for _s in ('R.B16.S2', 'R.B16.S4'): S[_s]['r'] += [(HALF, 'sharing between two is halving (to 10)', {'band': 10})]
@@ -859,3 +859,26 @@ NOLINK_WHY = {AWP: 'a word-work cell with a + − × ÷ bank, not a PK / K respo
   SHF: 'it deals quarters and eighths with the 1/2 symbol', FOS: 'it leaks thirds, fifths and sixths', 'measurement:bar_graph_intro': 'it asks for a typed category name',
   A3: 'a three-addend sum (1.OA.A.2)', CMPW: 'a comparison word problem, not a Reception response', SEO: 'it deals 1-20 whatever the range (generator floor 20)'}
 FORM_LABEL.update({MAS: 'missing numbers in + and − sentences', HCF: 'the hundred square', B10: 'build tens and ones with blocks'})
+
+# ---------------- Round 10 (critic R-Y1 r9) ----------------
+BLOCKS[CO] = BLOCKS[CO] | {'bond', 'share'}; BLOCKS[CG] = BLOCKS[CG] | {'share'}
+BLOCKS[CS + '{"band": 10, "dir": "forward"}'] = {'tens'}
+BLOCK_EXCEPT |= {(CS, 'Y1.B1.S4'), (CMP, 'Y1.B3.S4'), (NSF, 'Y1.B1.S10')}
+for _s, _sub in (('R.B3.S3', 'R.B3.S2 Subitise 1, 2 and 3'), ('R.B5.S3', 'R.B5.S2 Subitise 4 and 5'), ('R.B7.S4', 'R.B7.S3 Subitise 0 to 5')):
+    S[_s]['p'] += [(CO, _sub + ': see the amount, then build it', {'band': 5, 'objects': 'dice'})]
+prepre('R.B11.S9', (CO, 'R.B11.S1 count that each arrangement is still 10', {'band': 10, 'objects': 'frame'}))
+prepre('R.B13.S1', (CS, 'R.B11.S5 the number after: 10 and 1 more is 11', {'band': 10, 'dir': 'forward'}))
+for _s in ('Y1.B9.S5', 'Y1.B9.S8', 'Y1.B9.S9'):
+    S[_s]['p'] += [(CG, 'Y1.B9.S4 / Y1.B1.S11 are the groups the same?', {'band': 10}), (CO, 'count the total, to 20', {'band': 20})]
+S['Y1.B10.S6']['p'] += [(N2D, 'name the shape being split', {'forms': [1], 'shapes': [0, 1, 2]})]
+S['R.B17.S9']['n'] = (S['R.B17.S9']['n'] + ' ' if S['R.B17.S9']['n'] else '')
+for _s in ('R.B12.S2', 'R.B12.S3', 'R.B12.S4'):
+    prepre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the flat shapes (circles, triangles, squares, rectangles)', {'forms': [1], 'shapes': [0, 1, 2]}))
+NEW['shape_fit_turn'] = dict(kind='option', skill='shapes_early:compose_shapes', option="task: 'fit' (turn or flip one shape to fit its outline)",
+   name='Turn It to Fit (option)', teaches='look at a shape and an outline, and tap the turned or flipped copy that fits the outline',
+   representation='one outline in the cell and three copies of the shape at different turns; tap the one that fits', family='geometry', ccss=['K.G.B.6'],
+   why='compose_shapes only puts two shapes together; it never turns or flips a shape to fit')
+# few.py review (critic r9): real building blocks the short lists missed
+BLOCKS[CO] = BLOCKS[CO] | {'oddeven'}
+S['R.B11.S13']['p'] += [(CO, 'R.B9.S6 / R.B11.S1 count the objects before pairing them', {'band': 10, 'objects': 'frame'})]
+# (compose_shapes {shapes:[1]} as a lower rung on R.B15 was tried: its items are only Square / Rectangle, 2 distinct, so it is not linked)

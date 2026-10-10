@@ -100,9 +100,7 @@
      }
     }
    ],
-   "preBuild": [
-    "position_map"
-   ],
+   "preBuild": [],
    "related": [],
    "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
@@ -156,9 +154,7 @@
      }
     }
    ],
-   "preBuild": [
-    "position_map"
-   ],
+   "preBuild": [],
    "related": [],
    "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step)."
   },
@@ -186,6 +182,14 @@
      }
     },
     {
+     "key": "counting:count_objects",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (school prior learning, week W01)",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     }
+    },
+    {
      "key": "composing:ten_frame_build",
      "why": "R.B3.S3 Represent 1, 2 and 3 (school prior learning, week W01)",
      "opts": {
@@ -193,17 +197,22 @@
      }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "R.B11.S6 1 less (count back: a building block)",
+     "key": "counting:count_objects",
+     "why": "R.B9.S1 Find 6, 7 and 8 (school prior learning, week W01)",
      "opts": {
       "band": 10,
-      "dir": "back"
+      "objects": "frame"
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S3 Count objects from a larger group (earlier, same idea: find)",
+     "opts": {
+      "band": 10
      }
     }
    ],
-   "preBuild": [
-    "position_map"
-   ],
+   "preBuild": [],
    "related": [],
    "note": "Related: none; the candidate links are count_objects (a pre-skill here)."
   },
@@ -513,12 +522,10 @@
      }
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S3 Count objects from a larger group (count a group: a building block)",
      "opts": {
-      "step": 1,
-      "dir": "back",
-      "range": 10
+      "band": 10
      }
     }
    ],
@@ -526,7 +533,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -585,7 +592,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -654,7 +661,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -703,7 +710,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -755,7 +762,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -1962,7 +1969,7 @@
     "shape_3d_tasks"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B15.S8, R.B12.S4, R.B12.S3 have no live skill yet (see preBuild). Related: none; the candidate links are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here)."
+   "note": "Pre: 2 only; the earlier steps R.B15.S8, R.B12.S4, R.B12.S3 have no live skill yet (see preBuild); the neighbouring-idea skills of earlier steps (compose_shapes, compose_hexagon, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here)."
   },
   "Y1.B3.S2": {
    "title": "Sort 3-D shapes",
@@ -2125,23 +2132,13 @@
        1
       ]
      }
-    },
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B15.S6 Decompose shapes (two shapes make a new shape: a building block)",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "preBuild": [
     "shape_3d_tasks"
    ],
    "related": [],
-   "note": "Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s))."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shape_attributes); the other earlier skills on this idea do not fit this step (shape_name_match_2d: its content is past this grade); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet; the neighbouring-idea skills of earlier steps (shape_name_match_3d, compose_shapes, compose_hexagon) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s))."
   },
   "Y1.B3.S5": {
    "title": "Patterns with 2-D and 3-D shapes",
@@ -2822,7 +2819,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -2870,7 +2867,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "count two rows of a picture graph",
+     "why": "count a row of a picture graph",
      "opts": {
       "forms": [
        0
@@ -4116,7 +4113,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual). Related: none; the candidate links are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
   },
   "Y1.B8.S2": {
    "title": "Measure mass",
@@ -4204,7 +4201,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see build). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see build); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard, order_objects_length) are not judged building blocks of this step (spec.BLOCKS). Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S5": {
    "title": "Compare volume",
@@ -4534,13 +4531,17 @@
    "build": [],
    "pre": [
     {
-     "key": "composing:odd_even",
-     "why": "R.B9.S6 Make pairs-odd and even (school prior learning, week W19)",
+     "key": "comparing:compare_groups",
+     "why": "Y1.B9.S4 / Y1.B1.S11 are the groups the same?",
      "opts": {
-      "forms": [
-       2
-      ],
-      "range": 10
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "count the total, to 20",
+     "opts": {
+      "band": 20
      }
     },
     {
@@ -4553,7 +4554,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "\"___ groups of ___ make ___ in all\" with rings of dots. Pre: 2 only; the other earlier skills on this idea do not fit this step (equal_or_unequal_groups: it uses x or ÷); the earlier steps R.B16.S1 have no live skill yet. Related: none; the candidate links are repeated_add_to_mult (its content is past this grade); share_into_groups (a pre-skill here); arrays_groups (a direct skill here)."
+   "note": "\"___ groups of ___ make ___ in all\" with rings of dots. Related: none; the candidate links are repeated_add_to_mult (its content is past this grade); share_into_groups (a pre-skill here); arrays_groups (a direct skill here)."
   },
   "Y1.B9.S6": {
    "title": "Make arrays",
@@ -4672,13 +4673,17 @@
    "build": [],
    "pre": [
     {
-     "key": "composing:odd_even",
-     "why": "R.B9.S6 Make pairs-odd and even (school prior learning, week W33)",
+     "key": "comparing:compare_groups",
+     "why": "Y1.B9.S4 / Y1.B1.S11 are the groups the same?",
      "opts": {
-      "forms": [
-       2
-      ],
-      "range": 10
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "count the total, to 20",
+     "opts": {
+      "band": 10
      }
     },
     {
@@ -4696,7 +4701,7 @@
     "share_group"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (share_into_groups); the other earlier skills on this idea do not fit this step (arrays_groups: it deals numbers to 25, past this step (12); equal_or_unequal_groups: it uses x or ÷); the earlier steps R.B16.S1 have no live skill yet (see preBuild). Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\"); share_into_groups (a direct skill here)."
+   "note": "Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\"); share_into_groups (a direct skill here)."
   },
   "Y1.B9.S9": {
    "title": "Make equal groups - sharing",
@@ -4717,13 +4722,17 @@
    ],
    "pre": [
     {
-     "key": "composing:odd_even",
-     "why": "R.B9.S6 Make pairs-odd and even (school prior learning, week W33)",
+     "key": "comparing:compare_groups",
+     "why": "Y1.B9.S4 / Y1.B1.S11 are the groups the same?",
      "opts": {
-      "forms": [
-       2
-      ],
-      "range": 10
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "count the total, to 20",
+     "opts": {
+      "band": 10
      }
     },
     {
@@ -4739,7 +4748,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (share_into_groups); the other earlier skills on this idea do not fit this step (arrays_groups: it deals numbers to 25, past this step (12); equal_or_unequal_groups: it uses x or ÷); the earlier steps R.B16.S1 have no live skill yet (see build). Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\")."
+   "note": "Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\")."
   },
   "Y1.B10.S1": {
    "title": "Recognise a half of an object or a shape",
@@ -4908,7 +4917,7 @@
      }
     }
    ],
-   "note": "Pre: 2 only; the pre-skills above come from earlier steps on neighbouring ideas, judged as building blocks."
+   "note": "Pre: 2 only; the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS)."
   },
   "Y1.B10.S4": {
    "title": "Find a half of a quantity",
@@ -4943,7 +4952,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "halve: \"Half of 8\" within 10. Pre: 2 only; the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions). Related: none; the candidate links are fraction_of_set (it leaks thirds, fifths and sixths); double (a pre-skill here)."
+   "note": "halve: \"Half of 8\" within 10. Pre: 2 only; the other earlier skills on this idea do not fit this step (fraction_of_set: it shows fractions); the neighbouring-idea skills of earlier steps (partition_shapes, shade_fraction) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are fraction_of_set (it leaks thirds, fifths and sixths); double (a pre-skill here)."
   },
   "Y1.B10.S5": {
    "title": "Recognise a quarter of an object or a shape",
@@ -4992,7 +5001,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (partition_shapes); the other earlier skills on this idea do not fit this step (shade_fraction: it shows fractions). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (partition_shapes); the other earlier skills on this idea do not fit this step (shade_fraction: it shows fractions); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
   },
   "Y1.B10.S6": {
    "title": "Find a quarter of an object or a shape",
@@ -5015,6 +5024,20 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name the shape being split",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "shapes": [
+       0,
+       1,
+       2
+      ]
+     }
+    },
+    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (halving: a building block)",
      "opts": {
@@ -5025,7 +5048,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shade_fraction); the other earlier skills on this idea do not fit this step (partition_shapes: it asks for typed fraction notation (1/2, 3/4)). Related: none; the candidate links are partition_shapes (taught at an earlier step (Y1.B10.S5), but it asks for typed fraction notation (1/2, 3/4)); fraction_of_set (it leaks thirds, fifths and sixths)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shade_fraction); the other earlier skills on this idea do not fit this step (partition_shapes: it asks for typed fraction notation (1/2, 3/4)); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are partition_shapes (taught at an earlier step (Y1.B10.S5), but it asks for typed fraction notation (1/2, 3/4)); fraction_of_set (it leaks thirds, fifths and sixths)."
   },
   "Y1.B10.S7": {
    "title": "Recognise a quarter of a quantity",
@@ -5066,7 +5089,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol); fraction_of_set (a direct skill here)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol); fraction_of_set (a direct skill here)."
   },
   "Y1.B10.S8": {
    "title": "Find a quarter of a quantity",
@@ -5107,7 +5130,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
+   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
   },
   "Y1.B11.S1": {
    "title": "Describe turns",
@@ -5148,7 +5171,7 @@
     "position_map"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S11, R.B17.S10, R.B17.S8 have no live skill yet (see preBuild). Related: none; the candidate links are shape_positions (a pre-skill here)."
+   "note": "Pre: 2 only; the earlier steps R.B17.S11, R.B17.S10, R.B17.S9 have no live skill yet (see preBuild). Related: none; the candidate links are shape_positions (a pre-skill here)."
   },
   "Y1.B11.S2": {
    "title": "Describe position - left and right",
@@ -6265,24 +6288,6 @@
    "closes": "R.B1.S3: deciding which objects belong to a set and which does not",
    "reused": true
   },
-  "position_map": {
-   "kind": "new",
-   "skill": "shapes_early:position_and_maps",
-   "name": "Where Is It? Positions and Maps",
-   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
-   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
-   "family": "geometry",
-   "steps": [
-    "Y1.B11.S2",
-    "Y1.B11.S3"
-   ],
-   "ccss": [
-    "K.G.A.1"
-   ],
-   "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "Y1.B11.S2: left and right: shape_positions deals only above, below, beside and between; Y1.B11.S3: forwards and backwards moves",
-   "reused": true
-  },
   "ten_count_out": {
    "kind": "new",
    "skill": "counting:count_out",
@@ -7004,6 +7009,24 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "closes": "R.B15.S4: describing how shapes are arranged; R.B15.S7: copying a picture made of 2-D shapes; R.B17.S4: replicating a scene or construction from a model; R.B17.S5: visualising objects from different positions",
+   "reused": true
+  },
+  "position_map": {
+   "kind": "new",
+   "skill": "shapes_early:position_and_maps",
+   "name": "Where Is It? Positions and Maps",
+   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
+   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
+   "family": "geometry",
+   "steps": [
+    "Y1.B11.S2",
+    "Y1.B11.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "closes": "Y1.B11.S2: left and right: shape_positions deals only above, below, beside and between; Y1.B11.S3: forwards and backwards moves",
    "reused": true
   },
   "ordinal": {
