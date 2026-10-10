@@ -14,7 +14,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre-number step; no existing skill matches pictures. Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the candidate links are compare_groups (a counting skill; this step has no numbers); classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Pre-number step; no existing skill matches pictures. Left out from the block's other steps: classify_count (its sort comes later, at R.B1.S4). Pre: 0 only; this is the first step on this idea (sort) in the curriculum. Related: none; the candidate links are compare_groups (a counting skill; this step has no numbers); classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S2": {
    "title": "Match pictures and objects",
@@ -28,7 +28,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see build). Related: none; the candidate links are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Left out from the block's other steps: classify_count (its sort comes later, at R.B1.S4). Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see build). Related: none; the candidate links are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S3": {
    "title": "Identify a set",
@@ -44,7 +44,7 @@
     "match_same"
    ],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the candidate links are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
+   "note": "Left out from the block's other steps: classify_count (its sort comes later, at R.B1.S4). Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: none; the candidate links are classify_count (it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); pictograph_intro (a counting skill; this step has no numbers)."
   },
   "R.B1.S4": {
    "title": "Sort objects to a type",
@@ -1194,7 +1194,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Tap every square / rectangle (forms 1, shapes squares and rectangles). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s)); name_2d_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
+   "note": "Tap every square / rectangle (forms 1, shapes squares and rectangles). Left out from the block's other steps: compose_shapes (combining 4-sided shapes comes later, at R.B6.S2). Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B4.S3 have no live skill yet (see preBuild). Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s)); name_2d_shapes (a direct skill here); shape_name_match_2d (its content is past this grade)."
   },
   "R.B6.S2": {
    "title": "Combine shapes with 4 sides",
@@ -1994,7 +1994,7 @@
      "opts": {
       "band": 10
      },
-     "missing": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)"
+     "missing": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10: in 192 items whole 2 once, 3-5 in 45, 6-10 in 146)"
     }
    ],
    "verdict": "partial",
@@ -4043,7 +4043,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B6.S3, R.B4.S3 have no live skill yet (see preBuild); the neighbouring-idea skills of earlier steps (compose_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
+   "note": "Left out from the block's other steps: compose_shapes (putting two shapes together is not a block of choosing a shape for a job). Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_attributes: it asks about vertices); the earlier steps R.B6.S3, R.B4.S3 have no live skill yet (see preBuild); the neighbouring-idea skills of earlier steps (compose_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_name_match_2d (its content is past this grade); shape_attributes (taught at an earlier step (R.B4.S2), but it asks about vertices)."
   },
   "R.B15.S2": {
    "title": "Rotate shapes",
@@ -4719,13 +4719,36 @@
      }
     },
     {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 / R.B6.S1 name the shapes in the scene",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "shapes": [
+       0,
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 name the solids in the construction",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "shapes_early:shape_positions",
      "why": "R.B4.S4 Describe position (earlier, same idea: position)"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; every earlier step on this idea (R.B4.S4) is represented by its skill above. Related: none; the candidate links are compose_shapes (a pre-skill here); shape_positions (a pre-skill here)."
+   "note": "Related: none; the candidate links are compose_shapes (a pre-skill here); shape_positions (a pre-skill here)."
   },
   "R.B17.S5": {
    "title": "Visualise from different positions",
@@ -4863,13 +4886,32 @@
        2
       ]
      }
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 name the solids being built with",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 two shapes put together make a new shape",
+     "opts": {
+      "shapes": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "preBuild": [
     "scenes"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S5, R.B17.S4 have no live skill yet (see preBuild). Related: none; the candidate links are name_2d_shapes (a pre-skill here)."
+   "note": "Related: none; the candidate links are name_2d_shapes (a pre-skill here)."
   },
   "R.B17.S8": {
    "title": "Explore mapping",
@@ -4904,7 +4946,7 @@
     "scenes"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S5, R.B17.S4 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Left out from the block's other steps: name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites). Pre: 2 only; the earlier steps R.B17.S5, R.B17.S4 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S9": {
    "title": "Represent maps with models",
@@ -4937,7 +4979,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S8, R.B17.S5, R.B17.S4 have no live skill yet. Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Left out from the block's other steps: name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites). Pre: 2 only; the earlier steps R.B17.S8, R.B17.S5, R.B17.S4 have no live skill yet. Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S10": {
    "title": "Create own maps from familiar places",
@@ -4970,7 +5012,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S9, R.B17.S8, R.B17.S5 have no live skill yet. Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Left out from the block's other steps: name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites). Pre: 2 only; the earlier steps R.B17.S9, R.B17.S8, R.B17.S5 have no live skill yet. Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S11": {
    "title": "Create own maps and plans from story situations",
@@ -5003,7 +5045,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S10, R.B17.S9, R.B17.S8 have no live skill yet (see build). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Left out from the block's other steps: name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites). Pre: 2 only; the earlier steps R.B17.S10, R.B17.S9, R.B17.S8 have no live skill yet (see build). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B18.S1": {
    "title": "Deepen understanding",
@@ -5902,7 +5944,7 @@
    "key": "composing:number_bonds",
    "step": "R.B9.S5",
    "action": "partial",
-   "why": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)"
+   "why": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10: in 192 items whole 2 once, 3-5 in 45, 6-10 in 146)"
   },
   {
    "key": "number_sense:doubles_near_doubles",

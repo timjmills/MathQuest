@@ -11,7 +11,7 @@ record each critic round (r1-r10) and what changed.
 | 119 | 15 | 71 | 33 |
 
 - Proposals used: 33. 22 reuse existing ids; 11 are new (rule 13 short form): `add_10_pictures`, `band_3`, `bonds_3_parts`, `decompose_shapes`, `doubles_pictured`, `more_less_pictures`, `number_focus`, `oral_count`, `pictures_change_unknown`, `shape_fit_turn`, `sub_10_pictures`.
-- Tag fixes: 60. Steps with fewer than 3 pre: 58. Steps with no related link: 82. Every one of these
+- Tag fixes: 60. Steps with fewer than 3 pre: 56. Steps with no related link: 82. Every one of these
   has a note that gives its single reason.
 
 ## What changed (round 3)
@@ -254,3 +254,13 @@ record each critic round (r1-r10) and what changed.
   R.B9.S5 ("band 10 deals wholes 2-10").
 - **M9.** R.B6.S2's note says `compose_shapes {shapes:[1]}` deals only two items (square, rectangle).
 - Counts: 119 steps, 15 full, 71 partial, 33 gap.
+- **Block siblings (`sib.py`, read row by row).** Of 343 rows, 92 offered a pre-skill from a sibling step on the same
+  sub-idea. Each was either added or named as rejected in the step's note ("Left out from the block's other steps: …"),
+  with its reason: taught later, a different idea, or no units or counting.
+  - Added: R.B17.S4 and R.B17.S7 (shape and solid names, two shapes make a new shape); Y1.B10.S2, S5, S6 (equal groups;
+    S6 also two shapes make one); Y1.B10.S7, S8 (doubles); Y1.B14.S6 (`count_sequence {band:20}`, the numbers 1 to 12
+    round the clock).
+  - Named as rejected: R.B1.S1-S3, R.B6.S1, R.B15.S1, the R.B17.S8-S11 maps, Y1.B3.S1, Y1.B8.S1, Y1.B8.S4, Y1.B10.S3,
+    Y1.B11.S1-S2 and Y1.B14.S1-S4.
+- **R.B9.S5.** The wholes are now the observed ones: band 10 deals wholes 2-10. Over 3 seeds and 192 items, whole 2
+  appears once, 3-5 in 45 items and 6-10 in 146.

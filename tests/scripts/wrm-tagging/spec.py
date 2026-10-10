@@ -136,7 +136,7 @@ st('R.B9.S3', d=[P(CS,'one more within 8 with objects (deals to 10, no objects)'
    m='one more than 5, 6 and 7 with objects', b=['more_less_pictures', 'number_focus'])
 st('R.B9.S4', d=[P(CS,'one less within 8 with objects (deals to 10, no objects)', band=10, dir='back')], v='partial',
    m='one less than 6, 7 and 8 with objects', b=['more_less_pictures', 'number_focus'])
-st('R.B9.S5', d=[P(NB,'wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)', band=10)], v='partial',
+st('R.B9.S5', d=[P(NB,'wholes 6-8 only, pictured parts (band 10 deals wholes 2-10: in 192 items whole 2 once, 3-5 in 45, 6-10 in 146)', band=10)], v='partial',
    m='composition of 6, 7 and 8 only, with pictured parts', b=['number_focus'],
    p=[(NB,'R.B7.S7 / R.B5.S7 bonds to 5 first',{'band':5}),(CO,'R.B9.S1 count the whole (to 10)',{'band':10,'objects':'frame'})])
 st('R.B9.S6', d=[P(OE,'making pairs of objects to see odd and even; the skill names odd or even numbers', forms=[2], range=10)], v='partial',
@@ -891,3 +891,34 @@ for _s in ('Y1.B9.S5', 'Y1.B9.S8', 'Y1.B9.S9'):
     S[_s]['xp'] += [OE]
     S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + ('R.B9.S6 Make pairs (school prior learning) is not linked: its skill odd_even {forms:[2]} asks '
         '"Which number is even?" (the last-digit rule), not pairs of objects.')
+
+# sib.py review (critic r10): every same-sub-idea pre a block sibling carries and a short-pre step lacks, decided one by one
+S['R.B17.S4']['p'] += [(N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the scene', {'forms': [1], 'shapes': [0, 1, 2]}), (N3D, 'R.B12.S1 name the solids in the construction', {'forms': [1]})]
+S['R.B17.S7']['p'] += [(N3D, 'R.B12.S1 name the solids being built with', {'forms': [1]}), (CMP, 'R.B15.S5 two shapes put together make a new shape', {'shapes': [0, 1]})]
+for _s in ('Y1.B10.S2', 'Y1.B10.S5', 'Y1.B10.S6'): S[_s]['p'] += [(SHG, 'R.B16 grouping into equal groups: equal parts', {'band': 12})]
+S['Y1.B10.S6']['p'] += [(CMP, 'R.B15.S5 / S6 two shapes make one shape', {'shapes': [0, 1]})]
+for _s in ('Y1.B10.S7', 'Y1.B10.S8'): S[_s]['p'] += [(DBL, 'Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)', {'band': 20})]
+S['Y1.B14.S6']['p'] += [(CS, 'Y1.B4.S7 the order of the numbers 1 to 12 round the clock', {'band': 20, 'dir': 'forward'})]
+SIB_REJECT = {
+ 'R.B1.S1': 'classify_count (its sort comes later, at R.B1.S4)', 'R.B1.S2': 'classify_count (its sort comes later, at R.B1.S4)',
+ 'R.B1.S3': 'classify_count (its sort comes later, at R.B1.S4)',
+ 'R.B6.S1': 'compose_shapes (combining 4-sided shapes comes later, at R.B6.S2)',
+ 'R.B15.S1': 'compose_shapes (putting two shapes together is not a block of choosing a shape for a job)',
+ 'R.B17.S8': 'name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites)',
+ 'R.B17.S9': 'name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites)',
+ 'R.B17.S10': 'name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites)',
+ 'R.B17.S11': 'name_2d_shapes and compose_shapes (a map uses position words and models, not shape names or composites)',
+ 'Y1.B3.S1': 'classify_count (sorting is not a block of naming solids)',
+ 'Y1.B8.S1': 'measure_nonstandard and count_objects (heavier / lighter compares without units or counting)',
+ 'Y1.B8.S4': 'measure_nonstandard and count_objects (full and empty uses no units or counting)',
+ 'Y1.B10.S2': 'halve (half of a quantity comes later, at Y1.B10.S4)', 'Y1.B10.S3': 'halve (half of a number comes later, at Y1.B10.S4)',
+ 'Y1.B10.S5': 'halve (half of a quantity comes later in the school order, at Y1.B10.S4)',
+ 'Y1.B11.S1': 'count_sequence, number_seq_fill and count_objects from Y1.B11.S3 / S5 (counting is not a block of turning)',
+ 'Y1.B11.S2': 'count_sequence, number_seq_fill and count_objects from Y1.B11.S3 / S5 (counting is not a block of left and right)',
+ 'Y1.B14.S1': 'time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of ordering events)',
+ 'Y1.B14.S2': 'time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of naming days)',
+ 'Y1.B14.S3': 'time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of naming months)',
+ 'Y1.B14.S4': 'time_hour, clock_parts and count_sequence (clock reading comes after this step, at Y1.B14.S5)',
+}
+for _s, _r in SIB_REJECT.items():
+    S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + 'Left out from the block\'s other steps: ' + _r + '.'

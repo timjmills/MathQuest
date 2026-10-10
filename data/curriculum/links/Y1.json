@@ -2013,7 +2013,7 @@
     "shape_3d_tasks"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B15.S8, R.B12.S4, R.B12.S3 have no live skill yet (see preBuild); the neighbouring-idea skills of earlier steps (compose_shapes, compose_hexagon, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here)."
+   "note": "Left out from the block's other steps: classify_count (sorting is not a block of naming solids). Pre: 2 only; the earlier steps R.B15.S8, R.B12.S4, R.B12.S3 have no live skill yet (see preBuild); the neighbouring-idea skills of earlier steps (compose_shapes, compose_hexagon, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shape_name_match_3d (a direct skill here); name_3d_shapes (a direct skill here)."
   },
   "Y1.B3.S2": {
    "title": "Sort 3-D shapes",
@@ -4180,7 +4180,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
+   "note": "Left out from the block's other steps: measure_nonstandard and count_objects (heavier / lighter compares without units or counting). Pre: 2 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compare_objects (a pre-skill here); heavier_lighter_visual (a direct skill here)."
   },
   "Y1.B8.S2": {
    "title": "Measure mass",
@@ -4268,7 +4268,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see build); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard, order_objects_length) are not judged building blocks of this step (spec.BLOCKS). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Left out from the block's other steps: measure_nonstandard and count_objects (full and empty uses no units or counting). Pre: 2 only; the earlier steps R.B8.S4, R.B8.S3, R.B2.S3 have no live skill yet (see build); the neighbouring-idea skills of earlier steps (reading_ruler, measure_nonstandard, order_objects_length) are not judged building blocks of this step (spec.BLOCKS). Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S5": {
    "title": "Compare volume",
@@ -4924,6 +4924,13 @@
        1
       ]
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16 grouping into equal groups: equal parts",
+     "opts": {
+      "band": 12
+     }
     }
    ],
    "preBuild": [],
@@ -4936,7 +4943,7 @@
      }
     }
    ],
-   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (partition_shapes: it asks for typed fraction notation (1/2, 3/4))."
+   "note": "Left out from the block's other steps: halve (half of a quantity comes later, at Y1.B10.S4)."
   },
   "Y1.B10.S3": {
    "title": "Recognise a half of a quantity",
@@ -4984,7 +4991,7 @@
      }
     }
    ],
-   "note": "Pre: 2 only; the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS)."
+   "note": "Left out from the block's other steps: halve (half of a number comes later, at Y1.B10.S4). Pre: 2 only; the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS)."
   },
   "Y1.B10.S4": {
    "title": "Find a half of a quantity",
@@ -5064,11 +5071,18 @@
        1
       ]
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16 grouping into equal groups: equal parts",
+     "opts": {
+      "band": 12
+     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (partition_shapes {\"parts\": [0]}: it asks for typed fraction notation (1/2, 3/4); shade_fraction: it shows fractions); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
+   "note": "Left out from the block's other steps: halve (half of a quantity comes later in the school order, at Y1.B10.S4). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
   },
   "Y1.B10.S6": {
    "title": "Find a quarter of an object or a shape",
@@ -5105,17 +5119,26 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (halving: a building block)",
+     "key": "division:share_into_groups",
+     "why": "R.B16 grouping into equal groups: equal parts",
      "opts": {
-      "band": 10,
-      "range": 10
+      "band": 12
+     }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 / S6 two shapes make one shape",
+     "opts": {
+      "shapes": [
+       0,
+       1
+      ]
      }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shade_fraction); the other earlier skills on this idea do not fit this step (partition_shapes: it asks for typed fraction notation (1/2, 3/4)); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are partition_shapes (taught at an earlier step (Y1.B10.S5), but it asks for typed fraction notation (1/2, 3/4)); fraction_of_set (it leaks thirds, fifths and sixths)."
+   "note": "Related: none; the candidate links are partition_shapes (taught at an earlier step (Y1.B10.S5), but it asks for typed fraction notation (1/2, 3/4)); fraction_of_set (it leaks thirds, fifths and sixths)."
   },
   "Y1.B10.S7": {
    "title": "Recognise a quarter of a quantity",
@@ -5146,6 +5169,13 @@
      }
     },
     {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fracqty)",
      "opts": {
@@ -5156,7 +5186,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol); fraction_of_set (a direct skill here)."
+   "note": "Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol); fraction_of_set (a direct skill here)."
   },
   "Y1.B10.S8": {
    "title": "Find a quarter of a quantity",
@@ -5187,6 +5217,13 @@
      }
     },
     {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fracqty)",
      "opts": {
@@ -5197,7 +5234,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (fraction_of_set); the neighbouring-idea skills of earlier steps (shade_fraction, partition_shapes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
+   "note": "Related: none; the candidate links are halve (a pre-skill here); shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
   },
   "Y1.B11.S1": {
    "title": "Describe turns",
@@ -5238,7 +5275,7 @@
     "position_map"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S11, R.B17.S10, R.B17.S9 have no live skill yet (see preBuild). Related: none; the candidate links are shape_positions (a pre-skill here)."
+   "note": "Left out from the block's other steps: count_sequence, number_seq_fill and count_objects from Y1.B11.S3 / S5 (counting is not a block of turning). Pre: 2 only; the earlier steps R.B17.S11, R.B17.S10, R.B17.S9 have no live skill yet (see preBuild). Related: none; the candidate links are shape_positions (a pre-skill here)."
   },
   "Y1.B11.S2": {
    "title": "Describe position - left and right",
@@ -5280,7 +5317,7 @@
     "turns"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps Y1.B11.S1, R.B17.S11, R.B17.S10 have no live skill yet. Related: none; the candidate links are shape_positions (a pre-skill here)."
+   "note": "Left out from the block's other steps: count_sequence, number_seq_fill and count_objects from Y1.B11.S3 / S5 (counting is not a block of left and right). Pre: 2 only; the earlier steps Y1.B11.S1, R.B17.S11, R.B17.S10 have no live skill yet. Related: none; the candidate links are shape_positions (a pre-skill here)."
   },
   "Y1.B11.S3": {
    "title": "Describe position - forwards and backwards",
@@ -6154,7 +6191,7 @@
     "time_talk"
    ],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps Y1.B14.S3, Y1.B14.S2, R.B10.S6 have no live skill yet. Related: none; the candidate links are time_hour (clock time is taught from week 36); time_half_hour (clock time is taught from week 36); time_match_clock (clock time is taught from week 36)."
+   "note": "Left out from the block's other steps: time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of ordering events). Pre: 0 only; the earlier steps Y1.B14.S3, Y1.B14.S2, R.B10.S6 have no live skill yet. Related: none; the candidate links are time_hour (clock time is taught from week 36); time_half_hour (clock time is taught from week 36); time_match_clock (clock time is taught from week 36)."
   },
   "Y1.B14.S2": {
    "title": "Days of the week",
@@ -6170,7 +6207,7 @@
     "day_order"
    ],
    "related": [],
-   "note": "Pre: 0 only; the earlier steps R.B10.S6, R.B10.S5, R.B6.S4 have no live skill yet. Related: none; the candidate links are time_hour (clock time is taught from week 36); time_half_hour (clock time is taught from week 36); time_match_clock (clock time is taught from week 36)."
+   "note": "Left out from the block's other steps: time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of naming days). Pre: 0 only; the earlier steps R.B10.S6, R.B10.S5, R.B6.S4 have no live skill yet. Related: none; the candidate links are time_hour (clock time is taught from week 36); time_half_hour (clock time is taught from week 36); time_match_clock (clock time is taught from week 36)."
   },
   "Y1.B14.S3": {
    "title": "Months of the year",
@@ -6186,7 +6223,7 @@
     "day_order"
    ],
    "related": [],
-   "note": "Related: no live skill orders the months; the days-of-the-week build (time_talk) is the same idea. Pre: 0 only; the earlier steps Y1.B14.S2, R.B10.S6, R.B10.S5 have no live skill yet."
+   "note": "Related: no live skill orders the months; the days-of-the-week build (time_talk) is the same idea. Left out from the block's other steps: time_hour, clock_parts and count_sequence (clock reading comes later, at Y1.B14.S5, and is not a block of naming months). Pre: 0 only; the earlier steps Y1.B14.S2, R.B10.S6, R.B10.S5 have no live skill yet."
   },
   "Y1.B14.S4": {
    "title": "Hours, minutes and seconds",
@@ -6216,7 +6253,7 @@
      "why": "the next step on this idea: Y1.B14.S6 Tell the time to the half hour"
     }
    ],
-   "note": "Pre: 0 only; the earlier steps Y1.B14.S1, Y1.B14.S3, Y1.B14.S2 have no live skill yet (see preBuild)."
+   "note": "Left out from the block's other steps: time_hour, clock_parts and count_sequence (clock reading comes after this step, at Y1.B14.S5). Pre: 0 only; the earlier steps Y1.B14.S1, Y1.B14.S3, Y1.B14.S2 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S5": {
    "title": "Tell the time to the hour",
@@ -6287,6 +6324,14 @@
      "opts": {
       "task": "hands"
      }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 the order of the numbers 1 to 12 round the clock",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
     }
    ],
    "preBuild": [
@@ -6303,7 +6348,7 @@
      }
     }
    ],
-   "note": "Pre: 2 only; the earlier steps Y1.B14.S4, Y1.B14.S1, Y1.B14.S3 have no live skill yet (see preBuild)."
+   "note": ""
   }
  },
  "proposals": {

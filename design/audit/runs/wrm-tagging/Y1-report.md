@@ -11,7 +11,7 @@ record each critic round (r1-r10) and what changed.
 | 116 | 44 | 50 | 22 |
 
 - Proposals used: 47. 36 reuse existing ids; 11 are new (rule 13 short form): `add_10_pictures`, `family_add_only`, `half_or_not`, `halves_quarters_only`, `k_story`, `multiples_from_0`, `number_focus`, `ones_bonds_teen`, `sub_10_pictures`, `tens_name_100`, `unitise_coins`.
-- Tag fixes: 72. Steps with fewer than 3 pre: 20. Steps with no related link: 62. Every one of these
+- Tag fixes: 72. Steps with fewer than 3 pre: 14. Steps with no related link: 62. Every one of these
   has a note that gives its single reason.
 
 ## What changed (round 3)
@@ -269,3 +269,11 @@ record each critic round (r1-r10) and what changed.
     rule), not pairs of objects.
   - On S8 and S9 the why reads "count the total, to 10".
 - Counts: 116 steps, 44 full, 50 partial, 22 gap.
+- **Block siblings (`sib.py`, read row by row).** Of 343 rows, 92 offered a pre-skill from a sibling step on the same
+  sub-idea. Each was either added or named as rejected in the step's note ("Left out from the block's other steps: …"),
+  with its reason: taught later, a different idea, or no units or counting.
+  - Added: R.B17.S4 and R.B17.S7 (shape and solid names, two shapes make a new shape); Y1.B10.S2, S5, S6 (equal groups;
+    S6 also two shapes make one); Y1.B10.S7, S8 (doubles); Y1.B14.S6 (`count_sequence {band:20}`, the numbers 1 to 12
+    round the clock).
+  - Named as rejected: R.B1.S1-S3, R.B6.S1, R.B15.S1, the R.B17.S8-S11 maps, Y1.B3.S1, Y1.B8.S1, Y1.B8.S4, Y1.B10.S3,
+    Y1.B11.S1-S2 and Y1.B14.S1-S4.
