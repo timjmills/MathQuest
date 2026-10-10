@@ -1329,3 +1329,204 @@ Same command as round 6, against the round-6 file. Dropped links are listed in t
 3. Count the outside edges. What is the perimeter? → 10
 4. Count the outside edges. What is the perimeter? → 24
 
+
+# Round 8: generated items for every new or changed pre / related link
+
+Same command as round 6, against the round-7 file. Dropped links are listed in the report.
+
+**Y4.B4.S1 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[3],"band":100}` Max Number 10000 — the 3 row of the chart: the multiples written as products
+
+1. Fill in the missing products. → 18, 21, 27
+2. Fill in the missing products. → 15, 18, 24
+3. Fill in the missing products. → 3, 6, 12
+4. Fill in the missing products. → 21, 24, 30
+
+**Y4.B4.S2 related** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — equal-groups and array stories (the facts the stories use)
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B4.S3 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[6],"band":100}` Max Number 10000 — the 6 row of the chart
+
+1. Fill in the missing products. → 42, 48, 54
+2. Fill in the missing products. → 24, 42, 48
+3. Fill in the missing products. → 24, 30, 24
+4. Fill in the missing products. → 48, 42, 48
+
+**Y4.B4.S5 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[9],"band":100}` Max Number 10000 — the 9 row of the chart
+
+1. Fill in the missing products. → 63, 72, 90
+2. Fill in the missing products. → 45, 54, 72
+3. Fill in the missing products. → 18, 27, 54
+4. Fill in the missing products. → 63, 72, 81
+
+**Y4.B4.S7 related** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — equal-groups stories with 7 in a group
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B4.S8 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[7],"band":100}` Max Number 10000 — the 7 row of the chart
+
+1. Fill in the missing products. → 56, 63, 70
+2. Fill in the missing products. → 35, 21, 56
+3. Fill in the missing products. → 14, 21, 42
+4. Fill in the missing products. → 56, 56, 63
+
+**Y4.B4.S11 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[1],"band":100}` Max Number 10000 — the 1 row of the chart: n × 1 = n
+
+1. Fill in the missing products. → 6, 7, 9
+2. Fill in the missing products. → 5, 6, 8
+3. Fill in the missing products. → 2, 3, 6
+4. Fill in the missing products. → 7, 8, 10
+
+**Y4.B5.S14 related** `multiplication:mult_word_problems_plain` opts `{"range":100}` Max Number 10000 — multiplication stories
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B6.S8 related** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — equal sides as equal groups
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B7.S9 related** `fractions:graph_fractions` opts `{}` Max Number 10000 — fractions marked on a line (halves to eighths): equal ones land on one point
+
+1. Place 5/6 on the number line by clicking the correct tick mark. → 5
+2. Place 1/6 on the number line by clicking the correct tick mark. → 1
+3. Place 1/2 on the number line by clicking the correct tick mark. → 1
+4. Place 3/4 on the number line by clicking the correct tick mark. → 3
+
+**Y4.B7.S10 pre** `composing:fraction_number_line` opts `{}` Max Number 10000 — Y3.B6.S9 Equivalent fractions on a number line (lower grade, same idea)
+
+1. What fraction of the number line is shaded? → 1/4
+2. What fraction of the number line is shaded? → 1/2
+3. What fraction is shown at the arrow on the number line? → 1/3
+4. Place 5/8 on the number line by clicking the correct tick mark. → 5
+
+**Y4.B7.S10 related** `fractions:fraction_nl_drag` opts `{"denoms":[2]}` Max Number 10000 — quarters and eighths placed on one line: 2/4 and 4/8 share a point
+
+1. Put each number on the number line. → 1/8, 6/8, 7/8
+2. Put each number on the number line. → 1/4, 2/4, 3/4
+3. Put each number on the number line. → 2/8, 3/8, 6/8
+4. Put each number on the number line. → 2/8, 6/8, 7/8
+
+**Y4.B8.S6 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B8.S7 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — cents are hundredths of a dollar (37¢ = $0.37)
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B8.S8 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B8.S9 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B8.S10 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B9.S1 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B9.S2 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B9.S3 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B9.S4 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B9.S4 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B9.S5 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B9.S6 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B9.S8 pre** `composing:compose_whole` opts `{}` Max Number 10000 — Y3.B6.S4 Understand the whole (lower grade, same idea)
+
+1. Use halves and quarters and eighths to make 1 whole. → 1 whole
+2. Use halves and quarters and eighths to make 1 whole. → 1 whole
+3. Use halves and quarters to make 1 whole. → 1 whole
+4. Use halves and thirds and sixths to make 1 whole. → 1 whole
+
+**Y4.B10.S1 pre** `fractions:write_fraction` opts `{"denoms":[5]}` Max Number 10000 — Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)
+
+1. Write the fraction that is shaded. → 7/10
+2. Write the fraction that is shaded. → 4/5
+3. Write the fraction that is shaded. → 2/10
+4. Write the fraction that is shaded. → 4/10
+
+**Y4.B10.S5 related** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — multiple items at one price
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B12.S6 pre** `shapes_early:shape_corners_count` opts `{}` Max Number 10000 — Y2.B3.S3 Count vertices on 2-D shapes (lower grade, same idea)
+
+1. How many corners does this shape have? → 5
+2. How many corners does this shape have? → 7
+3. How many corners does this shape have? → 4
+4. How many corners does this shape have? → 4
+

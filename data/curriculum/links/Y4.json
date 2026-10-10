@@ -2116,7 +2116,8 @@
       "task": "fill",
       "constant": [
        3
-      ]
+      ],
+      "band": 100
      }
     }
    ],
@@ -2209,7 +2210,10 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories with 6 in a group"
+     "why": "equal-groups and array stories (the facts the stories use)",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 6 they are full."
@@ -2307,7 +2311,8 @@
       "task": "fill",
       "constant": [
        6
-      ]
+      ],
+      "band": 100
      }
     },
     {
@@ -2506,7 +2511,8 @@
       "task": "fill",
       "constant": [
        9
-      ]
+      ],
+      "band": 100
      }
     },
     {
@@ -2700,7 +2706,10 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories with 7 in a group"
+     "why": "equal-groups stories with 7 in a group",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "multiplication:nl_mult",
@@ -2800,7 +2809,8 @@
       "task": "fill",
       "constant": [
        7
-      ]
+      ],
+      "band": 100
      }
     },
     {
@@ -3088,7 +3098,8 @@
       "task": "fill",
       "constant": [
        1
-      ]
+      ],
+      "band": 100
      }
     }
    ],
@@ -4195,7 +4206,10 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems_plain",
-     "why": "multiplication stories"
+     "why": "multiplication stories",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "probability:probability_basic",
@@ -4792,7 +4806,10 @@
     },
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal sides as equal groups"
+     "why": "equal sides as equal groups",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "note": "",
@@ -5231,10 +5248,6 @@
     {
      "key": "composing:compose_whole",
      "why": "Y3.B6.S4 Understand the whole (prior learning wk W09)"
-    },
-    {
-     "key": "fractions:select_equiv_frac",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W09)"
     }
    ],
    "preBuild": [
@@ -5278,10 +5291,6 @@
     {
      "key": "multiplication:mult_facts",
      "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
-    },
-    {
-     "key": "fractions:select_equiv_frac",
-     "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W09)"
     }
    ],
    "preBuild": [],
@@ -5333,10 +5342,6 @@
     {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "fractions:select_equiv_frac",
-     "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W10)"
     },
     {
      "key": "fraction_operations:add_fractions_like",
@@ -5398,18 +5403,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:equiv_frac_nv",
-     "why": "equivalent fractions without pictures",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "fractions:select_equiv_frac",
-     "why": "circle the equivalent fractions"
+     "key": "fractions:graph_fractions",
+     "why": "fractions marked on a line (halves to eighths): equal ones land on one point"
     }
    ],
    "note": "",
@@ -5454,16 +5449,8 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:equivalent",
-     "why": "Y3.B6.S10 Equivalent fractions as bar models (prior learning wk W10)",
-     "opts": {
-      "denoms": [
-       2
-      ],
-      "forms": [
-       0
-      ]
-     }
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S9 Equivalent fractions on a number line (lower grade, same idea)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -5483,8 +5470,13 @@
    ],
    "related": [
     {
-     "key": "composing:fraction_number_line",
-     "why": "equivalent fractions name the same point on a number line"
+     "key": "fractions:fraction_nl_drag",
+     "why": "quarters and eighths placed on one line: 2/4 and 4/8 share a point",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
     }
    ],
    "note": ""
@@ -5530,10 +5522,6 @@
     {
      "key": "fraction_operations:frac_word_problems",
      "why": "fraction stories"
-    },
-    {
-     "key": "fractions:fraction_bar_ops",
-     "why": "bar model of the sum"
     }
    ],
    "note": "add_frac_like_nv is listed direct for the two-addend part; the step verdict stays partial.",
@@ -6151,8 +6139,11 @@
    ],
    "pre": [
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
+     "opts": {
+      "ticks": "some"
+     }
     },
     {
      "key": "multiplication:mult_facts",
@@ -6251,12 +6242,11 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:frac_10_100_nv",
-     "why": "tenths to hundredths without pictures"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "hundredths as decimals (next step)"
+     "key": "measurement:money_notation",
+     "why": "cents are hundredths of a dollar (37¢ = $0.37)",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": "",
@@ -6310,8 +6300,11 @@
    ],
    "pre": [
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (taught the same school week, W31)"
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 99
+     }
     },
     {
      "key": "fractions:write_fraction",
@@ -6323,10 +6316,10 @@
      }
     },
     {
-     "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (lower grade, same CCSS cluster)",
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
      "opts": {
-      "band": 99
+      "ticks": "some"
      }
     }
    ],
@@ -6380,8 +6373,8 @@
    ],
    "pre": [
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught the same school week, W31)",
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6472,8 +6465,11 @@
    ],
    "pre": [
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
+     "opts": {
+      "ticks": "some"
+     }
     },
     {
      "key": "placevalue:place_value_10x",
@@ -6543,8 +6539,11 @@
      "why": "Y4.B7.S11 Add two or more fractions (taught earlier this year, wk W10)"
     },
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
+     "opts": {
+      "ticks": "some"
+     }
     },
     {
      "key": "composing:make_ten",
@@ -6563,15 +6562,6 @@
     "dec_fraction_basics"
    ],
    "related": [
-    {
-     "key": "decimals:add_decimal",
-     "why": "adding decimals",
-     "opts": {
-      "decimals": 1,
-      "range": 100
-     },
-     "maxNumber": 10
-    },
     {
      "key": "measurement:money_change",
      "why": "change from $1",
@@ -6606,8 +6596,13 @@
    ],
    "pre": [
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (taught earlier this year, wk W31)"
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
     },
     {
      "key": "composing:make_ten",
@@ -6632,10 +6627,6 @@
       "band": 100,
       "step": 5
      }
-    },
-    {
-     "key": "decimals:sub_decimal",
-     "why": "1 − 0.36"
     }
    ],
    "note": "Bonds to 100 (Y3.B2.S19) are the key pre-skill and have no skill yet.",
@@ -6676,8 +6667,13 @@
      }
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)"
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
     },
     {
      "key": "placevalue:unit_form",
@@ -6700,15 +6696,6 @@
     {
      "key": "measurement:money_notation",
      "why": "$3.45 = 3 dollars 4 dimes 5 cents"
-    },
-    {
-     "key": "decimals:add_decimal",
-     "why": "recombine the parts",
-     "opts": {
-      "decimals": 1,
-      "range": 100
-     },
-     "maxNumber": 10
     }
    ],
    "note": "",
@@ -6734,8 +6721,8 @@
    ],
    "pre": [
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)",
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6743,12 +6730,10 @@
      }
     },
     {
-     "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (taught earlier this year, wk W30)",
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
      "opts": {
-      "forms": [
-       0
-      ]
+      "ticks": "some"
      }
     },
     {
@@ -6771,15 +6756,6 @@
     "decimal_pv"
    ],
    "related": [
-    {
-     "key": "decimals:add_decimal",
-     "why": "adding the parts",
-     "opts": {
-      "decimals": 1,
-      "range": 100
-     },
-     "maxNumber": 10
-    },
     {
      "key": "measurement:money_count",
      "why": "money made in different ways"
@@ -6825,8 +6801,13 @@
      "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)"
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)"
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
     },
     {
      "key": "placevalue:compare",
@@ -6903,8 +6884,8 @@
      "maxNumber": 10
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)",
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -7029,20 +7010,8 @@
    ],
    "pre": [
     {
-     "key": "fractions:equivalent",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (lower grade, same idea)",
-     "opts": {
-      "denoms": [
-       2
-      ],
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (taught earlier this year, wk W31)"
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (lower grade, same idea)"
     },
     {
      "key": "shapes_early:partition_shapes",
@@ -7058,10 +7027,6 @@
     {
      "key": "measurement:coin_value",
      "why": "quarters and half dollars"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "the reverse"
     }
    ],
    "note": "",
@@ -7096,8 +7061,13 @@
      "why": "Y3.B9.S1 Pounds and pence (prior learning wk W37)"
     },
     {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (taught earlier this year, wk W31)"
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
     },
     {
      "key": "measurement:coin_value",
@@ -7343,7 +7313,10 @@
     },
     {
      "key": "multiplication:mult_word_problems",
-     "why": "multiple items at one price"
+     "why": "multiple items at one price",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "note": "Generated with defaults the money skill added whole dollars only (16, 8); with step 5 and USD it deals dollars and cents."
@@ -7929,11 +7902,15 @@
    "pre": [
     {
      "key": "shapes_early:name_2d_shapes",
-     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W27)"
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
     },
     {
      "key": "angles_lines:identify_lines",
      "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -7949,7 +7926,7 @@
      "why": "symmetry of regular polygons"
     }
    ],
-   "note": "Pre-skills are few: Polygons (W27) comes before Quadrilaterals (W28) and Triangles in the school order, and the Identify angles skill prints degrees (a display defect), so naming shapes and parallel and perpendicular lines are the met building blocks.",
+   "note": "",
    "envision": [
     {
      "proposal": "polygons",

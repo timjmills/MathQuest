@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 7
+# Wave 2 tagging: Y4 (Grade 3) report, round 8
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **539 / 241** (round 7). Every step has at least 1 related and at least 3 pre, except B12.S6 (2 pre; its note says why). 0 keys in both |
-| Option checks | — | — | Round 7: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 780 links misfit** on size, content, layout or rule-19 school week (`linkfit.mjs`, 20 items a link; per-step result in `Y4-linkfit.txt`) |
+| Pre / related entries | 528 / — | 570 / 319 | **536 / 233** (round 8). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 8: 364 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 769 links misfit** (`linkfit.mjs`, two seed sets, 40 items a link; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,78 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 8 (after critic r7: 21 links on 18 steps; rules 18 and 19)
+All changes are in `spec_zz_z_r8.py`, and every change is to a link. The 28 new or changed links are generated at the end
+of `Y4-items.md`.
+
+**C. `f_to_d` and `d_to_f` (12 links).**
+- **Why they go.** Their drag-bin branch ignores `denoms` and prints 25%, 50% and 75% tiles, and quarters as decimals
+  before W33. Their plain items need fifths (0.4 = 2/5).
+- **`frac_10_100` and `frac_10_100_nv` are not clean either.** Their "click the equal fractions" item (0.25 = 1/4, with
+  40/1000 decoys) appears whatever `forms` says, because the print path ignores `forms`. So they are dropped too
+  (B8.S7, B8.S8, B9.S2, B9.S8).
+- **Replacements.** Two skills generate clean on both seed sets:
+  - `decimal_nl_drag {ticks:'some'}`: tenths on a 0–1 line, citing B8.S4.
+  - `write_fraction {denoms:[5]}`: tenths as fractions, citing B8.S1.
+- **Where each one went.**
+  - B8.S6, B8.S10, B9.S1 and B9.S4 → `decimal_nl_drag`.
+  - B8.S9, B9.S2, B9.S3, B9.S4, B9.S5, B9.S6 and B10.S1 → `write_fraction`.
+  - B8.S8 gains `decimal_nl_drag`.
+  - B8.S7 gains the related `money_notation {usd}` (cents as hundredths of a dollar).
+
+**F. Equivalence links past twelfths (7 links).**
+- Dropped:
+  - `select_equiv_frac` on B7.S6–S9 (15ths to 40ths);
+  - `equiv_frac_nv` on B7.S9 (24ths).
+- Replaced, because `equivalent {denoms:[2], forms:[0]}` still deals 16ths:
+  - on B7.S10 by `fraction_number_line`, citing Y3.B6.S9 (equivalent fractions on a line, 2nds to 8ths);
+  - on B9.S8 by `compose_whole`, citing Y3.B6.S4 (halves and quarters making a whole).
+- Related top-ups:
+  - B7.S9 gains `graph_fractions`.
+  - B7.S10 gains `fraction_nl_drag {denoms:[2]}`.
+
+**D and U.** `sub_decimal` dropped on B9.S2. `fraction_bar_ops` dropped on B7.S11: both the `fraction_operations` key and
+the `fractions` key. Both deal arithmetic from a later grade.
+
+**Lead ruling on `add_decimal`.** No option limits it to make-a-whole sums, so it is dropped on B9.S1, S3 and S4.
+`decimal_whole` (the build of B9.S1 and S2) is that skill.
+
+**B12.S6.**
+- New pre-skill `shape_corners_count`, citing Y2.B3.S3.
+- `name_2d_shapes` is re-cited to Y3.B11.S7.
+- With 3 pre-skills, the step no longer needs its note.
+
+**Minor fixes.**
+- `mult_word_problems` / `_plain` are held to `range:100` on B4.S2, S7, B5.S14, B6.S8 and B10.S5. B4.S2's label no
+  longer claims "6 in a group".
+- The chart windows on B4.S1, S3, S5, S8 and S11 are `band:100` (10 × 10), so they show no given 11s or 12s.
+
+**`linkfit.mjs`, round 8: gaps G7–G9 closed, plus a second seed set.**
+- **G7.** Printed option, tile and bin labels (`q.options`, `q.tiles`, `q.bins`, `q.items`) are read.
+- **G8.** Denominators are also read as `?/16` and `_/16`, and from `"den"` fields.
+- **G9.** New guards:
+  - unlike-denominator + and −;
+  - decimal + and − past a whole or with unlike places;
+  - fifths as decimals;
+  - quarters as decimals before W33;
+  - 4-digit column + and − before W14.
+- **Seeds.** Two seed sets (9100 + 17i and 777 + 53i), 20 items each.
+
+**Scan results.**
+- `linkfit.mjs`: 0 of 769 links misfit.
+- `optcheck.mjs`: 364 opts entries, 0 problems.
+- `optchange.mjs`: 0 non-default values that change nothing.
+- The critic's `own7.mjs` flags only its 11 "prime" hits. These are the words "composite shape" in `perimeter_grid`
+  and `composite_shapes`, which the critic marked as false positives in r7.
+
+**Generator defects for the lead (round 8).**
+1. `f_to_d` and `d_to_f` have no option to turn off the drag-bin form, and the bin form ignores `denoms`.
+2. The decoys in `select_equiv_frac` and in `equivalent`'s form 0 ignore `denoms`.
+3. `fraction_bar_ops` has no same-denominator option.
+4. `frac_10_100_nv` ignores `forms` on the print path. Its "click the equal fractions" item, which carries quarters and
+   thousandths, comes anyway.
+5. `add_decimal` has no make-a-whole form. `decimal_whole` is the build.
 
 ## Changes in round 7 (after critic r6: 30 links on 25 steps; plus rule 19)
 All changes are in `spec_zz_x_r7.py`, and every change is to a link. The 29 new or changed links are generated at the end

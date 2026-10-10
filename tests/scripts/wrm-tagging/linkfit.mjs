@@ -13,6 +13,9 @@
 //                       (triangle area, percent, GCF/simplify, ratio, prime/composite, reflection in an axis, 2-digit ×
 //                       2-digit) and times-tables the school has not taught by the step's week. Numbers are read from the
 //                       text, every part of the answer, the visual and the payload; 20 print-path items per link.
+//   G7-G9 (r8): option / tile / bin labels are read; denominators also as ?/16, _/16 and "den" fields; unlike-denominator
+//   ±, decimal ± past a whole or with unlike places, fifths as decimals, quarters as decimals before W33 and 4-digit
+//   column ± before W14 are flagged. Two seed sets, 20 items each.
 // usage: node linkfit.mjs [--all]
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
@@ -30,17 +33,21 @@ const NUM = /(\d{1,3}(?:,\d{3})+(?!\d)|\d+)(\.\d+)?/g;
 const TIME = /^measurement:(time|elapsed|clock|order_clocks)/;   // clock payloads hold minutes (19:00 = 1140)
 const DECOY = new Set(['number_sense:estimate_sums_diffs{"place":1000,"task":"reasonable"}']);
 const WK_FIRST_DECIMAL = 'W29';
-const N_ITEMS = 20;   // G6: margins show up late (estimate_sums_diffs reaches 16,000 only after item 8)
+const N_ITEMS = 20;
+const SEEDS = [[9100, 17], [777, 53]];   // two seed sets, 40 items a link
+const lab = x => x == null ? '' : typeof x === 'object' ? (x.label ?? x.text ?? x.html ?? JSON.stringify(x)) : String(x);   // G6: margins show up late (estimate_sums_diffs reaches 16,000 only after item 8)
 const cache = new Map();
 function probe(key, opts, range) {
   const id = key + JSON.stringify(opts) + range; if (cache.has(id)) return cache.get(id);
   const [c, k] = key.split(':'); let max = 0, ex = ''; const items = [];
-  for (let i = 0; i < N_ITEMS; i++) {
-    let q; try { q = g.generateQuestionFor({ category: c, skill: k, opts, range, seed: 9100 + i * 17, itemIndex: i, itemCount: N_ITEMS }); } catch (e) { items.push({ err: e.message }); continue; }
+  for (const [base, step] of SEEDS) for (let i = 0; i < N_ITEMS; i++) {
+    let q; try { q = g.generateQuestionFor({ category: c, skill: k, opts, range, seed: base + i * step, itemIndex: i, itemCount: N_ITEMS }); } catch (e) { items.push({ err: e.message }); continue; }
     if (!q) continue;
     const text = strip(q.text), a = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans), pay = q.cell ? JSON.stringify(q.cell.payload) : '';
-    items.push({ text, a: strip(a), pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
-    let t = text;
+    // G7: printed option, tile and bin labels
+    const x = strip([...(q.options || []), ...(q.tiles || []), ...(q.bins || []), ...(q.items || [])].map(lab).join(' ; '));
+    items.push({ text, a: strip(a), x, pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
+    let t = text + ' ' + x;
     if (/"[xy]":/.test(a)) t += ' ' + [...a.matchAll(/"[xy]":(\d+)/g)].map(m => m[1]).join(' ');
     else t += ' ' + strip(a).split(/[,;]/).join(' ');   // G1: dual answers ("P=136, A=1156") and lists: every comma separates
     if (!TIME.test(key) && !/coord/.test(k)) t += ' ' + strip(q.visual);           // G1: numbers drawn only in the visual
@@ -88,8 +95,8 @@ function firstTaught(sid, e, r, role) {
 }
 function content(sid, e, r) {
   const out = [], wk = wkOf(sid) || 'W99';
-  const all = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.pay || ''} ${i.vis || ''}`).join(' | ');
-  const said = r.items.map(i => `${i.text || ''} ${i.a || ''}`).join(' | ');                 // G3: text AND answer
+  const all = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.pay || ''} ${i.vis || ''}`).join(' | ');
+  const said = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''}`).join(' | ');   // G7: options, tiles and bins are printed                 // G3: text AND answer
   if (r.items.some(i => i.err)) out.push('generation error');
   if (/(?<![\d\w)])[−-]\d/.test(said) || /"[xy]":-\d/.test(all)) out.push('negative numbers');
   if (/coord/.test(e.key)) { const n = [...all.matchAll(/"[xy]":(-?\d+)/g), ...all.matchAll(/\((-?\d+), ?(-?\d+)\)/g)].flatMap(m => m.slice(1).filter(Boolean).map(Number)); if (n.length && Math.max(...n.map(Math.abs)) > 10) out.push(`coordinates past 10 (${Math.max(...n.map(Math.abs))})`); }
@@ -97,7 +104,7 @@ function content(sid, e, r) {
   if (wk < WK_FIRST_DECIMAL && /(?<![\d,])\d+\.\d+/.test(said) && !MONEY.test(all) && !/money|coin/.test(e.key)) out.push(`decimals in ${wk} (before ${WK_FIRST_DECIMAL})`);
   if ((/\d+\s*°(?!\s*[FC])/.test(all) || /\bdegrees\b(?! (Celsius|C\b))/.test(said)) && !/temperature/.test(e.key)) out.push('angle measured in degrees (4.MD.C)');
   for (const i of r.items) {                                                                    // G4: fractions in the visual / payload too
-    const src = `${i.text || ''} ${i.vis || ''} ${i.pay || ''}`;
+    const src = `${i.text || ''} ${i.x || ''} ${i.vis || ''} ${i.pay || ''}`;
     const fr = [...src.matchAll(FRAC), ...(i.pay || '').matchAll(/"n(?:um)?":(\d+),"d(?:en)?":(\d+)/g)];
     if (fr.length >= 2 && /compar|order|greater|smaller|smallest|largest|biggest|<|>/i.test(i.text || '')) {
       const nums = new Set(fr.map(m => m[1])), dens = new Set(fr.map(m => m[2]));
@@ -105,8 +112,21 @@ function content(sid, e, r) {
     }
   }
   // Grade 3 denominators: 2, 3, 4, 5, 6, 8, 10, 12 (and 100 from the decimal blocks, W29)
-  const dens = [...all.matchAll(/\b\d+\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 12 && !(x === 100 && wk >= WK_FIRST_DECIMAL));
+  const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g), ...all.matchAll(/"den(?:om)?(?:inator)?"\s*:\s*"?(\d+)/g)].map(m => +m[1]).filter(x => x > 12 && !(x === 100 && wk >= WK_FIRST_DECIMAL));
   if (dens.length) out.push(`denominator ${Math.max(...dens)} (Grade 3 stops at twelfths)`);
+  // G9: arithmetic and conversions from a later grade
+  for (const i of r.items) {
+    const t = `${i.text || ''} ${i.x || ''}`;
+    const fs_ = [...t.matchAll(/\b(\d+)\/(\d+)\s*[+\-−]\s*(\d+)\/(\d+)\b/g)];
+    if (fs_.some(m => m[2] !== m[4])) { out.push(`unlike-denominator ± (${fs_.find(m => m[2] !== m[4])[0]})`); break; }
+  }
+  if (!/money|coin/.test(e.key)) {
+    const dm = said.match(/(\d+\.\d+)\s*[+\-−]\s*(\d+\.\d+)/);
+    if (dm && (Math.floor(+dm[1]) > 0 || Math.floor(+dm[2]) > 0 || (dm[1].split('.')[1].length !== dm[2].split('.')[1].length))) out.push(`decimal ± past a whole or with unlike places (${dm[0]}) (5.NBT.B.7)`);
+    if (/\b\d\/5\b[^|]{0,40}\b0?\.\d|\b0?\.\d[^|]{0,40}\b\d\/5\b/.test(said)) out.push('fifths as decimals (0.4 = 2/5)');
+    if (wk < 'W33' && /(?<![\d$])0?\.(25|75)\b/.test(said)) out.push(`quarters as decimals in ${wk} (W33)`);
+  }
+  if (wk < 'W14' && r.items.some(i => i.tpl === 'stack' && /"op":"[+\-−]"/.test(i.pay) && Math.max(...[...(i.pay.match(/"operands":\[([\d,]+)\]/) || ['', '0'])[1].split(',')].map(Number)) >= 1000)) out.push(`column 4-digit ± in ${wk} (W14)`);
   // G5: concepts from a later grade
   if (/triangle/i.test(said) && /\barea\b/i.test(said)) out.push('triangle area (6.G.A.1)');
   if (/%|\bpercent/i.test(all)) out.push('percent (6.RP)');
