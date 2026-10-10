@@ -3332,6 +3332,800 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B5.S1": {
+   "title": "Add by counting on within 20",
+   "direct": [
+    {
+     "key": "addition:add_20_mixed",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_line_add",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "addition:add_10_regroup",
+     "why": "next step: Y1.B5.S2 Add ones using number bonds"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "next step: Y1.B5.S2 Add ones using number bonds"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S3 Find and make number bonds to 20"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S4 Doubles"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S2": {
+   "title": "Add ones using number bonds",
+   "direct": [
+    {
+     "key": "addition:add_10_regroup",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (the step before in this block)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B5.S1 Add by counting on within 20 (the step before in this block)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:make_ten",
+     "why": "next step: Y1.B5.S3 Find and make number bonds to 20"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S4 Doubles"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S8 Subtraction - finding the difference"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S3": {
+   "title": "Find and make number bonds to 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:make_ten",
+     "opts": {
+      "band": 20
+     },
+     "missing": "bonds to 20 (make 20 fills a second ten frame; bonds like 13 + 7)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "all bonds to 20",
+   "build": [
+    "bonds_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B9.S7 Double to 8 (find a double) (prior learning wk W17)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (prior learning wk W17)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W17)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W17)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W17)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S2 Add ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "next step: Y1.B5.S4 Doubles"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S8 Subtraction - finding the difference"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S4": {
+   "title": "Doubles",
+   "direct": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (prior learning wk W17)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W17)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W17)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W17)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W17)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S2 Add ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured",
+    "subitise",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "same CCSS 1.OA.C.6, K.OA.A.1 in Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S8 Subtraction - finding the difference"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S5": {
+   "title": "Near doubles",
+   "direct": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (prior learning wk W17)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W17)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W17)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W17)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W17)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S2 Add ones using number bonds (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured",
+    "subitise",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "next step: Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "next step: Y1.B5.S6 Subtract ones using number bonds"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S8 Subtraction - finding the difference"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S6": {
+   "title": "Subtract ones using number bonds",
+   "direct": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "number_sense:make_a_ten",
+     "opts": {},
+     "missing": "subtracting through 10 using bonds"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W18)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B5.S5 Near doubles (the step before in this block)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (same CCSS 1.OA.C.6, K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "subtraction:nl_sub",
+     "why": "next step: Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "next step: Y1.B5.S7 Subtraction - counting back"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S8 Subtraction - finding the difference"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S10 Missing number problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S7": {
+   "title": "Subtraction - counting back",
+   "direct": [
+    {
+     "key": "subtraction:nl_sub",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (the step before in this block)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B5.S5 Near doubles (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "addition:comparison_word",
+     "why": "next step: Y1.B5.S8 Subtraction - finding the difference"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S10 Missing number problems"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S10 Missing number problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S8": {
+   "title": "Subtraction - finding the difference",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:comparison_word",
+     "opts": {},
+     "missing": "finding the difference by comparing two bars or a number line"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "difference as comparison (bars, line)",
+   "build": [
+    "difference"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (the step before in this block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (the step before in this block)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "next step: Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "next step: Y1.B5.S9 Related facts"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S10 Missing number problems"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B5.S10 Missing number problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S9": {
+   "title": "Related facts",
+   "direct": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_families_add",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W18)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (the step before in this block)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (the step before in this block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "difference",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "addition:cloze_addition",
+     "why": "next step: Y1.B5.S10 Missing number problems"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "next step: Y1.B5.S10 Missing number problems"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "same block: Y1.B5.S1 Add by counting on within 20"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same block: Y1.B5.S1 Add by counting on within 20"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B5.S10": {
+   "title": "Missing number problems",
+   "direct": [
+    {
+     "key": "addition:cloze_addition",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (prior learning wk W19)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S4 How many did I take away (prior learning wk W19)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W19)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W19)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W19)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B5.S9 Related facts (the step before in this block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B5.S9 Related facts (the step before in this block)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "difference",
+    "bonds_20"
+   ],
+   "related": [
+    {
+     "key": "addition:add_20_mixed",
+     "why": "same block: Y1.B5.S1 Add by counting on within 20"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same block: Y1.B5.S1 Add by counting on within 20"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "same block: Y1.B5.S2 Add ones using number bonds"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "same block: Y1.B5.S2 Add ones using number bonds"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3632,6 +4426,55 @@
    "ccss": [
     "K.CC.A.3",
     "K.NBT.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "bonds_20": {
+   "kind": "new",
+   "skill": "composing:bonds_to_20",
+   "name": "Number Bonds to 20",
+   "teaches": "bonds to 20 and bonds within 20 from bonds to 10 (3 + 7 = 10 so 13 + 7 = 20), used to add and subtract ones",
+   "representation": "two ten frames and a part-whole diagram; write the missing part",
+   "family": "operations",
+   "steps": [
+    "Y1.B5.S3"
+   ],
+   "ccss": [
+    "1.OA.C.6",
+    "K.OA.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "doubles_pictured": {
+   "kind": "option",
+   "skill": "number_sense:doubles_near_doubles",
+   "option": "pictures and band 8 / 10",
+   "name": "Doubles with Pictures (option)",
+   "teaches": "finding and making a double with objects: two equal groups, totals to 8 and to 10",
+   "representation": "two identical rows of counters (or a ten frame split in two) in one boxed cell; write the total; option: draw the matching group to make a double",
+   "family": "algebra",
+   "ccss": [
+    "K.OA.A.1"
+   ],
+   "why": "doubles_near_doubles deals abstract doubles up to 10 + 10; Reception finds and builds doubles from pictures",
+   "steps": [],
+   "reused": false
+  },
+  "difference": {
+   "kind": "new",
+   "skill": "subtraction:find_the_difference",
+   "name": "Find the Difference",
+   "teaches": "subtraction as difference: comparing two amounts (bars, cubes, number line) and finding how many more or fewer",
+   "representation": "two cube trains or bars drawn one above the other; write the difference and the number sentence",
+   "family": "operations",
+   "steps": [
+    "Y1.B5.S8"
+   ],
+   "ccss": [
+    "1.OA.C.5",
+    "K.OA.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
