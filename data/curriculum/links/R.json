@@ -1649,6 +1649,477 @@
     }
    ],
    "note": ""
+  },
+  "R.B9.S1": {
+   "title": "Find 6, 7 and 8",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B7.S6 1 less (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B7.S4 Represent 0 to 5 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B9.S2 Represent 6, 7 and 8"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in R.B9.S3 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B9.S5 Composition of 6, 7 and 8"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B9.S6 Make pairs-odd and even"
+    }
+   ],
+   "note": "Band 10 deals to 10; 6-8 sit inside it."
+  },
+  "R.B9.S2": {
+   "title": "Represent 6, 7 and 8",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B9.S1 Find 6, 7 and 8 (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B9.S3 1 more"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B9.S5 Composition of 6, 7 and 8"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B9.S6 Make pairs-odd and even"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S3": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B9.S1 Find 6, 7 and 8 (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B9.S2 Represent 6, 7 and 8"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B9.S5 Composition of 6, 7 and 8"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B9.S6 Make pairs-odd and even"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S4": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B9.S1 Find 6, 7 and 8 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: R.B9.S5 Composition of 6, 7 and 8"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B9.S2 Represent 6, 7 and 8"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B9.S6 Make pairs-odd and even"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S5": {
+   "title": "Composition of 6, 7 and 8",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B9.S4 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:odd_even",
+     "why": "next step: R.B9.S6 Make pairs-odd and even"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "same CCSS K.OA.A.3 in R.B11.S8 Bonds to 10 (2 parts)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.OA.A.3 in R.B11.S9 Make arrangements of 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S6": {
+   "title": "Make pairs-odd and even",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:odd_even",
+     "opts": {},
+     "missing": "making pairs of objects to see odd and even; the skill names odd or even numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "pairing objects to see whether one is left over",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B9.S5 Composition of 6, 7 and 8 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B9.S4 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "next step: R.B9.S7 Double to 8 (find a double)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B9.S1 Find 6, 7 and 8"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B9.S2 Represent 6, 7 and 8"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B9.S3 1 more"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S7": {
+   "title": "Double to 8 (find a double)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "finding a double in a picture to 8 (the skill is abstract doubles to 10 + 10)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising a double (two equal groups) pictured, totals to 8",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (the step before in this block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B9.S5 Composition of 6, 7 and 8 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "patterns:double",
+     "why": "next step: R.B9.S8 Double to 8 (make a double)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same CCSS K.OA.A.1 in R.B9.S9 Combine 2 groups"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "same CCSS K.OA.A.1 in R.B9.S9 Combine 2 groups"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "same CCSS K.OA.A.1 in R.B11.S10 Bonds to 10 (3 parts)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S8": {
+   "title": "Double to 8 (make a double)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:double",
+     "opts": {},
+     "missing": "building a double with objects to 8; the skill is abstract"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making a double with objects",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B9.S7 Double to 8 (find a double) (the step before in this block)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "next step: R.B9.S9 Combine 2 groups"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "next step: R.B9.S9 Combine 2 groups"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "same CCSS K.OA.A.1 in R.B11.S10 Bonds to 10 (3 parts)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B11.S11 Doubles to 10 (find a double)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S9": {
+   "title": "Combine 2 groups",
+   "direct": [
+    {
+     "key": "addition:add_5_pictures",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_wp_10",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (the step before in this block)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B9.S7 Double to 8 (find a double) (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "the two groups are the parts of a bond"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "same CCSS K.OA.A.1 in R.B11.S10 Bonds to 10 (3 parts)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B11.S11 Doubles to 10 (find a double)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B11.S12 Doubles to 10 (make a double)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B9.S10": {
+   "title": "Conceptual subitising",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "conceptual subitising to 8 (see 5 and 3)",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (the step before in this block)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (the step before in this block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (the step before in this block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B9.S5 Composition of 6, 7 and 8 (same CCSS K.OA.A.3, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B9.S1 Find 6, 7 and 8 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B11.S3 Represent 9 and 10"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same CCSS K.OA.A.3 in R.B11.S7 Composition to 10"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "same CCSS K.OA.A.3 in R.B11.S8 Bonds to 10 (2 parts)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1760,7 +2231,8 @@
     "R.B3.S2",
     "R.B5.S2",
     "R.B7.S3",
-    "R.B7.S8"
+    "R.B7.S8",
+    "R.B9.S10"
    ],
    "ccss": [
     "K.CC.B.5",
@@ -1867,6 +2339,38 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "share_group": {
+   "kind": "new",
+   "skill": "division:share_and_group_early",
+   "name": "Share and Make Groups",
+   "teaches": "sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly",
+   "representation": "counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair",
+   "family": "operations",
+   "steps": [
+    "R.B9.S6"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "doubles_pictured": {
+   "kind": "option",
+   "skill": "number_sense:doubles_near_doubles",
+   "option": "pictures and band 8 / 10",
+   "name": "Doubles with Pictures (option)",
+   "teaches": "finding and making a double with objects: two equal groups, totals to 8 and to 10",
+   "representation": "two identical rows of counters (or a ten frame split in two) in one boxed cell; write the total; option: draw the matching group to make a double",
+   "family": "algebra",
+   "ccss": [
+    "K.OA.A.1"
+   ],
+   "why": "doubles_near_doubles deals abstract doubles up to 10 + 10; Reception finds and builds doubles from pictures",
+   "steps": [
+    "R.B9.S7",
+    "R.B9.S8"
+   ],
+   "reused": false
   }
  },
  "tagFixes": [
@@ -1875,6 +2379,12 @@
    "step": "R.B4.S4",
    "action": "partial",
    "why": "in front of, behind, next to, on top of, under (the skill does above / below / beside)"
+  },
+  {
+   "key": "number_sense:doubles_near_doubles",
+   "step": "R.B9.S7",
+   "action": "partial",
+   "why": "finding a double in a picture to 8 (the skill is abstract doubles to 10 + 10)"
   }
  ]
 }
