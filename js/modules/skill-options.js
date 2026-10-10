@@ -2076,7 +2076,9 @@ const P12_OPTIONS = {
         levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
     ],
     'multiplication:number_families_mult': [
-        _opsBand([25, 100, 144], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12' },
+        // (owner 2026-10-10) "6 × 6" is APPENDED: the values keep their order and the default stays
+        // 5 × 5, so every shipped code reads as before; 6 × 6 holds 15 families where 5 × 5 holds 10
+        _opsBand([25, 100, 144, 36], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12', 36: '6 × 6' },
             help: 'The largest table in the family, at every support level.' }),
         levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The tables stay the same at every level.'),
     ],

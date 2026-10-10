@@ -1548,7 +1548,15 @@ function lintKitGeometry(dom, pdf, info, F) {
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
-            if (comparable && !last && max > 0 && p.items < max / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${pt.pages[pt.pages.length - 1].idx} of the same sheet follows and its fullest page holds ${max}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
+            // DN-2 (owner 2026-10-10, PT-MPR-1): every More Practice letter is a sheet of its own, so a
+            // letter's pages are compared with each other only - letter A's count never judges letter
+            // B's. A page with no letter (any other role) is compared across its whole sheet as before.
+            const dnLetter = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return q.role === 'more-practice' && m ? m[1] : ''; };
+            const dnL = dnLetter(p);
+            const dnGroup = dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages;
+            const dnMax = Math.max(...dnGroup.map(q => q.items));
+            const dnLast = dnGroup[dnGroup.length - 1] === p;
+            if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
             if (comparable && last && pt.pages.length > 1 && max > 0 && p.items > 0 && p.items < max / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${max}): rows are rebalanced across the sheet's pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
             // print screen's default; --count N fixes it and turns this off), a practice page whose
@@ -2140,6 +2148,33 @@ const SELF_TESTS = [
         const foot = p2.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
         g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.7}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
     } },
+    // owner 2026-10-10 (DN-2 per letter): letter A's two-problem last page beside a full letter B is
+    // not half-empty (each letter is its own sheet, PT-MPR-1) ...
+    { name: 'More Practice letter A short beside a full letter B (kit)', mode: 'kit', expect: [], absent: [['L-DENSITY', 'DN-2']], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = `Practice ${'AB'[i]}`;
+        });
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    // ... but two pages of ONE letter are still compared: a half-empty first page of letter A fails
+    { name: 'half-empty first page inside More Practice letter A (kit)', mode: 'kit', expect: ['L-DENSITY', 'DN-2'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = 'Practice A';
+        });
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
     { name: 'a mixed pool page of one problem (kit)', mode: 'kit', pool: true, expect: ['L-DENSITY', 'POOL-MIN'], fn: () => {
         const p1 = document.querySelector('.ws-page');
         p1.setAttribute('data-ws-role', 'independent');
@@ -2242,7 +2277,13 @@ async function selfTest() {
             await sleep(50);
             const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool });
             await page.close();
-            const exp = Array.isArray(t.expect[0]) ? t.expect : [t.expect];
+            const exp = !t.expect.length ? [] : Array.isArray(t.expect[0]) ? t.expect : [t.expect];
+            // `absent`: a rule that must NOT fire on this page (a loosened rule proves its limit)
+            for (const e of t.absent || []) {
+                asserts++;
+                if (!fired(r, e)) console.log(`  ok   ${t.name}: ${e.join(' ')} did not fire`);
+                else bad.push(`${t.name}: ${e.join(' ')} fired but must not - ${r.findings.find(f => f.lint === e[0] && f.rule === e[1]).msg.slice(0, 160)}`);
+            }
             for (const e of exp) {
                 asserts++;
                 if (fired(r, e)) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${r.findings.find(f => f.lint === e[0] && f.rule === e[1]).msg.slice(0, 110)}`);

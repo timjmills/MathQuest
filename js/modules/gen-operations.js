@@ -3915,8 +3915,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isHard = mappedSkill === "number_families_mult_hard";
                 
                 // P12 (the P-1 split): `band` is the largest table (5 × 5, 10 × 10, 12 × 12) at every
-                // support level; the level (the branch) owns only which boxes are blank.
-                const maxFactor = { 25: 5, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 100, 144])] || 5;
+                // support level (6 × 6 added 2026-10-10); the level (the branch) owns only which boxes are blank.
+                const maxFactor = { 25: 5, 36: 6, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 36, 100, 144])] || 5;
                 const [factor1, factor2] = _familyPair(`nfm:${state.skill}`, 2, maxFactor);
                 const product = factor1 * factor2;
                 const isSquare = factor1 === factor2;
