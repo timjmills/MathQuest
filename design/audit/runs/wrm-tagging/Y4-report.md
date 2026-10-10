@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 3
+# Wave 2 tagging: Y4 (Grade 3) report, round 4
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -8,16 +8,16 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 
 ## Counts
 
-| | Round 2 | Round 3 |
-|---|---|---|
-| Steps | 129 | 129 (14 blocks, none skipped) |
-| Full | 56 | **48** |
-| Partial | 50 | **60** |
-| Gap | 23 | **21** |
-| Proposals used | 68 (17 new, 51 reused) | **68 (20 new, 48 reused)** |
-| Tag fixes | 76 (hand list) | **151, derived** (add 45, full 36, opts 31, partial 28, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319; every step has at least 3 pre and 1 related; **0 keys in both** |
-| Option values checked | — | 316 opts entries: 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`) |
+| | Round 2 | Round 3 | Round 4 |
+|---|---|---|---|
+| Steps | 129 | 129 | 129 (14 blocks, none skipped) |
+| Full | 56 | 48 | **45** |
+| Partial | 50 | 60 | **63** |
+| Gap | 23 | 21 | **21** |
+| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
+| Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
+| Pre / related entries | 528 / — | 570 / 319 | **570 / 314**; every step has at least 3 pre and 1 related; 0 keys in both |
+| Option checks | — | — | 340 opts entries: 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); 0 links past the Y4 ceiling (`linkfit.mjs`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,56 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 4 (after critic r3, 7.98)
+`spec_zz_u_r4.py` holds every round-4 change, and the build regenerates the file from the specs. The generated items are
+at the end of `Y4-items.md`.
+
+**The steps that scored under 8**
+- **B7.S4 is now partial.** `mixed_nl_drag {}` only places labels; it never asks what mixed number is at a point, and 2
+  of 8 items hold no mixed number. New option `mixed_nl_read` (a read form, with a mixed number on every item).
+- **B12.S3 pre-skills.** `symmetry` and `compose_shapes` are dropped. The pre-skills are now `identify_lines`
+  (perpendicular) and quarter turns of a clock hand, with preBuild `turns` (Y3 Turns and angles, W28). Related
+  `order_least_to_greatest` is dropped. The note says why there are so few live pre-skills.
+- **B9.S4.** New pre-skills `f_to_d` (B8.S8) and `d_to_f {forms:[0]}` (B8.S2). `equiv_frac_visual` is dropped. The
+  build is now `flex_partition` (decimal band) and the preBuild is `decimal_pv` (B9.S3).
+- **B1.S13.** The pre-skills are now `expand`, `combine` and `add_three`: a Roman numeral is read by adding its symbols.
+  `time_hour` is dropped, and the note explains why.
+
+**Re-judged from generated items**
+- **B7.S1 is now partial.** Half of `whole_as_fraction`'s items are "7 = 7/1". New option `whole_nn_only` (1 = n/n
+  only).
+- **B7.S13 is now partial.** `sub_fractions_like` simplifies its keys (4/8 − 2/8 = 1/4). New option
+  `frac_answer_as_is` keeps the denominator (2/8).
+
+**Housekeeping**
+- **Pre `why` labels.**
+  - A Y4 step that comes later in the WRM order is labelled "a later WRM step this year: the building block this step
+    uses". Before, it was "earlier block" (B13.S3, B13.S4).
+  - B8.S6 now cites B5.S5 for whole-number ÷ 10.
+  - B8.S1–S3 cite wk W30. W29 is the Geometry test and MAP week; `WK_OVERRIDE` in the spec sets this.
+- **B6.S9.** `composite_shapes {forms:[0]}` moved to pre. The mis-cited `perimeter_intro {labels:'some'}` is dropped.
+- **B8.S2 and B8.S8: `d_to_f {forms:[0]}`.** `d_to_f` has no `denoms` option; `forms` is its only one.
+- **B2.S7.** The `sub_across_zeros` clause now says "3- or 2-digit".
+- **Coordinates.** Every `coordinate_q1` link and partial carries Max Number 10, so its points stay within 10.
+  Max Number 10,000 let them reach 20.
+- **Noise pre-skills dropped.** `count_sequence` on B14.S2 and B14.S4, and `compare_groups` on B3.S4. Each step got a
+  real pre-skill in its place: `identify_lines` and `shape_positions`.
+
+**Rule 18: pre and related links carry options that fit the step.** The new script `linkfit.mjs` generates every pre and
+related link with its own options and fails a link that goes past Y4. The limit is 20,000 (the sum of two 4-digit
+numbers) or 2 decimal places. The one exception is the deliberate wrong answer in "is this answer reasonable?". 18 links
+were fixed:
+- `compare_decimal`, `order_decimals` and `round_decimals` now carry decimals 1 or 2 and Max Number 10.
+- `place_value_10x` now carries a band and a power.
+- `double` now carries band 50.
+- `number_word_names` now carries band 999.
+- Dropped: `nearest_10000` (Grade 4) and `area_model_mult_hard` (97 × 193). Also dropped: `count_by_powers_of_10`, which
+  counts by 100s up to 800,600 whatever the Max Number.
+
+**Note for the lead.** `count_by_powers_of_10`'s "1,000s and more" `match` pattern (`by \d+,?\d{3}s`) misses
+"by 1,000,000s". So on the print path `{step:[2]}` passes its own filter on only 9 of 12 items. Fix the regex together
+with `coord_forms_fix`. B1.S4 is partial either way.
 
 ## Changes in round 3
 

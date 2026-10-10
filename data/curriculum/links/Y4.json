@@ -194,10 +194,6 @@
      }
     },
     {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "counting in 10s and 100s along the line"
-    },
-    {
      "key": "placevalue:compare",
      "why": "position on the line decides which is greater",
      "opts": {
@@ -281,7 +277,15 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "a digit moving into the thousands place"
+     "why": "a digit moving into the thousands place",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
+      "band": 10000
+     }
     }
    ],
    "note": "Generated: count_by_powers_of_10 {step:[2]} gave \"Count down by 100,000s\", \"Count up by 1,000,000s\"; no 1,000s within 10,000.",
@@ -878,7 +882,10 @@
     },
     {
      "key": "decimals:order_decimals",
-     "why": "the same ordering routine with decimals later in the year"
+     "why": "the same ordering routine with decimals later in the year",
+     "opts": {
+      "decimals": 1
+     }
     }
    ],
    "note": ""
@@ -894,10 +901,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:time_hour",
-     "why": "Y3.B10.S1 Roman numerals to 12 (prior learning wk W12)"
-    },
-    {
      "key": "placevalue:expand",
      "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W12)",
      "opts": {
@@ -906,17 +909,27 @@
     },
     {
      "key": "placevalue:combine",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier step in the block)"
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (lower grade, same idea)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "addition:add_three",
+     "why": "adding three numbers (Grade 1, 1.OA.A.2): XXVI = 10 + 10 + 5 + 1"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "placevalue:number_word_names",
-     "why": "another way of writing a number"
+     "why": "another way of writing a number",
+     "opts": {
+      "band": 999
+     }
     }
    ],
-   "note": "Beyond CCSS (UK National Curriculum); taught as enrichment in W12. The prior learning \"Y3 Roman numerals to 12\" is band 12 of the same roman_numerals proposal, so it is not a separate preBuild. Pre-skills are few because Roman numerals have no earlier WRM step except \"Roman numerals to 12\" (band 12 of the same build).",
+   "note": "Beyond CCSS (UK National Curriculum); taught as enrichment in W12. Pre-skills are the additive writing of a number (expanded form, recombining parts, adding three numbers): a Roman numeral is read by adding its symbols. \"Y3 Roman numerals to 12\" is band 12 of the same roman_numerals build, so it is not a separate preBuild; time_hour (the Y3 clock lesson) was dropped, it is not a building block of reading numerals.",
    "envision": [
     {
      "proposal": "roman_numerals",
@@ -1123,10 +1136,6 @@
      "opts": {
       "place": 1000
      }
-    },
-    {
-     "key": "number_sense:nearest_10000",
-     "why": "Grade 4 extension"
     }
    ],
    "note": ""
@@ -1581,7 +1590,7 @@
     },
     {
      "key": "subtraction:sub_across_zeros",
-     "missing": "generated: only exchanges across zeros, and half the items are 3-digit (900 − 205, 800 − 351, 801 − 427)",
+     "missing": "generated: only exchanges across zeros, and half the items are 3- or 2-digit (900 − 205, 700 − 515, 100 − 29)",
      "opts": {
       "band": 10000
      }
@@ -2054,10 +2063,6 @@
      "why": "Y4.B3.S3 Make shapes (step before in the block)"
     },
     {
-     "key": "comparing:compare_groups",
-     "why": "R.B1.S7 Compare amounts (prior learning wk W19)"
-    },
-    {
      "key": "addition:comparison_word",
      "why": "Y1.B5.S8 Subtraction - finding the difference (lower grade, same CCSS cluster)"
     }
@@ -2211,7 +2216,10 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W01)"
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W01)",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "division:div_facts",
@@ -2630,7 +2638,10 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W02)"
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W02)",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "multiplication:mult_properties",
@@ -3056,7 +3067,10 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (lower grade, same CCSS cluster)"
+     "why": "Y2.B5.S11 Doubling and halving (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "multiplication:area_model_mult",
@@ -3861,10 +3875,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:area_model_mult_hard",
-     "why": "bigger area models"
-    },
-    {
      "key": "area_perimeter:area_distributive_visual",
      "why": "the distributive area picture"
     }
@@ -4326,7 +4336,10 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "division:area_model_div_2by1",
@@ -4421,7 +4434,8 @@
       "op": "x",
       "power": [
        1000
-      ]
+      ],
+      "band": 10000
      }
     }
    ],
@@ -4501,7 +4515,8 @@
       "power": [
        10,
        100
-      ]
+      ],
+      "band": 10000
      }
     }
    ],
@@ -4603,7 +4618,10 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W20)"
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W20)",
+     "opts": {
+      "band": 50
+     }
     },
     {
      "key": "subtraction:missing_add_sub",
@@ -4933,10 +4951,12 @@
      }
     },
     {
-     "key": "area_perimeter:perimeter_intro",
-     "why": "Y4.B6.S8 Perimeter of regular polygons (step before in the block)",
+     "key": "area_perimeter:composite_shapes",
+     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (earlier step in the block)",
      "opts": {
-      "labels": "some"
+      "forms": [
+       0
+      ]
      }
     },
     {
@@ -4950,10 +4970,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:composite_shapes",
-     "why": "rectilinear shapes"
-    },
     {
      "key": "coordinates:coord_polygon",
      "why": "polygons on a grid"
@@ -4973,20 +4989,22 @@
   },
   "Y4.B7.S1": {
    "title": "Understand the whole",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "composing:whole_as_fraction",
-     "opts": {}
+     "missing": "generated: 1 = 5/5, 1 = 8/8, but half the items write a whole number over 1 (7 = 7/1, 9 = 9/1), which is not this step"
     },
     {
      "key": "composing:compose_whole",
-     "opts": {}
+     "missing": "generated: makes 1 whole from mixed unit fractions (halves and quarters); never names the whole as n/n"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of \"one whole = n/n\" only: how many equal parts make the whole, written as a fraction",
+   "build": [
+    "whole_nn_only"
+   ],
    "pre": [
     {
      "key": "fractions:identify",
@@ -5026,7 +5044,17 @@
      "why": "0, 1/2 and 1 on a line"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "whole_nn_only",
+     "name": "One Whole as n/n (option)",
+     "kind": "option on composing:whole_as_fraction",
+     "teaches": "write one whole as a fraction from a shape cut into equal parts (1 = 6/6), and say how many parts make the whole",
+     "closes": "a page of \"one whole = n/n\" only: how many equal parts make the whole, written as a fraction",
+     "representation": "the existing cell with the cut shape beside the equation 1 = □/n (picture is a hint that fades)"
+    }
+   ]
   },
   "Y4.B7.S2": {
    "title": "Count beyond 1",
@@ -5157,16 +5185,18 @@
   },
   "Y4.B7.S4": {
    "title": "Number lines with mixed numbers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:mixed_nl_drag",
-     "opts": {}
+     "missing": "generated: places improper fractions and mixed numbers on 0-3 lines, but never asks what mixed number is at a point, and some items hold no mixed number at all (\"1/3, 2/3\", \"2/3, 1\")"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "reading the mixed number at a marked point on a line, and a mixed number on every item",
+   "build": [
+    "mixed_nl_read"
+   ],
    "pre": [
     {
      "key": "composing:fraction_number_line",
@@ -5206,7 +5236,17 @@
      "why": "decimals on a line (Y4.B8.S4)"
     }
    ],
-   "note": "Generated mixed_nl_drag {}: mixed numbers and improper fractions placed on 0-3 lines with every whole labelled."
+   "note": "Generated mixed_nl_drag {} (print path): place-only, and 2 of 8 items carry no mixed number.",
+   "envision": [
+    {
+     "proposal": "mixed_nl_read",
+     "name": "Read and Place Mixed Numbers on a Line (option)",
+     "kind": "option on fractions:mixed_nl_drag",
+     "teaches": "write the mixed number an arrow points to on a 0-3 line (2 1/4), and place mixed numbers, with one on every item",
+     "closes": "reading the mixed number at a marked point on a line, and a mixed number on every item",
+     "representation": "the existing nl-place line (wholes labelled)"
+    }
+   ]
   },
   "Y4.B7.S5": {
    "title": "Compare and order mixed numbers",
@@ -5248,7 +5288,13 @@
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "the same idea with decimals"
+     "why": "the same idea with decimals",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "fractions:compare deals proper fractions only; the existing partial tag of compare on this step should be dropped (it covers none of mixed numbers).",
@@ -5685,20 +5731,22 @@
   },
   "Y4.B7.S13": {
    "title": "Subtract two fractions",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:sub_fractions_like",
-     "opts": {}
+     "missing": "generated: same-denominator subtraction with a bar model, but the key simplifies (4/8 − 2/8 = 1/4, 7/10 − 3/10 = 2/5)"
     },
     {
      "key": "fraction_operations:sub_frac_like_nv",
-     "opts": {}
+     "missing": "generated: \"Subtract and simplify: 7/10 − 3/10\" → 2/5; simplifying is not this step"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "differences left with the same denominator (4/8 − 2/8 = 2/8), no simplifying",
+   "build": [
+    "frac_answer_as_is"
+   ],
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
@@ -5724,7 +5772,17 @@
      "why": "the next step with mixed numbers"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "frac_answer_as_is",
+     "name": "Leave the Answer Unsimplified (option)",
+     "kind": "option on fraction_operations:sub_fractions_like",
+     "teaches": "subtract two fractions with the same denominator and keep that denominator in the answer (5/8 − 3/8 = 2/8)",
+     "closes": "differences left with the same denominator (4/8 − 2/8 = 2/8), no simplifying",
+     "representation": "the existing frac-model cell"
+    }
+   ]
   },
   "Y4.B7.S14": {
    "title": "Subtract from whole amounts",
@@ -5867,11 +5925,11 @@
    "pre": [
     {
      "key": "fractions:identify",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W29)"
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W30)"
     },
     {
      "key": "fractions:shade_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W29)"
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W30)"
     },
     {
      "key": "composing:fraction_number_line",
@@ -5879,7 +5937,7 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W29)"
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W30)"
     },
     {
      "key": "composing:compose_whole",
@@ -5936,7 +5994,12 @@
     },
     {
      "key": "conversions:d_to_f",
-     "missing": "mixes fifths (0.6 = 3/5); no tenths-only page"
+     "missing": "mixes fifths (0.6 = 3/5); no tenths-only page",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "verdict": "partial",
@@ -5956,15 +6019,15 @@
     },
     {
      "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W29)"
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W30)"
     },
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W29)"
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30)"
     },
     {
      "key": "composing:ten_frame_build",
-     "why": "Y1.B4.S2 Understand 10 (prior learning wk W29)"
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W30)"
     }
    ],
    "preBuild": [
@@ -5981,7 +6044,13 @@
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "comparing tenths"
+     "why": "comparing tenths",
+     "opts": {
+      "decimals": 1,
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "",
@@ -6013,7 +6082,7 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
-     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W29)",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W30)",
      "opts": {
       "band": 999
      }
@@ -6029,7 +6098,7 @@
     },
     {
      "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W29)"
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W30)"
     },
     {
      "key": "placevalue:expand",
@@ -6048,7 +6117,12 @@
      "key": "placevalue:place_value_10x",
      "why": "digits moving into the tenths column",
      "opts": {
-      "decimals": true
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true,
+      "band": 1000
      }
     }
    ],
@@ -6117,11 +6191,23 @@
    "related": [
     {
      "key": "decimals:round_decimals",
-     "why": "rounding uses the same line"
+     "why": "rounding uses the same line",
+     "opts": {
+      "precision": [
+       0
+      ],
+      "range": 10
+     }
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "position shows which is greater"
+     "why": "position shows which is greater",
+     "opts": {
+      "decimals": 1,
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "ticks \"one\" labels every tenth except the answer, which gives it away; \"some\" (0, 0.5, 1) is the honest page.",
@@ -6249,7 +6335,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S5 Divide a 1-digit number by 10 (step before in the block)",
+     "why": "Y4.B5.S5 Divide by 10 (earlier block this year)",
      "opts": {
       "op": "/",
       "power": [
@@ -6402,7 +6488,12 @@
     },
     {
      "key": "conversions:d_to_f",
-     "missing": "mixes fifths; no hundredths-only page"
+     "missing": "mixes fifths; no hundredths-only page",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "verdict": "partial",
@@ -6434,7 +6525,13 @@
    "related": [
     {
      "key": "decimals:compare_decimal",
-     "why": "comparing hundredths"
+     "why": "comparing hundredths",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "measurement:money_notation",
@@ -6513,7 +6610,13 @@
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "compare digit by digit"
+     "why": "compare digit by digit",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": "",
@@ -6775,7 +6878,13 @@
    "related": [
     {
      "key": "decimals:compare_decimal",
-     "why": "compare by place"
+     "why": "compare by place",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "measurement:money_notation",
@@ -6805,9 +6914,27 @@
    "verdict": "gap",
    "missing": "partitioning decimals in more than one way (3.45 = 3.4 + 0.05 = 2 + 1.45) with a part-whole model",
    "build": [
-    "decimal_pv"
+    "flex_partition"
    ],
    "pre": [
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S2 Tenths as decimals (earlier block this year)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
     {
      "key": "placevalue:unit_form",
      "why": "Y3.B1.S7 Flexible partitioning of numbers to 1,000 (prior learning wk W33)",
@@ -6822,14 +6949,10 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W33)"
     }
    ],
    "preBuild": [
-    "flex_partition"
+    "decimal_pv"
    ],
    "related": [
     {
@@ -6844,12 +6967,12 @@
    "note": "",
    "envision": [
     {
-     "proposal": "decimal_pv",
-     "name": "Tenths and Hundredths in a Place-Value Chart",
-     "kind": "new skill decimals:decimal_place_value",
-     "teaches": "partition a decimal in a second way in a part-whole model (3.45 = 3.4 + 0.05 = 2 + 1.45)",
+     "proposal": "flex_partition",
+     "name": "Partition Numbers Flexibly",
+     "kind": "new skill placevalue:flexible_partition",
+     "teaches": "decimal band: partition a decimal in a second way in a part-whole model (3.45 = 3.4 + 0.05 = 2 + 1.45)",
      "closes": "partitioning decimals in more than one way (3.45 = 3.4 + 0.05 = 2 + 1.45) with a part-whole model",
-     "representation": "a place-value chart with counters"
+     "representation": "a part-whole diagram with one part given"
     }
    ]
   },
@@ -6960,7 +7083,13 @@
    "pre": [
     {
      "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (step before in the block)"
+     "why": "Y4.B9.S5 Compare decimals (step before in the block)",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -7278,7 +7407,13 @@
    "pre": [
     {
      "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (earlier block this year)"
+     "why": "Y4.B9.S5 Compare decimals (earlier block this year)",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "measurement:money_compare",
@@ -7305,7 +7440,10 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y4.B1.S12 Order numbers to 10,000 (earlier block this year)"
+     "why": "Y4.B1.S12 Order numbers to 10,000 (earlier block this year)",
+     "opts": {
+      "band": 9999
+     }
     }
    ],
    "preBuild": [
@@ -7345,7 +7483,13 @@
     },
     {
      "key": "decimals:round_decimals",
-     "why": "Y4.B9.S7 Round to the nearest whole number (earlier block this year)"
+     "why": "Y4.B9.S7 Round to the nearest whole number (earlier block this year)",
+     "opts": {
+      "precision": [
+       0
+      ],
+      "range": 10
+     }
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -7916,30 +8060,28 @@
      "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W28)"
     },
     {
-     "key": "angles_lines:symmetry",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
     },
     {
-     "key": "shapes_early:compose_shapes",
-     "why": "Y3.B11.S8 Draw polygons (lower grade, same CCSS cluster)"
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (lower grade, same idea)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "turns"
+   ],
    "related": [
     {
      "key": "angles_lines:measure_angles",
      "why": "measuring to compare"
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "the ordering routine"
-    },
-    {
      "key": "shapes_classify:classify_triangles",
      "why": "angles inside triangles"
     }
    ],
-   "note": "",
+   "note": "The main building block is Y3 \"Turns and angles\" (W28), which has no live skill: preBuild turns. identify_lines (horizontal, vertical, perpendicular) and quarter turns of a clock hand are the live building blocks.",
    "envision": [
     {
      "proposal": "turns_angles",
@@ -8346,7 +8488,7 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S1 Describe position using coordinates (earlier block this year)"
+     "why": "Y4.B14.S1 Describe position using coordinates (a later WRM step this year: the building block this step uses, so teach it first)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -8406,7 +8548,7 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (earlier block this year)"
+     "why": "Y4.B14.S2 Plot coordinates (a later WRM step this year: the building block this step uses, so teach it first)"
     }
    ],
    "preBuild": [],
@@ -8439,7 +8581,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "verdict": "partial",
@@ -8497,7 +8640,8 @@
       "forms": [
        1
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "verdict": "partial",
@@ -8520,12 +8664,12 @@
      "why": "R.B4.S4 Describe position (prior learning wk W38)"
     },
     {
-     "key": "counting:count_sequence",
-     "why": "Y1.B1.S8 Count backwards within 10 (prior learning wk W38)"
-    },
-    {
      "key": "number_sense:place_on_number_line",
      "why": "Y3.B1.S3 Number line to 100 (prior learning wk W38)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S5 Horizontal and vertical (prior learning wk W38)"
     }
    ],
    "preBuild": [],
@@ -8628,8 +8772,8 @@
      "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)"
     },
     {
-     "key": "counting:count_sequence",
-     "why": "Y1.B1.S8 Count backwards within 10 (prior learning wk W38)"
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -9245,6 +9389,23 @@
    "reused": true,
    "source": "WRM_PROPOSALS"
   },
+  "whole_nn_only": {
+   "kind": "option",
+   "skill": "composing:whole_as_fraction",
+   "option": "items \"1 = n/n only\" (no whole numbers over 1)",
+   "name": "One Whole as n/n (option)",
+   "teaches": "write one whole as a fraction from a shape cut into n equal parts (1 = 4/4), and say how many parts make the whole",
+   "representation": "the existing cell with the cut shape beside the equation 1 = □/n (picture is a hint that fades)",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.3c"
+   ],
+   "why": "generated whole_as_fraction {}: half the items are \"write 7 as a fraction with denominator 1\" (7/1)",
+   "steps": [
+    "Y4.B7.S1"
+   ],
+   "reused": false
+  },
   "frac_count": {
    "kind": "new",
    "skill": "fractions:count_in_fractions",
@@ -9295,6 +9456,23 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "mixed_nl_read": {
+   "kind": "option",
+   "skill": "fractions:mixed_nl_drag",
+   "option": "forms \"place\" | \"read the number at the arrow\"; every item holds a mixed number",
+   "name": "Read and Place Mixed Numbers on a Line (option)",
+   "teaches": "write the mixed number an arrow points to on a 0-3 line, and place mixed numbers, with a mixed number on every item",
+   "representation": "the existing nl-place line (wholes labelled); one mixed-number answer slot under the arrow for the read form",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.2"
+   ],
+   "why": "generated mixed_nl_drag {} only drags labels onto a line, and 2 of 8 items have no mixed number (\"1/3, 2/3\")",
+   "steps": [
+    "Y4.B7.S4"
+   ],
+   "reused": false
   },
   "frac_compare_gt1": {
    "kind": "option",
@@ -9361,6 +9539,24 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "frac_answer_as_is": {
+   "kind": "option",
+   "skill": "fraction_operations:sub_fractions_like",
+   "option": "answer \"as it is\" (2/8) | \"simplified\" (1/4); also on sub_frac_like_nv",
+   "name": "Leave the Answer Unsimplified (option)",
+   "teaches": "subtract fractions with the same denominator and write the difference with that denominator (4/8 − 2/8 = 2/8), with no simplifying",
+   "representation": "the existing frac-model cell; the key shows the unsimplified fraction",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.1",
+    "4.NF.B.3a"
+   ],
+   "why": "generated sub_fractions_like: keys are simplified (4/8 − 2/8 = 1/4, 7/10 − 3/10 = 2/5) and the _nv items say \"Subtract and simplify\"; simplifying is not taught until later",
+   "steps": [
+    "Y4.B7.S13"
+   ],
+   "reused": false
   },
   "sub_break_whole": {
    "kind": "option",
@@ -9796,6 +9992,7 @@
    "family": "geometry",
    "steps": [
     "Y4.B12.S1",
+    "Y4.B12.S3",
     "Y1.B11.S1",
     "Y2.B11.S3"
    ],
@@ -10272,7 +10469,7 @@
    "key": "subtraction:sub_across_zeros",
    "step": "Y4.B2.S7",
    "action": "partial",
-   "partial": "generated: only exchanges across zeros, and half the items are 3-digit (900 − 205, 800 − 351, 801 − 427)",
+   "partial": "generated: only exchanges across zeros, and half the items are 3- or 2-digit (900 − 205, 700 − 515, 100 − 29)",
    "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "band": 10000
@@ -10963,6 +11160,20 @@
    "why": "generated: triangles, rectangles and squares only; no 5- or 6-sided polygons"
   },
   {
+   "key": "composing:compose_whole",
+   "step": "Y4.B7.S1",
+   "action": "partial",
+   "partial": "generated: makes 1 whole from mixed unit fractions (halves and quarters); never names the whole as n/n",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
+   "key": "composing:whole_as_fraction",
+   "step": "Y4.B7.S1",
+   "action": "partial",
+   "partial": "generated: 1 = 5/5, 1 = 8/8, but half the items write a whole number over 1 (7 = 7/1, 9 = 9/1), which is not this step",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
    "key": "composing:fraction_number_line",
    "step": "Y4.B7.S2",
    "action": "add",
@@ -10973,6 +11184,7 @@
    "key": "fractions:mixed_nl_drag",
    "step": "Y4.B7.S4",
    "action": "add",
+   "partial": "generated: places improper fractions and mixed numbers on 0-3 lines, but never asks what mixed number is at a point, and some items hold no mixed number at all (\"1/3, 2/3\", \"2/3, 1\")",
    "why": "missing tag: place mixed numbers on a line"
   },
   {
@@ -11024,6 +11236,20 @@
    "why": "mixed + mixed only; never a proper fraction added to a mixed number"
   },
   {
+   "key": "fraction_operations:sub_frac_like_nv",
+   "step": "Y4.B7.S13",
+   "action": "partial",
+   "partial": "generated: \"Subtract and simplify: 7/10 − 3/10\" → 2/5; simplifying is not this step",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
+   "key": "fraction_operations:sub_fractions_like",
+   "step": "Y4.B7.S13",
+   "action": "partial",
+   "partial": "generated: same-denominator subtraction with a bar model, but the key simplifies (4/8 − 2/8 = 1/4, 7/10 − 3/10 = 2/5)",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
    "key": "fraction_operations:sub_mixed_like",
    "step": "Y4.B7.S15",
    "action": "partial",
@@ -11053,7 +11279,12 @@
    "step": "Y4.B8.S2",
    "action": "partial",
    "partial": "mixes fifths (0.6 = 3/5); no tenths-only page",
-   "why": "mixes fifths"
+   "why": "mixes fifths",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "conversions:f_to_d",
@@ -11114,7 +11345,12 @@
    "step": "Y4.B8.S8",
    "action": "partial",
    "partial": "mixes fifths; no hundredths-only page",
-   "why": "mixes fifths"
+   "why": "mixes fifths",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "conversions:f_to_d",
@@ -11346,7 +11582,8 @@
     "forms": [
      0
     ]
-   }
+   },
+   "maxNumber": 10
   },
   {
    "key": "coordinates:coordinate_q1",
@@ -11358,7 +11595,8 @@
     "forms": [
      1
     ]
-   }
+   },
+   "maxNumber": 10
   },
   {
    "key": "coordinates:geo_translate",

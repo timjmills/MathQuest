@@ -623,3 +623,160 @@ _No direct or partial skill (gap)._
 5. 560 ÷ 100 = ? → 5.6 [pv]
 6. 731 ÷ 100 = ? → 7.31 [pv]
 
+
+# Round 4: generated items for the steps changed after critic r3
+
+Same command and seeds as above (print path, `itemIndex`). B12.S3, B9.S4 and B1.S13 changed only their pre-skills and builds; they are listed for completeness.
+
+## Y4.B7.S1 Understand the whole — partial
+
+**partial** `composing:whole_as_fraction` opts `{}` Max Number 10000 — missing: generated: 1 = 5/5, 1 = 8/8, but half the items write a whole number over 1 (7 = 7/1, 9 = 9/1), which is not this step
+
+1. Write 1 as a fraction with denominator 8. → 8/8
+2. Write 1 as a fraction with denominator 2. → 2/2
+3. Write 3 as a fraction with denominator 1. → 3/1
+4. Write 1 as a fraction with denominator 8. → 8/8
+5. Write 3 as a fraction with denominator 1. → 3/1
+6. Write 1 as a fraction with denominator 5. → 5/5
+
+**partial** `composing:compose_whole` opts `{}` Max Number 10000 — missing: generated: makes 1 whole from mixed unit fractions (halves and quarters); never names the whole as n/n
+
+1. Use halves and quarters and eighths to make 1 whole. → 1 whole
+2. Use halves and quarters and eighths to make 1 whole. → 1 whole
+3. Use halves and quarters to make 1 whole. → 1 whole
+4. Use halves and thirds and sixths to make 1 whole. → 1 whole
+5. Use halves and quarters to make 1 whole. → 1 whole
+6. Use halves and sixths to make 1 whole. → 1 whole
+
+## Y4.B7.S4 Number lines with mixed numbers — partial
+
+**partial** `fractions:mixed_nl_drag` opts `{}` Max Number 10000 — missing: generated: places improper fractions and mixed numbers on 0-3 lines, but never asks what mixed number is at a point, and some items hold no mixed number at all ("1/3, 2/3", "2/3, 1")
+
+1. Put each number on the number line. → 1/6, 1, 9/6 [nl-place]
+2. Put each number on the number line. → 4/5, 1 2/5, 13/5 [nl-place]
+3. Put each number on the number line. → 2/3, 2 1/3 [nl-place]
+4. Put each number on the number line. → 3/5, 1 2/5, 12/5 [nl-place]
+5. Put each number on the number line. → 3/3, 2 [nl-place]
+6. Put each number on the number line. → 8/6, 1 4/6, 15/6 [nl-place]
+
+## Y4.B7.S13 Subtract two fractions — partial
+
+**partial** `fraction_operations:sub_fractions_like` opts `{}` Max Number 10000 — missing: generated: same-denominator subtraction with a bar model, but the key simplifies (4/8 − 2/8 = 1/4, 7/10 − 3/10 = 2/5)
+
+1. Calculate: 4/11 − 3/11 = ? → 1/11 [frac-model]
+2. Calculate: 3/3 − 1/3 = ? → 2/3 [frac-model]
+3. Click ALL differences that are less than 1/2. → ["opt0","opt1","opt2"]
+4. Calculate: 8/11 − 2/11 = ? → 6/11 [frac-model]
+5. Click ALL differences that are less than 1/2. → ["opt0","opt1","opt2","opt4"]
+6. Calculate: 8/8 − 5/8 = ? → 3/8 [frac-model]
+
+**partial** `fraction_operations:sub_frac_like_nv` opts `{}` Max Number 10000 — missing: generated: "Subtract and simplify: 7/10 − 3/10" → 2/5; simplifying is not this step
+
+1. Subtract and simplify: 11/11 − 3/11 → 8/11
+2. 3/3 − 1/3 = ? → 2/3
+3. Sort each difference into the correct bin (compared to 1/2). → {"t0":"less","t1":"less","t2":"more","t3":"less","t4":"eq"}
+4. 8/11 − ?/11 = 6/11. Find the missing numerator. → 2
+5. Sort each difference into the correct bin (compared to 1/2). → {"t0":"less","t1":"less","t2":"more","t3":"eq","t4":"less"}
+6. 8/8 − 5/8 = ? → 3/8
+
+## Y4.B8.S2 Tenths as decimals — partial
+
+**partial** `conversions:f_to_d` opts `{"denoms":[5]}` Max Number 10000 — missing: mixes fifths and hundredths with tenths; no tenths model
+
+1. Convert to decimal: 1/100 → 0.01
+2. Convert to decimal: 9/10 → 0.9
+3. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binThreeQ","t2":"binHalf","t3":"binH
+4. Drag each value into the bin for the equivalent fraction. → {"t0":"binQuarter","t1":"binHalf","t2":"binThreeQ","t3":"bin
+5. Convert to decimal: 25/100 → 0.25
+6. Convert to decimal: 7/100 → 0.07
+
+**partial** `conversions:d_to_f` opts `{"forms":[0]}` Max Number 10000 — missing: mixes fifths (0.6 = 3/5); no tenths-only page
+
+1. Convert 0.3 to a fraction. → 3/10
+2. Convert 0.1 to a fraction. → 1/10
+3. Convert 0.8 to a fraction. → 4/5
+4. Convert 0.5 to a fraction. → 1/2
+5. Convert 0.5 to a fraction. → 1/2
+6. Convert 0.7 to a fraction. → 7/10
+
+## Y4.B8.S8 Hundredths as decimals — partial
+
+**partial** `conversions:f_to_d` opts `{"denoms":[5]}` Max Number 10000 — missing: hundredths mixed with fifths and tenths; no hundred-square model
+
+1. Convert to decimal: 1/100 → 0.01
+2. Convert to decimal: 9/10 → 0.9
+3. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binThreeQ","t2":"binHalf","t3":"binH
+4. Drag each value into the bin for the equivalent fraction. → {"t0":"binQuarter","t1":"binHalf","t2":"binThreeQ","t3":"bin
+5. Convert to decimal: 25/100 → 0.25
+6. Convert to decimal: 7/100 → 0.07
+
+**partial** `conversions:d_to_f` opts `{"forms":[0]}` Max Number 10000 — missing: mixes fifths; no hundredths-only page
+
+1. Convert 0.3 to a fraction. → 3/10
+2. Convert 0.1 to a fraction. → 1/10
+3. Convert 0.8 to a fraction. → 4/5
+4. Convert 0.5 to a fraction. → 1/2
+5. Convert 0.5 to a fraction. → 1/2
+6. Convert 0.7 to a fraction. → 7/10
+
+## Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange — partial
+
+**partial** `subtraction:sub_10k_regroup` opts `{}` Max Number 10000 — missing: generated items mix one and several exchanges (5,710 − 2,907 has one, 4,266 − 2,398 three); a page cannot be held to two or more
+
+1. 3,087 − 2,828 = ? → 259 [stack]
+2. 6,606 − 1,617 = ? → 4989 [stack]
+3. 3,830 − 563 = ? → 3267 [stack]
+4. 6,635 − 1,828 = ? → 4807 [stack]
+5. 6,100 − 4,853 = ? → 1247 [stack]
+6. 9,837 − 5,889 = ? → 3948 [stack]
+
+**partial** `subtraction:sub_across_zeros` opts `{"band":10000}` Max Number 10000 — missing: generated: only exchanges across zeros, and half the items are 3- or 2-digit (900 − 205, 700 − 515, 100 − 29)
+
+1. 9,063 − 390 = ? → 8673
+2. 700 − 515 = ? → 185
+3. 300 − 62 = ? → 238
+4. 3,005 − 1,889 = ? → 1116
+5. 6,000 − 1,132 = ? → 4868
+6. 707 − 689 = ? → 18
+
+## Y4.B14.S1 Describe position using coordinates — partial
+
+**partial** `coordinates:coordinate_q1` opts `{"forms":[0]}` Max Number 10 — missing: right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to reading
+
+1. Plot point A at (1, 1) → {"x":1,"y":1}
+2. What are the coordinates of each point? → [{"label":"A","x":7,"y":2},{"label":"B","x":7,"y":3},{"label
+3. What are the coordinates of point A? → {"x":1,"y":3}
+4. Plot point A at (3, 9) → {"x":3,"y":9}
+5. Plot these points: A: (7, 10), B: (7, 1) → [{"label":"A","x":7,"y":10},{"label":"B","x":7,"y":1}]
+6. What are the coordinates of each point? → [{"label":"A","x":9,"y":7},{"label":"B","x":10,"y":6},{"labe
+
+## Y4.B14.S2 Plot coordinates — partial
+
+**partial** `coordinates:coordinate_q1` opts `{"forms":[1]}` Max Number 10 — missing: right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to plotting
+
+1. Plot these points: A: (8, 4), B: (10, 3), C: (2, 6) → [{"label":"A","x":8,"y":4},{"label":"B","x":10,"y":3},{"labe
+2. What are the coordinates of each point? → [{"label":"A","x":2,"y":3},{"label":"B","x":1,"y":4}]
+3. What are the coordinates of point A? → {"x":4,"y":1}
+4. Plot point A at (6, 9) → {"x":6,"y":9}
+5. Plot these points: A: (1, 3), B: (6, 8) → [{"label":"A","x":1,"y":3},{"label":"B","x":6,"y":8}]
+6. What are the coordinates of point A? → {"x":8,"y":10}
+
+## Y4.B12.S3 Compare and order angles — partial
+
+**partial** `angles_lines:identify_angles` opts `{}` Max Number 10000 — missing: names acute/right/obtuse; never compares two angles or orders three by size
+
+1. What type of angle is this? → Straight
+2. What type of angle is this? → Acute
+3. Click ALL the acute angles. → ["opt0","opt2"]
+4. Click ALL the right angles. → ["opt0","opt2","opt5"]
+5. Click ALL the obtuse angles in this shape. → ["h2","h3"]
+6. What type of angle is this? → Obtuse
+
+## Y4.B9.S4 Flexibly partition decimals — gap
+
+_No direct or partial skill (gap)._
+
+## Y4.B1.S13 Roman numerals — gap
+
+_No direct or partial skill (gap)._
+

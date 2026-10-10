@@ -40,7 +40,7 @@ def mx(e, key, o):
 def why_for(sid, ref, kind):
     t = steps[ref]['title'] if ref in steps else ''
     if kind == 'P':
-        wk = prior.get(sid, {}).get('wk')
+        wk = ns.get('WK_OVERRIDE', {}).get(sid) or prior.get(sid, {}).get('wk')
         return f"{ref} {t or ''} (prior learning wk {wk})".replace('  ', ' ')
     if kind == 'C':
         return f"{ref} (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk {prior.get(sid, {}).get('wk')})"
@@ -48,6 +48,8 @@ def why_for(sid, ref, kind):
         # say exactly where the pre-skill sits relative to this step
         if ref.startswith('Y4.'):
             same_block = ref.rsplit('.', 1)[0] == sid.rsplit('.', 1)[0]
+            if order.index(ref) > order.index(sid):
+                return f"{ref} {t} (a later WRM step this year: the building block this step uses, so teach it first)"
             prev = same_block and order.index(ref) == order.index(sid) - 1
             return f"{ref} {t} ({'step before in the block' if prev else ('earlier step in the block' if same_block else 'earlier block this year')})"
         return f"{ref} {t} (lower grade, same idea)" if kind == 'X' else f"{ref} {t} (lower grade, same CCSS cluster)"

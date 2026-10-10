@@ -131,3 +131,9 @@ ENVISION.update({
  'Y4.B14.S2': {'coord_forms_fix': 'plot given points on a first-quadrant grid, every item, on screen and on paper'},
 })
 ENVREP['dec_compare_model'] = 'two hundred squares side by side with a sign box between them'
+ENVISION.update({
+ 'Y4.B7.S4':  {'mixed_nl_read': 'write the mixed number an arrow points to on a 0-3 line (2 1/4), and place mixed numbers, with one on every item'},
+ 'Y4.B7.S1':  {'whole_nn_only': 'write one whole as a fraction from a shape cut into equal parts (1 = 6/6), and say how many parts make the whole'},
+ 'Y4.B7.S13': {'frac_answer_as_is': 'subtract two fractions with the same denominator and keep that denominator in the answer (5/8 − 3/8 = 2/8)'},
+ 'Y4.B9.S4':  {'flex_partition': 'decimal band: partition a decimal in a second way in a part-whole model (3.45 = 3.4 + 0.05 = 2 + 1.45)'},
+})
