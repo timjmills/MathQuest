@@ -41,7 +41,7 @@ rows.forEach((r, i) => {
     const at = `row ${i} "${r.task}"`;
     if (!STATUS.has(r.status)) errs.push(`${at}: bad status ${r.status}`);
     if (!STRANDS.has(r.strand)) errs.push(`${at}: bad strand ${r.strand}`);
-    if (r.status !== 'exists-ok' && !r.proposal) errs.push(`${at}: ${r.status} without proposal`);
+    if ((r.status === 'partial' || r.status === 'missing') && !r.proposal) errs.push(`${at}: ${r.status} without proposal`);
     if (r.proposal && !proposals[r.proposal]) errs.push(`${at}: unknown proposal ${r.proposal}`);
     for (const k of r.skills || []) if (!live(k)) errs.push(`${at}: skill ${k} not a live skill key`);
 });
@@ -51,7 +51,11 @@ for (const [id, p] of Object.entries(proposals)) {
     for (const k of (p.reused ? ['name'] : ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'map'])) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);
     if (p.kind === 'option' && !p.option) errs.push(`proposal ${id}: option without option`);
 }
-const out = { generatedBy: 'map-audit', rows, proposals };
+// Re-grades are not builds: every exists-regrade row's skills go to one list the Wave 5 lanes work from.
+const regrades = {};
+for (const r of rows) if (r.status === 'exists-regrade') for (const k of r.skills) (regrades[k] ??= []).push(r.task);
+for (const id of Object.keys(proposals)) if (/^map_regrade_/.test(id)) errs.push(`proposal ${id}: a re-grade is not a build; drop it and leave the row exists-regrade`);
+const out = { generatedBy: 'map-audit', rows, proposals, regrades };
 fs.mkdirSync(path.join(ROOT, 'data/curriculum/links'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'data/curriculum/links/MAP.json'), JSON.stringify(out, null, 1) + '\n');
 const c = {}; rows.forEach(r => c[r.status] = (c[r.status] || 0) + 1);
