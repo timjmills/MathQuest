@@ -27,6 +27,10 @@ export const ROLE_ID = 'opener';
 export const WRAP_TO_CELL = (index) => index === 0;
 /** critic r2 N4: a one-page count row's air (vpad, spread over the one-page SHEET) is not drawn here; the cell is the row's height. */
 export const TIGHT_ROWS = true;
+/** critic r3 N9 (H13): a Lines count row is short (digits on a rule), so its cell takes none of the PT-ENG-3 grow - the spare
+ * height stays blank at the foot - where a row with boxes grows as before. */
+const isLinesRow = (it) => !!(it && it.template === 'count-row' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.lines);
+const GROWCAP = (first) => (isLinesRow(first) ? 0 : Infinity);
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -70,7 +74,7 @@ function geometry(items, input) {
     if (first && first.template === 'count-row' && gc === 1 && used + gH + hand <= m.budget) { gRows = 2; used += gH; }
     const spare = Math.max(0, m.budget - used - hand);
     const rowsThatGrow = gRows + iRows;
-    const grow = Math.min(8, spare / rowsThatGrow);
+    const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first));
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
 }
 
@@ -116,7 +120,7 @@ export function plan(input = {}) {
         content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
     if (indep.length) {
         sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
-            content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: g.iRows, cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
+            content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
     }
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");

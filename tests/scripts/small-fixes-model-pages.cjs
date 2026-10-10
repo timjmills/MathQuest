@@ -3,6 +3,9 @@
 // print no more pupil pages (and no more key pages) on this tree than on a base checkout (main before the lane).
 // It also asserts the Scripted Model is byte-identical to the base (it never overflowed there) and prints the
 // Opener's Independent row count per sheet beside the base's, so a fuller page shows up in the log.
+// Critic r3 N8/N9: every Opener pupil page (this tree only) is also rendered in Chromium and every cell measured - no cell may be
+// EMPTY (a bordered box with no ink), and no cell's largest empty band (top or bottom, from the cell's inner edge to the nearest
+// ink: text, a drawing, a box or a line) may reach 30 % of the cell's height (RUBRIC H13).
 //   git archive 72e05d7 | tar -x -C /tmp/base-72e05d7
 //   MQ_BASE_ROOT=/tmp/base-72e05d7 node tests/scripts/small-fixes-model-pages.cjs
 // (it re-runs itself with MQ_ROOT=<base> and `--digest` to read the base's numbers)
@@ -11,7 +14,7 @@ const crypto = require('crypto');
 const { open } = require('../lib/ws-harness.cjs');
 
 const R = (step, start, at) => Object.assign({ step }, start ? { start } : {}, at !== undefined ? { at } : {});
-const COMBOS = [
+const COMBOS_ALL = [
   { name: 'default', opts: {} },
   { name: 'one page', opts: { onePage: true } },
   { name: 'Lines', opts: { spaces: 'line' } },
@@ -26,15 +29,56 @@ const COMBOS = [
   { name: '100,000 from 1,000,000 + Lines', opts: { rows: [R(100000, 'custom', 1000000)], spaces: 'line' } },
   { name: 'times under each', opts: { rows: [R(7)], times: 'each' } },
 ];
-const ROLES = ['opener', 'scripted-model'];
+const COMBOS = process.env.SF_ONLY ? COMBOS_ALL.filter((c) => process.env.SF_ONLY.split(',').includes(c.name)) : COMBOS_ALL;
+const ROLES = (process.env.SF_ROLES || 'opener,scripted-model').split(',');   // SF_ROLES / SF_ONLY narrow a quick run
 const SIZES = ['S', 'M', 'L'];
 const PAPERS = ['A4', 'Letter'];
 const sha = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 12);
 
 async function digest() {
   const app = await open({ seed: 1 });
-  const out = await app.page.evaluate(async (COMBOS, ROLES, SIZES, PAPERS) => {
+  const withCells = !process.env.MQ_ROOT;   // the base is only read for page counts and the scripted model's bytes
+  const out = await app.page.evaluate(async (COMBOS, ROLES, SIZES, PAPERS, withCells) => {
     const res = {};
+    // render a sheet document in a same-origin iframe (so its fonts and styles load) and measure its cells
+    const measureCells = withCells ? (doc) => new Promise((resolve) => {
+      const fr = document.createElement('iframe');
+      fr.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1400px;border:0;';
+      document.body.appendChild(fr);
+      fr.onload = async () => {
+        const d = fr.contentDocument;
+        try { await d.fonts.ready; } catch (e) { /* measure anyway */ }
+        await new Promise((r) => setTimeout(r, 50));
+        let maxBand = 0, empty = 0, n = 0, worst = '';
+        for (const cell of d.querySelectorAll('.ws-cell')) {
+          const cr = cell.getBoundingClientRect();
+          if (cr.height < 4) continue;
+          n++;
+          const cs = d.defaultView.getComputedStyle(cell);
+          const top = cr.top + parseFloat(cs.borderTopWidth || 0), bot = cr.bottom - parseFloat(cs.borderBottomWidth || 0);
+          let lo = Infinity, hi = -Infinity;
+          for (const el of cell.querySelectorAll('*')) {
+            const er = el.getBoundingClientRect();
+            if (!er.width || !er.height) continue;
+            const es = d.defaultView.getComputedStyle(el);
+            if (es.visibility === 'hidden') continue;
+            const leafText = !el.children.length && el.textContent.trim().length > 0;
+            const drawn = el.tagName.toLowerCase() === 'svg';
+            const bordered = ['Top', 'Bottom', 'Left', 'Right'].some((s) => parseFloat(es['border' + s + 'Width']) > 0 && es['border' + s + 'Style'] !== 'none');
+            if (!(leafText || drawn || bordered)) continue;
+            if (el.closest('svg') && !drawn) continue;
+            lo = Math.min(lo, er.top); hi = Math.max(hi, er.bottom);
+          }
+          const h = bot - top;
+          if (!(hi > lo)) { empty++; continue; }
+          const band = Math.max(0, lo - top, bot - hi) / h;
+          if (band > maxBand) { maxBand = band; worst = (cell.textContent || '').trim().slice(0, 16) + ` (top ${((lo - top) / h * 100).toFixed(0)} %, foot ${((bot - hi) / h * 100).toFixed(0)} %, cell ${(h / 3.7795).toFixed(1)} mm)`; }
+        }
+        fr.remove();
+        resolve({ n, empty, maxBand: Math.round(maxBand * 1000) / 1000, worst });
+      };
+      fr.srcdoc = doc.replace(/<head>/i, `<head><base href="${location.href}">`);
+    }) : null;
     for (const c of COMBOS) for (const role of ROLES) for (const size of SIZES) for (const paper of PAPERS) {
       const k = `${c.name} | ${role} | ${size} | ${paper}`;
       try {
@@ -42,10 +86,11 @@ async function digest() {
         const note = String((r.fits && r.fits.note) || '');
         const ind = /(\d+) independent/.exec(note);
         res[k] = { pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null };
+        if (role === 'opener' && measureCells) res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper }));
       } catch (e) { res[k] = { error: String(e && e.message || e).slice(0, 80) }; }
     }
     return res;
-  }, COMBOS, ROLES, SIZES, PAPERS);
+  }, COMBOS, ROLES, SIZES, PAPERS, withCells);
   await app.close();
   for (const v of Object.values(out)) if (v.html !== undefined) { v.sha = sha(v.html); delete v.html; }
   return out;
@@ -70,8 +115,12 @@ async function digest() {
       if (a.keyPages > b.keyPages) errs.push(`key pages ${b.keyPages} -> ${a.keyPages}`);
       if (k.includes('| scripted-model |') && a.sha !== b.sha) errs.push('scripted model differs from base');
     }
+    if (a.cells) {
+      if (a.cells.empty) errs.push(`${a.cells.empty} empty cell(s)`);
+      if (a.cells.maxBand >= 0.3) errs.push(`empty band ${Math.round(a.cells.maxBand * 100)} % (>= 30 %) in "${a.cells.worst}"`);
+    }
     if (errs.length) bad++;
-    const ind = k.includes('| opener |') ? `  independent rows ${b.indep} -> ${a.indep}` : '';
+    const ind = k.includes('| opener |') ? `  independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %` : ''}` : '';
     console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
   }
   console.log(`small-fixes-model-pages: ${bad ? 'FAIL' : 'OK'} (${Object.keys(now).length} sheets${bad ? `, ${bad} failing` : ''})`);
