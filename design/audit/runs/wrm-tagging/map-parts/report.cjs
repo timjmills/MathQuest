@@ -38,6 +38,8 @@ for (const s of STRANDS) {
 }
 L.push('## The 6.4 "match the two" audit', '', '| Pair | Strand | Status | Skills | Proposal |', '|---|---|---|---|---|');
 for (const r of rows.filter(r => r.source === '6.4')) L.push(`| ${esc(r.task)} | ${r.strand} | ${r.status} | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal)} |`);
+L.push('', '## Re-grades (not builds)', '', 'Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lanes). These are in `MAP.json` `regrades`, not in `proposals`.', '', '| Skill | MAP tasks it serves |', '|---|---|');
+for (const [k, ts] of Object.entries(d.regrades || {})) L.push(`| \`${k}\` | ${ts.map(esc).join('; ')} |`);
 L.push('', '## Every proposal', '', '| Id | Kind | Skill (option) | Name | MAP strand / RIT / task type | Reused from |', '|---|---|---|---|---|---|');
 for (const [id, p] of Object.entries(P)) L.push(`| \`${id}\` | ${p.kind || ''} | \`${p.skill || ''}\`${p.option ? ' (' + esc(p.option) + ')' : ''} | ${esc(p.name)} | ${(p.map || []).map(m => `${m.strand} ${m.ritBand} — ${esc(m.taskType)}`).join('<br>')} | ${p.reused ? p.source : 'new'} |`);
 L.push('', fs.readFileSync(path.join(__dirname, 'report-tail.md'), 'utf8').trim(), '');

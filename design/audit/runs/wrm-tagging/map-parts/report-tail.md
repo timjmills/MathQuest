@@ -15,13 +15,9 @@
    Measurement strand of the MAP practice set, as the chart does.
 3. **Should `map_share_among` (sharing "N among M" plus a screen drag response) be one option on `share_into_groups`?**
    Suggested: yes; this audit already merged the drag row into it.
-4. **Fold `map_minutes_to_hours` into the WRM `time_convert` proposal?** Suggested: build them as one option (both
-   directions, with decimal and mixed hours); the ids stay separate until the lead merges the build list.
-5. **Grade-6 content in the 221–230 band (ratios, percent, powers of ten, integers).** Suggested: keep it; the 3–5 RIT list
+4. **Grade-6 content in the 221–230 band (ratios, percent, powers of ten, integers).** Suggested: keep it; the 3–5 RIT list
    already includes it and pupils near the top of the band meet it.
-6. **Ordinal numbers and zero are not CCSS, but MAP K–2 items use ordinals.** Suggested: keep the `ordinal` row at low priority.
-   Roman numerals were dropped (not in CCSS or in any NWEA material found).
-7. **CCSS codes filled in where the source proposal had none (`hv_lines` K.G.A.1, `four_quadrants` 6.NS.C.8).** Suggested:
+5. **Ordinal positions (first, second …) are not CCSS, but MAP K–2 items use them.** Suggested: keep the `ordinal` row at low
+   priority. (Zero as a count is K.CC.A.3 and is a normal row.) Roman numerals were dropped (not in CCSS or any NWEA material found).
+6. **CCSS codes filled in where the source proposal had none (`hv_lines` K.G.A.1, `four_quadrants` 6.NS.C.8).** Suggested:
    confirm; the lead writes them into build-list.js when merging.
-8. **Six `map_regrade_*` proposals only record that a 6.2 skill needs a re-grade.** Suggested: the lead drops them if
-   re-grades are tracked in the Wave 5 lanes, and keeps the row status `exists-regrade`.
