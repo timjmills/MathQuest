@@ -1,0 +1,1375 @@
+{
+ "year": "Y4",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "Y4.B1.S1": {
+   "title": "Represent numbers to 1,000",
+   "direct": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B6.S4 Groups of tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "the same number written in unit form (4 hundreds 7 tens 6 ones)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "the next step: the representation written as a partition",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "the same number as a word name",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "numerals and words side by side"
+    }
+   ],
+   "note": "A Y3 step repeated as review; the three skills give base-10, place-value counters (read) and counters (draw)."
+  },
+  "Y4.B1.S2": {
+   "title": "Partition numbers to 1,000",
+   "direct": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:combine",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (prior learning wk W11)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S4 Hundreds (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "the partition written into a place-value chart",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "naming the place of each part"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "adding the parts back together"
+    }
+   ],
+   "note": "WRM also draws the part-whole model; the kit part-whole visual is vis_bond_options (not needed for the verdict)."
+  },
+  "Y4.B1.S3": {
+   "title": "Number line to 1,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "reading an unlabelled point and lines counting in 2s, 5s, 50s, 100s; estimating where a number goes on 0-1,000",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading the number at a point and lines with intervals other than 10/100; estimating on an unmarked 0-1,000 line",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W18)",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
+    },
+    {
+     "key": "number_sense:between_tens",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y2.B1.S9 10s on the number line to 100 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "the same 0-1,000 line used to round",
+     "opts": {
+      "place": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "counting in 10s and 100s along the line"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "position on the line decides which is greater",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S4": {
+   "title": "Thousands",
+   "direct": [
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "opts": {
+      "step": [
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:place_value_disks",
+     "missing": "1,000 shown as 10 hundreds (the exchange) and thousands counted in base-10 cubes",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "1,000 = 10 hundreds = 100 tens as an exchange; counting in 1,000s from any multiple of 1,000 with base-10 cubes",
+   "build": [
+    "regroup_thousands",
+    "count_50s"
+   ],
+   "pre": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S4 Hundreds (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y3.B1.S14 Count in 50s (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S3 Number line to 1,000 (step before in the block)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "thousands named in unit form",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "10 × 100 = 1,000"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "a digit moving into the thousands place"
+    }
+   ],
+   "note": "School teaches this step in W33 (enrichment after MAP)."
+  },
+  "Y4.B1.S5": {
+   "title": "Represent numbers to 10,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "Y4.B1.S4 Thousands (step before in the block)",
+     "opts": {
+      "step": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W33)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (prior learning wk W33)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W33)"
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "the next step: partitioning the 4-digit number",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "the same number as a word name",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "the value of each digit",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "note": "Existing partial tags on place_value_disks and pv_digit_drag become full with band 9,999."
+  },
+  "Y4.B1.S6": {
+   "title": "Partition numbers to 10,000",
+   "direct": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:combine",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (step before in the block)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W34)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B6.S4 Groups of tens and ones (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "the parts placed in a place-value chart",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of each digit",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "addition:add_10k_no_regroup",
+     "why": "recombining parts by column addition"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S7": {
+   "title": "Flexible partitioning of numbers to 10,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:unit_form",
+     "missing": "other partitions (3,452 = 2,000 + 1,400 + 52) and the part-whole/bar layout",
+     "opts": {
+      "band": 9999,
+      "rename": "more"
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "non-standard partitions of 4-digit numbers into two or more parts, with a part-whole or bar model",
+   "build": [
+    "flex_partition"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (step before in the block)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S7 Flexible partitioning of numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 999,
+      "rename": "more"
+     }
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S7 Flexibly partition numbers to 100 (prior learning wk W34)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:combine",
+     "why": "recombining scrambled parts",
+     "opts": {
+      "band": 9999,
+      "order": "scrambled"
+     }
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "regrouping inside column addition uses the same idea"
+    },
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "exchanging in subtraction is a flexible partition"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S8": {
+   "title": "Find 1, 10, 100, 1,000 more or less",
+   "direct": [
+    {
+     "key": "placevalue:more_less_100",
+     "opts": {
+      "step": 1000
+     }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "opts": {
+      "step": 100
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:more_less_10",
+     "missing": "1 more/less and 10 more/less on 4-digit numbers (the skill stops at 120)",
+     "opts": {
+      "step": [
+       1,
+       10
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "1 and 10 more/less of 4-digit numbers and a mixed page of all four steps (1, 10, 100, 1,000), crossing boundaries",
+   "build": [
+    "more_less_all"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (prior learning wk W11)",
+     "opts": {
+      "step": 0
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W11)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 1 more and 1 less (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (step before in the block)",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "adding and subtracting 100s is the same move"
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "counting on in 10s, 100s and 1,000s"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "which digit changes and why",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "note": "more_less_100 already offers step 1,000; with it the existing partial tag is full for the 100/1,000 part."
+  },
+  "Y4.B1.S9": {
+   "title": "Number line to 10,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "reading the number at a point and lines in 100s/1,000s with only some ticks labelled",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading numbers at points and lines counting in 100s, 500s or 1,000s with some labels missing",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W12)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (step before in the block)",
+     "opts": {
+      "step": 1000
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "Y4.B1.S4 Thousands (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "the same 0-10,000 line used for rounding"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "rounding to the nearest 1,000 on a line",
+     "opts": {
+      "place": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "ordering by position on the line",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S10": {
+   "title": "Estimate on a number line to 10,000",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "estimating where a number sits, and which number is at an arrow, on 0-10,000 lines with only the ends labelled",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (step before in the block)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W13)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "number_sense:between_tens",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W13)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W13)",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "rounding uses the same halfway reasoning"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "midpoint of an interval",
+     "opts": {
+      "place": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "comparing estimates",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "note": "place_on_number_line marks a number on a ticked line; estimation on a line with only end labels is not dealt."
+  },
+  "Y4.B1.S11": {
+   "title": "Compare numbers to 10,000",
+   "direct": [
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (prior learning wk W34)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "the next step: ordering",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "numbers with different numbers of digits",
+     "opts": {
+      "band": 9999,
+      "lengths": "mixed"
+     }
+    },
+    {
+     "key": "algebra:inequalities",
+     "why": "the < > symbols in a later form"
+    }
+   ],
+   "note": "Existing tag is partial only because of band; with band 9,999 and closeness \"some\" it is full."
+  },
+  "Y4.B1.S12": {
+   "title": "Order numbers to 10,000",
+   "direct": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (step before in the block)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (prior learning wk W35)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W35)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "order shown by position on a line",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "the same ordering routine with decimals later in the year"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S13": {
+   "title": "Roman numerals",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and writing Roman numerals to 100 (I, V, X, L, C), and Roman numerals on clocks",
+   "build": [
+    "roman_100"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_hour",
+     "why": "Y3.B10.S1 Roman numerals to 12 (prior learning wk W12)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W12)",
+     "opts": {
+      "band": 99
+     }
+    }
+   ],
+   "preBuild": [
+    "roman_12"
+   ],
+   "related": [
+    {
+     "key": "placevalue:number_word_names",
+     "why": "another way of writing a number"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Roman numerals are additive like expanded form"
+    }
+   ],
+   "note": "Non-CCSS (UK only); taught as enrichment in W12."
+  },
+  "Y4.B1.S14": {
+   "title": "Round to the nearest 10",
+   "direct": [
+    {
+     "key": "number_sense:rounding_visual",
+     "opts": {
+      "place": 10,
+      "band": 1000
+     }
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:between_tens",
+     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W12)",
+     "opts": {
+      "span": 10,
+      "band": 1000
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W12)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W12)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_10",
+     "why": "sorting numbers by what they round to"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "the next step"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "rounding used to estimate",
+     "opts": {
+      "place": 10
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S15": {
+   "title": "Round to the nearest 100",
+   "direct": [
+    {
+     "key": "number_sense:nearest_100",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_sort_100",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "opts": {
+      "place": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (step before in the block)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W13)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (lower grade, same CCSS cluster)",
+     "opts": {
+      "step": 100
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W13)",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "the next step"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "rounding to 100 to estimate",
+     "opts": {
+      "place": 100
+     }
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "the same number rounded to 10 and 100"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S16": {
+   "title": "Round to the nearest 1,000",
+   "direct": [
+    {
+     "key": "number_sense:nearest_1000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_sort_1000",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (step before in the block)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y4.B1.S9 Number line to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "span": 1000,
+      "band": 10000
+     }
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "Y4.B1.S15 Round to the nearest 100 (step before in the block)",
+     "opts": {
+      "place": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 9999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:rounding_table",
+     "why": "the next step: 10, 100 and 1,000 together"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "rounding to 1,000 to estimate",
+     "opts": {
+      "place": 1000
+     }
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "why": "Grade 4 extension"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B1.S17": {
+   "title": "Round to the nearest 10, 100 or 1,000",
+   "direct": [
+    {
+     "key": "number_sense:rounding_table",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (step before in the block)"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (step before in the block)"
+    },
+    {
+     "key": "number_sense:nearest_10",
+     "why": "Y4.B1.S14 Round to the nearest 10 (step before in the block)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W13)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:mixed_number_sense",
+     "why": "mixed rounding review"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "the next block uses rounding to estimate",
+     "opts": {
+      "place": 1000
+     }
+    },
+    {
+     "key": "number_sense:round_sort_1000",
+     "why": "sort by rounded value"
+    }
+   ],
+   "note": ""
+  }
+ },
+ "proposals": {
+  "nl_20": {
+   "kind": "new",
+   "skill": "number_sense:number_line_scales",
+   "name": "Numbers on a Number Line (any scale)",
+   "teaches": "the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled",
+   "representation": "a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked",
+   "family": "placevalue",
+   "steps": [
+    "Y4.B1.S3",
+    "Y4.B1.S9",
+    "Y4.B1.S10",
+    "Y1.B1.S15",
+    "Y1.B12.S4",
+    "Y1.B4.S10",
+    "Y1.B4.S8",
+    "Y1.B4.S9",
+    "Y1.B6.S6",
+    "Y1.B6.S7",
+    "Y2.B1.S10",
+    "Y2.B1.S11",
+    "Y2.B1.S9",
+    "Y3.B1.S10",
+    "Y3.B1.S11",
+    "Y3.B1.S3",
+    "Y5.B1.S9"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "regroup_thousands": {
+   "kind": "option",
+   "skill": "composing:base10_regroup",
+   "option": "band 9,999: exchange 1 thousand for 10 hundreds",
+   "name": "A Thousand Is Ten Hundreds (option)",
+   "teaches": "1,000 as 10 hundreds and 100 tens: exchange a thousand cube for ten hundred flats and back, and count in 1,000s",
+   "representation": "one boxed cell: a black-outline thousand cube beside ten flats with an exchange arrow; the pupil writes \"1 thousand = __ hundreds\"; numbers in Andika, no colour",
+   "family": "placevalue",
+   "ccss": [
+    "4.NBT.A.1",
+    "4.NBT.A.2"
+   ],
+   "why": "the exchange of thousands is the core of the Thousands step and no skill shows it",
+   "steps": [
+    "Y4.B1.S4"
+   ],
+   "reused": false
+  },
+  "count_50s": {
+   "kind": "option",
+   "skill": "patterns:count_by_step_up",
+   "option": "steps 50, 100, 1,000",
+   "name": "Count in 50s, 100s and 1,000s (option)",
+   "teaches": "counting forwards and backwards in 50s, 100s and 1,000s, and seeing 10 hundreds as 1,000",
+   "representation": "step values 50, 100 and 1,000 on count_by_step_up / skip_count_line with a base-10 picture support",
+   "family": "algebra",
+   "steps": [
+    "Y4.B1.S4",
+    "Y3.B1.S14",
+    "Y3.B1.S4"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "flex_partition": {
+   "kind": "new",
+   "skill": "placevalue:flexible_partition",
+   "name": "Partition Numbers Flexibly",
+   "teaches": "partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models",
+   "representation": "a part-whole diagram with one part given; base-10 picture beside it; write the other part",
+   "family": "placevalue",
+   "steps": [
+    "Y4.B1.S7",
+    "Y2.B1.S7",
+    "Y3.B1.S7"
+   ],
+   "improves": [
+    "Y3.B1.S2"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "more_less_all": {
+   "kind": "option",
+   "skill": "placevalue:more_less_100",
+   "option": "step \"1, 10, 100 or 1,000 (mixed)\" and band 9,999",
+   "name": "1, 10, 100 or 1,000 More or Less (option)",
+   "teaches": "finding 1, 10, 100 and 1,000 more or less than a 4-digit number, including across a boundary (3,995 + 10)",
+   "representation": "a \"−n | number | +n\" table cell with one empty box per row; optional place-value chart beside it with the changing column outlined",
+   "family": "placevalue",
+   "ccss": [
+    "2.NBT.B.8",
+    "4.NBT.A.1"
+   ],
+   "why": "the skill offers 10, 100 and 1,000 but not 1, and never mixes all four on 4-digit numbers",
+   "steps": [
+    "Y4.B1.S8"
+   ],
+   "reused": false
+  },
+  "roman_100": {
+   "kind": "new",
+   "skill": "placevalue:roman_numerals",
+   "name": "Roman Numerals",
+   "teaches": "reading and writing Roman numerals to 100 (I, V, X, L, C) and knowing there is no zero",
+   "representation": "numeral cards with a symbol key; write the value or the numeral",
+   "family": "placevalue",
+   "steps": [
+    "Y4.B1.S13"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "roman_12": {
+   "kind": "new",
+   "skill": "measurement:roman_numerals_clock",
+   "name": "Roman Numerals to 12",
+   "teaches": "reading Roman numerals I to XII on a clock face",
+   "representation": "a clock face with Roman numerals; write the time or the numeral value",
+   "family": "measurement",
+   "steps": [
+    "Y4.B1.S13",
+    "Y3.B10.S1"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  }
+ },
+ "tagFixes": [
+  {
+   "key": "placevalue:compare",
+   "step": "Y4.B1.S11",
+   "action": "add",
+   "why": "re-tag as FULL (drop the partial flag) with opts band 9,999"
+  },
+  {
+   "key": "placevalue:order_least_to_greatest",
+   "step": "Y4.B1.S12",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:order_greatest_to_least",
+   "step": "Y4.B1.S12",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:place_value_disks",
+   "step": "Y4.B1.S5",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y4.B1.S5",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S5",
+   "action": "add",
+   "why": "missing tag: unit form to 9,999 represents 4-digit numbers"
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y4.B1.S6",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:combine",
+   "step": "Y4.B1.S6",
+   "action": "add",
+   "why": "re-tag as FULL with band 9,999"
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y4.B1.S2",
+   "action": "add",
+   "why": "re-tag as FULL with band 999 (standard partition is all the step asks)"
+  },
+  {
+   "key": "placevalue:pv_disks_build",
+   "step": "Y4.B1.S1",
+   "action": "add",
+   "why": "missing tag: draw counters for a 3-digit number"
+  },
+  {
+   "key": "patterns:count_by_powers_of_10",
+   "step": "Y4.B1.S4",
+   "action": "add",
+   "why": "missing tag: counting in 1,000s (opts step [2])"
+  },
+  {
+   "key": "placevalue:place_value_disks",
+   "step": "Y4.B1.S1",
+   "action": "add",
+   "why": "re-tag as FULL with band 999"
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S7",
+   "action": "partial",
+   "why": "unit form with rename \"more\" is a partial cover of flexible partitioning"
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S1",
+   "action": "remove",
+   "why": "unit form is the partition step (Y4.B1.S2), not representing"
+  }
+ ]
+}
