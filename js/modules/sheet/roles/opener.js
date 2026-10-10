@@ -77,7 +77,8 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
     const traced = (it) => (c, o) => it.render(c, Object.assign({}, o, c.state === 'blank' && answerOf(it) ? { shown: answerOf(it), ink: 'trace' } : {}));
-    const modelItems = models.map((it, i) => planItem(it, { cols: g.mc, level: i === 0 ? 3 : 2, nolabel: true, model: ctx.look === 'daily', render: i === 0 ? traced(it) : undefined }));
+    // keyList (critic r2, R2-2): the second Model cell is the pupil's to write - the short key lists it
+    const modelItems = models.map((it, i) => Object.assign(planItem(it, { cols: g.mc, level: i === 0 ? 3 : 2, nolabel: true, model: ctx.look === 'daily', render: i === 0 ? traced(it) : undefined }), i > 0 ? { keyList: 'Model' } : {}));
     const sections = [];
     if (g.whatsNew) sections.push({ kind: 'band', label: "What's New:", instr: g.whatsNew, html: '' });
     const modelContentH = g.modelBand - m.strip;
