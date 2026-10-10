@@ -8,7 +8,10 @@
 // (ft, yd, in, mi, oz, lb, cup, pt, qt, gal) on a Y2/Y3 link (the school measures in metric; reading_ruler's inch ruler is
 // the only allowed case: it reads whole units on a ruler); no 2-digit column (stack) layout before Y2.B2.S15 and no
 // 3-digit column layout before Y3.B2.S11. Clock, angle and shape skills are not number-range checked (fixed domains);
-// money payloads are cents. Exit 1 on any flag; prints `linkscan: OK` / `linkscan: N`.
+// money payloads are cents. RULE 19 (WEEK): markers.mjs content markers (thirds, quarter past, 5-minute times, ÷, ×8,
+// ÷3/4/8, fractions beyond quarters, equivalence, angles and lines, L ↔ mL, decimals, 2-digit × ÷ 1-digit, rounding,
+// perimeter, mm, tally, pictogram, a.m./p.m., tables beyond the grade, customary units) each have the school week the
+// pupil first meets them; a link may not deal one more than 2 weeks after its step's week. Exit 1 on any flag; prints `linkscan: OK` / `linkscan: N`.
 import fs from 'fs';
 import { execFileSync } from 'child_process';
 const _m=new Map();globalThis.localStorage={getItem:k=>_m.get(k)??null,setItem:(k,v)=>_m.set(k,String(v)),removeItem:k=>_m.delete(k)};
@@ -18,6 +21,7 @@ const root=new URL('../../../',import.meta.url).pathname;
 const _l=console.log,_w=console.warn;console.log=()=>{};console.warn=()=>{};
 const {generateQuestionFor}=await import(root+'js/modules/generate-question.js');
 console.log=_l;console.warn=_w;
+const MK=await import(HERE+'markers.mjs');
 const args=process.argv.slice(2);const YEARMODE=args.includes('--year');const years=args.filter(a=>!a.startsWith('--'));
 const strip=s=>String(s??'').replace(/<style[\s\S]*?<\/style>/g,'').replace(/<svg[\s\S]*?<\/svg>/g,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ');
 const YLIM={Y2:120,Y3:1000},BASE={Y2:100,Y3:120},ULIM={Y2:2000,Y3:5000};
@@ -52,9 +56,12 @@ for(const Y of years){const L=JSON.parse(fs.readFileSync(root+`data/curriculum/l
     let c=0;for(const e of [...s.direct,...s.partial])if(!FIXED.test(e.key)&&!CENTS.test(e.key)&&!UNIT.test(e.key))c=Math.max(c,gen(e.key,e.opts||{}).mx);
     const tm=s.title.replace(/(\d),(\d{3})/g,'$1$2').match(/\d+/g);own[id]=Math.max(c,tm?Math.max(...tm.map(Number)):0);}
   const known=id=>{let k=BASE[Y];for(const o in own)if(wk[o]<wk[id]||(wk[o]===wk[id]&&order.indexOf(o)<=order.indexOf(id)))k=Math.max(k,own[o]);return k;};
+  // rule 19: content markers (markers.mjs) by school week, TOL 2 weeks; tables beyond the grade and customary units never
+  const SWK=MK.schoolWeeks(Object.fromEntries(Object.entries(L.steps).map(([i,s])=>[i,s.title])),xl);const mhit=MK.makeMarkerCheck(generateQuestionFor,Y,SWK,2);
   for(const[id,s]of Object.entries(L.steps)){const ceil=YEARMODE?YLIM[Y]:known(id);
     for(const [kind,list] of [['pre',s.pre],['rel',s.related]])for(const e of list){const r=gen(e.key,e.opts||{});const tag=`${Y} ${id} ${kind} ${e.key} ${JSON.stringify(e.opts||{})}`;const flag=m=>{bad++;rows.push(`${m.padEnd(8)} ${tag} | ${r.ex}`);};
       if(r.err)flag('ERR');
+      for(const h of mhit(e.key,e.opts||{},id)){bad++;rows.push(`WEEK    ${tag} | ${h.m} first met W${h.mw===999?'never':h.mw}, step W${SWK[id]} | ${h.ex}`);}
       if(/^coordinates:/.test(e.key))flag('COORD');
       const lim=CENTS.test(e.key)?ceil*100:UNIT.test(e.key)?ULIM[Y]:ceil;
       if(!FIXED.test(e.key)&&r.mx>lim)flag(`SIZE>${lim}`);

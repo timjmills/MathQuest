@@ -440,9 +440,9 @@ export const r3 = {
   // S6: the main building block first
   'Y2.B2.S6': { core: [C('composing:make_ten', 'Y2.B2.S1 bonds to 10: making 10 is the first jump (8 + 5 = 8 + 2 + 3)'), C('composing:number_bonds', 'Y1 bonds within 10: splitting the second number')] },
   'Y2.B5.S13': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the 10 times-table is the count of 10s')] },
-  'Y2.B3.S8': { core: [C('shapes_early:name_3d_shapes', 'Y2.B3.S1 naming 3-D shapes (xlsx prior learning: recognise and name 3-D shapes)'), C('shapes_early:shape_name_match_3d', 'Y2.B3.S1 matching a 3-D shape to its name')] },
-  'Y2.B3.S9': { core: [C('shapes_early:name_3d_shapes', 'Y2.B3.S1 naming 3-D shapes'), C('shapes_early:shape_name_match_3d', 'Y2.B3.S1 matching a 3-D shape to its name')] },
-  'Y2.B3.S10': { core: [C('shapes_early:name_3d_shapes', 'Y2.B3.S1 naming 3-D shapes')] },
+  'Y2.B3.S8': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes (xlsx prior learning: recognise and name 3-D shapes)'), C('shapes_early:shape_name_match_3d', 'Y1.B3.S1 / Y2.B3.S1 matching a 3-D shape to its name')] },
+  'Y2.B3.S9': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes'), C('shapes_early:shape_name_match_3d', 'Y1.B3.S1 / Y2.B3.S1 matching a 3-D shape to its name')] },
+  'Y2.B3.S10': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes')] },
   'Y2.B10.S3': { partials: [P('measurement:bar_graph_intro', 'reads a 1-to-1 bar chart (how many, how many more); drawing a block diagram, and blocks stacked as squares (one square = one) rather than bars, are not dealt')],
     build: ['block_diagram'], core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts: the counts a block diagram shows'), C('measurement:pictograph_intro', 'Y2.B10.S5 one picture = one: the same 1-to-1 idea')] },
   'Y3.B4.S4': { core: [C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3'), C('multiplication:mult_zeros', 'Y3.B4.S1 multiples of 10: 20 × 3')] },
@@ -822,3 +822,76 @@ r3['Y2.B3.S5'] = { ...r3['Y2.B3.S5'], relOnly: true, related: [R('shapes_early:c
 // 1-digit facts written across (WRM writes them as sentences and part-whole models), wherever the skill takes `notation`
 for (const k of ['addition:add_20_mixed', 'addition:add_10_mixed']) linkSwap.Y2[k] = { to: k, opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 };
 for (const k of ['addition:add_10_regroup', 'subtraction:sub_10_regroup', 'addition:add_20_mixed', 'addition:add_10_mixed']) linkSwap.Y3[k] = { to: k, opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y3 };
+
+// ======================= round 5 (critic Y2-Y3 r4: S10 = content taught LATER than the step's school week; rule 19) ===
+// markerFix: when a link's generated items carry content first met after the step's school week (markers.mjs), build.mjs
+// tries these alternatives in order (other opts, or another skill) before it drops the link.
+const PSq = (p) => ({ key: 'shapes_early:partition_shapes', opts: { parts: p } });
+const T3b = [2, 3, 4, 5, 10];
+export const markerFix = {
+  Y2: {
+    'shapes_early:partition_shapes': [{ opts: { parts: [0, 2] } }, { opts: { parts: [0] } }],
+    'measurement:estimate_length': [{ opts: { forms: [0, 1] } }],
+    'measurement:time_quarter': [{ key: 'measurement:time_half_hour' }], 'measurement:time_5min': [{ key: 'measurement:time_half_hour' }],
+    'measurement:elapsed_hour': [{ key: 'measurement:time_half_hour' }],
+    'shapes_early:compose_from_attributes': [{ key: 'shapes_early:shape_attributes', opts: { forms: [0, 1] } }],
+    'fractions:shade_fraction': [PSq([0, 2])], 'fractions:identify': [PSq([0, 2])], 'fractions:write_fraction': [PSq([0, 2])],
+  },
+  Y3: {
+    'division:div_facts': [{ opts: { constant: [2, 5, 10], band: 100 } }],
+    'multiplication:nl_mult': [{ opts: { constant: T3b, band: 100 } }, { opts: { constant: [2, 5, 10], band: 100 } }],
+    'division:nl_div': [{ opts: { constant: [2, 5, 10], band: 100 } }],
+    'multiplication:mult_facts': [{ opts: { constant: T3b, band: 100 } }, { opts: { constant: [2, 5, 10], band: 100 } }],
+    'multiplication:mult_chart_easy': [{ opts: { constant: T3b, band: 100 } }],
+    'division:box_division_easy': [{ opts: { regroup: 'none', constant: [2, 3, 4, 5, 8] } }, { opts: { regroup: 'none', constant: [2, 3, 4, 5] } }],
+    'multiplication:mult_word_problems': [{ key: 'multiplication:repeated_add_to_mult', opts: { band: 25 } }],
+    'multiplication:multiply': [{ key: 'multiplication:mult_zeros', opts: { forms: [0] } }], 'multiplication:area_model_mult': [{ key: 'multiplication:mult_zeros', opts: { forms: [0] } }],
+    'fractions:identify': [PSq([0, 1, 2])], 'fractions:write_fraction': [PSq([0, 1, 2])], 'fractions:shade_fraction': [PSq([0, 1, 2])], 'composing:compose_whole': [PSq([0, 1, 2])],
+    'measurement:estimate_length': [{ opts: { forms: [0, 1] } }],
+  },
+};
+for (const Y of ['Y2', 'Y3']) linkOpts[Y]['measurement:estimate_length'] = { forms: [0, 1] };
+ladders.frac = [C('shapes_early:partition_shapes', 'Y1.B10.S1 / Y1.B10.S5 halves and quarters of a shape (K)', { parts: [0, 2] }), C('patterns:halve', 'Y1.B10.S4 / Y2.B5.S11 halving an amount within 20', { band: 20 }),
+  C('division:share_into_groups', 'Y1.B9.S9 sharing into equal groups (K)', { band: 12 }), C('multiplication:equal_or_unequal_groups', 'Y1.B9.S4 equal and unequal groups (K)')];
+ladders.money = [C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0', ZR(2, 5, 10)), C('measurement:coin_value', 'Y1.B13.S2 recognising coins (K)', { currency: 'usd' }), C('measurement:money_count', 'Y1.B13 / Y2.B4.S1 counting coins', { currency: 'usd', kind: 'like' }), C('subtraction:sub_wp_20', 'Y1.B5 subtraction stories within 20 (K)')];
+markerFix.Y3['multiplication:nl_mult'] = [{ opts: { constant: T3b, band: 50 } }, { opts: { constant: [2, 5, 10], band: 50 } }, { opts: { constant: [2, 5, 10], band: 20 } }];
+markerFix.Y3['multiplication:mult_facts'] = [{ opts: { constant: T3b, band: 50 } }, { opts: { constant: [2, 5, 10], band: 50 } }];
+// ---- round 5 step fixes ----
+const NOTE_POS = 'no related skill a Grade 1 pupil has met by this school week (W19-W20): quarter past and quarter to come in W36 and grid or coordinate skills are Grade 5+ (rule 19); position words and halves and quarters of a shape (K learning) are pre';
+for (const id of ['Y2.B11.S2', 'Y2.B11.S3', 'Y2.B11.S4']) r3[id] = { ...(r3[id] || {}), relNote: NOTE_POS };
+Object.assign(r3, {
+  'Y2.B7.S1': { ...r3['Y2.B7.S1'], relNote: 'no related skill yet: reading a scale in grams or kilograms comes in W34-W35 (rule 19); compare language and heavier/lighter are pre' },
+  'Y2.B9.S6': { ...(r3['Y2.B9.S6'] || {}), relNote: 'no related skill met by W23: quarter past/to (W36), 5-minute times (W37) and durations come later (rule 19); o\'clock and half past are pre' },
+  'Y3.B4.S3': { partials: [P('multiplication:mult_properties', '×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available')], verdict: 'partial', build: ['props_tables'],
+    core: [C('multiplication:arrays_groups', 'Y3.B3.S2 arrays: turning an array gives the same product', { forms: [0] }), C('multiplication:repeated_add_to_mult', 'Y2.B5.S3 adding equal groups', { band: 25 })],
+    related: [R('patterns:double', 'doubling: the 4 times-table is double the 2 times-table', { band: 20 })] },
+  'Y3.B4.S4': { partials: [P('multiplication:multiply', '2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture, exchanges mixed, and ×6, ×7, ×9 items', { tiles: 21 })], build: ['exchange_count'] },
+  'Y3.B4.S5': { ...r3['Y3.B4.S5'], partials: [P('multiplication:multiply', 'mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear', { tiles: 21 })], build: ['exchange_count'] },
+  'Y3.B4.S7': { ...(r3['Y3.B4.S7'] || {}), partials: [P('division:box_division_easy', 'regroup "none" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)', { regroup: 'none', constant: [2, 3, 4, 5, 8] })], build: ['exchange_count'] },
+  'Y3.B4.S8': { direct: [D('division:area_model_div_2by1', { constant: [2, 3, 4, 5, 8] })], note: 'constant [2,3,4,5,8]: no ÷6, ÷7, ÷9 (the default deals 42 ÷ 7, 96 ÷ 6, 81 ÷ 9)' },
+  'Y3.B6.S7': { preOnly: true, pre: [R('shapes_early:partition_shapes', 'Y2.B8 halves, thirds and quarters of a whole', { parts: [0, 1, 2] }), R('number_sense:place_on_number_line', 'Y2.B1.S9 a number line marked in equal steps', { span: 10, band: 100 }), R('measurement:reading_ruler', 'Y2.B6.S1 reading a scale (a ruler)')] },
+  'Y3.B2.S20': { ...r3['Y3.B2.S20'], core: [C('number_sense:place_on_number_line', 'Y2.B1.S11 estimating on a number line to 100: which ten is nearer', { span: 10, band: 100 }), C('placevalue:more_less_100', 'Y3.B1.S9 10 and 100 more or less', { step: 10 })] },
+  'Y3.B7.S9': { ...(r3['Y3.B7.S9'] || {}), relNote: 'no related skill: the same exchange with mass (kg ↔ g) has no skill yet (metric_mass_capacity), and 1,000 = 10 hundreds is pre' },
+  'Y3.B7.S4': { ...(r3['Y3.B7.S4'] || {}), relOnly: true, related: [], relNote: 'no related skill: the same exchange with capacity (l ↔ ml) is taught later (W34) and has no whole-number skill yet (metric_mass_capacity)' },
+  'Y3.B1.S13': { ...(r3['Y3.B1.S13'] || {}), relOnly: true, related: [], relNote: 'no related skill: ordering other kinds of numbers (fractions, decimals) is above Grade 2; comparing and partitioning are pre' },
+  'Y2.B9.S1': { ...(r3['Y2.B9.S1'] || {}), related: [R('shapes_early:partition_shapes', 'half past: the minute hand has gone half way round, like half of a shape', { parts: [0] })] },
+});
+Object.assign(proposals, {
+  props_tables: { kind: 'option', skill: 'multiplication:mult_properties', option: 'tables: only the 2, 3, 4, 5, 8 and 10 times-tables (Grade 2)', name: 'Reasoning About Multiplication Within the Grade 2 Tables (option)',
+    teaches: 'using arrays, doubling and splitting to reason about multiplication facts, using only the tables taught at Grade 2 (4 × 3 = 3 × 4; 8 × 3 = double 4 × 3)',
+    representation: 'the existing properties cell (array picture with the two sentences), facts drawn from the Grade 2 tables only', family: 'operations',
+    steps: ['Y3.B4.S3'], ccss: ['3.OA.B.5'], why: 'mult_properties deals ×6 and ×7 splits (7 × 6 = 3 × 6 + 4 × 6), beyond the Grade 2 tables' },
+});
+delete relR3['Y3.B7.S9'];
+Object.assign(linkFix, { 'Y3.B3.S10': { 'multiplication:count_by_tables': ZR(4) }, 'Y3.B11.S7': { 'angles_lines:identify_lines': null, 'angles_lines:identify_angles': null } });
+const NOREL3 = {
+  'Y3.B2.S21': 'no related skill beyond the pre list: fact families and missing numbers (the same inverse idea) are earlier learning listed as pre',
+  'Y3.B4.S9': 'no related skill at Grade 2 tables: comparison stories deal ×6, ×7, ×9 (rule 19); sharing with remainders is pre',
+  'Y3.B6.S1': 'no related skill met by this week: equivalent fractions and number lines of fractions come later (rule 19)',
+  'Y3.B6.S7': 'no related skill met by W18: equivalence (W37) comes later (rule 19)',
+  'Y3.B7.S8': 'no related skill: litres-and-millilitres conversion (W34) uses decimal litres in the only skill (rule 18)',
+  'Y3.B11.S4': 'no related skill met by W23: angles and parallel or perpendicular lines come in W28-W29 (rule 19)',
+};
+for (const [id, n] of Object.entries(NOREL3)) r3[id] = { ...(r3[id] || {}), relNote: n };
+r3['Y2.B5.S1'] = { ...(r3['Y2.B5.S1'] || {}), relNote: 'no related skill beyond the pre list: in school order the 5 and 10 times-tables (W26) come before this step (W27), so they are pre; sharing and grouping are pre' };
+r3['Y2.B9.S1'] = { ...(r3['Y2.B9.S1'] || {}), related: [], relNote: 'no related skill met by this week: quarter past and to (W36) and 5-minute times (W37) come later (rule 19); half of a shape and clock parts are pre' };

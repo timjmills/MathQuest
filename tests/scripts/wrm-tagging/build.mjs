@@ -10,13 +10,16 @@
 //    the neighbouring steps' skills in the block. No "same cluster" padding.
 import fs from 'fs';
 import { execFileSync } from 'child_process';
-globalThis.localStorage={getItem:()=>null,setItem(){}};globalThis.window=globalThis;globalThis.document={};
+const _lsm=new Map();globalThis.localStorage={getItem:k=>_lsm.get(k)??null,setItem:(k,v)=>_lsm.set(k,String(v)),removeItem:k=>_lsm.delete(k)};globalThis.window=globalThis;globalThis.document={};
 const HERE=new URL('.',import.meta.url).pathname;
 const root=new URL('../../../',import.meta.url).pathname;
 const [YEAR, MAXB] = [process.argv[2], +process.argv[3] || 99];
 const _log=console.log;console.log=()=>{};
 const {SKILLS}=await import(root+'js/modules/data.js');
-console.log=_log;
+const _warn=console.warn;console.warn=()=>{};
+const {generateQuestionFor}=await import(root+'js/modules/generate-question.js');
+console.log=_log;console.warn=_warn;
+const MK=await import(HERE+'markers.mjs');
 const {SKILL_WRM,WRM_PROPOSALS}=await import(root+'js/modules/wrm.js');
 const {SKILL_STANDARDS}=await import(root+'js/modules/standards.js');
 const {SKILL_ALIASES}=await import(root+'js/modules/skill-aliases.js');
@@ -74,7 +77,7 @@ const noteOpts=n=>{const m=/^band (\d+)$/.exec(n||'');return m?{band:+m[1]}:{};}
 const directOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return d.length?d:p;};
 // r3: every skill of a step (direct and partial), and the latest EARLIER step of the same year that has a key
 const allOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return [...new Set([...d,...p].map(k=>resolve(k)).filter(Boolean))];};
-function earlierStep(k,sid,sameYear){const y=sid.split('.')[0];const at=order.indexOf(sid);for(let j=at-1;j>=0;j--){const id=order[j];if(sameYear&&!id.startsWith(y+'.'))continue;if(allOf(id).includes(k))return id;}return null;}
+function earlierStep(k,sid,sameYear){const y=sid.split('.')[0];const at=order.indexOf(sid);for(let j=at-1;j>=0;j--){const id=order[j];if(sameYear&&!id.startsWith(y+'.'))continue;if(typeof taughtBefore==='function'&&!taughtBefore(id,sid))continue;if(allOf(id).includes(k))return id;}return null;}
 const SAMESTD_SKIP=/:mixed_|_plain$/;
 // r3 rule 18: a pre/related LINK carries opts. Hand opts on the entry win; else the opts the referenced step (the first
 // step id in its why) uses for that key; else the year's default for the key (OV.linkOpts[YEAR]); else {}.
@@ -99,6 +102,12 @@ const prevYear={Y1:'R',Y2:'Y1',Y3:'Y2',Y4:'Y3'}[YEAR];
 
 const out={year:YEAR,generatedBy:'wave2-tagging',method:'r2: items generated with real opts (items.mjs); pre filtered by topic; related share the idea',steps:{},proposals:{},tagFixes:[],retireBuilt:OV.retireBuilt||[]};
 const yr=W.years.find(y=>y.id===YEAR);
+// r5 (rule 19): SCHOOL week of every step of this year (xlsx); a same-year step counts as earlier learning only when it
+// is taught in an earlier school week (or earlier in the same week). Earlier grades are always earlier learning.
+const SWK=MK.schoolWeeks(Object.fromEntries(yr.blocks.flatMap(bb=>bb.steps).map(st=>[st.id,st.title])),rows);
+const taughtBefore=(x,sid)=>{if(!x.startsWith(YEAR+'.'))return true;const a=SWK[x]??999,b=SWK[sid]??999;if(b===999||a===999)return order.indexOf(x)<order.indexOf(sid);return a<b||(a===b&&order.indexOf(x)<order.indexOf(sid));};
+const markerHits=MK.makeMarkerCheck(generateQuestionFor,YEAR,SWK,2);
+const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
 const usedProps=new Set();const missingReview=[];
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
@@ -143,18 +152,19 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // rule 14: a related key that is the skill of an EARLIER step of this year is a building block -> pre
   const handRelAll=[...(o.related||[]),...(OV.extraRelated?.[s.id]||[]),...(OV.relR3?.[s.id]||[])];
   for(const r of handRelAll){const k=resolve(r.key);const e=earlierStep(k,s.id,true);if(e)cand(k,`${r.why} (earlier step this builds on: ${e} ${stepById[e].title})`,2);}
-  const prev=b.steps[i-1];
+  // r5: "the step before" is the latest step on the same topic TAUGHT before this one (school week), not the WRM neighbour
+  const prev=yr.blocks.flatMap(bb=>bb.steps).filter(st=>st.id!==s.id&&topic(st)===topic(s)&&taughtBefore(st.id,s.id)).sort((a,c)=>((SWK[a.id]??999)-(SWK[c.id]??999))||(order.indexOf(a.id)-order.indexOf(c.id))).pop();
   if(!o.preOnly){
    const wk=lessonWeek[s.id];const ps=wk?priorSteps(wk):[];
-   const kept=ps.filter(x=>stepById[x.id]&&feeds(s,stepById[x.id])&&order.indexOf(x.id)<order.indexOf(s.id))
+   const kept=ps.filter(x=>stepById[x.id]&&feeds(s,stepById[x.id])&&order.indexOf(x.id)<order.indexOf(s.id)&&taughtBefore(x.id,s.id))
      .map(x=>({...x,same:topic(stepById[x.id])===topic(s)?0:1,dist:order.indexOf(s.id)-order.indexOf(x.id)})).sort((a,b)=>a.same-b.same||a.dist-b.dist);
-   if(prev&&topic(prev)===topic(s))for(const k of allOf(prev.id).slice(0,2))cand(k,`${prev.id} ${prev.title} (step before in the block)`,1);
+   if(prev&&topic(prev)===topic(s))for(const k of allOf(prev.id).slice(0,2))cand(k,`${prev.id} ${prev.title} (taught before this step${prev.block===s.block?' in the block':''})`,1);
    for(const x of kept){const st=stepById[x.id];const ks=allOf(x.id);
      if(!ks.length){if(topic(st)===topic(s))for(const pid of propsOf[x.id]||[])addPB(pid);continue;}
      for(const k of ks.slice(0,2))cand(k,`${x.id} ${st.title} (prior learning wk ${wk})`,x.same?5:3);}
-   for(let j=i-2,n=0;j>=0&&n<3;j--){const st=b.steps[j];if(topic(st)!==topic(s))continue;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (earlier in the block)`,4);}
+   for(let j=i-1,n=0;j>=0&&n<3;j--){const st=b.steps[j];if(topic(st)!==topic(s)||!taughtBefore(st.id,s.id)||st.id===prev?.id)continue;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (earlier in the block)`,4);}
   }
-  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=8)continue;seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{})});}};
+  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=14)continue;seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{})});}};
   take();
   if(pre.length<3&&prevYear&&!o.preOnly){const py=W.years.find(y=>y.id===prevYear);const cand6=py.blocks.flatMap(bb=>bb.steps).filter(st=>topic(st)===topic(s)).reverse();
     let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0)||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6);n++;}
@@ -189,6 +199,27 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     list[j]={key:sw.to,why:sw.to===e.key?`${e.why} [rule 18: opts ${JSON.stringify(sw.opts||{})} for this pupil]`:`${e.why} [rule 18: ${e.key.split(':')[1]} deals content above this pupil; ${sw.to.split(':')[1]} instead]`,opts:sw.opts||{}};}
   for(const list of [pre,related]){const seen=new Set(list===related?pre.map(x=>x.key):[]);for(let j=0;j<list.length;j++){const k=list[j].key;if(allDirect.has(k)||seen.has(k)){list.splice(j,1);j--;}else seen.add(k);}}
   if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(allDirect.has(k)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);pre.push({key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}});}
+  // r5 (rules 18-19): every link must be content met by this step's SCHOOL week. A pre that cites a step of this year
+  // taught later is dropped; a link whose generated items carry a content marker first met later (scan TOL 2 weeks) tries
+  // OV.markerFix alternatives (other opts / another skill) and is otherwise dropped. Then the topic ladder refills pre.
+  const citesLater=e=>{const all=[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]);if(all.some(x=>!x.startsWith(YEAR+'.')))return false; // also earlier-grade learning
+    const c=all.filter(x=>x.startsWith(YEAR+'.'));
+    if(c.length)return c.some(x=>!taughtBefore(x,s.id))&&!c.some(x=>taughtBefore(x,s.id));
+    return (keyFirstWk[e.key]??0)>(SWK[s.id]??999)+1&&!/Y\d\.|R\./.test(e.why);};
+  const fixLink=(e)=>{if(!markerHits(e.key,e.opts,s.id).length)return e;
+    for(const alt of OV.markerFix?.[YEAR]?.[e.key]||[]){const ne={key:alt.key||e.key,why:e.why+(alt.key&&alt.key!==e.key?` [rule 19: ${e.key.split(':')[1]} deals content taught later; ${alt.key.split(':')[1]} instead]`:` [rule 19: opts ${JSON.stringify(alt.opts||{})} keep it to content met by this week]`),opts:alt.opts||{}};
+      if(!allDirect.has(ne.key)&&!markerHits(ne.key,ne.opts,s.id).length)return ne;}
+    return null;};
+  const dropped=[];
+  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];if(list===pre&&citesLater(e)){dropped.push(e.key+' (taught later)');list.splice(j,1);continue;}
+    const ne=fixLink(e);if(!ne){dropped.push(e.key+' ('+markerHits(e.key,e.opts,s.id).map(h=>h.m).join(',')+')');list.splice(j,1);}else list[j]=ne;}
+  for(const list of [pre,related]){const seen=new Set(list===related?pre.map(x=>x.key):[]);for(let j=0;j<list.length;j++){const k=list[j].key;if(allDirect.has(k)||seen.has(k)){list.splice(j,1);j--;}else seen.add(k);}}
+  if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(allDirect.has(k)||pre.find(x=>x.key===k))continue;
+    const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}};if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
+  // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
+  for(const e of pre){for(const x of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0]))if(x.startsWith(YEAR+'.')&&!taughtBefore(x,s.id)){const q=x.replace(/\./g,'\\.');e.why=e.why.replace(new RegExp('\\s*/\\s*'+q),'').replace(new RegExp(q+'\\s*/\\s*'),'');}}
+  pre.splice(8);related.splice(6);
+  if(process.argv.includes('--dropped')&&dropped.length)console.error('DROPPED',s.id,dropped.join('; '));
   if(!related.length&&!o.relNote)console.error('NOREL(after linkFix)',s.id,s.title);
   if(pre.length<3)console.error('THINPRE(after linkFix)',s.id,s.title,pre.length);
   for(const id of build)usedProps.add(id);

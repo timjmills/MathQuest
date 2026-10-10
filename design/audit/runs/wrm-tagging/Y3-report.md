@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 4
+# Wave 2 tagging: Year 3 (US Grade 2) — round 5
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,11 +6,43 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 134 | 55 | 49 | 30 | 12 | 43 | 49 | 68 |
+| 134 | 54 | 50 | 30 | 13 | 43 | 50 | 69 |
 
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 5 (after critic Y2–Y3 r4, 7.64 / 7.53): rule 19, school-week order
+
+- **Pre tiers follow the SCHOOL week (xlsx), not WRM block order** (`build.mjs`). "The step before" is now the latest
+  step on the same topic taught before this one; earlier-in-block, xlsx and rule-14 promotions only take steps taught in
+  an earlier week (or earlier in the same week); earlier grades always count. A pre whose `why` cites only same-year
+  steps taught later is dropped; when it also cites earlier-grade learning, the later name is removed from the `why`.
+- **Content markers by week** (`tests/scripts/wrm-tagging/markers.mjs`, shared by `build.mjs` and `linkscan.mjs`):
+  every link is generated (10 + 8 items, two seed families) and checked for content first met later than the step's
+  week + 2 (Y2: thirds W31, quarter past W36, 5-minute times W37, ÷ W31, × W26, g/kg, ml/l, tally, pictogram; Y3: ÷3/4/8
+  W31, ×8, fractions beyond quarters, equivalence W37, right angles W28, parallel/perpendicular W29, L ↔ mL W34, kg ↔ g,
+  2-digit × ÷ 1-digit, rounding, perimeter, mm, a.m./p.m.) and for content never in the grade (×/÷ 6, 7, 9 at Grade 2,
+  ×/÷ beyond 2/5/10 at Grade 1, decimals, right angles at Grade 1, customary units). A flagged link tries the
+  `markerFix` alternatives (e.g. `partition_shapes {parts:[0,2]}`, `time_half_hour`, `div_facts {constant:[2,5,10]}`,
+  `nl_mult {constant:[2,3,4,5,10], band:50}`, `box_division_easy {constant:[2,3,4,5,8]}`, `estimate_length {forms:[0,1]}`)
+  and is otherwise dropped; the topic ladder (now with fractions and money ladders citing K learning) refills pre.
+  Steps left without an honest related skill say why in `note` (Y2.B5.S1, B7.S1, B9.S1, B9.S6, B11.S2–S4; Y3.B1.S13,
+  B2.S21, B4.S9, B6.S1, B6.S7, B7.S4, B7.S8, B7.S9, B11.S4).
+- **Scans** (critic r4 scripts, re-run): `scan6.mjs` TOL=2 → Y3 0; Y2 10 raw lines, all `repeated_add_to_mult`
+  (4 + 4 + 4 + 4 = 4 × 4), which `sys4.py` excludes as fine at Grade 1 → **`sys4.py` 0 / 0**; **`prewk.mjs` cite-later
+  0 / 0, key-later 0 / 0**; `fit.mjs` 0; `relfit.mjs week` Y3 0, Y2 only Y2.B1.S1 (K learning, allowed); `optcheck` 0;
+  `swap.py` 0 / 0. `direct6.mjs` lists Y3.B4.S4/S5 partials (`multiply`, `area_model_mult` have no table option): their
+  missing clauses now name the ×6, ×7, ×9 items. `sys3.py` (round 3, WRM order) still lists pre "citing a later step" by
+  WRM order (Y2 7, Y3 10); every one is taught EARLIER by school week (e.g. the 5 and 10 tables W26 before "Recognise
+  equal groups" W27), which is what rule 19 asks. **`linkscan (week mode): OK`** with the marker check added.
+- **Step fixes (Y3)**: B4.S8 direct `area_model_div_2by1 {constant:[2,3,4,5,8]}`; B4.S3 → partial (×6, ×7 splits) +
+  new option `props_tables`, with arrays and repeated addition as pre; B4.S4/S5/S7 missing clauses name the ×/÷ 6, 7, 9
+  items (B4.S7 now `{regroup:'none', constant:[2,3,4,5,8]}`); B3.S10 counting in 4s has 4s rows; B6.S7 pre = halves,
+  thirds and quarters, a number line, a ruler scale; B2.S20 leads with the Y2 number-line estimate (W03) instead of the
+  0–1,000 line (W13); B11.S7 drops `identify_lines` / `identify_angles`; `mult_word_problems`, `multiply`,
+  `area_model_mult`, `capacity`, `equiv_frac_visual` and the early ÷3/÷4 links are replaced or dropped by the markers;
+  B7.S4, B7.S9 and B1.S13 have a note instead of a related skill that did not share the idea.
 
 ## Round 4 (after critic Y2–Y3 r3, 7.55 / 7.60): rule 18 content and layout of every link
 

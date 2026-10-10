@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 4
+# Wave 2 tagging: Year 2 (US Grade 1) — round 5
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -9,6 +9,36 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 | 124 | 63 | 36 | 25 | 10 | 37 | 52 | 75 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 5 (after critic Y2–Y3 r4, 7.64 / 7.53): rule 19, school-week order
+
+- **Pre tiers follow the SCHOOL week (xlsx), not WRM block order** (`build.mjs`). "The step before" is now the latest
+  step on the same topic taught before this one; earlier-in-block, xlsx and rule-14 promotions only take steps taught in
+  an earlier week (or earlier in the same week); earlier grades always count. A pre whose `why` cites only same-year
+  steps taught later is dropped; when it also cites earlier-grade learning, the later name is removed from the `why`.
+- **Content markers by week** (`tests/scripts/wrm-tagging/markers.mjs`, shared by `build.mjs` and `linkscan.mjs`):
+  every link is generated (10 + 8 items, two seed families) and checked for content first met later than the step's
+  week + 2 (Y2: thirds W31, quarter past W36, 5-minute times W37, ÷ W31, × W26, g/kg, ml/l, tally, pictogram; Y3: ÷3/4/8
+  W31, ×8, fractions beyond quarters, equivalence W37, right angles W28, parallel/perpendicular W29, L ↔ mL W34, kg ↔ g,
+  2-digit × ÷ 1-digit, rounding, perimeter, mm, a.m./p.m.) and for content never in the grade (×/÷ 6, 7, 9 at Grade 2,
+  ×/÷ beyond 2/5/10 at Grade 1, decimals, right angles at Grade 1, customary units). A flagged link tries the
+  `markerFix` alternatives (e.g. `partition_shapes {parts:[0,2]}`, `time_half_hour`, `div_facts {constant:[2,5,10]}`,
+  `nl_mult {constant:[2,3,4,5,10], band:50}`, `box_division_easy {constant:[2,3,4,5,8]}`, `estimate_length {forms:[0,1]}`)
+  and is otherwise dropped; the topic ladder (now with fractions and money ladders citing K learning) refills pre.
+  Steps left without an honest related skill say why in `note` (Y2.B5.S1, B7.S1, B9.S1, B9.S6, B11.S2–S4; Y3.B1.S13,
+  B2.S21, B4.S9, B6.S1, B6.S7, B7.S4, B7.S8, B7.S9, B11.S4).
+- **Scans** (critic r4 scripts, re-run): `scan6.mjs` TOL=2 → Y3 0; Y2 10 raw lines, all `repeated_add_to_mult`
+  (4 + 4 + 4 + 4 = 4 × 4), which `sys4.py` excludes as fine at Grade 1 → **`sys4.py` 0 / 0**; **`prewk.mjs` cite-later
+  0 / 0, key-later 0 / 0**; `fit.mjs` 0; `relfit.mjs week` Y3 0, Y2 only Y2.B1.S1 (K learning, allowed); `optcheck` 0;
+  `swap.py` 0 / 0. `direct6.mjs` lists Y3.B4.S4/S5 partials (`multiply`, `area_model_mult` have no table option): their
+  missing clauses now name the ×6, ×7, ×9 items. `sys3.py` (round 3, WRM order) still lists pre "citing a later step" by
+  WRM order (Y2 7, Y3 10); every one is taught EARLIER by school week (e.g. the 5 and 10 tables W26 before "Recognise
+  equal groups" W27), which is what rule 19 asks. **`linkscan (week mode): OK`** with the marker check added.
+- **Step fixes (Y2)**: `compose_from_attributes` (right angles, parallel sides) is gone from every B3 pre;
+  `partition_shapes` is halves and quarters before W31; `time_quarter` / `time_5min` / `elapsed_hour` are gone from steps
+  before W36 / W37 (B8, B9.S1, S6, S7, B11.S3, S4); `div_facts` ÷5/÷10 gone from B5.S15/S17 pre; the kg-scale related
+  link on B7.S1 is gone; `tally_chart` / `build_pictograph` are off B10.S2 (W20); `estimate_length {forms:[0,1]}`
+  (form 2 is the ft/mi/in sort). The B11.S2–S4 notes are rewritten: time skills are later learning by school week.
 
 ## Round 4 (after critic Y2–Y3 r3, 7.55 / 7.60): rule 18 content and layout of every link
 

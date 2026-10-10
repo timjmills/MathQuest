@@ -99,14 +99,14 @@
    "pre": [
     {
      "key": "composing:base10_build",
-     "why": "Y3.B1.S1 Represent numbers to 100 (step before in the block)",
+     "why": "Y3.B1.S1 Represent numbers to 100 (taught before this step in the block)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S1 Represent numbers to 100 (step before in the block)",
+     "why": "Y3.B1.S1 Represent numbers to 100 (taught before this step in the block)",
      "opts": {
       "band": 99
      }
@@ -178,26 +178,12 @@
    ],
    "pre": [
     {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (step before in the block)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
-     "key": "composing:base10_build",
-     "why": "Y3.B1.S1 Represent numbers to 100 (earlier in the block)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S16 Count in 3s (Y2, same topic)",
+     "why": "Y3.B1.S14 Count in 50s (taught before this step in the block)",
      "opts": {
       "rows": [
        {
-        "step": 3,
+        "step": 50,
         "start": "zero",
         "dir": "up"
        }
@@ -205,8 +191,15 @@
      }
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y2.B1.S14 Order objects and numbers (Y2, same topic)",
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (earlier in the block)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y3.B1.S1 Represent numbers to 100 (earlier in the block)",
      "opts": {
       "band": 99
      }
@@ -258,15 +251,18 @@
    ],
    "pre": [
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S3 Number line to 100 (step before in the block)",
-     "opts": {}
-    },
-    {
      "key": "placevalue:expand",
-     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)",
+     "why": "Y3.B1.S2 Partition numbers to 100 (taught before this step in the block)",
      "opts": {
       "band": 99
+     }
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W01)",
+     "opts": {
+      "span": 10,
+      "band": 100
      }
     },
     {
@@ -354,8 +350,11 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "the same number placed on a line (earlier step this builds on: Y3.B1.S3 Number line to 100)",
-     "opts": {}
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W01)",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
     },
     {
      "key": "placevalue:combine",
@@ -390,6 +389,13 @@
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)",
      "opts": {
       "band": 90
+     }
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)",
+     "opts": {
+      "band": 99
      }
     }
    ],
@@ -430,12 +436,12 @@
    "pre": [
     {
      "key": "composing:base10_build_hundreds",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (step before in the block)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (taught before this step in the block)",
      "opts": {}
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (step before in the block)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (taught before this step in the block)",
      "opts": {
       "band": 999
      }
@@ -509,14 +515,14 @@
    "pre": [
     {
      "key": "placevalue:expand",
-     "why": "Y3.B1.S6 Partition numbers to 1,000 (step before in the block)",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (taught before this step in the block)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S6 Partition numbers to 1,000 (step before in the block)",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (taught before this step in the block)",
      "opts": {
       "band": 999
      }
@@ -678,14 +684,14 @@
    "pre": [
     {
      "key": "placevalue:identify",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (step before in the block)",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (taught before this step in the block)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (step before in the block)",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (taught before this step in the block)",
      "opts": {
       "band": 999
      }
@@ -775,7 +781,7 @@
    "pre": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (step before in the block)",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (earlier in the block)",
      "opts": {
       "step": 0
      }
@@ -793,11 +799,6 @@
      "opts": {
       "band": 999
      }
-    },
-    {
-     "key": "composing:base10_build_hundreds",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (earlier in the block)",
-     "opts": {}
     }
    ],
    "preBuild": [],
@@ -909,11 +910,10 @@
    "build": [],
    "pre": [
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S11 Estimate on a number line to 1,000 (step before in the block)",
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (taught before this step in the block)",
      "opts": {
-      "span": 100,
-      "band": 1000
+      "step": 0
      }
     },
     {
@@ -1010,7 +1010,7 @@
    "pre": [
     {
      "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (step before in the block)",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (taught before this step in the block)",
      "opts": {
       "band": 999
      }
@@ -1039,18 +1039,24 @@
      }
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S11 Estimate on a number line to 1,000 (earlier in the block)",
-     "opts": {
-      "span": 100,
-      "band": 1000
-     }
-    },
-    {
      "key": "placevalue:more_less_100",
      "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (earlier in the block)",
      "opts": {
       "step": 0
+     }
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (earlier in the block)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (earlier in the block)",
+     "opts": {
+      "band": 999
      }
     }
    ],
@@ -1179,12 +1185,7 @@
    "pre": [
     {
      "key": "addition:add_sub_10s",
-     "why": "Y3.B2.S1 Apply number bonds within 10 (step before in the block)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_sub_100s",
-     "why": "Y3.B2.S1 Apply number bonds within 10 (step before in the block)",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W03)",
      "opts": {}
     },
     {
@@ -1370,7 +1371,7 @@
    "pre": [
     {
      "key": "addition:add_sub_10s",
-     "why": "Y3.B2.S3 Add and subtract 10s (step before in the block)",
+     "why": "Y3.B2.S3 Add and subtract 10s (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -1441,12 +1442,12 @@
    "pre": [
     {
      "key": "addition:add_sub_100s",
-     "why": "Y3.B2.S4 Add and subtract 100s (step before in the block)",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught before this step in the block)",
      "opts": {}
     },
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B2.S4 Add and subtract 100s (step before in the block)",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught before this step in the block)",
      "opts": {
       "step": 100
      }
@@ -1591,7 +1592,7 @@
    "pre": [
     {
      "key": "number_sense:make_a_ten",
-     "why": "Y3.B2.S6 Add 1s across a 10 (step before in the block)",
+     "why": "Y3.B2.S6 Add 1s across a 10 (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -1735,7 +1736,7 @@
    "pre": [
     {
      "key": "subtraction:sub_50_regroup",
-     "why": "Y3.B2.S8 Subtract 1s across a 10 (step before in the block)",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -1888,7 +1889,7 @@
    "pre": [
     {
      "key": "number_sense:compensation",
-     "why": "Y3.B2.S10 Make connections (step before in the block)",
+     "why": "Y3.B2.S10 Make connections (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -1957,7 +1958,7 @@
    "pre": [
     {
      "key": "addition:add_1k_no_regroup",
-     "why": "Y3.B2.S11 Add two numbers (no exchange) (step before in the block)",
+     "why": "Y3.B2.S11 Add two numbers (no exchange) (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -2028,7 +2029,7 @@
    "pre": [
     {
      "key": "subtraction:sub_1k_no_regroup",
-     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (step before in the block)",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -2170,7 +2171,7 @@
    "pre": [
     {
      "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S14 Add two numbers (across a 100) (step before in the block)",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -2382,7 +2383,7 @@
    "pre": [
     {
      "key": "addition:add_1k_mixed",
-     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (step before in the block)",
+     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -2521,17 +2522,17 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S11 estimating on a number line to 1,000: which hundred is nearer",
+     "why": "Y2.B1.S11 estimating on a number line to 100: which ten is nearer",
      "opts": {
-      "span": 100,
-      "band": 1000
+      "span": 10,
+      "band": 100
      }
     },
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 100 more, 100 less",
+     "why": "Y3.B1.S9 10 and 100 more or less",
      "opts": {
-      "step": 100
+      "step": 10
      }
     },
     {
@@ -2592,14 +2593,14 @@
    "pre": [
     {
      "key": "number_sense:estimate_sum",
-     "why": "Y3.B2.S20 Estimate answers (step before in the block)",
+     "why": "Y3.B2.S20 Estimate answers (taught before this step in the block)",
      "opts": {
       "place": 10
      }
     },
     {
      "key": "number_sense:estimate_sums_diffs",
-     "why": "Y3.B2.S20 Estimate answers (step before in the block)",
+     "why": "Y3.B2.S20 Estimate answers (taught before this step in the block)",
      "opts": {
       "place": 10
      }
@@ -2638,14 +2639,8 @@
    "preBuild": [
     "add_next_10"
    ],
-   "related": [
-    {
-     "key": "addition:add_sub_fact_family",
-     "why": "fact families show the inverse",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill beyond the pre list: fact families and missing numbers (the same inverse idea) are earlier learning listed as pre"
   },
   "Y3.B2.S22": {
    "title": "Make decisions",
@@ -2659,7 +2654,7 @@
    "pre": [
     {
      "key": "subtraction:sub_check_by_adding",
-     "why": "Y3.B2.S21 Inverse operations (step before in the block)",
+     "why": "Y3.B2.S21 Inverse operations (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -2735,6 +2730,19 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y3.B4.S1 Multiples of 10 (taught before this step)",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
     {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W10)",
@@ -2815,7 +2823,7 @@
    "pre": [
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3.B3.S1 Multiplication - equal groups (step before in the block)",
+     "why": "Y3.B3.S1 Multiplication - equal groups (taught before this step in the block)",
      "opts": {
       "band": 36
      }
@@ -2885,7 +2893,7 @@
    "pre": [
     {
      "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S2 Use arrays (step before in the block)",
+     "why": "Y3.B3.S2 Use arrays (taught before this step in the block)",
      "opts": {
       "forms": [
        0
@@ -2894,7 +2902,7 @@
     },
     {
      "key": "multiplication:dot_array_mult",
-     "why": "Y3.B3.S2 Use arrays (step before in the block)",
+     "why": "Y3.B3.S2 Use arrays (taught before this step in the block)",
      "opts": {
       "band": 25
      }
@@ -2983,15 +2991,6 @@
      }
     },
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S2 Use arrays (earlier in the block)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y2.B5.S17 The 5 and 10 times-tables (Y2, same topic)",
      "opts": {
@@ -3046,8 +3045,8 @@
    "build": [],
    "pre": [
     {
-     "key": "number_theory:multiples",
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (step before in the block)",
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (taught before this step)",
      "opts": {}
     },
     {
@@ -3096,6 +3095,11 @@
      "opts": {
       "band": 25
      }
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (earlier in the block)",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -3143,15 +3147,8 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (step before in the block)",
-     "opts": {
-      "range": 100
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (step before in the block)",
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S3 Multiples of 2 (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -3207,11 +3204,14 @@
    "related": [
     {
      "key": "division:div_facts",
-     "why": "Y3.B3.S7 Divide by 3 (next step: the same idea one step further)",
+     "why": "Y3.B3.S7 Divide by 3 (next step: the same idea one step further) [rule 19: opts {\"constant\":[2,5,10],\"band\":100} keep it to content met by this week]",
      "opts": {
       "constant": [
-       3
-      ]
+       2,
+       5,
+       10
+      ],
+      "band": 100
      }
     }
    ],
@@ -3235,13 +3235,9 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S6 Multiply by 3 (step before in the block)",
-     "opts": {
-      "constant": [
-       3
-      ]
-     }
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S2 Related calculations (taught before this step)",
+     "opts": {}
     },
     {
      "key": "patterns:double",
@@ -3255,6 +3251,15 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     },
     {
@@ -3287,13 +3292,6 @@
     {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W31)",
-     "opts": {
-      "band": 25
-     }
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)",
      "opts": {
       "band": 25
      }
@@ -3349,15 +3347,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "Y3.B3.S7 Divide by 3 (step before in the block)",
-     "opts": {
-      "constant": [
-       3
-      ]
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
@@ -3393,13 +3382,6 @@
      "opts": {}
     },
     {
-     "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (earlier in the block)",
-     "opts": {
-      "range": 100
-     }
-    },
-    {
      "key": "number_theory:multiples",
      "why": "Y3.B3.S4 Multiples of 5 and 10 (earlier in the block)",
      "opts": {}
@@ -3409,24 +3391,14 @@
    "related": [
     {
      "key": "multiplication:nl_mult",
-     "why": "the 3 times-table as jumps on a number line",
+     "why": "the 3 times-table as jumps on a number line [rule 19: opts {\"constant\":[2,5,10],\"band\":20} keep it to content met by this week]",
      "opts": {
       "constant": [
        2,
-       3,
-       4,
        5,
-       8,
        10
       ],
-      "band": 100
-     }
-    },
-    {
-     "key": "multiplication:mult_word_problems",
-     "why": "the 3 times-table in stories",
-     "opts": {
-      "range": 100
+      "band": 20
      }
     }
    ],
@@ -3451,7 +3423,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S8 The 3 times-table (step before in the block)",
+     "why": "Y3.B3.S8 The 3 times-table (taught before this step in the block)",
      "opts": {
       "rows": [
        {
@@ -3498,44 +3470,23 @@
      "opts": {}
     },
     {
-     "key": "division:div_facts",
-     "why": "Y3.B3.S7 Divide by 3 (earlier in the block)",
-     "opts": {
-      "constant": [
-       3
-      ]
-     }
-    },
-    {
-     "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (earlier in the block)",
-     "opts": {
-      "range": 100
-     }
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (earlier in the block)",
+     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "multiplication:nl_mult",
-     "why": "multiplying by 4 as jumps on a number line",
+     "why": "multiplying by 4 as jumps on a number line [rule 19: opts {\"constant\":[2,5,10],\"band\":20} keep it to content met by this week]",
      "opts": {
       "constant": [
        2,
-       3,
-       4,
        5,
-       8,
        10
       ],
-      "band": 100
-     }
-    },
-    {
-     "key": "multiplication:mult_word_problems",
-     "why": "multiplying by 4 in stories",
-     "opts": {
-      "range": 100
+      "band": 20
      }
     }
    ],
@@ -3559,21 +3510,12 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S9 Multiply by 4 (step before in the block)",
-     "opts": {
-      "constant": [
-       4
-      ]
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "counting in 4s from 0 finds the multiples used (earlier step this builds on: Y3.B3.S8 The 3 times-table)",
      "opts": {
       "rows": [
        {
-        "step": 3,
+        "step": 4,
         "start": "zero",
         "dir": "up"
        }
@@ -3592,6 +3534,15 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     },
     {
@@ -3673,15 +3624,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "Y3.B3.S10 Divide by 4 (step before in the block)",
-     "opts": {
-      "constant": [
-       4
-      ]
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
@@ -3715,23 +3657,25 @@
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)",
      "opts": {}
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (earlier in the block)",
+     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "multiplication:nl_mult",
-     "why": "the 4 times-table as jumps on a number line",
+     "why": "the 4 times-table as jumps on a number line [rule 19: opts {\"constant\":[2,5,10],\"band\":20} keep it to content met by this week]",
      "opts": {
       "constant": [
        2,
-       3,
-       4,
        5,
-       8,
        10
       ],
-      "band": 100
+      "band": 20
      }
     },
     {
@@ -3775,19 +3719,6 @@
      }
     },
     {
-     "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S11 The 4 times-table (step before in the block)",
-     "opts": {
-      "rows": [
-       {
-        "step": 4,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
@@ -3799,6 +3730,19 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     },
     {
@@ -3846,13 +3790,6 @@
       ],
       "band": 100
      }
-    },
-    {
-     "key": "multiplication:mult_word_problems",
-     "why": "multiplying by 8 in stories",
-     "opts": {
-      "range": 100
-     }
     }
    ],
    "note": ""
@@ -3876,7 +3813,7 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S12 Multiply by 8 (step before in the block)",
+     "why": "Y3.B3.S12 Multiply by 8 (taught before this step in the block)",
      "opts": {
       "constant": [
        8
@@ -3995,7 +3932,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y3.B3.S13 Divide by 8 (step before in the block)",
+     "why": "Y3.B3.S13 Divide by 8 (taught before this step in the block)",
      "opts": {
       "constant": [
        8
@@ -4087,7 +4024,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S14 The 8 times-table (step before in the block)",
+     "why": "Y3.B3.S14 The 8 times-table (taught before this step in the block)",
      "opts": {
       "rows": [
        {
@@ -4217,23 +4154,9 @@
      }
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (Y2, same topic)",
-     "opts": {
-      "constant": [
-       5,
-       10
-      ]
-     }
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S16 Divide by 5 (Y2, same topic)",
-     "opts": {
-      "constant": [
-       5
-      ]
-     }
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (taught before this step)",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -4242,20 +4165,6 @@
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (a later step of the block: the same idea one step further)",
      "opts": {}
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (a later step of the block: the same idea one step further)",
-     "opts": {
-      "tiles": 21
-     }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (a later step of the block: the same idea one step further)",
-     "opts": {
-      "tiles": 21
-     }
     }
    ],
    "note": ""
@@ -4274,17 +4183,16 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 Multiples of 10 (step before in the block)",
+     "key": "division:div_word_problems",
+     "why": "Y3.B3.S5 Sharing and grouping (taught before this step)",
      "opts": {
-      "rows": [
-       {
-        "step": 10,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
+      "range": 100
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (taught before this step)",
+     "opts": {}
     },
     {
      "key": "multiplication:mult_facts",
@@ -4296,6 +4204,19 @@
      }
     },
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W30)",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "division:div_facts",
      "why": "Y2.B5.S10 Divide by 2 (prior learning wk W30)",
      "opts": {
@@ -4303,11 +4224,6 @@
        2
       ]
      }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W30)",
-     "opts": {}
     },
     {
      "key": "multiplication:arrays_groups",
@@ -4332,58 +4248,60 @@
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (next step: the same idea one step further)",
      "opts": {}
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (a later step of the block: the same idea one step further)",
-     "opts": {
-      "tiles": 21
-     }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (a later step of the block: the same idea one step further)",
-     "opts": {
-      "tiles": 21
-     }
     }
    ],
    "note": ""
   },
   "Y3.B4.S3": {
    "title": "Reasoning about multiplication",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "multiplication:mult_properties",
-     "opts": {}
+     "missing": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available",
+   "build": [
+    "props_tables"
+   ],
    "pre": [
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S2 Related calculations (step before in the block)",
-     "opts": {}
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (Y2, same topic)",
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 arrays: turning an array gives the same product",
      "opts": {
-      "constant": [
-       5,
-       10
+      "forms": [
+       0
       ]
      }
     },
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S16 Divide by 5 (Y2, same topic)",
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 adding equal groups",
+     "opts": {
+      "band": 25
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S11 The 4 times-table (taught before this step)",
      "opts": {
       "constant": [
-       5
+       4
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y3.B3.S11 The 4 times-table (taught before this step)",
+     "opts": {
+      "rows": [
+       {
+        "step": 4,
+        "start": "zero",
+        "dir": "up"
+       }
       ]
      }
     }
@@ -4391,17 +4309,10 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:multiply",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (next step: the same idea one step further)",
+     "key": "patterns:double",
+     "why": "doubling: the 4 times-table is double the 2 times-table",
      "opts": {
-      "tiles": 21
-     }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (next step: the same idea one step further)",
-     "opts": {
-      "tiles": 21
+      "band": 20
      }
     }
    ],
@@ -4413,45 +4324,36 @@
    "partial": [
     {
      "key": "multiplication:multiply",
-     "missing": "2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available",
+     "missing": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available",
      "opts": {
       "tiles": 21
      }
     },
     {
      "key": "multiplication:area_model_mult",
-     "missing": "the partition picture, exchanges mixed",
+     "missing": "the partition picture, exchanges mixed, and ×6, ×7, ×9 items",
      "opts": {
       "tiles": 21
      }
     }
    ],
    "verdict": "partial",
-   "missing": "2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available; the partition picture, exchanges mixed",
+   "missing": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available; the partition picture, exchanges mixed, and ×6, ×7, ×9 items",
    "build": [
     "exchange_count"
    ],
    "pre": [
     {
-     "key": "placevalue:expand",
-     "why": "Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3",
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (taught before this step in the block)",
      "opts": {
-      "band": 99
-     }
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 multiples of 10: 20 × 3",
-     "opts": {
-      "forms": [
-       0
+      "constant": [
+       2,
+       3,
+       4,
+       5
       ]
      }
-    },
-    {
-     "key": "multiplication:mult_properties",
-     "why": "Y3.B4.S3 Reasoning about multiplication (step before in the block)",
-     "opts": {}
     },
     {
      "key": "patterns:double",
@@ -4497,6 +4399,20 @@
        }
       ]
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W33)",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -4515,21 +4431,21 @@
    "partial": [
     {
      "key": "multiplication:multiply",
-     "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in",
+     "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)",
      "opts": {
       "tiles": 21
      }
     },
     {
      "key": "multiplication:area_model_mult",
-     "missing": "the partition picture; exchanges are not controlled (3 × 13)",
+     "missing": "the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear",
      "opts": {
       "tiles": 21
      }
     }
    ],
    "verdict": "partial",
-   "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in; the partition picture; exchanges are not controlled (3 × 13)",
+   "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9); the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear",
    "build": [
     "exchange_count"
    ],
@@ -4629,17 +4545,12 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:multiply",
-     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (step before in the block)",
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (taught before this step in the block) [rule 19: multiply deals content taught later; mult_zeros instead]",
      "opts": {
-      "tiles": 21
-     }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (step before in the block)",
-     "opts": {
-      "tiles": 21
+      "forms": [
+       0
+      ]
      }
     },
     {
@@ -4691,6 +4602,15 @@
      "key": "division:share_into_groups",
      "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W33)",
      "opts": {}
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -4699,7 +4619,14 @@
      "key": "division:box_division_easy",
      "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (next step: the same idea one step further)",
      "opts": {
-      "regroup": "none"
+      "regroup": "none",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
      }
     },
     {
@@ -4710,7 +4637,8 @@
        2,
        3,
        4,
-       5
+       5,
+       8
       ]
      }
     }
@@ -4723,36 +4651,34 @@
    "partial": [
     {
      "key": "division:box_division_easy",
-     "missing": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available",
+     "missing": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)",
      "opts": {
-      "regroup": "none"
-     }
-    }
-   ],
-   "verdict": "partial",
-   "missing": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available",
-   "build": [
-    "exchange_count"
-   ],
-   "pre": [
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "Y3.B4.S6 Link multiplication and division (step before in the block)",
-     "opts": {}
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y3.B4.S6 Link multiplication and division (step before in the block) [rule 18: missing_mult_div deals content above this pupil; div_facts instead]",
-     "opts": {
+      "regroup": "none",
       "constant": [
        2,
        3,
        4,
        5,
-       8,
-       10
-      ],
-      "band": 100
+       8
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)",
+   "build": [
+    "exchange_count"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (taught before this step)",
+     "opts": {
+      "constant": [
+       2,
+       4,
+       8
+      ]
      }
     },
     {
@@ -4770,8 +4696,8 @@
      }
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W32)",
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)",
      "opts": {
       "constant": [
        2
@@ -4795,6 +4721,22 @@
      "key": "division:share_into_groups",
      "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W32)",
      "opts": {}
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)",
+     "opts": {
+      "band": 25
+     }
     }
    ],
    "preBuild": [],
@@ -4831,7 +4773,15 @@
    "direct": [
     {
      "key": "division:area_model_div_2by1",
-     "opts": {}
+     "opts": {
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
+     }
     }
    ],
    "partial": [],
@@ -4841,9 +4791,16 @@
    "pre": [
     {
      "key": "division:box_division_easy",
-     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (step before in the block)",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (taught before this step in the block)",
      "opts": {
-      "regroup": "none"
+      "regroup": "none",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
      }
     },
     {
@@ -4919,16 +4876,9 @@
        5
       ]
      }
-    },
-    {
-     "key": "multiplication:mult_comparison",
-     "why": "Y3.B4.S10 Scaling (a later step of the block: the same idea one step further)",
-     "opts": {
-      "range": 50
-     }
     }
    ],
-   "note": ""
+   "note": "constant [2,3,4,5,8]: no ÷6, ÷7, ÷9 (the default deals 42 ÷ 7, 96 ÷ 6, 81 ÷ 9)"
   },
   "Y3.B4.S9": {
    "title": "Divide a 2-digit number by a 1-digit number - with remainders",
@@ -4945,13 +4895,14 @@
    "pre": [
     {
      "key": "division:area_model_div_2by1",
-     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (step before in the block)",
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (taught before this step in the block)",
      "opts": {
       "constant": [
        2,
        3,
        4,
-       5
+       5,
+       8
       ]
      }
     },
@@ -5016,16 +4967,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "multiplication:mult_comparison",
-     "why": "Y3.B4.S10 Scaling (next step: the same idea one step further)",
-     "opts": {
-      "range": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill at Grade 2 tables: comparison stories deal ×6, ×7, ×9 (rule 19); sharing with remainders is pre"
   },
   "Y3.B4.S10": {
    "title": "Scaling",
@@ -5041,6 +4984,26 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (taught before this step in the block)",
+     "opts": {}
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B4.S6 Link multiplication and division (taught before this step in the block) [rule 18: missing_mult_div deals content above this pupil; div_facts instead]",
+     "opts": {
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8,
+       10
+      ],
+      "band": 100
+     }
+    },
+    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
      "opts": {
@@ -5052,15 +5015,6 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)",
-     "opts": {
-      "constant": [
-       2
-      ]
      }
     },
     {
@@ -5098,13 +5052,6 @@
        0
       ]
      }
-    },
-    {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
-     "opts": {
-      "band": 25
-     }
     }
    ],
    "preBuild": [],
@@ -5115,10 +5062,10 @@
      "opts": {}
     },
     {
-     "key": "multiplication:mult_word_problems",
-     "why": "multiplication in stories",
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "multiplication in stories [rule 19: mult_word_problems deals content taught later; repeated_add_to_mult instead]",
      "opts": {
-      "range": 100
+      "band": 25
      }
     }
    ],
@@ -5159,10 +5106,10 @@
      }
     },
     {
-     "key": "multiplication:mult_word_problems",
-     "why": "multiplication in stories",
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "multiplication in stories [rule 19: mult_word_problems deals content taught later; repeated_add_to_mult instead]",
      "opts": {
-      "range": 100
+      "band": 25
      }
     }
    ],
@@ -5229,7 +5176,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing m or cm for an object",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "note": ""
@@ -5251,7 +5203,7 @@
    "pre": [
     {
      "key": "measurement:length_metric",
-     "why": "Y3.B5.S1 Measure in metres and centimetres (step before in the block)",
+     "why": "Y3.B5.S1 Measure in metres and centimetres (taught before this step in the block)",
      "opts": {
       "forms": [
        1
@@ -5276,7 +5228,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing mm or cm for an object",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     },
     {
      "key": "measurement:reading_ruler_hard",
@@ -5298,7 +5255,7 @@
    "pre": [
     {
      "key": "measurement:reading_ruler",
-     "why": "Y3.B5.S2 Measure in millimetres (step before in the block)",
+     "why": "Y3.B5.S2 Measure in millimetres (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -5328,7 +5285,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing mm or cm for an object",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "note": ""
@@ -5375,7 +5337,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing a sensible unit",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "note": "forms 0-2 = mm/cm, cm/m, mm/m; form 3 (m in km) is above the step"
@@ -5430,7 +5397,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing m or cm",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "note": ""
@@ -5495,7 +5467,7 @@
    "pre": [
     {
      "key": "measurement:length_metric",
-     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (step before in the block)",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (taught before this step in the block)",
      "opts": {
       "forms": [
        0
@@ -5769,7 +5741,7 @@
    "pre": [
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S10 What is perimeter (step before in the block)",
+     "why": "Y3.B5.S10 What is perimeter (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -5825,7 +5797,7 @@
    "pre": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "why": "Y3.B5.S11 Measure perimeter (step before in the block)",
+     "why": "Y3.B5.S11 Measure perimeter (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -5879,6 +5851,16 @@
    "build": [],
    "pre": [
     {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (taught before this step in the block)",
+     "opts": {}
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (taught before this step in the block)",
+     "opts": {}
+    },
+    {
      "key": "fractions:shade_fraction",
      "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W26)",
      "opts": {
@@ -5896,40 +5878,13 @@
        1
       ]
      }
-    },
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (Y2, same topic)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B8.S4 Find a half (Y2, same topic)",
-     "opts": {
-      "band": 20
-     }
     }
    ],
    "preBuild": [
     "fraction_parts"
    ],
-   "related": [
-    {
-     "key": "fractions:graph_fractions",
-     "why": "placing a unit fraction on a number line (the next idea)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill met by this week: equivalent fractions and number lines of fractions come later (rule 19)"
   },
   "Y3.B6.S2": {
    "title": "Compare and order unit fractions",
@@ -5956,18 +5911,8 @@
    ],
    "pre": [
     {
-     "key": "fractions:identify",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (step before in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
      "key": "fractions:write_fraction",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (step before in the block)",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)",
      "opts": {
       "denoms": [
        2,
@@ -5978,6 +5923,16 @@
     {
      "key": "fractions:shade_fraction",
      "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)",
+     "opts": {
+      "denoms": [
+       2,
+       3
+      ]
+     }
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W36)",
      "opts": {
       "denoms": [
        2,
@@ -6018,7 +5973,7 @@
    "pre": [
     {
      "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W26)",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -6037,15 +5992,14 @@
     },
     {
      "key": "patterns:halve",
-     "why": "Y2.B5.S11 halving an amount within 20 (topic ladder)",
+     "why": "Y2.B8.S4 Find a half (Y2, same topic)",
      "opts": {
       "band": 20
      }
     }
    ],
    "preBuild": [
-    "fraction_parts",
-    "compare_kind"
+    "fraction_parts"
    ],
    "related": [
     {
@@ -6083,7 +6037,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (step before in the block)",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -6093,7 +6047,7 @@
     },
     {
      "key": "fractions:shade_fraction",
-     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (step before in the block)",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -6136,8 +6090,7 @@
    ],
    "preBuild": [
     "frac_count",
-    "fraction_parts",
-    "compare_kind"
+    "fraction_parts"
    ],
    "related": [
     {
@@ -6178,11 +6131,6 @@
    ],
    "pre": [
     {
-     "key": "composing:compose_whole",
-     "why": "Y3.B6.S4 Understand the whole (step before in the block)",
-     "opts": {}
-    },
-    {
      "key": "fractions:write_fraction",
      "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)",
      "opts": {
@@ -6211,6 +6159,11 @@
        3
       ]
      }
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (earlier in the block)",
+     "opts": {}
     }
    ],
    "preBuild": [
@@ -6301,48 +6254,33 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8 halves, thirds and quarters of a whole",
      "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "composing:compose_whole",
-     "why": "Y3.B6.S4 Understand the whole (earlier in the block)",
-     "opts": {}
-    }
-   ],
-   "preBuild": [
-    "frac_count",
-    "fraction_parts",
-    "compare_kind"
-   ],
-   "related": [
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y3.B6.S9 Equivalent fractions on a number line (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a number line marked in equal steps",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 reading a scale (a ruler)",
+     "opts": {}
     }
    ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "no related skill met by W18: equivalence (W37) comes later (rule 19)"
   },
   "Y3.B6.S8": {
    "title": "Count in fractions on a number line",
@@ -6356,12 +6294,7 @@
    "pre": [
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S7 Fractions on a number line (step before in the block)",
-     "opts": {}
-    },
-    {
-     "key": "fractions:graph_fractions",
-     "why": "Y3.B6.S7 Fractions on a number line (step before in the block)",
+     "why": "reading a fraction at a point on the line (earlier step this builds on: Y3.B6.S7 Fractions on a number line)",
      "opts": {}
     },
     {
@@ -6599,17 +6532,17 @@
    ],
    "pre": [
     {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y3.B7.S5 Compare mass (taught before this step in the block)",
+     "opts": {}
+    },
+    {
      "key": "number_sense:place_on_number_line",
      "why": "a scale is a number line with intervals (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
      "opts": {
       "span": 100,
       "band": 1000
      }
-    },
-    {
-     "key": "measurement:heavier_lighter_visual",
-     "why": "Y2.B7.S1 Compare mass (Y2, same topic)",
-     "opts": {}
     },
     {
      "key": "multiplication:count_by_tables",
@@ -6809,7 +6742,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (step before in the block)",
+     "why": "Y3.B7.S3 Measure mass in kilograms and grams (taught before this step in the block)",
      "opts": {
       "forms": [
        1
@@ -6836,14 +6769,8 @@
    "preBuild": [
     "mass_ops"
    ],
-   "related": [
-    {
-     "key": "measurement:heavier_lighter_visual",
-     "why": "Y3.B7.S5 Compare mass (next step: the same idea one step further)",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: the same exchange with capacity (l ↔ ml) is taught later (W34) and has no whole-number skill yet (metric_mass_capacity)"
   },
   "Y3.B7.S5": {
    "title": "Compare mass",
@@ -6868,20 +6795,20 @@
      }
     },
     {
-     "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (earlier in the block)",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
-    },
-    {
      "key": "number_sense:place_on_number_line",
      "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)",
      "opts": {
       "span": 10,
       "band": 100
+     }
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S3 Measure in kilograms (Y2, same topic)",
+     "opts": {
+      "forms": [
+       1
+      ]
      }
     }
    ],
@@ -6906,11 +6833,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:heavier_lighter_visual",
-     "why": "Y3.B7.S5 Compare mass (step before in the block)",
-     "opts": {}
-    },
-    {
      "key": "addition:add_1k_mixed",
      "why": "the column addition used with masses (earlier step this builds on: Y3.B2.S17 Add 2-digit and 3-digit numbers)",
      "opts": {}
@@ -6928,6 +6850,11 @@
        1
       ]
      }
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y3.B7.S5 Compare mass (earlier in the block)",
+     "opts": {}
     },
     {
      "key": "addition:add_100_regroup",
@@ -7073,21 +7000,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "measurement:capacity",
-     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (next step: the same idea one step further)",
-     "opts": {
-      "units": [
-       1
-      ],
-      "forms": [
-       0
-      ]
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: litres-and-millilitres conversion (W34) uses decimal litres in the only skill (rule 18)"
   },
   "Y3.B7.S9": {
    "title": "Equivalent capacities and volumes (litres and millilitres)",
@@ -7113,19 +7027,19 @@
    ],
    "pre": [
     {
-     "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (step before in the block)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "placevalue:unit_form",
      "why": "1 l = 1,000 ml, the same exchange as 1 thousand (earlier step this builds on: Y3.B1.S8 Hundreds, tens and ones)",
      "opts": {
       "band": 999
+     }
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W34)",
+     "opts": {
+      "forms": [
+       0
+      ]
      }
     },
     {
@@ -7135,17 +7049,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "measurement:money_notation",
-     "why": "345 cents = $3.45: another exchange between a big and a small unit",
-     "opts": {
-      "currency": "usd",
-      "task": "words"
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: the same exchange with mass (kg ↔ g) has no skill yet (metric_mass_capacity), and 1,000 = 10 hundreds is pre"
   },
   "Y3.B7.S10": {
    "title": "Compare capacity and volume",
@@ -7158,18 +7063,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:capacity",
-     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (step before in the block)",
-     "opts": {
-      "units": [
-       1
-      ],
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "measurement:heavier_lighter_visual",
      "why": "comparing masses, the same compare idea (earlier step this builds on: Y3.B7.S5 Compare mass)",
      "opts": {}
@@ -7179,15 +7072,6 @@
      "why": "comparing the numbers once the units match (earlier step this builds on: Y3.B1.S12 Compare numbers to 1,000)",
      "opts": {
       "band": 999
-     }
-    },
-    {
-     "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (earlier in the block)",
-     "opts": {
-      "forms": [
-       0
-      ]
      }
     },
     {
@@ -7225,18 +7109,6 @@
      "key": "measurement:mass_volume_liquid",
      "why": "Y2.B7.S7 Measure in litres (prior learning wk W35)",
      "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
-     "key": "measurement:capacity",
-     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (earlier in the block)",
-     "opts": {
-      "units": [
-       1
-      ],
       "forms": [
        0
       ]
@@ -7297,7 +7169,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)",
+     "why": "Y3.B6.S10 Equivalent fractions as bar models (taught before this step)",
      "opts": {
       "denoms": [
        2
@@ -7420,7 +7292,7 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y3.B8.S1 Add fractions (step before in the block)",
+     "why": "Y3.B8.S1 Add fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -7512,7 +7384,7 @@
    "pre": [
     {
      "key": "fraction_operations:sub_fractions_like",
-     "why": "Y3.B8.S2 Subtract fractions (step before in the block)",
+     "why": "Y3.B8.S2 Subtract fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -7523,7 +7395,7 @@
     },
     {
      "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y3.B8.S2 Subtract fractions (step before in the block)",
+     "why": "Y3.B8.S2 Subtract fractions (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -7841,7 +7713,7 @@
    "pre": [
     {
      "key": "fractions:fraction_of_set",
-     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (step before in the block)",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -7853,7 +7725,7 @@
     },
     {
      "key": "fractions:fraction_of_set_nv",
-     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (step before in the block)",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (taught before this step in the block)",
      "opts": {
       "denoms": [
        2,
@@ -8041,7 +7913,7 @@
    "pre": [
     {
      "key": "measurement:money_count",
-     "why": "Y3.B9.S1 Pounds and pence (step before in the block)",
+     "why": "Y3.B9.S1 Pounds and pence (taught before this step in the block)",
      "opts": {
       "currency": "usd",
       "kind": "both"
@@ -8115,7 +7987,7 @@
    "pre": [
     {
      "key": "measurement:money_notation",
-     "why": "Y3.B9.S2 Convert pounds and pence (step before in the block)",
+     "why": "Y3.B9.S2 Convert pounds and pence (taught before this step in the block)",
      "opts": {
       "currency": "usd",
       "task": "words"
@@ -8203,7 +8075,7 @@
     },
     {
      "key": "measurement:money",
-     "why": "Y3.B9.S3 Add money (step before in the block)",
+     "why": "Y3.B9.S3 Add money (taught before this step in the block)",
      "opts": {
       "currency": "usd",
       "step": 5
@@ -8435,7 +8307,7 @@
    "pre": [
     {
      "key": "measurement:time_5min",
-     "why": "Y3.B10.S2 Tell the time to 5 minutes (step before in the block)",
+     "why": "Y3.B10.S2 Tell the time to 5 minutes (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -8489,7 +8361,7 @@
    "pre": [
     {
      "key": "measurement:time_1min",
-     "why": "Y3.B10.S3 Tell the time to the minute (step before in the block)",
+     "why": "Y3.B10.S3 Tell the time to the minute (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -8545,7 +8417,7 @@
    "pre": [
     {
      "key": "measurement:time_analog_digital",
-     "why": "Y3.B10.S4 Read time on a digital clock (step before in the block)",
+     "why": "Y3.B10.S4 Read time on a digital clock (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -8598,7 +8470,7 @@
    "pre": [
     {
      "key": "measurement:time_sense",
-     "why": "Y3.B10.S5 Use a.m. and p.m (step before in the block)",
+     "why": "Y3.B10.S5 Use a.m. and p.m (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -8838,12 +8710,12 @@
    "pre": [
     {
      "key": "measurement:elapsed_mixed",
-     "why": "Y3.B10.S9 Hours and minutes - use durations (step before in the block)",
+     "why": "Y3.B10.S9 Hours and minutes - use durations (taught before this step in the block)",
      "opts": {}
     },
     {
      "key": "measurement:elapsed_find_duration",
-     "why": "Y3.B10.S9 Hours and minutes - use durations (step before in the block)",
+     "why": "Y3.B10.S9 Hours and minutes - use durations (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9006,6 +8878,16 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (taught before this step in the block)",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (taught before this step in the block)",
+     "opts": {}
+    },
+    {
      "key": "shapes_early:count_edges_faces_vertices",
      "why": "Y2.B3.S10 Count vertices on 3-D shapes (prior learning wk W28)",
      "opts": {
@@ -9017,20 +8899,6 @@
     {
      "key": "shapes_early:shape_corners_count",
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W28)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W28)",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)",
      "opts": {}
     },
     {
@@ -9179,12 +9047,12 @@
     {
      "key": "measurement:estimate_length",
      "why": "Y2.B6 choosing and estimating lengths in cm",
-     "opts": {}
-    },
-    {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S2 right angles for drawing a rectangle",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
@@ -9194,22 +9062,16 @@
        0
       ]
      }
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (a later step of the block: the same idea one step further)",
-     "opts": {}
     },
     {
      "key": "shapes_early:name_2d_shapes",
-     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (a later step of the block: the same idea one step further)",
+     "why": "Y1.B3.S3 naming 2-D shapes (topic ladder)",
      "opts": {}
     }
    ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "no related skill met by W23: angles and parallel or perpendicular lines come in W28-W29 (rule 19)"
   },
   "Y3.B11.S5": {
    "title": "Horizontal and vertical",
@@ -9346,8 +9208,8 @@
    "build": [],
    "pre": [
     {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (step before in the block)",
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9356,11 +9218,16 @@
      "opts": {}
     },
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S3 Compare angles (earlier in the block)",
+     "key": "patterns:shape_pattern",
+     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (Y2, same topic)",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S10 Count vertices on 3-D shapes (Y2, same topic)",
      "opts": {
       "forms": [
-       0
+       2
       ]
      }
     }
@@ -9369,11 +9236,6 @@
    "related": [
     {
      "key": "shapes_early:name_3d_shapes",
-     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (a later step of the block: the same idea one step further)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:count_edges_faces_vertices",
      "why": "Y3.B11.S9 Recognise and describe 3-D shapes (a later step of the block: the same idea one step further)",
      "opts": {}
     }
@@ -9401,8 +9263,8 @@
      "opts": {}
     },
     {
-     "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (step before in the block)",
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 Parallel and perpendicular (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9421,9 +9283,13 @@
      "opts": {}
     },
     {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (earlier in the block)",
-     "opts": {}
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     },
     {
      "key": "angles_lines:identify_angles",
@@ -9463,6 +9329,11 @@
    "build": [],
    "pre": [
     {
+     "key": "angles_lines:identify_angles",
+     "why": "Y3.B11.S2 Right angles (taught before this step in the block)",
+     "opts": {}
+    },
+    {
      "key": "shapes_early:shape_corners_count",
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W28)",
      "opts": {}
@@ -9479,11 +9350,6 @@
     {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)",
-     "opts": {}
-    },
-    {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (earlier in the block)",
      "opts": {}
     },
     {
@@ -9514,12 +9380,12 @@
    "pre": [
     {
      "key": "shapes_early:name_3d_shapes",
-     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (step before in the block)",
+     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (taught before this step in the block)",
      "opts": {}
     },
     {
      "key": "shapes_early:count_edges_faces_vertices",
-     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (step before in the block)",
+     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9542,13 +9408,13 @@
      "opts": {}
     },
     {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (earlier in the block)",
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (earlier in the block)",
      "opts": {}
     },
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y3.B11.S4 Measure and draw accurately (earlier in the block)",
+     "key": "angles_lines:identify_angles",
+     "why": "Y3.B11.S2 Right angles (earlier in the block)",
      "opts": {}
     }
    ],
@@ -9646,7 +9512,7 @@
    "pre": [
     {
      "key": "graphs:pictograph",
-     "why": "Y3.B12.S1 Interpret pictograms (step before in the block)",
+     "why": "Y3.B12.S1 Interpret pictograms (taught before this step in the block)",
      "opts": {
       "range": 100
      }
@@ -9719,7 +9585,7 @@
    "pre": [
     {
      "key": "graphs:build_pictograph",
-     "why": "Y3.B12.S2 Draw pictograms (step before in the block)",
+     "why": "Y3.B12.S2 Draw pictograms (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9802,12 +9668,12 @@
    "pre": [
     {
      "key": "measurement:bar_graph_intro",
-     "why": "Y3.B12.S3 Interpret bar charts (step before in the block)",
+     "why": "Y3.B12.S3 Interpret bar charts (taught before this step in the block)",
      "opts": {}
     },
     {
      "key": "graphs:bar_graph",
-     "why": "Y3.B12.S3 Interpret bar charts (step before in the block)",
+     "why": "Y3.B12.S3 Interpret bar charts (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -9850,7 +9716,7 @@
     },
     {
      "key": "graphs:build_bar_graph",
-     "why": "Y3.B12.S4 Draw bar charts (step before in the block)",
+     "why": "Y3.B12.S4 Draw bar charts (taught before this step in the block)",
      "opts": {}
     },
     {
@@ -10290,9 +10156,9 @@
     "Y3.B2.S14": "exchanges are mixed; a page with one exchange in the tens (across a 100) only is not available",
     "Y3.B2.S15": "exchanges are mixed (307 − 278 exchanges twice); one exchange from the tens only is not available",
     "Y3.B2.S16": "exchanges are mixed; one exchange from the hundreds only is not available",
-    "Y3.B4.S4": "2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available; the partition picture, exchanges mixed",
-    "Y3.B4.S5": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in; the partition picture; exchanges are not controlled (3 × 13)",
-    "Y3.B4.S7": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available"
+    "Y3.B4.S4": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available; the partition picture, exchanges mixed, and ×6, ×7, ×9 items",
+    "Y3.B4.S5": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9); the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear",
+    "Y3.B4.S7": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)"
    },
    "kindText": "option on addition:add_1k_regroup, subtraction:sub_1k_regroup, subtraction:sub_across_zeros, multiplication:multiply, multiplication:area_model_mult, division:box_division_easy"
   },
@@ -10441,6 +10307,27 @@
     "Y3.B3.S15": "drills the three tables mixed; the doubling link (2 → 4 → 8) is not taught"
    },
    "kindText": "new skill"
+  },
+  "props_tables": {
+   "kind": "option",
+   "skill": "multiplication:mult_properties",
+   "option": "tables: only the 2, 3, 4, 5, 8 and 10 times-tables (Grade 2)",
+   "name": "Reasoning About Multiplication Within the Grade 2 Tables (option)",
+   "teaches": "using arrays, doubling and splitting to reason about multiplication facts, using only the tables taught at Grade 2 (4 × 3 = 3 × 4; 8 × 3 = double 4 × 3)",
+   "representation": "the existing properties cell (array picture with the two sentences), facts drawn from the Grade 2 tables only",
+   "family": "operations",
+   "steps": [
+    "Y3.B4.S3"
+   ],
+   "ccss": [
+    "3.OA.B.5"
+   ],
+   "why": "mult_properties deals ×6 and ×7 splits (7 × 6 = 3 × 6 + 4 × 6), beyond the Grade 2 tables",
+   "reused": false,
+   "closes": {
+    "Y3.B4.S3": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
+   },
+   "kindText": "option on multiplication:mult_properties"
   },
   "how_many_ways": {
    "kind": "new",
@@ -10650,7 +10537,6 @@
     "Y3.B6.S3",
     "Y3.B6.S4",
     "Y3.B6.S5",
-    "Y3.B6.S7",
     "Y3.B6.S8",
     "Y3.B6.S9",
     "Y3.B6.S10",
@@ -10672,7 +10558,6 @@
     "Y3.B6.S3": "(prerequisite of this step)",
     "Y3.B6.S4": "(prerequisite of this step)",
     "Y3.B6.S5": "(prerequisite of this step)",
-    "Y3.B6.S7": "(prerequisite of this step)",
     "Y3.B6.S8": "(prerequisite of this step)",
     "Y3.B6.S9": "(prerequisite of this step)",
     "Y3.B6.S10": "(prerequisite of this step)",
@@ -10701,7 +10586,6 @@
     "Y3.B6.S4",
     "Y3.B6.S5",
     "Y3.B6.S6",
-    "Y3.B6.S7",
     "Y3.B6.S10",
     "Y3.B8.S1",
     "Y3.B8.S2"
@@ -10719,7 +10603,6 @@
     "Y3.B6.S4": "(prerequisite of this step)",
     "Y3.B6.S5": "(prerequisite of this step)",
     "Y3.B6.S6": "(prerequisite of this step)",
-    "Y3.B6.S7": "(prerequisite of this step)",
     "Y3.B6.S8": "counting on and back in unit fractions along a number line, past one whole (3/4, 4/4, 5/4)",
     "Y3.B6.S9": "equivalent fractions shown on two number lines",
     "Y3.B6.S10": "(prerequisite of this step)",
@@ -10739,9 +10622,6 @@
    "steps": [
     "Y3.B6.S2",
     "Y3.B6.S5",
-    "Y3.B6.S3",
-    "Y3.B6.S4",
-    "Y3.B6.S7",
     "Y3.B6.S8",
     "Y3.B6.S9",
     "Y3.B6.S10"
@@ -10753,10 +10633,7 @@
    "reused": false,
    "closes": {
     "Y3.B6.S2": "compares any two fractions (2/6 and 7/8); a page of unit fractions only is not available; orders non-unit fractions too",
-    "Y3.B6.S3": "(prerequisite of this step)",
-    "Y3.B6.S4": "(prerequisite of this step)",
     "Y3.B6.S5": "forms [1] mixes same-denominator pairs (3/10, 9/10) with others (5/8, 1/3); mixed denominators",
-    "Y3.B6.S7": "(prerequisite of this step)",
     "Y3.B6.S8": "(prerequisite of this step)",
     "Y3.B6.S9": "(prerequisite of this step)",
     "Y3.B6.S10": "(prerequisite of this step)"
@@ -11602,34 +11479,40 @@
    "why": "teaches the step with opts {\"rows\":[{\"step\":10,\"start\":\"zero\",\"dir\":\"up\"}]}"
   },
   {
+   "key": "multiplication:mult_properties",
+   "step": "Y3.B4.S3",
+   "action": "partial",
+   "why": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
+  },
+  {
    "key": "multiplication:multiply",
    "step": "Y3.B4.S4",
    "action": "partial",
-   "why": "2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available"
+   "why": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available"
   },
   {
    "key": "multiplication:area_model_mult",
    "step": "Y3.B4.S4",
    "action": "partial",
-   "why": "the partition picture, exchanges mixed"
+   "why": "the partition picture, exchanges mixed, and ×6, ×7, ×9 items"
   },
   {
    "key": "multiplication:multiply",
    "step": "Y3.B4.S5",
    "action": "partial",
-   "why": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in"
+   "why": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)"
   },
   {
    "key": "multiplication:area_model_mult",
    "step": "Y3.B4.S5",
    "action": "partial",
-   "why": "the partition picture; exchanges are not controlled (3 × 13)"
+   "why": "the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear"
   },
   {
    "key": "division:box_division_easy",
    "step": "Y3.B4.S7",
    "action": "partial",
-   "why": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available"
+   "why": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)"
   },
   {
    "key": "division:area_model_div_2by1",
