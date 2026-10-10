@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 2)
+# R and Y1: generated items per step (wave 2 tagging, round 3)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -123,8 +123,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Where is the star compared to the ball? / A="Beside" / multiple-choice
   - Where is the ball compared to the star? / A="Above" / multiple-choice
 
-### R.B5.S1 Find 4 and 5 — **full**
-- full `counting:count_objects` opts `{"band":5,"objects":"pictures"}` (6 generated; Max Number not read)
+### R.B5.S1 Find 4 and 5 — **partial** (missing: finding groups of exactly 4 and 5 (band 5 deals 1-5, mostly 1-3))
+- partial `counting:count_objects` opts `{"band":5,"objects":"pictures"}` (6 generated; Max Number not read)
   - How many fish are there? / A=2 / number / {kind:count,n:2,shape:fish,ans:2}
   - How many fish are there? / A=1 / number / {kind:count,n:1,shape:fish,ans:1}
   - How many balls are there? / A=5 / number / {kind:count,n:5,shape:ball,ans:5}
@@ -135,8 +135,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - How many dots are there? / A=1 / number / {kind:count,n:1,shape:circle,ans:1,objects:dice}
   - How many dots are there? / A=5 / number / {kind:count,n:5,shape:circle,ans:5,objects:dice}
 
-### R.B5.S3 Represent 4 and 5 — **full**
-- full `composing:ten_frame_build` opts `{"band":5}` (6 generated; Max Number not read)
+### R.B5.S3 Represent 4 and 5 — **partial** (missing: representing exactly 4 and 5 (band 5 deals 1-5, mostly 1-3))
+- partial `composing:ten_frame_build` opts `{"band":5}` (6 generated; Max Number not read)
   - Build 2 on the ten frame. / A=2 / ten-frame-build / {target:2,frames:1}
   - Build 1 on the ten frame. / A=1 / ten-frame-build / {target:1,frames:1}
   - Build 5 on the ten frame. / A=5 / ten-frame-build / {target:5,frames:1}
@@ -159,10 +159,10 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
   - ? + 1 = 4 / A=3 / number / {whole:4,a:3,b:1,unknown:A}
 
-### R.B5.S7 Composition of 1 - 5 — **full**
-- full `composing:number_bonds` opts `{"band":5,"unknown":"mixed"}` (6 generated; Max Number not read)
+### R.B5.S7 Composition of 1 - 5 — **partial** (missing: composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5))
+- partial `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
   - 3 + ? = 5 / A=2 / number / {whole:5,a:3,b:2,unknown:B}
-  - 3 + 1 = ? / A=4 / number / {whole:4,a:3,b:1,unknown:whole}
+  - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
   - ? + 1 = 4 / A=3 / number / {whole:4,a:3,b:1,unknown:A}
 
 ### R.B6.S1 Identify and name shapes with 4 sides — **full**
@@ -216,8 +216,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - What number comes before 6? / A=5 / number
   - What number comes before 2? / A=1 / number
 
-### R.B7.S7 Composition — **full**
-- full `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
+### R.B7.S7 Composition — **partial** (missing: composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear)
+- partial `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
   - 3 + ? = 5 / A=2 / number / {whole:5,a:3,b:2,unknown:B}
   - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
   - ? + 1 = 4 / A=3 / number / {whole:4,a:3,b:1,unknown:A}
@@ -286,19 +286,19 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Double it! 3 + 3 = ? / A=6 / number
 
 ### R.B9.S8 Double to 8 (make a double) — **partial** (missing: making a double with objects to 8)
-- partial `patterns:double` opts `{"band":20,"range":10}` (6 generated; Max Number 10)
+- partial `patterns:double` opts `{"band":20}` (6 generated; Max Number 10)
   - Double 8 / A=16 / number
   - Double 8 / A=16 / number
   - Double 2 / A=4 / number
 
-### R.B9.S9 Combine 2 groups — **full**
-- full `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
+### R.B9.S9 Combine 2 groups — **partial** (missing: combining two pictured groups with totals to 8 and writing how many in all (add_5_pictures stops at 5; add_wp_10 is a word-work cell))
+- partial `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
   - How many in all? 1 + 3 = ? / A=4 / number / {kind:join,n:1,m:3,shape:triangle,ans:4}
   - How many in all? 3 + 1 = ? / A=4 / number / {kind:join,n:3,m:1,shape:star,ans:4}
   - How many in all? 1 + 1 = ? / A=2 / number / {kind:join,n:1,m:1,shape:square,ans:2}
-- full `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
-  - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
-  - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
+- partial `addition:add_wp_10` opts `{"band":7}` (6 generated; Max Number not read)
+  - I have 3 apples. I get 2 more apples. How many apples do I have now? / A=5 / number / {lines:[I have 3 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:3,b:2,op:+,ans:5,top:3
+  - There are 2 fish in a pond. 2 more fish swim in. How many fish are there now? / A=4 / number / {lines:[There are 2 fish in a pond.,2 more fish swim in.,How many fish are there now?],steps:[{a:2,b:2,op:+,an
   - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
 
 ### R.B9.S10 Conceptual subitising — **gap** (missing: conceptual subitising to 8 (see 5 and 3))
@@ -334,8 +334,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### R.B10.S6 Order and sequence time — **gap** (missing: ordering events in time (first, next, then))
 - no live skill; build: day_order
 
-### R.B11.S1 Find 9 and 10 — **full**
-- full `counting:count_objects` opts `{"band":10,"objects":"frame"}` (6 generated; Max Number not read)
+### R.B11.S1 Find 9 and 10 — **partial** (missing: finding groups of exactly 9 and 10 (band 10 deals 1-10, mostly below 9))
+- partial `counting:count_objects` opts `{"band":10,"objects":"frame"}` (6 generated; Max Number not read)
   - How many dots are there? / A=3 / number / {kind:count,n:3,shape:circle,ans:3,objects:frame}
   - How many dots are there? / A=7 / number / {kind:count,n:7,shape:circle,ans:7,objects:frame}
   - How many dots are there? / A=5 / number / {kind:count,n:5,shape:circle,ans:5,objects:frame}
@@ -350,8 +350,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Compare: 71 ___ 76 / A="<" / symbol / {keyValue:<,kind:compare,a:71,b:76}
   - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
 
-### R.B11.S3 Represent 9 and 10 — **full**
-- full `composing:ten_frame_build` opts `{"band":10}` (6 generated; Max Number not read)
+### R.B11.S3 Represent 9 and 10 — **partial** (missing: representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9))
+- partial `composing:ten_frame_build` opts `{"band":10}` (6 generated; Max Number not read)
   - Build 3 on the ten frame. / A=3 / ten-frame-build / {target:3,frames:1}
   - Build 8 on the ten frame. / A=8 / ten-frame-build / {target:8,frames:1}
   - Build 1 on the ten frame. / A=1 / ten-frame-build / {target:1,frames:1}
@@ -402,7 +402,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Double it! 3 + 3 = ? / A=6 / number
 
 ### R.B11.S12 Doubles to 10 (make a double) — **partial** (missing: making a double with objects to 10)
-- partial `patterns:double` opts `{"band":20,"range":10}` (6 generated; Max Number 10)
+- partial `patterns:double` opts `{"band":20}` (6 generated; Max Number 10)
   - Double 8 / A=16 / number
   - Double 8 / A=16 / number
   - Double 2 / A=4 / number
@@ -418,10 +418,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Click ALL the cones. / A=["opt2","opt3"] / multi-select-check
   - Click ALL the cubes. / A=["opt2"] / multi-select-check
   - Click ALL the cubes. / A=["opt0","opt1"] / multi-select-check
-- full `shapes_early:shape_name_match_3d` opts `{}` (6 generated; Max Number not read)
-  - Drag each name onto the matching 3D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
-  - Drag each name onto the matching 3D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
-  - Drag each name onto the matching 3D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
 
 ### R.B12.S2 Find 2-D shapes within 3-D shapes — **gap** (missing: finding the flat (2-D) faces on 3-D shapes)
 - no live skill; build: shape_3d_tasks
@@ -480,12 +476,12 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Build 11 on the ten frames. / A=11 / ten-frame-build
   - Build 13 on the ten frames. / A=13 / ten-frame-build
 
-### R.B13.S4 Continue patterns beyond 10 (14-20) — **full**
-- full `counting:count_sequence` opts `{"band":20,"dir":"forward"}` (6 generated; Max Number not read)
+### R.B13.S4 Continue patterns beyond 10 (14-20) — **partial** (missing: continuing the count 14, 15 … 20 only (the band and the tracks start from 1))
+- partial `counting:count_sequence` opts `{"band":20,"dir":"forward"}` (6 generated; Max Number not read)
   - What number comes after 11? / A=12 / number
   - What number comes after 15? / A=16 / number
   - What number comes after 6? / A=7 / number
-- full `counting:number_seq_fill` opts `{"step":1,"dir":"forward","range":20}` (6 generated; Max Number 20)
+- partial `counting:number_seq_fill` opts `{"step":1,"dir":"forward","range":20}` (6 generated; Max Number 20)
   - Write the missing number in the number track. / A=11 / number / {values:[8,9,10,11,12],blanks:[3],shape:mixed}
   - Write the missing numbers in the number track. / A="14, 16" / text / {values:[12,13,14,15,16],blanks:[2,4],shape:mixed}
   - Write the missing number in the number track. / A=6 / number / {values:[3,4,5,6,7],blanks:[3],shape:mixed}
@@ -502,12 +498,12 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Write the missing number in the number track. / A=73 / number / {values:[71,72,73,74,75],blanks:[2],shape:mixed}
   - Write the missing numbers in the number track. / A="24, 23" / text / {values:[26,25,24,23,22],blanks:[2,3],shape:mixed}
 
-### R.B14.S1 Add more — **full**
-- full `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
+### R.B14.S1 Add more — **partial** (missing: adding more to a pictured group, totals to 10, by counting on and writing how many now (add_5_pictures stops at 5; add_wp_10 is a word-work cell))
+- partial `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
   - How many in all? 1 + 3 = ? / A=4 / number / {kind:join,n:1,m:3,shape:triangle,ans:4}
   - How many in all? 3 + 1 = ? / A=4 / number / {kind:join,n:3,m:1,shape:star,ans:4}
   - How many in all? 1 + 1 = ? / A=2 / number / {kind:join,n:1,m:1,shape:square,ans:2}
-- full `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
+- partial `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
   - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
   - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
   - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
@@ -518,12 +514,12 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - How many in all? 3 + 1 = ? / A=4 / number / {kind:join,n:3,m:1,shape:star,ans:4}
   - How many in all? 1 + 1 = ? / A=2 / number / {kind:join,n:1,m:1,shape:square,ans:2}
 
-### R.B14.S3 Take away — **full**
-- full `subtraction:sub_5_pictures` opts `{}` (6 generated; Max Number not read)
+### R.B14.S3 Take away — **partial** (missing: taking away from a pictured group of up to 10 and writing how many are left (sub_5_pictures stops at 5; sub_wp_10 is a word-work cell))
+- partial `subtraction:sub_5_pictures` opts `{}` (6 generated; Max Number not read)
   - Start with 4, take away 1. How many are left? / A=3 / number / {kind:takeaway,n:4,m:1,shape:square,ans:3}
   - Start with 4, take away 4. How many are left? / A=0 / number / {kind:takeaway,n:4,m:4,shape:triangle,ans:0}
   - Start with 2, take away 1. How many are left? / A=1 / number / {kind:takeaway,n:2,m:1,shape:star,ans:1}
-- full `subtraction:sub_wp_10` opts `{}` (6 generated; Max Number not read)
+- partial `subtraction:sub_wp_10` opts `{}` (6 generated; Max Number not read)
   - Ana has 3 stamps. Ana gives 2 stamps to Noor. How many stamps does Ana have left? / A=1 / number / {lines:[Ana has 3 stamps.,Ana gives 2 stamps to Noor.,How many stamps does Ana have left?],steps:[{a:3,b:2,op:
   - There are 4 beads in a box. Noor takes 1 bead out. How many beads are left in the box? / A=3 / number / {lines:[There are 4 beads in a box.,Noor takes 1 bead out.,How many beads are left in the box?],steps:[{a:4,b:
   - Omar has 8 shells. Omar gives 3 shells to Kofi. How many shells does Omar have left? / A=5 / number / {lines:[Omar has 8 shells.,Omar gives 3 shells to Kofi.,How many shells does Omar have left?],steps:[{a:8,b:3,
@@ -691,8 +687,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Build 8 on the ten frame. / A=8 / ten-frame-build / {target:8,frames:1}
   - Build 1 on the ten frame. / A=1 / ten-frame-build / {target:1,frames:1}
 
-### Y1.B1.S5 Recognise numbers as words — **partial** (missing: reading and matching the words zero to ten)
-- partial `composing:number_word_form` opts `{"wordform":["to_number"],"range":10}` (6 generated; Max Number 10)
+### Y1.B1.S5 Recognise numbers as words — **partial** (missing: reading the number words zero to ten and matching each to its numeral (the live skill deals only "ten" at Max Number 10))
+- partial `composing:number_word_form` opts `{"range":10}` (6 generated; Max Number 10)
   - Write the numeral: ten / A=10 / number
   - Write the numeral: ten / A=10 / number
   - Write the numeral: ten / A=10 / number
@@ -754,10 +750,10 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
 
 ### Y1.B1.S14 Order objects and numbers — **partial** (missing: ordering groups and numbers within 10)
-- partial `placevalue:order_least_to_greatest` opts `{}` (6 generated; Max Number not read)
-  - Put the numbers in order. Start with the least. / A="537,775,873" / interactive / {keyValue:537, 775, 873,kind:order,nums:[873,775,537],sorted:[537,775,873]}
-  - Put the numbers in order. Start with the least. / A="715,762,769" / interactive / {keyValue:715, 762, 769,kind:order,nums:[769,762,715],sorted:[715,762,769]}
-  - Put the numbers in order. Start with the least. / A="309,325,331" / interactive / {keyValue:309, 325, 331,kind:order,nums:[325,331,309],sorted:[309,325,331]}
+- partial `placevalue:order_least_to_greatest` opts `{"band":99}` (6 generated; Max Number not read)
+  - Put the numbers in order. Start with the least. / A="53,77,87" / interactive / {keyValue:53, 77, 87,kind:order,nums:[87,77,53],sorted:[53,77,87]}
+  - Put the numbers in order. Start with the least. / A="71,72,76" / interactive / {keyValue:71, 72, 76,kind:order,nums:[76,72,71],sorted:[71,72,76]}
+  - Put the numbers in order. Start with the least. / A="30,32,33" / interactive / {keyValue:30, 32, 33,kind:order,nums:[32,33,30],sorted:[30,32,33]}
 
 ### Y1.B1.S15 The number line — **gap** (missing: the 0-10 number line: reading, counting along and placing numbers)
 - no live skill; build: nl_20
@@ -773,10 +769,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - 2 + ? = 5 / A=3 / number / {whole:5,a:2,b:3,unknown:B}
   - 5 + 2 = ? / A=7 / number / {whole:7,a:5,b:2,unknown:whole}
   - ? + 3 = 4 / A=1 / number / {whole:4,a:1,b:3,unknown:A}
-- partial `addition:number_families_add` opts `{"band":10}` (6 generated; Max Number not read)
-  - Number Family: Complete all equations / A="3, 4, 7" / number-family
-  - Number Family: Complete all equations / A="4, 4, 8" / number-family
-  - Number Family: Complete all equations / A="2, 1, 3" / number-family
 
 ### Y1.B2.S3 Write number sentences — **partial** (missing: writing the + / − sentence that matches a picture (the skills give the sentence))
 - partial `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
@@ -788,12 +780,12 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Start with 4, take away 4. How many are left? / A=0 / number / {kind:takeaway,n:4,m:4,shape:triangle,ans:0}
   - Start with 2, take away 1. How many are left? / A=1 / number / {kind:takeaway,n:2,m:1,shape:star,ans:1}
 
-### Y1.B2.S4 Fact families - addition facts — **full**
-- full `addition:add_sub_fact_family` opts `{"range":10}` (6 generated; Max Number 10)
+### Y1.B2.S4 Fact families - addition facts — **partial** (missing: the addition facts of a family only: both orders and the = on either side (8 = 6 + 2); both live skills also deal the subtraction facts)
+- partial `addition:add_sub_fact_family` opts `{"range":10}` (6 generated; Max Number 10)
   - Complete the fact family. / A="10, 10, 2, 8" / fact-family / {a:8,b:2}
   - Complete the fact family. / A="10, 10, 3, 7" / fact-family / {a:7,b:3}
   - Complete the fact family. / A="5, 5, 2, 3" / fact-family / {a:3,b:2}
-- full `addition:number_families_add` opts `{"band":10}` (6 generated; Max Number not read)
+- partial `addition:number_families_add` opts `{"band":10}` (6 generated; Max Number not read)
   - Number Family: Complete all equations / A="3, 4, 7" / number-family
   - Number Family: Complete all equations / A="4, 4, 8" / number-family
   - Number Family: Complete all equations / A="2, 1, 3" / number-family
@@ -812,10 +804,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - The frame shows 5. How many more make 10? / A=5 / number
   - The frame shows 6. How many more make 10? / A=4 / number
   - The frame shows 7. How many more make 10? / A=3 / number
-- partial `composing:number_bonds` opts `{"band":10,"unknown":"second"}` (6 generated; Max Number not read)
-  - 4 + ? = 10 / A=6 / number / {whole:10,a:4,b:6,unknown:B}
-  - 7 + ? = 8 / A=1 / number / {whole:8,a:7,b:1,unknown:B}
-  - 2 + ? = 5 / A=3 / number / {whole:5,a:2,b:3,unknown:B}
 
 ### Y1.B2.S8 Addition - add together — **partial** (missing: adding two pictured groups with totals to 10)
 - partial `addition:add_5_pictures` opts `{}` (6 generated; Max Number not read)
@@ -868,10 +856,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Number Family: Complete all equations / A="3, 4, 7" / number-family
   - Number Family: Complete all equations / A="4, 4, 8" / number-family
   - Number Family: Complete all equations / A="2, 1, 3" / number-family
-- full `addition:fact_family_sort` opts `{"range":10}` (6 generated; Max Number 10)
-  - Is 6, 8, 4 a fact family? Write yes or no. / A="no" / text
-  - Is 9, 3, 6 a fact family? Write yes or no. / A="yes" / text
-  - Is 6, 7, 1 a fact family? Write yes or no. / A="yes" / text
 
 ### Y1.B2.S14 Subtraction - take away cross out (How many left ) — **partial** (missing: crossing out to take away from amounts to 10)
 - partial `subtraction:sub_5_pictures` opts `{}` (6 generated; Max Number not read)
@@ -1001,15 +985,15 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### Y1.B4.S8 The number line to 20 — **gap** (missing: the 0-20 number line: reading and labelling ticks)
 - no live skill; build: nl_20
 
-### Y1.B4.S9 Use a number line to 20 — **partial** (missing: finding and placing numbers on a 0-20 line)
-- partial `addition:number_line_add` opts `{"range":10}` (6 generated; Max Number 10)
-  - Use the number line: 4 + 5 = ? / A=9 / number / {min:0,max:10,start:4,add:5,op:+,unknown:result}
-  - Use the number line: 6 + 3 = ? / A=9 / number / {min:0,max:10,start:6,add:3,op:+,unknown:result}
-  - Use the number line: 2 + 1 = ? / A=3 / number / {min:0,max:10,start:2,add:1,op:+,unknown:result}
-- partial `subtraction:number_line_sub` opts `{"range":10}` (6 generated; Max Number 10)
-  - Use the number line: 7 − 5 = ? / A=2 / number / {min:0,max:10,start:7,add:5,op:-,unknown:result}
-  - Use the number line: 9 − 6 = ? / A=3 / number / {min:0,max:10,start:9,add:6,op:-,unknown:result}
-  - Use the number line: 6 − 1 = ? / A=5 / number / {min:0,max:10,start:6,add:1,op:-,unknown:result}
+### Y1.B4.S9 Use a number line to 20 — **full**
+- full `addition:number_line_add` opts `{"range":20}` (6 generated; Max Number 20)
+  - Use the number line: 9 + 8 = ? / A=17 / number / {min:0,max:20,start:9,add:8,op:+,unknown:result}
+  - Use the number line: 14 + 5 = ? / A=19 / number / {min:0,max:20,start:14,add:5,op:+,unknown:result}
+  - Use the number line: 5 + 1 = ? / A=6 / number / {min:0,max:20,start:5,add:1,op:+,unknown:result}
+- full `subtraction:number_line_sub` opts `{"range":20}` (6 generated; Max Number 20)
+  - Use the number line: 12 − 8 = ? / A=4 / number / {min:0,max:20,start:12,add:8,op:-,unknown:result}
+  - Use the number line: 16 − 7 = ? / A=9 / number / {min:0,max:20,start:16,add:7,op:-,unknown:result}
+  - Use the number line: 8 − 1 = ? / A=7 / number / {min:0,max:20,start:8,add:1,op:-,unknown:result}
 
 ### Y1.B4.S10 Estimate on a number line to 20 — **gap** (missing: estimating where a number lies on a 0-20 line with only the ends marked)
 - no live skill; build: nl_20
@@ -1021,20 +1005,20 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
 
 ### Y1.B4.S12 Order numbers to 20 — **partial** (missing: ordering numbers within 20)
-- partial `placevalue:order_least_to_greatest` opts `{}` (6 generated; Max Number not read)
-  - Put the numbers in order. Start with the least. / A="537,775,873" / interactive / {keyValue:537, 775, 873,kind:order,nums:[873,775,537],sorted:[537,775,873]}
-  - Put the numbers in order. Start with the least. / A="715,762,769" / interactive / {keyValue:715, 762, 769,kind:order,nums:[769,762,715],sorted:[715,762,769]}
-  - Put the numbers in order. Start with the least. / A="309,325,331" / interactive / {keyValue:309, 325, 331,kind:order,nums:[325,331,309],sorted:[309,325,331]}
+- partial `placevalue:order_least_to_greatest` opts `{"band":99}` (6 generated; Max Number not read)
+  - Put the numbers in order. Start with the least. / A="53,77,87" / interactive / {keyValue:53, 77, 87,kind:order,nums:[87,77,53],sorted:[53,77,87]}
+  - Put the numbers in order. Start with the least. / A="71,72,76" / interactive / {keyValue:71, 72, 76,kind:order,nums:[76,72,71],sorted:[71,72,76]}
+  - Put the numbers in order. Start with the least. / A="30,32,33" / interactive / {keyValue:30, 32, 33,kind:order,nums:[32,33,30],sorted:[30,32,33]}
 
 ### Y1.B5.S1 Add by counting on within 20 — **full**
 - full `addition:add_20_no_regroup` opts `{"band":20,"notation":["across"]}` (6 generated; Max Number not read)
   - 7 + 12 = ? / A=19 / number
   - 4 + 12 = ? / A=16 / number
   - 3 + 6 = ? / A=9 / number
-- partial `addition:number_line_add` opts `{"range":10}` (6 generated; Max Number 10)
-  - Use the number line: 4 + 5 = ? / A=9 / number / {min:0,max:10,start:4,add:5,op:+,unknown:result}
-  - Use the number line: 6 + 3 = ? / A=9 / number / {min:0,max:10,start:6,add:3,op:+,unknown:result}
-  - Use the number line: 2 + 1 = ? / A=3 / number / {min:0,max:10,start:2,add:1,op:+,unknown:result}
+- full `addition:number_line_add` opts `{"range":20}` (6 generated; Max Number 20)
+  - Use the number line: 9 + 8 = ? / A=17 / number / {min:0,max:20,start:9,add:8,op:+,unknown:result}
+  - Use the number line: 14 + 5 = ? / A=19 / number / {min:0,max:20,start:14,add:5,op:+,unknown:result}
+  - Use the number line: 5 + 1 = ? / A=6 / number / {min:0,max:20,start:5,add:1,op:+,unknown:result}
 
 ### Y1.B5.S2 Add ones using number bonds — **partial** (missing: adding ones to a teen number using a known bond, shown with a ten and ones)
 - partial `addition:add_20_no_regroup` opts `{"band":20,"notation":["across"]}` (6 generated; Max Number not read)
@@ -1066,15 +1050,15 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - 16 − 4 = ? / A=12 / number
   - 9 − 3 = ? / A=6 / number
 
-### Y1.B5.S7 Subtraction - counting back — **partial** (missing: counting back within 20 on a line)
-- partial `subtraction:nl_sub` opts `{"range":10}` (6 generated; Max Number 10)
-  - 6 − 4 = ? / A=2 / number / {min:0,max:10,start:6,add:4,op:-,unknown:result}
-  - 8 − ? = 3 / A=5 / number / {min:0,max:10,start:8,add:5,op:-,unknown:b}
-  - 4 − 1 = ? / A=3 / number / {min:0,max:10,start:4,add:1,op:-,unknown:result}
-- partial `subtraction:number_line_sub` opts `{"range":10}` (6 generated; Max Number 10)
-  - Use the number line: 7 − 5 = ? / A=2 / number / {min:0,max:10,start:7,add:5,op:-,unknown:result}
-  - Use the number line: 9 − 6 = ? / A=3 / number / {min:0,max:10,start:9,add:6,op:-,unknown:result}
-  - Use the number line: 6 − 1 = ? / A=5 / number / {min:0,max:10,start:6,add:1,op:-,unknown:result}
+### Y1.B5.S7 Subtraction - counting back — **full**
+- full `subtraction:nl_sub` opts `{"range":20}` (6 generated; Max Number 20)
+  - 11 − 8 = ? / A=3 / number / {min:0,max:20,start:11,add:8,op:-,unknown:result}
+  - 16 − ? = 9 / A=7 / number / {min:0,max:20,start:16,add:7,op:-,unknown:b}
+  - 7 − 1 = ? / A=6 / number / {min:0,max:20,start:7,add:1,op:-,unknown:result}
+- full `subtraction:number_line_sub` opts `{"range":20}` (6 generated; Max Number 20)
+  - Use the number line: 12 − 8 = ? / A=4 / number / {min:0,max:20,start:12,add:8,op:-,unknown:result}
+  - Use the number line: 16 − 7 = ? / A=9 / number / {min:0,max:20,start:16,add:7,op:-,unknown:result}
+  - Use the number line: 8 − 1 = ? / A=7 / number / {min:0,max:20,start:8,add:1,op:-,unknown:result}
 
 ### Y1.B5.S8 Subtraction - finding the difference — **partial** (missing: difference as comparison (bars, line))
 - partial `addition:comparison_word` opts `{"range":10}` (6 generated; Max Number 10)
@@ -1088,28 +1072,28 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Number Family: Complete all equations / A="8, 7, 15" / number-family
   - Number Family: Complete all equations / A="3, 1, 4" / number-family
 
-### Y1.B5.S10 Missing number problems — **partial** (missing: missing-number sentences within 20)
-- partial `addition:cloze_addition` opts `{"range":10}` (6 generated; Max Number 10)
-  - Pick one number from each bank to make 8. / A="6, 2" / text / {sum:8,a:6,b:2,banks:[[2,6,7],[2,4,5]]}
-  - Pick one number from each bank to make 9. / A="6, 3" / text / {sum:9,a:6,b:3,banks:[[4,6,7],[3,4,7]]}
-  - Pick one number from each bank to make 7. / A="1, 6" / text / {sum:7,a:1,b:6,banks:[[1,4,5],[4,6,7]]}
-- partial `subtraction:missing_add_sub` opts `{"range":10}` (6 generated; Max Number 10)
-  - 4 + 5 = ___ / A=9 / number
-  - 10 − ___ = 2 / A=8 / number
-  - 1 + ___ = 4 / A=3 / number
+### Y1.B5.S10 Missing number problems — **full**
+- full `addition:cloze_addition` opts `{"range":20}` (6 generated; Max Number 20)
+  - Pick one number from each bank to make 13. / A="10, 3" / text / {sum:13,a:10,b:3,banks:[[6,10,12],[3,4,5]]}
+  - Pick one number from each bank to make 17. / A="12, 5" / text / {sum:17,a:12,b:5,banks:[[10,11,12],[1,5,8]]}
+  - Pick one number from each bank to make 9. / A="1, 8" / text / {sum:9,a:1,b:8,banks:[[1,4,5],[6,8,9]]}
+- full `subtraction:missing_add_sub` opts `{"range":20}` (6 generated; Max Number 20)
+  - 8 + 9 = ___ / A=17 / number
+  - 17 − ___ = 3 / A=14 / number
+  - 1 + ___ = 6 / A=5 / number
 
-### Y1.B6.S1 Count from 20 to 50 — **full**
-- full `counting:number_seq_fill` opts `{"step":1,"range":50}` (6 generated; Max Number 50)
+### Y1.B6.S1 Count from 20 to 50 — **partial** (missing: counting on from 20 to 50 only (the tracks and the chart start below 20))
+- partial `counting:number_seq_fill` opts `{"step":1,"range":50}` (6 generated; Max Number 50)
   - Write the missing numbers in the number track. / A="37, 39" / text / {values:[35,36,37,38,39],blanks:[2,4],shape:mixed}
   - Write the missing number in the number track. / A=36 / number / {values:[34,35,36,37,38],blanks:[2],shape:mixed}
   - Write the missing numbers in the number track. / A="12, 11" / text / {values:[14,13,12,11,10],blanks:[2,3],shape:mixed}
-- full `composing:hundreds_chart_fill` opts `{"band":50}` (6 generated; Max Number not read)
+- partial `composing:hundreds_chart_fill` opts `{"band":50}` (6 generated; Max Number not read)
   - Write the missing numbers in the empty boxes. / A="15, 19, 27" / text / {rows:[1,2,3],cols:[4,5,6,7,8],blanks:[15,19,27]}
   - What number goes in the empty box? / A=36 / number / {rows:[2,3,4],cols:[4,5,6,7,8],blanks:[36]}
   - Write the missing numbers in the empty boxes. / A="3, 22" / text / {rows:[0,1,2],cols:[0,1,2,3,4],blanks:[3,22]}
 
-### Y1.B6.S2 20, 30, 40 and 50 — **full**
-- full `composing:tens_foundation_visual` opts `{"band":50}` (6 generated; Max Number not read)
+### Y1.B6.S2 20, 30, 40 and 50 — **partial** (missing: saying and writing 20, 30, 40 and 50 for 2-5 tens (the skill answers only how many tens))
+- partial `composing:tens_foundation_visual` opts `{"band":50}` (6 generated; Max Number not read)
   - How many tens? / A=3 / number / {kind:tens,n:3,ans:3}
   - How many tens? / A=4 / number / {kind:tens,n:4,ans:4}
   - How many tens? / A=5 / number / {kind:tens,n:5,ans:5}
@@ -1200,19 +1184,19 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 - no live skill; build: nonstandard_capacity
 
 ### Y1.B9.S1 Count in 2s — **partial** (missing: counting in 2s from 0 on true multiples, a page of 2s alone, with pictured pairs)
-- partial `patterns:skip_count_line` opts `{"step":[0],"band":50,"range":50}` (6 generated; Max Number 50)
+- partial `patterns:skip_count_line` opts `{"step":[0],"band":50}` (6 generated; Max Number 10)
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 16" / text
   - Fill in the missing numbers. Skip count by 2s. / A="2, 8, 12" / text
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 12" / text
 
 ### Y1.B9.S2 Count in 10s — **partial** (missing: counting in 10s from 0 on true multiples to 100, a page of 10s alone)
-- partial `patterns:skip_count_line` opts `{"step":[0],"band":50,"range":50}` (6 generated; Max Number 50)
+- partial `patterns:skip_count_line` opts `{"step":[0],"band":50}` (6 generated; Max Number 10)
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 16" / text
   - Fill in the missing numbers. Skip count by 2s. / A="2, 8, 12" / text
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 12" / text
 
 ### Y1.B9.S3 Count in 5s — **partial** (missing: counting in 5s from 0 on true multiples, a page of 5s alone)
-- partial `patterns:skip_count_line` opts `{"step":[0],"band":50,"range":50}` (6 generated; Max Number 50)
+- partial `patterns:skip_count_line` opts `{"step":[0],"band":50}` (6 generated; Max Number 10)
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 16" / text
   - Fill in the missing numbers. Skip count by 2s. / A="2, 8, 12" / text
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 12" / text
@@ -1240,7 +1224,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Double it! 5 + 5 = ? / A=10 / number
   - Double it! 8 + 8 = ? / A=16 / number
   - Double it! 3 + 3 = ? / A=6 / number
-- full `patterns:double` opts `{"band":20,"range":20}` (6 generated; Max Number 20)
+- full `patterns:double` opts `{"band":20}` (6 generated; Max Number 10)
   - Double 8 / A=16 / number
   - Double 8 / A=16 / number
   - Double 2 / A=4 / number
@@ -1269,7 +1253,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Show 1/2 on the model. / A="1" / shade-parts / {task:shade,show:{n:1,d:2},terms:[{n:1,d:2,kind:area,blank:true,frac:none}],answer:{shade:1},showAbove:true}
   - Show 1/2 on the model. / A="1" / shade-parts / {task:shade,show:{n:1,d:2},terms:[{n:1,d:2,kind:circle,blank:true,frac:none}],answer:{shade:1}}
 
-### Y1.B10.S3 Recognise a half of a quantity — **partial** (missing: is this set in halves? (equal / not equal))
+### Y1.B10.S3 Recognise a half of a quantity — **partial** (missing: is this set in halves? (two equal groups or not); the live option leaks thirds, fifths and sixths)
 - partial `fractions:fraction_of_set` opts `{"denoms":[2],"range":10}` (6 generated; Max Number 10)
   - ?/4 of 8 = 4. Find the missing numerator. / A=2 / number
   - ?/6 of 12 = 8. Find the missing numerator. / A=4 / number
@@ -1280,10 +1264,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Half of 8 / A=4 / number
   - Half of 8 / A=4 / number
   - Half of 2 / A=1 / number
-- partial `fractions:fraction_of_set` opts `{"denoms":[2],"range":10}` (6 generated; Max Number 10)
-  - ?/4 of 8 = 4. Find the missing numerator. / A=2 / number
-  - ?/6 of 12 = 8. Find the missing numerator. / A=4 / number
-  - There are 4 stickers. 1/2 are purple. How many purple stickers? / A=2 / number
 
 ### Y1.B10.S5 Recognise a quarter of an object or a shape — **full**
 - full `shapes_early:partition_shapes` opts `{"parts":[2]}` (6 generated; Max Number not read)
@@ -1297,13 +1277,13 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Show 1/2 on the model. / A="1" / shade-parts / {task:shade,show:{n:1,d:2},terms:[{n:1,d:2,kind:area,blank:true,frac:none}],answer:{shade:1},showAbove:true}
   - Show 1/2 on the model. / A="1" / shade-parts / {task:shade,show:{n:1,d:2},terms:[{n:1,d:2,kind:circle,blank:true,frac:none}],answer:{shade:1}}
 
-### Y1.B10.S7 Recognise a quarter of a quantity — **partial** (missing: is this set in quarters?)
+### Y1.B10.S7 Recognise a quarter of a quantity — **partial** (missing: is this set in quarters? (four equal groups or not); the live option leaks thirds, fifths and sixths)
 - partial `fractions:fraction_of_set` opts `{"denoms":[2],"range":10}` (6 generated; Max Number 10)
   - ?/4 of 8 = 4. Find the missing numerator. / A=2 / number
   - ?/6 of 12 = 8. Find the missing numerator. / A=4 / number
   - There are 4 stickers. 1/2 are purple. How many purple stickers? / A=2 / number
 
-### Y1.B10.S8 Find a quarter of a quantity — **partial** (missing: finding a quarter of a quantity only)
+### Y1.B10.S8 Find a quarter of a quantity — **partial** (missing: finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths))
 - partial `fractions:fraction_of_set` opts `{"denoms":[2],"range":10}` (6 generated; Max Number 10)
   - ?/4 of 8 = 4. Find the missing numerator. / A=2 / number
   - ?/6 of 12 = 8. Find the missing numerator. / A=4 / number
@@ -1330,18 +1310,18 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### Y1.B11.S5 Ordinal numbers — **gap** (missing: ordinal numbers 1st, 2nd, 3rd ...)
 - no live skill; build: ordinal
 
-### Y1.B12.S1 Count from 50 to 100 — **full**
-- full `counting:number_seq_fill` opts `{"step":1,"range":100}` (6 generated; Max Number 100)
+### Y1.B12.S1 Count from 50 to 100 — **partial** (missing: counting on from 50 to 100 only (the tracks and the chart deal mostly below 50))
+- partial `counting:number_seq_fill` opts `{"step":1,"range":100}` (6 generated; Max Number 100)
   - Write the missing numbers in the number track. / A="74, 76" / text / {values:[72,73,74,75,76],blanks:[2,4],shape:mixed}
   - Write the missing number in the number track. / A=73 / number / {values:[71,72,73,74,75],blanks:[2],shape:mixed}
   - Write the missing numbers in the number track. / A="24, 23" / text / {values:[26,25,24,23,22],blanks:[2,3],shape:mixed}
-- full `composing:hundreds_chart_fill` opts `{"band":100}` (6 generated; Max Number not read)
+- partial `composing:hundreds_chart_fill` opts `{"band":100}` (6 generated; Max Number not read)
   - Write the missing numbers in the empty boxes. / A="35, 39, 47" / text / {rows:[3,4,5],cols:[4,5,6,7,8],blanks:[35,39,47]}
   - What number goes in the empty box? / A=66 / number / {rows:[5,6,7],cols:[4,5,6,7,8],blanks:[66]}
   - Write the missing numbers in the empty boxes. / A="13, 32" / text / {rows:[1,2,3],cols:[0,1,2,3,4],blanks:[13,32]}
 
-### Y1.B12.S2 Tens to 100 — **full**
-- full `composing:tens_foundation_visual` opts `{"band":90}` (6 generated; Max Number not read)
+### Y1.B12.S2 Tens to 100 — **partial** (missing: counting the tens to 100, with 100 as ten tens (band 90 stops at 9 tens) and naming each multiple of ten)
+- partial `composing:tens_foundation_visual` opts `{"band":90}` (6 generated; Max Number not read)
   - How many tens? / A=5 / number / {kind:tens,n:5,ans:5}
   - How many tens? / A=6 / number / {kind:tens,n:6,ans:6}
   - How many tens? / A=7 / number / {kind:tens,n:7,ans:7}

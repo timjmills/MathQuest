@@ -51,6 +51,14 @@
       "band": 3,
       "tiles": 2
      }
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild)."
@@ -75,6 +83,14 @@
      "opts": {
       "band": 6
      }
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -109,6 +125,14 @@
      "opts": {
       "band": 5
      }
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -151,6 +175,14 @@
      "opts": {
       "band": 5
      }
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -176,8 +208,17 @@
    "preBuild": [
     "odd_one_out"
    ],
-   "related": [],
-   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "the sorted groups shown as bars"
+    }
+   ],
+   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
   },
   "R.B1.S7": {
    "title": "Compare amounts",
@@ -219,11 +260,12 @@
      "why": "compare by an attribute, not an amount"
     },
     {
-     "key": "composing:ten_frame_build",
-     "why": "a later step on this idea: R.B3.S3 Represent 1, 2 and 3",
-     "opts": {
-      "band": 5
-     }
+     "key": "measurement:pictograph_intro",
+     "why": "compare two rows of pictures: which has more"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "compare two bars: which is taller"
     }
    ],
    "note": "Compare two groups to 5 by matching one to one (tap A or B). Pre: 2 only; this is the first step on this idea (compare) in the curriculum, so its pre-skills are building blocks from other ideas."
@@ -271,29 +313,13 @@
    "build": [],
    "pre": [
     {
-     "key": "comparing:compare_groups",
-     "why": "R.B1.S7 compare two amounts: more, fewer (the compare words)",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
      "key": "comparing:compare_objects",
      "why": "R.B2.S1 Compare size (earlier, same idea: length)"
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": "Tap the heavier / lighter picture. Pre: 2 only; no other live skill teaches an earlier step on this idea."
+   "related": [],
+   "note": "Tap the heavier / lighter picture. Pre: 1 only; no other live skill teaches an earlier step on this idea. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B2.S3": {
    "title": "Compare capacity",
@@ -306,13 +332,6 @@
    ],
    "pre": [
     {
-     "key": "comparing:compare_groups",
-     "why": "R.B1.S7 compare two amounts: more, fewer (the compare words)",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
      "key": "measurement:heavier_lighter_visual",
      "why": "R.B2.S2 Compare mass (earlier, same idea: mass)"
     },
@@ -322,17 +341,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Pre: 2 only; no other live skill teaches an earlier step on this idea. Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B2.S4": {
    "title": "Explore simple patterns",
@@ -464,13 +474,6 @@
      "opts": {
       "band": 5
      }
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "note": "Pre: 1 only; no other live skill teaches an earlier step on this idea."
@@ -522,13 +525,6 @@
      "opts": {
       "band": 5
      }
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "note": "Pre: 2 only; no other live skill teaches an earlier step on this idea."
@@ -571,16 +567,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": "Pre: 2 only; no other live skill teaches an earlier step on this idea."
+   "related": [],
+   "note": "Pre: 2 only; no other live skill teaches an earlier step on this idea. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B3.S4": {
    "title": "1 more",
@@ -629,16 +617,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B3.S5": {
    "title": "1 less",
@@ -687,16 +667,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B3.S6": {
    "title": "Composition of 1, 2 and 3",
@@ -740,20 +712,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 5
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B4.S1": {
    "title": "Identify and name circles and triangles",
@@ -885,13 +845,8 @@
      }
     },
     {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "a later step on this idea: R.B12.S1 Recognise and name 3-D shapes",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
+     "key": "shapes_early:compose_hexagon",
+     "why": "a later step on this idea: R.B15.S5 Compose shapes"
     }
    ],
    "note": "Pre: 2 only; no other live skill teaches an earlier step on this idea."
@@ -974,16 +929,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S2": {
    "title": "Subitise 4 and 5",
@@ -1029,16 +976,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S3": {
    "title": "Represent 4 and 5",
@@ -1086,16 +1025,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S4": {
    "title": "1 more",
@@ -1142,16 +1073,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S5": {
    "title": "1 less",
@@ -1200,16 +1123,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S6": {
    "title": "Composition of 4 and 5",
@@ -1252,20 +1167,8 @@
    "preBuild": [
     "band_3"
    ],
-   "related": [
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
-    }
-   ],
-   "note": "Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts."
+   "related": [],
+   "note": "Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B5.S7": {
    "title": "Composition of 1 - 5",
@@ -1309,20 +1212,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B6.S1": {
    "title": "Identify and name shapes with 4 sides",
@@ -1429,13 +1320,8 @@
      "why": "composing with pattern blocks"
     },
     {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "a later step on this idea: R.B12.S1 Recognise and name 3-D shapes",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
     }
    ],
    "note": "Two shapes make a square or rectangle (tap the answer). Pre: 2 only; the earlier steps R.B4.S3 have no live skill yet (see preBuild)."
@@ -1479,17 +1365,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "a later step on this idea: R.B12.S1 Recognise and name 3-D shapes",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
-    },
-    {
      "key": "shapes_early:compose_hexagon",
      "why": "a later step on this idea: R.B15.S5 Compose shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
     }
    ],
    "note": ""
@@ -1552,16 +1433,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B7.S2": {
    "title": "Find 0 to 5",
@@ -1607,16 +1480,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S3": {
    "title": "Subitise 0 to 5",
@@ -1664,16 +1529,8 @@
    "preBuild": [
     "zero"
    ],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S4": {
    "title": "Represent 0 to 5",
@@ -1721,16 +1578,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S5": {
    "title": "1 more",
@@ -1777,16 +1626,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S6": {
    "title": "1 less",
@@ -1835,16 +1676,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S7": {
    "title": "Composition",
@@ -1889,20 +1722,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B7.S8": {
    "title": "Conceptual subitising to 5",
@@ -1938,20 +1759,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "addition:add_5_pictures",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B8.S1": {
    "title": "Compare mass",
@@ -1972,17 +1781,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": "\"Which is heavier?\" about two pictured objects; the balance comes in S2. Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "\"Which is heavier?\" about two pictured objects; the balance comes in S2. Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B8.S2": {
    "title": "Find a balance",
@@ -2006,17 +1806,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (heavier_lighter_visual); the earlier steps R.B2.S3 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B8.S3": {
    "title": "Explore capacity",
@@ -2038,17 +1829,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": "Pre: 2 only; the earlier steps R.B2.S3 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Pre: 2 only; the earlier steps R.B2.S3 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B8.S4": {
    "title": "Compare capacity",
@@ -2070,17 +1852,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "a later step on this idea: Y1.B7.S1 Compare lengths and heights"
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "a later step on this idea: Y1.B7.S2 Measure length using objects"
-    }
-   ],
-   "note": "Pre: 2 only; the earlier steps R.B8.S3, R.B2.S3 have no live skill yet (see preBuild)."
+   "related": [],
+   "note": "Pre: 2 only; the earlier steps R.B8.S3, R.B2.S3 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B9.S1": {
    "title": "Find 6, 7 and 8",
@@ -2130,17 +1903,18 @@
    ],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: R.B13.S2 Continue patterns beyond 10 (10-13)",
+     "key": "composing:number_word_form",
+     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
-      "step": 1,
       "range": 10
      }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "key": "counting:number_seq_fill",
+     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
      "opts": {
+      "step": 1,
+      "dir": "forward",
       "range": 10
      }
     }
@@ -2194,17 +1968,18 @@
    ],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: R.B13.S2 Continue patterns beyond 10 (10-13)",
+     "key": "composing:number_word_form",
+     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
-      "step": 1,
       "range": 10
      }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "key": "counting:number_seq_fill",
+     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
      "opts": {
+      "step": 1,
+      "dir": "forward",
       "range": 10
      }
     }
@@ -2266,8 +2041,8 @@
      }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "key": "addition:nl_add",
+     "why": "one more as one jump on a 0-10 number line",
      "opts": {
       "range": 10
      }
@@ -2330,8 +2105,8 @@
      }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "key": "addition:nl_add",
+     "why": "one more as one jump on a 0-10 number line",
      "opts": {
       "range": 10
      }
@@ -2451,6 +2226,13 @@
      "opts": {
       "band": 12
      }
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "circle the even or the odd numbers to 10",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -2510,13 +2292,6 @@
     {
      "key": "addition:add_5_pictures",
      "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "note": ""
@@ -2574,13 +2349,6 @@
     {
      "key": "addition:add_5_pictures",
      "why": "a later step on this idea: R.B9.S9 Combine 2 groups"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "a later step on this idea: R.B9.S9 Combine 2 groups",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "note": ""
@@ -2638,8 +2406,11 @@
      "why": "the inverse: take away with pictures"
     },
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "the inverse: take-away stories"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B2.S9 Addition - add more",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -2672,32 +2443,24 @@
     {
      "key": "addition:add_5_pictures",
      "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "composing:make_ten",
-     "why": "a later step on this idea: R.B11.S8 Bonds to 10 (2 parts)",
+     "key": "composing:number_word_form",
+     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
-      "band": 10
+      "range": 10
      }
     },
     {
-     "key": "addition:add_three",
-     "why": "a later step on this idea: R.B11.S10 Bonds to 10 (3 parts)",
+     "key": "counting:number_seq_fill",
+     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
      "opts": {
-      "band": 10,
-      "notation": [
-       "across"
-      ]
+      "step": 1,
+      "dir": "forward",
+      "range": 10
      }
     }
    ],
@@ -2967,17 +2730,19 @@
    ],
    "related": [
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "composing:number_word_form",
+     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
-      "band": 15
+      "range": 10
      }
     },
     {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "counting:number_seq_fill",
+     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
      "opts": {
-      "band": 15
+      "step": 1,
+      "dir": "forward",
+      "range": 10
      }
     }
    ],
@@ -3041,18 +2806,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
-     "opts": {
-      "band": 15
-     }
+     "key": "measurement:pictograph_intro",
+     "why": "compare two rows of pictures: which has more"
     },
     {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
-     "opts": {
-      "band": 15
-     }
+     "key": "measurement:bar_graph_intro",
+     "why": "compare two bars: which is taller"
     }
    ],
    "note": ""
@@ -3106,17 +2865,19 @@
    ],
    "related": [
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "composing:number_word_form",
+     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
-      "band": 15
+      "range": 10
      }
     },
     {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "counting:number_seq_fill",
+     "why": "a later step on this idea: Y1.B1.S6 Count on from any number",
      "opts": {
-      "band": 15
+      "step": 1,
+      "dir": "forward",
+      "range": 10
      }
     }
    ],
@@ -3236,17 +2997,10 @@
      }
     },
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "addition:nl_add",
+     "why": "one more as one jump on a 0-10 number line",
      "opts": {
-      "band": 15
-     }
-    },
-    {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
-     "opts": {
-      "band": 15
+      "range": 10
      }
     }
    ],
@@ -3308,17 +3062,10 @@
      }
     },
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "addition:nl_add",
+     "why": "one more as one jump on a 0-10 number line",
      "opts": {
-      "band": 15
-     }
-    },
-    {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
-     "opts": {
-      "band": 15
+      "range": 10
      }
     }
    ],
@@ -3349,13 +3096,6 @@
     {
      "key": "addition:add_5_pictures",
      "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "preBuild": [],
@@ -3385,7 +3125,7 @@
      }
     }
    ],
-   "note": ""
+   "note": "Pre: 2 only; the other earlier skills on this idea deal numbers past this step (double, doubles_near_doubles; rule 18); the earlier steps R.B11.S4, R.B9.S10, R.B7.S8 have no live skill yet (see preBuild)."
   },
   "R.B11.S8": {
    "title": "Bonds to 10 (2 parts)",
@@ -3412,13 +3152,6 @@
     {
      "key": "addition:add_5_pictures",
      "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "preBuild": [],
@@ -3434,15 +3167,14 @@
      }
     },
     {
-     "key": "subtraction:sub_5_pictures",
-     "why": "a later step on this idea: R.B14.S3 Take away"
-    },
-    {
-     "key": "subtraction:sub_wp_10",
-     "why": "a later step on this idea: R.B14.S3 Take away"
+     "key": "subtraction:missing_add_sub",
+     "why": "a later step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
     }
    ],
-   "note": "make_ten: the frame shows n, how many more make 10."
+   "note": "make_ten: the frame shows n, how many more make 10. Pre: 2 only; the other earlier skills on this idea deal numbers past this step (double, doubles_near_doubles; rule 18); the earlier steps R.B11.S4, R.B9.S10, R.B7.S8 have no live skill yet (see preBuild)."
   },
   "R.B11.S9": {
    "title": "Make arrangements of 10",
@@ -3506,17 +3238,10 @@
      }
     },
     {
-     "key": "composing:teen_compose",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
+     "key": "subtraction:missing_add_sub",
+     "why": "a later step on this idea: Y1.B2.S12 Subtraction - find a part",
      "opts": {
-      "band": 15
-     }
-    },
-    {
-     "key": "composing:ten_frame_build_teen",
-     "why": "a later step on this idea: R.B13.S1 Build numbers beyond 10 (10 -13)",
-     "opts": {
-      "band": 15
+      "range": 10
      }
     }
    ],
@@ -3568,12 +3293,27 @@
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_5_pictures",
-     "why": "a later step on this idea: R.B14.S3 Take away"
+     "key": "subtraction:missing_add_sub",
+     "why": "a later step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "a later step on this idea: R.B14.S3 Take away"
+     "key": "addition:add_10_no_regroup",
+     "why": "the two parts written as an addition sentence",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "the parts as two jumps on a 0-10 line",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -3631,14 +3371,6 @@
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "a later step on this idea: R.B14.S3 Take away"
-    },
-    {
-     "key": "subtraction:sub_wp_10",
-     "why": "a later step on this idea: R.B14.S3 Take away"
     }
    ],
    "note": ""
@@ -3694,14 +3426,6 @@
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "a later step on this idea: R.B14.S3 Take away"
-    },
-    {
-     "key": "subtraction:sub_wp_10",
-     "why": "a later step on this idea: R.B14.S3 Take away"
     }
    ],
    "note": ""
@@ -3749,6 +3473,13 @@
      "why": "the same idea in another form: make equal groups",
      "opts": {
       "band": 12
+     }
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "circle the even or the odd numbers to 10",
+     "opts": {
+      "range": 10
      }
     }
    ],
@@ -3802,10 +3533,6 @@
     {
      "key": "shapes_early:shape_name_match_3d",
      "why": "the same shapes named by dragging written names: a Year 1 response (Y1.B3.S1), so related, not direct (rule 8)"
-    },
-    {
-     "key": "shapes_early:compose_hexagon",
-     "why": "a later step on this idea: R.B15.S5 Compose shapes"
     }
    ],
    "note": "Tap every cube / sphere ... (forms 1)."
@@ -3853,10 +3580,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "shapes_early:compose_hexagon",
-     "why": "a later step on this idea: R.B15.S5 Compose shapes"
-    },
     {
      "key": "shapes_early:shape_name_match_3d",
      "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
@@ -3910,10 +3633,6 @@
     {
      "key": "shapes_early:shape_name_match_3d",
      "why": "the next step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
-    },
-    {
-     "key": "shapes_early:compose_hexagon",
-     "why": "a later step on this idea: R.B15.S5 Compose shapes"
     }
    ],
    "note": ""
@@ -3966,10 +3685,6 @@
     {
      "key": "shapes_early:shape_name_match_3d",
      "why": "the next step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
-    },
-    {
-     "key": "shapes_early:compose_hexagon",
-     "why": "a later step on this idea: R.B15.S5 Compose shapes"
     }
    ],
    "note": ""
@@ -4004,13 +3719,6 @@
      }
     },
     {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
-     }
-    },
-    {
      "key": "patterns:shape_pattern",
      "why": "R.B2.S5 Copy and continue simple patterns (earlier, same idea: pattern)",
      "opts": {
@@ -4022,7 +3730,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "note": "Pre: 2 only; the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B12.S6": {
    "title": "Copy and continue patterns",
@@ -4052,13 +3760,6 @@
       "forms": [
        1
       ]
-     }
-    },
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
      }
     },
     {
@@ -4111,13 +3812,6 @@
       "forms": [
        1
       ]
-     }
-    },
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
      }
     },
     {
@@ -4377,10 +4071,10 @@
      }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
      "opts": {
-      "range": 10
+      "band": 30
      }
     }
    ],
@@ -4515,13 +4209,6 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
-     "opts": {
-      "range": 10
-     }
     }
    ],
    "note": ""
@@ -4579,13 +4266,6 @@
      "opts": {
       "band": 100
      }
-    },
-    {
-     "key": "composing:number_word_form",
-     "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
-     "opts": {
-      "range": 10
-     }
     }
    ],
    "note": ""
@@ -4635,13 +4315,6 @@
      "opts": {
       "band": 10
      }
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "R.B9.S9 Combine 2 groups (earlier, same idea: add)",
-     "opts": {
-      "band": 7
-     }
     }
    ],
    "preBuild": [],
@@ -4649,10 +4322,6 @@
     {
      "key": "subtraction:sub_5_pictures",
      "why": "the inverse: take away with pictures"
-    },
-    {
-     "key": "subtraction:sub_wp_10",
-     "why": "the inverse: take-away stories"
     },
     {
      "key": "addition:number_line_add",
@@ -4681,13 +4350,6 @@
    ],
    "pre": [
     {
-     "key": "addition:add_wp_10",
-     "why": "R.B14.S1 Add more (earlier, same idea: add)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "addition:add_three",
      "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
@@ -4700,6 +4362,13 @@
     {
      "key": "composing:ten_frame_build",
      "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (earlier, same idea: bond)",
      "opts": {
       "band": 10
      }
@@ -4723,13 +4392,6 @@
      "why": "the next step on this idea: Y1.B2.S9 Addition - add more",
      "opts": {
       "range": 10
-     }
-    },
-    {
-     "key": "addition:add_wp_10_plain",
-     "why": "the next step on this idea: Y1.B2.S10 Addition problems",
-     "opts": {
-      "band": 10
      }
     }
    ],
@@ -4782,29 +4444,22 @@
     {
      "key": "addition:add_5_pictures",
      "why": "R.B14.S2 How many did I add (earlier step; the inverse: add with pictures)"
-    },
-    {
-     "key": "addition:add_wp_10",
-     "why": "R.B14.S1 Add more (earlier step; the inverse: addition stories)",
-     "opts": {
-      "band": 10
-     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_sub_fact_family",
-     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
+     "key": "subtraction:nl_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
      "opts": {
       "range": 10
      }
     },
     {
-     "key": "addition:number_families_add",
-     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
      "opts": {
-      "band": 10
+      "range": 10
      }
     }
    ],
@@ -4827,16 +4482,22 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "R.B14.S3 Take away (earlier, same idea: sub)"
-    },
-    {
      "key": "addition:add_5_pictures",
      "why": "R.B14.S2 How many did I add (earlier, same idea: add)"
     },
     {
-     "key": "addition:add_wp_10",
-     "why": "R.B14.S1 Add more (earlier, same idea: add)",
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
+     "opts": {
+      "band": 10,
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
      "opts": {
       "band": 10
      }
@@ -5062,8 +4723,8 @@
      "why": "the same idea in another form: fill a hexagon with blocks"
     },
     {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
     }
    ],
    "note": ""
@@ -5119,8 +4780,8 @@
      "why": "the same idea in another form: fill a hexagon with blocks"
     },
     {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
     }
    ],
    "note": ""
@@ -5175,10 +4836,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "the next step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
     }
    ],
    "note": ""
@@ -5236,10 +4893,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "the next step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
     }
    ],
    "note": ""
@@ -5286,10 +4939,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "the next step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "a later step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
     }
    ],
    "note": ""
@@ -5329,10 +4978,6 @@
     {
      "key": "shapes_early:shape_name_match_3d",
      "why": "the next step on this idea: Y1.B3.S1 Recognise and name 3-D shapes"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
     }
    ],
    "note": ""
@@ -5568,8 +5213,16 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "related": [
+    {
+     "key": "composing:select_even_odd",
+     "why": "circle the even or the odd numbers to 10",
+     "opts": {
+      "range": 10
+     }
+    }
+   ],
+   "note": ""
   },
   "R.B16.S6": {
    "title": "Play with and build doubles",
@@ -5596,12 +5249,18 @@
      "why": "R.B14.S4 How many did I take away (earlier, same idea: sub)"
     },
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "R.B14.S3 Take away (earlier, same idea: sub)"
-    },
-    {
      "key": "addition:add_5_pictures",
      "why": "R.B14.S2 How many did I add (earlier, same idea: add)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
+     "opts": {
+      "band": 10,
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -5609,20 +5268,6 @@
     {
      "key": "patterns:halve",
      "why": "the inverse: halve",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
-     "key": "addition:add_sub_fact_family",
-     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
-     "opts": {
-      "range": 10
-     }
-    },
-    {
-     "key": "addition:number_families_add",
-     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
      "opts": {
       "band": 10
      }
@@ -5658,13 +5303,6 @@
       "forms": [
        1
       ]
-     }
-    },
-    {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
      }
     },
     {
@@ -5710,13 +5348,6 @@
      }
     },
     {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
-     }
-    },
-    {
      "key": "patterns:shape_pattern",
      "why": "R.B17.S1 Identify units of repeating patterns (earlier, same idea: pattern)",
      "opts": {
@@ -5729,7 +5360,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 2 only; the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S3": {
    "title": "Explore own pattern rules",
@@ -5751,13 +5382,6 @@
      }
     },
     {
-     "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort by kind: which kinds repeat",
-     "opts": {
-      "band": 3
-     }
-    },
-    {
      "key": "patterns:shape_pattern",
      "why": "R.B17.S1 Identify units of repeating patterns (earlier, same idea: pattern)",
      "opts": {
@@ -5770,7 +5394,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 2 only; the earlier steps R.B17.S2, R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S4": {
    "title": "Replicate and build scenes and constructions",
@@ -6138,14 +5762,6 @@
      "why": "a later step on this idea: Y1.B1.S5 Recognise numbers as words",
      "opts": {
       "range": 10
-     }
-    },
-    {
-     "key": "placevalue:more_less_10",
-     "why": "a later step on this idea: Y1.B4.S7 1 more and 1 less",
-     "opts": {
-      "step": 1,
-      "band": 20
      }
     }
    ],

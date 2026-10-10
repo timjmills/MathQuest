@@ -501,7 +501,7 @@ NEW = {
 S['R.B9.S6']['p'] += [(CO,'R.B9.S1 count the objects before pairing them',{'band':10,'objects':'frame'})]
 S['R.B1.S7']['p'] += [(CO,'count each group; matching one to one needs no count, so this is a light pre-skill',{'band':5})]
 S['Y1.B10.S1']['p'] += [(SHG,'R.B16 grouping into equal groups: equal parts',{'band':12})]
-S['Y1.B13.S1']['p'] += [(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: a nickel is five ones',{'step':[0],'band':50}),(CO,'Y1.B1.S2 count ones',{'band':20}),(B10,'Y1.B6.S4 a ten as one rod',{'band':50})]
+S['Y1.B13.S1']['p'] += [(SKL,'Y1.B9.S2 / S3 count in 5s and 10s: a nickel is five ones',{'step':[0],'band':50}),(CO,'Y1.B1.S2 count ones',{'band':20})]
 
 # Related by idea (rule 4/10): the same idea in another form, or its inverse. gen.py adds these after the hand-written ones.
 _f = 'the same idea in another form: '; _i = 'the inverse: '
@@ -626,7 +626,7 @@ addpre('Y1.B11.S5', (CS, 'Y1.B1.S6 the counting order: first, next', {'band': 10
 for _s in ('Y1.B10.S1', 'Y1.B10.S2'):
     addpre(_s, (N2D, 'Y1.B3.S3 name the shape being halved', {'forms': [1]}), (CMP, 'R.B15.S5 / S6 two shapes make one shape', {}))
 addpre('Y1.B10.S2', (PART, 'Y1.B10.S1 recognise a half of a shape', {'parts': [0]}))
-addpre('Y1.B13.S2', (MON, 'count 1-cent coins one by one', {'currency': 'usd', 'kind': 'like', 'values': [1], 'band': 20}))
+addpre('Y1.B13.S2', (MON, 'count 1-cent coins one by one (pennies only: totals 1-6)', {'currency': 'usd', 'kind': 'like', 'values': [1]}))
 for _s in ('R.B9.S7', 'R.B9.S8'):
     addpre(_s, (CO, 'R.B9.S1 count each group, to 8', {'band': 10, 'objects': 'frame'}), (CG, 'R.B1.S7 / R.B11.S2 two groups are the same', {'band': 5}))
 for _s in ('R.B9.S6', 'R.B11.S13'):
@@ -634,9 +634,24 @@ for _s in ('R.B9.S6', 'R.B11.S13'):
 for _s in ('R.B16.S1', 'R.B16.S2', 'R.B16.S3', 'R.B16.S4', 'R.B16.S5'):
     addpre(_s, (CO, 'R.B11.S1 count the amount to share, to 10', {'band': 10}), (CG, 'R.B11.S2 are the groups the same?', {'band': 10}))
 for _s in ('R.B12.S5', 'R.B12.S6', 'R.B12.S7', 'R.B17.S1', 'R.B17.S2', 'R.B17.S3'):
-    addpre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the pattern', {'forms': [1]}), (CC, 'R.B1.S4 sort by kind: which kinds repeat', {'band': 3}))
-for _s in ('R.B2.S2', 'R.B2.S3'): addpre(_s, (CG, 'R.B1.S7 compare two amounts: more, fewer (the compare words)', {'band': 5}))
+    addpre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the pattern', {'forms': [1]}))
 for _s in ('R.B8.S1', 'R.B8.S2'): addpre(_s, (COB, 'R.B2.S1 / R.B10 compare by size: the compare words', {}))
 for _s in ('R.B10.S1', 'R.B10.S2'): addpre(_s, (HL, 'R.B2.S2 / R.B8.S1 compare two objects (mass): the compare words', {}))
 for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S4 sort and count one kind', {'band': 3}))
 addpre('Y1.B14.S5', (CLK, 'the numbers on the clock face', {'task': 'numerals'}), (CS, 'Y1.B4.S7 the order of the numbers 1 to 12', {'band': 20, 'dir': 'forward'}))
+R_NOLINK = {AWP, AWPP, SWP, SWPP, CMPW}   # word-work cells (text lines, operation and unit banks): never a pre / related link in Reception
+for _s in ('Y1.B2.S14', 'Y1.B2.S15'):
+    addpre(_s, (CS, 'R.B11.S6 / Y1.B1.S9 1 less: take away one', {'band': 10, 'dir': 'back'}), (CO, 'Y1.B1.S2 count what is left', {'band': 10}))
+# Related forms a pupil meets next that no R / Y1 step teaches (rule 4): used when a step has fewer than 2 related.
+PIC = 'measurement:pictograph_intro'; BARI = 'measurement:bar_graph_intro'; NLAV = 'addition:nl_add'; A10NR = 'addition:add_10_no_regroup'
+SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'measurement:time_match_clock'; EQS2 = 'addition:equal_sign'
+EXTRA = {
+ 'sort': [(PIC, 'the sorted groups shown as rows of pictures and counted (K.MD.B.3)', {}), (BARI, 'the sorted groups shown as bars', {})],
+ 'compare': [(PIC, 'compare two rows of pictures: which has more', {}), (BARI, 'compare two bars: which is taller', {})],
+ 'more1': [(NLAV, 'one more as one jump on a 0-10 number line', {'range': 10})],
+ 'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10})],
+ 'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10}), (EQS2, 'is the sentence true? the = sign', {'range': 10})],
+ 'oddeven': [(SEO, 'circle the even or the odd numbers to 10', {'range': 10})],
+ 'money': [(ECS, 'do these coins make the amount? (nickels, dimes, pennies)', {'currency': 'usd', 'band': 25, 'values': [1, 5, 10]})],
+ 'time': [(TMC, 'choose the clock that shows the time (hours and half hours)', {'precision': 30})],
+}

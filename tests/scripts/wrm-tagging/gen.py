@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, EXTRA
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -53,7 +53,7 @@ READS = json.load(open(f'{HERE}/reads_range.json'))   # skill -> True when its i
 SUBS = [  # (family, sub, regex on the step title) — first match wins; order matters
     ('money', 'money', r'coin|note|money|unitis'),
     ('time', 'time', r'\btime\b|\bdays?\b|month|hours|before and after'),
-    ('fraction', 'fraction', r'half|quarter'),
+    ('fraction', 'fracshape', r'(half|quarter) of an object'), ('fraction', 'fracqty', r'(half|quarter) of a quantity'),
     ('count', 'oral', r'verbal|patterns beyond'), ('pattern', 'pattern', r'pattern'),
     ('measure', 'mass', r'mass|balance|heavier'), ('measure', 'capacity', r'capacity|volume|full'),
     ('measure', 'length', r'length|height|size'),
@@ -138,6 +138,7 @@ def build(step):
     sig = lambda k, o: k + json.dumps(o or {}, sort_keys=True)
     seen = {sig(k, o) for k, o in dentries(step)}; seen_keys = set()
     xp = set(sp['xp']); xr = set(sp['xr'])
+    if s['year'] == 'R': xp |= R_NOLINK; xr |= R_NOLINK   # rule 8: word-work cells are not a Reception response
     def addp(k, why, o=None, explicit=False):
         # a pre may be the step's own skill on an earlier rung (other opts); never the same skill+opts as a direct
         if k in xp or not live(k) or len(pre) >= 8: return False
@@ -211,10 +212,13 @@ def build(step):
     for x in later[:3]:
         for k, o in dentries(x): addr(k, f"the next step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
     if len(rel) < 2:   # a later step on the same idea whose skill is new (not taught yet): the next form a pupil meets
-        for x in [x for x in order[idx[step] + 1:] if related_topic(step, x)]:
+        for x in [x for x in order[idx[step] + 1:] if related_topic(step, x) == 2 or (related_topic(step, x) and info[x]['block'] == s['block'])]:
             if len(rel) >= 2: break
             for k, o in dentries(x):
                 if not earlier(k): addr(k, f"a later step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
+    if len(rel) < 2:
+        for e in EXTRA.get(topic(step), []):
+            k, why, o = split(e); addr(k, why, o)
     note = sp['n']
     def add_note(t):
         nonlocal note
