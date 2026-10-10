@@ -7789,7 +7789,7 @@
    "ccss": [
     "4.NBT.B.4"
    ],
-   "why": "closes Y5.B2.S7 Compare calculations (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B2.S7 Compare calculations (existing wrm_props entry, reused)"
   },
   "common_mf": {
    "kind": "option",
@@ -7825,7 +7825,7 @@
    "ccss": [
     "6.EE.A.1"
    ],
-   "why": "closes Y5.B3.S6 Square numbers; Y5.B3.S7 Cube numbers (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B3.S6 Square numbers; Y5.B3.S7 Cube numbers (existing wrm_props entry, reused)"
   },
   "mult_multiples": {
    "kind": "option",
@@ -8393,7 +8393,7 @@
    "ccss": [
     "4.MD.C.6"
    ],
-   "why": "closes Y5.B10.S1 Understand and use degrees (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B10.S1 Understand and use degrees (existing wrm_props entry, reused)"
   },
   "reflex_angles": {
    "kind": "option",
@@ -8490,7 +8490,7 @@
     "4.G.A.1",
     "4.MD.C.6"
    ],
-   "why": "closes Y5.B10.S5 Draw lines and angles accurately (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B10.S5 Draw lines and angles accurately (existing wrm_props entry, reused)"
   },
   "ruler_cm": {
    "kind": "option",
@@ -8656,7 +8656,7 @@
     "6.NS.C.6",
     "6.NS.C.7"
    ],
-   "why": "closes Y5.B13.S1 Understand negative numbers; Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B13.S1 Understand negative numbers; Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference (existing wrm_props entry, reused)"
   },
   "km_m": {
    "kind": "option",
@@ -8711,7 +8711,7 @@
     "4.MD.A.1",
     "5.MD.A.1"
    ],
-   "why": "closes Y5.B14.S2 Millimetres and millilitres; Y5.B14.S3 Convert units of length (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B14.S2 Millimetres and millilitres; Y5.B14.S3 Convert units of length (existing wrm_props entry, reused)"
   },
   "l_ml_convert": {
    "kind": "option",
@@ -8798,7 +8798,7 @@
     "5.MD.C.3",
     "5.MD.C.4"
    ],
-   "why": "closes Y5.B15.S1 Cubic centimetres; Y5.B15.S2 Compare volume; Y5.B15.S3 Estimate volume (existing wrm_ext entry, reused)"
+   "why": "closes Y5.B15.S1 Cubic centimetres; Y5.B15.S2 Compare volume; Y5.B15.S3 Estimate volume (existing wrm_props entry, reused)"
   },
   "mass_scales": {
    "kind": "new",
@@ -8811,6 +8811,57 @@
    "reused": true,
    "ccss": [],
    "why": "needed as a pre-skill for Y5.B14.S1, Y5.B14.S2, Y5.B15.S4 (existing entry, reused)"
+  },
+  "roman_12": {
+   "kind": "new",
+   "skill": "measurement:roman_numerals_clock",
+   "name": "Roman Numerals to 12",
+   "teaches": "reading Roman numerals I to XII on a clock face",
+   "representation": "a clock face with Roman numerals; write the time or the numeral value",
+   "family": "measurement",
+   "steps": [],
+   "reused": true,
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B1.S1 (existing entry, reused)"
+  },
+  "roman_100": {
+   "kind": "new",
+   "skill": "placevalue:roman_numerals",
+   "name": "Roman Numerals",
+   "teaches": "reading and writing Roman numerals to 100 (I, V, X, L, C) and knowing there is no zero",
+   "representation": "numeral cards with a symbol key; write the value or the numeral",
+   "family": "placevalue",
+   "steps": [],
+   "reused": true,
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B1.S1 (existing entry, reused)"
+  },
+  "bonds_100": {
+   "kind": "new",
+   "skill": "addition:bonds_to_100",
+   "name": "Bonds to 100",
+   "teaches": "pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10",
+   "representation": "a hundred square or bead string with part shaded; part-whole diagram; write the missing part",
+   "family": "operations",
+   "steps": [],
+   "reused": true,
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B2.S1 (existing entry, reused)"
+  },
+  "mult_three": {
+   "kind": "new",
+   "skill": "multiplication:multiply_three_numbers",
+   "name": "Multiply Three Numbers",
+   "teaches": "multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)",
+   "representation": "three-factor expressions with a bracket prompt to choose the easy pair first",
+   "family": "operations",
+   "steps": [],
+   "improves": [
+    "Y4.B5.S2"
+   ],
+   "reused": true,
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B3.S7 (existing entry, reused)"
   }
  },
  "tagFixes": [
