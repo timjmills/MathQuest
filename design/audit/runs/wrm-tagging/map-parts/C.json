@@ -11,7 +11,7 @@
         "angles_lines:place_symmetry_lines"
       ],
       "proposal": "map_symmetry_compare",
-      "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare; re-check --n 12, checked: symmetry (count one shape / click-all / click lines), place_symmetry_lines (draw) — none compare two shapes",
+      "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare; re-check --n 12, checked: symmetry (count one shape / click-all / click lines), place_symmetry_lines (draw) — none compare two shapes; options checked: symmetry forms 0/1/2 (count, click shapes, click lines) — one shape each",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.G.A.3 is in MAP's blueprint"
@@ -28,7 +28,7 @@
         "angles_lines:symmetry"
       ],
       "proposal": "map_symmetry_check_line",
-      "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line",
+      "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line; options checked: symmetry forms 0-2, place_symmetry_lines shapes — never judge a given line",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.G.A.3 is in MAP's blueprint"
@@ -61,7 +61,7 @@
       "skills": [
         "shapes_classify:net_identify"
       ],
-      "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade; no residual build: net_identify already deals 'which net folds into', shapes_3d_props (property select-all) stays on rows 64/89 only",
+      "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade; no residual build: net_identify already deals 'which net folds into', shapes_3d_props (property select-all) stays on the '3-D shape properties and nets' and 'Choose ALL objects with six faces' rows only",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 6.G.A.4 is in MAP's blueprint"
@@ -93,7 +93,7 @@
         "area_perimeter:volume_composite"
       ],
       "proposal": "volume_cubes",
-      "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form)",
+      "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form); options checked: volume forms 0/1/2 — edges given, no cube model",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 5.MD.C.4 is in MAP's blueprint"
@@ -149,10 +149,10 @@
         "measurement:unit_conversions"
       ],
       "proposal": "time_convert",
-      "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours",
+      "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours; options checked: unit_conversion_word units 0 (time) --n 6: hr→min / hr→sec only",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.MD.A.1 / 5.MD.A.1 (small → large) is in MAP's blueprint"
       },
       "closes": "time_convert's MAP clause adds minutes → hours as h-and-min, decimal and mixed hours."
     },
@@ -384,7 +384,7 @@
         "measurement:reading_ruler"
       ],
       "proposal": "map_ruler_measure_object",
-      "note": "reading_ruler: \"What length does the arrow point to?\" only",
+      "note": "reading_ruler: \"What length does the arrow point to?\" only; options checked: reading_ruler parts/labels — arrow from 0 only",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
@@ -431,7 +431,7 @@
         "measurement:mass_volume_liquid"
       ],
       "proposal": "mass_scales",
-      "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading)",
+      "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading); options checked: mass_volume_liquid forms 0/1/2 (cylinder, scale, sort)",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 3.MD.A.2 is in MAP's blueprint"
@@ -529,7 +529,7 @@
         "measurement:make_change_least_coins"
       ],
       "proposal": "map_money_build",
-      "note": "check a given set or write fewest coins; no free build",
+      "note": "check a given set or write fewest coins; no free build; options checked: money_count kind/values/order, equiv_coin_sets, make_change_least_coins — count or least coins, no free build",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
@@ -589,7 +589,7 @@
       "strand": "Measurement",
       "ritBand": "171-190",
       "source": "strand-walk",
-      "status": "exists-ok",
+      "status": "partial",
       "skills": [
         "measurement:time_sense"
       ],
@@ -597,7 +597,9 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 2.MD.C.7 is in MAP's blueprint"
-      }
+      },
+      "proposal": "time_units",
+      "closes": "time_units adds choosing seconds, minutes or hours for an activity; time_sense deals only a.m./p.m."
     },
     {
       "task": "Elapsed time: end, start, duration",
@@ -626,7 +628,7 @@
         "measurement:elapsed_mixed"
       ],
       "proposal": "elapsed_stories",
-      "note": "time line only, no story context",
+      "note": "time line only, no story context; options checked: elapsed_mixed hours/step/support/noon — no story form",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; page returned 503)"
@@ -676,8 +678,8 @@
       "proposal": "same_area",
       "note": "dual P= A= of one shape only",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: separate area and perimeter items in 181-210 bands"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.D.8 (same area, different perimeter) is in MAP's blueprint"
       },
       "closes": "same_area adds same area / different perimeter comparisons."
     },
@@ -708,7 +710,7 @@
         "area_perimeter:area"
       ],
       "proposal": "missing_lengths",
-      "note": "--n 12: perimeter 4/12 and area 4/12 give a missing side (rectangles only); residual = missing sides of rectilinear/polygon shapes (missing_lengths)",
+      "note": "--n 12: perimeter 4/12 and area 4/12 give a missing side (rectangles only); residual = missing sides of rectilinear/polygon shapes (missing_lengths); options checked: perimeter forms 1 and area forms 1 deal the rectangle missing side (live part)",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 3.MD.D.8 is in MAP's blueprint"
@@ -865,7 +867,7 @@
         "shapes_early:partition_shapes"
       ],
       "proposal": "map_shape_partition_pick",
-      "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares",
+      "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares; options checked: partition_shapes forms 0/1, parts halves/thirds/fourths — no choose-all, no eighths",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
@@ -944,7 +946,7 @@
         "angles_lines:measure_angles"
       ],
       "proposal": "protractor_read",
-      "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor",
+      "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor; options checked: measure_angles forms 0/1 (45° / 30° multiples) — MC, no protractor drawn",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.6 is in MAP's blueprint"
@@ -1072,8 +1074,8 @@
       ],
       "note": "number entry",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 6.NS.C.8 / 5.G.A.2 (distance on a grid) is in MAP's blueprint"
       }
     },
     {
@@ -1167,7 +1169,7 @@
         "graphs:build_pictograph"
       ],
       "proposal": "pictogram_scale",
-      "note": "build uses each picture = 1; re-check --n 12, checked: build_pictograph — 12/12 key = 1; pictograph read only",
+      "note": "build uses each picture = 1; re-check --n 12, checked: build_pictograph — 12/12 key = 1; pictograph read only; options checked: pictograph scale 2/5/10/25 READS a keyed graph (so reading is live); build_pictograph has only tiles/band, key fixed at 1",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 3.MD.B.3 is in MAP's blueprint"
@@ -1215,7 +1217,7 @@
         "graphs:build_bar_graph"
       ],
       "proposal": "bar_graph_scale",
-      "note": "scale 1 only; re-check --n 12, checked: build_bar_graph — 12/12 values ≤ 10, unit scale",
+      "note": "scale 1 only; re-check --n 12, checked: build_bar_graph — 12/12 values ≤ 10, unit scale; options checked: build_bar_graph tiles, band 5/10 — no scale option",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 3.MD.B.3 is in MAP's blueprint"
@@ -1247,7 +1249,7 @@
         "graphs:tally_chart"
       ],
       "proposal": "map_tally_build",
-      "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build",
+      "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build; options checked: tally_chart forms 0-3 all read a finished chart",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary; page returned 503)"
@@ -1291,17 +1293,18 @@
       "strand": "Data & graphing",
       "ritBand": "205-220",
       "source": "strand-walk",
-      "status": "exists-regrade",
+      "status": "partial",
       "skills": [
         "graphs:line_plot",
         "graphs:line_plot_fractions"
       ],
       "proposal": "make_line_plot",
-      "note": "counts at a value and total; few add/subtract-fraction items",
+      "note": "counts at a value and total; few add/subtract-fraction items; options checked: line_plot_fractions forms 0 ('How many total measurements' = count of dots, 6/6), 1, 2 — never a sum or difference of lengths; same status as 'Total from a fraction line plot'",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
-      }
+      },
+      "closes": "make_line_plot's MAP clause adds total and difference of the lengths on a fraction plot; line_plot_fractions only counts dots (forms: in all / most common / at a mark)."
     },
     {
       "task": "Line graphs (Gr 5 edge)",
@@ -1362,7 +1365,7 @@
         "measurement:unit_conversions"
       ],
       "proposal": "time_convert",
-      "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only)",
+      "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only); options checked: unit_conversions forms 1 (click every equal) with units metric/customary — no time units",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' multi-select"
@@ -1495,7 +1498,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "turns_angles",
-      "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap; re-check --n 12, checked: measure_angles, identify_angles, additive_angles — none (see note)",
+      "note": "checked: measure_angles (--n 12: MC of degree values, no protractor drawn), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap; re-check --n 12, checked: measure_angles, identify_angles, additive_angles — none (see note)",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
@@ -1582,13 +1585,48 @@
       "skills": [
         "area_perimeter:volume_composite"
       ],
-      "proposal": "map_volume_two_prisms",
+      "proposal": "volume_composite_repair",
       "note": "--n 8 re-sample: 8/8 single prism or cube, 0 composite (critic --dist 200: 143 prisms, 57 cubes). BUG: volume_composite ('Composite 3D Volume') does not deal what its name says",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 5.MD.C.5c is in MAP's blueprint"
       },
-      "closes": "Adds solids made of two prisms: find each volume and add; no live item is composite."
+      "closes": "volume_composite_repair makes the skill deal two joined prisms (find each volume, add); today 0 composite items."
+    },
+    {
+      "task": "Measure one object in two units and relate unit size to the count",
+      "strand": "Measurement",
+      "ritBand": "181-190",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "shapes_early:measure_nonstandard",
+        "measurement:reading_ruler"
+      ],
+      "proposal": "measure_two_units",
+      "note": "measure_nonstandard --n 8: one unit per item (crayons, clips or cubes); reading_ruler: inches only (options parts 0/1/2 all inches) — no item measures one object twice; options checked: reading_ruler parts, labels",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.A.2 is in MAP's blueprint"
+      },
+      "closes": "measure_two_units adds measuring the same object in two units and saying why the bigger unit gives the smaller count."
+    },
+    {
+      "task": "Compose 3-D shapes (put solids together; what is the model made of)",
+      "strand": "Geometry",
+      "ritBand": "151-170",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "shapes_early:compose_shapes"
+      ],
+      "proposal": "map_compose_solids",
+      "note": "compose_shapes --n 8: 8/8 two flat shapes ('What shape do you make when you put these two shapes together?'); compose_hexagon, compose_rect_from_squares flat too; no options on compose_shapes",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 1.G.A.2 is in MAP's blueprint"
+      },
+      "closes": "map_compose_solids adds putting 3-D solids together and naming the solids a model is made of; live compose skills are 2-D only."
     }
   ],
   "proposals": {
@@ -1781,7 +1819,7 @@
     },
     "map_area_equation": {
       "kind": "option",
-      "skill": "area_perimeter:area_unit_squares",
+      "skill": "area_perimeter:area_perimeter",
       "option": "form \"match the equation\": a grid rectangle and equations (3 × 4, 3 + 4, 3 + 4 + 3 + 4, 4 × 4); tick the one that gives the area (or the perimeter)",
       "name": "Picture to Area Equation (option)",
       "teaches": "connecting area to multiplication and perimeter to adding sides",
@@ -1796,7 +1834,7 @@
         "ritBand": "191-200",
         "taskType": "select the expression"
       },
-      "why": "6.4 picture ↔ equation for area/perimeter: no skill shows a picture and asks which equation models it",
+      "why": "6.4 picture ↔ equation for area/perimeter: no skill shows a picture and asks which equation models it; hosted on area_perimeter:area_perimeter ('Area AND Perimeter') so the perimeter equations stay inside the host's name (moved off area_unit_squares)",
       "reused": false,
       "problemTypes": [
         "area — tick every equation that gives the area (3 × 4, 4 + 4 + 4)",
@@ -1896,7 +1934,7 @@
     "map_shape_partition_pick": {
       "kind": "option",
       "skill": "shapes_early:partition_shapes",
-      "option": "forms \"equal or not?\", \"cut it\" and \"choose all that show a fraction\": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth / one-eighth shaded",
+      "option": "form \"choose ALL\": 4-6 shapes, some cut unequally; choose ALL in equal halves/thirds/fourths/eighths, or ALL showing a named unit fraction shaded",
       "name": "Equal Parts of Shapes (option)",
       "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
       "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
@@ -1912,19 +1950,19 @@
         "ritBand": "161-180",
         "taskType": "multi-select figures"
       },
-      "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares; owns the choose-ALL-shaded form for unit fractions 1/2, 1/3, 1/4, 1/8 of shapes (part B's fractions:identify option keeps only non-unit fractions and sets)",
+      "why": "partition_shapes asks fraction shaded / count parts only; MAP asks choose ALL shapes in equal shares and choose ALL shapes showing a named unit fraction. This option owns that choose-ALL form for 1/2, 1/3, 1/4 and 1/8 (no other proposal has it). Companions, not duplicated here: WRM fraction_parts (tick equal / not equal on one shape) and STANDARD partition_draw (draw the cuts).",
       "reused": false,
       "problemTypes": [
-        "equal or not — shapes cut into parts — tick those in equal halves/quarters / select all",
-        "cut it — a blank rectangle or circle — draw lines into halves or quarters / place cut line",
-        "choose all that show — 'Choose ALL shapes with one-third shaded' — tick / select all"
+        "choose all equal — 'Choose ALL shapes cut into equal fourths' — tick / select all",
+        "choose all shaded — 'Choose ALL shapes with 1/3 shaded' — tick / select all",
+        "name then choose — write the fraction under each shape, then tick the ones equal to 1/2"
       ],
       "levels": [
-        "L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades)",
-        "L2: quarters (fourths)",
-        "L3: cut it yourself (halves, quarters)",
-        "L4: thirds; choose ALL shapes showing a named unit fraction (1/2, 1/3, 1/4)",
-        "L5: eighths (cut and choose all showing 1/8)"
+        "L1: halves only, 4 shapes, unequal ones clearly unequal (structural: outline shapes and check boxes stay; hint: 'same size?' cue fades)",
+        "L2: fourths",
+        "L3: thirds",
+        "L4: choose ALL showing a named unit fraction shaded",
+        "L5: eighths"
       ],
       "example": {
         "item": "Tick every shape cut into equal quarters.",
@@ -2566,7 +2604,7 @@
         "ritBand": "211-220",
         "taskType": "drag into chart"
       },
-      "why": "MAP 2-5 sample item; no skill sorts by two attributes",
+      "why": "MAP 2-5 sample item; no skill sorts by two attributes; reuse sweep: VISUAL_BUILDS vis_sort_diagrams supplies the Carroll 2 × 2 pane this skill draws with, but it hosts no shape-attribute skill, so the skill stays new",
       "reused": false,
       "problemTypes": [
         "sort — drag/write each shape into the chart",
@@ -2664,13 +2702,32 @@
       "why": "WRM turns_angles already planned (wrm.js); standards-audit gives 4.MD.C.5a/b a gap verdict",
       "reused": true
     },
-    "map_volume_two_prisms": {
-      "kind": "option",
+    "time_units": {
+      "kind": "new",
+      "skill": "measurement:hours_minutes_seconds",
+      "name": "Hours, Minutes or Seconds?",
+      "teaches": "a sense of time units: which activities take seconds, minutes or hours",
+      "representation": "activity pictures with a unit word bank; option: longer/shorter",
+      "family": "measurement",
+      "ccss": [
+        "1.MD.B.3",
+        "2.MD.C.7"
+      ],
+      "map": {
+        "strand": "Measurement",
+        "ritBand": "171-190",
+        "taskType": "choose the time unit"
+      },
+      "why": "WRM time_units (wrm.js) already plans it; time_sense deals a.m./p.m. only",
+      "reused": true
+    },
+    "volume_composite_repair": {
+      "kind": "repair",
       "skill": "area_perimeter:volume_composite",
-      "option": "form \"two prisms\": an L- or step-shaped solid made of two rectangular prisms; find each volume and add",
-      "name": "Composite Volume: Two Prisms (option)",
-      "teaches": "volume is additive: split a solid made of two non-overlapping rectangular prisms, find each volume and add (5.MD.C.5c)",
-      "representation": "print: B&W boxed Andika cell, isometric line drawing of the solid with edge labels and a dashed split line, slots '__ × __ × __ = __', '__ × __ × __ = __', '__ + __ = __'; screen: number entry for each slot, never MC",
+      "option": "deal what the name says: two non-overlapping rectangular prisms joined (L-shaped solids), not one prism",
+      "name": "Composite 3-D Volume (repair)",
+      "teaches": "volume is additive: the volume of two joined prisms is the sum of their volumes, in real-world problems",
+      "representation": "legacy → solid-kit template",
       "family": "geometry",
       "ccss": [
         "5.MD.C.5c"
@@ -2680,26 +2737,63 @@
         "ritBand": "211-230",
         "taskType": "volume of a composite solid"
       },
-      "why": "volume_composite's name promises composite solids but 0/200 items are composite (143 prisms, 57 cubes) — this is the build that makes the skill match its name",
+      "why": "STANDARD_PROPOSALS volume_composite_repair already specifies it (build-list.js)",
+      "reused": true
+    },
+    "measure_two_units": {
+      "kind": "option",
+      "skill": "shapes_early:measure_nonstandard",
+      "option": "task \"measure twice\": the same object in two units (paper clips and crayons; inches and cm)",
+      "name": "Measure With Two Units (option)",
+      "teaches": "measuring one length in two different units and relating the counts to the unit size (the bigger unit gives the smaller count)",
+      "representation": "legacy → measure-scale template; write both counts, tick the longer unit",
+      "family": "measurement",
+      "ccss": [
+        "2.MD.A.2"
+      ],
+      "map": {
+        "strand": "Measurement",
+        "ritBand": "181-190",
+        "taskType": "measure in two units"
+      },
+      "why": "STANDARD_PROPOSALS measure_two_units (build-list.js) already specifies it",
+      "reused": true
+    },
+    "map_compose_solids": {
+      "kind": "option",
+      "skill": "shapes_early:compose_shapes",
+      "option": "form \"solids\": two or three 3-D shapes (cubes, cuboids, cylinders, cones, half-cylinders) put together; name what is made or pick the solids that make a drawn model",
+      "name": "Combine 3-D Shapes (option)",
+      "teaches": "composing 3-D shapes from cubes, prisms, cylinders and cones to make a composite shape, and seeing which solids a model is made from (1.G.A.2)",
+      "representation": "print: B&W boxed Andika cell, isometric line drawings of the solids and the composite model, slots 'This model is made of __ cubes and __ cylinder' with a shape word bank; screen: drag solids onto the model outline (production), never MC",
+      "family": "geometry",
+      "ccss": [
+        "1.G.A.2"
+      ],
+      "map": {
+        "strand": "Geometry",
+        "ritBand": "151-170",
+        "taskType": "compose 3-D shapes"
+      },
+      "why": "compose_shapes and compose_hexagon put together flat shapes only (8/8 2-D); no proposal in proposals-index or build-list.js covers composing solids",
       "reused": false,
       "problemTypes": [
-        "split given — dashed split line drawn — write both volumes and the total",
-        "split yourself — no line — draw the split, then compute",
-        "missing edge — the total and one prism given — find the missing edge"
+        "what is it made of — a drawn model — write how many of each solid (bank) / drag solids",
+        "build it — 'Use 2 cubes and 1 cone to make a tower' — draw/drag",
+        "which model — pick the model made from the solids listed (tick) / click"
       ],
       "levels": [
-        "L1: split line drawn, all edges labelled (structural: labelled drawing and three slot rows stay; hint: split line)",
-        "L2: split line faded; pupil chooses the split",
-        "L3: one edge must be worked out from two others (subtract lengths)"
+        "L1: two cubes stacked, solids named under the drawing (structural: word bank stays; hint: names under drawings fade)",
+        "L2: two different solids (cube + cone)",
+        "L3: three solids, names faded"
       ],
       "example": {
-        "item": "A step shape is a 6 × 2 × 3 cm block with a 2 × 2 × 3 cm block on top. Find the total volume.",
-        "answer": "36 + 12 = 48 cm³"
+        "item": "A tower is a cylinder with a cone on top. Which shapes is it made of?",
+        "answer": "1 cylinder and 1 cone"
       },
       "misconceptions": [
-        "multiplies the outer edges as if the solid were one box",
-        "counts the shared face twice or uses an edge in both prisms",
-        "adds edge lengths instead of volumes"
+        "names the flat face (circle) instead of the solid (cylinder)",
+        "counts a hidden cube twice or misses it"
       ]
     }
   }
