@@ -107,6 +107,29 @@ const yr=W.years.find(y=>y.id===YEAR);
 const SWK=MK.schoolWeeks(Object.fromEntries(yr.blocks.flatMap(bb=>bb.steps).map(st=>[st.id,st.title])),rows);
 const taughtBefore=(x,sid)=>{if(!x.startsWith(YEAR+'.'))return true;const a=SWK[x]??999,b=SWK[sid]??999;if(b===999||a===999)return order.indexOf(x)<order.indexOf(sid);return a<b||(a===b&&order.indexOf(x)<order.indexOf(sid));};
 const markerHits=MK.makeMarkerCheck(generateQuestionFor,YEAR,SWK,2);
+// r6 (S11): a why written from the skill and opts actually linked. Used after any swap, and whenever the hand why
+// names a table, a count step or a unit the opts do not deal (whyMismatch).
+const PARTS=['halves','thirds','quarters'];
+function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividing by ':'the ')+o.constant.join(', ')+(/div/.test(k)?'':' times-table'+(o.constant.length>1?'s':'')));
+  if(o.rows)t.push('counting in '+o.rows.map(r=>r.step+'s').join(', ')+' from 0');if(o.parts)t.push(o.parts.map(i=>PARTS[i]).join(' and ')+' of a shape');
+  if(o.band&&!o.constant)t.push('within '+o.band);if(o.range)t.push('within '+o.range);if(o.notation&&o.notation.includes('across'))t.push('written across');
+  if(k==='measurement:length_metric'&&o.forms)t.push(o.forms.map(f=>['cm ↔ mm','m ↔ cm','m ↔ mm','km ↔ m'][f]).join(', '));
+  if(k==='measurement:estimate_length'&&o.forms)t.push('about how long is it? a sensible length in metric units');return t.join('; ');}
+function taughtAt(k,sid,o){if(o&&Object.keys(o).length){let b2=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(JSON.stringify(stepOptsFor(id,k))===JSON.stringify(o))b2=id;}if(b2)return b2;}
+  let best=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(!best||taughtBefore(best,id))best=id;}return best;}
+function descWhy(k,o,sid){const src=taughtAt(k,sid,o);const ot=optsText(k,o);return `${OV.whyText?.[k]||label[k]||k}${ot?' ('+ot+')':''}${src?` — ${src} ${stepById[src].title}`:' — earlier learning'}`;}
+function whyMismatch(e){const w=String(e.why).split('(')[0];const o=e.opts||{};const tabs=o.constant||(o.rows||[]).map(x=>x.step);
+  const named=[...w.matchAll(/(?:counting in (\d+)s|dividing by (\d+)|multiplying by (\d+)|the (\d+) times-table|Divide by (\d+)|Multiply by (\d+))/g)].map(m=>+(m[1]||m[2]||m[3]||m[4]||m[5]||m[6]));
+  if(tabs.length&&named.length&&named.some(n=>!tabs.includes(n)))return true;
+  if(tabs.length&&/counting in/.test(w)){const ns=[...w.replace(/[\s\S]*?counting in/,'').split(/[:—]/)[0].matchAll(/(\d+)s\b/g)].map(m=>+m[1]);if(ns.some(n=>!tabs.includes(n))||tabs.some(t=>ns.length&&!ns.includes(t)))return true;}
+  if(/time_half_hour|time_hour/.test(e.key)&&/quarter past|quarter to/.test(w))return true;
+  if(e.key==='multiplication:repeated_add_to_mult'&&/stories/.test(w))return true;
+  if(e.key==='measurement:estimate_length'&&/cm or m|mm or cm|m or cm/.test(w))return true; // say what form 0 does: 'about how long is a shoe? 25 cm'
+  if(e.key==='measurement:length_metric'&&JSON.stringify(o.forms)==='[0]'&&/\bm and cm|exchange with 100/.test(w))return true;
+  if(/:mult_zeros$/.test(e.key)&&/2-digit number by a 1-digit/.test(w))return true;
+  if(/:div_facts$/.test(e.key)&&/mult_facts \{constant/.test(e.why))return true;
+  if(/counting in 5s and 10s|counting in 2s, 5s and 10s/.test(w)&&o.rows&&!o.rows.some(r=>r.step===5))return true;
+  return false;}
 const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
 const usedProps=new Set();const missingReview=[];
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
@@ -196,7 +219,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];const sw=SW[e.key];if(!sw||(sw.only&&!sw.only.test(s.id))||(sw.not&&sw.not.test(s.id)))continue;
     if(sw.preBuild&&list===pre&&!build.includes(sw.preBuild)&&!preBuild.includes(sw.preBuild)){preBuild.push(sw.preBuild);usedProps.add(sw.preBuild);}
     if(!sw.to){list.splice(j,1);continue;}
-    list[j]={key:sw.to,why:sw.to===e.key?`${e.why} [rule 18: opts ${JSON.stringify(sw.opts||{})} for this pupil]`:`${e.why} [rule 18: ${e.key.split(':')[1]} deals content above this pupil; ${sw.to.split(':')[1]} instead]`,opts:sw.opts||{}};}
+    list[j]={key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id),opts:sw.opts||{},swapped:true};}
   for(const list of [pre,related]){const seen=new Set(list===related?pre.map(x=>x.key):[]);for(let j=0;j<list.length;j++){const k=list[j].key;if(allDirect.has(k)||seen.has(k)){list.splice(j,1);j--;}else seen.add(k);}}
   if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(allDirect.has(k)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);pre.push({key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}});}
   // r5 (rules 18-19): every link must be content met by this step's SCHOOL week. A pre that cites a step of this year
@@ -207,7 +230,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     if(c.length)return c.some(x=>!taughtBefore(x,s.id))&&!c.some(x=>taughtBefore(x,s.id));
     return (keyFirstWk[e.key]??0)>(SWK[s.id]??999)+1&&!/Y\d\.|R\./.test(e.why);};
   const fixLink=(e)=>{if(!markerHits(e.key,e.opts,s.id).length)return e;
-    for(const alt of OV.markerFix?.[YEAR]?.[e.key]||[]){const ne={key:alt.key||e.key,why:e.why+(alt.key&&alt.key!==e.key?` [rule 19: ${e.key.split(':')[1]} deals content taught later; ${alt.key.split(':')[1]} instead]`:` [rule 19: opts ${JSON.stringify(alt.opts||{})} keep it to content met by this week]`),opts:alt.opts||{}};
+    for(const alt of OV.markerFix?.[YEAR]?.[e.key]||[]){const ne={key:alt.key||e.key,why:descWhy(alt.key||e.key,alt.opts||{},s.id),opts:alt.opts||{}};
       if(!allDirect.has(ne.key)&&!markerHits(ne.key,ne.opts,s.id).length)return ne;}
     return null;};
   const dropped=[];
@@ -218,7 +241,12 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}};if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
   // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
   for(const e of pre){for(const x of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0]))if(x.startsWith(YEAR+'.')&&!taughtBefore(x,s.id)){const q=x.replace(/\./g,'\\.');e.why=e.why.replace(new RegExp('\\s*/\\s*'+q),'').replace(new RegExp(q+'\\s*/\\s*'),'');}}
+  for(const e of [...pre,...related]){if(e.swapped&&e.why.includes('[rule'))e.why=descWhy(e.key,e.opts,s.id);delete e.swapped;
+    e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');if(whyMismatch(e))e.why=descWhy(e.key,e.opts,s.id);}
   pre.splice(8);related.splice(6);
+  // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
+  for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))
+    if(!(o.neverNamed||[]).includes(d.key))console.error('NEVERDIRECT',s.id,verdict,d.key,JSON.stringify(d.opts||{}),h.m,h.ex);
   if(process.argv.includes('--dropped')&&dropped.length)console.error('DROPPED',s.id,dropped.join('; '));
   if(!related.length&&!o.relNote)console.error('NOREL(after linkFix)',s.id,s.title);
   if(pre.length<3)console.error('THINPRE(after linkFix)',s.id,s.title,pre.length);

@@ -895,3 +895,68 @@ const NOREL3 = {
 for (const [id, n] of Object.entries(NOREL3)) r3[id] = { ...(r3[id] || {}), relNote: n };
 r3['Y2.B5.S1'] = { ...(r3['Y2.B5.S1'] || {}), relNote: 'no related skill beyond the pre list: in school order the 5 and 10 times-tables (W26) come before this step (W27), so they are pre; sharing and grouping are pre' };
 r3['Y2.B9.S1'] = { ...(r3['Y2.B9.S1'] || {}), related: [], relNote: 'no related skill met by this week: quarter past and to (W36) and 5-minute times (W37) come later (rule 19); half of a shape and clock parts are pre' };
+
+// ======================= round 6 (critic Y2-Y3 r5: marker blind spots, S11 stale whys, direct never-in-grade) =======
+for (const Y of ['Y2', 'Y3']) { linkOpts[Y]['measurement:estimate_length'] = { forms: [0] }; markerFix[Y]['measurement:estimate_length'] = [{ opts: { forms: [0] } }]; }
+linkSwap.Y3['multiplication:mult_properties'] = { to: null, preBuild: 'props_tables' };   // no table option: ×6/×7 splits
+linkSwap.Y3['multiplication:mult_div_fact_family'] = { to: 'multiplication:mult_facts', opts: { constant: [2, 3, 4, 5, 8, 10], band: 100 } };
+markerFix.Y3['multiplication:mult_zeros'] = [{ opts: { forms: [0] } }];
+markerFix.Y3['multiplication:nl_mult'] = [{ opts: { constant: [3], band: 50 } }, { opts: { constant: [4], band: 50 } }, ...markerFix.Y3['multiplication:nl_mult']];
+markerFix.Y3['measurement:money_change'] = [{ opts: { currency: 'usd', step: 100, paid: 'note', band: 2000 } }];
+Object.assign(linkFix, {
+  'Y2.B1.S11': { 'measurement:estimate_length': null }, 'Y3.B11.S4': { ...(linkFix['Y3.B11.S4'] || {}), 'measurement:estimate_length': null },
+  'Y3.B3.S7': { 'multiplication:mult_zeros': { forms: [0] } },
+  'Y3.B3.S8': { 'multiplication:nl_mult': { constant: [3], band: 50 } }, 'Y3.B3.S9': { 'multiplication:nl_mult': { constant: [4], band: 50 } }, 'Y3.B3.S11': { 'multiplication:nl_mult': { constant: [4], band: 50 } },
+  'Y3.B3.S4': { 'multiplication:count_by_tables': ZR(5, 10) }, 'Y3.B3.S13': { 'multiplication:count_by_tables': ZR(8) },
+  'Y3.B2.S19': { 'measurement:money_change': { currency: 'usd', step: 100, paid: 'note', band: 2000 } },
+  'Y3.B6.S4': { 'shapes_early:shape_corners_count': null, 'shapes_early:count_sides_vertices_2d': null },
+  'Y3.B7.S3': { ...(linkFix['Y3.B7.S3'] || {}), 'measurement:length_metric': { forms: [1] } }, 'Y3.B7.S4': { 'measurement:length_metric': { forms: [1] } },
+  'Y3.B1.S13': { 'measurement:order_clocks_digital_asc': null },
+});
+const NN = (id, keys, extra = {}) => { r3[id] = { ...(r3[id] || {}), neverNamed: keys, ...extra }; };
+NN('Y2.B3.S7', ['shapes_early:compose_from_attributes'], { partials: [P('shapes_early:compose_from_attributes', 'sorts by attributes that include right angles and parallel sides ("4 right angles", "no parallel sides"), which Grade 1 never meets; sorting 2-D shapes into labelled groups by number of sides or corners is not dealt')] });
+NN('Y3.B4.S2', ['multiplication:mult_zeros'], { direct: [], partials: [P('multiplication:mult_zeros', 'related calculations with a multiple of 10 (3 × 4 = 12, so 30 × 4 = 120) are dealt, but ×6, ×7 and ×9 facts beyond the Grade 2 tables appear too (7 × 60, 70 × 7, 3 × 60); a page on the 2, 3, 4, 5, 8 and 10 tables only is not available')], verdict: 'partial', build: ['zeros_tables'] });
+NN('Y3.B4.S3', ['multiplication:mult_properties']); NN('Y3.B4.S4', ['multiplication:multiply', 'multiplication:area_model_mult']); NN('Y3.B4.S5', ['multiplication:multiply', 'multiplication:area_model_mult']);
+NN('Y3.B7.S9', ['measurement:capacity']); NN('Y3.B8.S5', ['fractions:fraction_of_set_nv'], { note: 'fraction_of_set_nv: the only beyond-grade hit is a "10 ÷ 6" distractor among the choices' });
+NN('Y3.B4.S6', ['division:missing_mult_div', 'multiplication:mult_div_fact_family'], { direct: [], partials: [
+  P('division:missing_mult_div', 'missing-number × and ÷ sentences, but ÷6, ÷7, ÷9, ×11 and ÷12 items beyond the Grade 2 tables appear (84 ÷ 7, 7 × 11, ___ × 6 = 72, 108 ÷ 12)'),
+  P('multiplication:mult_div_fact_family', 'fact families, but with ×6, ×7, ×9 and ×11 facts (6, 7, 42; 9, 11, 99) beyond the Grade 2 tables')], verdict: 'partial', build: ['muldiv_tables'] });
+NN('Y3.B4.S10', ['multiplication:mult_comparison'], { direct: [], partials: [P('multiplication:mult_comparison', '"times as many" stories, but with ×6, ×7 and ×9 facts (6 times as many as 6; 63 is 9 times as many) beyond the Grade 2 tables')], verdict: 'partial', build: ['comparison_tables'] });
+Object.assign(proposals, {
+  zeros_tables: { kind: 'option', skill: 'multiplication:mult_zeros', option: 'constant: the single-digit factor from the 2, 3, 4, 5, 8 and 10 tables only', name: 'Related Calculations Within the Grade 2 Tables (option)',
+    teaches: 'using a known table fact to multiply a multiple of 10 (3 × 4 = 12, so 30 × 4 = 120), with facts from the Grade 2 tables only',
+    representation: 'the existing two-line cell: the known fact above, the related calculation below with base-10 rods; answer box', family: 'operations', steps: ['Y3.B4.S2'], ccss: ['3.NBT.A.3'], why: 'mult_zeros form 2 deals 70 × 7 and 3 × 60' },
+  muldiv_tables: { kind: 'option', skill: 'division:missing_mult_div', skills: ['division:missing_mult_div', 'multiplication:mult_div_fact_family'], option: 'constant: the 2, 3, 4, 5, 8 and 10 tables only', name: 'Link × and ÷ Within the Grade 2 Tables (option)',
+    teaches: 'writing the multiplication and division facts of one array or fact family (4 × 5 = 20, 20 ÷ 4 = 5) and finding a missing factor, using the Grade 2 tables only',
+    representation: 'the existing fact-family cell (three numbers in a triangle, four sentences to complete) and missing-number sentences', family: 'operations', steps: ['Y3.B4.S6'], ccss: ['3.OA.B.6', '3.OA.C.7'], why: 'both skills deal ×6, ×7, ×9, ×11 and ÷12 facts (84 ÷ 7, 9, 11, 99); `range` is ignored' },
+  comparison_tables: { kind: 'option', skill: 'multiplication:mult_comparison', option: 'constant: the scale factor from 2, 3, 4, 5, 8 and 10 only', name: 'Scaling Within the Grade 2 Tables (option)',
+    teaches: 'solving "times as many / times as long" stories with a scale factor from the Grade 2 tables (4 times as many as 5)',
+    representation: 'the existing story cell with a bar model of the two amounts; answer box', family: 'operations', steps: ['Y3.B4.S10'], ccss: ['3.OA.A.3'], why: 'mult_comparison deals 6 times as many as 6 and 63 = 9 × 7' },
+});
+// step fixes
+Object.assign(r3, {
+  'Y2.B9.S6': { ...r3['Y2.B9.S6'], core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0: 12 fives make the 60 minutes (xlsx W23 prior learning)', ZR(5))] },
+  'Y2.B8.S12': { ...(r3['Y2.B8.S12'] || {}), partials: [P('fractions:equiv_frac_visual', 'denoms [2] is the halves family: it deals 3/4 = 12/16, sixths, twelfths and eighths (and 5/3 choices); a page of 1/2 = 2/4 only is not available', { denoms: [2] })] },
+  'Y2.B8.S13': { ...(r3['Y2.B8.S13'] || {}), partials: [P('shapes_early:partition_shapes', 'quarters shapes: shades 1/4, 2/4 and 3/4, not three-quarters alone', { parts: [2] }), P('fractions:identify', 'denoms [2] is the halves family: it deals eighths (1/8, 7/8) and fifths among the choices (2/5), not 3/4 alone', { denoms: [2] })] },
+  'Y3.B4.S4': { ...r3['Y3.B4.S4'], neverNamed: ['multiplication:multiply', 'multiplication:area_model_mult'], dropPre: ['division:div_remainders'],
+    core: [C('multiplication:mult_zeros', 'Y3.B4.S1 / Y3.B4.S2 multiples of 10 and related calculations: 20 × 3', { forms: [0, 2] }), C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3', { band: 99 })] },
+  'Y3.B4.S7': { ...r3['Y3.B4.S7'], core: [C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 3, 4 and 8', { constant: [3, 4, 8] })] },
+  'Y3.B2.S21': { ...(r3['Y3.B2.S21'] || {}), core: [C('addition:add_sub_fact_family', 'Y2.B2.S3 related facts: the inverse as a fact family', { range: 100 }), C('subtraction:missing_add_sub', 'Y2.B2.S21 missing-number problems'), C('addition:cloze_addition', 'Y2.B2.S21 missing-number additions')] },
+  'Y3.B6.S1': { ...(r3['Y3.B6.S1'] || {}), relNote: undefined, related: [R('fractions:write_fraction', 'the numerator of a non-unit fraction (Y3.B6.S3, the same week): the next idea', { denoms: [2, 3] })] },
+  'Y3.B7.S4': { ...(r3['Y3.B7.S4'] || {}), relNote: 'no related skill: the same exchange with capacity (l ↔ ml, W34) has no whole-number skill yet (metric_mass_capacity); capacity reads decimal litres' },
+  'Y3.B1.S13': { ...(r3['Y3.B1.S13'] || {}), relOnly: true, related: [R('number_sense:place_on_number_line', 'placing the numbers on a 0-1,000 line shows their order', { span: 100, band: 1000 })], relNote: undefined },
+});
+const DIVP = R('division:area_model_div_2by1', 'the inverse: dividing by partitioning (Y3.B4.S8)', { constant: [2, 3, 4, 5, 8] });
+Object.assign(relR3, {
+  'Y3.B6.S1': [R('composing:compose_whole', 'how many unit fractions make one whole (Y3.B6.S4)')],
+  'Y3.B4.S1': [R('multiplication:mult_chart_easy', 'the 10 row of a times-table chart', { constant: [10], band: 100 }), R('placevalue:unit_form', '12 tens = 120: the same multiple of 10 as place value', { band: 999 })],
+  'Y3.B4.S2': [R('placevalue:unit_form', '4 × 3 tens = 12 tens = 120: the same calculation as place value', { band: 999 }), DIVP],
+  'Y3.B4.S4': [DIVP], 'Y3.B4.S5': [DIVP],
+});
+r3['Y3.B1.S13'] = { ...r3['Y3.B1.S13'], related: [], relNote: 'no related skill: the number line to 1,000 (the other way to see the order) is earlier learning listed as pre; ordering other kinds of numbers is above Grade 2' };
+// teacher-facing wording for a skill that a swap puts in place of another (descWhy)
+export const whyText = { 'measurement:time_half_hour': 'half past: the minute hand makes a half turn of the clock', 'shapes_early:partition_shapes': 'equal parts of a shape' };
+linkFix['Y3.B2.S19'] = { 'measurement:money_change': null };
+r3['Y3.B3.S12'] = { ...(r3['Y3.B3.S12'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S9 multiplying by 4: double the 4 times-table to get the 8s', { constant: [4] })] };
+r3['Y3.B3.S12'] = { ...(r3['Y3.B3.S12'] || {}), core: [C(CBT, 'Y3.B3.S11 counting in 4s from 0: double each multiple of 4 to count in 8s', ZR(4))] };
+linkFix['Y3.B11.S1'] = { 'measurement:reading_ruler': null };

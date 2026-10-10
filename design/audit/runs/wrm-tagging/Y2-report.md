@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 5
+# Wave 2 tagging: Year 2 (US Grade 1) — round 6
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -9,6 +9,43 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 | 124 | 63 | 36 | 25 | 10 | 37 | 52 | 75 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 6 (after critic Y2–Y3 r5, 7.70 / 7.44): marker blind spots, S11 whys, never-in-grade directs
+
+- **`markers.mjs`**: reads multiple-choice option labels for the never-in-grade markers (tables beyond the grade,
+  customary units, right angles / parallel sides), parses "Fact Family: a, b, c", samples 120 items per link over five
+  seed families (the critic's included), `mult2x1` no longer counts 11 × 3 / 12 × 4 (table facts) as 2-digit × 1-digit,
+  `ml_l` keyed to "Measure in litres" (W35), the critic's extra markers added (Y2 litres, metres, cm, money; Y3 ×3/×4
+  before W11 — 5 × 3 counts as a Grade 1 fact —, fraction compare, fractions on a line, fraction add, Roman numerals).
+  `NEVERDIRECT`: the never-in-grade markers also run on every step's OWN direct and partial skills; `build.mjs` reports
+  any hit not named in the step's missing clause.
+- **S11 (`build.mjs`)**: after any swap or markerFix the `why` is rebuilt from the skill and opts actually linked
+  (label + tables / count steps / parts / band + the step where it was taught before this one); a hand `why` that names
+  a table, a count step, a unit form or a quarter-past time the opts do not deal is rebuilt the same way; the
+  `[rule NN …]` bookkeeping is stripped from every teacher-facing `why` (0 left).
+- **S10 links**: `estimate_length {forms:[0]}` everywhere (forms 1 and 2 offer in/ft/mi); dropped on Y2.B1.S11 and
+  Y3.B11.S4. `mult_properties` dropped from Y3 links (`props_tables` preBuild); `mult_div_fact_family` links →
+  `mult_facts {constant:[2,3,4,5,8,10]}`; Y3.B3.S7 `mult_zeros {forms:[0]}`; Y3.B3.S8/S9/S11 `nl_mult {constant:[3]}` /
+  `[4]` band 50 restored; Y3.B4.S1/S2/S4/S5 related replaced (10 row of the chart, unit form, the inverse by
+  partitioning `area_model_div_2by1 {constant:[2,3,4,5,8]}`); Y3.B2.S19 `money_change` dropped.
+- **Direct verdicts**: Y3.B4.S6 → partial (÷7, ×11, ÷12, fact families 6, 7, 42) + new option `muldiv_tables`;
+  Y3.B4.S10 → partial (×6, ×9) + new option `comparison_tables`; Y3.B4.S2 → partial (70 × 7, 3 × 60 are common, not rare)
+  + new option `zeros_tables`; Y2.B3.S7 clause names right angles and parallel sides. Every NEVERDIRECT hit is now a
+  partial whose clause names it (Y2.B3.S7; Y3.B4.S2–S6, S10, B7.S9; Y3.B8.S5's only hit is a "10 ÷ 6" distractor).
+- **Step fixes**: Y2.B9.S6 counting in 5s leads pre; Y2.B8.S12 / S13 clauses name sixths, twelfths, 5/3 / eighths,
+  fifths; Y2.B11.S3 / S4 and the B8 half-past links say "half past: the minute hand makes a half turn"; Y3.B4.S4 leads
+  with `mult_zeros {forms:[0,2]}` and partitioning, `div_remainders` dropped; Y3.B4.S7 adds `div_facts {3,4,8}`;
+  Y3.B2.S21 leads with fact families and missing numbers; Y3.B6.S4 vertex counting dropped; Y3.B6.S1 related
+  `compose_whole` (no false note); Y3.B7.S4 note corrected (l ↔ ml is W34, before); Y3.B1.S13 clock link removed, note
+  added; counting rows match their whys (Y3.B3.S4 5s and 10s, B3.S12 4s doubled, B3.S13 8s); Y3.B7.S3 / S4
+  `length_metric {forms:[1]}` (m ↔ cm) to match "exchange with 100"; Y3.B11.S1 drops `reading_ruler`.
+- **Scans**: critic r5 `whyfit.mjs` **0 / 0**; `sys5.py` S10 links **Y2 0**, **Y3 6 — all six are the script's
+  hard-coded fact-family lines** (added unconditionally); the data has **no** `mult_div_fact_family` pre/related link
+  left (checked), and every direct/partial in its never-in-grade list is a partial whose clause names the content.
+  `scan8.mjs` raw: Y2 12 `thirds` (the 4/3 distractor in `partition_shapes`, which sys5 removes) + 1 named direct;
+  Y3 one `times34` (5 × 3 in the 5 times-table, which sys5 removes) + named directs. `prewk` 0 / 0, `fit` 0,
+  `optcheck` 0, `linkscan (week mode)` OK. The r4 `scan6.mjs` still flags `nl_mult {constant:[3]}` / `[4]` (11 × 3,
+  11 × 4) under its old `mult2x1` — the false positive r5 asked to fix and restore.
 
 ## Round 5 (after critic Y2–Y3 r4, 7.64 / 7.53): rule 19, school-week order
 
@@ -56,7 +93,7 @@ New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `sin
     3-digit column steps are no longer related before Y3.B2.S11; 1-digit facts across before S11.
   - Both years: every `coordinates:` link dropped. Steps left without a related skill got hand entries that share the
     idea (quarter / half past for quarter / half turns and fractions, `compose_shapes`, `between_tens`, the inverse
-    across-10 fact …); Y2.B11.S2–S4 say in `note` why none fits.
+    across-10 fact …); Y2.B11.S2 says in `note` why none fits (S3 / S4 now have a half-past related link).
 - **`linkscan.mjs`, rewritten**: week-relative by default (a link must fit the largest number the pupil has met by that
   school week, xlsx order, never below the previous year's range: K counts to 100, Grade 1 to 120), plus content and
   layout checks: Y2 denominators 2/3/4 only, Y3 compares sharing a numerator or denominator, no coordinate skills (no
