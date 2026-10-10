@@ -597,13 +597,13 @@
     "shapes_early:partition_shapes",
     "fractions:identify"
    ],
-   "proposal": "map_shape_partition_pick",
-   "note": "Sampled shapes_early:partition_shapes n=12: \"How many equal parts?\" / \"What fraction is shaded?\"; 0/12 equal-vs-unequal. Same residual as part C row \"Partition shapes into equal shares\": points at C's map_shape_partition_pick (defined in C). Options checked: partition_shapes variants count_parts / fraction_shaded.",
+   "proposal": "fraction_parts",
+   "note": "Sampled shapes_early:partition_shapes n=12: \"How many equal parts?\" / \"What fraction is shaded?\"; 0/12 equal-vs-unequal. Residual is equal-vs-unequal parts: reused WRM fraction_parts (C's map_shape_partition_pick is now choose-ALL only).",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_180: represents 1/2 with a diagram; identifies one-half from a region or set, RIT 171-180"
    },
-   "closes": "map_shape_partition_pick (part C) adds the equal-vs-unequal parts pick; counting parts and naming the shaded fraction are live."
+   "closes": "fraction_parts (WRM, new skill fractions:equal_parts) adds deciding whether parts are equal (tick equal / not equal) and drawing the whole from a half or quarter; counting parts and naming the shaded fraction are live in partition_shapes."
   },
   {
    "task": "Identify fraction of a shape (area model)",
@@ -2294,6 +2294,24 @@
     "taskType": "number entry; build from word tiles"
    },
    "mapClause": "screen production forms: expanded form typed into a frame (3 + 0.4 + 0.07); word form built from word tiles; never MC",
+   "reused": true
+  },
+  "fraction_parts": {
+   "kind": "new",
+   "skill": "fractions:equal_parts",
+   "name": "Equal and Unequal Parts",
+   "teaches": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "representation": "shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter",
+   "family": "fractions",
+   "ccss": [
+    "2.G.A.3",
+    "1.G.A.3"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "171-180",
+    "taskType": "equal or not; click"
+   },
    "reused": true
   }
  }
