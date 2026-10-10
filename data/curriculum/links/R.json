@@ -4675,6 +4675,95 @@
     }
    ],
    "note": ""
+  },
+  "R.B18.S1": {
+   "title": "Deepen understanding",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "a consolidation review across the Reception year",
+   "build": [
+    "consolidate"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 counting to 10"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 composition to 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 compare to 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S3 numbers to 20"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 add more"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 take away"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "counting"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "composition"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "compare"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "patterns"
+    }
+   ],
+   "note": "A review step: no single skill; served by a review pool."
+  },
+  "R.B18.S2": {
+   "title": "Patterns and relationships",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {},
+     "missing": "relationships between numbers (1 more, doubles, bonds)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "number relationships (1 more, doubles, bonds) reviewed together",
+   "build": [
+    "consolidate"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "1 more / 1 less"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "bonds"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "doubles"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5028,7 +5117,9 @@
    "representation": "a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content)",
    "family": "counting",
    "steps": [
-    "R.B13.S5"
+    "R.B13.S5",
+    "R.B18.S1",
+    "R.B18.S2"
    ],
    "ccss": [
     "K.CC.A.1"
