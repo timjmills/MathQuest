@@ -5990,6 +5990,379 @@
    ],
    "related": [],
    "note": ""
+  },
+  "Y2.B7.S1": {
+   "title": "Compare mass",
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W22)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W22)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W22)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S2 Measure in grams (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B7.S2": {
+   "title": "Measure in grams",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "reading a scale in grams with different scale steps"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading a scale in grams with different scale steps",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y2.B7.S1 Compare mass (step before in the block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S1 Unitising (prior learning wk W34)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_mass"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B7.S3": {
+   "title": "Measure in kilograms",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "reading a scale in kilograms"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading a scale in kilograms",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B7.S4": {
+   "title": "Four operations with mass",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S3 Measure in kilograms (step before in the block)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B7.S5": {
+   "title": "Compare volume and capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "capacity_early",
+    "time_units",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S6 Measure in millilitres (next step)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "same standard K.MD.A.2: Compare Attributes (Visual)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same standard K.MD.A.2: Heavier or Lighter? (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B7.S6": {
+   "title": "Measure in millilitres",
+   "direct": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "note": "millilitres"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "time_units",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B7.S7": {
+   "title": "Measure in litres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "reading a jug in litres"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading a jug in litres",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B7.S8": {
+   "title": "Four operations with volume and capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (step before in the block)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "time_units",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:temperature",
+     "why": "Y2.B7.S9 Temperature (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B7.S9": {
+   "title": "Temperature",
+   "direct": [
+    {
+     "key": "measurement:temperature",
+     "opts": {
+      "note": "Read the thermometer (°C)"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W22)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W22)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W22)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": ""
   }
  },
  "proposals": {
@@ -6560,6 +6933,126 @@
    ],
    "ccss": [
     "2.MD.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "mass_scales": {
+   "kind": "new",
+   "skill": "measurement:read_scales",
+   "name": "Read Scales (g, kg, ml, l)",
+   "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100",
+   "representation": "a drawn dial or jug scale; write the reading with the unit; option: scale step",
+   "family": "measurement",
+   "steps": [
+    "Y2.B7.S2",
+    "Y2.B7.S3",
+    "Y2.B7.S7",
+    "Y3.B7.S1",
+    "Y3.B7.S3",
+    "Y3.B7.S4",
+    "Y3.B7.S8"
+   ],
+   "ccss": [
+    "3.MD.A.2",
+    "4.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "nonstandard_capacity": {
+   "kind": "new",
+   "skill": "measurement:measure_capacity_cups",
+   "name": "Measure Capacity with Cups",
+   "teaches": "measuring capacity and volume with non-standard units (cups, spoons) and comparing",
+   "representation": "containers with a count of cups drawn beside them; write how many cups; circle the one that holds more",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S6",
+    "Y1.B8.S7"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "capacity_early": {
+   "kind": "new",
+   "skill": "comparing:compare_capacity",
+   "name": "Full, Empty, Holds More",
+   "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+   "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
+   "family": "measurement",
+   "steps": [
+    "R.B2.S3",
+    "R.B8.S3",
+    "R.B8.S4",
+    "Y1.B8.S4",
+    "Y1.B8.S5",
+    "Y2.B7.S5"
+   ],
+   "ccss": [
+    "K.MD.A.2",
+    "K.MD.A.1",
+    "3.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "mass_ops": {
+   "kind": "new",
+   "skill": "measurement:mass_capacity_word_problems",
+   "name": "Mass and Capacity Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "representation": "picture of scales/jugs with values; write the answer with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B7.S4",
+    "Y2.B7.S8",
+    "Y3.B7.S5",
+    "Y3.B7.S6",
+    "Y3.B7.S10",
+    "Y3.B7.S11"
+   ],
+   "ccss": [
+    "3.MD.A.2",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "time_units": {
+   "kind": "new",
+   "skill": "measurement:hours_minutes_seconds",
+   "name": "Hours, Minutes or Seconds?",
+   "teaches": "a sense of time units: which activities take seconds, minutes or hours",
+   "representation": "activity pictures with a unit word bank; option: longer/shorter",
+   "family": "measurement",
+   "steps": [
+    "Y1.B14.S4"
+   ],
+   "ccss": [
+    "1.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "day_order": {
+   "kind": "new",
+   "skill": "measurement:order_events",
+   "name": "First, Next, Then",
+   "teaches": "sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then)",
+   "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
+   "family": "measurement",
+   "steps": [
+    "R.B6.S4",
+    "R.B10.S6",
+    "Y1.B14.S1"
+   ],
+   "ccss": [
+    "1.MD.B.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
