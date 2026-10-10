@@ -84,12 +84,12 @@ None.
 
 - Grade 1, in workbook, not in preview: Measure length using objects
 - Grade 2, in workbook, not in preview: Count squares
-- Grade 3, in workbook, not in preview: Compare and order non-unit fractions
 - Grade 3, in workbook, not in preview: Multiplication - equal groups
+- Grade 3, in workbook, not in preview: Compare and order non-unit fractions
 - Grade 3, in workbook, not in preview: Sharing and grouping
 - Grade 4, in workbook, not in preview: Understand angles as turns
-- Grade 4, in workbook, not in preview: Identify angles
 - Grade 4, in workbook, not in preview: Parallel and perpendicular
+- Grade 4, in workbook, not in preview: Identify angles
 - Grade 4, in workbook, not in preview: Triangles
 - Grade 5, in workbook, not in preview: Cubic centimetres
 - Grade 5, in workbook, not in preview: Order and compare any decimals with up to 3 decimal places

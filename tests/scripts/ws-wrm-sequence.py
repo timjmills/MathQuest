@@ -331,6 +331,10 @@ def write_report(seq, rep):
 
 
 def compact_js(seq):
+    steps = load_steps()[0]
+    used = sorted({l['step'] for g in seq['grades'] for u in g['units'] for l in u['lessons'] if l['step']}, key=step_order)
+    used += sorted({p['step'] for g in seq['grades'] for w in g['weeks'].values() for p in w['prior'] if p['step'] and p['step'] not in used}, key=step_order)
+    drive = {sid: [(steps[sid].get('drive') or {}).get(k, '') for k in ('lesson', 'guide', 'video')] for sid in used}
     grades = []
     for g in seq['grades']:
         weeks = {k: [p['step'] for p in w['prior'] if p['step']] for k, w in g['weeks'].items()}
@@ -344,7 +348,9 @@ def compact_js(seq):
             '// domain-sequence workbook (data/curriculum/source/) and the curriculum-site preview. Never hand-edit.\n'
             '// Lesson tuple: [title, wrmStepId|null, ccss[], power(0/1), type (wr|copied|build|enrich), weeks[], strands, fromGrade].\n'
             '// prior: week -> WRM step ids of that week\'s prior-learning (support block) lessons, in the workbook\'s order.\n\n'
-            'export const WRM_SEQUENCE = [\n' + body + ',\n];\n')
+            'export const WRM_SEQUENCE = [\n' + body + ',\n];\n\n'
+            '// step id -> [lesson file id, teaching guide file id, video url] (Google Drive, the school\'s White Rose folder).\n'
+            'export const WRM_STEP_FILES = ' + json.dumps(drive, ensure_ascii=False, separators=(',', ':')) + ';\n')
 
 
 def main():

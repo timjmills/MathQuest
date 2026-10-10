@@ -1,0 +1,138 @@
+/* teacher-wrm.css — the "White Rose lessons" teacher screen (js/modules/teacher-wrm.js).
+   Teacher chrome only (colour UI on the --tv-* tokens of css/teacher.css); the skill thumbnails are
+   the shared black-and-white paper cells of teacher-preview.js. All targets are at least 44 px. */
+
+.tvw-body { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------------------------------------------------------------- find: search + grade + unit */
+.tvw-find { display: flex; flex-direction: column; gap: 12px; }
+.tvw-search { position: relative; max-width: 640px; }
+.tvw-search .tv-input { height: 48px; font-size: 16px; width: 100%; }
+.tvw-hits {
+    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 6px;
+    list-style: none; background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(20, 20, 30, .12); max-height: 360px; overflow-y: auto;
+}
+.tvw-hits[hidden] { display: none; }
+.tvw-hit {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-height: 48px;
+    padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; text-align: left; cursor: pointer; color: var(--tv-text);
+}
+.tvw-hit:hover, .tvw-hit:focus-visible { background: var(--tv-accent-tint); }
+.tvw-hit-t { font-size: 15px; line-height: 20px; font-weight: 600; }
+.tvw-hit-m, .tvw-hit-none { font-size: 13px; line-height: 18px; color: var(--tv-caption); }
+.tvw-hit-none { padding: 10px; }
+
+.tvw-pick { display: flex; flex-direction: column; gap: 8px; }
+.tvw-pickrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tvw-pick-h { flex: none; width: 52px; font-size: 13px; line-height: 16px; font-weight: 700; color: var(--tv-caption); text-transform: uppercase; letter-spacing: .04em; }
+.tvw-pickrow .tv-chips { gap: 6px; }
+.tvw-pickrow .tv-chip { min-width: 48px; height: 44px; font-size: 16px; }
+.tv-chip.tvw-unit { display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; width: auto; }
+.tv-chip.tvw-unit b { font-weight: 800; }
+.tv-chip.tvw-unit span { font-size: 14px; font-weight: 500; white-space: nowrap; }
+
+/* ---------------------------------------------------------------- lessons | detail */
+.tvw-grid { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.tvw-lessons {
+    position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 12px 8px 12px;
+}
+.tvw-unit-title { margin: 0; padding: 4px 8px; }
+.tvw-sub-h { margin: 12px 8px 4px; font-size: 13px; line-height: 16px; font-weight: 700; color: var(--tv-caption); }
+.tvw-pad { margin: 0; padding: 2px 8px 8px; }
+.tvw-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.tvw-lesson {
+    display: grid; grid-template-columns: 28px minmax(0, 1fr); grid-template-areas: "n t" "n c";
+    column-gap: 8px; row-gap: 2px; width: 100%; min-height: 52px; padding: 8px; border: 1px solid transparent;
+    border-radius: 8px; background: transparent; text-align: left; cursor: pointer; color: var(--tv-text);
+}
+.tvw-lesson:hover { background: var(--tv-subtle-2); }
+.tvw-lesson[aria-current="true"] { background: var(--tv-accent-tint); border-color: var(--tv-accent); }
+.tvw-n { grid-area: n; font-size: 14px; line-height: 20px; font-weight: 700; color: var(--tv-caption); text-align: right; font-variant-numeric: tabular-nums; }
+.tvw-lt { grid-area: t; display: flex; flex-direction: column; min-width: 0; }
+.tvw-lt-title { font-size: 15px; line-height: 20px; font-weight: 600; }
+.tvw-lt-meta { font-size: 12px; line-height: 16px; color: var(--tv-caption); }
+.tvw-count { grid-area: c; font-size: 12px; line-height: 16px; font-weight: 700; color: var(--tv-accent); }
+.tvw-count.is-gap { color: var(--tv-danger); font-weight: 600; }
+
+.tvw-tag {
+    display: inline-flex; align-items: center; min-height: 22px; padding: 1px 8px; border-radius: 6px;
+    font-size: 12px; line-height: 16px; font-weight: 600; background: var(--tv-subtle); color: var(--tv-text-2);
+}
+.tvw-tag.tvw-power { background: #fdf0d5; color: #7a4b00; }
+.tvw-tag.tvw-code { font-family: var(--tv-mono); font-weight: 500; }
+.tvw-tag.tvw-ee { background: transparent; border: 1px solid var(--tv-border); }
+.tvw-tag.tvw-part { background: #fdecea; color: var(--tv-danger); }
+.tvw-lt-meta .tvw-tag { min-height: 18px; padding: 0 6px; font-size: 11px; }
+
+/* ---------------------------------------------------------------- detail */
+.tvw-detail { display: flex; flex-direction: column; gap: 16px; min-width: 0; scroll-margin-top: 16px; }
+.tvw-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 48px 24px; }
+.tvw-head { display: flex; flex-direction: column; gap: 10px; }
+.tvw-kicker { margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-caption); }
+.tvw-title { margin: 0; }
+.tvw-title-n { color: var(--tv-caption); font-weight: 600; margin-right: 4px; }
+.tvw-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tvw-files { display: flex; flex-wrap: wrap; gap: 8px; }
+.tvw-files .tv-btn { text-decoration: none; }
+.tvw-verdict { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--tv-text-2); }
+.tvw-verdict.is-gap { color: var(--tv-danger); }
+.tvw-tbb { margin: 4px 0 0; font-size: 13px; line-height: 18px; color: var(--tv-caption); font-style: italic; }
+
+.tvw-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tvw-viewtog { margin-left: auto; }
+
+.tvw-group { display: flex; flex-direction: column; gap: 10px; background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; padding: 16px; }
+.tvw-group-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tvw-group-head .tv-h3 { margin: 0; }
+.tvw-group-head .tv-cap { margin: 2px 0 0; }
+.tvw-n-sm { display: inline-block; min-width: 24px; padding: 0 6px; border-radius: 12px; background: var(--tv-subtle); font-size: 13px; text-align: center; color: var(--tv-text-2); }
+.tvw-none { margin: 0; padding: 12px; border: 1px dashed var(--tv-border); border-radius: 8px; font-size: 14px; color: var(--tv-text-2); }
+
+/* list rows */
+.tvw-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.tvw-row { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 6px; border-radius: 8px; border: 1px solid var(--tv-rule); }
+.tvw-row.is-on { border-color: var(--tv-selected); background: var(--tv-subtle-2); }
+.tvw-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tvw-row-name { font-size: 15px; line-height: 20px; font-weight: 600; }
+.tvw-row-meta, .tvw-card-meta { font-size: 12px; line-height: 16px; color: var(--tv-caption); }
+.tvw-why { color: var(--tv-caption); }
+.tvw-tick { flex: none; min-width: 44px; min-height: 44px; justify-content: center; }
+.tvw-q { flex: none; display: inline-flex; gap: 4px; }
+.tvw-q .tv-btn { height: 44px; padding: 0 10px; }
+
+/* thumbnails */
+.tvw-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tvw-card { min-width: 0; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 10px; border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface); }
+.tvw-card.is-on { border: 1.5px solid var(--tv-selected); }
+.tvw-card-top { display: flex; align-items: center; gap: 4px; }
+.tvw-card-name { font-size: 14px; line-height: 18px; font-weight: 600; min-width: 0; }
+.tvw-thumbbtn { overflow: hidden; display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.tvw-card-meta { margin: 0; }
+.tvw-card .tvw-q { justify-content: flex-start; }
+
+/* the sticky action bar sits inside the detail column (not the whole screen) */
+.tv-actionbar.tvw-bar { margin: 0; padding: 10px 16px; border: 1px solid var(--tv-border); border-radius: 12px; }
+.tvw-linkbox { display: flex; flex-direction: column; gap: 2px; flex: 1 1 240px; min-width: 0; }
+.tvw-linkrow { display: flex; gap: 8px; min-width: 0; }
+.tvw-link-l { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-text-2); }
+.tvw-link { flex: 1; min-width: 0; height: 44px; font-family: var(--tv-mono); font-size: 13px; }
+.tvw-bar-btns .tv-btn { height: 48px; }
+.tv-actionbar.tvw-bar { flex-wrap: nowrap; }
+.tvw-group-head .tv-check { flex: none; white-space: nowrap; }
+@media (max-width: 760px) { .tv-actionbar.tvw-bar { flex-wrap: wrap; } }
+
+@media (max-width: 1023px) {
+    .tvw-grid { grid-template-columns: minmax(0, 1fr); }
+    .tvw-lessons { position: static; max-height: 360px; }
+}
+@media (max-width: 600px) {
+    .tvw-pick-h { width: auto; }
+    .tvw-q .tv-btn span { display: none; }
+    .tvw-viewtog { margin-left: 0; }
+}
+
+/* dark mode: the warm tags keep their contrast */
+html.dark body.teacher-mode .tvw-tag.tvw-power { background: #4a3a12; color: #ffe2a3; }
+html.dark body.teacher-mode .tvw-tag.tvw-part { background: #4a1f1c; color: #ffc4be; }
+.tvw-thumbbtn .tvp-frame { display: block; width: 100%; }

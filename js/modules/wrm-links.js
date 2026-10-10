@@ -28,6 +28,9 @@ import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
 // verdict, missing, build / preBuild proposal ids, pre and related. The page fetches the year files
 // and hands them in with addCuratedYear(); a missing year or step falls back to the rules below.
+// The years whose curated file exists (the page fetches only these, so a missing file never costs a
+// failed request). Add a year here in the same change that adds its file; ws-wrm-page-unit checks both agree.
+export const CURATED_YEARS = [];
 const CURATED = new Map();       // step id -> record
 const CURATED_PROPOSALS = {};    // proposal id -> { name, ... }
 export function addCuratedYear(data) {

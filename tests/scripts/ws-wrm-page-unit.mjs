@@ -1,10 +1,10 @@
 // ws-wrm-page-unit.mjs — node unit test for the White Rose page data: the GENERATED sequence
 // (wrm-sequence-db.js) and the link rules (wrm-links.js). Run: node tests/scripts/ws-wrm-page-unit.mjs
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
-    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES } from '../../js/modules/wrm-links.js';
+    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, CURATED_YEARS } from '../../js/modules/wrm-links.js';
 
 let fails = 0;
 const ok = (c, msg) => { if (!c) { fails += 1; console.log('FAIL', msg); } };
@@ -59,6 +59,10 @@ ok(proposalName('pattern_make') === 'Make a Pattern', 'WRM_PROPOSALS name');
 ok(linksFor('2:D1:2').source === 'rules', 'absent step falls back to rules');
 clearCurated();
 ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
+// the curated year files on disk and CURATED_YEARS agree
+const dir = new URL('../../data/curriculum/links/', import.meta.url);
+const onDisk = existsSync(dir) ? readdirSync(dir).filter((f) => /^(R|Y[1-6])\.json$/.test(f)).map((f) => f.replace('.json', '')).sort() : [];
+ok(JSON.stringify(onDisk) === JSON.stringify([...CURATED_YEARS].sort()), `CURATED_YEARS ${JSON.stringify(CURATED_YEARS)} = files on disk ${JSON.stringify(onDisk)}`);
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');
 ok(searchLessons('3.NF.A.1').length > 0, 'search by CCSS code');

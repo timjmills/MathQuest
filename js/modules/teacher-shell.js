@@ -33,9 +33,10 @@ import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './t
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
 import { renderLibraryScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
+import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
-const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'quizzes', 'map', 'settings', 'progress'];
+const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
 // (the legacy views stay for their old entry points; pupils never reach the navigator).
 const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
@@ -48,7 +49,7 @@ const SCREEN_KEY = 'mq_teacher_screen';
 
 const BOARD_WINDOW = (() => { try { return new URLSearchParams(location.search).get('board') === '1'; } catch (e) { return false; } })();
 
-let current = (() => { try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : 'home'; } catch (e) { return 'home'; } })();
+let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : 'home'; } catch (e) { return 'home'; } })();
 let started = false;
 
 /* ================================================================= routing */
@@ -87,6 +88,8 @@ function showScreen(key) {
     if (BOARD_WINDOW) return;
     document.body.classList.add('tv-on-screen');
     document.body.classList.remove('tv-play', 'tv-bigboard');
+    // The White Rose screen keeps its place in the URL hash (#wrm/...); every other screen drops it.
+    if (key !== 'wrm') clearWrmHash();
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
     setNavCurrent(key);
     const el = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
@@ -235,6 +238,13 @@ function start() {
         const hit = (list) => [...list].some((n) => n.nodeType === 1 && LEGACY_OVERLAYS.includes(n.id));
         if (records.some((r) => hit(r.addedNodes) || hit(r.removedNodes))) { watchOverlays(); syncInert(); }
     }).observe(document.body, { childList: true });
+
+    // A #wrm/... link (bookmark, Back, Forward) opens the White Rose screen at that lesson.
+    window.addEventListener('hashchange', () => {
+        if (!isTeacher() || !wrmHashActive()) return;
+        if (current !== 'wrm' || !document.body.classList.contains('tv-on-screen')) tvGo('wrm');
+        else wrmOnHashChange();
+    });
 
     document.getElementById('teacherApp')?.addEventListener('click', (e) => {
         const a = e.target.closest('[data-tv-go]');
@@ -977,6 +987,7 @@ const RENDER = {
     print: renderPrintScreen,
     run: renderRun,
     library: renderLibraryScreen,
+    wrm: renderWrmScreen,
     map: renderMapScreen,
     quizzes: renderQuizzes,
     settings: renderSettings,
