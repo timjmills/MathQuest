@@ -262,3 +262,5 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   half cell; the key's answer digits need about 4 mm more row height than the pupil page.
 - 2026-10-09 div_facts forms fix round 3: builder escalated to Opus medium (the ceiling) - Mix at size L wasted space (critic R1 D14, R2 D-A) survived two Opus-low rounds.
 
+- 2026-10-10: answer-key options deployed (e58f15fa via 498d8710): critic r5 PASS, full gates green (c2phone passed on rerun, print-lint at its 463/33 baseline), stamp OK, live serves the new modules.
+- 2026-10-10 White Rose page (recommended answers kept, per owner): the 13 lessons that map to another year's WRM step stay mapped and are listed in MAPPING_REPORT; Kindergarten's two duplicate titles (1 more, 1 less; Partition into tens and ones) resolve to the nearest block.
