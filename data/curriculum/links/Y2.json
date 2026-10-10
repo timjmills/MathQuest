@@ -7896,6 +7896,414 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B10.S1": {
+   "title": "Make tally charts",
+   "direct": [
+    {
+     "key": "graphs:tally_chart",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W24)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W24)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W24)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (prior learning wk W24)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W24)"
+    }
+   ],
+   "preBuild": [
+    "sort_groups"
+   ],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 1.MD.C.4: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 1.MD.C.4: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_pictograph",
+     "why": "same standard 1.MD.C.4: Build a Pictograph"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S2": {
+   "title": "Tables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and completing simple tables and tally-to-number tables",
+   "build": [
+    "table_data"
+   ],
+   "pre": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2.B10.S1 Make tally charts (step before in the block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 1.MD.C.4: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 1.MD.C.4: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_pictograph",
+     "why": "same standard 1.MD.C.4: Build a Pictograph"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S3": {
+   "title": "Block diagrams",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and drawing block diagrams (one square = one) with a scale in 1s or 2s",
+   "build": [
+    "block_diagram"
+   ],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W25)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W25)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W25)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (prior learning wk W25)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W25)"
+    }
+   ],
+   "preBuild": [
+    "match_same"
+   ],
+   "related": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "Y2.B10.S4 Draw pictograms (1-1) (next step)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 1.MD.C.4: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 1.MD.C.4: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "same standard 1.MD.C.4: Tally Charts"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S4": {
+   "title": "Draw pictograms (1-1)",
+   "direct": [
+    {
+     "key": "graphs:build_pictograph",
+     "opts": {
+      "note": "each picture = 1"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W25)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W25)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W25)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (prior learning wk W25)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W25)"
+    }
+   ],
+   "preBuild": [
+    "match_same"
+   ],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (next step)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 1.MD.C.4: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "same standard 1.MD.C.4: Tally Charts"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S5": {
+   "title": "Interpret pictograms (1-1)",
+   "direct": [
+    {
+     "key": "measurement:pictograph_intro",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "Y2.B10.S4 Draw pictograms (1-1) (step before in the block)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W25)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W25)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W25)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (prior learning wk W25)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W25)"
+    }
+   ],
+   "preBuild": [
+    "match_same"
+   ],
+   "related": [
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 1.MD.C.4: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "same standard 1.MD.C.4: Tally Charts"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S6": {
+   "title": "Draw pictograms (2, 5 and 10)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:build_pictograph",
+     "missing": "a key where one picture stands for 2, 5 or 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a key where one picture stands for 2, 5 or 10",
+   "build": [
+    "pictogram_scale"
+   ],
+   "pre": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (step before in the block)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W37)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W37)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "graphs:pictograph",
+     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (next step)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 2.MD.D.10: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "same standard 3.MD.B.3: Bar Graphs"
+    },
+    {
+     "key": "graphs:pie_chart",
+     "why": "same standard 3.MD.B.3: Pie Charts"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B10.S7": {
+   "title": "Interpret pictograms (2, 5 and 10)",
+   "direct": [
+    {
+     "key": "graphs:pictograph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "Y2.B10.S6 Draw pictograms (2, 5 and 10) (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S8 Find a quarter of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 2.MD.D.10: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 2.MD.D.10: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "same standard 3.MD.B.3: Bar Graphs"
+    },
+    {
+     "key": "graphs:pie_chart",
+     "why": "same standard 3.MD.B.3: Pie Charts"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -8644,6 +9052,94 @@
    "ccss": [
     "1.MD.B.3",
     "4.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "sort_groups": {
+   "kind": "new",
+   "skill": "comparing:sort_into_groups",
+   "name": "Sort into Groups",
+   "teaches": "sorting objects by one attribute (kind, colour, size, shape) into labelled groups, then saying the sorting rule",
+   "representation": "picture tiles and two or three labelled sorting rings; write the letter of each tile in its ring; option: rule given or rule found",
+   "family": "counting",
+   "steps": [
+    "R.B1.S4",
+    "R.B1.S5",
+    "R.B1.S6",
+    "Y1.B1.S1"
+   ],
+   "ccss": [
+    "K.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "table_data": {
+   "kind": "new",
+   "skill": "graphs:read_and_make_tables",
+   "name": "Tables",
+   "teaches": "reading and completing simple tables and tally-to-number tables",
+   "representation": "a two-column table with blanks; fill in the counts; answer one question",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S2",
+    "Y5.B9.S3"
+   ],
+   "ccss": [
+    "1.MD.C.4",
+    "4.OA.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "match_same": {
+   "kind": "new",
+   "skill": "counting:match_same",
+   "name": "Match the Same",
+   "teaches": "matching identical objects and pictures one to one (the first step before sorting and counting)",
+   "representation": "two columns of line-drawn pictures; draw a line to join each pair that is the same",
+   "family": "counting",
+   "steps": [
+    "R.B1.S1",
+    "R.B1.S2"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "block_diagram": {
+   "kind": "new",
+   "skill": "graphs:block_diagrams",
+   "name": "Block Diagrams",
+   "teaches": "reading and drawing block diagrams (one square = one) with a scale in 1s or 2s",
+   "representation": "a squared grid with labelled columns; count the blocks or colour to build",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S3"
+   ],
+   "ccss": [
+    "1.MD.C.4",
+    "2.MD.D.10"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "pictogram_scale": {
+   "kind": "option",
+   "skill": "graphs:build_pictograph",
+   "option": "key 2, 5, 10",
+   "name": "Pictograms with a Key (option)",
+   "teaches": "drawing pictograms where one picture stands for 2, 5 or 10, including half pictures",
+   "representation": "a key option (1, 2, 5, 10) on build_pictograph",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S6",
+    "Y3.B12.S2"
+   ],
+   "ccss": [
+    "2.MD.D.10",
+    "3.MD.B.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
