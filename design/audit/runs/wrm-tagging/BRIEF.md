@@ -117,3 +117,5 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
 18. PRE and RELATED links carry opts too: a pre/related skill with its defaults must deal numbers and layouts a pupil of
     THIS step can do (no "1 more than 69", 3-digit compare or column layouts for PK/K). Set band/range/forms on the link,
     or choose another skill.
+    Rule 18 is checked PER STEP: a link's generated items must fit the step's own dealt maximum and its school week — a
+    year-wide ceiling is not enough (Y4 critic r4).
