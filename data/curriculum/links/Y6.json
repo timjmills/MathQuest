@@ -1947,6 +1947,395 @@
    ],
    "note": ""
   },
+  "Y6.B4.S1": {
+   "title": "Multiply fractions by integers",
+   "direct": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "multiplying a mixed number by an integer (2 1/3 x 4)",
+   "build": [
+    "mult_mixed_int"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "convert the improper product"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "repeated addition of fractions"
+    }
+   ],
+   "preBuild": [
+    "mult_mixed_int"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:mult_frac_frac",
+     "why": "next: fraction x fraction"
+    },
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "is the product bigger or smaller?"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "stories"
+    }
+   ],
+   "note": "Verdict partial with both skills listed direct: they teach the proper-fraction clause fully; only the mixed-number clause is missing (Y5.B6.S3 is also untagged)."
+  },
+  "Y6.B4.S2": {
+   "title": "Multiply fractions by fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:mult_frac_frac",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:mult_frac_frac_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y5.B6.S4 a fraction of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y6.B4.S1 previous step"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplify the product"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "product smaller than each factor"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "stories"
+    },
+    {
+     "key": "fraction_operations:div_unit_fraction",
+     "why": "next: divide a fraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B4.S3": {
+   "title": "Divide a fraction by an integer",
+   "direct": [
+    {
+     "key": "fraction_operations:div_unit_fraction",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:div_unit_frac_nv",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "dividing a non-unit fraction whose numerator is a multiple of the divisor (6/7 / 3 = 2/7)",
+   "build": [
+    "frac_div_int_any"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_frac_frac",
+     "why": "Y6.B4.S2 previous step: 1/3 / 2 = 1/3 x 1/2"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 (prior learning wk W17)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "share the numerator"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "fraction / whole stories"
+    },
+    {
+     "key": "fraction_operations:frac_as_division",
+     "why": "fractions as division"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "rename before dividing (next step)"
+    }
+   ],
+   "note": "Only unit fractions are divided today (variant A); variants B (whole / unit fraction) are 5.NF.B.7b and not this step."
+  },
+  "Y6.B4.S4": {
+   "title": "Divide any fraction by an integer",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:div_unit_frac_nv",
+     "missing": "non-unit fractions and renaming with an equivalent fraction first (unit fractions only)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "dividing any fraction by an integer, renaming with an equivalent fraction when the numerator does not divide (2/3 / 4 = 8/12 / 4)",
+   "build": [
+    "frac_div_int_any"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:div_unit_frac_nv",
+     "why": "Y6.B4.S3 previous step"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y6.B3.S1 Equivalent fractions"
+    },
+    {
+     "key": "fraction_operations:mult_frac_frac_nv",
+     "why": "Y6.B4.S2 Multiply fractions by fractions"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "Y5.B6.S2 (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "frac_div_int_any"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:div_unit_fraction",
+     "why": "unit fractions with bars"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "stories"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "simplify the answer"
+    }
+   ],
+   "note": "Tag fix: div_unit_frac_nv is partial here; mixed_frac_qs (which the old list named for S4) is about choosing operations, so it moves to S5 only."
+  },
+  "Y6.B4.S5": {
+   "title": "Mixed questions with fractions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:mixed_fraction_ops",
+     "missing": "a page that asks the pupil to choose among +, -, x and / by an integer (it is a random pool that also deals /10-/100 and fraction-as-division items)"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "missing": "calculation items; it is stories only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "mixed calculations where the pupil chooses the operation (+, -, x, / by an integer) on fractions and mixed numbers",
+   "build": [
+    "mixed_frac_qs"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_frac_frac_nv",
+     "why": "Y6.B4.S2"
+    },
+    {
+     "key": "fraction_operations:div_unit_frac_nv",
+     "why": "Y6.B4.S3"
+    },
+    {
+     "key": "fraction_operations:add_mixed_unlike_nv",
+     "why": "Y6.B3.S7"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike_nv",
+     "why": "Y6.B3.S8"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S5 Fraction of an amount (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "Y5.B4.S1 (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "x and / stories"
+    },
+    {
+     "key": "fraction_operations:frac_word_problems",
+     "why": "+ and - stories"
+    },
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "reason about the size of the answer"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B4.S6": {
+   "title": "Fraction of an amount",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y5.B6.S4 (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y5.B6.S5 Fraction of an amount (prior learning wk W18)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "divide by the denominator"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "multiply by the numerator"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:mult_frac_whole_nv",
+     "why": "the same as fraction x integer"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "stories"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "unit fractions of amounts"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B4.S7": {
+   "title": "Fraction of an amount - find the whole",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "missing": "the bar model (forms \"Find the whole\" is numbers only)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding the whole from a known part with a bar model (3/5 of a number is 24)",
+   "build": [
+    "frac_find_whole"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S6 Find the whole (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y6.B4.S6 previous step"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar models"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "one part = known part / numerator"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "fraction of an amount"
+    },
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "stories"
+    },
+    {
+     "key": "algebra:solve_eq_multdiv",
+     "why": "unknown whole as an equation"
+    }
+   ],
+   "note": "Partial on representation, not content: the pupil can already compute the whole with forms [1]; the WRM bar model is missing."
+  },
   "Y6.B5.S1": {
    "title": "Metric measures",
    "direct": [
@@ -4499,6 +4888,43 @@
    "why": "coord_polygon works in the first quadrant on side lengths only; missing vertices and coordinate problems across four quadrants are not dealt.",
    "reused": true
   },
+  "frac_div_int_any": {
+   "kind": "option",
+   "skill": "fraction_operations:div_unit_frac_nv",
+   "option": "non-unit fraction / whole: numerator a multiple of the divisor (6/7 / 3 = 2/7), then any fraction via an equivalent fraction (2/3 / 4 = 8/12 / 4 = 2/12)",
+   "name": "Divide Any Fraction by an Integer (option)",
+   "teaches": "dividing a non-unit fraction by a whole number: share the numerator when it divides exactly, otherwise rename the fraction with a larger numerator first",
+   "representation": "equation cell with a fraction bar model above (structural: one bar cut into the fraction, then each part split into the divisor), answer as a stacked fraction slot; the hint step \"rename first\" fades",
+   "family": "fractions",
+   "ccss": [
+    "5.NF.B.7",
+    "6.NS.A.1"
+   ],
+   "why": "div_unit_frac_nv and div_unit_fraction only divide UNIT fractions (1/3 / 2); WRM S3 and S4 divide non-unit fractions.",
+   "steps": [
+    "Y6.B4.S3",
+    "Y6.B4.S4",
+    "Y6.B4.S4"
+   ],
+   "reused": false
+  },
+  "frac_find_whole": {
+   "kind": "option",
+   "skill": "fractions:fraction_of_set_hard_nv",
+   "option": "find the whole",
+   "name": "Fraction of an Amount: Find the Whole (option)",
+   "teaches": "finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?)",
+   "representation": "a \"find the whole\" task option with a bar model support",
+   "family": "fractions",
+   "steps": [
+    "Y6.B4.S7"
+   ],
+   "ccss": [
+    "5.NF.B.4"
+   ],
+   "why": "fraction_of_set_hard_nv \"find the whole\" has no bar model; the bar model is the WRM method and the ELL/SPED scaffold.",
+   "reused": true
+  },
   "frac_multistep": {
    "kind": "new",
    "skill": "fraction_operations:fraction_multi_step_problems",
@@ -4721,6 +5147,43 @@
     "5.MD.A.1"
    ],
    "why": "no skill uses 5 miles ≈ 8 km",
+   "reused": true
+  },
+  "mixed_frac_qs": {
+   "kind": "new",
+   "skill": "fraction_operations:mixed_fraction_questions",
+   "name": "Mixed Fraction Questions",
+   "teaches": "choosing the operation in mixed fraction calculations (+, −, ×, ÷ by an integer)",
+   "representation": "a page mixing the four operations with fraction cards",
+   "family": "fractions",
+   "steps": [
+    "Y6.B4.S5"
+   ],
+   "ccss": [
+    "5.NF.B.6",
+    "5.NF.A.1",
+    "5.NF.B.7"
+   ],
+   "why": "mixed_fraction_ops is a random pool (also /10-/100 and fraction-as-division items); no page asks the pupil to choose among +, -, x and / by an integer.",
+   "reused": true
+  },
+  "mult_mixed_int": {
+   "kind": "option",
+   "skill": "fraction_operations:mult_frac_whole",
+   "option": "mixed numbers",
+   "name": "Multiply a Mixed Number by an Integer (option)",
+   "teaches": "multiplying a mixed number by a whole number (2 1/3 × 4)",
+   "representation": "a mixed-number band on mult_frac_whole",
+   "family": "fractions",
+   "steps": [
+    "Y6.B4.S1",
+    "Y6.B4.S1"
+   ],
+   "ccss": [
+    "5.NF.B.4",
+    "5.NF.B.6"
+   ],
+   "why": "mult_frac_whole deals proper fractions only; Y6 also multiplies mixed numbers by integers.",
    "reused": true
   },
   "multi_step_four_ops": {
@@ -5357,6 +5820,48 @@
    "step": "Y6.B3.S9",
    "action": "partial",
    "why": "One-step stories only."
+  },
+  {
+   "key": "fraction_operations:mult_frac_whole",
+   "step": "Y6.B4.S1",
+   "action": "partial",
+   "why": "No mixed number x integer."
+  },
+  {
+   "key": "fraction_operations:mult_frac_whole_nv",
+   "step": "Y6.B4.S1",
+   "action": "partial",
+   "why": "No mixed number x integer."
+  },
+  {
+   "key": "fraction_operations:div_unit_fraction",
+   "step": "Y6.B4.S3",
+   "action": "partial",
+   "why": "Unit fractions only."
+  },
+  {
+   "key": "fraction_operations:div_unit_frac_nv",
+   "step": "Y6.B4.S3",
+   "action": "partial",
+   "why": "Unit fractions only."
+  },
+  {
+   "key": "fraction_operations:div_unit_frac_nv",
+   "step": "Y6.B4.S4",
+   "action": "partial",
+   "why": "Unit fractions only; no renaming."
+  },
+  {
+   "key": "fraction_operations:mixed_fraction_ops",
+   "step": "Y6.B4.S5",
+   "action": "partial",
+   "why": "Random pool; no operation choice page."
+  },
+  {
+   "key": "fractions:fraction_of_set_hard_nv",
+   "step": "Y6.B4.S7",
+   "action": "partial",
+   "why": "Find-the-whole form has no bar model."
   },
   {
    "key": "measurement:capacity",
