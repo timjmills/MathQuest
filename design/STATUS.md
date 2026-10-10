@@ -49,7 +49,7 @@ failed once on the known Andika font-abort under load — re-run alone, then sta
 | Lane B answer boxes + `ansBox` (74 skills) | `af686f163db04a00a` | Critic r5 FAIL (C1 5 / C2 5 / C3 6 / C4 6); builder **escalated to Opus medium**, was mid round 6 (merge of main done; WIP saved) | Finish R5-1..R5-6 in `design/audit/runs/wave1-B/critic.md` (card freeze on right answer at *digit*; per-digit marking; add_three overflow at 390; missing-digit given sums drawn as answer boxes; add_sub_100s overflow at S; one slot shape per section) → critic r6 |
 | Lane D print backlog | `a3256e8dfc9684535` | r3 committed 219c057; full S lint 0, L 1 finding; seeded deal differs between sweep and single run | Root-cause the cross-skill state leak (same seed must give identical pupilHtml), counting_all unlabelled item, lone area model → critic r3 |
 | Touch numerals | `a4f5e3d5dbe19dc18` | Critic r2: PASS everywhere except quiz (C2 7); builder was fixing R2-1..R2-5 + owner hairline-outline-on-screen ruling | Finish, re-run gates → critic r3 |
-| Fraction key (option ids, Check-ALL, whole sums) | `adbb61b8450078736` | Critic r2 FAIL; r3 fixes N1-N6 + D9 at L + D1 remnant, gates green. OPEN: N7 (scripted-model / opener modelled a choose-all item; now drawn from production items only via LIST_FREE_ROLES, not yet graded) | Critic r3 |
+| Fraction key (option ids, Check-ALL, whole sums) | `adbb61b8450078736` | Critic r3 FAIL; r4 (escalated, Opus medium) fixes R1 (one list per run from the first deal), R2 (L practice strips 4 %; odd/even sort list in a column), R3 (ring options at digit size, >= 44 px), R4 (stacked step/Say lines; worksheet/quiz fraction-sentence line says the verb once), R6, R7, R9. R5/R8 left for the model-role lane (below) | Critic r4 |
 | Custom number line support (149 skills) | `a84c3e870c715852e` | Critic r1 FAIL; fixes 63d7652; critic r2 was running | Critic r2 |
 | Count-by short arrows, smallest→biggest, select all/none, docked panel, option help, Lines mode (12 per row) | `a91a01fc3e4acb8e8` | Built; owner approved look (narrow boxes, keep count); gates were running | Merge main (phone-29px), gates → critic |
 | skip_count_grid / skip_count_line redo + search label | `a79237e5c40225940` | Built (6d1987c); line keeps arcs (owner); grid takes the short arrows | Merge after the arrows lane; unify its search synonyms into search-terms.js → critic |
@@ -213,6 +213,10 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - R5 (critic fractions-key r3): the Scripted Model page splits a 4-step model over two pages (page 2 holds one panel and
   the Say line, 51-59 % blank); each panel repeats the whole cell beside a mostly empty step column; the model never draws
   the renamed fractions step 2 names ("2/3 = 20/30"). Role-level, also on main (countby critic P1-P3).
+- mixed_composing more-practice S (pre-existing, identical on main): seeds whose deal opens with a wide draw-mat or
+  ten-frame item still leave a large blank (seed 3: one item, 60 %; seed 2: 4 items over two pages, 52 % / 31 %). The page
+  capacity comes from the run's order; the lane fixed only its own list row (seed 5: 30 % -> 4 %). Needs a deal that skips
+  an item the page cannot hold (practice capacity, not this lane).
 - R8 (critic fractions-key r3): fraction_of_set independent S prints one lone item (main: one small cell, 59 % of the
   page blank). Pre-existing; the B&W glyphs and the one instruction hold.
 
