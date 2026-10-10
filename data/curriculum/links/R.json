@@ -198,6 +198,216 @@
     }
    ],
    "note": "Compare amounts by looking and matching one to one (level 1, to 5)."
+  },
+  "R.B2.S1": {
+   "title": "Compare size",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {},
+     "missing": "overall size (big / small); the skill compares length, height and thickness only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing overall size with big / bigger / small / smaller",
+   "build": [
+    "compare_size"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "next step: R.B2.S2 Compare mass"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B2.S4 Explore simple patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B2.S2": {
+   "title": "Compare mass",
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_size"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "the same compare language for length"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B2.S4 Explore simple patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B2.S3": {
+   "title": "Compare capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing capacity: full, empty, holds more / less",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B2.S2 Compare mass (the step before in this block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_size"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "mass, the measure before"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "next step: R.B2.S4 Explore simple patterns"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B2.S1 Compare size"
+    }
+   ],
+   "note": ""
+  },
+  "R.B2.S4": {
+   "title": "Explore simple patterns",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {},
+     "missing": "talking about what repeats in a pattern (finding the unit); the skill only fills missing shapes"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "spotting and naming the repeating part of an AB pattern",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B2.S2 Compare mass (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B2.S1 Compare size"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: R.B2.S2 Compare mass"
+    }
+   ],
+   "note": ""
+  },
+  "R.B2.S5": {
+   "title": "Copy and continue simple patterns",
+   "direct": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {
+      "points": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B2.S2 Compare mass (earlier in this block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "pattern_make",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B2.S1 Compare size"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: R.B2.S2 Compare mass"
+    }
+   ],
+   "note": "AB / ABB patterns, fill the next two."
+  },
+  "R.B2.S6": {
+   "title": "Create simple patterns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "creating a pattern of one's own",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B2.S5 Copy and continue simple patterns (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "continue a given pattern first"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B2.S1 Compare size"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: R.B2.S2 Compare mass"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -245,6 +455,53 @@
    "ccss": [
     "K.MD.B.3"
    ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "compare_size": {
+   "kind": "new",
+   "skill": "comparing:compare_size",
+   "name": "Big and Small",
+   "teaches": "comparing overall size (big, bigger, small, smaller) of two or three objects",
+   "representation": "pairs of the same object drawn at different sizes; circle the bigger or the smaller",
+   "family": "measurement",
+   "steps": [
+    "R.B2.S1"
+   ],
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "capacity_early": {
+   "kind": "new",
+   "skill": "comparing:compare_capacity",
+   "name": "Full, Empty, Holds More",
+   "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+   "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
+   "family": "measurement",
+   "steps": [
+    "R.B2.S3"
+   ],
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "pattern_make": {
+   "kind": "new",
+   "skill": "patterns:make_a_pattern",
+   "name": "Make a Pattern",
+   "teaches": "copying, continuing and creating repeating patterns (AB, ABB, ABC) and finding the part that repeats",
+   "representation": "a row of boxes with a started pattern; draw or write the next shapes; option: circle the repeating unit; option: make your own",
+   "family": "algebra",
+   "steps": [
+    "R.B2.S4",
+    "R.B2.S6"
+   ],
+   "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
