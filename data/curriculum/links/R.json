@@ -3771,6 +3771,338 @@
     }
    ],
    "note": ""
+  },
+  "R.B15.S1": {
+   "title": "Select shapes for a purpose",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "opts": {},
+     "missing": "choosing a shape for a purpose (it rolls, it stacks, it fits)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "selecting a shape for a purpose",
+   "build": [
+    "shape_3d_tasks"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "next step: R.B15.S2 Rotate shapes"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same block: R.B15.S3 Manipulate shapes"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same block: R.B15.S5 Compose shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S2": {
+   "title": "Rotate shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {},
+     "missing": "recognising a shape when it is turned"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising a turned shape as the same shape",
+   "build": [
+    "compare_shapes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B15.S1 Select shapes for a purpose (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (same CCSS K.G.A.2, earlier)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (same CCSS K.G.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "next step: R.B15.S3 Manipulate shapes"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same block: R.B15.S5 Compose shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S3": {
+   "title": "Manipulate shapes",
+   "direct": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B15.S1 Select shapes for a purpose (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same CCSS K.G.B.6 in R.B15.S5 Compose shapes"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S4": {
+   "title": "Explain shape arrangements",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "opts": {},
+     "missing": "explaining an arrangement of shapes"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "describing how shapes are arranged",
+   "build": [
+    "scenes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "next step: R.B15.S5 Compose shapes"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S5": {
+   "title": "Compose shapes",
+   "direct": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (earlier in this block)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B15.S1 Select shapes for a purpose (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S6": {
+   "title": "Decompose shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "opts": {},
+     "missing": "decomposing: finding the shapes inside a shape"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "decomposing a shape into smaller shapes",
+   "build": [
+    "scenes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same block: R.B15.S5 Compose shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S7": {
+   "title": "Copy 2-D shape pictures",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "copying a picture made of 2-D shapes",
+   "build": [
+    "scenes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "combining shapes"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same block: R.B15.S5 Compose shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B15.S8": {
+   "title": "Find 2-D shapes within 3-D shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding 2-D faces within 3-D shapes",
+   "build": [
+    "shape_3d_tasks"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B15.S1 Select shapes for a purpose (same CCSS K.G.B.4, earlier)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (same CCSS K.G.A.3, earlier)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (same CCSS K.G.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "naming the 3-D shape"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B15.S1 Select shapes for a purpose"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B15.S2 Rotate shapes"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same block: R.B15.S3 Manipulate shapes"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3903,9 +4235,11 @@
    "representation": "two shapes side by side with a same/different checklist (sides, corners, curved)",
    "family": "geometry",
    "steps": [
-    "R.B4.S2"
+    "R.B4.S2",
+    "R.B15.S2"
    ],
    "ccss": [
+    "K.G.A.2",
     "K.G.B.4"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -4089,7 +4423,9 @@
    "family": "geometry",
    "steps": [
     "R.B12.S2",
-    "R.B12.S3"
+    "R.B12.S3",
+    "R.B15.S1",
+    "R.B15.S8"
    ],
    "ccss": [
     "K.G.A.3",
@@ -4132,6 +4468,24 @@
     "R.B14.S4"
    ],
    "reused": false
+  },
+  "scenes": {
+   "kind": "new",
+   "skill": "shapes_early:build_and_copy",
+   "name": "Copy and Build",
+   "teaches": "copying a picture or construction made of shapes, visualising from another viewpoint, replicating a scene",
+   "representation": "a model picture made of shapes beside an empty frame; draw or choose the matching copy",
+   "family": "geometry",
+   "steps": [
+    "R.B15.S4",
+    "R.B15.S6",
+    "R.B15.S7"
+   ],
+   "ccss": [
+    "K.G.B.6"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
