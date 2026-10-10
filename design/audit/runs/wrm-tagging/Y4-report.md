@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 4
+# Wave 2 tagging: Y4 (Grade 3) report, round 5
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **570 / 314**; every step has at least 3 pre and 1 related; 0 keys in both |
-| Option checks | — | — | 340 opts entries: 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); 0 links past the Y4 ceiling (`linkfit.mjs`) |
+| Pre / related entries | 528 / — | 570 / 319 | **565 / 308** (round 5); every step has at least 3 pre and 1 related; 0 keys in both |
+| Option checks | — | — | Round 5: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 873 links too big for their own step** (`linkfit.mjs`, step-relative; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,59 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 5 (after critic r4: mean 8.06, FAIL on rule 18)
+Round 5 is mechanical: it changes links only, with no verdict, build or proposal change. The changes are in
+`spec_zz_v_r5.py`.
+
+**`build.py` carries `maxNumber` on pre and related links.** Round 4 set `@10` on the coordinate links, but the build
+kept the value only on direct and partial entries. Now every entry carries its own `maxNumber`, on any link. This fixes
+pattern A: the seven `coordinate_q1` links on B12.S8, B13.S3, B13.S4 and B14.S2–S5 now carry Max Number 10.
+
+**The critic's patterns**
+- **B.** `count_by_step_up` (3s and 4s from 4-digit starts) is replaced:
+  - "Count in 3s" on B4.S1 and B4.S2 → `count_by_tables {constant:[3]}` (true multiples from 0).
+  - B7.S2 → `count_by_tables {constant:[2,5]}`.
+  - B11.S1 → `count_by_tables {constant:[7,12]}` (days in weeks, months in years).
+  - B1.S3 and B1.S4 → `{step:[0], range:1000}`. B1.S4 is relabelled: no live skill counts in 50s, and `count_50s` is
+    that step's own build.
+- **C.** `area_model_mult` now carries `{tiles:21}` on B5.S8, B5.S15 and B5.S2. On B4.S9 and B4.S10 it is dropped: no
+  option holds it under 7 × 86, and `mult_properties {forms:[1]}` (breaking apart) is already a pre-skill there.
+- **D and E.** `missing_mult_div` (B4.S2, S4, S7, B5.S7) and `halve` (B5.S11) carry Max Number 100.
+- **F.** `round_decimals {precision:[0]}` rounds to the nearest tenth. On B10.S4 it is relabelled as "the same rounding
+  move one place over"; on B8.S4 it is dropped.
+
+**`linkfit.mjs` is now step-relative.** It compares each link with its own step:
+- The step's ceiling is the largest of these:
+  - the largest number its direct and partial items deal (print path, their own opts and Max Number);
+  - its title's numbers ("3-digit" counts as 999);
+  - its block's ceiling;
+  - the largest number of any step the school teaches in an earlier week (from the xlsx).
+- A link fails if it deals past 1.5 × that ceiling (and at least 100), or more than 2 decimal places.
+- On a step taught before W11, a link also fails if it deals 4-digit numbers the step does not.
+- Clock-time skills are exempt, because their minute payloads (19:00 = 1140) are not numbers a pupil reads.
+
+**What the new check found**, beyond the critic's 25:
+- `area {}` deals triangles, so it is now `{forms:[0], band:10}` (B3.S1, S2, S4).
+- `place_value_10x` now carries band 1,000 (B8.S5, B8.S10).
+- `mult_zeros {forms:[0]}` (B4.S13).
+- `number_word_form {range:1000}` (B1.S1).
+- `add_decimal`, now carrying decimals and range (B9.S1, S3, S4).
+- `money_change {usd, band:100, step:5}` (B9.S1, B9.S2).
+- `length_metric {forms:[1]}` (B10.S2).
+- `seq_5`/`seq_10`, now carrying Max Number 100 or 1,000.
+- `remainder_interpret {range:100}` (B7.S8).
+- Dropped:
+  - `geo_rotate` and `additive_angles`, which deal degrees (270°, 112°) (B12.S1, B14.S4);
+  - the 3-digit `sub_across_zeros` analogy on B7.S14.
+
+The result: 0 of 873 links fail, and all 129 steps show "ok" in `Y4-linkfit.txt`.
+
+**Small fixes**
+- B9.S4's `f_to_d` label now cites B8.S2.
+- B5.S9's `mult_facts` label now says "facts to 12 × 12".
+- The stale notes on B1.S8 and B8.S5 are rewritten.
+- B9.S6 drops the related `money_compare {}`.
 
 ## Changes in round 4 (after critic r3, 7.98)
 `spec_zz_u_r4.py` holds every round-4 change, and the build regenerates the file from the specs. The generated items are
@@ -60,8 +113,9 @@ at the end of `Y4-items.md`.
 - **B6.S9.** `composite_shapes {forms:[0]}` moved to pre. The mis-cited `perimeter_intro {labels:'some'}` is dropped.
 - **B8.S2 and B8.S8: `d_to_f {forms:[0]}`.** `d_to_f` has no `denoms` option; `forms` is its only one.
 - **B2.S7.** The `sub_across_zeros` clause now says "3- or 2-digit".
-- **Coordinates.** Every `coordinate_q1` link and partial carries Max Number 10, so its points stay within 10.
-  Max Number 10,000 let them reach 20.
+- **Coordinates.** Every `coordinate_q1` partial carries Max Number 10, so its points stay within 10 (Max Number
+  10,000 let them reach 20). *Corrected in round 5:* the round-4 build dropped `@10` on pre and related links, so seven
+  links still reached (19, 18). `build.py` now carries `maxNumber` on every link.
 - **Noise pre-skills dropped.** `count_sequence` on B14.S2 and B14.S4, and `compare_groups` on B3.S4. Each step got a
   real pre-skill in its place: `identify_lines` and `shape_positions`.
 

@@ -71,7 +71,10 @@
     },
     {
      "key": "composing:number_word_form",
-     "why": "numerals and words side by side"
+     "why": "numerals and words side by side",
+     "opts": {
+      "range": 1000
+     }
     }
    ],
    "note": "A Y3 step repeated as review; the three skills give base-10, place-value counters (read) and counters (draw)."
@@ -172,7 +175,13 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)",
+     "opts": {
+      "step": [
+       0
+      ],
+      "range": 1000
+     }
     },
     {
      "key": "number_sense:between_tens",
@@ -251,7 +260,13 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y3.B1.S14 Count in 50s (lower grade, same CCSS cluster)"
+     "why": "counting on in 10s along a line to 1,000 (Y3.B1.S14 counts in 50s, which no live skill deals: count_50s is this step's build)",
+     "opts": {
+      "step": [
+       0
+      ],
+      "range": 1000
+     }
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -604,7 +619,7 @@
      }
     }
    ],
-   "note": "more_less_100 already offers step 1,000; with it the existing partial tag is full for the 100/1,000 part.",
+   "note": "more_less_100 offers step 100 and 1,000 but 100 more/less only on 3-digit numbers; more_less_10 stops at 120. more_less_all closes the step.",
    "envision": [
     {
      "proposal": "more_less_all",
@@ -885,7 +900,8 @@
      "why": "the same ordering routine with decimals later in the year",
      "opts": {
       "decimals": 1
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "note": ""
@@ -1693,7 +1709,8 @@
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)"
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)",
+     "maxNumber": 1000
     },
     {
      "key": "addition:number_families_add",
@@ -1915,7 +1932,13 @@
     },
     {
      "key": "area_perimeter:area",
-     "why": "area by multiplying, the Grade 3 build that follows"
+     "why": "area by multiplying, the Grade 3 build that follows",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "band": 10
+     }
     }
    ],
    "note": "area_unit_squares counts squares; the \"what is area\" comparing idea is in the area_compare proposal.",
@@ -1966,7 +1989,13 @@
    "related": [
     {
      "key": "area_perimeter:area",
-     "why": "area by multiplying (3.MD.C.7)"
+     "why": "area by multiplying (3.MD.C.7)",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "band": 10
+     }
     },
     {
      "key": "area_perimeter:perimeter_grid",
@@ -2071,7 +2100,13 @@
    "related": [
     {
      "key": "area_perimeter:area",
-     "why": "computing area to compare"
+     "why": "computing area to compare",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "band": 10
+     }
     },
     {
      "key": "area_perimeter:perimeter_grid",
@@ -2116,15 +2151,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
-     "opts": {
-      "step": [
-       1
-      ]
-     }
-    },
     {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S8 The 3 times-table (prior learning wk W01)",
@@ -2243,11 +2269,11 @@
      "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
     },
     {
-     "key": "patterns:count_by_step_up",
+     "key": "multiplication:count_by_tables",
      "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
      "opts": {
-      "step": [
-       1
+      "constant": [
+       3
       ]
      }
     }
@@ -2268,7 +2294,8 @@
     },
     {
      "key": "division:missing_mult_div",
-     "why": "missing-factor form of the same facts"
+     "why": "missing-factor form of the same facts",
+     "maxNumber": 100
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 6 they are full."
@@ -2473,7 +2500,8 @@
     },
     {
      "key": "division:missing_mult_div",
-     "why": "missing-factor form of the same facts"
+     "why": "missing-factor form of the same facts",
+     "maxNumber": 100
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 9 they are full."
@@ -2778,7 +2806,8 @@
     },
     {
      "key": "division:missing_mult_div",
-     "why": "missing-factor form of the same facts"
+     "why": "missing-factor form of the same facts",
+     "maxNumber": 100
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 7 they are full."
@@ -2957,10 +2986,6 @@
        7
       ]
      }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -3071,10 +3096,6 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -3285,7 +3306,12 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (lower grade, same idea)"
+     "why": "Y3.B4.S1 Multiples of 10 (lower grade, same idea)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -3429,7 +3455,10 @@
    "related": [
     {
      "key": "multiplication:area_model_mult",
-     "why": "another way to make a product easy"
+     "why": "another way to make a product easy",
+     "opts": {
+      "tiles": 21
+     }
     }
    ],
    "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form.",
@@ -3482,7 +3511,8 @@
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)"
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)",
+     "maxNumber": 1000
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3789,7 +3819,8 @@
     },
     {
      "key": "division:missing_mult_div",
-     "why": "missing factors"
+     "why": "missing factors",
+     "maxNumber": 100
     },
     {
      "key": "number_sense:estimate_products",
@@ -3851,10 +3882,6 @@
        2
       ]
      }
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (prior learning wk W05)"
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3931,7 +3958,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
+     "why": "the times-table facts to 12 × 12 (Y4 block 4), used in every column of the multiplication"
     },
     {
      "key": "placevalue:expand",
@@ -4078,7 +4105,8 @@
     },
     {
      "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)",
+     "maxNumber": 100
     },
     {
      "key": "multiplication:multiply",
@@ -4347,7 +4375,10 @@
     },
     {
      "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (earlier step in the block)"
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (earlier step in the block)",
+     "opts": {
+      "tiles": 21
+     }
     },
     {
      "key": "number_sense:compensation",
@@ -5089,8 +5120,14 @@
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W07)"
     },
     {
-     "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
+     "key": "multiplication:count_by_tables",
+     "why": "counting on in equal steps of 2 and 5 from 0 (Y2.B1.S15): the same counting routine used for fractions",
+     "opts": {
+      "constant": [
+       2,
+       5
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -5294,7 +5331,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "note": "fractions:compare deals proper fractions only; the existing partial tag of compare on this step should be dropped (it covers none of mixed numbers).",
@@ -5473,7 +5511,10 @@
    "related": [
     {
      "key": "division:remainder_interpret",
-     "why": "the remainder becomes the fraction"
+     "why": "the remainder becomes the fraction",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "note": "Generated improper_mixed {}: both directions on one page. Owner said yes to a one-direction option.",
@@ -5819,10 +5860,6 @@
      "why": "subtracting from mixed numbers"
     },
     {
-     "key": "subtraction:sub_across_zeros",
-     "why": "exchanging a whole is like subtracting across zeros"
-    },
-    {
      "key": "fraction_operations:frac_word_problems",
      "why": "stories"
     }
@@ -6050,7 +6087,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "note": "",
@@ -6190,16 +6228,6 @@
    ],
    "related": [
     {
-     "key": "decimals:round_decimals",
-     "why": "rounding uses the same line",
-     "opts": {
-      "precision": [
-       0
-      ],
-      "range": 10
-     }
-    },
-    {
      "key": "decimals:compare_decimal",
      "why": "position shows which is greater",
      "opts": {
@@ -6207,7 +6235,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "note": "ticks \"one\" labels every tenth except the answer, which gives it away; \"some\" (0, 0.5, 1) is the honest page.",
@@ -6256,7 +6285,7 @@
       "power": [
        10
       ],
-      "band": 10000
+      "band": 1000
      }
     },
     {
@@ -6295,7 +6324,7 @@
      }
     }
    ],
-   "note": "Needs the decimals option ON; verify the generator gives 1-digit ÷ 10 = 0.n items.",
+   "note": "Generated place_value_10x {op:\"/\", power:[10], decimals:true}: 3-digit dividends (990 ÷ 10, 298 ÷ 10 = 29.8) on an H T O chart; div10_small_numbers closes it.",
    "envision": [
     {
      "proposal": "div10_small_numbers",
@@ -6531,7 +6560,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     },
     {
      "key": "measurement:money_notation",
@@ -6616,7 +6646,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     }
    ],
    "note": "",
@@ -6671,20 +6702,9 @@
      "opts": {
       "op": "/",
       "power": [
-       10
-      ],
-      "decimals": true
-     }
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S6 Divide by 100 (earlier block this year)",
-     "opts": {
-      "op": "/",
-      "power": [
        100
       ],
-      "band": 10000
+      "band": 1000
      }
     },
     {
@@ -6766,11 +6786,21 @@
    "related": [
     {
      "key": "decimals:add_decimal",
-     "why": "adding decimals"
+     "why": "adding decimals",
+     "opts": {
+      "decimals": 1,
+      "range": 100
+     },
+     "maxNumber": 10
     },
     {
      "key": "measurement:money_change",
-     "why": "change from $1"
+     "why": "change from $1",
+     "opts": {
+      "currency": "usd",
+      "band": 100,
+      "step": 5
+     }
     }
    ],
    "note": "",
@@ -6817,7 +6847,12 @@
    "related": [
     {
      "key": "measurement:money_change",
-     "why": "change from $1.00"
+     "why": "change from $1.00",
+     "opts": {
+      "currency": "usd",
+      "band": 100,
+      "step": 5
+     }
     },
     {
      "key": "conversions:percent_visual",
@@ -6884,7 +6919,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     },
     {
      "key": "measurement:money_notation",
@@ -6892,7 +6928,12 @@
     },
     {
      "key": "decimals:add_decimal",
-     "why": "recombine the parts"
+     "why": "recombine the parts",
+     "opts": {
+      "decimals": 2,
+      "range": 100
+     },
+     "maxNumber": 10
     }
    ],
    "note": "",
@@ -6919,7 +6960,7 @@
    "pre": [
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)",
+     "why": "Y4.B8.S2 Tenths as decimals (earlier block this year)",
      "opts": {
       "denoms": [
        5
@@ -6957,7 +6998,12 @@
    "related": [
     {
      "key": "decimals:add_decimal",
-     "why": "adding the parts"
+     "why": "adding the parts",
+     "opts": {
+      "decimals": 2,
+      "range": 100
+     },
+     "maxNumber": 10
     },
     {
      "key": "measurement:money_count",
@@ -7089,7 +7135,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -7115,10 +7162,6 @@
     {
      "key": "conversions:order_fdp",
      "why": "ordering mixed forms later"
-    },
-    {
-     "key": "measurement:money_compare",
-     "why": "ordering prices"
     }
    ],
    "note": "decimals 2 and Max Number 10 hold the page to hundredths below 10.",
@@ -7372,7 +7415,12 @@
     },
     {
      "key": "measurement:length_metric",
-     "why": "another ×100 / ÷100 conversion"
+     "why": "another ×100 / ÷100 conversion",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "note": "School swaps pounds and pence for dollars and cents.",
@@ -7413,7 +7461,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     },
     {
      "key": "measurement:money_compare",
@@ -7483,7 +7532,7 @@
     },
     {
      "key": "decimals:round_decimals",
-     "why": "Y4.B9.S7 Round to the nearest whole number (earlier block this year)",
+     "why": "rounding a decimal to the nearest tenth: the same rounding move one place over (no live skill rounds a decimal to the nearest whole; that is round_whole, the build of Y4.B9.S7)",
      "opts": {
       "precision": [
        0
@@ -7685,8 +7734,14 @@
      }
     },
     {
-     "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S16 Count in 3s (lower grade, same CCSS cluster)"
+     "key": "multiplication:count_by_tables",
+     "why": "counting in 7s (days in weeks) and 12s (months in years), the counts the conversions use (Y4.B4 times-tables)",
+     "opts": {
+      "constant": [
+       7,
+       12
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -7744,7 +7799,8 @@
     },
     {
      "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)",
+     "maxNumber": 100
     },
     {
      "key": "multiplication:mult_facts",
@@ -7973,14 +8029,6 @@
     {
      "key": "angles_lines:measure_angles",
      "why": "turn measured in degrees (Grade 4)"
-    },
-    {
-     "key": "coordinates:geo_rotate",
-     "why": "rotations of a shape"
-    },
-    {
-     "key": "angles_lines:additive_angles",
-     "why": "angles that add up"
     }
    ],
    "note": "",
@@ -8322,7 +8370,8 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "grid positions"
+     "why": "grid positions",
+     "maxNumber": 10
     }
    ],
    "note": "Y2.B3.S6 (Use lines of symmetry to complete shapes) is the prior step with the same proposal.",
@@ -8381,7 +8430,8 @@
     },
     {
      "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W25)"
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W25)",
+     "maxNumber": 100
     }
    ],
    "preBuild": [
@@ -8488,7 +8538,8 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S1 Describe position using coordinates (a later WRM step this year: the building block this step uses, so teach it first)"
+     "why": "Y4.B14.S1 Describe position using coordinates (a later WRM step this year: the building block this step uses, so teach it first)",
+     "maxNumber": 10
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -8548,7 +8599,8 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (a later WRM step this year: the building block this step uses, so teach it first)"
+     "why": "Y4.B14.S2 Plot coordinates (a later WRM step this year: the building block this step uses, so teach it first)",
+     "maxNumber": 10
     }
    ],
    "preBuild": [],
@@ -8657,7 +8709,8 @@
       "forms": [
        0
       ]
-     }
+     },
+     "maxNumber": 10
     },
     {
      "key": "shapes_early:shape_positions",
@@ -8712,7 +8765,8 @@
    "pre": [
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (step before in the block)"
+     "why": "Y4.B14.S2 Plot coordinates (step before in the block)",
+     "maxNumber": 10
     },
     {
      "key": "shapes_classify:classify_quads",
@@ -8769,7 +8823,8 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)"
+     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)",
+     "maxNumber": 10
     },
     {
      "key": "shapes_early:shape_positions",
@@ -8783,10 +8838,6 @@
     {
      "key": "coordinates:geo_reflect",
      "why": "reflection, another transformation"
-    },
-    {
-     "key": "coordinates:geo_rotate",
-     "why": "rotation"
     }
    ],
    "note": "",
@@ -8818,7 +8869,8 @@
    "pre": [
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)"
+     "why": "Y4.B14.S2 Plot coordinates (prior learning wk W38)",
+     "maxNumber": 10
     },
     {
      "key": "shapes_early:shape_positions",

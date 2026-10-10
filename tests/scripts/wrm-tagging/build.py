@@ -28,12 +28,12 @@ def pk(k):
     if not m:
         errs.append('bad key ' + k); return k, {}
     key, o = m.group(1), json.loads(m.group(2)) if m.group(2) else {}
-    if m.group(3): MAXN[(key, json.dumps(o, sort_keys=True))] = int(m.group(3))
+    MAXN['last'] = int(m.group(3)) if m.group(3) else None   # this entry's own Max Number
     if key not in keys:
         errs.append('unknown skill ' + key)
     return key, o
 def mx(e, key, o):
-    n = MAXN.get((key, json.dumps(o, sort_keys=True)))
+    n = MAXN.get('last')   # set by the pk() call that parsed this entry
     if n: e['maxNumber'] = n
     return e
 
@@ -79,14 +79,14 @@ for sp in ns['STEPS']:
         seen_pre.add((key, json.dumps(o, sort_keys=True)))
         e = {'key': key, 'why': why_for(sid, ref, kind)}
         if o: e['opts'] = o
-        pre.append(e)
+        pre.append(mx(e, key, o))
     rel = []
     for k, w in sp.get('related', []):
         key, o = pk(k)
         if (key, json.dumps(o, sort_keys=True)) in dk: errs.append(f'{sid}: related repeats direct {key}'); continue
         e = {'key': key, 'why': w}
         if o: e['opts'] = o
-        rel.append(e)
+        rel.append(mx(e, key, o))
     if len(pre) > 8 or len(rel) > 8: errs.append(sid + ' too many pre/related')
     # BRIEF rule 10: a key is never in both pre and related, whatever its options
     both = {p['key'] for p in pre} & {r['key'] for r in rel}
