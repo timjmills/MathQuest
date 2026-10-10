@@ -66,6 +66,16 @@ function _wsOpHint(q) {
     const sid = (q.skillId || "").toLowerCase();
     const pf = (q.printFormat || "").toLowerCase();
 
+    // Word-work items: the hint (word-work.js workHint) already names the item's own
+    // operation; a sentence from the skill id would contradict it on the stories an
+    // add/sub skill deliberately solves the other way. Only the two-step note is kept.
+    if (q.wordWork || (q.cell && q.cell.template === 'word-work')) {
+        const ops = (q.wordWork && q.wordWork.ops) || [];
+        return ops.length > 1
+            ? "💡 This problem has <b>two steps</b>: do the first operation, then use the result in the second."
+            : "";
+    }
+
     // Multi-step word problems: two operations
     if (sid === "multi_step_word" || sid === "multi_step_word_plain"
         || pf === "multi-step-word") {
@@ -1467,7 +1477,8 @@ function _wsRenderCard(grid, q, i) {
     // Generate hint content with visual if available
     const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
     const baseHint = q.hint || 'Think about this problem step by step.';
-    const opHint = _wsOpHint(q);
+    // the popup title already carries the bulb: the note under it does not repeat it
+    const opHint = String(_wsOpHint(q) || '').replace(/^💡\s*/, '');
     let hintText = opHint
         ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
         : baseHint;

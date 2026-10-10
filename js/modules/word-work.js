@@ -117,7 +117,11 @@ export function applyWordWork(q) {
     } catch (e) { payload = null; }
     if (!payload) return q;
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
+    const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');
+    // A retold story has new names and nouns: the generator's hint ("Zoe has more, so add ...")
+    // would name a child who is not in it. The hint is rebuilt from the item's own work.
+    if (retold) q.hint = workHint(payload);
     q.cell = { template: WW_TEMPLATE, v: 1, payload };
     try { q.visual = wordWorkTwin(renderCell, payload); } catch (e) { /* keep the old visual */ }
     q.answerType = 'number';
@@ -136,4 +140,40 @@ export function applyWordWork(q) {
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;
+}
+
+/** A hint built from a word-work payload alone (no names): the sign and the number sentence.
+ *  Multi-step: one line per step, and a later step never prints the earlier step's answer
+ *  (it says "your Step 1 answer"), so the hint does not fill the Step 1 boxes. */
+export function workHint(p) {
+    const G = { '+': '+', '-': '\u2212', '*': '\u00d7', '/': '\u00f7' };
+    const V = { '+': 'Add', '-': 'Subtract', '*': 'Multiply', '/': 'Divide' };
+    const steps = (p && p.steps) || [];
+    if (steps.length <= 1) {
+        return steps.map((st) => `${V[st.op] || 'Work it out'}: ${st.top} ${G[st.op] || st.op} ${st.bottom} = ?`).join('');
+    }
+    const lines = steps.map((st, i) => {
+        const pre = `Step ${i + 1}: `;
+        const prev = i > 0 ? steps[i - 1].ans : undefined;
+        const yours = `your Step ${i} answer`;
+        let a = st.top, b = st.bottom, aPrev = false, bPrev = false;
+        // the previous result is identified by position (st.prevSide when the generator gives
+        // it, else the first operand equal to it), so a same-valued own number never leaks it
+        const side = st.prevSide || (prev === undefined ? null : String(a) === String(prev) ? 'top' : String(b) === String(prev) ? 'bottom' : null);
+        if (side === 'top') { a = yours; aPrev = true; }
+        else if (side === 'bottom') { b = yours; bPrev = true; }
+        // the other operand equals the previous result too: naming it would print the Step 1 answer
+        if (side && String(st.top) === String(st.bottom)) {
+            const W = { '+': 'Add your Step N answer to itself', '-': 'Subtract your Step N answer from itself', '*': 'Multiply your Step N answer by itself', '/': 'Divide your Step N answer by itself' };
+            if (W[st.op]) return `${pre}${W[st.op].replace('N', String(i))}.`;
+        }
+        switch (st.op) {
+            case '+': return (aPrev || bPrev) ? `${pre}Add ${aPrev ? b : a} to ${aPrev ? a : b}.` : `${pre}Add ${a} and ${b}.`;
+            case '-': return `${pre}Subtract ${b} from ${a}.`;
+            case '*': return `${pre}Multiply ${aPrev ? a : b} by ${aPrev ? b : a}.`;
+            case '/': return `${pre}Divide ${a} by ${b}.`;
+            default: return `${pre}${a} ${st.op} ${b} = ?`;
+        }
+    });
+    return lines.join('<br>');
 }

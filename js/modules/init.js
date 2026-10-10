@@ -1,4 +1,6 @@
 import { state } from './state.js';
+import { warmSkillSearch } from './skill-finder.js';
+import { installSearchNotice } from './search-notice.js';
 import { createBackgroundShapes, loadState } from './ui-core.js';
 import { updateCategoryOptions, updateSkillOptions, updateBreadcrumb, initInlineDropdowns } from './category-dropdowns.js';
 import { renderNumbers } from './number-selection.js';
@@ -19,6 +21,18 @@ import { parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
 
 export function init() {
     createBackgroundShapes();
+    // Load the standards / WRM search terms (~230 KB) only when someone reaches for a search box, so a
+    // pupil's play session never downloads them; search works on labels and concepts meanwhile.
+    try { installSearchNotice(); } catch (e) { /* the notice is optional */ }
+    const warmOnSearchFocus = (ev) => {
+        const t = ev.target;
+        if (!t || t.tagName !== 'INPUT') return;
+        const tag = `${t.type} ${t.id} ${t.className} ${t.placeholder} ${t.getAttribute('aria-label') || ''}`;
+        if (!/search|find/i.test(tag)) return;
+        document.removeEventListener('focusin', warmOnSearchFocus, true);
+        try { warmSkillSearch(); } catch (e) { /* search falls back to labels and concepts */ }
+    };
+    document.addEventListener('focusin', warmOnSearchFocus, true);
     updateCategoryOptions();
     updateSkillOptions();
     updateBreadcrumb();

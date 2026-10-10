@@ -395,6 +395,9 @@ function footprintClass(q, template, size) {
     // A horizontal fact ("24 ÷ 6 = ___") is one line with one short answer (critic round 2, H5:
     // six division facts filled a page, every cell 80% empty).
     if (isAcrossFact(q, template)) return 'short';
+    // div_facts' Long-division and Fraction forms (payload `fact`): a recalled fact with one
+    // short answer, no work rows - packed with the page's other fact forms, never as long work.
+    if ((template === 'division' || template === 'equation') && q.cell && q.cell.payload && q.cell.payload.fact) return 'short';
     // The same holds for the kit's one-line equation with one box ("[ ] + 2 = 11"): 2 x 8 fits where
     // the dense standard ceiling stopped at 2 x 5 (kit lint PAGEFILL, 2026-10-02). The ÷ bracket
     // and fraction-bar notations are taller and keep the standard class.
@@ -969,7 +972,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
         } catch (e) { cellPrompt = null; }
     }
-    if (isAcrossFact(q, template)) {
+    // div_facts' fact forms (Long division and Fraction, and Mix's across form, payload `fact`)
+    // are measured exactly like the across fact, so a Mix page packs all three in one grid.
+    if (isAcrossFact(q, template) || ((template === 'division' || template === 'equation') && q.cell && q.cell.payload && q.cell.payload.fact)) {
         // Its static footprint is the VERTICAL fact's cell height plus a stack's pads (50 mm at
         // L), for one line about 17 mm tall: the measurement is the truth for this one.
         fp = Object.assign({}, fp, { measure: true, hMm: null, tracks: undefined, factLike: false });
@@ -1200,6 +1205,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         let fits = true;
         let contentBottom = r.top;
         let stampH = 0;
+        let slackPx = Infinity;
         const pics = [];
         const leaves = [];
         for (const el of cell.querySelectorAll('*')) {
@@ -1212,6 +1218,11 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             }
             if (el.closest('.ws-legacy-answer')) continue;
             contentBottom = Math.max(contentBottom, er.bottom);
+            // CL-8: how near the drawing comes to the cell's side borders (its leaves,
+            // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
+            if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
+                slackPx = Math.min(slackPx, er.left - r.left, r.right - er.right);
+            }
             if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
             // A clip under 1 mm is a stroke or a line box, not hidden content.
             if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
@@ -1253,7 +1264,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
             }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx };
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -1291,7 +1302,8 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
-        best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW });
+        best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -1317,6 +1329,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 const b = best.get(it);
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits };
+                if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
@@ -2677,7 +2690,10 @@ async function buildLesson(n, metaOf) {
     const stripH = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
     const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: 'ican', mode: 'print' })) : '';
     // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
-    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
+    // A div_facts fact in any written form (across or fraction on the equation cell, the bracket)
+    // is a one-number answer too (critic R1 D8: Long / Fraction practice pages printed 2 x 3).
+    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round')
+        || ((it.template === 'equation' || it.template === 'division') && /div_facts/.test(String(it.skill || '')));
     const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
     // The skill ref of the practice pages: a subtraction lesson gives step 5 ("Check: add back")
     // its room, a Check line under every problem.
@@ -2688,7 +2704,16 @@ async function buildLesson(n, metaOf) {
     // Lessons r2-r3: a rounding cell ("27 -> ___") is short and narrow: M prints three across like
     // L, and the lesson's own 15 at every size (never 12.1's 16 ceiling passed).
     const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    // div_facts: a practice page of one-number facts holds what its stand-alone Independent page
+    // does at L (16, 2 x 8 for the across facts - critic R3 N-2: 15 printed 2 x 5 of tall cells)
+    const divFactsOnly = (teach.items || []).filter((it) => it.pool === 'main').every((it) => /div_facts/.test(String(it.skill || '')));
+    // ... and keeps the lesson's one across look (critic R3 N-2): no column count at which a
+    // division fact's line would go under its sentence (a cell markedly taller there than in one column).
+    const mainIts = (teach.items || []).filter((it) => it.pool === 'main');
+    const reflow = (c) => mainIts.some((it) => it.template === 'equation' && it.measured && it.measured[1] && it.measured[c]
+        && Number.isFinite(it.measured[1].hMm) && Number.isFinite(it.measured[c].hMm) && it.measured[c].hMm > it.measured[1].hMm * 1.25);
+    const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: divFactsOnly ? 16 : 15 }, ...(besideCap < 4 ? { maxCols: besideCap } : {}) } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
     // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     const stackShapes = [[6, 2]];

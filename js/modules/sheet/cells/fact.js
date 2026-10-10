@@ -426,7 +426,10 @@ register('fact', {
                 // It is a fact cell either way, VA-70's height (the drawing holds it, above), so
                 // its height is the fact cell's with the pads inside (`factLike`); a fact with a
                 // P11 cue is measured instead.
-                factLike: !p.cue, maxCols: ACROSS_MAX_COLS,
+                // VA-71's 4-column clamp is a design rule, not an author's guess at L: held at
+                // every size (hardCap), so an across fact page is never re-laid at 5 columns,
+                // where it would be drawn vertical while its screen twin stays across (SP-1).
+                factLike: !p.cue, maxCols: ACROSS_MAX_COLS, hardCap: true,
             };
         }
         // P11: a fact with a cue is no longer a bare fact row: it is measured, three to a row.

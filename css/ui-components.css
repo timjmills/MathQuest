@@ -8349,6 +8349,16 @@ html.dark .student-def strong {
 .dark .nav-stats .nav-tip-wrap > .nav-popup-toggle { background: #2A2740; border-color: #4A4660; }
 .dark .nav-stats .nav-tip-wrap > .nav-popup-toggle .popup-toggle-label { color: #E9E6F5; }
 
+/* Option tips (owner 2026-10-03): every option row carries a "?" - hover shows its short explanation,
+   a tap shows it under the control (touch screens have no hover). Additive. */
+.sko-has-tip { position: relative; padding-right: 34px !important; }
+.sko-tip { position: absolute; top: 6px; right: 0; width: 28px; height: 28px; min-width: 28px !important; min-height: 28px !important;
+    padding: 0 !important; border: 1px solid var(--border, #c9c9d4); border-radius: 50% !important; background: transparent;
+    color: var(--text-dim, #555) !important; font: 700 13px/1 inherit; cursor: help; }
+.sko-tip:hover, .sko-tip:focus-visible, .sko-tip[aria-expanded="true"] { color: var(--text, #111) !important; border-color: currentColor; }
+.sko-tip-text { display: block; margin-top: 6px; padding: 6px 8px; border-radius: 6px; font-size: 12px; line-height: 16px;
+    background: var(--bg-card-light, #f2f2f7); color: var(--text, #111); }
+.sko-tip-text[hidden] { display: none; }
 /* Many skills in a shared link (owner 2026-10-05): the pop-up never runs off the screen (Start Playing
    always reachable), and the skill list folds behind "See the N skills", scrolling inside itself. Additive. */
 .landing-modal { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; box-sizing: border-box; }

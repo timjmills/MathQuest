@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, gradeCircleText, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
+import { searchSkillIndex } from './skill-search.js';
 
 // The Add Skills list is an options host: a skill row gets the ⚙ Options panel. Values live in
 // the set's option store, so Play / Print / Quiz from this list honour them.
@@ -371,13 +372,10 @@ export function handleAddSkillsSearch(query) {
         return;
     }
 
-    const index = getSkillIndex();
-    const lowerQuery = query.toLowerCase().trim();
-    const terms = lowerQuery.split(/\s+/);
+    // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
+    const index = searchSkillIndex(query);
 
-    const matches = index.filter(item => {
-        return terms.every(term => item.searchText.includes(term));
-    });
+    const matches = index;
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:#666;text-align:center;font-size:0.9rem;">No skills found.</div>';

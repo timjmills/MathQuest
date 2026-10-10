@@ -709,7 +709,10 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
             : (!anchors && packByHeight(itemsBySection[si], L.cols, {
                 // A packed dense section holds the rows its layout packed (its dense ceiling), not
                 // the practice ceiling's (critic guided-r1: 10 mixed problems split 6 + 4 at S).
-                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
+                // Likewise a DENSE section (12.1: the layout chose more rows than the practice
+                // ceiling, "Dense: 3 x 9") holds its rows: a div_facts Mix page at S, 3 x 9 by the
+                // layout, was paged 15 + 12 with half of page 1 blank.
+                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed || L.rows * L.cols > L.ceiling ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));
     // A SPLIT part's grid prints its rows as dealt (composeSheet: rowShape against partCellH), not
     // rows x its layout's cell. Placed at rows x cellH, a split page was charged up to 30 mm more

@@ -894,3 +894,22 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 @media (max-width: 1023px) {
     .tv-print-grid { grid-template-areas: "preview" "what" "setup"; }
 }
+
+/* Owner 2026-10-03: the options popover DOCKS beside the print preview (over the settings column), so the preview page
+   stays in view and updates live; at narrow widths it is a bottom sheet over the lower half. Additive. */
+.tv-sko.is-docked { border-radius: 12px; }
+.tv-sko.is-halfsheet { left: 0 !important; right: 0; bottom: 0; top: auto !important; width: auto !important; border-radius: 16px 16px 0 0; }
+.tv-sko .sko-tip-text { background: var(--tv-subtle-2); color: var(--tv-text); }
+.tv-sko .sko-tip { color: var(--tv-text-2) !important; border-color: var(--tv-control); }
+/* The sample is a whole row, never the phone's swipe strip (owner 2026-10-03). */
+.tv-sko-frame .k2-swipe-cues { display: none !important; }
+.tv-sko-frame [data-mq-swiperow] { overflow: visible !important; }
+/* the count-by row reads as one sentence: its drop-downs size to their words, not the panel's width */
+.tv-sko .sko-row-line select.tv-select { width: auto; flex: 0 1 auto; min-width: 0; max-width: 100%; }
+/* critic countby-arrows r1 D6 (2026-10-09): the sample row is never capped at the stage's width, so the stage measures the
+   whole row and fit() scales it inside the frame instead of clipping its last box. Additive. */
+.tv-sko-frame :is(.tvp-visual, .k2-twin, .k2-countrow, .k2-countrow-frame, [data-mq-swiperow]):has(.k2-countrow-body) { max-width: none !important; width: max-content !important; min-width: 0 !important; }
+.tv-sko-frame .k2-countrow-frame [data-mq-swiperow] { flex: none !important; }
+/* critic search-terms r5 U-E (2026-10-09): the Sets search box keeps the line for its "Showing results for ..." notice
+   reserved at all times, so the Level row never jumps when a correction appears or goes. Additive. */
+.tv-panel-head .tv-search:has(> #tvSkillSearch) { margin-bottom: 12px; }

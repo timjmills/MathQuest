@@ -26,7 +26,9 @@ const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
  * @param {number} n  1-based item number (CL-13: a run never passes z.)
  */
 export function label(style, n) {
-    if (style === 'letter') return `<span class="ws-letter" data-ws-label="letter">${LETTERS[(n - 1) % 26]}.</span>`;
+    // One page holding more than 26 items (a dense S page) runs on aa. bb. ... - never a second
+    // "a." on the same sheet, which would make the key's references ambiguous (critic R1 D11).
+    if (style === 'letter') return `<span class="ws-letter" data-ws-label="letter">${LETTERS[(n - 1) % 26].repeat(Math.floor((n - 1) / 26) + 1)}.</span>`;
     if (style === 'tab') return `<span class="ws-tab${n > 99 ? ' w3' : n > 9 ? ' w2' : ''}" data-ws-label="tab">${n}</span>`;
     if (style === 'model') return `<span class="ws-modeltab" data-ws-label="model">Model</span>`;
     return '';

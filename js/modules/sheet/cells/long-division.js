@@ -28,7 +28,9 @@ import { INK, stripPos } from '../tokens.js';
 import { stepMarks, WHOLE_SLOTS } from '../steps.js';
 
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
-const rowsOf = (p) => (Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
+// A division FACT (`fact: true`, div_facts' long-division form): the bracket and the quotient
+// boxes only - a fact is recalled, not worked, so no work rows.
+const rowsOf = (p) => (p.fact ? 0 : Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
 
 /** The steps of the standard algorithm: where each quotient digit sits and what is written. */
 export function divisionSteps(dividend, divisor) {
@@ -94,8 +96,14 @@ function workRows(p, rows, shown = null) {
  * the cell is not three quarters empty (RUBRIC H13); M and L keep the base pitch.
  */
 function trackOf(p, ctx, g) {
-    const base = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
-    if (ctx.mode === 'screen') return base;
+    // A division fact's quotient box is at least the writing height wide (critic R1 D13: 4.5 mm
+    // boxes for 6 mm handwriting at S).
+    // A fact on a fact-rows / probe page is drawn at the row's rung and tracked from THAT digit
+    // (`factRowTrack`, critic R2 D-C: a writing-height track spread "72" into "7  2").
+    const rowTrack = p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0 ? Number(ctx.metrics.factRowTrack) : 0;
+    if (rowTrack) return rowTrack;
+    const base = Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
+    if (ctx.mode === 'screen' || p.fact) return base;
     return ctx.size === 'S' ? base * 1.2 : base;
 }
 
@@ -106,6 +114,11 @@ register('division', {
         const n = D.length, dv = V.length;
         const rows = rowsOf(p);
         const trackMm = trackOf(p, ctx, g);
+        // VA-61: the digit grid over the dividend is a Model / Guided scaffold. A division FACT on
+        // an Independent, Test, Probe ... page (scaffold level below 2) writes its quotient on the
+        // vinculum's open space, one digit per track, with no boxes (critic R1 D13). Screen twins
+        // keep their typed boxes (the input needs a target).
+        const openQ = !!p.fact && !g.twin && ctx.mode !== 'screen' && !((Number(ctx.scaffoldLevel) || 1) >= 2);
         const gutterMm = trackMm * 1.1;
         const k = keyOf(p);
         const ink = inkOf(ctx);
@@ -115,6 +128,7 @@ register('division', {
             for (let i = 0; i < n; i++) o[`q-${i}`] = s[i] === ' ' ? '' : s[i];
             return o;
         });
+        const o = dv + 2;
         const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
             + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
         // S5 step state: {slot: {value, ink}} and one ink per work row (stepState below).
@@ -127,10 +141,11 @@ register('division', {
         // Row 1: the quotient strip over every dividend track (VA-61, SL-12).
         for (let i = 0; i < n; i++) {
             html += cell(box(g, `q-${i}`, {
-                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: stripPos(i, n),
+                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
+                ...(openQ ? { shape: 'open', extra: 'border:0;background:transparent;' } : {}),
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
-            }), dv + 2 + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+            }), o + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
         }
         // P11: the remainder slot, "R [ ]", on the quotient's row after the last dividend track.
         if (p.rbox) {
@@ -141,8 +156,16 @@ register('division', {
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
         const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
             + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
-        html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block">${arc}</span>`;
-        for (let i = 0; i < n; i++) html += cell(esc(D[i]), dv + 2 + i, 2, `border-top:${HEAVY} solid ${INK.ink};`);
+        // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
+        // inside its row: the arc drops half a stroke so the two meet in one line.
+        html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
+        // The vinculum is ONE rule over every dividend track (critic R3: per-track top borders showed
+        // seams at the track joins); each digit keeps the rule's place above it (a clear border, which
+        // the screen's work-row wiring still reads as "a dividend track").
+        for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid transparent;`);
+        // (it starts over the arc's own top stroke - 15 % into the arc's track, where the path starts -
+        // so the arc and the bar meet in one unbroken line, no step at the join)
+        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span>`;
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;
@@ -192,7 +215,7 @@ register('division', {
         return {
             wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
-            measure: true, factLike: false, maxCols: 2, tracks: n + dv + 1,
+            measure: !p.fact, factLike: !!p.fact, maxCols: p.fact ? 4 : 2, tracks: n + dv + 1,
         };
     },
     inputs(p) {

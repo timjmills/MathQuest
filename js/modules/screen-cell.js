@@ -128,11 +128,24 @@ export function cellKindFor(q) {
             return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
         }
     }
+    // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
+    // carries the paper's "Divide." line and the hosts' digit size like the other forms (critic R1
+    // D9 / D10: it fell through to the legacy twin, which restated "54 ÷ 9 = ?" over a 48 px bracket).
+    if (cellT === 'division' && pay.fact && p.op === '/') return { kind: 'division', ...p, fact: true };
+    // div_facts' Fraction form: the kit equation template's fraction drawing, its slot typed.
+    if (cellT === 'equation' && pay.notation === 'fraction' && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', frac: true, ...p };
     if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
+    // div_facts' Vertical form (divForm): a 12s-table dividend has three digits (144 ÷ 12); the
+    // paper draws it on the fact template, so the screen does too.
+    if (cellT === 'fact' && pay.notation === 'vertical' && p.op === '/' && A.length <= 3 && B.length <= 2 && ANS.length <= 2) return { kind: 'fact', ...p };
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
     }
+    // div_facts' Standard form (an across division FACT): the paper's tight tracks, and on a Mix
+    // page the slot under the sentence as paper prints it (critic R3 §6: 0.7 em on screen against
+    // 0.29 em on paper; the Mix slot beside on screen, under on paper).
+    if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
     if (!v.trim()) return { kind: 'eq', ...p };
     return null;
 }
@@ -247,6 +260,25 @@ export function equationHTML(k, slotHtml) {
     // S2: touch dots on the given numbers (k.supports, screenSupportsFor).
     const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
     const to = touchOpts(40, 'px');
+    // div_facts' Fraction form (divForm): the dividend over the divisor on a bar, = [slot] - the
+    // kit equation template's fraction drawing, same markup as paper (cells/equation.js).
+    if (k.frac) {
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" data-ws-notation="fraction" style="align-items:center" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+            + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+            + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;"><span>${esc(k.a)}</span></span><span style="padding:0 0.2em;"><span>${esc(k.b)}</span></span></span>`
+            + `<span class="o">=</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
+    if (k.divFact) {
+        // the kit equation cell's division-fact tracks (cells/equation.js ACROSS_OP_EM / ACROSS_GAP_EM)
+        const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
+        const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
+        const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
+        if (k.mix) {
+            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
+                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+        }
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
+    }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
         + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`
         + `<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
@@ -686,8 +718,8 @@ function _badgePlace(el) {
     if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
     b.dataset.kind = kind;
     const r = el.getBoundingClientRect();
-    // not shown while the box is not, nor while this item's hint box is open over it
-    const hintOpen = !!host.querySelector('.hint-popup.active');
+    // not shown while the box is not
+    // (the hint now sits in page flow above the cell, so the tick stays while it is open)
     // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
     let clipped = false;
     for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
@@ -697,7 +729,7 @@ function _badgePlace(el) {
             if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
         }
     }
-    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
+    if (!r.width || !r.height || clipped) { b.style.display = 'none'; return; }
     b.style.display = '';
     const c = _badgeSpot(el, r, host);
     const hr = host.getBoundingClientRect();
@@ -1560,6 +1592,28 @@ function wireChartSwipe(cellEl) {
     });
 }
 
+/** The disk mat's window (kitCellTwin): the same swipe cue, hidden when the mat fits or is scrolled to the end. */
+// ONE shared resize listener for every disk window on the page (critic nit: one per render piled up
+// and kept old nodes alive); it updates the windows that are in the page now.
+const diskWinEnd = (w) => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+let diskResizeWired = false;
+export function wireDiskSwipe(root) {
+    if (!root || !root.querySelectorAll) return;
+    if (!diskResizeWired && typeof window !== 'undefined') {
+        diskResizeWired = true;
+        window.addEventListener('resize', () => document.querySelectorAll('.mq-diskwin').forEach(diskWinEnd));
+    }
+    root.querySelectorAll('.mq-diskwin').forEach((w) => {
+        const upd = () => diskWinEnd(w);
+        if (w.dataset.mqSwipe !== '1') {
+            w.dataset.mqSwipe = '1';
+            w.addEventListener('scroll', upd, { passive: true });
+            setTimeout(upd, 300); setTimeout(upd, 1000);
+        }
+        upd();
+    });
+}
+
 /** A count-by row swipes sideways inside its cell on a phone; a box that takes focus scrolls into view so no gap is missed. */
 function wireSwipeRows(cellEl) {
     cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
@@ -1782,7 +1836,9 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         el.setAttribute('inputmode', kind ? 'text' : 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
-        el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
+        el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        if (fixedW) el.dataset.mqFixed = '1';
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
@@ -2391,18 +2447,20 @@ export function unmonoCell(root) {
 const _n = (v) => { const x = Number(String(v == null ? '' : v).replace(/,/g, '')); return Number.isFinite(x) ? x : null; };
 
 /** One boxed answer slot for wireCellSlots: `w` is the digit capacity (SL-2: the section's width). */
-export function cellSlot(w = 2, label = '') {
+export function cellSlot(w = 2, label = '', fixed = false) {
     const n = Math.max(1, Math.min(8, w | 0));
-    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}" style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
+    // `fixed`: the box holds exactly `w` digits (a unit-form place box is one digit): maxlength is w,
+    // and a full box hands the caret on (active-box.js)
+    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}"${fixed ? ' data-mq-fixed="1"' : ''} style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths) {
+export function inlineBlanksHTML(text, widths, fixed = false) {
     let i = 0;
     const html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
-        return cellSlot(w);
+        return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
     return i ? `<div class="mq-ibline">${html}</div>` : '';
 }
@@ -2621,6 +2679,7 @@ export function ringCellHTML(p) {
  */
 export function workRowsHTML(k) {
     if (!k || k.kind !== 'division') return '';
+    if (k.fact) return '';      // a division FACT has no working rows (paper: workRows 0)
     const n = String(k.a).length;
     const steps = Math.max(1, Math.min(4, String(Math.floor(k.a / k.b)).length));
     const strip = (label) => `<div class="mq-workrow" role="group" aria-label="${attr(label)}"><span class="mq-workop">−</span>`
@@ -2867,6 +2926,13 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     // a kit twin is already drawn at the host's size (--mq-k2)
     if (root.matches('.k2-twin, [data-mq-k2]') || root.querySelector('[data-mq-k2]')) return 1;
     root.style.removeProperty('zoom');
+    // the disk mat keeps its paper width under a host's zoom (the worksheet scales the cell to its
+    // digit size; the mat was drawn to 790 px at 1280): its caps are divided by the zoom
+    const capMats = (z) => root.querySelectorAll('svg.pv-disk-mat[data-mq-paper-w]').forEach((s) => {
+        s.style.maxWidth = `${Math.round(Number(s.dataset.mqPaperW) / z)}px`;
+        s.style.minWidth = `${Math.ceil(Number(s.dataset.mqFloorW) / z)}px`;
+    });
+    capMats(1);
     delete root.dataset.mqFit;
     delete root.dataset.mqFitShort;
     const sizes = _numeralSizes(root);
@@ -2883,6 +2949,7 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     if (f < Math.min(want, max) * 0.97) root.dataset.mqFitShort = '1';
     if (f <= 1.04) return 1;
     root.style.setProperty('zoom', f.toFixed(3));
+    capMats(f);
     root.dataset.mqFit = f.toFixed(2);
     return f;
 }
@@ -2976,7 +3043,7 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -3057,6 +3124,7 @@ export function fitTwinRows(root) {
     if (!root || typeof getComputedStyle === 'undefined') return false;
     const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
     let changed = false;
+    wireDiskSwipe(root);
     // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks
     // hold printed digits, not inputs, so in a narrow cell they close up to the digit's own width;
     // the dividend's tracks keep their >= 44 px targets.
@@ -3183,6 +3251,8 @@ export function fitTwinRows(root) {
  * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
  */
 const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart']);
+const PV_PLACE_WORDS = new Set(['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands', 'millions',
+    'one', 'ten', 'hundred', 'thousand', 'tenths', 'hundredths', 'thousandths']);
 const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
 
 function _categoriesOf(skillId, given) {
@@ -3479,6 +3549,41 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
     tpl.innerHTML = _screenSizes(html, digitPt);
+    // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
+    // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
+    // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a
+    // line never splits a box from its word and the boxes and digits keep their full size.
+    tpl.content.querySelectorAll('.pv-blanks .pv-slotgroup').forEach((grp) => {
+        const kids = Array.from(grp.children);
+        const isSlot = (el) => el.hasAttribute('data-ws-slot') || !!el.querySelector('[data-ws-slot]');
+        const words = kids.filter((el) => !isSlot(el)).map((el) => el.textContent.trim());
+        if (!words.length || !words.every((w) => PV_PLACE_WORDS.has(w))) return;
+        // the frame's last word ("ones") follows the group: it joins the last pair
+        const tail = [];
+        for (let s = grp.nextElementSibling; s && !isSlot(s); s = s.nextElementSibling) {
+            if (!PV_PLACE_WORDS.has(s.textContent.trim())) break;
+            tail.push(s);
+        }
+        const pairs = [];
+        kids.forEach((el) => {
+            if (isSlot(el) || !pairs.length) {
+                const pr = document.createElement('span');
+                pr.className = 'mq-slotpair';
+                pr.style.cssText = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+                pairs.push(pr);
+            }
+            pairs[pairs.length - 1].appendChild(el);
+        });
+        tail.forEach((el) => pairs[pairs.length - 1].appendChild(el));
+        pairs.forEach((pr) => grp.appendChild(pr));
+        grp.style.flexWrap = 'wrap';
+        grp.style.whiteSpace = 'normal';
+        grp.style.justifyContent = 'center';
+        grp.style.rowGap = '2mm';
+        grp.style.columnGap = '0.45em';
+        grp.style.maxWidth = '100%';
+        grp.classList.add('mq-pairwrap');
+    });
     const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'))
         .filter((s) => s.getAttribute('data-ws-graded') !== '0');
     const chart = p.kind === 'chart';
@@ -3512,7 +3617,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         table.setAttribute('data-mq-join', '');
         slots.forEach((s, k) => {
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
             const box = t.content.firstChild;
             box.classList.add('mq-cellbox--chart');
             s.replaceWith(box);
@@ -3520,9 +3625,12 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         mode = 'slots';
     } else if (inline && sets && sets[0] && sets[0].length === slots.length) {
         slots.forEach((s, k) => {
-            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(/[^0-9]/g, '').length));
+            // a unit-form place box (fixedWidth) holds its own digits exactly: 1 for "7 hundreds"
+            const fx = !!q.inlineBlanksData.fixedWidth;
+            const len = String(sets[0][k]).replace(/[^0-9]/g, '').length;
+            const w = fx ? Math.max(1, Math.min(8, len)) : Math.max(2, Math.min(8, len));
             const t = document.createElement('template');
-            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
+            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
             s.replaceWith(box);
@@ -3531,6 +3639,28 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } else {
         return null;
     }
+    // The disk mat is drawn in paper millimetres (three L zones = 115 mm = 435 px), wider than a
+    // phone card. It scales down with its cell, never below the size at which its smallest label
+    // reaches the 8 pt floor (TY-11); past that it swipes inside its own window with the SP-11a cue.
+    tpl.content.querySelectorAll('svg.pv-disk-mat').forEach((svg) => {
+        const wMm = parseFloat(svg.getAttribute('width'));
+        const labels = Array.from(svg.querySelectorAll('text')).map((t) => parseFloat(t.getAttribute('font-size'))).filter((v) => v > 0);
+        if (!(wMm > 0) || !labels.length) return;
+        const pxPerMm = 96 / 25.4;
+        const minLabelPt = Math.min(...labels) / (25.4 / 72);
+        const floor = Math.min(1, 8 / minLabelPt);
+        svg.style.width = '100%';
+        svg.style.height = 'auto';
+        svg.style.maxWidth = `${Math.round(wMm * pxPerMm)}px`;
+        svg.style.minWidth = `${Math.ceil(wMm * pxPerMm * floor)}px`;
+        svg.dataset.mqPaperW = String(Math.round(wMm * pxPerMm));
+        svg.dataset.mqFloorW = String(Math.ceil(wMm * pxPerMm * floor));
+        const win = document.createElement('div');
+        win.className = 'k2-chartwindow mq-diskwin';
+        svg.replaceWith(win);
+        win.appendChild(svg);
+        win.insertAdjacentHTML('beforeend', '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more</b></span>');
+    });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
     const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;

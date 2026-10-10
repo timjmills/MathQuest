@@ -1609,6 +1609,19 @@ html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-sw
 /* ---- Start cards: dark-theme focus ring reaches 3:1 against the dark section (critic R2-D1). */
 .dark .mode-cards .student-start-btn:focus-visible,
 .dark-theme .mode-cards .student-start-btn:focus-visible { outline-color: #B5A5F4; }
+
+/* The place-value disk mat on a phone (2026-10-03): it scales with its cell down to the 8 pt label
+   floor (screen-cell.js kitCellTwin), then swipes inside its own window with the SP-11a cue. */
+.mq-diskwin { overflow-x: auto; overflow-y: hidden; width: 100%; max-width: 100%; min-width: 0; -webkit-overflow-scrolling: touch; scrollbar-width: auto; scrollbar-color: #000 #ddd; }
+.mq-kittwin[data-mq-kind="disks"], .mq-kittwin[data-mq-kind="disks"] .pv-cell { min-width: 0; max-width: 100%; }
+.mq-diskwin:not([data-mq-end]) .k2-swipe-cue {
+    display: block; position: sticky; left: 0; width: 100%; box-sizing: border-box; text-align: center;
+    padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
+    border-top: 2px solid #000; font-family: "Andika", sans-serif;
+}
+.mq-diskwin .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
+.mq-diskwin[data-mq-end] .k2-swipe-cue { display: none; }
+@media print { .mq-diskwin .k2-swipe-cue { display: none !important; } }
 /* count-by rows (critic C2 r6): a box's tile never wraps. On the online worksheet ui-components.css wraps every inline flex
    inside .problem-card (specificity 0,7,0); the worksheet's own nowrap rule matches only while the tile's style attribute reads
    "display:flex", which the active-box highlight rewrites, and the 44 px input then sat 2 px low in its tile. This beats both. */
@@ -1617,6 +1630,20 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
 
+/* SL-3 (2026-10-03): an inline-blanks input adopted into a kit box (unit_form's "__ thousands") drew its own
+   ib-cell border inside the box's border: two boxes. The box is the slot; the input fills it, borderless.
+   The per-box live marks stay on the box (.mq-cellbox:has(> input.mq-live-*)). */
+html body .mq-scell .mq-cellbox > input.ib-cell { width: 100% !important; height: 100% !important; min-width: 0 !important; border: 0 !important; margin: 0 !important; }
+/* ...and the active-box highlight (yellow + ring) moves from that input to its box: on the input it was clipped by the
+   box's overflow to a thick top edge. */
+html body .mq-scell .mq-cellbox > input.ib-cell { outline: none !important; box-shadow: none !important; animation: none !important; display: block !important; vertical-align: top !important; }
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) {
+    background-color: #fff3a0 !important; box-shadow: 0 0 0 3px #f2c200 !important; overflow: visible;
+    animation: mq-active-pulse 1.3s ease-in-out infinite !important;
+}
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box) > input.ib-cell,
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus) > input.ib-cell { background: transparent !important; }
 /* ---- Wave 1 / A3 (owner 2026-10-03): the WRONG DIGITS blink red, 3 cycles of 1.2 s, then hold steady red.
    Practice card and online worksheet only; the A2 dashed edge and cross stay (colour is never the only cue).
    Reduced motion: no blink, the steady red only. Additive: older saved HTML never carries these classes. */
@@ -1756,3 +1783,17 @@ html body .ws-cell.mq-scell:has(.k2-twin[data-mq-template="counters"]) { padding
    sits in the MIDDLE of the taller cell, so the spare splits above and below it (RUBRIC H13), never
    one band under it. Additive: it overrides the round-6 compact rule by specificity only. */
 html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid.mq-wsgrid > .problem-card.mq-wscard:has(.mq-nl-track) > .mq-wspaper > .ws-cell.mq-scell { flex: 1 1 auto; justify-content: center; }
+
+/* ---- Steps-box lane (D3): an open hint sits in flow between the bar and the paper, pushing
+   the cell down, so it never covers the story it hints about (RUBRIC C1: chrome never covers). */
+.problem-card.mq-wscard > .hint-popup.active {
+    position: relative; top: auto; bottom: auto; left: auto; right: auto;
+    margin: 0 0 8px; box-shadow: none;
+}
+
+/* Count rows, Answer spaces: Lines (critic countby-arrows r1 D1, 2026-10-09): the input stays INSIDE its drawn line, never
+   widened to a touch width past it, so the next-box yellow and the right/wrong tints can never cover a jump arrow. The line
+   itself is wide enough to tap (the screen twin wraps Lines 6 + 6, count-row.js). Additive. */
+html body .mq-scell .k2-shape-line { overflow: hidden; }
+html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
+html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }

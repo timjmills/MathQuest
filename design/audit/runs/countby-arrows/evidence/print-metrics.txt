@@ -1,0 +1,632 @@
+roles independent more-practice opener scripted-model guided error-analysis review test pre-skill-check word-problems fact-rows fact-probe mixed-practice true-false reason-it stretch lesson
+independent-S-boxes                pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-boxes                key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-lines                pupil pg1 rows6 j66 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+independent-S-lines                key   pg1 rows6 j66 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+independent-S-lines-wide           pupil pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK30 arcs0 per6+6 ovf0
+independent-S-lines-wide           key   pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per6+6 ovf0
+independent-S-boxes-times          pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-boxes-times          key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-lines-times          pupil pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+independent-S-lines-times          key   pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+independent-S-boxes-hex            pupil pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-boxes-hex            key   pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-onepage              pupil pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+independent-S-onepage              key   pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+independent-S-onepage-lines        pupil pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK60 arcs0 per12 ovf0
+independent-S-onepage-lines        key   pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK0 arcs0 per12 ovf0
+independent-S-onepage-wide         pupil pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+independent-S-onepage-wide         key   pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-boxes                pupil pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-boxes                key   pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-lines                pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK30 arcs0 per12 ovf0
+independent-M-lines                key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK0 arcs0 per12 ovf0
+independent-M-lines-wide           pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK30 arcs0 per6+6 ovf0
+independent-M-lines-wide           key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK0 arcs0 per6+6 ovf0
+independent-M-boxes-times          pupil pg2 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-boxes-times          key   pg2 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-lines-times          pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK30 arcs0 per12 ovf0
+independent-M-lines-times          key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK0 arcs0 per12 ovf0
+independent-M-boxes-hex            pupil pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-M-boxes-hex            key   pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-boxes                pupil pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-boxes                key   pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-lines                pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK30 arcs0 per12 ovf0
+independent-L-lines                key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK0 arcs0 per12 ovf0
+independent-L-lines-wide           pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK30 arcs0 per6+6 ovf0
+independent-L-lines-wide           key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK0 arcs0 per6+6 ovf0
+independent-L-boxes-times          pupil pg2 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-boxes-times          key   pg2 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-lines-times          pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK30 arcs0 per12 ovf0
+independent-L-lines-times          key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK0 arcs0 per12 ovf0
+independent-L-boxes-hex            pupil pg2 rows6 j60 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+independent-L-boxes-hex            key   pg2 rows6 j60 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-boxes              pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-boxes              key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-lines              pupil pg1 rows6 j66 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+more-practice-S-lines              key   pg1 rows6 j66 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+more-practice-S-lines-wide         pupil pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK30 arcs0 per6+6 ovf0
+more-practice-S-lines-wide         key   pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per6+6 ovf0
+more-practice-S-boxes-times        pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-boxes-times        key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-lines-times        pupil pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+more-practice-S-lines-times        key   pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+more-practice-S-boxes-hex          pupil pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-boxes-hex          key   pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-onepage            pupil pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+more-practice-S-onepage            key   pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+more-practice-S-onepage-lines      pupil pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK60 arcs0 per12 ovf0
+more-practice-S-onepage-lines      key   pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK0 arcs0 per12 ovf0
+more-practice-S-onepage-wide       pupil pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-S-onepage-wide       key   pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-boxes              pupil pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-boxes              key   pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-lines              pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK30 arcs0 per12 ovf0
+more-practice-M-lines              key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK0 arcs0 per12 ovf0
+more-practice-M-lines-wide         pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK30 arcs0 per6+6 ovf0
+more-practice-M-lines-wide         key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK0 arcs0 per6+6 ovf0
+more-practice-M-boxes-times        pupil pg2 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-boxes-times        key   pg2 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-lines-times        pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK30 arcs0 per12 ovf0
+more-practice-M-lines-times        key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK0 arcs0 per12 ovf0
+more-practice-M-boxes-hex          pupil pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-M-boxes-hex          key   pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-boxes              pupil pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-boxes              key   pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-lines              pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK30 arcs0 per12 ovf0
+more-practice-L-lines              key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK0 arcs0 per12 ovf0
+more-practice-L-lines-wide         pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK30 arcs0 per6+6 ovf0
+more-practice-L-lines-wide         key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK0 arcs0 per6+6 ovf0
+more-practice-L-boxes-times        pupil pg2 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-boxes-times        key   pg2 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-lines-times        pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK30 arcs0 per12 ovf0
+more-practice-L-lines-times        key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK0 arcs0 per12 ovf0
+more-practice-L-boxes-hex          pupil pg2 rows6 j60 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+more-practice-L-boxes-hex          key   pg2 rows6 j60 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+opener-S-boxes                     pupil pg1 rows2 j20 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0
+opener-S-boxes                     key   pg1 rows2 j20 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-S-lines                     pupil pg1 rows2 j22 clr1 ovl0 len4.73 v0 pt10.24 ln14 eK9 arcs0 per12 ovf0
+opener-S-lines                     key   pg1 rows2 j22 clr1 ovl0 len4.73 v0 pt10.24 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-S-lines-wide                pupil pg1 rows2 j21 clr1 ovl0 len3.12 v0 pt10.24 ln14 eK9 arcs0 per6+6 ovf0
+opener-S-lines-wide                key   pg1 rows2 j21 clr1 ovl0 len3.12 v0 pt10.24 ln14 eK4 arcs0 per6+6 ovf0 <<<
+opener-S-boxes-times               pupil pg1 rows2 j20 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0
+opener-S-boxes-times               key   pg1 rows2 j20 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-S-lines-times               pupil pg1 rows2 j22 clr1 ovl0 len4.73 v0 pt10.24 ln14 eK9 arcs0 per12 ovf0
+opener-S-lines-times               key   pg1 rows2 j22 clr1 ovl0 len4.73 v0 pt10.24 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-S-boxes-hex                 pupil pg1 rows2 j20 clr1.9 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0
+opener-S-boxes-hex                 key   pg1 rows2 j20 clr1.9 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-M-boxes                     pupil pg1 rows2 j20 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0
+opener-M-boxes                     key   pg1 rows2 j20 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-M-lines                     pupil pg1 rows2 j22 clr1 ovl0 len3.63 v0 pt14.08 ln14 eK9 arcs0 per12 ovf0
+opener-M-lines                     key   pg1 rows2 j22 clr1 ovl0 len3.63 v0 pt14.08 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-M-lines-wide                pupil pg1 rows2 j21 clr1 ovl0 len3 v0 pt10.36 ln14 eK9 arcs0 per6+6 ovf0
+opener-M-lines-wide                key   pg1 rows2 j21 clr1 ovl0 len3 v0 pt10.36 ln14 eK4 arcs0 per6+6 ovf0 <<<
+opener-M-boxes-times               pupil pg1 rows2 j20 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0
+opener-M-boxes-times               key   pg1 rows2 j20 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-M-lines-times               pupil pg1 rows2 j22 clr1 ovl0 len3.63 v0 pt14.08 ln14 eK9 arcs0 per12 ovf0
+opener-M-lines-times               key   pg1 rows2 j22 clr1 ovl0 len3.63 v0 pt14.08 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-M-boxes-hex                 pupil pg1 rows2 j20 clr1.58 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0
+opener-M-boxes-hex                 key   pg1 rows2 j20 clr1.58 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-L-boxes                     pupil pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+opener-L-boxes                     key   pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-L-lines                     pupil pg1 rows2 j22 clr1 ovl0 len3 v0 pt15.33 ln14 eK9 arcs0 per12 ovf0
+opener-L-lines                     key   pg1 rows2 j22 clr1 ovl0 len3 v0 pt15.33 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-L-lines-wide                pupil pg1 rows2 j21 clr1 ovl0 len3 v0 pt10.22 ln14 eK9 arcs0 per6+6 ovf0
+opener-L-lines-wide                key   pg1 rows2 j21 clr1 ovl0 len3 v0 pt10.22 ln14 eK4 arcs0 per6+6 ovf0 <<<
+opener-L-boxes-times               pupil pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+opener-L-boxes-times               key   pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0 <<<
+opener-L-lines-times               pupil pg1 rows2 j22 clr1 ovl0 len3 v0 pt15.33 ln14 eK9 arcs0 per12 ovf0
+opener-L-lines-times               key   pg1 rows2 j22 clr1 ovl0 len3 v0 pt15.33 ln14 eK4 arcs0 per12 ovf0 <<<
+opener-L-boxes-hex                 pupil pg1 rows2 j20 clr1 ovl0 len4.5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+opener-L-boxes-hex                 key   pg1 rows2 j20 clr1 ovl0 len4.5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0 <<<
+scripted-model-S-boxes             pupil pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-S-boxes             key   pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-S-lines             pupil pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln20 eK15 arcs0 per12 ovf0
+scripted-model-S-lines             key   pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-S-lines-wide        pupil pg1 rows4 j40 clr2.5 ovl0 len5 v0 pt10.24 ln20 eK15 arcs0 per6+6 ovf0
+scripted-model-S-lines-wide        key   pg1 rows4 j40 clr2.5 ovl0 len5 v0 pt10.24 ln20 eK15 arcs0 per6+6 ovf0 <<<
+scripted-model-S-boxes-times       pupil pg2 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-S-boxes-times       key   pg2 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-S-lines-times       pupil pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln20 eK15 arcs0 per12 ovf0
+scripted-model-S-lines-times       key   pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-S-boxes-hex         pupil pg2 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-S-boxes-hex         key   pg2 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-boxes             pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-boxes             key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-lines             pupil pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln20 eK15 arcs0 per12 ovf0
+scripted-model-M-lines             key   pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-M-lines-wide        pupil pg1 rows4 j40 clr1 ovl0 len3.06 v0 pt14.08 ln20 eK15 arcs0 per6+6 ovf0
+scripted-model-M-lines-wide        key   pg1 rows4 j40 clr1 ovl0 len3.06 v0 pt14.08 ln20 eK15 arcs0 per6+6 ovf0 <<<
+scripted-model-M-boxes-times       pupil pg2 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-boxes-times       key   pg2 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-lines-times       pupil pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln20 eK15 arcs0 per12 ovf0
+scripted-model-M-lines-times       key   pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-M-boxes-hex         pupil pg2 rows4 j40 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-M-boxes-hex         key   pg2 rows4 j40 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-boxes             pupil pg2 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-boxes             key   pg2 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-lines             pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln20 eK15 arcs0 per12 ovf0
+scripted-model-L-lines             key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-L-lines-wide        pupil pg2 rows4 j40 clr1 ovl0 len3 v0 pt13.52 ln20 eK15 arcs0 per6+6 ovf0
+scripted-model-L-lines-wide        key   pg2 rows4 j40 clr1 ovl0 len3 v0 pt13.52 ln20 eK15 arcs0 per6+6 ovf0 <<<
+scripted-model-L-boxes-times       pupil pg2 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-boxes-times       key   pg2 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-lines-times       pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln20 eK15 arcs0 per12 ovf0
+scripted-model-L-lines-times       key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln20 eK15 arcs0 per12 ovf0 <<<
+scripted-model-L-boxes-hex         pupil pg2 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+scripted-model-L-boxes-hex         key   pg2 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-boxes                     pupil pg1 rows5 j50 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-boxes                     key   pg1 rows5 j50 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-lines                     pupil pg1 rows10 j110 clr1 ovl0 len3.12 v0 pt10.24 ln50 eK45 arcs0 per12 ovf0
+guided-S-lines                     key   pg1 rows10 j110 clr1 ovl0 len3.12 v0 pt10.24 ln50 eK0 arcs0 per12 ovf0
+guided-S-lines-wide                pupil pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK25 arcs0 per12 ovf0
+guided-S-lines-wide                key   pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+guided-S-boxes-times               pupil pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-boxes-times               key   pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-lines-times               pupil pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln40 eK35 arcs0 per12 ovf0
+guided-S-lines-times               key   pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln40 eK0 arcs0 per12 ovf0
+guided-S-boxes-hex                 pupil pg1 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-S-boxes-hex                 key   pg1 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-boxes                     pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-boxes                     key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-lines                     pupil pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.36 ln40 eK35 arcs0 per12 ovf0
+guided-M-lines                     key   pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.36 ln40 eK0 arcs0 per12 ovf0
+guided-M-lines-wide                pupil pg1 rows5 j52 clr1 ovl0 len3 v0 pt10.36 ln25 eK20 arcs0 per12 ovf0
+guided-M-lines-wide                key   pg1 rows5 j52 clr1 ovl0 len3 v0 pt10.36 ln25 eK0 arcs0 per12 ovf0
+guided-M-boxes-times               pupil pg2 rows7 j70 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-boxes-times               key   pg2 rows7 j70 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-lines-times               pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK25 arcs0 per12 ovf0
+guided-M-lines-times               key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK0 arcs0 per12 ovf0
+guided-M-boxes-hex                 pupil pg2 rows7 j70 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-M-boxes-hex                 key   pg2 rows7 j70 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-boxes                     pupil pg2 rows7 j70 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-boxes                     key   pg2 rows7 j70 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-lines                     pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK25 arcs0 per12 ovf0
+guided-L-lines                     key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK0 arcs0 per12 ovf0
+guided-L-lines-wide                pupil pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.22 ln20 eK15 arcs0 per12 ovf0
+guided-L-lines-wide                key   pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.22 ln20 eK0 arcs0 per12 ovf0
+guided-L-boxes-times               pupil pg2 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-boxes-times               key   pg2 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-lines-times               pupil pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK20 arcs0 per12 ovf0
+guided-L-lines-times               key   pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK0 arcs0 per12 ovf0
+guided-L-boxes-hex                 pupil pg2 rows7 j70 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+guided-L-boxes-hex                 key   pg2 rows7 j70 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-boxes             pupil pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-boxes             key   pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-lines             pupil pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln40 eK20 arcs0 per12 ovf0
+error-analysis-S-lines             key   pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln40 eK10 arcs0 per12 ovf0 <<<
+error-analysis-S-lines-wide        pupil pg1 rows8 j88 clr1 ovl0 len3.12 v0 pt10.24 ln40 eK20 arcs0 per12 ovf0
+error-analysis-S-lines-wide        key   pg1 rows8 j88 clr1 ovl0 len3.12 v0 pt10.24 ln40 eK10 arcs0 per12 ovf0 <<<
+error-analysis-S-boxes-times       pupil pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-boxes-times       key   pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-lines-times       pupil pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK15 arcs0 per12 ovf0
+error-analysis-S-lines-times       key   pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-S-boxes-hex         pupil pg1 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-S-boxes-hex         key   pg1 rows4 j40 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-boxes             pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-boxes             key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-lines             pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK15 arcs0 per12 ovf0
+error-analysis-M-lines             key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-M-lines-wide        pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK15 arcs0 per12 ovf0
+error-analysis-M-lines-wide        key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.36 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-M-boxes-times       pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-boxes-times       key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-lines-times       pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK15 arcs0 per12 ovf0
+error-analysis-M-lines-times       key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-M-boxes-hex         pupil pg1 rows4 j40 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-M-boxes-hex         key   pg1 rows4 j40 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-boxes             pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-boxes             key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-lines             pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK15 arcs0 per12 ovf0
+error-analysis-L-lines             key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-L-lines-wide        pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK15 arcs0 per12 ovf0
+error-analysis-L-lines-wide        key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt10.22 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-L-boxes-times       pupil pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-boxes-times       key   pg1 rows2 j20 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-lines-times       pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK15 arcs0 per12 ovf0
+error-analysis-L-lines-times       key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK5 arcs0 per12 ovf0 <<<
+error-analysis-L-boxes-hex         pupil pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+error-analysis-L-boxes-hex         key   pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+review-S-boxes                     pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0
+review-S-boxes                     key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK0 arcs0 per6+6 ovf0
+review-S-lines                     pupil pg1 rows10 j110 clr1 ovl0 len3.12 v0 pt10.24 ln56 eK56 arcs0 per12 ovf0
+review-S-lines                     key   pg1 rows10 j110 clr1 ovl0 len3.12 v0 pt10.24 ln56 eK0 arcs0 per12 ovf0
+review-S-lines-wide                pupil pg1 rows8 j84 clr1 ovl0 len3.12 v0 pt10.24 ln44 eK44 arcs0 per6+6 ovf0
+review-S-lines-wide                key   pg1 rows8 j84 clr1 ovl0 len3.12 v0 pt10.24 ln44 eK0 arcs0 per6+6 ovf0
+review-S-boxes-times               pupil pg1 rows5 j50 clr2.83 ovl0 len5 v0 pt10.24 ln2 eK2 arcs0 per6+6 ovf0
+review-S-boxes-times               key   pg1 rows5 j50 clr2.83 ovl0 len5 v0 pt10.24 ln2 eK0 arcs0 per6+6 ovf0
+review-S-lines-times               pupil pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln46 eK46 arcs0 per12 ovf0
+review-S-lines-times               key   pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln46 eK0 arcs0 per12 ovf0
+review-S-boxes-hex                 pupil pg1 rows5 j50 clr1.9 ovl0 len5 v0 pt10.24 ln2 eK2 arcs0 per6+6 ovf0
+review-S-boxes-hex                 key   pg1 rows5 j50 clr1.9 ovl0 len5 v0 pt10.24 ln2 eK0 arcs0 per6+6 ovf0
+review-M-boxes                     pupil pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0
+review-M-boxes                     key   pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK0 arcs0 per6+6 ovf0
+review-M-lines                     pupil pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.36 ln44 eK44 arcs0 per12 ovf0
+review-M-lines                     key   pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.36 ln44 eK0 arcs0 per12 ovf0
+review-M-lines-wide                pupil pg1 rows7 j73 clr1 ovl0 len3 v0 pt10.36 ln39 eK39 arcs0 per6+6 ovf0
+review-M-lines-wide                key   pg1 rows7 j73 clr1 ovl0 len3 v0 pt10.36 ln39 eK0 arcs0 per6+6 ovf0
+review-M-boxes-times               pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf0
+review-M-boxes-times               key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf0
+review-M-lines-times               pupil pg1 rows8 j88 clr1 ovl0 len3.63 v0 pt14.08 ln44 eK44 arcs0 per12 ovf0
+review-M-lines-times               key   pg1 rows8 j88 clr1 ovl0 len3.63 v0 pt14.08 ln44 eK0 arcs0 per12 ovf0
+review-M-boxes-hex                 pupil pg1 rows5 j50 clr1.58 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf0
+review-M-boxes-hex                 key   pg1 rows5 j50 clr1.58 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf0
+review-L-boxes                     pupil pg1 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf0
+review-L-boxes                     key   pg1 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf0
+review-L-lines                     pupil pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.22 ln44 eK44 arcs0 per12 ovf0
+review-L-lines                     key   pg1 rows8 j88 clr1 ovl0 len3 v0 pt10.22 ln44 eK0 arcs0 per12 ovf0
+review-L-lines-wide                pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln34 eK34 arcs0 per6+6 ovf0
+review-L-lines-wide                key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln34 eK0 arcs0 per6+6 ovf0
+review-L-boxes-times               pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf0
+review-L-boxes-times               key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf0
+review-L-lines-times               pupil pg1 rows7 j77 clr1 ovl0 len3 v0 pt15.33 ln39 eK39 arcs0 per12 ovf0
+review-L-lines-times               key   pg1 rows7 j77 clr1 ovl0 len3 v0 pt15.33 ln39 eK0 arcs0 per12 ovf0
+review-L-boxes-hex                 pupil pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf0
+review-L-boxes-hex                 key   pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf0
+test-S-boxes                       pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-boxes                       key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-lines                       pupil pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+test-S-lines                       key   pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+test-S-lines-wide                  pupil pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK30 arcs0 per6+6 ovf0
+test-S-lines-wide                  key   pg1 rows6 j63 clr1 ovl0 len3.12 v0 pt10.24 ln30 eK0 arcs0 per6+6 ovf0
+test-S-boxes-times                 pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-boxes-times                 key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-lines-times                 pupil pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK30 arcs0 per12 ovf0
+test-S-lines-times                 key   pg1 rows6 j66 clr1 ovl0 len4.73 v0 pt10.24 ln30 eK0 arcs0 per12 ovf0
+test-S-boxes-hex                   pupil pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-boxes-hex                   key   pg1 rows6 j60 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+test-S-onepage                     pupil pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+test-S-onepage                     key   pg1 rows12 j132 clr1 ovl0 len2.2 v0 pt14.7 ln0 eK0 arcs0 per12 ovf0
+test-S-onepage-lines               pupil pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK60 arcs0 per12 ovf0
+test-S-onepage-lines               key   pg1 rows12 j132 clr1 ovl0 len3 v0 pt11.28 ln60 eK0 arcs0 per12 ovf0
+test-S-onepage-wide                pupil pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+test-S-onepage-wide                key   pg1 rows5 j53 clr1 ovl0 len2.2 v0 pt9 ln0 eK0 arcs0 per6+6 ovf0
+test-M-boxes                       pupil pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-M-boxes                       key   pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-M-lines                       pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK30 arcs0 per12 ovf0
+test-M-lines                       key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK0 arcs0 per12 ovf0
+test-M-lines-wide                  pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK30 arcs0 per6+6 ovf0
+test-M-lines-wide                  key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.36 ln30 eK0 arcs0 per6+6 ovf0
+test-M-boxes-times                 pupil pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-M-boxes-times                 key   pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-M-lines-times                 pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK30 arcs0 per12 ovf0
+test-M-lines-times                 key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln30 eK0 arcs0 per12 ovf0
+test-M-boxes-hex                   pupil pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-M-boxes-hex                   key   pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+test-L-boxes                       pupil pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+test-L-boxes                       key   pg1 rows6 j60 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+test-L-lines                       pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK30 arcs0 per12 ovf0
+test-L-lines                       key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK0 arcs0 per12 ovf0
+test-L-lines-wide                  pupil pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK30 arcs0 per6+6 ovf0
+test-L-lines-wide                  key   pg1 rows6 j63 clr1 ovl0 len3 v0 pt10.22 ln30 eK0 arcs0 per6+6 ovf0
+test-L-boxes-times                 pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+test-L-boxes-times                 key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+test-L-lines-times                 pupil pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK30 arcs0 per12 ovf0
+test-L-lines-times                 key   pg1 rows6 j66 clr1 ovl0 len3 v0 pt15.33 ln30 eK0 arcs0 per12 ovf0
+test-L-boxes-hex                   pupil pg1 rows5 j50 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+test-L-boxes-hex                   key   pg1 rows5 j50 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+pre-skill-check-S-boxes            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-boxes            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-S-lines            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-lines            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-S-lines-wide       pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-lines-wide       key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-S-boxes-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-boxes-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-S-lines-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-lines-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-S-boxes-hex        pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-S-boxes-hex        key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-boxes            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-boxes            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-lines            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-lines            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-lines-wide       pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-lines-wide       key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-boxes-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-boxes-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-lines-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-lines-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-M-boxes-hex        pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-M-boxes-hex        key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-boxes            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-boxes            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-lines            pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-lines            key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-lines-wide       pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-lines-wide       key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-boxes-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-boxes-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-lines-times      pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-lines-times      key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+pre-skill-check-L-boxes-hex        pupil pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK4 arcs0 per ovf0
+pre-skill-check-L-boxes-hex        key   pg2 rows0 j0 clrNone ovl0 lenNone vNone ptNone ln4 eK0 arcs0 per ovf0
+word-problems-S-boxes ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-S-lines ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-S-lines-wide ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-S-boxes-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-S-lines-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-S-boxes-hex ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-boxes ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-lines ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-lines-wide ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-boxes-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-lines-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-M-boxes-hex ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-boxes ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-lines ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-lines-wide ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-boxes-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-lines-times ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+word-problems-L-boxes-hex ERROR Word problems need a story skill (a word-problem generator or provider stories). This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.
+buildRoleSheet 
+fact-rows-S-boxes ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-S-lines ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-S-lines-wide ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-S-boxes-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-S-lines-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-S-boxes-hex ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-boxes ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-lines ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-lines-wide ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-boxes-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-lines-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-M-boxes-hex ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-boxes ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-lines ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-lines-wide ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-boxes-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-lines-times ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-rows-L-boxes-hex ERROR Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.
+buildRoleSheet (http://12
+fact-probe-S-boxes ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-S-lines ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-S-lines-wide ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-S-boxes-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-S-lines-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-S-boxes-hex ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-boxes ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-lines ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-lines-wide ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-boxes-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-lines-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-M-boxes-hex ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-boxes ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-lines ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-lines-wide ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-boxes-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-lines-times ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+fact-probe-L-boxes-hex ERROR The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae
+mixed-practice-S-boxes             pupil pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-boxes             key   pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-lines             pupil pg1 rows9 j99 clr1 ovl0 len3.12 v0 pt10.24 ln45 eK45 arcs0 per12 ovf0
+mixed-practice-S-lines             key   pg1 rows9 j99 clr1 ovl0 len3.12 v0 pt10.24 ln45 eK0 arcs0 per12 ovf0
+mixed-practice-S-lines-wide        pupil pg1 rows9 j94 clr1 ovl0 len3.12 v0 pt10.24 ln45 eK45 arcs0 per6+6 ovf0
+mixed-practice-S-lines-wide        key   pg1 rows9 j94 clr1 ovl0 len3.12 v0 pt10.24 ln45 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-boxes-times       pupil pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-boxes-times       key   pg1 rows6 j60 clr2.83 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-lines-times       pupil pg1 rows9 j99 clr1 ovl0 len4.73 v0 pt10.24 ln45 eK45 arcs0 per12 ovf0
+mixed-practice-S-lines-times       key   pg1 rows9 j99 clr1 ovl0 len4.73 v0 pt10.24 ln45 eK0 arcs0 per12 ovf0
+mixed-practice-S-boxes-hex         pupil pg1 rows5 j50 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-S-boxes-hex         key   pg1 rows5 j50 clr1.9 ovl0 len5 v0 pt10.24 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-boxes             pupil pg2 rows7 j70 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-boxes             key   pg2 rows7 j70 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-lines             pupil pg1 rows7 j77 clr1 ovl0 len3.63 v0 pt14.08 ln35 eK35 arcs0 per12 ovf0
+mixed-practice-M-lines             key   pg1 rows7 j77 clr1 ovl0 len3.63 v0 pt14.08 ln35 eK0 arcs0 per12 ovf0
+mixed-practice-M-lines-wide        pupil pg1 rows7 j73 clr1 ovl0 len3 v0 pt10.36 ln35 eK35 arcs0 per6+6 ovf0
+mixed-practice-M-lines-wide        key   pg1 rows7 j73 clr1 ovl0 len3 v0 pt10.36 ln35 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-boxes-times       pupil pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-boxes-times       key   pg1 rows5 j50 clr2.54 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-lines-times       pupil pg1 rows7 j77 clr1 ovl0 len3.63 v0 pt14.08 ln35 eK35 arcs0 per12 ovf0
+mixed-practice-M-lines-times       key   pg1 rows7 j77 clr1 ovl0 len3.63 v0 pt14.08 ln35 eK0 arcs0 per12 ovf0
+mixed-practice-M-boxes-hex         pupil pg1 rows5 j50 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-M-boxes-hex         key   pg1 rows5 j50 clr1.58 ovl0 len5 v0 pt14.08 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-boxes             pupil pg1 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-boxes             key   pg1 rows5 j50 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-lines             pupil pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK25 arcs0 per12 ovf0
+mixed-practice-L-lines             key   pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK0 arcs0 per12 ovf0
+mixed-practice-L-lines-wide        pupil pg1 rows5 j52 clr1 ovl0 len3 v0 pt10.22 ln25 eK25 arcs0 per6+6 ovf0
+mixed-practice-L-lines-wide        key   pg1 rows5 j52 clr1 ovl0 len3 v0 pt10.22 ln25 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-boxes-times       pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-boxes-times       key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-lines-times       pupil pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK25 arcs0 per12 ovf0
+mixed-practice-L-lines-times       key   pg1 rows5 j55 clr1 ovl0 len3 v0 pt15.33 ln25 eK0 arcs0 per12 ovf0
+mixed-practice-L-boxes-hex         pupil pg1 rows5 j50 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+mixed-practice-L-boxes-hex         key   pg1 rows5 j50 clr1 ovl0 len4.5 v0 pt17.92 ln0 eK0 arcs0 per6+6 ovf0
+true-false-S-boxes                 pupil pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK4 arcs0 per6+6 ovf0
+true-false-S-boxes                 key   pg1 rows4 j40 clr2.83 ovl0 len5 v0 pt10.24 ln4 eK0 arcs0 per6+6 ovf0
+true-false-S-lines                 pupil pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln24 eK4 arcs0 per12 ovf0
+true-false-S-lines                 key   pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln24 eK0 arcs0 per12 ovf0
+true-false-S-lines-wide            pupil pg1 rows4 j42 clr1 ovl0 len3.12 v0 pt10.24 ln24 eK4 arcs0 per6+6 ovf0
+true-false-S-lines-wide            key   pg1 rows4 j42 clr1 ovl0 len3.12 v0 pt10.24 ln24 eK0 arcs0 per6+6 ovf0
+true-false-S-boxes-times           pupil pg1 rows3 j30 clr2.83 ovl0 len5 v0 pt10.24 ln3 eK3 arcs0 per6+6 ovf0
+true-false-S-boxes-times           key   pg1 rows3 j30 clr2.83 ovl0 len5 v0 pt10.24 ln3 eK0 arcs0 per6+6 ovf0
+true-false-S-lines-times           pupil pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln24 eK4 arcs0 per12 ovf0
+true-false-S-lines-times           key   pg1 rows4 j44 clr1 ovl0 len4.73 v0 pt10.24 ln24 eK0 arcs0 per12 ovf0
+true-false-S-boxes-hex             pupil pg1 rows3 j30 clr1.9 ovl0 len5 v0 pt10.24 ln3 eK3 arcs0 per6+6 ovf0
+true-false-S-boxes-hex             key   pg1 rows3 j30 clr1.9 ovl0 len5 v0 pt10.24 ln3 eK0 arcs0 per6+6 ovf0
+true-false-M-boxes                 pupil pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK4 arcs0 per6+6 ovf0
+true-false-M-boxes                 key   pg1 rows4 j40 clr2.54 ovl0 len5 v0 pt14.08 ln4 eK0 arcs0 per6+6 ovf0
+true-false-M-lines                 pupil pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln24 eK4 arcs0 per12 ovf0
+true-false-M-lines                 key   pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln24 eK0 arcs0 per12 ovf0
+true-false-M-lines-wide            pupil pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.36 ln24 eK4 arcs0 per6+6 ovf0
+true-false-M-lines-wide            key   pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.36 ln24 eK0 arcs0 per6+6 ovf0
+true-false-M-boxes-times           pupil pg1 rows3 j30 clr2.54 ovl0 len5 v0 pt14.08 ln3 eK3 arcs0 per6+6 ovf0
+true-false-M-boxes-times           key   pg1 rows3 j30 clr2.54 ovl0 len5 v0 pt14.08 ln3 eK0 arcs0 per6+6 ovf0
+true-false-M-lines-times           pupil pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln24 eK4 arcs0 per12 ovf0
+true-false-M-lines-times           key   pg1 rows4 j44 clr1 ovl0 len3.63 v0 pt14.08 ln24 eK0 arcs0 per12 ovf0
+true-false-M-boxes-hex             pupil pg1 rows3 j30 clr1.58 ovl0 len5 v0 pt14.08 ln3 eK3 arcs0 per6+6 ovf0
+true-false-M-boxes-hex             key   pg1 rows3 j30 clr1.58 ovl0 len5 v0 pt14.08 ln3 eK0 arcs0 per6+6 ovf0
+true-false-L-boxes                 pupil pg1 rows3 j30 clr1.71 ovl0 len5 v0 pt17.92 ln3 eK3 arcs0 per6+6 ovf0
+true-false-L-boxes                 key   pg1 rows3 j30 clr1.71 ovl0 len5 v0 pt17.92 ln3 eK0 arcs0 per6+6 ovf0
+true-false-L-lines                 pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK4 arcs0 per12 ovf0
+true-false-L-lines                 key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK0 arcs0 per12 ovf0
+true-false-L-lines-wide            pupil pg1 rows3 j31 clr1 ovl0 len3 v0 pt10.22 ln18 eK3 arcs0 per6+6 ovf0
+true-false-L-lines-wide            key   pg1 rows3 j31 clr1 ovl0 len3 v0 pt10.22 ln18 eK0 arcs0 per6+6 ovf0
+true-false-L-boxes-times           pupil pg1 rows3 j30 clr1.71 ovl0 len5 v0 pt17.92 ln3 eK3 arcs0 per6+6 ovf0
+true-false-L-boxes-times           key   pg1 rows3 j30 clr1.71 ovl0 len5 v0 pt17.92 ln3 eK0 arcs0 per6+6 ovf0
+true-false-L-lines-times           pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK4 arcs0 per12 ovf0
+true-false-L-lines-times           key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK0 arcs0 per12 ovf0
+true-false-L-boxes-hex             pupil pg1 rows3 j30 clr1 ovl0 len4.5 v0 pt17.92 ln3 eK3 arcs0 per6+6 ovf0
+true-false-L-boxes-hex             key   pg1 rows3 j30 clr1 ovl0 len4.5 v0 pt17.92 ln3 eK0 arcs0 per6+6 ovf0
+reason-it-S-boxes                  pupil pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln8 eK8 arcs0 per6+6 ovf0
+reason-it-S-boxes                  key   pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln8 eK0 arcs0 per6+6 ovf0
+reason-it-S-lines                  pupil pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln48 eK8 arcs0 per12 ovf0
+reason-it-S-lines                  key   pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln48 eK0 arcs0 per12 ovf0
+reason-it-S-lines-wide             pupil pg1 rows8 j84 clr1 ovl0 len3.12 v0 pt10.24 ln48 eK8 arcs0 per6+6 ovf0
+reason-it-S-lines-wide             key   pg1 rows8 j84 clr1 ovl0 len3.12 v0 pt10.24 ln48 eK0 arcs0 per6+6 ovf0
+reason-it-S-boxes-times            pupil pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln8 eK8 arcs0 per6+6 ovf0
+reason-it-S-boxes-times            key   pg1 rows8 j80 clr2.83 ovl0 len5 v0 pt10.24 ln8 eK0 arcs0 per6+6 ovf0
+reason-it-S-lines-times            pupil pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln48 eK8 arcs0 per12 ovf0
+reason-it-S-lines-times            key   pg1 rows8 j88 clr1 ovl0 len4.73 v0 pt10.24 ln48 eK0 arcs0 per12 ovf0
+reason-it-S-boxes-hex              pupil pg1 rows8 j80 clr1.9 ovl0 len5 v0 pt10.24 ln8 eK8 arcs0 per6+6 ovf0
+reason-it-S-boxes-hex              key   pg1 rows8 j80 clr1.9 ovl0 len5 v0 pt10.24 ln8 eK0 arcs0 per6+6 ovf0
+reason-it-M-boxes                  pupil pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln6 eK6 arcs0 per6+6 ovf0
+reason-it-M-boxes                  key   pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln6 eK0 arcs0 per6+6 ovf0
+reason-it-M-lines                  pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln36 eK6 arcs0 per12 ovf0
+reason-it-M-lines                  key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln36 eK0 arcs0 per12 ovf0
+reason-it-M-lines-wide             pupil pg1 rows6 j62 clr1 ovl0 len3 v0 pt10.36 ln36 eK6 arcs0 per6+6 ovf0
+reason-it-M-lines-wide             key   pg1 rows6 j62 clr1 ovl0 len3 v0 pt10.36 ln36 eK0 arcs0 per6+6 ovf0
+reason-it-M-boxes-times            pupil pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln6 eK6 arcs0 per6+6 ovf0
+reason-it-M-boxes-times            key   pg1 rows6 j60 clr2.54 ovl0 len5 v0 pt14.08 ln6 eK0 arcs0 per6+6 ovf0
+reason-it-M-lines-times            pupil pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln36 eK6 arcs0 per12 ovf0
+reason-it-M-lines-times            key   pg1 rows6 j66 clr1 ovl0 len3.63 v0 pt14.08 ln36 eK0 arcs0 per12 ovf0
+reason-it-M-boxes-hex              pupil pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln6 eK6 arcs0 per6+6 ovf0
+reason-it-M-boxes-hex              key   pg1 rows6 j60 clr1.58 ovl0 len5 v0 pt14.08 ln6 eK0 arcs0 per6+6 ovf0
+reason-it-L-boxes                  pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+reason-it-L-boxes                  key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK0 arcs0 per6+6 ovf0
+reason-it-L-lines                  pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK4 arcs0 per12 ovf0
+reason-it-L-lines                  key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK0 arcs0 per12 ovf0
+reason-it-L-lines-wide             pupil pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.22 ln24 eK4 arcs0 per6+6 ovf0
+reason-it-L-lines-wide             key   pg1 rows4 j42 clr1 ovl0 len3 v0 pt10.22 ln24 eK0 arcs0 per6+6 ovf0
+reason-it-L-boxes-times            pupil pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+reason-it-L-boxes-times            key   pg1 rows4 j40 clr1.71 ovl0 len5 v0 pt17.92 ln4 eK0 arcs0 per6+6 ovf0
+reason-it-L-lines-times            pupil pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK4 arcs0 per12 ovf0
+reason-it-L-lines-times            key   pg1 rows4 j44 clr1 ovl0 len3 v0 pt15.33 ln24 eK0 arcs0 per12 ovf0
+reason-it-L-boxes-hex              pupil pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln4 eK4 arcs0 per6+6 ovf0
+reason-it-L-boxes-hex              key   pg1 rows4 j40 clr1 ovl0 len4.5 v0 pt17.92 ln4 eK0 arcs0 per6+6 ovf0
+stretch-S-boxes ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-S-lines ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-S-lines-wide ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-S-boxes-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-S-lines-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-S-boxes-hex ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-boxes ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-lines ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-lines-wide ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-boxes-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-lines-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-M-boxes-hex ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-boxes ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-lines ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-lines-wide ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-boxes-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-lines-times ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+stretch-L-boxes-hex ERROR No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+buildRoleSheet (http://127.0.0.1:42145/js/modules/print-sheet.js?v=ae6eb08cfd:
+lesson-S-boxes                     pupil pg4 rows13 j130 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-S-boxes                     key   pg4 rows13 j130 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-S-lines                     pupil pg4 rows14 j154 clr1 ovl0 len3 v0 pt10.22 ln72 eK67 arcs0 per12 ovf1 <<<
+lesson-S-lines                     key   pg4 rows14 j154 clr1 ovl0 len3 v0 pt10.22 ln72 eK15 arcs0 per12 ovf1 <<<
+lesson-S-lines-wide                pupil pg3 rows13 j134 clr1 ovl0 len3 v0 pt10.36 ln67 eK62 arcs0 per6+6 ovf1 <<<
+lesson-S-lines-wide                key   pg3 rows13 j134 clr1 ovl0 len3 v0 pt10.36 ln67 eK15 arcs0 per6+6 ovf1 <<<
+lesson-S-boxes-times               pupil pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-S-boxes-times               key   pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-S-lines-times               pupil pg4 rows14 j154 clr1 ovl0 len3 v0 pt14.08 ln72 eK67 arcs0 per12 ovf1 <<<
+lesson-S-lines-times               key   pg4 rows14 j154 clr1 ovl0 len3 v0 pt14.08 ln72 eK15 arcs0 per12 ovf1 <<<
+lesson-S-boxes-hex                 pupil pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-S-boxes-hex                 key   pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-M-boxes                     pupil pg4 rows13 j130 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-M-boxes                     key   pg4 rows13 j130 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-M-lines                     pupil pg4 rows14 j154 clr1 ovl0 len3 v0 pt10.22 ln72 eK67 arcs0 per12 ovf1 <<<
+lesson-M-lines                     key   pg4 rows14 j154 clr1 ovl0 len3 v0 pt10.22 ln72 eK15 arcs0 per12 ovf1 <<<
+lesson-M-lines-wide                pupil pg3 rows13 j134 clr1 ovl0 len3 v0 pt10.36 ln67 eK62 arcs0 per6+6 ovf1 <<<
+lesson-M-lines-wide                key   pg3 rows13 j134 clr1 ovl0 len3 v0 pt10.36 ln67 eK15 arcs0 per6+6 ovf1 <<<
+lesson-M-boxes-times               pupil pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-M-boxes-times               key   pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-M-lines-times               pupil pg4 rows14 j154 clr1 ovl0 len3 v0 pt14.08 ln72 eK67 arcs0 per12 ovf1 <<<
+lesson-M-lines-times               key   pg4 rows14 j154 clr1 ovl0 len3 v0 pt14.08 ln72 eK15 arcs0 per12 ovf1 <<<
+lesson-M-boxes-hex                 pupil pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt14.08 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-M-boxes-hex                 key   pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt14.08 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-L-boxes                     pupil pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-L-boxes                     key   pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-L-lines                     pupil pg4 rows13 j143 clr1 ovl0 len3 v0 pt10.22 ln67 eK62 arcs0 per12 ovf1 <<<
+lesson-L-lines                     key   pg4 rows13 j143 clr1 ovl0 len3 v0 pt10.22 ln67 eK15 arcs0 per12 ovf1 <<<
+lesson-L-lines-wide                pupil pg3 rows11 j113 clr1 ovl0 len3 v0 pt10.22 ln57 eK52 arcs0 per6+6 ovf1 <<<
+lesson-L-lines-wide                key   pg3 rows11 j113 clr1 ovl0 len3 v0 pt10.22 ln57 eK15 arcs0 per6+6 ovf1 <<<
+lesson-L-boxes-times               pupil pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-L-boxes-times               key   pg4 rows12 j120 clr1.71 ovl0 len5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf1 <<<
+lesson-L-lines-times               pupil pg4 rows13 j143 clr1 ovl0 len3 v0 pt15.33 ln67 eK62 arcs0 per12 ovf1 <<<
+lesson-L-lines-times               key   pg4 rows13 j143 clr1 ovl0 len3 v0 pt15.33 ln67 eK15 arcs0 per12 ovf1 <<<
+lesson-L-boxes-hex                 pupil pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt17.92 ln2 eK2 arcs0 per6+6 ovf1 <<<
+lesson-L-boxes-hex                 key   pg4 rows12 j120 clr1 ovl0 len4.5 v0 pt17.92 ln2 eK0 arcs0 per6+6 ovf1 <<<
+problems []
