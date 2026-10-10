@@ -8304,6 +8304,203 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B11.S1": {
+   "title": "Language of position",
+   "direct": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (prior learning wk W19)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "position_map",
+    "turns",
+    "ordinal"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same cluster K.G.A.2: Identify 3D Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same cluster K.G.A.2: Match Names to 2D Shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same cluster K.G.A.2: Match Names to 3D Shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B11.S2": {
+   "title": "Describe movement",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns",
+   "build": [
+    "movement"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 Language of position (step before in the block)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (prior learning wk W19)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "position_map",
+    "turns",
+    "ordinal"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same cluster K.G.A.2: Identify 3D Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same cluster K.G.A.2: Match Names to 2D Shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same cluster K.G.A.2: Match Names to 3D Shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B11.S3": {
+   "title": "Describe turns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object",
+   "build": [
+    "turns"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same standard K.G.A.1: Shape Positions: Above/Below/Beside (Visual)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same cluster K.G.A.2: Identify 2D Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same cluster K.G.A.2: Identify 3D Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same cluster K.G.A.2: Match Names to 2D Shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B11.S4": {
+   "title": "Describe movement and turns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns",
+   "build": [
+    "movement"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y1.B11.S4 Describe position - above and below (prior learning wk W19)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B15.S2 Rotate shapes (prior learning wk W19)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "position_map",
+    "turns",
+    "ordinal"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same cluster K.G.A.2: Identify 3D Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same cluster K.G.A.2: Match Names to 2D Shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same cluster K.G.A.2: Match Names to 3D Shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B11.S5": {
+   "title": "Shape patterns with turns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "continuing patterns made by turning a shape (quarter turns clockwise)",
+   "build": [
+    "pattern_turns"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same standard 1.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -9140,6 +9337,92 @@
    "ccss": [
     "2.MD.D.10",
     "3.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "position_map": {
+   "kind": "new",
+   "skill": "shapes_early:position_and_maps",
+   "name": "Where Is It? Positions and Maps",
+   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
+   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
+   "family": "geometry",
+   "steps": [
+    "R.B17.S7",
+    "R.B17.S8",
+    "R.B17.S9",
+    "R.B17.S10",
+    "R.B17.S11",
+    "Y1.B11.S2",
+    "Y1.B11.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "turns": {
+   "kind": "new",
+   "skill": "coordinates:whole_half_quarter_turns",
+   "name": "Whole, Half and Quarter Turns",
+   "teaches": "describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object",
+   "representation": "an arrow or object drawn before and after a turn; circle the turn from a word bank",
+   "family": "geometry",
+   "steps": [
+    "Y1.B11.S1",
+    "Y2.B11.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "ordinal": {
+   "kind": "new",
+   "skill": "counting:ordinal_numbers",
+   "name": "1st, 2nd, 3rd",
+   "teaches": "ordinal numbers (first to tenth) and their abbreviations for position in a line",
+   "representation": "a line of line-drawn children or objects with a start flag; circle the 3rd, write the position of the star",
+   "family": "counting",
+   "steps": [
+    "Y1.B11.S5"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "movement": {
+   "kind": "new",
+   "skill": "coordinates:describe_movement",
+   "name": "Describe Movement",
+   "teaches": "describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns",
+   "representation": "a square grid with a start and an object; write the moves; option: follow a route",
+   "family": "geometry",
+   "steps": [
+    "Y2.B11.S2",
+    "Y2.B11.S4"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "pattern_turns": {
+   "kind": "new",
+   "skill": "patterns:patterns_with_turns",
+   "name": "Shape Patterns with Turns",
+   "teaches": "continuing patterns made by turning a shape (quarter turns clockwise)",
+   "representation": "a row of arrow or shape tiles turning; draw or circle the next one",
+   "family": "geometry",
+   "steps": [
+    "Y2.B11.S5"
+   ],
+   "ccss": [
+    "1.G.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
