@@ -35,6 +35,7 @@ import { renderLibraryScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
 import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
 import { renderTodoScreen, openTodo } from './teacher-todo.js';
+import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
 const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
@@ -50,7 +51,7 @@ const SCREEN_KEY = 'mq_teacher_screen';
 
 const BOARD_WINDOW = (() => { try { return new URLSearchParams(location.search).get('board') === '1'; } catch (e) { return false; } })();
 
-let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : 'home'; } catch (e) { return 'home'; } })();
+let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; if (typeof location !== 'undefined' && mapHashActive()) return 'map'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : 'home'; } catch (e) { return 'home'; } })();
 let started = false;
 
 /* ================================================================= routing */
@@ -91,6 +92,7 @@ function showScreen(key) {
     document.body.classList.remove('tv-play', 'tv-bigboard');
     // The White Rose screen keeps its place in the URL hash (#wrm/...); every other screen drops it.
     if (key !== 'wrm') clearWrmHash();
+    if (key !== 'map') clearMapHash();
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
     setNavCurrent(key);
     const el = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
@@ -243,6 +245,7 @@ function start() {
 
     // A #wrm/... link (bookmark, Back, Forward) opens the White Rose screen at that lesson.
     window.addEventListener('hashchange', () => {
+        if (isTeacher() && mapHashActive()) { tvGo('map'); return; }   // #map/... (MAP task views)
         if (!isTeacher() || !wrmHashActive()) return;
         if (current !== 'wrm' || !document.body.classList.contains('tv-on-screen')) tvGo('wrm');
         else wrmOnHashChange();

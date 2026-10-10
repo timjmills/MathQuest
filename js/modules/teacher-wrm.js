@@ -21,7 +21,7 @@
 import { icon, esc } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { createPicker, liveKey, toBeBuiltHTML } from './teacher-skillpick.js';
-import { loadLinksData } from './links-data.js';
+import { loadYear } from './links-data.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -51,13 +51,22 @@ const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDe
 function load() {
     if (L) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js'), loadLinksData()]).then(([a, b, data]) => {
-            // Curated links (data/curriculum/links/<YEAR>.json, when present) win over the computed rules.
-            for (const y of Object.values(data.years)) a.addCuratedYear(y);
-            L = a; SEQ = b;
-        }).catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
+        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; })
+            .catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
     }
     return loading;
+}
+
+// Curated year files (data/curriculum/links/<YEAR>.json) load on demand: the years of the steps in the
+// unit on screen (a copied-in lesson's step is another year's). They win over the computed rules.
+const curatedDone = new Set();
+function ensureCurated() {
+    const u = unitRec();
+    const years = new Set([SEQ.WRM_SEQUENCE.find((g) => g.id === v.grade)?.year].filter(Boolean));
+    if (u) for (const l of lessonsOf(u)) if (l && l.step) years.add(l.step.split('.')[0]);
+    const want = [...years].filter((y) => !curatedDone.has(y));
+    if (!want.length) return Promise.resolve();
+    return Promise.all(want.map((y) => loadYear(y).then((d) => { curatedDone.add(y); if (d) L.addCuratedYear(d); })));
 }
 
 /** Open the screen at a White Rose step (from the Skills to be made screen). False when no lesson teaches it. */
@@ -66,10 +75,10 @@ export function openWrmStep(stepId) {
         const l = L && L.allLessons().find((x) => x.step === stepId);
         if (!l) return false;
         Object.assign(v, { grade: l.grade, unit: l.unit, lesson: l.key });
+        v.finderOpen = false;
         pick.reset();
         writeHash(false);
-        window.tvGo?.('wrm');
-        return true;
+        return ensureCurated().then(() => { window.tvGo?.('wrm'); return true; });
     });
 }
 
@@ -113,6 +122,20 @@ function unitRec() { return unitsOf(v.grade).find((u) => u.id === v.unit) || nul
 function lessonsOf(u) { return u.lessons.map((_, i) => L.lessonByKey(`${v.grade}:${u.id}:${i + 1}`)); }
 const live = liveKey;
 
+/** "Week 1 (6–10 Sep)" — the pacing guide's words. */
+function weekText(l) {
+    if (!l.weeks.length) return '';
+    const w = l.weeks[0];
+    const of = (L.weekInfo(l.grade, w) || {}).weekOf;
+    return `Week ${w.replace(/^W0?/, '')}${of ? ` (${of})` : ''}${l.weeks.length > 1 ? ` +${l.weeks.length - 1}` : ''}`;
+}
+/** S / P / I columns → the handbook's strand words. */
+function strandText(st) {
+    if (!st) return '';
+    if (st === 'SPI') return 'All strands';
+    return st.split('').map((c) => STRAND[c]).filter(Boolean).join(' + ') + (st.length === 1 ? ' only' : '');
+}
+
 /** { n, verdict } for a lesson row: the curated record when present, else the computed rules. */
 function rowFacts(lesson) {
     if (!lesson.step) return { n: 0, verdict: 'gap' };
@@ -139,7 +162,10 @@ export function renderWrmScreen(el) {
         if (!v.grade) v.grade = '2';
         if (!v.unit || !unitRec()) v.unit = (unitsOf(v.grade)[0] || {}).id || '';
         writeHash(true);
-        draw();
+        ensureCurated().then(() => {
+            draw();
+            if (v.lesson) root.querySelector('#tvwDetail')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+        });
     });
 }
 
@@ -148,18 +174,24 @@ export function wrmOnHashChange() {
     if (!L || !root || !root.isConnected) return;
     const before = `${v.grade}|${v.unit}|${v.lesson}`;
     readHash();
-    if (`${v.grade}|${v.unit}|${v.lesson}` !== before) { pick.reset(); draw(); }
+    if (`${v.grade}|${v.unit}|${v.lesson}` !== before) { pick.reset(); v.finderOpen = !v.lesson; ensureCurated().then(draw); }
 }
 
 function draw() {
     const body = root.querySelector('#tvwBody');
+    // While a lesson is open the finder folds to one line (search + "Grade 2 · D1 …  Change"), so the
+    // lesson's skills are on screen on a Chromebook (critic r1 B5).
+    const compact = !!v.lesson && !v.finderOpen;
+    const u0 = unitRec();
+    const crumb = `${gradeRec() ? gradeRec().label : ''} · ${u0 ? (u0.id === 'E' ? 'Enrichment' : `${u0.id} · ${L.domainName(u0.domain)}`) : ''}`;
     body.innerHTML = `
-      <div class="tvw-find">
+      <div class="tvw-find${compact ? ' is-compact' : ''}">
         <div class="tv-search tvw-search"><span aria-hidden="true">${icon('search', 18)}</span>
           <label class="tv-sr" for="tvwSearch">Find a lesson</label>
           <input id="tvwSearch" class="tv-input" type="search" autocomplete="off" placeholder="Find a lesson: title, unit or standard (e.g. 3.NF.A.1)" value="${esc(v.query)}" aria-controls="tvwHits">
           <ul class="tvw-hits" id="tvwHits" role="listbox" aria-label="Lessons found" hidden></ul></div>
-        <div class="tvw-pick">
+        ${compact ? `<button type="button" class="tv-btn tvw-crumb" data-w-finder="open" aria-expanded="false"><span class="tvw-crumb-t">${esc(crumb)}</span><span class="tvw-crumb-c">Change grade or unit</span></button>` : ''}
+        <div class="tvw-pick"${compact ? ' hidden' : ''}>
           <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvwGradeH">Grade</span>
             <div class="tv-chips" role="group" aria-labelledby="tvwGradeH">${grades().map((g) => `<button type="button" class="tv-chip" data-w-grade="${esc(g.id)}" aria-pressed="${g.id === v.grade}" aria-label="${esc(g.label)}">${esc(GRADE_LABEL[g.id] || g.id)}</button>`).join('')}</div></div>
           <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvwUnitH">Unit</span>
@@ -190,7 +222,7 @@ function unitChips() {
 function lessonRowHTML(l) {
     const f = rowFacts(l);
     const gap = l.type === 'build' ? 'CCSS lesson to be built' : !l.step ? 'Not a White Rose step' : f.n ? '' : 'No skill yet';
-    const meta = [l.weeks.length ? l.weeks[0] : '', l.strands ? l.strands.split('').join(' ') : ''].filter(Boolean).join(' · ');
+    const meta = [weekText(l), strandText(l.strands)].filter(Boolean).join(' · ');
     const part = gap ? '' : f.verdict === 'partial' ? ' <span class="tvw-tag tvw-part">Covers part</span>' : ' <span class="tvw-tag tvw-verdict-tag is-full">Full</span>';
     return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${gap ? 'gap' : f.verdict}"${l.key === v.lesson ? ' aria-current="true"' : ''}>
       <span class="tvw-n">${l.n}</span>
@@ -223,7 +255,7 @@ function detailHTML() {
     links = L.linksFor(l, { live });
     pick.setGroups({ direct: links.direct, prereq: links.prereq, related: links.related });
     const files = l.step ? (SEQ.WRM_STEP_FILES[l.step] || []) : [];
-    const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label === 'Open lesson' ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
+    const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label.startsWith('Open lesson') ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
     const ee = (links.step && links.step.ee) || [];
     const strands = l.strands.split('').map((s) => STRAND[s]).filter(Boolean);
     const vd = l.type === 'build' ? null : VERDICT[links.verdict];
@@ -240,14 +272,15 @@ function detailHTML() {
           ${l.power ? '<span class="tvw-tag tvw-power">Power standard</span>' : ''}
           ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(l.from)} — teach it from that grade's files</span>` : ''}
           ${l.type === 'enrich' ? '<span class="tvw-tag">Enrichment (after MAP)</span>' : ''}
+          ${l.note ? `<span class="tvw-tag tvw-power">${esc(l.note)}</span>` : ''}
           ${strands.length ? `<span class="tvw-tag tvw-strand">${esc(strands.join(' · '))}</span>` : ''}
           ${l.ccss.map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join('')}
           ${ee.slice(0, 3).map((c) => `<span class="tvw-tag tvw-code tvw-ee">${esc(c.replace(/^M\./, ''))}</span>`).join('')}
         </div>
-        ${files.length ? `<div class="tvw-files">${fileBtn(files[0], 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
+        ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${l.from.replace(/^G/, 'Grade ')} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
         <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalName)}
+        ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
-      ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       ${GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalName, 'Still to make') : '')).join('')}
       ${pick.barWrapHTML()}`;
 }
@@ -267,10 +300,19 @@ function redrawDetail() {
 
 function choose(patch, focusSel) {
     Object.assign(v, patch);
+    v.finderOpen = !v.lesson;
     pick.reset();
     writeHash(false);
-    draw();
-    if (focusSel) root.querySelector(focusSel)?.focus();
+    return ensureCurated().then(() => {
+        draw();
+        if (focusSel) root.querySelector(focusSel)?.focus();
+    });
+}
+
+/** The CCSS code the search matched (else the lesson's first code). */
+function matchedCode(l, q) {
+    const t = String(q || '').trim().toLowerCase();
+    return l.ccss.find((c) => t && c.toLowerCase().startsWith(t)) || l.ccss.find((c) => t && c.toLowerCase().includes(t)) || l.ccss[0];
 }
 
 function searchHits(box, q) {
@@ -278,7 +320,7 @@ function searchHits(box, q) {
     box.hidden = !q.trim();
     box.innerHTML = hits.length
         ? hits.map((l) => `<li role="option"><button type="button" class="tvw-hit" data-w-jump="${esc(l.key)}"><span class="tvw-hit-t">${esc(l.title)}</span>
-            <span class="tvw-hit-m">${esc(l.gradeLabel)} · ${esc(l.unit === 'E' ? 'Enrichment' : `${l.unit} ${L.domainName(l.domain)}`)}${l.ccss.length ? ` · ${esc(l.ccss[0])}` : ''}</span></button></li>`).join('')
+            <span class="tvw-hit-m">${esc(l.gradeLabel)} · ${esc(l.unit === 'E' ? 'Enrichment' : `${l.unit} ${L.domainName(l.domain)}`)}${l.ccss.length ? ` · ${esc(matchedCode(l, q))}` : ''}</span></button></li>`).join('')
         : '<li class="tvw-hit-none">No lesson matches. Try a shorter word or a standard such as 2.NBT.A.1.</li>';
 }
 
@@ -288,12 +330,12 @@ function wire(el) {
         if (!t || !el.contains(t)) return;
         const d = t.dataset;
         if (d.wTodo) { window.tvGo?.('todo'); return; }
+        if (d.wFinder) { v.finderOpen = true; draw(); root.querySelector('[data-w-grade][aria-pressed="true"]')?.focus(); return; }
         if (!L) return;
         if (d.wGrade) { choose({ grade: d.wGrade, unit: (unitsOf(d.wGrade)[0] || {}).id || '', lesson: '' }, `[data-w-grade="${d.wGrade}"]`); return; }
         if (d.wUnit) { choose({ unit: d.wUnit, lesson: '' }, `[data-w-unit="${d.wUnit}"]`); return; }
         if (d.wLesson) {
-            choose({ lesson: d.wLesson }, `[data-w-lesson="${d.wLesson}"]`);
-            root.querySelector('#tvwDetail')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+            choose({ lesson: d.wLesson }, `[data-w-lesson="${d.wLesson}"]`).then(() => root.querySelector('#tvwDetail')?.scrollIntoView({ block: 'start', behavior: 'instant' }));
             return;
         }
         if (d.wJump) {

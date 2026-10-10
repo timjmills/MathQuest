@@ -80,10 +80,10 @@ function unpack() {
     for (const g of WRM_SEQUENCE) {
         for (const u of g.units) {
             u.lessons.forEach((t, i) => {
-                const [title, step, ccss, power, type, weeks, strands, from] = t;
+                const [title, step, ccss, power, type, weeks, strands, from, note] = t;
                 const l = {
                     key: `${g.id}:${u.id}:${i + 1}`, grade: g.id, gradeLabel: g.label, unit: u.id, domain: u.domain,
-                    unitName: u.name, n: i + 1, title, step, ccss, power: !!power, type, weeks, strands, from,
+                    unitName: u.name, n: i + 1, title, step, ccss, power: !!power, type, weeks, strands, from, note: note || '',
                 };
                 LESSONS.push(l);
                 BY_KEY.set(l.key, l);
@@ -127,7 +127,7 @@ function directOf(step, live) {
 function applyOverride(list, ov, why, cap) {
     if (!ov) return cap ? list.slice(0, cap) : list;
     const rm = new Set(ov.remove || []);
-    const add = (ov.add || []).map((key) => ({ key, why }));
+    const add = (ov.add || []).map((k) => (typeof k === 'string' ? { key: k, why } : { why, ...k }));
     const seen = new Set();
     const out = [];
     for (const x of [...add, ...list]) {
@@ -212,14 +212,45 @@ function curatedLinks(lesson, cur, ovr, live) {
     const keep = (x) => x && x.key && live(x.key) && !seen.has(x.key) && seen.add(x.key);
     const direct = applyOverride([
         ...(cur.direct || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: '' })),
-        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: x.missing || 'part of the step' })),
+        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: plainWhy(x.missing || 'part of the step') })),
     ], ovr.direct, 'Added by the school', 0).filter(keep).map((x) => ({ key: x.key, opts: x.opts || null, partial: x.partial || '' }));
-    const prereq = applyOverride((cur.pre || []).map((x) => ({ key: x.key, why: x.why || '' })), ovr.prereq, 'Added by the school', 0).filter(keep);
-    const related = applyOverride((cur.related || []).map((x) => ({ key: x.key, why: x.why || '' })), ovr.related, 'Added by the school', 0).filter(keep);
+    // opts travel with every link (a curated pre / related skill is often "within 100" etc.)
+    const withOpts = (x) => ({ key: x.key, why: plainWhy(x.why || ''), opts: x.opts && Object.keys(x.opts).length ? x.opts : null });
+    const prereq = applyOverride((cur.pre || []).map(withOpts), ovr.prereq, 'Added by the school', 0).filter(keep);
+    const related = applyOverride((cur.related || []).map(withOpts), ovr.related, 'Added by the school', 0).filter(keep);
     const verdict = ['full', 'partial', 'gap'].includes(cur.verdict) ? cur.verdict
         : !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
-    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: cur.missing || '',
+    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: plainWhy(cur.missing || ''),
         build: (cur.build || []).slice(), preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' };
+}
+
+/**
+ * A tagging note in a teacher's words: step ids become "Grade 1: <step title>", the tagging lanes' shorthand
+ * ("prior learning wk W01", "step before in the block", "not dealt") becomes the handbook's words
+ * ("support block, week 1", "the step before", "not practised yet").
+ */
+export function plainWhy(text) {
+    let t = String(text || '');
+    if (!t) return t;
+    t = t.replace(/\b(R|Y[1-6])\.B\d+\.S\d+\b(\s*\/\s*(R|Y[1-6])\.B\d+\.S\d+\b)*/g, (m) => {
+        const id = m.split('/').pop().trim();
+        return `${gradeOfYear(id.split('.')[0])}:\u0001${id}\u0001`;
+    });
+    // a bare id (no title after it) gets its title
+    t = t.replace(/\u0001([^\u0001]+)\u0001(\s*)(?=$|[(;,)\-]|\s*$)/g, (m, id) => { const r = wrmStep(id); return r ? ` ${r.title}` : ''; });
+    t = t.replace(/\u0001[^\u0001]+\u0001/g, '');
+    t = t.replace(/\s*\(prior learning(?:,)?(?: wk ((?:W\d+\/?)+))?\)/gi, (m, w) => (w ? ` — support block, week ${w.split('/').map((x) => +x.replace(/\D/g, '')).join(', ')}` : ' — support block'));
+    t = t.replace(/\s*\((?:the )?(?:step before in (?:the|this) block|previous step|earlier in (?:the|this) block|earlier step)\)/gi, ' — the step before');
+    t = t.replace(/\s*\(next step[^)]*\)/gi, ' — the next step');
+    t = t.replace(/\s*\(neighbouring step[^)]*\)/gi, ' — the step next to it');
+    t = t.replace(/\s*\(lower grade, same CCSS cluster\)/gi, ' — earlier grade, same standard group');
+    t = t.replace(/\s*\(same CCSS ([^,)]+), earlier\)/gi, ' — same standard $1, earlier');
+    t = t.replace(/\s*\(earlier (?:R|Y[1-6]) step\)/gi, ' — earlier');
+    t = t.replace(/^same block:\s*/i, 'Same unit: ').replace(/^next step:\s*/i, 'Next: ').replace(/^same CCSS ([^ ]+(?:, [^ ]+)*) in /i, 'Same standard $1: ');
+    t = t.replace(/\s*-?\s*easier:\s*\{[^}]*\}/gi, ' (easier numbers)');
+    t = t.replace(/\((R|Y[1-6]), /g, (m, y) => `(${gradeOfYear(y)}, `);
+    t = t.replace(/\bare not dealt\b/gi, 'are not practised yet').replace(/\bis not dealt\b/gi, 'is not practised yet').replace(/\bnot dealt\b/gi, 'not practised yet');
+    return t.replace(/\s{2,}/g, ' ').trim();
 }
 
 /** Lessons whose title, CCSS code or unit name match the text, best first (cap `limit`). */

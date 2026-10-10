@@ -29,6 +29,17 @@ STEPS = os.path.join(ROOT, 'data', 'curriculum', 'wrm-steps.json')
 OUT_JSON = os.path.join(ROOT, 'data', 'curriculum', 'wrm-sequence.json')
 OUT_JS = os.path.join(ROOT, 'js', 'modules', 'wrm-sequence-db.js')
 OUT_REPORT = os.path.join(ROOT, 'design', 'audit', 'runs', 'wrm-page', 'MAPPING_REPORT.md')
+# The preview's sequence, extracted (data only) so --check works without the site file.
+PREVIEW_DEFAULT = os.path.join(ROOT, 'data', 'curriculum', 'source', 'awsaj-preview-sequence.json')
+# Lessons the school teaches with US money where White Rose teaches pounds: the nearest current money step
+# (owner ruling 2026-10-10: map them, tagged "ADAPT: US money").
+MONEY_ADAPT = {
+    ('1', 'find the total'): 'Y2.B4.S7',
+    ('1', 'find the difference'): 'Y2.B4.S7',
+    ('1', 'count money notes and coins'): 'Y2.B4.S2',
+    ('1', 'select money'): 'Y2.B4.S4',
+    ('3', 'pounds tens ones and pence'): 'Y4.B10.S1',
+}
 
 GRADES = [  # id, sheet, WRM year, label
     ('PK', None, 'R', 'Pre-K'),
@@ -69,15 +80,15 @@ def loose(t):
 def load_steps():
     d = json.load(open(STEPS))
     steps, blocks = {}, {}
-    by_title = {}  # (year, norm) -> [ids]
+    exact, rough = {}, {}  # (year, norm) / (year, loose) -> [ids]; kept apart so an exact title always wins
     for y in d['years']:
         for b in y['blocks']:
             blocks[b['id']] = b
             for s in b['steps']:
                 steps[s['id']] = dict(s, year=y['id'], block=b['id'], blockName=b['name'])
-                for key in {norm(s['title']), loose(s['title'])}:
-                    by_title.setdefault((y['id'], key), []).append(s['id'])
-    return steps, blocks, by_title
+                exact.setdefault((y['id'], norm(s['title'])), []).append(s['id'])
+                rough.setdefault((y['id'], loose(s['title'])), []).append(s['id'])
+    return steps, blocks, (exact, rough)
 
 
 def load_preview(path):
@@ -110,7 +121,8 @@ class Mapper:
                             self.prev_units.setdefault((g, norm(s['title'])), []).append(u['name'])
 
     def candidates(self, year, title):
-        return self.by_title.get((year, norm(title))) or self.by_title.get((year, loose(title))) or []
+        exact, rough = self.by_title
+        return exact.get((year, norm(title))) or rough.get((year, loose(title))) or []
 
     def pick(self, cands, grade, title, ccss, near):
         """Choose among same-title steps of one year: preview unit name, then CCSS overlap, then nearest."""
@@ -136,6 +148,9 @@ class Mapper:
         home = YEAR_OF_GRADE[grade]
         if typ == 'build':
             return None, 'CCSS BUILD (no White Rose lesson)'
+        adapt = MONEY_ADAPT.get((grade, loose(title))) if 'US' in str(title) else None
+        if adapt:
+            return adapt, 'ADAPT: US money'
         order = []
         if typ == 'copied' and frm in FROM_YEAR:
             order.append(FROM_YEAR[frm])
@@ -149,7 +164,7 @@ class Mapper:
             c = self.candidates(y, title)
             if c:
                 sid, how = self.pick(c, grade, title, ccss, near if near and near.startswith(y + '.') else None)
-                where = '' if y == home else ' (from %s)' % y
+                where = '' if y == home or (typ == 'copied' and y == order[0]) else ' (CROSS-YEAR from %s)' % y
                 return sid, ('title' + (', ' + how if how else '') + where)
         return None, 'no WRM step with this title'
 
@@ -239,12 +254,16 @@ def build(preview_path):
                     used.add(sid)
                     if 'nearest' in how:
                         report['ambiguous'].append((label, unit, title, sid, how))
+                    if 'CROSS-YEAR' in how or 'ADAPT' in how:
+                        report.setdefault('crossYear', []).append((label, unit, title, sid, how))
                 elif tc != 'build':
                     report['unmapped'].append((label, unit, week, title, tc, how))
                 les = {'n': len(u['lessons']) + 1, 'title': title, 'step': sid, 'ccss': cc, 'power': power == 'POWER',
                        'type': tc, 'weeks': [week], 'strands': strands}
                 if frm:
                     les['from'] = frm
+                if 'ADAPT' in how:
+                    les['note'] = 'ADAPT: US money'
                 u['lessons'].append(les)
             # cross-check with the preview's core steps
             if preview:
@@ -268,9 +287,16 @@ def build(preview_path):
                 for un in dom.get('coreUnits', []):
                     u = {'id': '%s%d' % (dom['code'], un['num']), 'domain': dom['code'], 'name': '%s: %s' % (dom['name'], un['name']),
                          'weeks': '', 'power': [], 'test': '', 'lessons': []}
+                    # the Reception block of this unit: the one holding most of the unit's titles
+                    score = {}
                     for st in un['steps']:
-                        c = [x for x in mp.candidates('R', st['title']) if steps[x]['blockName'] == un['name']] or mp.candidates('R', st['title'])
-                        sid = sorted(c, key=step_order)[0] if c else None
+                        for x in set(mp.candidates('R', st['title'])):
+                            score[steps[x]['block']] = score.get(steps[x]['block'], 0) + 1
+                    for st in un['steps']:
+                        c = sorted(set(mp.candidates('R', st['title'])), key=lambda x: (-score.get(steps[x]['block'], 0), step_order(x)))
+                        sid = c[0] if c else None
+                        if len(c) > 1 and score.get(steps[c[0]]['block'], 0) == score.get(steps[c[1]]['block'], 0):
+                            report['ambiguous'].append((label, u['id'], st['title'], sid, 'Reception tie of %d' % len(c)))
                         if sid:
                             used.add(sid)
                         else:
@@ -309,6 +335,7 @@ def write_report(seq, rep):
          '| CCSS BUILD lessons (no White Rose lesson exists; expected) | %d |' % builds,
          '| Unmapped (not CCSS BUILD) | %d |' % len(rep['unmapped']),
          '| Same-title steps settled by nearest block (check) | %d |' % len(rep['ambiguous']),
+         '| Mapped to another year\'s step, or adapted (check) | %d |' % len(rep.get('crossYear', [])),
          '| Prior-learning entries | %d (unmapped %d) |' % (len(prior), len(rep['priorUnmapped'])),
          '| WRM steps the sequence leaves out | %d |' % sum(len(v) for v in rep['missing'].values()),
          '| Workbook / preview disagreements (core units; enrichment not compared) | %d |' % len(rep['disagree']), '']
@@ -316,6 +343,8 @@ def write_report(seq, rep):
     L += ['- %s %s %s: "%s" (%s) — %s' % r for r in rep['unmapped']] or ['None.']
     L += ['', '## Same-title steps settled by nearest block', '']
     L += ['- %s %s: "%s" -> %s (%s)' % r for r in rep['ambiguous']] or ['None.']
+    L += ['', '## Mapped to another year\'s step, or adapted (US money)', '']
+    L += ['- %s %s: "%s" -> %s (%s)' % r for r in rep.get('crossYear', [])] or ['None.']
     L += ['', '## Prior-learning entries that match no WRM step', '']
     L += ['- %s %s: %s' % r for r in rep['priorUnmapped']] or ['None.']
     L += ['', '## WRM steps the sequence leaves out', '', '"prior" = still listed as prior learning in some week.', '']
@@ -341,12 +370,12 @@ def compact_js(seq):
         info = {k: {kk: w[kk] for kk in ('weekOf', 'exam', 'map') if w.get(kk)} for k, w in g['weeks'].items()}
         grades.append({'id': g['id'], 'label': g['label'], 'year': g['year'], 'units': [
             {'id': u['id'], 'domain': u['domain'], 'name': u['name'], 'weeks': u['weeks'], 'power': u['power'],
-             'lessons': [[l['title'], l['step'], l['ccss'], 1 if l['power'] else 0, l['type'], l['weeks'], l['strands'], l.get('from', '')]
+             'lessons': [[l['title'], l['step'], l['ccss'], 1 if l['power'] else 0, l['type'], l['weeks'], l['strands'], l.get('from', '')] + ([l['note']] if l.get('note') else [])
                          for l in u['lessons']]} for u in g['units']], 'prior': weeks, 'weekInfo': info})
     body = ',\n'.join('    ' + json.dumps(g, ensure_ascii=False, separators=(',', ':')) for g in grades)
     return ('// wrm-sequence-db.js — GENERATED by `python3 tests/scripts/ws-wrm-sequence.py` from the school\'s\n'
             '// domain-sequence workbook (data/curriculum/source/) and the curriculum-site preview. Never hand-edit.\n'
-            '// Lesson tuple: [title, wrmStepId|null, ccss[], power(0/1), type (wr|copied|build|enrich), weeks[], strands, fromGrade].\n'
+            '// Lesson tuple: [title, wrmStepId|null, ccss[], power(0/1), type (wr|copied|build|enrich), weeks[], strands, fromGrade, note?].\n'
             '// prior: week -> WRM step ids of that week\'s prior-learning (support block) lessons, in the workbook\'s order.\n\n'
             'export const WRM_SEQUENCE = [\n' + body + ',\n];\n\n'
             '// step id -> [lesson file id, teaching guide file id, video url] (Google Drive, the school\'s White Rose folder).\n'
@@ -355,7 +384,7 @@ def compact_js(seq):
 
 def main():
     args = sys.argv[1:]
-    preview = args[args.index('--preview') + 1] if '--preview' in args else None
+    preview = args[args.index('--preview') + 1] if '--preview' in args else PREVIEW_DEFAULT
     seq, rep = build(preview)
     outs = {OUT_JSON: json.dumps(seq, ensure_ascii=False, indent=1) + '\n', OUT_JS: compact_js(seq), OUT_REPORT: write_report(seq, rep)}
     if '--check' in args:

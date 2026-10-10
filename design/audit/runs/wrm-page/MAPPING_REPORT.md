@@ -3,20 +3,17 @@
 | | count |
 |---|---|
 | Lessons in the sequence (unique per unit) | 945 |
-| Mapped to a WRM step | 893 |
+| Mapped to a WRM step | 897 |
 | CCSS BUILD lessons (no White Rose lesson exists; expected) | 44 |
-| Unmapped (not CCSS BUILD) | 8 |
-| Same-title steps settled by nearest block (check) | 4 |
+| Unmapped (not CCSS BUILD) | 4 |
+| Same-title steps settled by nearest block (check) | 2 |
+| Mapped to another year's step, or adapted (check) | 18 |
 | Prior-learning entries | 2235 (unmapped 0) |
-| WRM steps the sequence leaves out | 18 |
+| WRM steps the sequence leaves out | 4 |
 | Workbook / preview disagreements (core units; enrichment not compared) | 11 |
 
 ## Unmapped lessons
 
-- Grade 1 D1 W08: "Find the total (US: dollars & cents)" (wr) — no WRM step with this title
-- Grade 1 E W33: "Count money - notes and coins (US: dollars & cents)" (enrich) — no WRM step with this title
-- Grade 1 E W33: "Select money (US: dollars & cents)" (enrich) — no WRM step with this title
-- Grade 3 D4 W22: "Pounds, tens, ones and pence (US: dollars & cents)" (wr) — no WRM step with this title
 - Grade 5 E W38: "Consolidation of arithmetic" (enrich) — no WRM step with this title
 - Grade 5 E W38: "Problem solving across strands" (enrich) — no WRM step with this title
 - Grade 5 E W38: "End-of-year investigation projects" (enrich) — no WRM step with this title
@@ -26,8 +23,27 @@
 
 - Kindergarten D1: "1 more, 1 less" -> Y1.B6.S8 (title, nearest of 2)
 - Kindergarten D3: "Partition into tens and ones" -> Y1.B6.S5 (title, nearest of 2)
-- Grade 4 D2: "Multiply a 2-digit number by a 2-digit number" -> Y5.B5.S2 (title, nearest of 2)
-- Grade 4 D3: "Equivalent fractions and decimals" -> Y5.B7.S3 (title, nearest of 3)
+
+## Mapped to another year's step, or adapted (US money)
+
+- Kindergarten D1: "Verbal counting patterns" -> R.B13.S6 (title (CROSS-YEAR from R))
+- Grade 1 D1: "Find the total (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
+- Grade 1 D2: "Find the difference (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
+- Grade 1 E: "Count money - notes and coins (US: dollars & cents)" -> Y2.B4.S2 (ADAPT: US money)
+- Grade 1 E: "Select money (US: dollars & cents)" -> Y2.B4.S4 (ADAPT: US money)
+- Grade 1 E: "Hours and minutes - use start and end times" -> Y3.B10.S8 (title (CROSS-YEAR from Y3))
+- Grade 3 D2: "Fractions on a number line" -> Y3.B6.S7 (title (CROSS-YEAR from Y3))
+- Grade 3 D4: "Pounds, tens, ones and pence (US: dollars & cents)" -> Y4.B10.S1 (ADAPT: US money)
+- Grade 3 D4: "Solve problems with time" -> Y3.B10.S12 (title (CROSS-YEAR from Y3))
+- Grade 3 D4: "Draw bar charts" -> Y3.B12.S4 (title (CROSS-YEAR from Y3))
+- Grade 3 D4: "Draw pictograms" -> Y3.B12.S2 (title (CROSS-YEAR from Y3))
+- Grade 3 D4: "Interpret pictograms" -> Y3.B12.S1 (title (CROSS-YEAR from Y3))
+- Grade 3 E: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
+- Grade 4 D3: "Add two or more fractions" -> Y4.B7.S11 (title (CROSS-YEAR from Y4))
+- Grade 4 D5: "Metric measures" -> Y6.B5.S1 (title (CROSS-YEAR from Y6))
+- Grade 4 E: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
+- Grade 5 D1: "Multiply up to a 4-digit number by a 1-digit number" -> Y5.B5.S1 (title (CROSS-YEAR from Y5))
+- Grade 5 D2: "Factors" -> Y5.B3.S3 (title (CROSS-YEAR from Y5))
 
 ## Prior-learning entries that match no WRM step
 
@@ -37,20 +53,9 @@ None.
 
 "prior" = still listed as prior learning in some week.
 
-### R (12)
+### R (0)
 
-- R.B5.S4 1 more
-- R.B5.S5 1 less
-- R.B6.S3 Shapes in the environment
-- R.B7.S5 1 more
-- R.B7.S6 1 less
-- R.B8.S1 Compare mass
-- R.B8.S4 Compare capacity
-- R.B9.S3 1 more
-- R.B9.S4 1 less
-- R.B11.S5 1 more
-- R.B11.S6 1 less
-- R.B15.S8 Find 2-D shapes within 3-D shapes
+None.
 
 ### Y1 (2)
 
@@ -69,12 +74,10 @@ None.
 
 None.
 
-### Y5 (4)
+### Y5 (2)
 
 - Y5.B3.S8 Multiply by 10, 100 and 1,000 (prior)
 - Y5.B3.S9 Divide by 10, 100 and 1,000 (prior)
-- Y5.B5.S3 Multiply a 2-digit number by a 2-digit number
-- Y5.B7.S4 Equivalent fractions and decimals
 
 ### Y6 (0)
 
@@ -88,8 +91,8 @@ None.
 - Grade 3, in workbook, not in preview: Compare and order non-unit fractions
 - Grade 3, in workbook, not in preview: Sharing and grouping
 - Grade 4, in workbook, not in preview: Understand angles as turns
-- Grade 4, in workbook, not in preview: Parallel and perpendicular
 - Grade 4, in workbook, not in preview: Identify angles
+- Grade 4, in workbook, not in preview: Parallel and perpendicular
 - Grade 4, in workbook, not in preview: Triangles
-- Grade 5, in workbook, not in preview: Cubic centimetres
 - Grade 5, in workbook, not in preview: Order and compare any decimals with up to 3 decimal places
+- Grade 5, in workbook, not in preview: Cubic centimetres

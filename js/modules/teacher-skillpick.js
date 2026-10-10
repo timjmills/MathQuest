@@ -137,10 +137,13 @@ export function createPicker(opts) {
         const items = itemsFor(keys);
         if (!items.length) { toast('Tick at least one skill first'); return; }
         p.link = makePracticeLink(items);
-        p.linkNote = `Practice link · ${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''} · copied`;
+        const what = `Practice link · ${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''}`;
+        if (!p.link) { p.linkNote = what; p.redrawBar(); toast('Could not make a link'); return; }
+        const ok = await copyText(p.link);
+        // Say "copied" only when it was (critic r1 M3); otherwise the link is selected for the teacher to copy.
+        p.linkNote = ok ? `${what} · copied` : `${what} · copy it from the box`;
         p.redrawBar();
-        if (!p.link) { toast('Could not make a link'); return; }
-        toast((await copyText(p.link)) ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
+        toast(ok ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
         root().querySelector(`#${idp}Link`)?.select();
     }
     function doPrint(keys) {

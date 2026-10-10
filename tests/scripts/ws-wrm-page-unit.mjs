@@ -4,8 +4,8 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
-    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
-import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit } from '../../js/modules/build-queue.js';
+    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, plainWhy, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
+import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit, closesText } from '../../js/modules/build-queue.js';
 
 let fails = 0;
 const ok = (c, msg) => { if (!c) { fails += 1; console.log('FAIL', msg); } };
@@ -27,6 +27,32 @@ const copied = L.find((l) => l.type === 'copied');
 ok(copied && copied.from, 'copied-in lesson keeps its source grade');
 ok(WRM_SEQUENCE.find((g) => g.id === '2').prior.W01.length >= 5, 'Grade 2 W01 has prior-learning steps');
 ok(WRM_SEQUENCE.find((g) => g.id === '2').units.map((u) => u.id).slice(0, 2).join() === 'D1,D2', 'units in workbook order');
+
+// mapping (critic r1 B1): an exact title maps to its exact step; no two White Rose lessons of a grade share
+// a step unless their titles are the same lesson; cross-year and adapted mappings are in the report.
+const norm = (t) => String(t || '').toLowerCase().replace(/[–—]/g, '-').replace(/[^a-z0-9]+/g, ' ').trim();
+const stepById = new Map(WRM_STEPS.map((s) => [s.id, s]));
+const YEAR_OF = { PK: 'R', K: 'Y1', 1: 'Y2', 2: 'Y3', 3: 'Y4', 4: 'Y5', 5: 'Y6' };
+for (const l of L) {
+    if (!l.step || l.type === 'build') continue;
+    const st = stepById.get(l.step);
+    const year = l.step.split('.')[0];
+    const exact = WRM_STEPS.filter((s) => s.id.startsWith(year + '.') && norm(s.title) === norm(l.title));
+    if (exact.length === 1) ok(l.step === exact[0].id, `${l.key} "${l.title}" maps to ${l.step}, exact title is ${exact[0].id}`);
+    if (!exact.length && !l.note) ok(norm(st.title).length > 0, `${l.key} title-less map`);
+}
+for (const g of WRM_SEQUENCE) {
+    const seen = new Map();
+    for (const l of L.filter((x) => x.grade === g.id && x.step && x.type === 'wr')) {
+        const prev = seen.get(l.step);
+        ok(!prev || norm(prev.title) === norm(l.title) || l.note || prev.note, `${g.id}: "${prev && prev.title}" and "${l.title}" share ${l.step}`);
+        seen.set(l.step, l);
+    }
+}
+const pkMore = L.filter((l) => l.grade === 'PK' && /^1 (more|less)$/.test(l.title)).map((l) => l.step);
+ok(new Set(pkMore).size === pkMore.length && pkMore.length >= 8, `Pre-K "1 more/1 less" map to distinct steps (${pkMore})`);
+ok(L.find((l) => /Find the difference \(US/.test(l.title)).step === 'Y2.B4.S7', 'US money lesson adapted to Y2.B4.S7');
+ok(L.filter((l) => l.note === 'ADAPT: US money').length === 5, 'five US-money lessons tagged ADAPT');
 
 // rules
 for (const l of L) {
@@ -58,6 +84,13 @@ ok(c.prereq.length === 1 && c.prereq[0].key === 'counting:count_objects', 'curat
 ok(c.build[0] === 'fixture_pv_model' && proposalName('fixture_pv_model') === 'Fixture place value model', 'curated proposal name');
 ok(proposalName('pattern_make') === 'Make a Pattern', 'WRM_PROPOSALS name');
 ok(linksFor('2:D1:2').source === 'rules', 'absent step falls back to rules');
+// curated opts survive on pre and related (critic r1 B2)
+addCuratedYear({ steps: { 'Y3.B1.S2': { title: 'x', direct: [], verdict: 'gap', pre: [{ key: 'placevalue:combine', opts: { band: 99 }, why: 'Y3.B1.S1 Represent numbers to 100 (step before in the block)' }],
+    related: [{ key: 'number_sense:place_on_number_line', opts: { span: 10, band: 100 }, why: 'Y2.B1.S8 Write numbers (prior learning wk W01)' }] } } });
+const co = linksFor('2:D1:2');
+ok(co.prereq[0].opts && co.prereq[0].opts.band === 99 && co.related[0].opts.span === 10, 'curated pre / related keep opts');
+ok(!/Y\d\.B\d|prior learning|wk W/.test(co.prereq[0].why + co.related[0].why), `why lines in plain words: "${co.prereq[0].why}" / "${co.related[0].why}"`);
+ok(plainWhy('builds 3-digit numbers; counting in 100s are not dealt').includes('not practised yet'), 'plainWhy: not dealt');
 clearCurated();
 ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
 // the curated files on disk and data/curriculum/links/index.json agree
@@ -107,6 +140,7 @@ ok(both && both.sources.join() === 'WRM,MAP' && both.name === 'Fixture place val
 ok(Q1.items.filter((e) => passes(e, { sources: new Set(['MAP']) })).length === 2, 'filter by source');
 ok(Q1.items.filter((e) => passes(e, { q: 'fixture map option' })).length === 1, 'filter by search');
 ok(Q1.items.filter((e) => passes(e, { grades: new Set(['2']), domains: new Set(['G']), kinds: new Set(['option']) })).some((e) => e.id === 'fixture_map_one'), 'filter grade+domain+kind');
+ok(closesText({ 'Y3.B1.S1': 'part-whole' }).join() === 'Grade 2: Represent numbers to 100 — part-whole' && closesText(['a', 'b']).length === 2, 'closesText object / array');
 const csv = toCSV(Q1.items.slice(0, 5)).split('\r\n');
 ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
 

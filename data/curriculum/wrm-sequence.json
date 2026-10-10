@@ -239,7 +239,7 @@
       {
        "n": 4,
        "title": "1 more",
-       "step": "R.B3.S4",
+       "step": "R.B5.S4",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -251,7 +251,7 @@
       {
        "n": 5,
        "title": "1 less",
-       "step": "R.B3.S5",
+       "step": "R.B5.S5",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -348,7 +348,7 @@
       {
        "n": 5,
        "title": "1 more",
-       "step": "R.B3.S4",
+       "step": "R.B7.S5",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -360,7 +360,7 @@
       {
        "n": 6,
        "title": "1 less",
-       "step": "R.B3.S5",
+       "step": "R.B7.S6",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -433,7 +433,7 @@
       {
        "n": 3,
        "title": "1 more",
-       "step": "R.B3.S4",
+       "step": "R.B9.S3",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -445,7 +445,7 @@
       {
        "n": 4,
        "title": "1 less",
-       "step": "R.B3.S5",
+       "step": "R.B9.S4",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -591,7 +591,7 @@
       {
        "n": 5,
        "title": "1 more",
-       "step": "R.B3.S4",
+       "step": "R.B11.S5",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -603,7 +603,7 @@
       {
        "n": 6,
        "title": "1 less",
-       "step": "R.B3.S5",
+       "step": "R.B11.S6",
        "ccss": [
         "K.CC.B.4"
        ],
@@ -931,7 +931,7 @@
       {
        "n": 1,
        "title": "Compare mass",
-       "step": "R.B2.S2",
+       "step": "R.B8.S1",
        "ccss": [
         "K.MD.A.2"
        ],
@@ -967,7 +967,7 @@
       {
        "n": 4,
        "title": "Compare capacity",
-       "step": "R.B2.S3",
+       "step": "R.B8.S4",
        "ccss": [
         "K.MD.A.2"
        ],
@@ -1225,7 +1225,7 @@
       {
        "n": 3,
        "title": "Shapes in the environment",
-       "step": "R.B4.S3",
+       "step": "R.B6.S3",
        "ccss": [
         "K.G.A.1"
        ],
@@ -1431,7 +1431,7 @@
       {
        "n": 8,
        "title": "Find 2-D shapes within 3-D shapes",
-       "step": "R.B12.S2",
+       "step": "R.B15.S8",
        "ccss": [
         "K.G.A.3",
         "K.G.B.4"
@@ -5506,7 +5506,7 @@
       {
        "n": 29,
        "title": "Find the total (US: dollars & cents)",
-       "step": null,
+       "step": "Y2.B4.S7",
        "ccss": [
         "1.NBT.C.4",
         "2.MD.C.8"
@@ -5516,7 +5516,8 @@
        "weeks": [
         "W08"
        ],
-       "strands": "S"
+       "strands": "S",
+       "note": "ADAPT: US money"
       }
      ]
     },
@@ -5714,7 +5715,7 @@
       {
        "n": 13,
        "title": "Find the difference (US: dollars & cents)",
-       "step": "Y5.B13.S5",
+       "step": "Y2.B4.S7",
        "ccss": [
         "1.OA.A.1",
         "2.MD.C.8"
@@ -5724,7 +5725,8 @@
        "weeks": [
         "W12"
        ],
-       "strands": "S"
+       "strands": "S",
+       "note": "ADAPT: US money"
       }
      ]
     },
@@ -6798,7 +6800,7 @@
       {
        "n": 26,
        "title": "Count money - notes and coins (US: dollars & cents)",
-       "step": null,
+       "step": "Y2.B4.S2",
        "ccss": [
         "2.MD.C.8"
        ],
@@ -6807,12 +6809,13 @@
        "weeks": [
         "W33"
        ],
-       "strands": "S"
+       "strands": "S",
+       "note": "ADAPT: US money"
       },
       {
        "n": 27,
        "title": "Select money (US: dollars & cents)",
-       "step": null,
+       "step": "Y2.B4.S4",
        "ccss": [
         "2.MD.C.8"
        ],
@@ -6821,7 +6824,8 @@
        "weeks": [
         "W33"
        ],
-       "strands": "S"
+       "strands": "S",
+       "note": "ADAPT: US money"
       },
       {
        "n": 28,
@@ -15349,7 +15353,7 @@
       {
        "n": 20,
        "title": "Pounds, tens, ones and pence (US: dollars & cents)",
-       "step": null,
+       "step": "Y4.B10.S1",
        "ccss": [
         "2.MD.C.8"
        ],
@@ -15358,7 +15362,8 @@
        "weeks": [
         "W22"
        ],
-       "strands": "S"
+       "strands": "S",
+       "note": "ADAPT: US money"
       },
       {
        "n": 21,
@@ -19065,7 +19070,7 @@
       {
        "n": 26,
        "title": "Multiply a 2-digit number by a 2-digit number",
-       "step": "Y5.B5.S2",
+       "step": "Y5.B5.S3",
        "ccss": [
         "4.NBT.B.5"
        ],
@@ -19694,7 +19699,7 @@
       {
        "n": 29,
        "title": "Equivalent fractions and decimals",
-       "step": "Y5.B7.S3",
+       "step": "Y5.B7.S4",
        "ccss": [
         "4.NF.C.6"
        ],
@@ -25422,7 +25427,7 @@
       {
        "year": "Y5",
        "title": "Multiply a 2-digit number by a 2-digit number",
-       "step": "Y5.B5.S2"
+       "step": "Y5.B5.S3"
       },
       {
        "year": "Y5",
@@ -26048,7 +26053,7 @@
       {
        "year": "Y5",
        "title": "Equivalent fractions and decimals",
-       "step": "Y5.B7.S2"
+       "step": "Y5.B7.S4"
       },
       {
        "year": "Y5",

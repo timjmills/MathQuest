@@ -34,6 +34,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   for (const y of CUR_YEARS) links.addCuratedYear(JSON.parse(fs.readFileSync(path.join(CUR_DIR, `${y}.json`), 'utf8')));
   const all = links.allLessons();
   const builtLesson = CUR_YEARS.length ? all.find((l) => l.grade === '2' && links.linksFor(l).build.length) : null;
+  const optLesson = CUR_YEARS.length ? all.find((l) => l.grade === '2' && links.linksFor(l).prereq.some((x) => x.opts)) : null;
   const gapLesson = all.find((l) => l.grade === '3' && l.type === 'wr' && l.step && !links.linksFor(l).direct.length)
     || all.find((l) => l.type === 'wr' && l.step && !links.linksFor(l).direct.length);
   const buildLesson = all.find((l) => l.grade === '3' && l.type === 'build');
@@ -63,6 +64,24 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const c = new URL(link).searchParams.get('c') || '';
     return window.parseSkillCodeParts(c.split('|')[0]).map((s) => `${s.categoryId}|${s.skillId}`);
   }, u);
+  const decodeOpts = (u) => page.evaluate((link) => {
+    const c = new URL(link).searchParams.get('c') || '';
+    return Object.fromEntries(window.parseSkillCodeParts(c.split('|')[0]).map((s) => [`${s.categoryId}:${s.skillId}`, s.opts || {}]));
+  }, u);
+  // B5: on a Chromebook the first skill row is on screen and no Tick button is under the sticky bar.
+  const clearOfBar = async (tag) => {
+    const r = await page.evaluate(() => {
+      const bar = document.querySelector('[data-screen="wrm"].is-active #tvwBar');
+      const barTop = bar ? bar.getBoundingClientRect().top : innerHeight;
+      const row = document.querySelector('[data-screen="wrm"] .tvw-group .tvw-row, [data-screen="wrm"] .tvw-group .tvw-card');
+      const rowTop = row ? row.getBoundingClientRect().top : 9999;
+      const under = [...document.querySelectorAll('[data-screen="wrm"] [data-w-quick], [data-screen="wrm"] [data-act="skill-view"]')]
+        .filter((b) => { const q = b.getBoundingClientRect(); return q.width && q.bottom > barTop && q.top < innerHeight; }).map((b) => b.textContent.trim());
+      return { barTop: Math.round(barTop), rowTop: Math.round(rowTop), under };
+    });
+    check(r.rowTop + 40 <= r.barTop, `${tag}: first skill row at ${r.rowTop}px is not clear of the bar at ${r.barTop}px`);
+    check(!r.under.length, `${tag}: under the action bar: ${r.under.join(', ')}`);
+  };
   const fit = async (tag, screen = 'wrm') => {
     const r = await page.evaluate((scr) => {
       const W = window.innerWidth;
@@ -104,14 +123,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     /* ---------------------------------------------------- grade → unit → lesson */
     await page.click('[data-w-grade="3"]');
-    await sleep(150);
+    await waitFor(page, () => document.querySelector('[data-w-grade="3"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 3');
     check(/^#wrm\/3\/D1$/.test(await hash()), `hash after grade: ${await hash()}`);
     const units3 = await page.$$eval('[data-w-unit]', (b) => b.map((x) => x.dataset.wUnit));
     check(units3[0] === 'D1' && units3.includes('E'), `grade 3 units ${units3}`);
     await page.click('[data-w-grade="2"]');
-    await sleep(150);
+    await waitFor(page, () => document.querySelector('[data-w-grade="2"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 2');
     await page.click(`[data-w-unit="${rich.unit}"]`);
-    await sleep(150);
+    await sleep(300);
     await page.click(`[data-w-lesson="${rich.key}"]`);
     await waitFor(page, () => !!document.querySelector('.tvw-head'), 5000, 'detail');
     check((await hash()) === `#wrm/2/${rich.unit}/${rich.n}`, `hash after lesson: ${await hash()}`);
@@ -127,6 +146,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(/Fully taught|Covers part|No skill yet/.test(vt), `detail: no verdict tag ("${vt}")`);
     check(await page.$$eval('.tvw-lesson[data-w-verdict]', (b) => b.length) > 0, 'lesson rows carry no verdict');
     await fit('1366 lesson list');
+    await clearOfBar('1366 lesson open');
     await page.evaluate(() => window.scrollTo(0, 0));
     await shot('02-lesson-list-1366');
 
@@ -226,6 +246,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await shot('08-build-lesson-1366');
 
     /* ---------------------------------------------------- Pre-K */
+    // with a lesson open the finder is one line; "Change grade or unit" opens it
+    check(await page.$eval('.tvw-pick', (p) => p.hidden), 'finder not folded while a lesson is open');
+    await tap('[data-w-finder]');
+    await sleep(150);
     await page.click('[data-w-grade="PK"]');
     await sleep(200);
     const pk = await page.$$eval('.tvw-lesson', (b) => b.length);
@@ -242,6 +266,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
     await sleep(300);
     await fit('1280 list');
+    await page.click(`[data-w-lesson="${rich.key}"]`).catch(() => {});
+    await sleep(500);
+    await clearOfBar('1280 lesson open');
     await shot('10-lesson-list-1280');
     await page.click('[data-act="skill-view"][data-view="thumbs"]');
     await sleep(1000);
@@ -263,6 +290,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(150);
     await shot('13-dark-1280');
     await page.evaluate(() => document.documentElement.classList.remove('dark'));
+    if (await page.$('[data-w-finder]')) { await tap('[data-w-finder]'); await sleep(150); }
     await page.focus('[data-w-grade="4"]');
     await page.keyboard.press('Enter');
     await sleep(200);
@@ -310,6 +338,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await shot('15-todo-entry-from-lesson-1366');
     } else if (CUR_YEARS.length) failures.push('curated: no Grade 2 lesson with a build proposal');
 
+    /* ==================================================== curated options travel into the link (B2) */
+    if (optLesson) {
+      await page.evaluate(() => window.tvGo('home'));
+      await page.evaluate((h) => { location.hash = h; }, `#wrm/${optLesson.grade}/${optLesson.unit}/${optLesson.n}`);
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 10000, 'opt lesson');
+      await sleep(300);
+      await tap('[data-w-quick="prereq"]');
+      await tap('[data-w-act="link"]');
+      await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'opt link');
+      const od = await decodeOpts(await page.$eval('#tvwLink', (i) => i.value));
+      const want = links.linksFor(optLesson).prereq.filter((x) => x.opts);
+      // an option equal to the skill's default is (rightly) not written into the code: compare encodings
+      const lost = await page.evaluate(async (want, od) => {
+        const c = await import('./js/modules/skill-option-codec.js');
+        return want.filter((x) => { const [cat, id] = x.key.split(':'); return c.encodeOptionPayload(cat, id, x.opts) !== c.encodeOptionPayload(cat, id, od[x.key] || {}); }).map((x) => x.key);
+      }, want, od);
+      check(want.some((x) => { return Object.keys(od[x.key] || {}).length; }), 'no curated option reached the link at all');
+      check(want.length && !lost.length, `curated pre opts lost in the link: ${lost.join(', ')} (of ${want.length})`);
+      const why = await page.$$eval('[data-w-group="prereq"] .tvw-why', (w) => w.map((x) => x.textContent).join(' | '));
+      check(!/\b(R|Y\d)\.B\d+\.S\d+|prior learning|wk W|not dealt/.test(why), `why lines show ids/jargon: ${why.slice(0, 200)}`);
+    } else if (CUR_YEARS.length) failures.push('curated: no lesson whose do-first skills carry options');
+
     /* ==================================================== Skills to be made */
     await page.evaluate(() => window.tvGo('home'));
     await sleep(200);
@@ -349,6 +399,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(150);
     const spec = await page.evaluate(() => { const s = document.querySelector('.tvt-item.is-open .tvt-spec'); return s ? [...s.querySelectorAll('dt')].map((d) => d.textContent) : []; });
     check(['Kind', 'What pupils will do', 'Gap it fills', 'How it looks'].every((x) => spec.includes(x)), `todo: spec ${JSON.stringify(spec)}`);
+    check(!(await page.evaluate(() => /\[object/.test(document.querySelector('[data-screen="todo"]').textContent))), 'todo screen shows [object …]');
     check(await page.$('.tvt-item.is-open [data-t-spec-slot]') !== null, 'todo: no slot for the fuller spec');
     await page.evaluate(() => window.scrollTo(0, 0));
     await fit('1366 todo filtered', 'todo');
@@ -357,6 +408,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.click('[data-t-act="print"]');
     await sleep(200);
     const ph = await page.evaluate(() => window.__opened);
+    check(!/\[object/.test(ph), 'todo print shows [object …]');
     check(/<title>Skills to be made<\/title>/.test(ph) && (ph.match(/class="it"/g) || []).length === f4, `todo print: ${(ph.match(/class="it"/g) || []).length} of ${f4}`);
     await page.evaluate(() => { window.__csv = null; const orig = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { if (this.download) { fetch(this.href).then((r) => r.text()).then((t) => { window.__csv = { name: this.download, text: t }; }); return; } return orig.call(this); }; });
     await page.click('[data-t-act="csv"]');
@@ -430,6 +482,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await waitFor(page, () => !!document.querySelector('#tvmkLink'), 5000, 'map link');
     const mdec = await decode(await page.$eval('#tvmkLink', (i) => i.value));
     check(mdec.length === mtick.length && mtick.every((x) => mdec.includes(x)), `map link decodes to ${JSON.stringify(mdec)} not ${JSON.stringify(mtick)}`);
+    const mh = await hash();
+    check(new RegExp(`^#map/tasks/fd/all/${mt}$`).test(mh), `map task hash ${mh}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     await fit('1366 map tasks', 'map');
     await shot('30-map-tasks-1366');
@@ -445,6 +499,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const mpr = await page.evaluate((names) => { const el = document.querySelector('#teacherMain .tv-screen.is-active'); return { screen: el.dataset.screen, has: names.filter((n) => el.textContent.includes(n)).length }; }, mlabels);
     check(mpr.screen === 'print' && mpr.has === mlabels.length, `map print: ${JSON.stringify(mpr)} of ${mlabels.length}`);
 
+    // a MAP task bookmark reopens the task; Back returns to it from another screen
+    await page.goto(`${base}/index.html${mh}`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head'), 20000, 'map bookmark');
+    check(await page.$eval('[data-mk-task][aria-current="true"]', (b) => b.dataset.mkTask) === mt, 'map bookmark: task not reopened');
+    await page.evaluate(() => window.tvGo('home'));
+    await sleep(300);
+    await page.goBack();
+    await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head'), 10000, 'map back').catch(() => {});
+    check(await page.evaluate(() => (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen) === 'map' && (await hash()) === mh, `map Back: ${await hash()}`);
+    await page.evaluate(() => { window.__opened = ''; window.open = () => ({ document: { open() {}, write(h) { window.__opened += h; }, close() {} }, focus() {}, print() {} }); });
+
     /* ==================================================== MAP page: by representation */
     await page.evaluate(() => window.tvGo('map'));
     await sleep(300);
@@ -452,13 +517,35 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await waitFor(page, () => !!document.querySelector('[data-screen="map"] [data-mk-strand]'), 10000, 'reps');
     await page.click('[data-mk-strand="Measurement"]');
     await sleep(200);
+    // B3: after each strand change every group lists exactly that strand's live skills
+    const repCheck = async (strand) => {
+      const r = await page.evaluate(async (st) => {
+        const w = await import('./js/modules/wrm-links.js');
+        const ui = await import('./js/modules/teacher-ui.js');
+        const bad = [];
+        for (const p of w.REP_PAIRS) {
+          const want = (p.strands[st] ? p.strands[st].skills : []).filter((k) => { const [c, i] = k.split(':'); return ui.findSkill(c, i); }).map((k) => k.replace(':', '|'));
+          const g = document.querySelector(`#tvmkDetail [data-w-group="${p.id}"]`);
+          if (!p.strands[st]) { if (g) bad.push(`${p.id} shown`); continue; }
+          const got = g ? [...g.querySelectorAll('.tvw-tick')].map((b) => b.dataset.wTick) : [];
+          if (got.join() !== want.join()) bad.push(`${p.id}: ${got} != ${want}`);
+        }
+        return bad;
+      }, strand);
+      check(!r.length, `reps ${strand}: ${r.join(' ; ')}`);
+    };
+    await repCheck('Measurement');
     const reps = await page.evaluate(() => [...document.querySelectorAll('#tvmkDetail [data-w-group]')].map((g) => g.dataset.wGroup));
     check(reps.includes('clock-words') && reps.includes('numberline-number'), `reps Measurement: ${reps}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     await fit('1366 reps', 'map');
     await shot('32-map-reps-1366');
+    await page.click('[data-mk-strand="Fractions & decimals"]');
+    await sleep(200);
+    await repCheck('Fractions & decimals');
     await page.click('[data-mk-strand="Data & graphing"]');
     await sleep(200);
+    await repCheck('Data & graphing');
     const rb = await page.$$eval('#tvmkDetail .tvw-tbb-link', (b) => b.length);
     check(rb > 0, 'reps Data & graphing: no "To be built" link');
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });

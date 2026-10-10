@@ -129,6 +129,13 @@ Open questions for the owner: (1) "Practice map" tile — the UI lane wired it t
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
 of coin unless the teacher changes it — keep the default?
 
+### White Rose page rulings (owner, 2026-10-10; kept the recommended answers)
+1. Curated link files (`data/curriculum/links/<YEAR>.json`, `MAP.json`) win over the computed rules; the rules stay the fallback.
+2. Units are named "D1 · <domain>" (the pacing guides' words).
+3. Pre-K comes from the curriculum-site preview (extracted to `data/curriculum/source/awsaj-preview-sequence.json`).
+4. "Skills to be made" is reached from Home, White Rose and MAP — not the sidebar.
+5. The US-money lessons map to the nearest money step, tagged "ADAPT: US money": Grade 1 "Find the total" / "Find the difference" -> Y2.B4.S7, "Count money - notes and coins" -> Y2.B4.S2, "Select money" -> Y2.B4.S4; Grade 3 "Pounds, tens, ones and pence" -> Y4.B10.S1.
+
 ## 3. Work lanes at pause (not merged, not deployed)
 
 Each lane is a git worktree at `.claude/worktrees/agent-<id>` on branch `worktree-agent-<id>`; every tree was clean

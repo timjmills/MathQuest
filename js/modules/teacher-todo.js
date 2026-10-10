@@ -146,8 +146,8 @@ function itemHTML(e) {
 
 function specHTML(e) {
     const steps = e.wrmSteps.map((s) => (lessonSteps.has(s)
-        ? `<button type="button" class="tvt-step" data-t-step="${esc(s)}" title="Open this lesson on the White Rose screen">${esc(s)}</button>`
-        : `<span class="tvw-tag tvw-code">${esc(s)}</span>`)).join(' ');
+        ? `<button type="button" class="tvt-step" data-t-step="${esc(s)}" title="Open this lesson on the White Rose screen (${esc(s)})">${esc(Q.stepName(s))}</button>`
+        : `<span class="tvw-tag" title="${esc(s)}">${esc(Q.stepName(s))}</span>`)).join(' ');
     const maps = e.map.map((m) => `<li>${esc([m.strand, m.ritBand ? `RIT ${m.ritBand}` : '', m.task || m.taskType].filter(Boolean).join(' · '))}</li>`).join('');
     const pairs = e.pairs.map((p) => (W.REP_PAIRS.find((x) => x.id === p) || {}).label).filter(Boolean);
     return `<div class="tvt-spec" id="tvtS-${esc(e.id)}">
@@ -175,7 +175,7 @@ export function todoPrintHTML() {
     const row = (e) => `<div class="it"><h4>${esc(e.name)} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
       <p><b>What pupils will do:</b> ${esc(e.teaches)}</p><p><b>Gap it fills:</b> ${esc(e.closes.slice(0, 3).join(' | '))}</p>
       <p><b>How it looks:</b> ${esc(e.representation)}</p>
-      ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · WRM ${esc(e.wrmSteps.join(', '))}` : ''}</p>` : ''}</div>`;
+      ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · White Rose: ${esc(e.wrmSteps.slice(0, 6).map(Q.stepName).join('; '))}${e.wrmSteps.length > 6 ? ' …' : ''}` : ''}</p>` : ''}</div>`;
     const body = groupsOf(items).map((g) => `<h2>${esc(Q.GRADE_NAMES[g.grade])} (${g.n})</h2>${g.doms.map(([d, list]) => `<h3>${esc(domName(d))}</h3>${list.map(row).join('')}`).join('')}`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Skills to be made</title><style>
       body{font:11pt/1.35 Arial,Helvetica,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0 0 2mm}h2{font-size:14pt;margin:6mm 0 2mm;border-bottom:1px solid #000}

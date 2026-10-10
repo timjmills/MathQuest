@@ -17,7 +17,7 @@ import { startMapSession } from './map-engine.js';
 import { generateMapShareLink } from './map-mode-ui.js';
 import { icon, esc, toast, copyText, readStore, writeStore, findSkill } from './teacher-ui.js';
 import { mountSample } from './teacher-preview.js';
-import { renderMapTasks } from './teacher-map-tasks.js';
+import { renderMapTasks, mapHashView, clearMapHash } from './teacher-map-tasks.js';
 
 const UI_KEY = 'mq_teacher_map_ui';
 
@@ -81,6 +81,8 @@ export function renderMapScreen(el) {
         m.tab = 'start';   // an old "open the MAP test" entry point lands on the test itself
     }
     seenTier = state.mapTier;
+    const hv = mapHashView();
+    if (hv) m.tab = hv;   // a #map/... bookmark or Back names the view
     if (!root.dataset.built) {
         root.dataset.built = '1';
         wire();
@@ -327,7 +329,7 @@ function wire() {
         const b = e.target.closest('button');
         if (!b || !root.contains(b)) return;
         const d = b.dataset;
-        if (d.mapTab) { if (d.mapTab !== m.tab) { m.tab = d.mapTab; persist(); render(); } refocus(`[data-map-tab="${d.mapTab}"]`); return; }
+        if (d.mapTab) { if (d.mapTab !== m.tab) { m.tab = d.mapTab; persist(); if (m.tab === 'start') clearMapHash(); render(); } refocus(`[data-map-tab="${d.mapTab}"]`); return; }
         if (d.mapTier) { if (d.mapTier !== m.tier) { setTier(d.mapTier); changed(); } refocus(`[data-map-tier="${d.mapTier}"]`); return; }
         if (d.mapMode) {
             if (d.mapMode !== m.mode) { m.mode = d.mapMode; changed(); }

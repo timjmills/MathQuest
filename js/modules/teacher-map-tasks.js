@@ -24,7 +24,7 @@ import { esc, icon } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { getMapSkillsForBands, getCategoryForSkill, DOMAINS } from './data.js';
 import { createPicker, liveKey, toBeBuiltHTML } from './teacher-skillpick.js';
-import { loadLinksData } from './links-data.js';
+import { loadMap } from './links-data.js';
 
 export const RIT_BANDS = ['<141', '141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
 const STATUS = {
@@ -92,8 +92,8 @@ function buildTasks() {
 function load() {
     if (TASKS) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), loadLinksData()]).then(([w, data]) => {
-            W = w; MAPD = data.map;
+        loading = Promise.all([import('./wrm-links.js'), loadMap()]).then(([w, map]) => {
+            W = w; MAPD = map;
             TASKS = buildTasks();
         }).catch((e) => { console.warn('[teacher-map-tasks] load', e); loading = null; });
     }
@@ -110,7 +110,7 @@ const nameOf = (id) => {
 
 /** A note in plain words: a proposal id inside it becomes its name. */
 function plainNote(text) {
-    return String(text).replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id) => (MAPD && MAPD.proposals && MAPD.proposals[id] ? `"${nameOf(id)}"` : id));
+    return String(text).replace(/\s*\(part [A-Z]\)/g, '').replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id) => (MAPD && MAPD.proposals && MAPD.proposals[id] ? `"${nameOf(id)}"` : id));
 }
 
 /* ================================================================= links for a task */
@@ -131,6 +131,35 @@ export function taskLinks(t) {
     return { direct, pre, related };
 }
 
+/* ================================================================= URL state (#map/<view>/<strand>/<band>/<task>) */
+// Like the White Rose screen: the view, strand, band and task live in the hash, so a teacher can bookmark
+// a task and Back works (critic r1 M4). "Start a MAP test" keeps no hash.
+
+export function mapHashActive() { return /^#map(\/|$)/.test(location.hash || ''); }
+/** The view the hash names ('tasks' | 'reps'), or ''. */
+export function mapHashView() { const m = /^#map\/(tasks|reps)/.exec(location.hash || ''); return m ? m[1] : ''; }
+function readHash() {
+    const m = /^#map\/(tasks|reps)(?:\/([^/]*))?(?:\/([^/]*))?(?:\/([^/]*))?/.exec(location.hash || '');
+    if (!m || !W) return;
+    const st = W.MAP_STRANDS.find((x) => x[0] === m[2]);
+    if (st) k.strand = st[1];
+    if (m[1] === 'tasks') {
+        const b = decodeURIComponent(m[3] || 'all');
+        k.band = b === 'all' ? '' : RIT_BANDS.includes(b) ? b : '';
+        k.task = m[4] && TASKS && TASKS.some((t) => t.id === m[4]) ? m[4] : '';
+    }
+}
+function writeHash(replace) {
+    const sid = (W.MAP_STRANDS.find((x) => x[1] === k.strand) || [''])[0];
+    const h = k.view === 'reps' ? `#map/reps/${sid}` : `#map/tasks/${sid}/${encodeURIComponent(k.band || 'all')}${k.task ? `/${k.task}` : ''}`;
+    if (location.hash === h) return;
+    if (replace) history.replaceState(history.state, '', h); else history.pushState(history.state, '', h);
+}
+/** Leaving the MAP browse views: drop the hash (a new entry, so Back returns to the task). */
+export function clearMapHash() {
+    if (mapHashActive()) history.pushState(history.state, '', location.pathname + location.search);
+}
+
 /* ================================================================= render */
 
 /** Draw the browse view ('tasks' | 'reps') into `el` (a container inside the MAP screen). */
@@ -142,6 +171,8 @@ export function renderMapTasks(el, view) {
     if (!TASKS) el.innerHTML = '<p class="tv-cap">Loading the MAP tasks…</p>';
     load().then(() => {
         if (!TASKS) { el.innerHTML = '<p class="tv-cap">Could not load the MAP tasks. Reload the page to try again.</p>'; return; }
+        if (mapHashView() === view) readHash();
+        writeHash(true);
         draw();
     });
 }
@@ -221,19 +252,16 @@ function taskHTML() {
 }
 
 function repsHTML() {
-    const groups = {};
-    const parts = [];
-    for (const p of W.REP_PAIRS) {
+    // Build every group first, hand them to the picker, THEN draw (the groups render from the picker).
+    const pairs = W.REP_PAIRS.filter((p) => p.strands[k.strand]).map((p) => {
         const s = p.strands[k.strand];
-        if (!s) continue;
-        const live = s.skills.filter(liveKey);
-        groups[p.id] = live.map((key) => ({ key }));
-        const builds = s.build.map((b) => b[0]);
-        parts.push(pick.groupHTML(p.id, esc(p.label), live.length ? `${live.length === 1 ? '1 skill practises' : `${live.length} skills practise`} this change.` : '',
-            builds.length ? 'No skill practises this change yet.' : 'No skill yet.', toBeBuiltHTML(builds, nameOf)));
-    }
+        return { p, live: s.skills.filter(liveKey), builds: s.build.map((b) => b[0]) };
+    });
+    pick.setGroups(Object.fromEntries(pairs.map((x) => [x.p.id, x.live.map((key) => ({ key }))])));
+    const parts = pairs.map(({ p, live, builds }) => pick.groupHTML(p.id, esc(p.label),
+        live.length ? `${live.length === 1 ? '1 skill practises' : `${live.length} skills practise`} this change.` : '',
+        builds.length ? 'No skill practises this change yet.' : 'No skill yet.', toBeBuiltHTML(builds, nameOf)));
     const absent = W.REP_PAIRS.filter((p) => !p.strands[k.strand]).map((p) => p.label);
-    pick.setGroups(groups);
     return `${parts.length ? pick.quickHTML([['all', 'Everything']]) : ''}
       ${parts.join('') || '<div class="tv-card tvw-empty"><div class="tv-h3">No representation changes listed</div></div>'}
       ${absent.length ? `<p class="tv-cap">Not asked in this strand: ${esc(absent.join(', '))}.</p>` : ''}
@@ -247,10 +275,11 @@ function wire(el) {
         const b = e.target.closest('button');
         if (!b || !el.contains(b) || !TASKS) return;
         const d = b.dataset;
-        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; pick.reset(); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
-        if (d.mkBand !== undefined) { k.band = d.mkBand; pick.reset(); draw(); host.querySelector(`[data-mk-band="${CSS.escape(d.mkBand)}"]`)?.focus(); return; }
+        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
+        if (d.mkBand !== undefined) { k.band = d.mkBand; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-band="${CSS.escape(d.mkBand)}"]`)?.focus(); return; }
         if (d.mkTask) {
             k.task = d.mkTask; pick.reset();
+            writeHash(false);
             host.querySelectorAll('[data-mk-task]').forEach((x) => { if (x.dataset.mkTask === k.task) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
             drawDetail();
             host.querySelector('#tvmkDetail')?.scrollIntoView({ block: 'start', behavior: 'instant' });

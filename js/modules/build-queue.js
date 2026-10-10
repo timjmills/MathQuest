@@ -18,7 +18,7 @@
 import { buildList } from './build-list.js';
 import { WRM_PROPOSALS, wrmStep } from './wrm.js';
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
-import { repPairsOfText } from './wrm-links.js';
+import { repPairsOfText, plainWhy, gradeOfYear } from './wrm-links.js';
 
 export const SOURCES = ['CCSS', 'EE', 'WRM', 'MAP'];
 export const GRADES = ['PK', 'K', '1', '2', '3', '4', '5', '6'];
@@ -59,7 +59,17 @@ export function gradesOfText(t) {
     return GRADES.slice(a, (b < a ? a : b) + 1);
 }
 const kindOf = (k) => (['new', 'skill'].includes(k) ? 'new' : ['option', 'band'].includes(k) ? 'option' : 'other');
-const stepList = (ids) => `${ids.slice(0, 3).map((s) => { const r = wrmStep(s); return r ? `"${r.title}" (${s})` : s; }).join(', ')}${ids.length > 3 ? ` and ${ids.length - 3} more steps` : ''}`;
+const stepList = (ids) => `${ids.slice(0, 3).map((s) => `"${stepName(s)}"`).join(', ')}${ids.length > 3 ? ` and ${ids.length - 3} more steps` : ''}`;
+/** A step as a teacher reads it: 'Grade 2: Hundreds'. */
+export const stepName = (id) => { const r = wrmStep(id); return `${gradeOfYear(String(id).split('.')[0])}: ${r ? r.title : id}`; };
+/** `closes` may be a string, a list, or { stepId: clause } — always plain strings back. */
+export function closesText(v) {
+    if (v == null || v === '') return [];
+    if (typeof v === 'string') return [plainWhy(v)];
+    if (Array.isArray(v)) return v.flatMap(closesText);
+    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? `${stepName(k)} — ${plainWhy(String(t))}` : `${k}: ${plainWhy(String(t))}`));
+    return [String(v)];
+}
 const uniq = (a) => [...new Set(a.filter(Boolean))];
 const sortGrades = (a) => uniq(a).filter((g) => GRADES.includes(g)).sort((x, y) => GRADES.indexOf(x) - GRADES.indexOf(y));
 
@@ -131,7 +141,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
             fill(e, p);
             e.ccss.push(...(p.ccss || []));
             e.wrmSteps.push(...(p.steps || []));
-            if (p.closes) e.closes.unshift(p.closes);
+            if (p.closes) e.closes.unshift(...closesText(p.closes));
             else if (p.why && !/reused/i.test(p.why)) e.closes.push(p.why);
         }
         for (const [sid, st] of Object.entries(y.steps || {})) {
@@ -139,7 +149,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
                 const e = byId.get(id);
                 if (!e) continue;
                 e.wrmSteps.push(sid);
-                if (st.missing) e.closes.push(`${sid} ${st.title || ''}: ${st.missing}`);
+                if (st.missing) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing)}`);
             }
         }
     }
@@ -152,7 +162,8 @@ export function buildQueue({ curated = [], map = null } = {}) {
             e.ccss.push(...(p.ccss || []));
             const facets = Array.isArray(p.map) ? p.map : p.map ? [p.map] : [];
             e.map.push(...facets.map((f) => ({ strand: f.strand || '', ritBand: f.ritBand || '', taskType: f.taskType || '' })));
-            if (p.why) e.closes.push(p.why);
+            if (p.closes) e.closes.push(...closesText(p.closes));
+            else if (p.why) e.closes.push(p.why);
             if (!e.spec && (p.problemTypes || p.levels || p.misconceptions)) {
                 e.spec = { problemTypes: p.problemTypes || [], ladder: (p.levels || []).join(' · '), answer: '', misconceptions: p.misconceptions || [] };
             }
@@ -163,7 +174,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
             if (!e) continue;
             e.sources.add('MAP');
             if (!e.map.some((f) => f.task === r.task)) e.map.push({ strand: r.strand || '', ritBand: r.ritBand || '', taskType: '', task: r.task || '' });
-            if (r.closes) e.closes.push(`MAP ${r.task}: ${r.closes}`);
+            if (r.closes) e.closes.push(...closesText(r.closes).map((c) => `MAP task "${r.task}": ${c}`));
         }
     }
 
@@ -174,7 +185,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         if (W) fill(e, W);
         if (!e.name) e.name = e.id.replace(/_/g, ' ');
         e.ccss = uniq(e.ccss); e.ee = uniq(e.ee); e.wrmSteps = uniq(e.wrmSteps);
-        e.closes = uniq(e.closes);
+        e.closes = uniq(e.closes.filter((c) => typeof c === 'string'));
         if (!e.closes.length && e.wrmSteps.length) {
             e.closes.push(`No skill teaches ${stepList(e.wrmSteps)}.`);
         }

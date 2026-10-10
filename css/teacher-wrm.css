@@ -200,3 +200,15 @@ html.dark body.teacher-mode .tvt-kind.is-option { background: #33264d; color: #e
 .tvmk-detail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .tvm-tabs > button { min-height: 44px; padding: 0 16px; white-space: nowrap; }
 .tvm-tabs > button[aria-selected="true"] { border-color: var(--tv-selected); background: var(--tv-surface); color: var(--tv-text); font-weight: 700; }
+
+/* ---------------------------------------------------------------- critic r1: compact finder, Tick row in the lesson card */
+.tvw-find.is-compact { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tvw-find.is-compact .tvw-search { flex: 1 1 320px; min-width: 0; }
+.tvw-crumb { min-height: 44px; display: inline-flex; gap: 10px; align-items: center; }
+.tvw-crumb-t { font-weight: 700; }
+.tvw-crumb-c { color: var(--tv-accent); font-weight: 600; }
+.tvw-head .tvw-quick { padding-top: 10px; border-top: 1px solid var(--tv-rule); }
+.tvw-head { gap: 8px; }
+/* the toast sits above a picker's action bar, never on the link box (critic r1 M2) */
+body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: 112px; }
+.tvt-step { font: 600 13px/18px inherit; font-family: inherit; text-align: left; }
