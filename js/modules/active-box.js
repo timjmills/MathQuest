@@ -159,6 +159,7 @@ function selectIfLoose(active) {
     const justRight = ae && ae !== active && ae.classList && ae.classList.contains('mq-live-correct')
         && ae === lastInput.el && Date.now() - lastInput.t < 1500;
     if (justRight) {
+        active.dataset.mqHandedAt = String(Date.now());   // the caret was handed here: a move-on key now is for the box left behind
         try { active.focus({ preventScroll: !onScreen(active) ? false : true }); } catch (e) { /* ignore */ }
         return;
     }
@@ -234,11 +235,18 @@ function overflowKey(e) {
     if (el.selectionStart !== v.length || el.selectionEnd !== v.length) return;       // a selection is typed over, in place
     const host = el.closest(POPUP) || el.closest(HOSTS);
     if (!host) return;
-    const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
+    // a box scrolled out of its swipe row's window is still the row's next box (its rect may lie over a neighbouring card)
+    const shown = (b) => b.closest('[data-mq-swiperow]') || visible(b);
+    const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(shown));
     const i = boxes.indexOf(el);
     const next = i < 0 ? null : boxes.slice(i + 1).find(okNext);
-    if (!next || next.tagName !== 'INPUT') return;
+    if (!next || next.tagName !== 'INPUT') {
+        // no box left to take it (the last box, or every later box filled): the digit stays here, never lost (critic r3 N10)
+        el.setAttribute('maxlength', String(v.length + 1));
+        return;
+    }
     e.preventDefault();
+    next.dataset.mqHandedAt = String(Date.now());
     moveTo(next);
     next.value = e.key;
     lastInput = { t: Date.now(), el: next };

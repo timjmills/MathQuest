@@ -1858,6 +1858,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     };
     boxes.forEach((b, k) => {
         b.addEventListener('input', () => {
+            delete b.dataset.mqHandedAt;
             b.value = _slotChars(b.value, b.dataset.mqKind);
             input.value = compose();
             input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1866,9 +1867,20 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         b.addEventListener('keydown', (e) => {
             // a LIST of numbers (a count-by row): Space or a comma after a number moves on to the next box, as a pupil writes
             // a gap (a box keeps digits only, so a comma is never part of a number here)
-            if ((e.key === ' ' || e.key === ',') && join.trim() === ',' && !b.dataset.mqKind && (b.value || '').trim() && boxes[k + 1]) {
+            const list = join.trim() === ',' && !b.dataset.mqKind;
+            // critic r3 N7: the caret was just HANDED to this empty box (a right number turned green, or a digit ran over):
+            // the pupil's Space / comma / Enter / Tab is the move-on for the number they finished - it is already done here
+            const handed = list && !(b.value || '').trim() && Date.now() - Number(b.dataset.mqHandedAt || 0) < 2500;
+            if (handed && (e.key === ' ' || e.key === ',' || e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey))) {
                 e.preventDefault();
-                const nx = boxes[k + 1];
+                delete b.dataset.mqHandedAt;
+                return;
+            }
+            // Space or a comma moves on to the NEXT EMPTY box (one already right or filled is passed over, critic r3 N11)
+            const nextEmpty = boxes.slice(k + 1).find((x) => !(x.value || '').trim());
+            if ((e.key === ' ' || e.key === ',') && list && (b.value || '').trim() && nextEmpty) {
+                e.preventDefault();
+                const nx = nextEmpty;
                 nx.focus({ preventScroll: true });
                 try { nx.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (err) { /* ignore */ }   // a box 1 px under the fold too
                 return;

@@ -121,18 +121,23 @@ const active = (page) => page.evaluate(() => Number((document.activeElement && d
             check(hidden.split(/\s*,\s*/).map(digits).join('|') === exp.join('|'), `${tag} the quiz answer composes one number per box (${hidden})`);
           }
           // B. comma after each number, fast; then C. no separator at all
-          for (const mode of ['comma', 'none']) {
+          for (const mode of ['comma', 'enter', 'tab', 'none']) {
             info = await setup(app, host, opts, vp);
             await tapFirst(page, false);
             for (let i = 0; i < exp.length; i++) {
               await page.keyboard.type(exp[i], { delay: 30 });
-              if (mode === 'comma' && i < exp.length - 1) await page.keyboard.type(',');
+              if (i < exp.length - 1) {
+                if (mode === 'comma') await page.keyboard.type(',');
+                if (mode === 'enter') await page.keyboard.press('Enter');
+                if (mode === 'tab') await page.keyboard.press('Tab');
+              }
             }
             await sleep(200);
             got = (await boxVals(page)).map(digits);
             const typedDigits = exp.join('');
-            if (mode === 'comma' || exp.every((e) => e.length === W)) {
-              check(JSON.stringify(got) === JSON.stringify(exp), `${tag} ${mode === 'comma' ? 'commas between numbers' : 'numbers all ' + W + ' digits, typed straight on'}: ${got.join('|')}`);
+            if (mode !== 'none' || exp.every((e) => e.length === W)) {
+              // (on the card and the worksheet a right number has already handed the caret on: the key then moves nothing, N7)
+              check(JSON.stringify(got) === JSON.stringify(exp), `${tag} ${mode !== 'none' ? mode + ' between numbers' : 'numbers all ' + W + ' digits, typed straight on'}: ${got.join('|')}`);
             } else {
               // mixed lengths with no separator cannot be split by the screen without telling lengths: nothing may be lost
               check(got.join('') === typedDigits && got.every((g) => g.length <= W), `${tag} no separator, mixed lengths: no digit lost, no box over ${W} (${got.join('|')})`);
@@ -146,6 +151,15 @@ const active = (page) => page.evaluate(() => Number((document.activeElement && d
           await sleep(150);
           got = (await boxVals(page)).map(digits);
           check(got.join('') === long && got.every((g) => g.length <= W), `${tag} a number longer than the row's widest keeps every digit (${got.join('|')})`);
+          // E. the LAST box: a digit past the row's width stays in it, never dropped (critic r3 N10)
+          info = await setup(app, host, opts, vp);
+          const li = info.n - 1;
+          await page.evaluate((i) => { const el = document.querySelector(`[data-t="${i}"]`); el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.focus(); }, li);
+          const lastLong = '9'.repeat(W + 1);
+          await page.keyboard.type(lastLong, { delay: 30 });
+          await sleep(150);
+          const lv = await page.evaluate((i) => document.querySelector(`[data-t="${i}"]`).value, li);
+          check(digits(lv) === lastLong, `${tag} the last box keeps a digit past the row's width (${lv})`);
           check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
         } catch (e) {
           check(false, `${tag} ${e.message}`);
