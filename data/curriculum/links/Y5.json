@@ -1455,7 +1455,7 @@
      "why": "multiples in the chart"
     }
    ],
-   "note": ""
+   "note": "WRM also lists multiples of 2-digit numbers (15, 25, 50); number_theory:multiples reaches × 9 tables only, so those items need the teacher or a later option."
   },
   "Y5.B3.S2": {
    "title": "Common multiples",
@@ -1538,7 +1538,7 @@
     },
     {
      "key": "multiplication:mult_properties",
-     "why": "Y4.B4.S12 Divide a number by 1 and itself (prior learning wk W02)"
+     "why": "× 1 and commutative facts (n × 1 = n, 3 × 4 = 4 × 3) underpin \"1 and itself\" and factor pairs (prior learning wk W02 Y4.B4.S12 Divide a number by 1 and itself, nearest live skill)"
     },
     {
      "key": "number_theory:multiples",
@@ -1820,15 +1820,6 @@
        1000
       ]
      }
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "opts": {
-      "forms": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "partial": [],
@@ -1863,6 +1854,10 @@
    ],
    "preBuild": [],
    "related": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "1-digit × 10 / × 100 only (no × 1,000): the same idea at a smaller size, for warm-up"
+    },
     {
      "key": "placevalue:value",
      "why": "each place 10 times the next"
@@ -3747,6 +3742,10 @@
      "why": "Y5.B4.S9 repeated addition (prior learning wk W19)"
     },
     {
+     "key": "fraction_operations:decompose_fractions",
+     "why": "3/5 = 1/5 + 1/5 + 1/5 is the step that turns 3 × 1/5 into a non-unit fraction (4.NF.B.3b, before 4.NF.B.4)"
+    },
+    {
      "key": "multiplication:repeated_add_to_mult",
      "why": "repeated addition (prior learning wk W19)"
     },
@@ -3759,10 +3758,6 @@
     "mult_unit_frac_int"
    ],
    "related": [
-    {
-     "key": "fraction_operations:decompose_fractions",
-     "why": "3/5 = 1/5+1/5+1/5"
-    },
     {
      "key": "fraction_operations:frac_mult_word",
      "why": "in stories"
@@ -3869,9 +3864,7 @@
      "why": "halving (prior learning wk W20)"
     }
    ],
-   "preBuild": [
-    "mult_mixed_int"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "fractions:fraction_of_set_hard",
@@ -4251,8 +4244,7 @@
    "verdict": "partial",
    "missing": "thousandths as fractions (x/1000) with a place-value chart and a thousandths model",
    "build": [
-    "thousandths_pv",
-    "fd_place_band"
+    "thousandths_pv"
    ],
    "pre": [
     {
@@ -4411,13 +4403,9 @@
    "verdict": "partial",
    "missing": "a page where every number has the same number of decimal places and the same whole part (0.47 vs 0.43; 3.6, 3.2, 3.9): order_decimals at 2 dp mixes 1 and 2 dp, compare_decimal pairs usually differ in the whole part",
    "build": [
-    "dec_dp_match"
+    "dec_compare_same"
    ],
    "pre": [
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "Y5.B7.S6–S7 thousandths (earlier steps)"
-    },
     {
      "key": "conversions:d_to_f",
      "why": "Y5.B7.S5 (earlier step)"
@@ -4446,6 +4434,10 @@
     {
      "key": "conversions:order_fdp",
      "why": "mixed forms"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "next step (B7.S9): the same comparison with up to 3 decimal places"
     }
    ],
    "note": ""
@@ -4862,7 +4854,7 @@
    "partial": [
     {
      "key": "area_perimeter:composite_shapes",
-     "missing": "every side is labelled, so the pupil never finds the missing lengths first"
+     "missing": "its perimeter-and-area form ({forms:[1]}) labels only 4 sides of an L/T shape so pupils do find missing sides, but there is no perimeter-only page and no unlabelled-side task with several shapes"
     },
     {
      "key": "area_perimeter:perimeter_grid",
@@ -4870,7 +4862,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "finding missing side lengths of a rectilinear shape from the given sides before adding the perimeter",
+   "missing": "a perimeter-only page of rectilinear shapes where the pupil finds the unlabelled side lengths first and then adds all sides",
    "build": [
     "missing_lengths"
    ],
@@ -7978,7 +7970,7 @@
    "also": [
     "conversions:f_to_d"
    ],
-   "option": "place \"tenths\" / \"hundredths\" / \"thousandths\" with a tenths strip / hundred square support",
+   "option": "place \"tenths\" / \"hundredths\" with a tenths strip / hundred square support (thousandths belong to thousandths_pv)",
    "name": "Fractions and Decimals by Place (option)",
    "teaches": "writing tenths, then hundredths, then thousandths as both a fraction and a decimal (3/10 = 0.3; 27/100 = 0.27; 7/1000 = 0.007), without simplifying",
    "representation": "boxed cell: a tenths strip or hundred square (black outline, grey shading) above; fraction slot and decimal slot side by side; strip fades to none",
@@ -7989,8 +7981,7 @@
    ],
    "why": "d_to_f / f_to_d mix tenths, hundredths and 3/4-type items and stop at hundredths",
    "steps": [
-    "Y5.B7.S2",
-    "Y5.B7.S5"
+    "Y5.B7.S2"
    ],
    "reused": false
   },
@@ -8019,11 +8010,9 @@
    "kind": "option",
    "skill": "decimals:add_decimal",
    "also": [
-    "decimals:sub_decimal",
-    "decimals:compare_decimal",
-    "decimals:order_decimals"
+    "decimals:sub_decimal"
    ],
-   "option": "decimal places \"same\" / \"different\" (place-holder zero shown in the column); on compare/order also \"same whole part\"",
+   "option": "decimal places \"same\" / \"different\" (place-holder zero shown in the column)",
    "name": "Add and Subtract Decimals: Same or Different Decimal Places (option)",
    "teaches": "column addition and subtraction of decimals where both numbers have the same number of decimal places, then different (3.4 + 1.25 written as 3.40 + 1.25; 5 − 1.23)",
    "representation": "the existing stack cell with decimal points aligned in one column; on \"different\" the place-holder 0 is drawn in grey as a hint that fades",
@@ -8032,9 +8021,8 @@
     "5.NBT.B.7",
     "4.NBT.B.4"
    ],
-   "why": "WRM separates same-dp and different-dp steps (add/sub B12.S4–S7, compare/order B7.S8); today the Decimal Places setting mixes them at 2–3 dp and compare pairs differ in the whole part",
+   "why": "WRM separates same-dp and different-dp add/subtract steps (B12.S4–S7); today the Decimal Places setting mixes them at 2–3 dp",
    "steps": [
-    "Y5.B7.S8",
     "Y5.B12.S4",
     "Y5.B12.S5",
     "Y5.B12.S6",
@@ -8226,6 +8214,27 @@
    ],
    "why": "closes the listed Y5 steps"
   },
+  "dec_compare_same": {
+   "kind": "option",
+   "skill": "decimals:compare_decimal",
+   "also": [
+    "decimals:order_decimals"
+   ],
+   "option": "set \"same decimal places, same whole part\" (0.47 vs 0.43; 3.6, 3.2, 3.9) vs \"any\"",
+   "name": "Compare and Order Decimals: Same Decimal Places (option)",
+   "teaches": "comparing and ordering decimals that all have the same number of decimal places and the same whole part, so the tenths then hundredths digit decides",
+   "representation": "two (or four) decimals in boxed cells over an aligned place-value header (O . t h); write < > = in the circle, or write the order in answer boxes; a grey column-highlight hint on the first differing place that fades",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.7",
+    "5.NBT.A.3"
+   ],
+   "steps": [
+    "Y5.B7.S8"
+   ],
+   "why": "WRM B7.S8 is \"same number of decimal places\"; compare_decimal pairs usually differ in the whole part and order_decimals mixes 1 and 2 dp",
+   "reused": false
+  },
   "missing_lengths": {
    "kind": "new",
    "skill": "area_perimeter:rectilinear_missing_sides",
@@ -8237,6 +8246,7 @@
     "Y5.B8.S2"
    ],
    "reused": true,
+   "extendNote": "For Y5.B8.S2 this could be a form option on area_perimeter:composite_shapes (perimeter only, unlabelled sides) rather than a new skill.",
    "ccss": [
     "3.MD.D.8"
    ],
@@ -8544,6 +8554,7 @@
    "representation": "a B&W coordinate grid with three plotted, labelled vertices and dashed sides; write ( , ) in boxes",
    "family": "geometry",
    "steps": [
+    "Y4.B14.S3",
     "Y5.B11.S2"
    ],
    "ccss": [
@@ -8551,7 +8562,8 @@
     "4.G.A.2"
    ],
    "why": "coord_polygon only measures sides; WRM Y5 problem solving is the missing vertex",
-   "reused": false
+   "reused": false,
+   "note": "Y4.B14.S3 already carries a partial tag in wrm.js for the same missing-vertex clause"
   },
   "translate_grid": {
    "kind": "new",
@@ -9014,12 +9026,6 @@
    "step": "Y5.B3.S7",
    "action": "add",
    "why": "partial: evaluates cubes (forms Cubes) without the cube picture"
-  },
-  {
-   "key": "multiplication:mult_zeros",
-   "step": "Y5.B3.S8",
-   "action": "add",
-   "why": "× 10 and × 100 forms"
   },
   {
    "key": "multiplication:area_model_mult",
