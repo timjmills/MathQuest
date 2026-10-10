@@ -99,3 +99,67 @@ Steps under 8: 17 of 28. Steps under 7: 5 (B3.S10, B4.S14, B7.S8, B12.S5, B12.S1
 ## Overall
 Mean 7.43 / 10. **Verdict: FAIL.**
 To pass, fix the two generous "full" verdicts (B4.S14, B7.S8), the missing demotion tagFixes, the invalid option keys (file-wide), and the unrelated pre-skill lists (B12.S12, B7.S7). With those fixed, the sample would land around 8.
+# Critic round 2 — Y5 (US Grade 4) WRM tagging, data/curriculum/links/Y5.json
+
+Method: read each sampled step's WRM title/CCSS/notes and its school prior-learning list, generated items for every
+direct/partial skill with the stated options (sample.mjs, RANGE=1000000), read optionsFor for each, and checked
+the sampled tagFixes against SKILL_WRM in js/modules/wrm.js. Proposal ids were checked against wrm.js /
+build-list.js / build-specs.js for reuse.
+
+## Per-step scores (0-10)
+
+| Step | Score | Reason |
+|---|---|---|
+| Y5.B1.S1 Roman numerals to 1,000 | 8 | Honest gap; roman_1000 reuses the roman_100 entry; roman_12/roman_100 in preBuild. Pre-skills are thin stand-ins (expand, missing-number). |
+| Y5.B1.S2 Numbers to 10,000 | 7 | Direct correct (sampled band 9999: disks, chart, unit form, expanded). But all 4 pre-skills are the 4 direct skills again with no lower-band opts, so the pre list adds nothing. |
+| Y5.B1.S11 Compare/order to 1,000,000 | 7 | Direct correct (sampled 6-digit compare and order). Pre repeats direct compare and order_least_to_greatest without a lower band. |
+| Y5.B1.S13 Round within 100,000 | 7 | Verdict full is right only with options the entry does not give: nearest_1000 is listed with opts {} and deals 4-digit numbers (default band 10,000). rounding_table {places:[10,100,1000,10000]} deals 5-digit numbers to every place but is put in pre/related, not direct. |
+| Y5.B2.S1 Mental strategies | 8 | Honest partial (compensation is 2-digit, add_sub_100s whole hundreds). mental_add_sub reused; bonds_100 preBuild good. |
+| Y5.B3.S5 Prime numbers | 8 | prime_composite sampled, all four forms, to about 100. Full is right. gcf_easy is a weak pre-skill. |
+| Y5.B3.S9 Divide by 10, 100, 1,000 | 8 | place_value_10x op "/" with shift chart sampled, whole-number answers, matches the autumn lesson. No missing-number form, which is fine here. |
+| Y5.B4.S1 Equivalent to a unit fraction | 9 | Honest partial, confirmed by sampling (2/4 = 6/__ appears). equiv_from_unit is new, specific and written as a B&W cell. Pre list is good. |
+| Y5.B4.S5 Mixed to improper | 7 | improper_mixed has no direction option and deals improper to mixed as well (sampled 14/4 to 3 2/4). S4 and S5 have identical direct lists, so neither step can be printed on its own. "Full" needs a note or a direction-option proposal. Pre is thin (2 entries) and leaves out the previous step's idea (count in fractions past 1, number line). |
+| Y5.B4.S9 Add/sub same denominator | 8 | Sampled: sums within and beyond 1. Full is fair. decompose_fractions appears in both pre and related. |
+| Y5.B5.S2 2-digit × 2-digit (area model) | 9 | tiles 22 sampled as a 2 × 2 grid. Good pre chain. |
+| Y5.B5.S9 Divide with remainders | 8 | divide tiles 41, regroup always, sampled 4-digit ÷ 1-digit R. The div_remainders remove fix is right. remainder_too_big (a 2-digit check task, to 119) belongs in related or pre, not direct. |
+| Y5.B6.S3 Mixed number × integer | 7 | Gap verified: mult_frac_whole deals proper/improper fractions only. The reused proposal is thin ("a mixed-number band on mult_frac_whole", "closes the listed Y5 steps"), with no B&W cell shape. Related is 3 of 4 copies of pre. |
+| Y5.B7.S12 Understand percentages | 8 | percent_visual sampled: hundred grid with % / fraction / count / click forms. Full is acceptable. |
+| Y5.B7.S15 Equivalent FDP | 8 | f_to_p, d_to_p, order_fdp and f_to_d sampled. Fine. Pre and related share all three items. |
+| Y5.B8.S5 Area of compound shapes | 7 | Direct correct. composite_shapes forms [1] also asks for the perimeter, which is acceptable. composite_shapes is listed as a direct skill and as a pre-skill, and addition:add is a weak pre-skill. |
+| Y5.B8.S6 Estimate area | 8 | Correct gap; area_estimate reused. Related is thin. |
+| Y5.B11.S2 Problem solving with coordinates | 8 | Honest partial (coord_polygon sampled: side lengths and perimeter only). coord_missing_vertex is new, concrete and B&W. Only 2 pre-skills. |
+| Y5.B11.S5 Lines of symmetry | 7 | Direct correct (sampled). The pre list is the direct skill symmetry again, plus partition_shapes, and nothing else. |
+| Y5.B12.S4 Add decimals, same dp | 7 | Partial confirmed (DEC=2 gives 43.53 + 41.4). Pre skips the block's own earlier steps (S1–S3 known facts, complements to 1, across 1, which are gaps) and has no preBuild (dec_known_facts / dec_across_one / decimal_pv). compare_decimal's related "why: column method" is wrong. |
+| Y5.B12.S6 Add decimals, different dp | 8 | Honest partial; dec_dp_match describes the place-holder 0 as a fading grey hint. Good. |
+| Y5.B12.S12 × ÷ decimals, missing values | 8 | Correct gap; dec_missing reused; pre has place_value_10x {decimals:true}. Dropping the off-topic W36 xlsx list is noted. |
+| Y5.B13.S5 Find the difference | 8 | Honest partial. sub_int forms [1] on a number line (sampled 2 − (−6)) is close, so the partial entry should carry opts {forms:[1]}. negative_count reused. |
+| Y5.B14.S3 Convert units of length | 7 | The partials are right (sampled: unit_conversions mixes g/L; length_metric goes larger to smaller only). But the stated missing clause, smaller to larger, is not clearly closed by km_m / mm_cm_m, whose specs name mixed units only. Related is 2 items, one of which repeats pre. |
+| Y5.B14.S5 Convert units of time | 8 | unit_conversion_word units [0] sampled: hr to min/sec only. Honest; time_convert reused. |
+| Y5.B14.S6 Calculate with timetables | 8 | Correct gap; timetables reused; time_convert in preBuild. |
+| Y5.B15.S1 Cubic centimetres | 8 | Gap is defensible: area_perimeter:volume is l × w × h, not counting cm³ cubes. A note on volume band 12 as a later bridge would help. Related is thin. |
+| Y5.B15.S4 Estimate capacity | 8 | Partial confirmed (capacity forms [1] is only "click containers larger than 1 litre"). capacity_estimate is new and B&W; the mass_scales preBuild fits. |
+
+**Mean: 217 / 28 = 7.75 (pass is 8 or more): FAIL.** No step scored below 7. The fails come from pre/related usefulness and a few option slips, not from wrong verdicts. Verdicts are honest throughout the sample.
+
+## Concrete defects (step, field: what is wrong → what it should be)
+
+1. **Y5.B1.S13, direct:** nearest_1000 has opts {}, which deals 4-digit numbers → set opts {band:100000}. Add number_sense:rounding_table {places:[10,100,1000,10000]} as direct, since it rounds 5-digit numbers to 10/100/1,000/10,000, which is the WRM lesson. Optionally add nearest_100 / nearest_10 with {band:100000}. Fix the B1.S13 tagFix for nearest_1000 to carry the band.
+2. **Y5.B1.S2, pre:** the 4 pre-skills equal the 4 direct skills with no opts → give them a lower band ({band:999}, the Y4 numbers to 1,000 steps), or use other skills (placevalue:value / identify at 999, more_less_100).
+3. **Y5.B1.S11, pre:** compare and order_least_to_greatest repeat direct → give them {band:99999} (the previous step, B1.S10) or drop them; add placevalue:value {band:999999} as the "first differing place" pre-skill.
+4. **Y5.B4.S5 (and S4), verdict/build:** improper_mixed and mixed_improper_visual cannot isolate one direction, so a page for this step also deals improper to mixed → either keep full with a note, or add an option proposal `direction: mixed→improper | improper→mixed` on improper_mixed. Pre: add the S4 idea (fractions:mixed_nl_drag, counting in fractions past 1) and fraction_operations:add_fractions_like (wholes as n/n).
+5. **Y5.B5.S9, direct:** remainder_too_big (2-digit check-the-remainder, band to 119) is a misconception/check task, not 4-digit division with remainders → move it to related, or keep it with a note.
+6. **Y5.B6.S3, proposal mult_mixed_int:** representation "a mixed-number band on mult_frac_whole" and why "closes the listed Y5 steps" are placeholders → write the B&W cell, e.g. "boxed cell: 2 1/3 × 4 with a part-whole bar (4 × 2 wholes + 4 × 1/3), write the answer as a mixed number in boxes; partition hint fades". Related: replace the copies of pre with mult_frac_whole_nv / frac_mult_word / add_mixed_like_nv.
+7. **Y5.B8.S5, pre:** composite_shapes is both direct and pre → drop it from pre; replace addition:add with area_perimeter:area_distributive_visual (split a rectangle), or a missing-lengths pre-skill (missing_lengths, preBuild).
+8. **Y5.B11.S5, pre:** angles_lines:symmetry is both direct and pre → use shape-property pre-skills (shapes_classify:classify_quads, a shape-naming skill, partition_shapes) and the Y4 step with forms [0] only, if that is the point.
+9. **Y5.B12.S4, pre/preBuild:** add the block's own earlier steps: dec_known_facts, dec_across_one and decimal_pv in preBuild (they are gaps), plus decimals:decimal_nl_drag. Fix the related why for compare_decimal ("column method" is wrong; it compares decimals).
+10. **Y5.B13.S5, partial:** integers:sub_int → add opts {forms:[1], band:10, ticks:"one"} (positive minus negative on a drawn line), which is the closest current item.
+11. **Y5.B14.S3, build:** the missing clause "smaller to larger" (2,500 m = 2.5 km / 2 km 500 m; 350 cm = 3 m 50 cm) is not named in km_m or mm_cm_m → add a `direction` value to those option specs, or a separate option on length_metric. Related: add measurement:unit_conversion_word {units:[1]} or measurement:mass_volume_liquid as the parallel mass/capacity conversion.
+12. **File-wide (systemic):** 49 of 136 steps list a direct or partial skill again as a pre-skill without lower-band opts, and 77 steps repeat pre-skills in related. Pre-skills must be different skills, or the same skill with an easier opts value written in the entry. Related lists should not echo pre.
+
+## tagFixes spot-check (sampled steps, against SKILL_WRM)
+- Correct: B1.S2 add disks/unit_form; B1.S11 add order_greatest_to_least; B2.S1 add the two partials; B4.S1 equivalent → partial, remove equiv_frac_nv, add equiv_frac_visual partial; B4.S9 add the two _nv; B5.S9 add divide, remove div_remainders (Y3-level); B7.S15 add f_to_d; B12.S4 and B12.S6 add_decimal → partial (existing tags are full); B14.S3 length_metric and unit_conversion_word → partial, add unit_conversions; B14.S5 add unit_conversion_word partial.
+- Defect: B1.S13 add nearest_1000 has no band (see defect 1). The B4.S1 fix text mentions opts {"forms":[0]}, but the partial entry has no opts, so the two should agree.
+- Not needed: B11.S2, B13.S5 and B15.S4 already carry partial tags that match the file.
+
+## Verdict
+**FAIL (mean 7.75).** Verdicts, missing clauses and proposal reuse are strong: every proposal id checked exists or is new for a reason, and no duplicates were found. Fix defects 1–11 and the systemic pre/related duplication (12), then re-grade.
