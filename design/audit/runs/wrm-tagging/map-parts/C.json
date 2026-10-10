@@ -1581,7 +1581,9 @@
    "teaches": "recognising horizontal and vertical lines in shapes and on a grid",
    "representation": "shapes with sides marked; write H or V for each marked line",
    "family": "geometry",
-   "ccss": [],
+   "ccss": [
+    "K.G.A.1"
+   ],
    "map": {
     "strand": "Geometry",
     "ritBand": "171-185",
@@ -1634,7 +1636,9 @@
    "teaches": "reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints)",
    "representation": "a task option on coordinate_all",
    "family": "geometry",
-   "ccss": [],
+   "ccss": [
+    "6.NS.C.8"
+   ],
    "map": {
     "strand": "Geometry",
     "ritBand": "215-230",
