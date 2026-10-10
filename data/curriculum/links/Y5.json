@@ -76,19 +76,31 @@
    "pre": [
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1) - easier: {\"band\": 999}",
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:pv_digit_drag",
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1) - easier: {\"band\": 999}",
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y4.B1.S2 Partition numbers to 1,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+     "why": "Y4.B1.S2 Partition numbers to 1,000 (lower grade, same cluster CCSS 2.NBT.A.1) - easier: {\"band\": 999}",
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:expand",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3) - easier: {\"band\": 999}",
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "preBuild": [],
@@ -155,11 +167,17 @@
    "pre": [
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
+     "why": "Y5.B1.S2 Numbers to 10,000 (previous step) - easier: {\"band\": 999}",
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:pv_digit_drag",
-     "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
+     "why": "Y5.B1.S2 Numbers to 10,000 (previous step) - easier: {\"band\": 9999}",
+     "opts": {
+      "band": 9999
+     }
     },
     {
      "key": "placevalue:expand",
@@ -168,10 +186,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:expand",
-     "why": "partition a 5-digit number (Y5.B1.S8)"
-    },
     {
      "key": "placevalue:number_word_names",
      "why": "5-digit numbers in words"
@@ -218,7 +232,10 @@
    "pre": [
     {
      "key": "placevalue:pv_digit_drag",
-     "why": "Y5.B1.S3 Numbers to 100,000 (previous step)"
+     "why": "Y5.B1.S3 Numbers to 100,000 (previous step) - easier: {\"band\": 99999}",
+     "opts": {
+      "band": 99999
+     }
     },
     {
      "key": "placevalue:place_value_disks",
@@ -242,10 +259,6 @@
     {
      "key": "placevalue:number_word_names",
      "why": "read and write to 1,000,000 (Y5.B1.S5)"
-    },
-    {
-     "key": "placevalue:expand",
-     "why": "partition to 1,000,000 (Y5.B1.S8)"
     },
     {
      "key": "placevalue:combine",
@@ -290,7 +303,11 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
-     "why": "Y5.B1.S4 Numbers to 1,000,000 (previous step)"
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (previous step) - easier: {\"band\": 999999, \"source\": \"expanded\"}",
+     "opts": {
+      "band": 999999,
+      "source": "expanded"
+     }
     },
     {
      "key": "placevalue:unit_form",
@@ -301,12 +318,10 @@
      "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "vis_pv_bands_millions"
+   ],
    "related": [
-    {
-     "key": "placevalue:expand",
-     "why": "the parts named in the words"
-    },
     {
      "key": "placevalue:combine",
      "why": "standard form from parts"
@@ -341,7 +356,15 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W06)"
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W06) - easier: {\"op\": \"x\", \"power\": [10, 100], \"band\": 10000}",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
+      "band": 10000
+     }
     },
     {
      "key": "multiplication:mult_zeros",
@@ -361,14 +384,6 @@
     {
      "key": "placevalue:value",
      "why": "value of a digit: each place 10 times the next"
-    },
-    {
-     "key": "placevalue:unit_form",
-     "why": "rename (47 tens) with option rename=more"
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "× 10, × 100"
     },
     {
      "key": "order_of_operations:exponents_simple",
@@ -398,7 +413,10 @@
    "pre": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W06)"
+     "why": "Y4.B1.S8 Find 1, 10, 100, 1,000 more or less (prior learning wk W06) - easier: {\"step\": 100}",
+     "opts": {
+      "step": 100
+     }
     },
     {
      "key": "placevalue:more_less_10",
@@ -426,10 +444,6 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "the other way of changing by a power of ten"
-    },
-    {
-     "key": "placevalue:value",
-     "why": "which digit changes"
     }
    ],
    "note": ""
@@ -460,11 +474,17 @@
    "pre": [
     {
      "key": "placevalue:expand",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07) - easier: {\"band\": 9999}",
+     "opts": {
+      "band": 9999
+     }
     },
     {
      "key": "placevalue:combine",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W07) - easier: {\"band\": 9999}",
+     "opts": {
+      "band": 9999
+     }
     },
     {
      "key": "placevalue:unit_form",
@@ -480,16 +500,8 @@
    ],
    "related": [
     {
-     "key": "placevalue:unit_form",
-     "why": "rename a place (option rename=more)"
-    },
-    {
      "key": "placevalue:value",
      "why": "the value of each part"
-    },
-    {
-     "key": "placevalue:pv_digit_drag",
-     "why": "numbers to 1,000,000 in a chart"
     },
     {
      "key": "algebra:tape_diagram",
@@ -523,7 +535,11 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07) - easier: {\"span\": 100, \"band\": 1000}",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
     },
     {
      "key": "placevalue:more_less_100",
@@ -586,11 +602,17 @@
    "pre": [
     {
      "key": "placevalue:compare",
-     "why": "Y4.B1.S11 Compare numbers to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (prior learning wk W07) - easier: {\"band\": 9999}",
+     "opts": {
+      "band": 9999
+     }
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07) - easier: {\"band\": 9999}",
+     "opts": {
+      "band": 9999
+     }
     },
     {
      "key": "placevalue:pv_digit_drag",
@@ -601,7 +623,9 @@
      "why": "Y5.B1.S3 Numbers to 100,000 (earlier Y5 step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "nl_20"
+   ],
    "related": [
     {
      "key": "placevalue:value",
@@ -651,11 +675,24 @@
    "pre": [
     {
      "key": "placevalue:compare",
-     "why": "Y5.B1.S10 Compare and order numbers to 100,000 (previous step)"
+     "why": "Y5.B1.S10 Compare and order numbers to 100,000 (previous step) - easier: {\"band\": 99999}",
+     "opts": {
+      "band": 99999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "opts": {
+      "band": 999999
+     },
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step): the value of the first differing place decides"
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S12 Order numbers to 10,000 (prior learning wk W07) - easier: {\"band\": 99999}",
+     "opts": {
+      "band": 99999
+     }
     },
     {
      "key": "placevalue:pv_digit_drag",
@@ -668,10 +705,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:value",
-     "why": "the first place that differs decides"
-    },
     {
      "key": "number_sense:round_nl_hundred_thousands",
      "why": "numbers placed on a line"
@@ -704,7 +737,13 @@
     },
     {
      "key": "number_sense:rounding_table",
-     "opts": {}
+     "opts": {
+      "places": [
+       10,
+       100,
+       1000
+      ]
+     }
     },
     {
      "key": "number_sense:round_nl_thousands",
@@ -717,24 +756,12 @@
    "build": [],
    "pre": [
     {
-     "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W06)"
-    },
-    {
      "key": "number_sense:rounding_visual",
      "why": "Y4.B1.S14 Round to the nearest 10 (prior learning wk W06)"
     },
     {
-     "key": "number_sense:nearest_100",
-     "why": "Y4.B1.S15 Round to the nearest 100 (prior learning wk W06)"
-    },
-    {
      "key": "number_sense:round_sort_100",
      "why": "Y4.B1.S15 Round to the nearest 100 (prior learning wk W06)"
-    },
-    {
-     "key": "number_sense:round_nl_thousands",
-     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W06)"
     },
     {
      "key": "number_sense:between_tens",
@@ -746,10 +773,6 @@
     {
      "key": "number_sense:round_sort_1000",
      "why": "sort by the rounded value"
-    },
-    {
-     "key": "number_sense:rounding_visual",
-     "why": "round on a number line (place 1,000)"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -770,15 +793,28 @@
      "opts": {}
     },
     {
+     "key": "number_sense:nearest_1000",
+     "opts": {
+      "band": 100000
+     }
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "opts": {
+      "places": [
+       10,
+       100,
+       1000,
+       10000
+      ]
+     }
+    },
+    {
      "key": "number_sense:round_nl_ten_thousands",
      "opts": {}
     },
     {
      "key": "number_sense:round_sort_10000",
-     "opts": {}
-    },
-    {
-     "key": "number_sense:nearest_1000",
      "opts": {}
     }
    ],
@@ -789,11 +825,10 @@
    "pre": [
     {
      "key": "number_sense:nearest_1000",
-     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (previous step)"
-    },
-    {
-     "key": "number_sense:rounding_table",
-     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (previous step)"
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (previous step) - easier: {\"band\": 10000}",
+     "opts": {
+      "band": 10000
+     }
     },
     {
      "key": "number_sense:round_nl_thousands",
@@ -810,10 +845,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "number_sense:rounding_table",
-     "why": "one number rounded to several places"
-    },
     {
      "key": "number_sense:nearest_100000",
      "why": "next step"
@@ -837,15 +868,17 @@
      "opts": {}
     },
     {
+     "key": "number_sense:nearest_10000",
+     "opts": {
+      "band": 1000000
+     }
+    },
+    {
      "key": "number_sense:round_nl_hundred_thousands",
      "opts": {}
     },
     {
      "key": "number_sense:round_sort_100000",
-     "opts": {}
-    },
-    {
-     "key": "number_sense:nearest_10000",
      "opts": {}
     }
    ],
@@ -856,7 +889,10 @@
    "pre": [
     {
      "key": "number_sense:nearest_10000",
-     "why": "Y5.B1.S13 Round within 100,000 (previous step)"
+     "why": "Y5.B1.S13 Round within 100,000 (previous step) - easier: {\"band\": 100000}",
+     "opts": {
+      "band": 100000
+     }
     },
     {
      "key": "number_sense:round_nl_ten_thousands",
@@ -876,10 +912,6 @@
     {
      "key": "number_sense:nearest_million",
      "why": "Y6 rounding to 1,000,000"
-    },
-    {
-     "key": "number_sense:rounding_table",
-     "why": "several places at once"
     },
     {
      "key": "placevalue:compare",
@@ -911,14 +943,6 @@
     "mental_add_sub"
    ],
    "pre": [
-    {
-     "key": "addition:add_sub_100s",
-     "why": "Y4.B2.S1 Add and subtract 1s, 10s, 100s and 1,000s (prior learning wk W08)"
-    },
-    {
-     "key": "number_sense:compensation",
-     "why": "Y4.B2.S8 Efficient subtraction (lower grade, same cluster CCSS 3.NBT.A.2)"
-    },
     {
      "key": "composing:make_ten",
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W08)"
@@ -1110,7 +1134,11 @@
    "pre": [
     {
      "key": "number_sense:estimate_sums_diffs",
-     "why": "Y4.B2.S9 Estimate answers (prior learning wk W09)"
+     "why": "Y4.B2.S9 Estimate answers (prior learning wk W09) - easier: {\"place\": 100, \"task\": \"reasonable\"}",
+     "opts": {
+      "place": 100,
+      "task": "reasonable"
+     }
     },
     {
      "key": "number_sense:estimate_sum",
@@ -1131,10 +1159,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "number_sense:estimate_sum",
-     "why": "estimate a sum"
-    },
     {
      "key": "number_sense:estimate_diff",
      "why": "estimate a difference"
@@ -1169,10 +1193,6 @@
     "inverse_check"
    ],
    "pre": [
-    {
-     "key": "subtraction:sub_check_by_adding",
-     "why": "Y4.B2.S10 Checking strategies (prior learning wk W09)"
-    },
     {
      "key": "addition:number_families_add",
      "why": "Y2.B2.S3 Related facts (prior learning wk W09)"
@@ -1322,18 +1342,6 @@
     {
      "key": "algebra:balance_addsub",
      "why": "keep both sides equal"
-    },
-    {
-     "key": "number_sense:compensation",
-     "why": "change one number, adjust the other"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "<, > and = signs"
-    },
-    {
-     "key": "addition:equal_sign",
-     "why": "true or false equations"
     }
    ],
    "note": "Weeks W09-W10."
@@ -1359,10 +1367,6 @@
    ],
    "pre": [
     {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W01)"
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y1.B5.S10 Missing number problems (prior learning wk W01)"
     },
@@ -1375,7 +1379,9 @@
      "why": "Y5.B2.S6 Multi-step addition and subtraction problems (earlier Y5 step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "inverse_check"
+   ],
    "related": [
     {
      "key": "algebra:solve_eq_addsub",
@@ -1412,10 +1418,6 @@
     {
      "key": "multiplication:count_by_tables",
      "why": "Y4.B4.S1 Multiples of 3 (prior learning wk W01)"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W01)"
     },
     {
      "key": "multiplication:mult_chart",
@@ -1495,10 +1497,6 @@
      "why": "common factors (Y5.B3.S4)"
     },
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of one number"
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "tables facts"
     },
@@ -1532,10 +1530,6 @@
    "pre": [
     {
      "key": "number_theory:factor_tchart_easy",
-     "why": "Y4.B5.S1 Factor pairs (prior learning wk W01)"
-    },
-    {
-     "key": "number_theory:factors_identify",
      "why": "Y4.B5.S1 Factor pairs (prior learning wk W01)"
     },
     {
@@ -1775,7 +1769,15 @@
    "pre": [
     {
      "key": "order_of_operations:exponents_simple",
-     "why": "Y5.B3.S6 Square numbers (previous step)"
+     "why": "Y5.B3.S6 Square numbers (previous step) - easier: {\"forms\": [0], \"step\": [0]}",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "step": [
+       0
+      ]
+     }
     },
     {
      "key": "multiplication:dot_array_mult",
@@ -1801,10 +1803,6 @@
     {
      "key": "multiplication:mult_properties",
      "why": "multiply three numbers in any order"
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "n × n facts"
     }
    ],
    "note": "Above CCSS K-5 (6.EE.A.1). Prior-learning Y4.B4.S13 Multiply three numbers has no skill (mult_three)."
@@ -1839,12 +1837,16 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W10)"
-    },
-    {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10) - easier: {\"op\": \"x\", \"power\": [10, 100], \"band\": 10000}",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
+      "band": 10000
+     }
     },
     {
      "key": "placevalue:unit_form",
@@ -1898,7 +1900,15 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (previous step)"
+     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (previous step) - easier: {\"op\": \"x\", \"power\": [10, 100, 1000]}",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100,
+       1000
+      ]
+     }
     },
     {
      "key": "division:div_facts",
@@ -1960,10 +1970,6 @@
      "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W02)"
-    },
-    {
      "key": "placevalue:place_value_10x",
      "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (previous step)"
     }
@@ -1973,10 +1979,6 @@
     {
      "key": "number_theory:divisibility_sort",
      "why": "divisible by 10 (mixed with 2 and 5)"
-    },
-    {
-     "key": "number_theory:multiples",
-     "why": "multiples of a 1-digit number"
     },
     {
      "key": "placevalue:more_less_100",
@@ -2984,11 +2986,17 @@
    "pre": [
     {
      "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11) - easier: {\"tiles\": 21}",
+     "opts": {
+      "tiles": 21
+     }
     },
     {
      "key": "multiplication:area_model_mult",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11) - easier: {\"tiles\": 21}",
+     "opts": {
+      "tiles": 21
+     }
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3063,10 +3071,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:multiply",
-     "why": "the column method for the same product (Y5.B5.S3)"
-    },
-    {
      "key": "multiplication:mult_properties",
      "why": "distributive property"
     },
@@ -3110,7 +3114,10 @@
     },
     {
      "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11) - easier: {\"tiles\": 21}",
+     "opts": {
+      "tiles": 21
+     }
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3165,7 +3172,10 @@
    "pre": [
     {
      "key": "multiplication:mult_placeholder_zero",
-     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step): option tiles 22"
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step): option tiles 22 - easier: {\"tiles\": 22}",
+     "opts": {
+      "tiles": 22
+     }
     },
     {
      "key": "multiplication:multiply",
@@ -3173,7 +3183,10 @@
     },
     {
      "key": "multiplication:area_model_mult_hard",
-     "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (earlier Y5 step)"
+     "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (earlier Y5 step) - easier: {\"tiles\": 22}",
+     "opts": {
+      "tiles": 22
+     }
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3221,7 +3234,10 @@
    "pre": [
     {
      "key": "multiplication:mult_placeholder_zero",
-     "why": "Y5.B5.S4 Multiply a 3-digit number by a 2-digit number (previous step)"
+     "why": "Y5.B5.S4 Multiply a 3-digit number by a 2-digit number (previous step) - easier: {\"tiles\": 22}",
+     "opts": {
+      "tiles": 22
+     }
     },
     {
      "key": "multiplication:area_model_mult_hard",
@@ -3244,15 +3260,13 @@
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W35)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "long_mult"
+   ],
    "related": [
     {
      "key": "number_sense:estimate_products",
      "why": "estimate the product"
-    },
-    {
-     "key": "multiplication:multiply",
-     "why": "2-digit × 2-digit column"
     },
     {
      "key": "decimals:mult_decimal",
@@ -3315,10 +3329,6 @@
    ],
    "related": [
     {
-     "key": "multiplication:mult_comparison",
-     "why": "times as many (scaling)"
-    },
-    {
      "key": "multiplication:mult_comparison_plain",
      "why": "scaling without pictures"
     },
@@ -3368,10 +3378,6 @@
    ],
    "pre": [
     {
-     "key": "division:box_division_hard",
-     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W11)"
-    },
-    {
      "key": "division:area_model_div_3by1",
      "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W11)"
     },
@@ -3409,10 +3415,6 @@
     {
      "key": "division:remainder_too_big",
      "why": "is the remainder finished?"
-    },
-    {
-     "key": "division:area_model_div_3by1",
-     "why": "the area-model method for the same division"
     }
    ],
    "note": ""
@@ -3444,10 +3446,6 @@
     {
      "key": "division:div_zero_in_quotient",
      "why": "Y5.B5.S7 Short division (previous step)"
-    },
-    {
-     "key": "division:box_division_hard",
-     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
     },
     {
      "key": "division:area_model_div_3by1",
@@ -3502,10 +3500,6 @@
      "opts": {
       "regroup": "always"
      }
-    },
-    {
-     "key": "division:remainder_too_big",
-     "opts": {}
     }
    ],
    "partial": [],
@@ -3543,6 +3537,10 @@
     {
      "key": "division:div_equation_parts",
      "why": "parts of a division equation"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "check that a remainder is smaller than the divisor (2-digit check task)"
     }
    ],
    "note": ""
@@ -3591,10 +3589,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:box_division_hard",
-     "why": "box method"
-    },
-    {
      "key": "number_sense:estimate_quotient",
      "why": "estimate first"
     },
@@ -3634,10 +3628,6 @@
     "multi_step_four_ops"
    ],
    "pre": [
-    {
-     "key": "multiplication:mult_comparison",
-     "why": "Y3.B4.S10 Scaling (prior learning wk W03)"
-    },
     {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W04)"
@@ -7134,14 +7124,14 @@
    "option": "to 1,000",
    "name": "Roman Numerals to 1,000 (option)",
    "teaches": "reading and writing Roman numerals to 1,000 (D, M) and years",
-   "representation": "a band option on the roman_100 proposal",
+   "representation": "B&W boxed cell: a symbol key strip (I 1, V 5, X 10, L 50, C 100, D 500, M 1,000), the numeral or number in big Andika type, one write-on box; option: years (MMXXVI); key shows the value",
    "family": "placevalue",
    "steps": [
     "Y5.B1.S1"
    ],
    "reused": true,
-   "ccss": [],
-   "why": "closes Y5.B1.S1 Roman numerals to 1,000 (existing wrm_props entry, reused)"
+   "why": "no Roman-numeral skill exists; roman_100 to 100 plus this band to 1,000 closes Y4.B1.S13 and Y5.B1.S1",
+   "ccss": []
   },
   "vis_pv_bands_millions": {
    "lane": "placevalue",
@@ -7327,16 +7317,16 @@
    "option": "10,000 and 100,000",
    "name": "10,000 and 100,000 More or Less (option)",
    "teaches": "finding 10, 100, 1,000, 10,000 and 100,000 more or less than a number to 1,000,000",
-   "representation": "step values 10,000 and 100,000 on more_less_100",
+   "representation": "B&W boxed cell: the start number in big Andika digits in a 6-column place-value chart, an arrow labelled \"+ 10,000\" / \"− 100,000\", and one write-on answer box; the changed column is not shaded (no give-away); key shows the answer",
    "family": "placevalue",
    "steps": [
     "Y5.B1.S7"
    ],
    "reused": true,
+   "why": "more_less_100 steps stop at 1,000 with numbers to 10,000, so Y5 10,000 / 100,000 more or less to 1,000,000 is never dealt",
    "ccss": [
     "4.NBT.A.1"
-   ],
-   "why": "closes Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (existing wrm_props entry, reused)"
+   ]
   },
   "vis_more_less_table": {
    "lane": "placevalue",
@@ -7443,18 +7433,19 @@
    "option": "large numbers and addition",
    "name": "Inverse Operations (option)",
    "teaches": "using the inverse to check and to find missing numbers in addition and subtraction with 5- and 6-digit numbers",
-   "representation": "band option to 1,000,000 and an \"addition checked by subtracting\" variant",
+   "representation": "B&W boxed cell: the worked calculation in a column stack with big Andika digits, a second empty stack for the inverse, and a Correct / Fix it check box with an answer box; option: a missing number with a bar model",
    "family": "operations",
    "steps": [
     "Y5.B2.S5",
     "Y5.B2.S8"
    ],
    "reused": true,
+   "why": "sub_check_by_adding deals 3-digit subtractions only and never checks an addition by subtracting or finds a missing number with the inverse",
+   "extendNote": "for Y5.B2.S8 it must also add the missing-number form (__ + 24,315 = 61,000) solved with the inverse and a part-whole bar",
    "ccss": [
     "4.NBT.B.4",
     "4.OA.A.3"
-   ],
-   "why": "closes Y5.B2.S5 Inverse operations (addition and subtraction); Y5.B2.S8 Find missing numbers (existing wrm_props entry, reused)"
+   ]
   },
   "vis_bar_family": {
    "lane": "operations",
@@ -7625,6 +7616,7 @@
     "Y6.B2.S7"
    ],
    "reused": true,
+   "extendNote": "for Y5.B5.S4 it must also deal 3-digit × 2-digit long multiplication (not only 4-digit × 2-digit)",
    "ccss": [
     "4.NBT.B.6",
     "5.NBT.B.5"
@@ -7754,6 +7746,7 @@
     "Y5.B5.S10"
    ],
    "reused": true,
+   "extendNote": "for Y5.B5.S10 it must also deal 1-digit divisors split into factors (÷ 4 as halve then halve, ÷ 6 as ÷ 2 then ÷ 3) with 3- and 4-digit dividends",
    "ccss": [
     "4.NBT.B.6"
    ],
@@ -7772,8 +7765,7 @@
    ],
    "why": "equivalent / equiv_frac_visual mix unit and non-unit starts, so the WRM unit-fraction lesson cannot be printed on its own",
    "steps": [
-    "Y5.B4.S1",
-    "Y5.B4.S2"
+    "Y5.B4.S1"
    ],
    "reused": false
   },
@@ -7794,28 +7786,9 @@
    "why": "WRM teaches the two directions as two steps (Y5.B4.S4, S5); improper_mixed always mixes them",
    "steps": [
     "Y5.B4.S4",
-    "Y5.B4.S5",
-    "Y5.B4.S6"
+    "Y5.B4.S5"
    ],
    "reused": false
-  },
-  "frac_beyond_1": {
-   "kind": "new",
-   "skill": "fractions:mixed_numbers_intro",
-   "name": "Fractions Beyond 1",
-   "teaches": "counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line",
-   "representation": "bar and number-line models with wholes shaded; write the mixed number",
-   "family": "fractions",
-   "steps": [
-    "Y5.B4.S4",
-    "Y5.B4.S8"
-   ],
-   "reused": true,
-   "ccss": [
-    "4.NF.A.2",
-    "4.NF.B.3"
-   ],
-   "why": "closes the listed Y5 steps"
   },
   "frac_compare_gt1": {
    "kind": "option",
@@ -7826,13 +7799,11 @@
    "representation": "a band option on compare / order_fractions",
    "family": "fractions",
    "steps": [
-    "Y5.B4.S8",
-    "Y5.B4.S9"
+    "Y5.B4.S8"
    ],
    "reused": true,
    "ccss": [
-    "4.NF.A.2",
-    "4.NF.B.3"
+    "4.NF.A.2"
    ],
    "why": "closes the listed Y5 steps"
   },
@@ -7853,8 +7824,7 @@
    ],
    "why": "WRM splits within-1 and over-1 into two steps; today the sums are mixed",
    "steps": [
-    "Y5.B4.S10",
-    "Y5.B4.S11"
+    "Y5.B4.S10"
    ],
    "reused": false
   },
@@ -7877,10 +7847,8 @@
    "why": "every mixed-number skill deals mixed ± mixed; WRM Y5.B4.S12/S15/S16 start from mixed ± fraction",
    "steps": [
     "Y5.B4.S12",
-    "Y5.B4.S13",
     "Y5.B4.S15",
-    "Y5.B4.S16",
-    "Y5.B4.S17"
+    "Y5.B4.S16"
    ],
    "reused": false
   },
@@ -7901,8 +7869,7 @@
    ],
    "why": "WRM Y5.B4.S14 subtracts from wholes and improper fractions; every dealt item stays within 1",
    "steps": [
-    "Y5.B4.S14",
-    "Y5.B4.S15"
+    "Y5.B4.S14"
    ],
    "reused": false
   },
@@ -7915,8 +7882,7 @@
    "representation": "an \"exchange a whole\" band with a bar-model support",
    "family": "fractions",
    "steps": [
-    "Y5.B4.S16",
-    "Y5.B4.S17"
+    "Y5.B4.S16"
    ],
    "reused": true,
    "ccss": [
@@ -7940,8 +7906,7 @@
    ],
    "why": "mult_frac_whole mixes unit and non-unit fractions, so the first WRM step cannot be isolated",
    "steps": [
-    "Y5.B6.S1",
-    "Y5.B6.S2"
+    "Y5.B6.S1"
    ],
    "reused": false
   },
@@ -7954,8 +7919,7 @@
    "representation": "boxed cell: 2 1/3 × 4 with a part-whole bar split into the wholes and the fraction (4 × 2 wholes + 4 × 1/3 = 8 + 4/3 = 9 1/3); write the answer as a mixed number in two boxes; the partition hint fades to none",
    "family": "fractions",
    "steps": [
-    "Y5.B6.S3",
-    "Y5.B6.S4"
+    "Y5.B6.S3"
    ],
    "reused": true,
    "why": "no skill multiplies a mixed number by an integer; mult_frac_whole deals proper and improper fractions only (checked)",
@@ -7972,8 +7936,7 @@
    "representation": "a \"find the whole\" task option with a bar model support",
    "family": "fractions",
    "steps": [
-    "Y5.B6.S6",
-    "Y5.B6.S7"
+    "Y5.B6.S6"
    ],
    "reused": true,
    "ccss": [
@@ -8005,42 +7968,11 @@
    "representation": "a place-value chart with counters; write the decimal; option: partition 0.36 = 0.3 + 0.06",
    "family": "decimals",
    "steps": [
-    "Y5.B7.S1",
-    "Y5.B7.S2",
-    "Y5.B7.S3",
-    "Y5.B7.S5",
-    "Y5.B7.S6",
-    "Y5.B7.S7",
-    "Y5.B12.S1",
-    "Y5.B12.S4"
+    "Y5.B7.S1"
    ],
    "reused": true,
    "ccss": [
-    "4.NBT.A.1",
-    "4.NBT.B.4",
-    "4.NF.C.6",
-    "5.NBT.A.3",
-    "5.NBT.B.7"
-   ],
-   "why": "closes the listed Y5 steps"
-  },
-  "decimal_whole": {
-   "kind": "new",
-   "skill": "decimals:make_a_whole",
-   "name": "Make a Whole with Decimals",
-   "teaches": "complements to 1 with tenths and hundredths (0.3 + 0.7, 0.45 + 0.55)",
-   "representation": "a tenths strip or hundred square with part shaded; write the missing part",
-   "family": "decimals",
-   "steps": [
-    "Y5.B7.S1",
-    "Y5.B12.S2",
-    "Y5.B12.S3"
-   ],
-   "reused": true,
-   "ccss": [
-    "4.NBT.B.4",
-    "4.NF.C.6",
-    "5.NBT.B.7"
+    "4.NF.C.6"
    ],
    "why": "closes the listed Y5 steps"
   },
@@ -8062,9 +7994,7 @@
    "why": "d_to_f / f_to_d mix tenths, hundredths and 3/4-type items and stop at hundredths",
    "steps": [
     "Y5.B7.S2",
-    "Y5.B7.S3",
-    "Y5.B7.S5",
-    "Y5.B7.S6"
+    "Y5.B7.S5"
    ],
    "reused": false
   },
@@ -8079,14 +8009,12 @@
    "steps": [
     "Y5.B7.S5",
     "Y5.B7.S6",
-    "Y5.B7.S7",
-    "Y5.B7.S8"
+    "Y5.B7.S7"
    ],
    "reused": true,
    "ccss": [
     "4.NBT.A.1",
     "4.NF.C.6",
-    "4.NF.C.7",
     "5.NBT.A.3"
    ],
    "why": "closes the listed Y5 steps"
@@ -8111,12 +8039,10 @@
    "why": "WRM separates same-dp and different-dp steps (add/sub B12.S4–S7, compare/order B7.S8); today the Decimal Places setting mixes them at 2–3 dp and compare pairs differ in the whole part",
    "steps": [
     "Y5.B7.S8",
-    "Y5.B7.S9",
     "Y5.B12.S4",
     "Y5.B12.S5",
     "Y5.B12.S6",
-    "Y5.B12.S7",
-    "Y5.B12.S8"
+    "Y5.B12.S7"
    ],
    "reused": false
   },
@@ -8129,8 +8055,7 @@
    "representation": "a \"nearest whole\" target option with a number-line support",
    "family": "decimals",
    "steps": [
-    "Y5.B7.S10",
-    "Y5.B7.S11"
+    "Y5.B7.S10"
    ],
    "reused": true,
    "ccss": [
@@ -8148,15 +8073,11 @@
    "steps": [
     "Y5.B12.S1",
     "Y5.B12.S2",
-    "Y5.B12.S3",
-    "Y5.B12.S4",
-    "Y5.B12.S8",
-    "Y5.B12.S9"
+    "Y5.B12.S8"
    ],
    "reused": true,
    "ccss": [
     "4.NBT.B.4",
-    "4.OA.C.5",
     "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
@@ -8178,8 +8099,7 @@
    ],
    "why": "decimal_models adds pictures but no across-1 item control; add_decimal crosses 1 only at random",
    "steps": [
-    "Y5.B12.S3",
-    "Y5.B12.S4"
+    "Y5.B12.S3"
    ],
    "reused": false
   },
@@ -8229,8 +8149,7 @@
    "steps": [
     "Y5.B12.S3",
     "Y5.B12.S4",
-    "Y5.B12.S5",
-    "Y5.B12.S6"
+    "Y5.B12.S5"
    ],
    "ccss": [
     "4.NBT.B.4",
@@ -8247,14 +8166,11 @@
    "representation": "a number track with decimal steps; write the missing terms and the rule",
    "family": "decimals",
    "steps": [
-    "Y5.B12.S9",
-    "Y5.B12.S10"
+    "Y5.B12.S9"
    ],
    "reused": true,
    "ccss": [
-    "4.NBT.A.1",
     "4.OA.C.5",
-    "5.NBT.A.2",
     "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
@@ -8273,6 +8189,44 @@
    "reused": true,
    "ccss": [
     "5.NBT.A.2"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "frac_beyond_1": {
+   "kind": "new",
+   "skill": "fractions:mixed_numbers_intro",
+   "name": "Fractions Beyond 1",
+   "teaches": "counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line",
+   "representation": "bar and number-line models with wholes shaded; write the mixed number",
+   "family": "fractions",
+   "steps": [
+    "Y5.B4.S4",
+    "Y5.B4.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NF.A.2",
+    "4.NF.B.3"
+   ],
+   "why": "closes the listed Y5 steps"
+  },
+  "decimal_whole": {
+   "kind": "new",
+   "skill": "decimals:make_a_whole",
+   "name": "Make a Whole with Decimals",
+   "teaches": "complements to 1 with tenths and hundredths (0.3 + 0.7, 0.45 + 0.55)",
+   "representation": "a tenths strip or hundred square with part shaded; write the missing part",
+   "family": "decimals",
+   "steps": [
+    "Y5.B7.S1",
+    "Y5.B12.S2",
+    "Y5.B12.S3"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4",
+    "4.NF.C.6",
+    "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
   },
@@ -8991,13 +8945,13 @@
    "key": "number_sense:nearest_1000",
    "step": "Y5.B1.S13",
    "action": "add",
-   "why": "rounding a 5-digit number to the nearest 1,000 is part of \"within 100,000\""
+   "why": "opts {band:100000}: rounds 5-digit numbers to the nearest 1,000"
   },
   {
    "key": "number_sense:nearest_10000",
    "step": "Y5.B1.S14",
    "action": "add",
-   "why": "6-digit numbers rounded to 10,000 are part of \"within 1,000,000\""
+   "why": "opts {band:1000000}: rounds 6-digit numbers to the nearest 10,000"
   },
   {
    "key": "number_sense:compensation",
@@ -9160,6 +9114,18 @@
    "step": "Y5.B5.S9",
    "action": "remove",
    "why": "Y3-level (2-digit ÷ 1-digit with ringed groups); a pre-skill, not this step"
+  },
+  {
+   "key": "number_sense:rounding_table",
+   "step": "Y5.B1.S13",
+   "action": "add",
+   "why": "opts {places:[10,100,1000,10000]}: one 5-digit number rounded to every place"
+  },
+  {
+   "key": "division:remainder_too_big",
+   "step": "Y5.B5.S9",
+   "action": "remove",
+   "why": "a 2-digit check-the-remainder task (to 119); related, not 4-digit division with remainders"
   },
   {
    "key": "fractions:equiv_frac_visual",
