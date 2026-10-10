@@ -5802,6 +5802,194 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B6.S1": {
+   "title": "Measure in centimetres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:reading_ruler",
+     "missing": "a centimetre ruler (the skill reads inches only)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a centimetre ruler (the skill reads inches only)",
+   "build": [
+    "ruler_cm",
+    "measure_two_units"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "same standard 1.MD.A.2: Measure with Non-Standard Units (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B6.S2": {
+   "title": "Measure in metres",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "measuring and comparing lengths in metres, choosing cm or m",
+   "build": [
+    "metres"
+   ],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (step before in the block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W21)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W21)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "nl_20"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B6.S3": {
+   "title": "Compare lengths and heights",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:compare_objects",
+     "missing": "comparing and ordering lengths given as measurements in cm and m with <, > and = (the skills compare pictured objects, no units)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "missing": "comparing and ordering lengths given as measurements in cm and m with <, > and = (the skills compare pictured objects, no units)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing and ordering lengths given as measurements in cm and m with <, > and = (the skills compare pictured objects, no units)",
+   "build": [
+    "compare_lengths"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W22)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B6.S4": {
+   "title": "Order lengths and heights",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:order_objects_length",
+     "missing": "ordering lengths given as measurements in cm and m (the skill orders pictured objects)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering lengths given as measurements in cm and m (the skill orders pictured objects)",
+   "build": [
+    "ruler_difference",
+    "compare_lengths"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y2.B6.S3 Compare lengths and heights (step before in the block)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W22)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": ""
+  },
+  "Y2.B6.S5": {
+   "title": "Four operations with lengths and heights",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing lengths and heights in context (same units)",
+   "build": [
+    "length_ops"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (step before in the block)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (prior learning wk W34)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S1 Unitising (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (prior learning wk W34)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_mass"
+   ],
+   "related": [],
+   "note": ""
   }
  },
  "proposals": {
@@ -6267,6 +6455,114 @@
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
+  },
+  "ruler_cm": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "centimetres and millimetres",
+   "name": "Read a Centimetre Ruler (option)",
+   "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
+   "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture",
+   "family": "measurement",
+   "steps": [
+    "Y1.B7.S3",
+    "Y2.B6.S1",
+    "Y3.B5.S2"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "2.MD.A.1",
+    "1.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "measure_two_units": {
+   "kind": "option",
+   "skill": "shapes_early:measure_nonstandard",
+   "option": "task \"measure twice\": the same object in two units (paper clips and crayons; inches and cm)",
+   "name": "Measure With Two Units (option)",
+   "teaches": "measuring one length in two different units and relating the counts to the unit size (the bigger unit gives the smaller count)",
+   "representation": "legacy; write both counts; tick the longer unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S1"
+   ],
+   "ccss": [
+    "2.MD.A.2"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "metres": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "metres",
+   "name": "Measure in Metres (option)",
+   "teaches": "measuring and comparing lengths in metres, choosing cm or m",
+   "representation": "a metre stick picture; unit choice cm/m",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S2"
+   ],
+   "ccss": [
+    "1.MD.A.2",
+    "2.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "compare_lengths": {
+   "kind": "new",
+   "skill": "measurement:compare_lengths",
+   "name": "Compare Lengths",
+   "teaches": "comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm)",
+   "representation": "two labelled bars; write <, > or = after converting",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S7",
+    "Y2.B6.S3",
+    "Y2.B6.S4"
+   ],
+   "ccss": [
+    "2.MD.A.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "ruler_difference": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "task \"how much longer?\": two objects on one ruler; cm and inches",
+   "name": "How Much Longer? (option)",
+   "teaches": "measuring two objects with a standard unit and finding how much longer one is",
+   "representation": "legacy; write both lengths and the difference with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S4",
+    "Y3.B5.S7"
+   ],
+   "ccss": [
+    "2.MD.A.4"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "length_ops": {
+   "kind": "new",
+   "skill": "measurement:length_word_problems",
+   "name": "Length Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing lengths and heights in context (same units)",
+   "representation": "a drawn ruler or bar model with the lengths labelled; write the answer with its unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S5"
+   ],
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -6281,6 +6577,24 @@
    "step": "Y2.B2.S20",
    "action": "remove",
    "why": "the skill deals plain column addition today (build-list equal_sign_repair); it does not compare two number sentences"
+  },
+  {
+   "key": "comparing:compare_objects",
+   "step": "Y2.B6.S3",
+   "action": "partial",
+   "why": "comparing and ordering lengths given as measurements in cm and m with <, > and = (the skills compare pictured objects, no units)"
+  },
+  {
+   "key": "shapes_early:order_objects_length",
+   "step": "Y2.B6.S3",
+   "action": "partial",
+   "why": "comparing and ordering lengths given as measurements in cm and m with <, > and = (the skills compare pictured objects, no units)"
+  },
+  {
+   "key": "shapes_early:order_objects_length",
+   "step": "Y2.B6.S4",
+   "action": "partial",
+   "why": "ordering lengths given as measurements in cm and m (the skill orders pictured objects)"
   }
  ]
 }
