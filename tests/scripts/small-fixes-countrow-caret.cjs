@@ -97,7 +97,7 @@ const active = (page) => page.evaluate(() => Number((document.activeElement && d
             for (let i = 0; i < exp.length; i++) {
               const b = await page.$(`[data-t="${i}"]`);
               await b.evaluate((el) => { const w = el.closest('[data-mq-swiperow]'); if (w) { const v = w.getBoundingClientRect(), r = el.getBoundingClientRect(); w.scrollLeft += r.left - v.left - 8; } el.scrollIntoView({ block: 'center' }); });
-              await sleep(100); await b.tap(); await sleep(100);
+              await sleep(350); await b.tap(); await sleep(200);
               await page.keyboard.type(exp[i], { delay: 30 });
             }
             const got = (await boxVals(page)).map(digits);
