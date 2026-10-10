@@ -9,6 +9,7 @@
 
 import { icon, esc, toast } from './teacher-ui.js';
 import { loadLinksData } from './links-data.js';
+import { skillLabelOf, teacherName } from './teacher-skillpick.js';
 
 let Q = null;          // build-queue.js
 let W = null;          // wrm-links.js
@@ -27,6 +28,7 @@ function load() {
     if (!loading) {
         loading = Promise.all([import('./build-queue.js'), import('./wrm-links.js'), loadLinksData()]).then(([q, w, data]) => {
             Q = q; W = w;
+            W.setSkillLabeler(skillLabelOf);
             queue = Q.buildQueue({ curated: Object.values(data.years), map: data.map });
             lessonSteps = new Set(W.allLessons().map((l) => l.step).filter(Boolean));
         }).catch((e) => { console.warn('[teacher-todo] load', e); loading = null; });
@@ -138,7 +140,7 @@ function itemHTML(e) {
     return `<li class="tvt-item${open ? ' is-open' : ''}" data-t-item="${esc(e.id)}">
       <button type="button" class="tvt-row" aria-expanded="${open}" aria-controls="tvtS-${esc(e.id)}" data-t-open="${esc(e.id)}">
         <span class="tvt-chev" aria-hidden="true">${icon('arrow', 16)}</span>
-        <span class="tvt-name">${esc(e.name)}</span>
+        <span class="tvt-name">${esc(teacherName(e.name))}</span>
         <span class="tvt-badges"><span class="tvw-tag tvt-kind is-${e.kind}">${esc(kindName(e.kind))}</span>${e.sources.map((s) => `<span class="tvw-tag tvt-src">${s}</span>`).join('')}<span class="tvt-gr">${esc(gradeText(e))}</span></span>
       </button>
       ${open ? specHTML(e) : ''}</li>`;
@@ -172,7 +174,7 @@ export function todoPrintHTML() {
     const filt = [t.sources.size ? `Source ${[...t.sources].join(', ')}` : '', t.grades.size ? `Grade ${[...t.grades].join(', ')}` : '',
         t.domains.size ? `Domain ${[...t.domains].join(', ')}` : '', t.kinds.size ? `Kind ${[...t.kinds].map(kindName).join(', ')}` : '',
         t.pair ? (W.REP_PAIRS.find((p) => p.id === t.pair) || {}).label : '', t.q ? `"${t.q}"` : ''].filter(Boolean).join(' · ');
-    const row = (e) => `<div class="it"><h4>${esc(e.name)} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
+    const row = (e) => `<div class="it"><h4>${esc(teacherName(e.name))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
       <p><b>What pupils will do:</b> ${esc(e.teaches)}</p><p><b>Gap it fills:</b> ${esc(e.closes.slice(0, 3).join(' | '))}</p>
       <p><b>How it looks:</b> ${esc(e.representation)}</p>
       ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · White Rose: ${esc(e.wrmSteps.slice(0, 6).map(Q.stepName).join('; '))}${e.wrmSteps.length > 6 ? ' …' : ''}` : ''}</p>` : ''}</div>`;

@@ -566,6 +566,30 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(200);
     check(!!(await page.$('[data-map-act="start"]')), 'map: Start a MAP test tab lost the start button');
 
+
+    /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
+    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+    const side = async (tag) => {
+      const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, w: innerWidth,
+        wide: [...document.querySelectorAll('#teacherMain .tv-screen.is-active *')].filter((n) => n.getBoundingClientRect().right > innerWidth + 1 && !n.closest('.tvp-frame, [hidden]') && getComputedStyle(n).position !== 'fixed').slice(0, 3).map((n) => `${n.tagName}.${n.className}`.slice(0, 50)) }));
+      check(r.sw <= r.w, `390 ${tag}: page scrolls sideways (${r.sw} > ${r.w}) ${r.wide.join(', ')}`);
+    };
+    await page.goto(`${base}/index.html#wrm/2/D1/2`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, '390 wrm');
+    await sleep(300);
+    await side('White Rose lesson');
+    await shot('40-wrm-lesson-390');
+    await page.goto(`${base}/index.html${mh}`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head'), 20000, '390 map');
+    await sleep(300);
+    await side('MAP task');
+    await page.evaluate(() => window.tvGo('todo'));
+    await waitFor(page, () => !!document.querySelector('[data-screen="todo"].is-active .tvt-item'), 20000, '390 todo');
+    await page.click('.tvt-item .tvt-row');
+    await sleep(300);
+    await side('Skills to be made');
+    await shot('41-todo-390');
+
     if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`);
   } catch (e) {
     failures.push(e.stack || e.message);

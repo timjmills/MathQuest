@@ -212,3 +212,14 @@ html.dark body.teacher-mode .tvt-kind.is-option { background: #33264d; color: #e
 /* the toast sits above a picker's action bar, never on the link box (critic r1 M2) */
 body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: 112px; }
 .tvt-step { font: 600 13px/18px inherit; font-family: inherit; text-align: left; }
+
+/* ---------------------------------------------------------------- critic r2: phone width, toast from the bar's height */
+.tvw-crumb { white-space: normal; flex-wrap: wrap; max-width: 100%; min-width: 0; text-align: left; height: auto; }
+.tvw-crumb-t, .tvw-crumb-c { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+    .tvt-row { flex-wrap: wrap; }
+    .tvt-badges { flex: 1 1 100%; max-width: none; justify-content: flex-start; padding-left: 26px; }
+}
+body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(var(--tv-bar-h, 88px) + 24px); }
+.tvw-thisweek { margin: 0 8px 8px; }
+@media (max-width: 600px) { .tvm-tabs { grid-auto-flow: row; width: 100%; max-width: 100%; } .tvm-tabs > button { white-space: normal; } }

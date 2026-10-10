@@ -23,12 +23,12 @@
 import { esc, icon } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { getMapSkillsForBands, getCategoryForSkill, DOMAINS } from './data.js';
-import { createPicker, liveKey, toBeBuiltHTML } from './teacher-skillpick.js';
+import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf } from './teacher-skillpick.js';
 import { loadMap } from './links-data.js';
 
 export const RIT_BANDS = ['<141', '141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
 const STATUS = {
-    'exists-ok': ['Ready', 'is-full'], 'exists-regrade': ['Ready (being checked)', 'is-full'], exists: ['Ready', 'is-full'],
+    'exists-ok': ['Ready', 'is-full'], 'exists-regrade': ['Ready — being checked by the team', 'is-full'], exists: ['Ready', 'is-full'],
     partial: ['Covers part', 'is-part'], missing: ['To be built', 'is-gap'],
 };
 const CAP = 8;
@@ -94,6 +94,7 @@ function load() {
     if (!loading) {
         loading = Promise.all([import('./wrm-links.js'), loadMap()]).then(([w, map]) => {
             W = w; MAPD = map;
+            W.setSkillLabeler(skillLabelOf);
             TASKS = buildTasks();
         }).catch((e) => { console.warn('[teacher-map-tasks] load', e); loading = null; });
     }
@@ -110,7 +111,8 @@ const nameOf = (id) => {
 
 /** A note in plain words: a proposal id inside it becomes its name. */
 function plainNote(text) {
-    return String(text).replace(/\s*\(part [A-Z]\)/g, '').replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id) => (MAPD && MAPD.proposals && MAPD.proposals[id] ? `"${nameOf(id)}"` : id));
+    const named = String(text).replace(/\s*\(part [A-Z]\)/g, '').replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id) => (MAPD && MAPD.proposals && MAPD.proposals[id] ? `"${nameOf(id)}"` : id));
+    return W.plainWhy(named);
 }
 
 /* ================================================================= links for a task */

@@ -64,9 +64,12 @@ const stepList = (ids) => `${ids.slice(0, 3).map((s) => `"${stepName(s)}"`).join
 export const stepName = (id) => { const r = wrmStep(id); return `${gradeOfYear(String(id).split('.')[0])}: ${r ? r.title : id}`; };
 /** `closes` may be a string, a list, or { stepId: clause } — always plain strings back. */
 export function closesText(v) {
+    return closesRaw(v).map((c) => c.replace(/\s*—\s*\(/g, ' (').replace(/\s*—\s*$/, ''));
+}
+function closesRaw(v) {
     if (v == null || v === '') return [];
     if (typeof v === 'string') return [plainWhy(v)];
-    if (Array.isArray(v)) return v.flatMap(closesText);
+    if (Array.isArray(v)) return v.flatMap(closesRaw);
     if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? `${stepName(k)} — ${plainWhy(String(t))}` : `${k}: ${plainWhy(String(t))}`));
     return [String(v)];
 }

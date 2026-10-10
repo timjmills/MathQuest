@@ -20,7 +20,7 @@
 
 import { icon, esc } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
-import { createPicker, liveKey, toBeBuiltHTML } from './teacher-skillpick.js';
+import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf } from './teacher-skillpick.js';
 import { loadYear } from './links-data.js';
 
 let L = null;          // the wrm-links.js module
@@ -51,7 +51,7 @@ const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDe
 function load() {
     if (L) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; })
+        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; L.setSkillLabeler(skillLabelOf); })
             .catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
     }
     return loading;
@@ -188,7 +188,7 @@ function draw() {
       <div class="tvw-find${compact ? ' is-compact' : ''}">
         <div class="tv-search tvw-search"><span aria-hidden="true">${icon('search', 18)}</span>
           <label class="tv-sr" for="tvwSearch">Find a lesson</label>
-          <input id="tvwSearch" class="tv-input" type="search" autocomplete="off" placeholder="Find a lesson: title, unit or standard (e.g. 3.NF.A.1)" value="${esc(v.query)}" aria-controls="tvwHits">
+          <input id="tvwSearch" class="tv-input" type="search" autocomplete="off" placeholder="Find a lesson: title, standard (3.NF.A.1) or week (week 5)" value="${esc(v.query)}" aria-controls="tvwHits">
           <ul class="tvw-hits" id="tvwHits" role="listbox" aria-label="Lessons found" hidden></ul></div>
         ${compact ? `<button type="button" class="tv-btn tvw-crumb" data-w-finder="open" aria-expanded="false"><span class="tvw-crumb-t">${esc(crumb)}</span><span class="tvw-crumb-c">Change grade or unit</span></button>` : ''}
         <div class="tvw-pick"${compact ? ' hidden' : ''}>
@@ -231,6 +231,18 @@ function lessonRowHTML(l) {
       <span class="tvw-count${gap ? ' is-gap' : ''}">${gap ? esc(gap) : `${f.n} skill${f.n === 1 ? '' : 's'}`}</span></button></li>`;
 }
 
+/** "This week" (critic r2 m3): the first lesson of the grade taught in the school week of today. */
+function thisWeekLesson() {
+    const w = L.weekForDate(v.grade);
+    if (!w) return null;
+    for (const u of unitsOf(v.grade)) for (const l of lessonsOf(u)) if (l && l.weeks.includes(w)) return { w, l };
+    return null;
+}
+function thisWeekHTML() {
+    const t = thisWeekLesson();
+    return t ? `<button type="button" class="tv-btn tv-btn-sm tvw-thisweek" data-w-thisweek="${esc(t.l.key)}">${icon('flag', 16)}<span>This week: Week ${esc(t.w.replace(/^W0?/, ''))}</span></button>` : '';
+}
+
 function lessonListHTML() {
     const u = unitRec();
     if (!u) return '<p class="tv-cap tvw-pad">This grade has no lessons yet.</p>';
@@ -239,7 +251,7 @@ function lessonListHTML() {
         return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(L.domainName(u.domain))}</h2>
           ${units.map((x) => `<h3 class="tvw-sub-h">${esc(x.name.replace(/^[^:]*:\s*/, ''))}</h3><ol class="tvw-list">${lessonsOf(x).map(lessonRowHTML).join('')}</ol>`).join('')}`;
     }
-    return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(u.id === 'E' ? 'Enrichment lessons (after MAP)' : `${u.id} ${u.name}`)}</h2>
+    return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(u.id === 'E' ? 'Enrichment lessons (after MAP)' : `${u.id} ${u.name}`)}</h2>${thisWeekHTML()}
       <p class="tv-cap tvw-pad">${esc(u.weeks || '')}${u.power && u.power.length ? ` · Power standards ${esc(u.power.join(', '))}` : ''}</p>
       <ol class="tvw-list">${lessonsOf(u).map(lessonRowHTML).join('')}</ol>`;
 }
@@ -316,7 +328,7 @@ function matchedCode(l, q) {
 }
 
 function searchHits(box, q) {
-    const hits = q.trim() ? L.searchLessons(q, 10) : [];
+    const hits = q.trim() ? L.searchLessons(q, 10, v.grade) : [];
     box.hidden = !q.trim();
     box.innerHTML = hits.length
         ? hits.map((l) => `<li role="option"><button type="button" class="tvw-hit" data-w-jump="${esc(l.key)}"><span class="tvw-hit-t">${esc(l.title)}</span>
@@ -336,6 +348,11 @@ function wire(el) {
         if (d.wUnit) { choose({ unit: d.wUnit, lesson: '' }, `[data-w-unit="${d.wUnit}"]`); return; }
         if (d.wLesson) {
             choose({ lesson: d.wLesson }, `[data-w-lesson="${d.wLesson}"]`).then(() => root.querySelector('#tvwDetail')?.scrollIntoView({ block: 'start', behavior: 'instant' }));
+            return;
+        }
+        if (d.wThisweek) {
+            const l = L.lessonByKey(d.wThisweek);
+            choose({ grade: l.grade, unit: l.unit, lesson: l.key }, '#tvwDetail .tvw-title');
             return;
         }
         if (d.wJump) {

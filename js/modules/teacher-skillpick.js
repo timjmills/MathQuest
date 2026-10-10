@@ -10,7 +10,15 @@
 import { state } from './state.js';
 import { icon, esc, toast, copyText, findSkill, levelText, loadSetIntoQueue, currentSet } from './teacher-ui.js';
 import { printSkills } from './teacher-print.js';
+import { getCategoryForSkill } from './data.js';
 import { skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
+
+/** A skill id or 'category:id' → its label (for plainWhy's notes), or null. */
+export function skillLabelOf(id) {
+    const [a, b] = String(id).includes(':') ? String(id).split(':') : [getCategoryForSkill(id), id];
+    const sk = a && b ? findSkill(a, b) : null;
+    return sk ? sk.label : null;
+}
 
 export const k2p = (key) => key.replace(':', '|');
 export const liveKey = (key) => { const [c, s] = String(key || '').split(':'); return !!(c && s && findSkill(c, s)); };
@@ -36,10 +44,13 @@ export function makePracticeLink(items) {
     return link;
 }
 
+/** A build-list name in a teacher's words: "… (option)" → "… (new option on an existing skill)". */
+export const teacherName = (n) => String(n || '').replace(/\s*\(option\)\s*$/i, ' (new option on an existing skill)');
+
 /** "To be built: <name>" — each name a button to the Skills to be made screen at that entry. */
 export function toBeBuiltHTML(ids, nameOf, lead = 'To be built') {
     if (!ids || !ids.length) return '';
-    return `<p class="tvw-tbb">${esc(lead)}: ${ids.map((id) => `<button type="button" class="tvw-tbb-link" data-todo-open="${esc(id)}">${esc(nameOf(id))}</button>`).join(', ')}</p>`;
+    return `<p class="tvw-tbb">${esc(lead)}: ${ids.map((id) => `<button type="button" class="tvw-tbb-link" data-todo-open="${esc(id)}">${esc(teacherName(nameOf(id)))}</button>`).join(', ')}</p>`;
 }
 
 /**
@@ -120,8 +131,13 @@ export function createPicker(opts) {
         <button type="button" class="tv-btn" data-w-act="print"${n ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>Print</span></button></div>`;
     };
     p.barWrapHTML = () => `<div class="tv-actionbar tvw-bar" id="${idp}Bar">${p.barHTML()}</div>`;
-    p.redrawBar = () => { const bar = root().querySelector(`#${idp}Bar`); if (bar) bar.innerHTML = p.barHTML(); };
-    p.after = (container) => { if (container && p.view === 'thumbs') lazyThumbs(container, null); };
+    // The toast sits above the bar: publish the bar's real height (it wraps to two rows on a phone).
+    p.measureBar = () => {
+        const bar = root() && root().querySelector(`#${idp}Bar`);
+        if (bar && bar.offsetHeight) document.documentElement.style.setProperty('--tv-bar-h', `${bar.offsetHeight}px`);
+    };
+    p.redrawBar = () => { const bar = root().querySelector(`#${idp}Bar`); if (bar) bar.innerHTML = p.barHTML(); p.measureBar(); };
+    p.after = (container) => { if (container && p.view === 'thumbs') lazyThumbs(container, null); p.measureBar(); };
 
     function itemsFor(keys) {
         const all = p.all();
@@ -162,7 +178,7 @@ export function createPicker(opts) {
         const d = t.dataset;
         if (d.wTick) {
             if (p.ticked.has(d.wTick)) p.ticked.delete(d.wTick); else p.ticked.add(d.wTick);
-            p.link = '';
+            p.link = ''; p.linkNote = '';
             opts.redraw();
             root().querySelector(`.tvw-tick[data-w-tick="${CSS.escape(d.wTick)}"]`)?.focus();
             return true;
@@ -178,7 +194,7 @@ export function createPicker(opts) {
         if (d.wQuick) {
             p.ticked.clear();
             if (d.wQuick !== 'none') tickGroup(d.wQuick, true);
-            p.link = '';
+            p.link = ''; p.linkNote = '';
             opts.redraw();
             root().querySelector(`[data-w-quick="${d.wQuick}"]`)?.focus();
             return true;
@@ -191,8 +207,12 @@ export function createPicker(opts) {
         if (d.act === 'skill-view' && d.view) {
             p.view = d.view === 'thumbs' ? 'thumbs' : 'list';
             setSkillView(p.view);
+            p.link = ''; p.linkNote = '';
             opts.redraw();
-            root().querySelector(`[data-act="skill-view"][data-view="${p.view}"]`)?.focus();
+            const btn = root().querySelector(`[data-act="skill-view"][data-view="${p.view}"]`);
+            btn?.focus({ preventScroll: true });
+            // show the change: bring the first skills into view (critic r2 N11)
+            if (p.view === 'thumbs') root().querySelector('.tvw-cards')?.scrollIntoView({ block: 'center', behavior: 'instant' });
             return true;
         }
         if (d.todoOpen) { window.tvOpenTodo?.(d.todoOpen); return true; }

@@ -144,10 +144,41 @@ ok(closesText({ 'Y3.B1.S1': 'part-whole' }).join() === 'Grade 2: Represent numbe
 const csv = toCSV(Q1.items.slice(0, 5)).split('\r\n');
 ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
 
+// jargon gate (critic r2 M1): every curated why / missing / closes line reads plainly after plainWhy.
+// Runs over data/curriculum/links/*.json, any `--curated <dir>` given (the tagging lanes' newest files),
+// and the known-bad samples the critics found.
+const JARGON = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|\{|\[rule|[a-z]+_[a-z0-9_]+/;
+const samples = ['R.B2.S1 / R.B10 compare by size: the compare words', 'R.B1.S4 Sort objects to a type (school prior learning, week W23)',
+    'combining groups (add_5_pictures stops at 5; add_wp_10 is a word-work cell) [rule 3: nearest first]', 'Y2/Gr.1 Count in 10s, school week, W05',
+    'Y3.B1.S1 x {"band": 99}', 'same CCSS K.OA.A.1 in Y1.B2.S3 Parts', 'Y2.B1.S2 / Y2.B1.S3 Count (prior learning wk W01/W02)'];
+for (const t of samples) ok(!JARGON.test(plainWhy(t)), `jargon left: "${t}" -> "${plainWhy(t)}"`);
+const dirs = [new URL('../../data/curriculum/links/', import.meta.url).pathname];
+process.argv.forEach((a, i) => { if (a === '--curated' && process.argv[i + 1]) dirs.push(...process.argv[i + 1].split(',')); });
+let jLines = 0, jBad = 0;
+for (const dir of dirs) {
+    for (const y of ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6']) {
+        const f = `${dir.replace(/\/$/, '')}/${y}.json`;
+        if (!existsSync(f)) continue;
+        const d = JSON.parse(readFileSync(f, 'utf8'));
+        const lines = [];
+        for (const st of Object.values(d.steps || {})) {
+            for (const g of ['pre', 'related']) for (const x of st[g] || []) lines.push(plainWhy(x.why));
+            for (const x of st.partial || []) lines.push(plainWhy(x.missing));
+            lines.push(plainWhy(st.missing));
+        }
+        for (const pr of Object.values(d.proposals || {})) lines.push(...closesText(pr.closes));
+        for (const o of lines) { jLines += 1; if (JARGON.test(o)) { jBad += 1; if (jBad <= 5) console.log('JARGON', f, '|', o); } }
+    }
+}
+ok(!jBad, `jargon gate: ${jBad} of ${jLines} curated lines`);
+if (jLines) console.log(`jargon gate: ${jLines} curated lines checked`);
+
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');
 ok(searchLessons('3.NF.A.1').length > 0, 'search by CCSS code');
 ok(searchLessons('zzzz').length === 0, 'search nothing');
+ok(searchLessons('week 5', 5, '2').every((l) => l.grade === '2' && l.weeks.includes('W05')), 'search by week, own grade first');
+ok(searchLessons('3.NF.A.1', 3)[0].grade === '3', 'a CCSS code ranks its own grade first');
 
 console.log(`ws-wrm-page-unit: ${fails ? 'FAIL (' + fails + ')' : 'OK'} — ${L.length} lessons, ${mapped} mapped`);
 process.exit(fails ? 1 : 0);

@@ -225,21 +225,39 @@ function curatedLinks(lesson, cur, ovr, live) {
 }
 
 /**
- * A tagging note in a teacher's words: step ids become "Grade 1: <step title>", the tagging lanes' shorthand
- * ("prior learning wk W01", "step before in the block", "not dealt") becomes the handbook's words
- * ("support block, week 1", "the step before", "not practised yet").
+ * Skill ids inside a note become the skill's label. Pure by default (the id in words); the page installs
+ * the real labels with setSkillLabeler(fn(key|id) → label|null).
+ */
+let skillLabeler = null;
+export function setSkillLabeler(fn) { skillLabeler = typeof fn === 'function' ? fn : null; }
+const skillWords = (id) => {
+    const lab = skillLabeler ? skillLabeler(id) : null;
+    return lab || id.replace(/^[a-z_]+:/, '').replace(/_/g, ' ');
+};
+const YEAR_WORD = { R: 'Pre-K', Y1: 'Kindergarten', Y2: 'Grade 1', Y3: 'Grade 2', Y4: 'Grade 3', Y5: 'Grade 4', Y6: 'Grade 5' };
+const weekWords = (w) => w.split(/\s*\/\s*|,\s*/).map((x) => +String(x).replace(/\D/g, '')).filter(Boolean);
+
+/**
+ * A tagging note in a teacher's words (critic r1 M1, r2 M1): step ids become "Grade 1: <step title>",
+ * block ids and year codes become grade names, the tagging lanes' shorthand ("prior learning wk W01",
+ * "step before in the block", "not dealt", "[rule 3: …]", "{band: 99}", snake_case skill ids) becomes
+ * the handbook's words ("support block, week 1", "the step before", "not practised yet", the skill's label).
  */
 export function plainWhy(text) {
     let t = String(text || '');
     if (!t) return t;
-    t = t.replace(/\b(R|Y[1-6])\.B\d+\.S\d+\b(\s*\/\s*(R|Y[1-6])\.B\d+\.S\d+\b)*/g, (m) => {
-        const id = m.split('/').pop().trim();
-        return `${gradeOfYear(id.split('.')[0])}:\u0001${id}\u0001`;
+    t = t.replace(/\s*\[rule[^\]]*\]/gi, '');
+    t = t.replace(/\s*-?\s*easier:\s*\{[^}]*\}/gi, ' (easier numbers)').replace(/\s*\{[^}]*\}/g, '');
+    // chains of ids "R.B2.S1 / R.B10" → the last full step's grade + title, else the grade
+    t = t.replace(/\b(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b(?:\s*\/\s*(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b)*/g, (m) => {
+        const ids = m.split('/').map((x) => x.trim());
+        const full = ids.find((x) => /\.S\d+$/.test(x));
+        const y = ids[0].split('.')[0];
+        return full ? `${YEAR_WORD[y]}:\u0001${full}\u0001` : `${YEAR_WORD[y]}`;
     });
-    // a bare id (no title after it) gets its title
     t = t.replace(/\u0001([^\u0001]+)\u0001(\s*)(?=$|[(;,)\-]|\s*$)/g, (m, id) => { const r = wrmStep(id); return r ? ` ${r.title}` : ''; });
     t = t.replace(/\u0001[^\u0001]+\u0001/g, '');
-    t = t.replace(/\s*\(prior learning(?:,)?(?: wk ((?:W\d+\/?)+))?\)/gi, (m, w) => (w ? ` — support block, week ${w.split('/').map((x) => +x.replace(/\D/g, '')).join(', ')}` : ' — support block'));
+    t = t.replace(/\s*\((?:school )?prior learning(?:,)?(?:\s*(?:wk|week)\s*((?:W?\d+\s*\/?\s*)+))?\)/gi, (m, w) => (w ? ` — support block, week ${weekWords(w).join(', ')}` : ' — support block'));
     t = t.replace(/\s*\((?:the )?(?:step before in (?:the|this) block|previous step|earlier in (?:the|this) block|earlier step)\)/gi, ' — the step before');
     t = t.replace(/\s*\(next step[^)]*\)/gi, ' — the next step');
     t = t.replace(/\s*\(neighbouring step[^)]*\)/gi, ' — the step next to it');
@@ -247,33 +265,71 @@ export function plainWhy(text) {
     t = t.replace(/\s*\(same CCSS ([^,)]+), earlier\)/gi, ' — same standard $1, earlier');
     t = t.replace(/\s*\(earlier (?:R|Y[1-6]) step\)/gi, ' — earlier');
     t = t.replace(/^same block:\s*/i, 'Same unit: ').replace(/^next step:\s*/i, 'Next: ').replace(/^same CCSS ([^ ]+(?:, [^ ]+)*) in /i, 'Same standard $1: ');
-    t = t.replace(/\s*-?\s*easier:\s*\{[^}]*\}/gi, ' (easier numbers)');
-    t = t.replace(/\((R|Y[1-6]), /g, (m, y) => `(${gradeOfYear(y)}, `);
+    t = t.replace(/\bCCSS cluster\b/gi, 'standard group');
+    // weeks: "school week, W23", "wk W05", "week W05", bare "W05"
+    t = t.replace(/\b(?:school )?(?:wk|week),?\s*W?0?(\d{1,2})\b/gi, 'week $1').replace(/\bW0?(\d{1,2})\b/g, 'week $1').replace(/\bweek week\b/gi, 'week');
+    // year codes: Y3 / Gr.2 / Rec / Y2/Gr.1
+    t = t.replace(/\bY[1-6]\/Gr\.\s?\d\b/g, (m) => YEAR_WORD[m.split('/')[0]]).replace(/\bRec\/PK4\b/g, 'Pre-K').replace(/\bY1\/KG\b/g, 'Kindergarten');
+    t = t.replace(/\bGr\.\s?(\d)\b/g, 'Grade $1').replace(/\bY([1-6])\b/g, (m) => YEAR_WORD[m]);
+    // skill ids → labels
+    t = t.replace(/\b[a-z_]+:[a-z0-9_]+\b/g, (m) => skillWords(m)).replace(/\b[a-z]+(?:_[a-z0-9]+)+\b/g, (m) => skillWords(m));
     t = t.replace(/\bare not dealt\b/gi, 'are not practised yet').replace(/\bis not dealt\b/gi, 'is not practised yet').replace(/\bnot dealt\b/gi, 'not practised yet');
-    return t.replace(/\s{2,}/g, ' ').trim();
+    t = t.replace(/\(\s*\)/g, '').replace(/:\s*(—|$)/g, ' $1').replace(/—\s*—/g, '—').replace(/\s+([,;)])/g, '$1');
+    return t.replace(/\s{2,}/g, ' ').replace(/[\s—:-]+$/, '').trim();
 }
 
-/** Lessons whose title, CCSS code or unit name match the text, best first (cap `limit`). */
-export function searchLessons(text, limit = 12) {
+/**
+ * Lessons whose title, CCSS code, unit name or WEEK ("week 5", "w05") match the text, best first (cap `limit`).
+ * A CCSS code ranks the code's own grade first (3.NF.A.1 → Grade 3 before the Grade 1 copies); a week search
+ * ranks `grade` (the grade on screen) first.
+ */
+export function searchLessons(text, limit = 12, grade = '') {
     unpack();
     const q = String(text || '').toLowerCase().replace(/[^a-z0-9.\s]/g, ' ').replace(/\s+/g, ' ').trim();
     if (!q) return [];
     const words = q.split(' ');
+    const wk = /^(?:week|wk|w)\s*0?(\d{1,2})$/.exec(q);
+    const codeGrade = (/^([k\d])\.[a-z]+/.exec(q) || [])[1];
+    const gradeOfCode = codeGrade === 'k' ? 'K' : codeGrade || '';
     const scored = [];
     for (const l of LESSONS) {
         const title = l.title.toLowerCase();
         const codes = l.ccss.join(' ').toLowerCase();
         const unit = `${l.unitName} ${domainName(l.domain)}`.toLowerCase();
         let s = 0;
-        if (title === q) s = 100;
+        if (wk) { if (l.weeks.some((w) => +w.replace(/\D/g, '') === +wk[1])) s = 70 + (l.grade === grade ? 20 : 0); }
+        else if (title === q) s = 100;
         else if (title.startsWith(q)) s = 80;
         else if (title.includes(q)) s = 60;
-        else if (codes.split(' ').some((c) => c === q || c.startsWith(q))) s = 50;
+        else if (codes.split(' ').some((c) => c === q || c.startsWith(q))) s = 50 + (l.grade === gradeOfCode ? 5 : 0);
         else if (words.every((w) => title.includes(w) || codes.includes(w) || unit.includes(w))) s = 30;
         if (s) scored.push({ l, s });
     }
     scored.sort((a, b) => b.s - a.s);
     return scored.slice(0, limit).map((x) => x.l);
+}
+
+/**
+ * The school week a date falls in for a grade ("6–10 Sep" → 2026-09-06…10; Sep–Dec 2026, Jan–Aug 2027), or
+ * the next week to come (a weekend or a holiday) — '' when the year is over.
+ */
+export function weekForDate(gradeId, date = new Date()) {
+    const g = WRM_SEQUENCE.find((x) => x.id === gradeId);
+    if (!g || !g.weekInfo) return '';
+    const MON = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+    const day = (d, m) => new Date(m >= 7 ? 2026 : 2027, m, d);
+    const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    let next = '';
+    for (const [w, info] of Object.entries(g.weekInfo)) {
+        const m = /(\d+)\s*(?:([A-Za-z]{3})[a-z]*)?\s*[–-]\s*(\d+)\s*([A-Za-z]{3})/.exec(info.weekOf || '');
+        if (!m) continue;
+        const endM = MON[m[4].toLowerCase()];
+        const startM = m[2] ? MON[m[2].toLowerCase()] : endM;
+        const start = day(+m[1], startM), end = day(+m[3], endM);
+        if (today >= start && today <= end) return w;
+        if (!next && start > today) next = w;
+    }
+    return next;
 }
 
 
