@@ -5,7 +5,7 @@
 export const exclude = ['addition:equal_sign']; // deals plain column addition today (build-list equal_sign_repair)
 const D = (key, opts = {}) => ({ key, opts });
 const P = (key, missing, opts) => ({ key, missing, ...(opts ? { opts } : {}) });
-const R = (key, why) => ({ key, why });
+const R = (key, why, opts) => ({ key, why, ...(opts ? { opts } : {}) });
 const USD = { currency: 'usd' };
 const zero = (step) => ({ rows: [{ step, start: 'zero', dir: 'up' }] });
 const OK = { reviewed: true };
@@ -434,7 +434,7 @@ export const prePatch = {
 // ======================= round 3 (critic Y2-Y3 r2: S6 pre/related swap, S7 thin measure pre, S8 step fixes) =======================
 // r3 entries are merged OVER steps + prePatch. `core` = the main building block (pre tier 1, never pushed out by the cap);
 // `dropPre` removes an automatic pre entry that is not a building block.
-const C = (key, why) => ({ key, why });
+const C = (key, why, opts) => ({ key, why, ...(opts ? { opts } : {}) });
 const CBT = 'multiplication:count_by_tables';
 export const r3 = {
   // S6: the main building block first
@@ -618,3 +618,65 @@ export const relR3 = {
   'Y3.B12.S5': [R('graphs:line_plot_g2', 'another way to show collected data')],
   'Y3.B12.S6': [R('coordinates:coordinate_q1', 'reading a grid by row and column, like a two-way table')],
 };
+
+// rule 18 (lead, 2026-10-10): pre and related LINKS carry opts. build.mjs gives a link the opts its referenced step uses
+// for that key; else these year defaults; linkscan.mjs then generates every link and flags numbers past the year's range.
+export const linkOpts = {
+  Y2: { 'patterns:seq_10': { band: 50 }, 'patterns:seq_5': { band: 50 }, 'patterns:seq_2': { band: 50 }, 'patterns:double': { band: 20 },
+    'patterns:halve': { band: 20 }, 'patterns:number_pattern': { band: 50 }, 'patterns:skip_count_line': { band: 50 }, 'graphs:pictograph': { range: 20 },
+    'algebra:tape_diagram': { band: 50 }, 'algebra:multi_step_word': { band: 50 }, 'placevalue:combine': { band: 99 }, 'placevalue:expand': { band: 99 },
+    'placevalue:order_least_to_greatest': { band: 99 }, 'placevalue:order_greatest_to_least': { band: 99 }, 'placevalue:identify': { band: 99 },
+    'placevalue:value': { band: 99 }, 'placevalue:unit_form': { band: 99 }, 'placevalue:compare': { band: 99 }, 'subtraction:mixed_add_sub': { range: 100 },
+    'multiplication:mult_chart_easy': { band: 100 }, 'counting:number_seq_fill': { range: 100 }, 'composing:hundreds_chart_fill': { band: 100 },
+    'measurement:money_count': { currency: 'usd' }, 'measurement:money': { currency: 'usd' }, 'measurement:money_change': { currency: 'usd', step: 100, paid: 'note', band: 2000 },
+    'measurement:coin_value': { currency: 'usd' }, 'measurement:equiv_coin_sets': { currency: 'usd' }, 'measurement:make_change_least_coins': { currency: 'usd' },
+    'measurement:temperature': { forms: [1] }, 'fractions:shade_fraction': { denoms: [2] }, 'fractions:identify': { denoms: [2] } },
+  Y3: { 'placevalue:combine': { band: 999 }, 'placevalue:expand': { band: 999 }, 'placevalue:order_least_to_greatest': { band: 999 },
+    'placevalue:order_greatest_to_least': { band: 999 }, 'placevalue:compare': { band: 999 }, 'measurement:capacity': { units: [1], forms: [0] },
+    'measurement:money_count': { currency: 'usd', kind: 'both' }, 'measurement:money': { currency: 'usd', step: 5 }, 'measurement:money_change': { currency: 'usd', step: 5, paid: 'note' },
+    'measurement:coin_value': { currency: 'usd' }, 'measurement:equiv_coin_sets': { currency: 'usd' }, 'measurement:make_change_least_coins': { currency: 'usd' },
+    'measurement:money_notation': { currency: 'usd' }, 'measurement:enough_money': { currency: 'usd' }, 'measurement:money_compare': {},
+    'measurement:temperature': { forms: [1] }, 'graphs:pictograph': { range: 100 } },
+};
+// per-link fixes: opts, or null = the link is dropped (its defaults are beyond the step and no option narrows it)
+export const linkFix = {
+  'Y2.B5.S12': { 'patterns:skip_count_grid': null },
+  'Y2.B2.S19': { 'subtraction:mixed_add_sub': null },
+  'Y2.B6.S1': { 'measurement:length_metric': null },
+  'Y2.B6.S5': { 'measurement:unit_conversion_word': null },
+  'Y2.B7.S4': { 'measurement:capacity': null }, 'Y2.B7.S5': { 'measurement:capacity': null }, 'Y2.B7.S6': { 'measurement:capacity': null },
+  'Y2.B7.S7': { 'measurement:capacity': null }, 'Y2.B7.S8': { 'measurement:capacity': null },
+  'Y3.B1.S1': { 'multiplication:count_by_tables': null }, 'Y3.B1.S2': { 'multiplication:count_by_tables': null },
+  'Y3.B1.S5': { 'multiplication:count_by_tables': null },
+};
+relR3['Y2.B5.S12'] = [...(relR3['Y2.B5.S12'] || []), R('counting:number_seq_fill', 'counting in 2s fills in the even numbers', { step: 2, range: 20 })];
+relR3['Y2.B7.S4'] = [R('algebra:tape_diagram', 'a bar model of two masses and their total', { band: 50 }), R('algebra:multi_step_word', 'two-step stories in other contexts', { band: 50 })];
+relR3['Y2.B7.S8'] = [R('algebra:tape_diagram', 'a bar model of two capacities and their total', { band: 50 }), R('algebra:multi_step_word', 'two-step stories in other contexts', { band: 50 })];
+relR3['Y2.B7.S5'] = [R('fractions:shade_fraction', 'half full is a half of the container (Y2.B8 halves)', { denoms: [2] })];
+relR3['Y2.B7.S6'] = [R('measurement:temperature', 'a thermometer (Y2.B7.S9): another scale read at a pointer', { forms: [1] })];
+relR3['Y2.B7.S7'] = [R('measurement:temperature', 'a thermometer (Y2.B7.S9): another scale read at a pointer', { forms: [1] })];
+// rule 18, ×/÷ and fractions: links with default opts deal every table to 12 and every denominator family; narrow them
+// to the tables and fractions this year knows (Y2: 2, 5, 10, halves; Y3: 2, 3, 4, 5, 8, 10; halves, thirds, fifths).
+// null = drop the link in this year (no option narrows it: mult_word_problems deals 5 × 8; fraction_of_set ignores denoms).
+const ZR = (...st) => ({ rows: st.map((step) => ({ step, start: 'zero', dir: 'up' })) });
+Object.assign(linkOpts.Y2, {
+  'multiplication:mult_facts': { constant: [2, 5, 10], band: 100 }, 'division:div_facts': { constant: [2, 5, 10], band: 100 },
+  'multiplication:mult_word_problems': null, 'division:share_into_groups': { band: 12 }, 'multiplication:dot_array_mult': { band: 25 },
+  'multiplication:repeated_add_to_mult': { band: 25 }, 'fractions:fraction_of_set': null, 'fractions:fraction_of_set_nv': null,
+  'fractions:equiv_frac_nv': { denoms: [2] }, 'fractions:select_equiv_frac': { denoms: [2] }, 'multiplication:count_by_tables': ZR(2, 5, 10),
+});
+const T3 = [2, 3, 4, 5, 8, 10];
+Object.assign(linkOpts.Y3, {
+  'multiplication:mult_facts': { constant: T3, band: 100 }, 'division:div_facts': { constant: T3, band: 100 },
+  'multiplication:mult_chart_easy': { constant: T3, band: 100 }, 'multiplication:nl_mult': { constant: T3, band: 100 }, 'division:nl_div': { constant: T3, band: 100 },
+  'division:missing_mult_div': { range: 100 }, 'multiplication:mult_word_problems': { range: 100 }, 'division:div_word_problems': { range: 100 },
+  'multiplication:mult_comparison': { range: 50 }, 'division:div_remainders': { constant: [2, 3, 4, 5] }, 'division:area_model_div_2by1': { constant: [2, 3, 4, 5] },
+  'division:div_equation_parts': { band: 25 }, 'fractions:fraction_of_set_hard': { denoms: [2, 3], range: 50 }, 'fractions:fraction_of_set': { denoms: [2, 3, 5], range: 50 },
+  'fractions:fraction_of_set_nv': { denoms: [2, 3, 5] }, 'fraction_operations:add_frac_like_nv': { denoms: [2, 3, 5], forms: [0] }, 'fractions:identify': { denoms: [2, 3] },
+  'fractions:shade_fraction': { denoms: [2, 3] }, 'fractions:write_fraction': { denoms: [2, 3] }, 'fractions:equiv_frac_nv': { denoms: [2] },
+  'fractions:equiv_frac_visual': { denoms: [2] }, 'multiplication:count_by_tables': ZR(2, 5, 10), 'fraction_operations:mult_frac_whole': { denoms: [2] },
+});
+relR3['Y2.B5.S1'] = [R('multiplication:repeated_add_to_mult', 'adding the equal groups (Y2.B5.S3): the next idea', { band: 25 }), R('multiplication:dot_array_mult', 'equal groups set out in rows as an array', { band: 25 })];
+relR3['Y2.B5.S2'] = [R('multiplication:repeated_add_to_mult', 'adding the equal groups made (Y2.B5.S3)', { band: 25 }), R('multiplication:dot_array_mult', 'equal groups set out in rows as an array', { band: 25 })];
+relR3['Y2.B5.S1'].push(R('multiplication:mult_facts', 'equal groups written as a multiplication fact (Y2.B5.S9): where this leads', { constant: [2, 5, 10], band: 100 }));
+relR3['Y2.B5.S2'].push(R('multiplication:mult_facts', 'equal groups written as a multiplication fact (Y2.B5.S9): where this leads', { constant: [2, 5, 10], band: 100 }));

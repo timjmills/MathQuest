@@ -76,6 +76,12 @@ const directOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p
 const allOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return [...new Set([...d,...p].map(k=>resolve(k)).filter(Boolean))];};
 function earlierStep(k,sid,sameYear){const y=sid.split('.')[0];const at=order.indexOf(sid);for(let j=at-1;j>=0;j--){const id=order[j];if(sameYear&&!id.startsWith(y+'.'))continue;if(allOf(id).includes(k))return id;}return null;}
 const SAMESTD_SKIP=/:mixed_|_plain$/;
+// r3 rule 18: a pre/related LINK carries opts. Hand opts on the entry win; else the opts the referenced step (the first
+// step id in its why) uses for that key; else the year's default for the key (OV.linkOpts[YEAR]); else {}.
+function stepOptsFor(id,k){const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};for(const d of [...(o.direct||[]),...(o.partials||[])])if(resolve(d.key)===k&&d.opts&&Object.keys(d.opts).length)return d.opts;
+  for(const t of tags[id]||[])if(resolve(t.key)===k){const n=noteOpts(t.note);if(Object.keys(n).length)return n;}return null;}
+function linkOpts(e){if(e.opts)return e.opts;const ids=[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]);
+  for(const id of ids){const o=stepOptsFor(id,e.key);if(o)return o;}return OV.linkOpts?.[YEAR]?.[e.key]||{};}  // null (drop) is handled after
 const ODDEVEN=['composing:odd_even','composing:select_even_odd'];
 const propsOf={};for(const[id,p]of Object.entries(WRM_PROPOSALS))for(const s of p.steps||[])(propsOf[s]??=[]).push(id);
 for(const[id,ss]of Object.entries(OV.extendSteps||{}))for(const s of ss)if(!(propsOf[s]||[]).includes(id))(propsOf[s]??=[]).push(id);
@@ -130,10 +136,10 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   const dropPre=new Set((o.dropPre||[]).map(resolve));
   const oddOk=/odd|even/i.test(s.title);
   const okKey=k=>k&&!(OV.exclude||[]).includes(k)&&!allDirect.has(k)&&!dropPre.has(k)&&(oddOk||!ODDEVEN.includes(k));
-  const cand=(k,why,tier)=>{k=resolve(k);if(okKey(k))cands.push({key:k,why,tier,ord:ord++});};
+  const cand=(k,why,tier,opts)=>{k=resolve(k);if(okKey(k))cands.push({key:k,why,tier,ord:ord++,...(opts?{opts}:{})});};
   const addPB=pid=>{if(build.includes(pid)||preBuild.includes(pid)||preBuild.length>=3)return;preBuild.push(pid);usedProps.add(pid);};
-  for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])cand(p.key,p.why,0);
-  for(const p of o.core||[])cand(p.key,p.why,1);
+  for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])cand(p.key,p.why,0,p.opts);
+  for(const p of o.core||[])cand(p.key,p.why,1,p.opts);
   // rule 14: a related key that is the skill of an EARLIER step of this year is a building block -> pre
   const handRelAll=[...(o.related||[]),...(OV.extraRelated?.[s.id]||[]),...(OV.relR3?.[s.id]||[])];
   for(const r of handRelAll){const k=resolve(r.key);const e=earlierStep(k,s.id,true);if(e)cand(k,`${r.why} (earlier step this builds on: ${e} ${stepById[e].title})`,2);}
@@ -148,26 +154,33 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
      for(const k of ks.slice(0,2))cand(k,`${x.id} ${st.title} (prior learning wk ${wk})`,x.same?5:3);}
    for(let j=i-2,n=0;j>=0&&n<3;j--){const st=b.steps[j];if(topic(st)!==topic(s))continue;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (earlier in the block)`,4);}
   }
-  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=8)continue;seen.add(c.key);pre.push({key:c.key,why:c.why});}};
+  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=8)continue;seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{})});}};
   take();
   if(pre.length<3&&prevYear&&!o.preOnly){const py=W.years.find(y=>y.id===prevYear);const cand6=py.blocks.flatMap(bb=>bb.steps).filter(st=>topic(st)===topic(s)).reverse();
     let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0)||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6);n++;}
     take();}
-  if(pre.length<3){for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(cands.find(c=>c.key===k))continue;cand(k,l.why+' (topic ladder)',7);take();if(pre.length>=3)break;}}
+  if(pre.length<3){for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(cands.find(c=>c.key===k))continue;cand(k,l.why+' (topic ladder)',7,l.opts);take();if(pre.length>=3)break;}}
   for(const pid of o.preBuild||[])addPB(pid);
   if(pre.length<3&&!o.thinPreNote)console.error('THINPRE',s.id,s.title,pre.length);
   // ---- related (rule 5 / 14): the same idea in another form, the inverse, the NEXT step. Never an earlier step of
   // the block (that is pre), never a pre key. ----
   const related=[];
   const relOk=k=>k&&!(OV.exclude||[]).includes(k)&&!allDirect.has(k)&&!related.find(p=>p.key===k)&&!pre.find(p=>p.key===k)&&!b.steps.slice(0,i).some(st=>allOf(st.id).includes(k))&&related.length<6;
-  const addRel=(k,why)=>{k=resolve(k);if(relOk(k))related.push({key:k,why});};
-  for(const r of handRelAll)addRel(r.key,r.why);
+  const addRel=(k,why,opts)=>{k=resolve(k);if(relOk(k))related.push({key:k,why,...(opts?{opts}:{})});};
+  for(const r of handRelAll)addRel(r.key,r.why,r.opts);
   if(!o.relOnly){
    for(const d of [1,2,3,4]){if(related.length>=2&&d>1)break;const nx=b.steps[i+d];if(nx&&topic(nx)===topic(s))for(const k of allOf(nx.id).slice(0,2))addRel(k,`${nx.id} ${nx.title} (${d===1?'next step':'a later step of the block'}: the same idea one step further)`);}
    // last resort: a skill tagged to the step's OWN standard code that no earlier step uses (the same idea in another form)
    if(false)for(const c of s.ccss){for(const k of byStd[c]||[]){if(related.length>=2)break;if(SAMESTD_SKIP.test(k))continue;addRel(k,`also teaches ${c} (this step's standard): ${label[k]}`);}}
   }
   if(!related.length)console.error('NOREL',s.id,s.title);
+  for(const e of [...pre,...related])e.opts=linkOpts(e);
+  const yo=OV.linkOpts?.[YEAR]||{};
+  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--)if(yo[list[j].key]===null&&!Object.keys(list[j].opts||{}).length)list.splice(j,1);
+  const lf=OV.linkFix?.[s.id]||{};
+  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const f=lf[list[j].key];if(f===null)list.splice(j,1);else if(f)list[j].opts=f;}
+  if(!related.length)console.error('NOREL(after linkFix)',s.id,s.title);
+  if(pre.length<3)console.error('THINPRE(after linkFix)',s.id,s.title,pre.length);
   for(const id of build)usedProps.add(id);
   out.steps[s.id]={title:s.title,direct,partial,verdict,missing,build,pre,preBuild,related,note:o.note||(lessonWeek[s.id]?'':'not in the school sequence xlsx; pre-skills from the block and the previous year')};
  });

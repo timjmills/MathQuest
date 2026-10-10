@@ -34,6 +34,17 @@ the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit
   pre ≤ 1 entry **0 / 0** (minimum pre is now 3 on every step); odd/even pre on a non-odd/even step **0 / 0**;
   gap `closes` = `teaches` **0 / 0**; full verdict with partial entries **0 / 0**; empty related **0 / 0**;
   pre = related **0 / 0**; own build in preBuild **0 / 0**.
+- **Rule 18, links carry opts** (lead, 2026-10-10). Every pre and related entry now has `opts`: the opts its referenced
+  step uses for that key (e.g. `mult_facts {constant:[3]}` from Y3.B3.S6, `band:99` from Y2 place value), else the year
+  default in `overrides.mjs` `linkOpts` (Y2: tables 2/5/10, `band` 20–99 on counting, doubling, place value and bar
+  models, halves; Y3: tables 2/3/4/5/8/10, `band` 999 place value, denominators 2/3/5, US money opts), else a per-link
+  fix (`linkFix`). Links no option can narrow are dropped in that year (Y2 `mult_word_problems` deals 5 × 8;
+  `fraction_of_set` ignores denoms; Y2 `capacity`, `length_metric`, `unit_conversion_word`; Y3 `count_by_tables` 100s
+  past 1,000 on the to-100 steps) and replaced where a step was left without related.
+  `tests/scripts/wrm-tagging/linkscan.mjs` generates 8 items of every link with its opts and flags numbers past the
+  year's range (Y2 120 = 1.NBT.A.1, Y3 1,000; measures Y2 2,000 g/ml, Y3 5,000; money in cents; clock, angle and grid
+  skills not range-checked): **243 flagged before, 0 after** (`linkscan: OK`). Links with explicit opts: Y2 390 of
+  924, Y3 484 of 1,010 (the rest are skills whose defaults already sit inside the year).
 - **Self-check**: 10 random steps per year re-judged from generated items (Y2: B1.S16, B3.S4, B5.S6, B11.S3, B5.S7,
   B7.S2, B9.S6, B1.S14, B10.S2, B2.S13; Y3: B5.S2, B2.S8, B9.S5, B10.S6, B3.S7, B3.S1, B4.S2, B2.S14, B12.S3, B12.S2).
   Two weak ladders found and fixed with `core` (Y2.B1.S16 Count in 3s now starts from counting in 2s/5s/10s;
