@@ -22,7 +22,7 @@ Y4.B2.S4 [W15] own ceiling 9999: ok
 Y4.B2.S5 [W15] own ceiling 9999: ok
 Y4.B2.S6 [W15] own ceiling 9999: ok
 Y4.B2.S7 [W16] own ceiling 9999: ok
-Y4.B2.S8 [W16] own ceiling 143: ok
+Y4.B2.S8 [W16] own ceiling 144: ok
 Y4.B2.S9 [W16] own ceiling 2000: ok
 Y4.B2.S10 [W16] own ceiling 976: ok
 Y4.B3.S1 [W18] own ceiling 48: ok
@@ -71,9 +71,9 @@ Y4.B7.S2 [W07] own ceiling 11: ok
 Y4.B7.S3 [W08] own ceiling 0: ok
 Y4.B7.S4 [W08] own ceiling 18: ok
 Y4.B7.S5 [W08] own ceiling 18: ok
-Y4.B7.S6 [W09] own ceiling 54: ok
-Y4.B7.S7 [W09] own ceiling 54: ok
-Y4.B7.S8 [W10] own ceiling 54: ok
+Y4.B7.S6 [W09] own ceiling 75: ok
+Y4.B7.S7 [W09] own ceiling 75: ok
+Y4.B7.S8 [W10] own ceiling 75: ok
 Y4.B7.S9 [W09] own ceiling 30: ok
 Y4.B7.S10 [W10] own ceiling 40: ok
 Y4.B7.S11 [W10] own ceiling 26: ok
@@ -127,4 +127,4 @@ Y4.B14.S2 [W38] own ceiling 10: ok
 Y4.B14.S3 [W29] own ceiling 38: ok
 Y4.B14.S4 [W38] own ceiling 3: ok
 Y4.B14.S5 [W38] own ceiling 3: ok
-linkfit: 760 links in 129 steps; 0 misfits (0 size, 0 content/layout)
+linkfit: 747 links in 129 steps; 0 misfits (0 size, 0 content/layout)

@@ -1890,3 +1890,118 @@ Same command as round 6, against the round-9 file.
 3. How many equal parts is this shape divided into? → 2
 4. What fraction of the shape is shaded? → 1/2
 
+
+# Round 11: generated items
+
+B6.S5 and B6.S7 (clauses changed), then every new or changed pre / related link against the round-10 file.
+
+## Y4.B6.S5 Perimeter of rectilinear shapes — partial
+
+**partial** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — missing: counts the edges of rectilinear shapes on a grid; never a shape with its side lengths written
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+5. Count the outside edges of this L-shape. What is the perimeter? → 16
+6. Find the perimeter of this rectangle. → 36
+
+**partial** `area_perimeter:composite_shapes` opts `{"forms":[0]}` Max Number 10000 — missing: perimeter of L-, T- and U-shapes with the lengths given, but some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)
+
+1. Find the perimeter of this composite shape. → 34
+2. Find the perimeter of this composite shape. → 32
+3. Find the perimeter of this composite shape. → 20
+4. Find the perimeter of this composite shape. → 32
+5. Find the perimeter of this composite shape. → 28
+6. Find the perimeter of this composite shape. → 38
+
+## Y4.B6.S7 Calculate the perimeter of rectilinear shapes — partial
+
+**partial** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — missing: on a grid only (lengths counted, not calculated)
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+5. Count the outside edges of this L-shape. What is the perimeter? → 16
+6. Find the perimeter of this rectangle. → 36
+
+**partial** `area_perimeter:composite_shapes` opts `{"forms":[0]}` Max Number 10000 — missing: perimeter of a composite shape; generated items label the sides, so no missing length has to be found first; some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)
+
+1. Find the perimeter of this composite shape. → 34
+2. Find the perimeter of this composite shape. → 32
+3. Find the perimeter of this composite shape. → 20
+4. Find the perimeter of this composite shape. → 32
+5. Find the perimeter of this composite shape. → 28
+6. Find the perimeter of this composite shape. → 38
+
+**Y4.B4.S1 pre** `multiplication:dot_array_mult` opts `{"band":25}` Max Number 10000 — Y3.B3.S2 Use arrays (prior learning wk W01)
+
+1. Count the array: 3 rows × 5 columns = ? → 15
+2. Count the array: 4 rows × 4 columns = ? → 16
+3. Count the array: 2 rows × 2 columns = ? → 4
+4. Count the array: 2 rows × 4 columns = ? → 8
+
+**Y4.B4.S2 pre** `multiplication:dot_array_mult` opts `{"band":25}` Max Number 10000 — Y3.B3.S2 Use arrays (prior learning wk W01)
+
+1. Count the array: 3 rows × 5 columns = ? → 15
+2. Count the array: 4 rows × 4 columns = ? → 16
+3. Count the array: 2 rows × 2 columns = ? → 4
+4. Count the array: 2 rows × 4 columns = ? → 8
+
+**Y4.B4.S2 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[6],"band":100}` Max Number 10000 — the 6 row of the chart
+
+1. Fill in the missing products. → 42, 48, 54
+2. Fill in the missing products. → 24, 42, 48
+3. Fill in the missing products. → 24, 30, 24
+4. Fill in the missing products. → 48, 42, 48
+
+**Y4.B5.S8 related** `multiplication:repeated_add_to_mult` opts `{}` Max Number 10000 — 23 × 4 as 23 + 23 + 23 + 23: the repeated addition partitioning shortens
+
+1. 5 + 5 + 5 + 5 = 4 × 5 = ? → 20
+2. 5 + 5 + 5 + 5 + 5 = 5 × 5 = ? → 25
+3. 2 + 2 + 2 = 3 × 2 = ? → 6
+4. 4 + 4 + 4 = 3 × 4 = ? → 12
+
+**Y4.B6.S6 pre** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — Y4.B6.S5 Perimeter of rectilinear shapes (taught the same school week, W20)
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+
+**Y4.B6.S8 pre** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+
+**Y4.B6.S8 related** `shapes_early:shape_attributes` opts `{}` Max Number 10000 — sides and vertices of polygons: a regular polygon's sides are all equal
+
+1. How many vertices does a hexagon have? → 6
+2. How many sides does a hexagon have? → 6
+3. Click ALL shapes with 4 sides. → ["opt1","opt3"]
+4. Click ALL shapes with 3 sides. → ["opt1","opt2"]
+
+**Y4.B6.S9 pre** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+
+**Y4.B9.S6 pre** `decimals:decimal_nl_drag` opts `{"ticks":"some"}` Max Number 10000 — Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)
+
+1. Put 0.3 on the number line. → 0.3
+2. Put 0.3 on the number line. → 0.3
+3. Put each number on the number line. → 0.2, 0.5, 0.7
+4. Put each number on the number line. → 0.1, 0.3, 0.8
+
+**Y4.B9.S6 related** `decimals:order_decimals` opts `{"decimals":1}` Max Number 10 — ordering tenths first: the same routine with one decimal place
+
+1. Order from greatest to least: → 9.9,9.3,8.3,7.3,4.5,1.6
+2. Order from greatest to least: → 4.2,2.2,1.6,1.5,0.3
+3. Drag the decimals from least to greatest. → ["t2","t0","t3","t1"]
+4. Drag the decimals from least to greatest. → ["t4","t3","t2","t0","t1"]
+

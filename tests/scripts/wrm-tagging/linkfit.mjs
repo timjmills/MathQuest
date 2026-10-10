@@ -36,7 +36,7 @@ const TIME = /^measurement:(time|elapsed|clock|order_clocks)/;   // clock payloa
 const DECOY = new Set(['number_sense:estimate_sums_diffs{"place":1000,"task":"reasonable"}']);
 const WK_FIRST_DECIMAL = 'W29';
 const N_ITEMS = 30;
-const SEEDS = [[9100, 17], [777, 53], [31337, 101], [4242, 29], [61, 7]];   // G10: five seed sets, 150 items a link
+const SEEDS = [[9100, 17], [777, 53], [31337, 101], [4242, 29], [61, 7], [424243, 59]];   // G10: six seed sets, 180 items a link
 const lab = x => x == null ? '' : typeof x === 'object' ? (x.label ?? x.text ?? x.html ?? JSON.stringify(x)) : String(x);   // G6: margins show up late (estimate_sums_diffs reaches 16,000 only after item 8)
 const cache = new Map();
 function probe(key, opts, range) {
@@ -85,13 +85,14 @@ const FIRST = [
   ['mixed numbers / fractions past 1', 'W07', (e, said) => /\b\d+ \d+\/\d+\b/.test(said)],
   ['angles', 'W27', (e, said) => /^angles_lines:(identify_angles|measure_angles|additive_angles)/.test(e.key) || /\b(acute|obtuse|right angle)/i.test(said)],
   ['hundredths', 'W31', (e, said) => !/money|coin/.test(e.key) && /\/100\b|\b0\.\d\d\b|hundredth/i.test(said)],
+  ['area', 'W18', (e, said) => /\barea\b/i.test(said)],
   ['decimals', 'W29', (e, said) => /(?<![\d,])\d+\.\d+/.test(said) && !/money|coin/.test(e.key)],
   ['column 3-digit × 1-digit', 'W36', (e, said, r) => r.items.some(i => i.tpl === 'stack' && /"op":"[×x*]"/.test(i.pay) && /"operands":\[\d{3,}/.test(i.pay))],
   ['coordinates / axes', 'W37', (e, said) => /^coordinates:/.test(e.key) || /coordinates|[xy]-axis/i.test(said)],
 ];
 function firstTaught(sid, e, r, role) {
   const wk = wkOf(sid) || 'W99', said = r.items.map(i => `${i.text || ''} ${i.a || ''}`).join(' | ');
-  const out = FIRST.filter(([n, w, f]) => (role === 'pre' || n === 'hundredths') && wk < w && f(e, said, r)).map(([n, w]) => `rule 19: ${n} first taught ${w}, step is ${wk}`);
+  const out = FIRST.filter(([n, w, f]) => (role === 'pre' || n === 'hundredths' || n === 'area') && wk < w && f(e, said, r)).map(([n, w]) => `rule 19: ${n} first taught ${w}, step is ${wk}`);
   const ref = role === 'pre' ? (String(e.why).match(/^Y4\.B\d+\.S\d+/) || [])[0] : null;
   if (ref && wkOf(ref) && wkOf(ref) > wk) out.push(`rule 19: cites ${ref}, taught ${wkOf(ref)}, after this step (${wk})`);
   return out;
@@ -117,6 +118,17 @@ function content(sid, e, r) {
   // Grade 3 denominators: 2, 3, 4, 5, 6, 8, 10, 12 (and 100 from the decimal blocks, W29)
   const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g), ...all.matchAll(/"den(?:om)?(?:inator)?"\s*:\s*"?(\d+)/g)].map(m => +m[1]).filter(x => x > 12 && !(x === 100 && wk >= WK_FIRST_DECIMAL));
   if (dens.length) out.push(`denominator ${Math.max(...dens)} (Grade 3 stops at twelfths)`);
+  // G16: 3-digit ÷ 1-digit before W36 (text, options and judge cells; dividends to 120 are table facts, 10 × 12);
+  // area-model labels for 2-digit × 2-digit
+  if (wk < 'W36') { const m = [...all.matchAll(/\b(\d{3})\s*÷\s*(\d)\b/g)].find(x => +x[1] > 120); if (m) out.push(`3-digit ÷ 1-digit in ${wk} (${m[0]}; B5.S13 is W36)`); }
+  for (const i of r.items) { const m = (i.vis || '').match(/(\d+)\s*[×x]\s*\((\d+)\s*\+\s*(\d+)\)/);
+    if (m && +m[1] >= 10 && +m[2] + +m[3] >= 13 && ![10, 100].includes(+m[1])) { out.push(`2-digit × 2-digit area model (${m[0]})`); break; } }
+  // whole numbers ÷ 10 and ÷ 100 are first taught W35 (B5.S5, B5.S6)
+  if (wk < 'W35') { const m = [...said.matchAll(/\b(\d{1,3}(?:,\d{3})*)\s*÷\s*(10|100)\b(?!\.)/g)].find(x => +x[1].replace(/,/g, '') > 120); if (m) out.push(`whole number ÷ ${m[2]} in ${wk} (${m[0]}; W35)`); }
+  // G17: decimals in the visual / SVG labels before W29
+  if (wk < WK_FIRST_DECIMAL && !/money|coin/.test(e.key) && !MONEY.test(all) && r.items.some(i => /(?<![\d,.])\d+\.\d+(?![\d.])/.test(`${i.vis || ''}`))) out.push(`decimals drawn in the visual in ${wk} (before ${WK_FIRST_DECIMAL})`);
+  // G18: angle classes before W27, in any role
+  if (wk < 'W27' && /\b(acute|obtuse)\b/i.test(said)) out.push(`angle classes (acute, obtuse) in ${wk} (W27)`);
   // G9: arithmetic and conversions from a later grade
   for (const i of r.items) {
     const t = `${i.text || ''} ${i.x || ''}`;
@@ -152,7 +164,9 @@ function content(sid, e, r) {
       const t = `${i.text || ''} ${i.a || ''} ${i.x || ''}`;
       const pairs = [...t.matchAll(/\b(\d{1,2})\s*[×x]\s*(\d{1,2})\b/g)].map(m => [+m[1], +m[2]])
         .concat([...t.matchAll(/\b(\d{1,3})\s*÷\s*(\d{1,2})\b/g)].map(m => [+m[2], +m[2]]))
-        .concat([...t.matchAll(/Fact Family:\s*(\d+),\s*(\d+)/gi)].map(m => [+m[1], +m[2]]));
+        .concat([...t.matchAll(/Fact Family:\s*(\d+),\s*(\d+)/gi)].map(m => [+m[1], +m[2]]))
+        .concat([...`${t} ${i.vis || ''}`.matchAll(/(\d+) rows? (?:of|×|x|and) (\d+)(?: columns?)?/gi)].map(m => [+m[1], +m[2]]))      // G16
+        .concat([...(i.pay || '').matchAll(/"a":(\d+),"b":(\d+)/g)].map(m => [+m[1], +m[2]]));
       const singles = [...t.matchAll(/multiples of (\d+)|count(?:ing)? (?:up |down )?by (\d+)s?\b|skip count by (\d+)s?\b|hops? of (\d+)|jumps? of (\d+)/gi)].map(m => +m.slice(1).find(Boolean))
         .concat([...(i.pay || '').matchAll(/"step":(\d+)/g)].map(m => +m[1]));
       let grid = null; if (i.tpl === 'mult-grid') { try { const p = JSON.parse(i.pay); for (const [a, b] of p.blanks || []) if (!taught.has(p.rows[a]) && !taught.has(p.cols[b])) grid = [p.rows[a], p.cols[b]]; } catch (x) {} }
@@ -200,8 +214,21 @@ function whyCheck(e, r) {
   const UNIT = { metres: 'm|metres?|meters?', meters: 'm|metres?|meters?', kilometres: 'km|kilometres?', km: 'km|kilometres?', centimetres: 'cm|centimetres?', cm: 'cm|centimetres?', millimetres: 'mm|millimetres?', mm: 'mm|millimetres?', grams: 'g|grams?', kg: 'kg|kilograms?', litres: 'l|litres?', ml: 'ml|millilitres?', hours: 'h|hr|hours?', minutes: 'min|minutes?', seconds: 's|sec|seconds?' };
   const um = w.match(/\bin (metres|meters|kilometres|km|centimetres|cm|millimetres|mm|grams|kg|litres|ml|hours|minutes|seconds)\b/i);
   if (um && !texts.some(t => new RegExp(`\\b(${UNIT[um[1].toLowerCase()]})\\b`, 'i').test(t))) out.push(`why says "in ${um[1]}" but no item has that unit`);
+  if (/0-10,000|0 to 10,000|0–10,000/.test(w)) { const sp = r.items.map(i => ((i.pay || '').match(/"lo":(\d+),"hi":(\d+)/) || []).slice(1).map(Number)).filter(x => x.length);
+    if (sp.length && sp.filter(([lo, hi]) => lo === 0 && hi === 10000).length < sp.length / 3) out.push('why says a 0-10,000 line; the items draw 1,000-wide pieces'); }
   if (/one line|share a point|same point|land on one point/i.test(w) && !/one denominator a line/i.test(w)) out.push('why claims fractions share a point on one line (unchecked: each item is one line)');
   return out;
+}
+// G18: the step a pre cites must be one the skill teaches (SKILL_WRM, or a direct / partial skill in this file)
+const TAGS = JSON.parse(fs.readFileSync(DATA + '/keys.json', 'utf8')).tags;
+const taughtAt = {};
+for (const [k, v] of Object.entries(TAGS)) for (const t of v) (taughtAt[k] ??= new Set()).add(typeof t === 'string' ? t : t.step);
+for (const [sid, s] of Object.entries(d.steps)) for (const e of [...s.direct, ...s.partial]) (taughtAt[e.key] ??= new Set()).add(sid);
+function citeCheck(e, role) {
+  if (role !== 'pre') return [];
+  const m = String(e.why).match(/^((?:R|Y\d)\.B\d+\.S\d+)/); if (!m) return [];
+  if (/has no live skill|this step's build|nearest live practice/i.test(e.why)) return [];
+  return (taughtAt[e.key] && taughtAt[e.key].has(m[1])) ? [] : [`cites ${m[1]}, which ${e.key} is not tagged to (name the gap or cite its own step)`];
 }
 let bad = 0, nContent = 0, checked = 0;
 for (const [sid, s] of Object.entries(d.steps)) {
@@ -214,7 +241,7 @@ for (const [sid, s] of Object.entries(d.steps)) {
     const limit = Math.max(1.5 * base, 100);
     const tag = `${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}`;
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
-    for (const c of [...content(sid, e, r), ...firstTaught(sid, e, r, role), ...whyCheck(e, r)]) { fails.push(`${tag}: ${c}`); nContent++; }
+    for (const c of [...content(sid, e, r), ...firstTaught(sid, e, r, role), ...whyCheck(e, r), ...citeCheck(e, role)]) { fails.push(`${tag}: ${c}`); nContent++; }
   }
   bad += fails.length;
   if (fails.length || ALL) console.log(`${sid} [${wkOf(sid) || '—'}] own ceiling ${own[sid]}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);

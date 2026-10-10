@@ -146,6 +146,33 @@ for pid, sids in used.items():
     proposals[pid] = p
 for pid in NEW:
     if pid not in used: errs.append('unused new proposal ' + pid)
+# Critic r10 G18: a pre's cited step must be a step the skill is tagged to (SKILL_WRM, or a Y4 direct / partial here).
+# When it is not, re-cite the nearest step the skill IS tagged to that the pupil has met by this week (an earlier
+# grade, or a Y4 step taught by now); if there is none, say so in the why.
+taught_at = {}
+for k_, v_ in K['tags'].items():
+    for t_ in v_: taught_at.setdefault(k_, set()).add(t_ if isinstance(t_, str) else t_['step'])
+for sid_, st_ in out_steps.items():
+    for e_ in st_['direct'] + st_['partial']: taught_at.setdefault(e_['key'], set()).add(sid_)
+allorder = [s_['id'] for y_ in wrm['years'] for b_ in y_['blocks'] for s_ in b_['steps']]
+def _wk(x): return ns.get('WK_OVERRIDE', {}).get(x) or prior.get(x, {}).get('wk') or ''
+recited = 0
+for sid_, st_ in out_steps.items():
+    for e_ in st_['pre']:
+        m_ = re.match(r'^((?:R|Y\d)\.B\d+\.S\d+)', e_['why'])
+        if not m_ or re.search(r"has no live skill|this step's build|nearest live practice", e_['why']): continue
+        if m_.group(1) in taught_at.get(e_['key'], set()): continue
+        _yr = lambda x: ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].index(x.split('.')[0])
+        cands = [t_ for t_ in taught_at.get(e_['key'], set()) if t_ in allorder and t_ != sid_ and
+                 (_yr(t_) < 4 or (_yr(t_) == 4 and _wk(t_) and _wk(sid_) and _wk(t_) <= _wk(sid_)))]   # met by this week: earlier grade or taught already
+        if cands:
+            ref_ = m_.group(1)
+            # the same grade as the cited step first, then the nearest step to it in WRM order
+            best = min(cands, key=lambda t_: (t_.split('.')[0] != ref_.split('.')[0], abs(allorder.index(t_) - allorder.index(ref_)) if ref_ in allorder else 0))
+            e_['why'] = why_for(sid_, best, 'X'); recited += 1
+        else:
+            e_['why'] = e_['why'].rstrip(')') + f"; nearest live practice: {e_['key'].split(':')[1]} is not tagged to {m_.group(1)})"
+            recited += 1
 # Rule 13 (revised): every partial or gap step names the skill or option, still to be made, that would make it full.
 ENV, CLOSES, ENVREP = ns.get('ENVISION', {}), ns.get('CLOSES', {}), ns.get('ENVREP', {})
 def short_rep(r):
@@ -231,4 +258,5 @@ c = Counter(s['verdict'] for s in out_steps.values())
 print('steps', len(out_steps), dict(c), 'remaining', len(missing_steps))
 print('proposals new', sum(1 for p in proposals.values() if not p['reused']), 'reused', sum(1 for p in proposals.values() if p['reused']), 'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')}, 'hand fixes now moot', len(stale))
 if os.environ.get('SHOW_STALE'): print('\n'.join(f'stale: {k}' for k in stale))
+print('pre labels re-cited to a tagged step (G18):', recited)
 print('\n'.join(errs) or 'OK')

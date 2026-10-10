@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 10
+# Wave 2 tagging: Y4 (Grade 3) report, round 11
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -11,13 +11,13 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | | Round 2 | Round 3 | Round 4 |
 |---|---|---|---|
 | Steps | 129 | 129 | 129 (14 blocks, none skipped) |
-| Full | 56 | 48 | **45** |
-| Partial | 50 | 60 | **63** |
+| Full | 56 | 48 | **44** (round 11; 45 in round 4) |
+| Partial | 50 | 60 | **64** (round 11; 63 in round 4) |
 | Gap | 23 | 21 | **21** |
-| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
-| Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **535 / 225** (round 10). Every step has at least 3 pre and at least 1 related. 0 keys in both |
-| Option checks | — | — | Round 10: 401 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 760 links misfit** (`linkfit.mjs`, 150 items a link, free-text whys and cited titles both checked; per-step result in `Y4-linkfit.txt`) |
+| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **72 (24 new, 48 reused)** (round 11) |
+| Tag fixes | 76 (hand list) | 151, derived | **154, derived** (round 11: add 45, full 35, opts 31, partial 32, remove 11) |
+| Pre / related entries | 528 / — | 570 / 319 | **532 / 215** (round 11). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 11: 394 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 747 links misfit** (`linkfit.mjs`, 180 items a link; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,81 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 11 (after critic r10: 3 classes and 3 isolated misfits)
+All changes are in `spec_zzzz_r11.py`. One verdict changed: B6.S5 goes from full to partial, as the coordinator allowed.
+The generated items for B6.S5, B6.S7 and the 10 new or changed links are at the end of `Y4-items.md`.
+
+**D. `composite_shapes` labels T-shape sides 2.5 and 3.5 (decimals before W29).**
+- **The pre links.** B6.S6, S8 and S9 now use `perimeter_grid` (whole-unit edges), with the same cited step.
+- **B6.S5 is now partial.**
+  - Its partial skills are `perimeter_grid` (counts edges on a grid, never written lengths) and `composite_shapes`, whose
+    clause names the half-unit sides.
+  - Missing: "perimeter of rectilinear shapes from written whole-number side lengths (no decimal side lengths before W29)".
+- **B6.S7.** Its `composite_shapes` clause and its missing clause name the same thing.
+- **New proposal `composite_whole_sides`.** It is an option on `composite_shapes` (sides "whole numbers only"), and the
+  build of both steps. Its rule-13 spec is on both.
+
+**T′.**
+- `dot_array_mult {band:25}` on B4.S1 and B4.S2.
+- B4.S2's related story → `mult_chart {task:'fill', constant:[6], band:100}`, "the 6 row of the chart".
+
+**C. Cited titles.**
+- `identify_lines` (7 steps) → "Y3.B11.S6 Parallel and perpendicular (…; Y3.B11.S5 Horizontal and vertical has no live
+  skill)".
+- B11.S1 `time_sense` → "Y3.B10.S5 Use a.m. and p.m. (…; Y3.B10.S6 is time_calendar, this step's build)".
+- `clock_parts` (B11.S3, B12.S1) → "the clock face: the numbers 1-12 in their places".
+- B5.S14 → "equal-groups stories (Y3.B4.S11 How many ways has no live skill; …)".
+- **`build.py` now applies G18 to every pre link.** If the cited step is not one the skill is tagged to (in `SKILL_WRM`,
+  or as a Y4 direct or partial skill), the label is re-cited.
+  - It picks the nearest step the skill is tagged to that the pupil has met by this week: the same grade as the cited
+    step first, then an earlier grade, or a Y4 step already taught. That re-cited 39 labels.
+  - Where no such step exists, the label names the gap ("nearest live practice: … is not tagged to …"). On B4.S2 and
+    B4.S5 the gap is named by hand, because re-citing would land on another table.
+
+**Isolated misfits.**
+- `area_distributive_visual` on B5.S8 → `repeated_add_to_mult`, because area is first taught in W18.
+- B6.S8 `classify_triangles` → `shape_attributes`.
+- `div_check_by_multiplying` dropped on B2.S10, B5.S11 and B5.S12. The critic suggested Max Number 100, but its own
+  `own10` scan still flags dividends of 100–108 there.
+
+**Why texts.**
+- The number-line whys on B1.S8, B1.S9, B6.S1 and B6.S2 now say "a line between two thousands" (the lines are
+  1,000-wide pieces), and B1.S3 says "a 100-wide piece". The coordinator's "1,000-wide piece of the 0-10,000 line"
+  wording still tripped `own10`'s span check.
+- B5.S9: "equal-groups stories: the facts each column of the multiplication uses".
+- The money whys no longer name dimes.
+
+**Found by `own10`.**
+- Whole-number ÷ 10 / ÷ 100 links taught before W35 dropped: B5.S3 and B5.S4 related, B8.S7 and B8.S10 pre.
+- Area before W18 dropped: B5.S1 related, B5.S15 pre.
+- `remainder_too_big` (112 ÷ 9 at W06) dropped on B5.S12.
+- `compare_decimal` (0.75 before W33) dropped on B8.S8, S9 and B9.S3. On B9.S6 it is replaced by
+  `decimal_nl_drag {ticks:'some'}` as pre, and `order_decimals {decimals:1} @10` as related.
+
+**`linkfit.mjs`: G16–G18 closed.**
+- **G16.** The operation level is read from "n rows of / × m", from story `"a"`/`"b"` payloads, and from area-model labels
+  "w × (h1 + h2)". 3-digit ÷ 1-digit before W36 is flagged, except dividends up to 120, which are table facts.
+- **G17.** Decimals in the visual and SVG labels are flagged before W29.
+- **G18.**
+  - A pre's cited step must be tagged to the skill, unless the why names the gap.
+  - Angle classes (acute, obtuse) are flagged in any role before W27.
+  - Area is flagged before W18 in any role.
+  - Whole-number ÷ 10 / ÷ 100 above 120 is flagged before W35.
+  - A why saying "0-10,000" is checked against the drawn line's span.
+- A sixth seed set (424243 + 59i), so 180 items per link.
+
+**Scan results.**
+- `build.py`: OK.
+- `linkfit.mjs`: 0 of 747 links misfit.
+- `optcheck.mjs`: 394 opts entries, 0 problems. `optchange.mjs`: 0 non-default values that change nothing.
+- The critic's `own10.mjs` has 3 classes left, and none is a misfit:
+  - **11 "prime" hits.** These are the words "composite shape", already ruled false positives.
+  - **100 "3-digit ÷ before W36" hits, all on one link:** B5.S6's pre `place_value_10x {op:'/', power:[10]}`. This is
+    ÷ 10 of a whole number, which is B5.S5 Divide by 10, taught in W35, the same week as B5.S6. It is that step's own
+    direct skill and the building block for ÷ 100. The scan counts 10 as a divisor of 2–12.
+  - **1 "divisor ≥ 13" hit:** B6.S2's pre `place_value_10x {op:'/', power:[10,100]}`, which gives 4,800 ÷ 100. Dividing by
+    100 is B5.S6 (W35), taught before B6.S2 (W36). The scan does not exempt ÷ 100.
 
 ## Changes in round 10 (after critic r9: 15 links in two classes, 1 isolated, and `why` texts)
 All changes are in `spec_zz_zzz_r10.py`, and every change is to a link. The 38 new or changed links are generated at the

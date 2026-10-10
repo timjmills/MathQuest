@@ -175,7 +175,7 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)",
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)",
      "opts": {
       "step": [
        0
@@ -185,18 +185,18 @@
     },
     {
      "key": "number_sense:between_tens",
-     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (lower grade, same CCSS cluster)"
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (lower grade, same CCSS cluster; nearest live practice: between_tens is not tagged to Y2.B1.S10)"
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y2.B1.S9 10s on the number line to 100 (lower grade, same CCSS cluster)"
+     "why": "Y1.B12.S1 Count from 50 to 100 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "number_sense:rounding_visual",
-     "why": "the same 0-1,000 line used to round",
+     "why": "a 100-wide piece of the 0-1,000 line, used to round to the nearest 100",
      "opts": {
       "place": 100,
       "band": 1000
@@ -493,7 +493,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S7 Flexible partitioning of numbers to 1,000 (prior learning wk W34)",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
      "opts": {
       "band": 999,
       "rename": "more"
@@ -501,7 +501,7 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "Y2.B1.S7 Flexibly partition numbers to 100 (prior learning wk W34)"
+     "why": "Y2.B1.S7 Flexibly partition numbers to 100 (prior learning wk W34; nearest live practice: base10_regroup is not tagged to Y2.B1.S7)"
     },
     {
      "key": "placevalue:place_value_disks",
@@ -612,7 +612,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "4-digit numbers placed on a 0-10,000 line (where 1,000 more lands)",
+     "why": "hundreds placed on a line between two thousands (such as 3,000-4,000, ticks of 100)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -677,7 +677,7 @@
    "related": [
     {
      "key": "number_sense:round_nl_thousands",
-     "why": "the same 0-10,000 line used for rounding"
+     "why": "a line between two thousands, used to round to the nearest 1,000"
     },
     {
      "key": "number_sense:rounding_visual",
@@ -736,7 +736,7 @@
     },
     {
      "key": "number_sense:between_tens",
-     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W13)"
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W13; nearest live practice: between_tens is not tagged to Y2.B1.S11)"
     },
     {
      "key": "placevalue:compare",
@@ -977,7 +977,7 @@
    "pre": [
     {
      "key": "number_sense:between_tens",
-     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster)"
+     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster; nearest live practice: between_tens is not tagged to Y3.B1.S10)"
     },
     {
      "key": "placevalue:more_less_10",
@@ -985,7 +985,7 @@
     },
     {
      "key": "number_sense:nearest_10",
-     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster)"
+     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster; nearest live practice: nearest_10 is not tagged to Y3.B1.S10)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -1413,7 +1413,7 @@
    "pre": [
     {
      "key": "addition:add_10k_regroup",
-     "why": "Y3.B2.S14 Add two numbers (across a 100) (prior learning wk W15)",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (step before in the block, wk W14)",
      "opts": {
       "band": 1000
      }
@@ -1584,7 +1584,7 @@
    "pre": [
     {
      "key": "subtraction:sub_10k_regroup",
-     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (prior learning wk W16)",
+     "why": "Y4.B2.S6 Subtract two 4-digit numbers - one exchange (step before in the block, wk W15)",
      "opts": {
       "band": 1000
      }
@@ -1755,7 +1755,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S11 Estimate on a number line to 1,000 (prior learning wk W16)",
+     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same idea)",
      "opts": {
       "span": 100,
       "band": 1000
@@ -1813,10 +1813,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "division:div_check_by_multiplying",
-     "why": "the same inverse check for division"
-    },
     {
      "key": "algebra:tape_diagram",
      "why": "the bar model that shows why the inverse works"
@@ -2109,7 +2105,10 @@
     },
     {
      "key": "multiplication:dot_array_mult",
-     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)",
+     "opts": {
+      "band": 25
+     }
     }
    ],
    "preBuild": [],
@@ -2199,11 +2198,14 @@
     },
     {
      "key": "multiplication:dot_array_mult",
-     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)",
+     "opts": {
+      "band": 25
+     }
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
+     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01; nearest live practice: count_by_tables is not tagged to it)",
      "opts": {
       "constant": [
        3
@@ -2214,10 +2216,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories (the facts the stories use)",
+     "key": "multiplication:mult_chart",
+     "why": "the 6 row of the chart",
      "opts": {
-      "range": 100
+      "task": "fill",
+      "constant": [
+       6
+      ],
+      "band": 100
      }
     }
    ],
@@ -2399,7 +2405,7 @@
     },
     {
      "key": "multiplication:number_families_mult",
-     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea)"
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea; nearest live practice: number_families_mult is not tagged to Y3.B4.S6)"
     },
     {
      "key": "multiplication:mult_properties",
@@ -2515,7 +2521,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (lower grade, same idea)",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02; nearest live practice: count_by_tables is not tagged to it)",
      "opts": {
       "constant": [
        5,
@@ -2714,7 +2720,7 @@
     },
     {
      "key": "multiplication:number_families_mult",
-     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea)"
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea; nearest live practice: number_families_mult is not tagged to Y3.B4.S6)"
     },
     {
      "key": "multiplication:mult_properties",
@@ -3337,10 +3343,6 @@
     {
      "key": "number_theory:factor_links_easy",
      "why": "factor pairs drawn as links"
-    },
-    {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "rectangles of a given area are factor pairs"
     }
    ],
    "note": ""
@@ -3479,17 +3481,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "placevalue:place_value_10x",
-     "why": "the inverse: divide by 10 (Y4.B5.S5)",
-     "opts": {
-      "op": "/",
-      "power": [
-       10
-      ],
-      "band": 1000
-     }
-    },
-    {
      "key": "measurement:length_metric",
      "why": "1 cm = 10 mm, a ×10 conversion",
      "opts": {
@@ -3553,17 +3544,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "the inverse: divide by 100",
-     "opts": {
-      "op": "/",
-      "power": [
-       100
-      ],
-      "band": 10000
-     }
-    },
     {
      "key": "measurement:length_metric",
      "why": "1 m = 100 cm",
@@ -3754,7 +3734,7 @@
     },
     {
      "key": "placevalue:value",
-     "why": "Y3.B1.S4 Hundreds (prior learning wk W17)"
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -3844,8 +3824,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "area_perimeter:area_distributive_visual",
-     "why": "the distributive area picture"
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "23 × 4 as 23 + 23 + 23 + 23: the repeated addition partitioning shortens"
     }
    ],
    "note": "",
@@ -3915,7 +3895,7 @@
     },
     {
      "key": "number_sense:estimate_products",
-     "why": "Y3.B2.S20 Estimate answers (prior learning wk W17)"
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W17; nearest live practice: estimate_products is not tagged to Y3.B2.S20)"
     }
    ],
    "preBuild": [
@@ -3924,7 +3904,7 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "stories with 2-digit × 1-digit"
+     "why": "equal-groups stories: the facts each column of the multiplication uses"
     },
     {
      "key": "multiplication:mult_missing_digit",
@@ -4064,11 +4044,6 @@
      }
     },
     {
-     "key": "division:div_check_by_multiplying",
-     "why": "check by multiplying",
-     "maxNumber": 100
-    },
-    {
      "key": "division:nl_div",
      "why": "division on a number line"
     }
@@ -4114,7 +4089,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (lower grade, same CCSS cluster)",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
      "opts": {
       "band": 99,
       "rename": "more"
@@ -4134,15 +4109,6 @@
       "tiles": 21,
       "regroup": "always"
      }
-    },
-    {
-     "key": "division:div_check_by_multiplying",
-     "why": "check by multiplying",
-     "maxNumber": 100
-    },
-    {
-     "key": "division:remainder_too_big",
-     "why": "is the remainder finished?"
     }
    ],
    "note": "Generated: area_model_div_2by1, divide {tiles:21} and box_division_easy all mix exchange and no-exchange items; div_exchange is one shared option on the three.",
@@ -4248,7 +4214,7 @@
     },
     {
      "key": "multiplication:mult_word_problems",
-     "why": "Y3.B4.S11 How many ways (prior learning wk W06)",
+     "why": "equal-groups stories (Y3.B4.S11 How many ways has no live skill; correspondence is this step's build)",
      "opts": {
       "range": 100
      }
@@ -4304,10 +4270,6 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "division:area_model_div_2by1",
-     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (prior learning wk W06)"
     },
     {
      "key": "number_sense:compensation",
@@ -4402,7 +4364,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "4-digit numbers placed on a 0-10,000 line (metres before kilometres)",
+     "why": "4-digit numbers placed on a line between two thousands (metres before kilometres)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -4481,7 +4443,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "4-digit numbers placed on a 0-10,000 line (metres before kilometres)",
+     "why": "4-digit numbers placed on a line between two thousands (metres before kilometres)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -4605,13 +4567,15 @@
   },
   "Y4.B6.S5": {
    "title": "Perimeter of rectilinear shapes",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "opts": {}
+     "missing": "counts the edges of rectilinear shapes on a grid; never a shape with its side lengths written"
     },
     {
      "key": "area_perimeter:composite_shapes",
+     "missing": "perimeter of L-, T- and U-shapes with the lengths given, but some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)",
      "opts": {
       "forms": [
        0
@@ -4619,10 +4583,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "perimeter of rectilinear shapes from written whole-number side lengths (no decimal side lengths before W29)",
+   "build": [
+    "composite_whole_sides"
+   ],
    "pre": [
     {
      "key": "area_perimeter:perimeter",
@@ -4635,11 +4600,11 @@
     },
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S12 Calculate perimeter (prior learning wk W20)"
+     "why": "Y3.B5.S10 What is perimeter (lower grade, same idea)"
     },
     {
      "key": "addition:add_column_multi",
-     "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster)"
+     "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster; nearest live practice: add_column_multi is not tagged to Y3.B5.S8)"
     }
    ],
    "preBuild": [],
@@ -4665,7 +4630,17 @@
      "why": "what makes a shape rectilinear"
     }
    ],
-   "note": "perimeter_grid deals L-shapes on a grid; composite_shapes deals L/T/U shapes with lengths given."
+   "note": "Generated composite_shapes {forms:[0]}: T-shapes label sides 2.5 and 3.5.",
+   "envision": [
+    {
+     "proposal": "composite_whole_sides",
+     "name": "Composite Shapes With Whole-Number Sides (option)",
+     "kind": "option on area_perimeter:composite_shapes",
+     "teaches": "add the written whole-number sides of an L-, T- or U-shape to find its perimeter",
+     "closes": "perimeter of rectilinear shapes from written whole-number side lengths (no decimal side lengths before W29)",
+     "representation": "the existing composite-shape cell"
+    }
+   ]
   },
   "Y4.B6.S6": {
    "title": "Find missing lengths in rectilinear shapes",
@@ -4678,13 +4653,8 @@
    ],
    "pre": [
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "Y4.B6.S5 Perimeter of rectilinear shapes (taught the same school week, W20)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S5 Perimeter of rectilinear shapes (taught the same school week, W20)"
     },
     {
      "key": "area_perimeter:perimeter",
@@ -4701,7 +4671,7 @@
     },
     {
      "key": "algebra:tape_diagram",
-     "why": "Y3.B2.S19 Complements to 100 (lower grade, same CCSS cluster)",
+     "why": "Y3.B2.S19 Complements to 100 (lower grade, same CCSS cluster; nearest live practice: tape_diagram is not tagged to Y3.B2.S19)",
      "opts": {
       "band": 50
      }
@@ -4743,7 +4713,7 @@
     },
     {
      "key": "area_perimeter:composite_shapes",
-     "missing": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first",
+     "missing": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first; some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)",
      "opts": {
       "forms": [
        0
@@ -4752,9 +4722,10 @@
     }
    ],
    "verdict": "partial",
-   "missing": "calculating the perimeter when some side lengths are not given and must be found first",
+   "missing": "calculating the perimeter when some side lengths are not given and must be found first; the composite shapes must have whole-number sides (no 2.5 / 3.5 before W29)",
    "build": [
-    "missing_lengths"
+    "missing_lengths",
+    "composite_whole_sides"
    ],
    "pre": [
     {
@@ -4768,11 +4739,11 @@
     },
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S12 Calculate perimeter (prior learning wk W21)"
+     "why": "Y3.B5.S10 What is perimeter (lower grade, same idea)"
     },
     {
      "key": "addition:add_column_multi",
-     "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster)"
+     "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster; nearest live practice: add_column_multi is not tagged to Y3.B5.S8)"
     }
    ],
    "preBuild": [],
@@ -4792,8 +4763,16 @@
      "name": "Missing Lengths in Rectilinear Shapes",
      "kind": "new skill area_perimeter:rectilinear_missing_sides",
      "teaches": "find the missing sides of a rectilinear shape first, then its perimeter",
-     "closes": "calculating the perimeter when some side lengths are not given and must be found first",
+     "closes": "finding a side length not given before the perimeter",
      "representation": "an L or T shape with some sides labelled"
+    },
+    {
+     "proposal": "composite_whole_sides",
+     "name": "Composite Shapes With Whole-Number Sides (option)",
+     "kind": "option on area_perimeter:composite_shapes",
+     "teaches": "the same shapes with whole-number sides only, so the missing side is a whole number",
+     "closes": "decimal side lengths before W29",
+     "representation": "the existing composite-shape cell"
     }
    ]
   },
@@ -4823,13 +4802,8 @@
      }
     },
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -4857,8 +4831,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "shapes_classify:classify_triangles",
-     "why": "equilateral triangles are regular"
+     "key": "shapes_early:shape_attributes",
+     "why": "sides and vertices of polygons: a regular polygon's sides are all equal"
     },
     {
      "key": "multiplication:mult_word_problems",
@@ -4913,13 +4887,8 @@
      }
     },
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (taught the same school week, W21)"
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
@@ -5186,11 +5155,11 @@
     },
     {
      "key": "fractions:fraction_nl_drag",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W08)"
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W08; nearest live practice: fraction_nl_drag is not tagged to Y3.B6.S7)"
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y1.B4.S8 The number line to 20 (lower grade, same CCSS cluster)"
+     "why": "Y1.B6.S6 The number line to 50 (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -5304,7 +5273,7 @@
     },
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
     },
     {
      "key": "composing:compose_whole",
@@ -5464,7 +5433,7 @@
     },
     {
      "key": "fractions:fraction_nl_drag",
-     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
+     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09; nearest live practice: fraction_nl_drag is not tagged to Y3.B6.S8)"
     }
    ],
    "preBuild": [],
@@ -5522,7 +5491,7 @@
    "pre": [
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S9 Equivalent fractions on a number line (lower grade, same idea)"
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -5981,7 +5950,7 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "dimes as tenths of a dollar",
+     "why": "an amount written from coins with the point ($7.05): the digits after the point are the cents",
      "opts": {
       "currency": "usd"
      }
@@ -6027,7 +5996,7 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y2.B1.S4 Use a place value chart (lower grade, same idea)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 99
      }
@@ -6093,7 +6062,7 @@
    "pre": [
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W30)"
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
     },
     {
      "key": "fractions:mixed_nl_drag",
@@ -6105,7 +6074,7 @@
     },
     {
      "key": "fractions:fraction_nl_drag",
-     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30)"
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30; nearest live practice: fraction_nl_drag is not tagged to Y3.B6.S7)"
     }
    ],
    "preBuild": [
@@ -6305,17 +6274,6 @@
      }
     },
     {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (taught the same school week, W31)",
-     "opts": {
-      "op": "/",
-      "power": [
-       10
-      ],
-      "decimals": true
-     }
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y2.B5.S13 The 10 times-table (prior learning wk W31)",
      "opts": {
@@ -6330,7 +6288,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y2.B1.S9 10s on the number line to 100 (lower grade, same CCSS cluster)"
+     "why": "Y1.B12.S1 Count from 50 to 100 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -6420,17 +6378,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "comparing hundredths",
-     "opts": {
-      "decimals": 2,
-      "forms": [
-       0
-      ]
-     },
-     "maxNumber": 10
-    },
-    {
      "key": "measurement:money_notation",
      "why": "cents are hundredths of a dollar",
      "opts": {
@@ -6480,7 +6427,7 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y2.B1.S4 Use a place value chart (lower grade, same idea)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 99
      }
@@ -6505,21 +6452,10 @@
    "related": [
     {
      "key": "measurement:money_notation",
-     "why": "dollars, dimes, cents",
+     "why": "an amount written from coins with the point: dollars before it, cents after it",
      "opts": {
       "currency": "usd"
      }
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "compare digit by digit",
-     "opts": {
-      "decimals": 2,
-      "forms": [
-       0
-      ]
-     },
-     "maxNumber": 10
     }
    ],
    "note": "",
@@ -6569,17 +6505,6 @@
      "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
      "opts": {
       "ticks": "some"
-     }
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (taught earlier this year, wk W31)",
-     "opts": {
-      "op": "/",
-      "power": [
-       100
-      ],
-      "band": 1000
      }
     },
     {
@@ -6786,19 +6711,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "compare by place",
-     "opts": {
-      "decimals": 2,
-      "forms": [
-       0
-      ]
-     },
-     "maxNumber": 10
-    },
-    {
      "key": "measurement:money_notation",
-     "why": "$3.45 = 3 dollars 4 dimes 5 cents",
+     "why": "an amount written from coins with the point ($3.45 = 3 dollars and 45 cents)",
      "opts": {
       "currency": "usd"
      }
@@ -6844,7 +6758,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S7 Flexible partitioning of numbers to 1,000 (prior learning wk W33)",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
      "opts": {
       "band": 999,
       "rename": "more"
@@ -6852,7 +6766,7 @@
     },
     {
      "key": "placevalue:expand",
-     "why": "Y2.B1.S7 Flexibly partition numbers to 100 (prior learning wk W33)",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (lower grade, same idea)",
      "opts": {
       "band": 99
      }
@@ -6979,15 +6893,11 @@
    ],
    "pre": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "Y4.B9.S5 Compare decimals (taught the same school week, W32)",
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
      "opts": {
-      "decimals": 2,
-      "forms": [
-       0
-      ]
-     },
-     "maxNumber": 10
+      "ticks": "some"
+     }
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -7009,8 +6919,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "order shown on a line"
+     "key": "decimals:order_decimals",
+     "why": "ordering tenths first: the same routine with one decimal place",
+     "opts": {
+      "decimals": 1
+     },
+     "maxNumber": 10
     }
    ],
    "note": "decimals 2 and Max Number 10 hold the page to hundredths below 10.",
@@ -7356,7 +7270,7 @@
     },
     {
      "key": "number_sense:estimate_products",
-     "why": "Y3.B2.S20 Estimate answers (lower grade, same CCSS cluster)"
+     "why": "Y3.B2.S20 Estimate answers (lower grade, same CCSS cluster; nearest live practice: estimate_products is not tagged to Y3.B2.S20)"
     }
    ],
    "preBuild": [
@@ -7477,7 +7391,7 @@
     },
     {
      "key": "algebra:tape_diagram",
-     "why": "Y3.B2.S19 Complements to 100 (lower grade, same CCSS cluster)",
+     "why": "Y3.B2.S19 Complements to 100 (lower grade, same CCSS cluster; nearest live practice: tape_diagram is not tagged to Y3.B2.S19)",
      "opts": {
       "band": 50
      }
@@ -7514,7 +7428,7 @@
    "pre": [
     {
      "key": "measurement:time_sense",
-     "why": "Y3.B10.S6 Years, months and days (lower grade, same CCSS cluster)"
+     "why": "Y3.B10.S5 Use a.m. and p.m. (lower grade, same CCSS cluster; Y3.B10.S6 Years, months and days is time_calendar, this step's build)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -7598,7 +7512,7 @@
     },
     {
      "key": "measurement:time_fives_ring",
-     "why": "Y2.B9.S6 Minutes in an hour (prior learning wk W23)"
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (lower grade, same idea)"
     },
     {
      "key": "patterns:seq_5",
@@ -7664,7 +7578,7 @@
     },
     {
      "key": "measurement:clock_parts",
-     "why": "Y1.B14.S6 Tell the time to the half hour (lower grade, same CCSS cluster)"
+     "why": "the clock face: the numbers 1-12 in their places (the face every time step reads)"
     },
     {
      "key": "measurement:time_half_hour",
@@ -7796,7 +7710,7 @@
    "pre": [
     {
      "key": "measurement:clock_parts",
-     "why": "Y1.B14.S6 Tell the time to the half hour (lower grade, same CCSS cluster)"
+     "why": "the clock face: the numbers 1-12 in their places (the face every time step reads)"
     },
     {
      "key": "shapes_early:shape_positions",
@@ -7804,7 +7718,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     }
    ],
    "preBuild": [
@@ -7851,7 +7765,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same CCSS cluster)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     }
    ],
    "preBuild": [
@@ -7890,7 +7804,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     },
     {
      "key": "measurement:time_quarter",
@@ -7937,7 +7851,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y3.B11.S8 Draw polygons (lower grade, same CCSS cluster)"
+     "why": "Y4.B12.S6 Polygons (taught earlier this year, wk W27)"
     },
     {
      "key": "angles_lines:symmetry",
@@ -7984,7 +7898,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same CCSS cluster)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     }
    ],
    "preBuild": [],
@@ -8021,7 +7935,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (lower grade, same idea)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     },
     {
      "key": "shapes_early:shape_corners_count",
@@ -8172,7 +8086,7 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S3 Block diagrams (lower grade, same CCSS cluster)"
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (lower grade, same idea)"
     },
     {
      "key": "graphs:build_bar_graph",
@@ -8251,7 +8165,7 @@
     },
     {
      "key": "subtraction:sub_100_mixed",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (lower grade, same CCSS cluster)"
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (lower grade, same CCSS cluster; nearest live practice: sub_100_mixed is not tagged to Y2.B2.S18)"
     }
    ],
    "preBuild": [],
@@ -8395,7 +8309,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (prior learning wk W37)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     }
    ],
    "preBuild": [
@@ -8461,7 +8375,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S5 Horizontal and vertical (prior learning wk W38)"
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same CCSS cluster; Y3.B11.S5 Horizontal and vertical has no live skill)"
     }
    ],
    "preBuild": [],
@@ -9125,6 +9039,24 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "composite_whole_sides": {
+   "kind": "option",
+   "skill": "area_perimeter:composite_shapes",
+   "option": "sides \"whole numbers only\" (a T-shape's shoulders split evenly)",
+   "name": "Composite Shapes With Whole-Number Sides (option)",
+   "teaches": "find the perimeter of an L-, T- or U-shape whose side lengths are all whole numbers",
+   "representation": "the existing composite-shape cell; only the dealing changes",
+   "family": "measurement",
+   "ccss": [
+    "3.MD.D.8"
+   ],
+   "why": "generated composite_shapes {forms:[0]}: T-shapes label sides 2.5 and 3.5 (half the difference of the two widths), decimals the pupil meets in W29",
+   "steps": [
+    "Y4.B6.S5",
+    "Y4.B6.S7"
+   ],
+   "reused": false
   },
   "missing_lengths": {
    "kind": "new",
@@ -10902,6 +10834,7 @@
    "key": "area_perimeter:composite_shapes",
    "step": "Y4.B6.S5",
    "action": "add",
+   "partial": "perimeter of L-, T- and U-shapes with the lengths given, but some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)",
    "why": "missing tag: L/T/U perimeters with lengths given",
    "opts": {
     "forms": [
@@ -10910,16 +10843,10 @@
    }
   },
   {
-   "key": "area_perimeter:perimeter_grid",
-   "step": "Y4.B6.S5",
-   "action": "full",
-   "why": "re-tag as FULL (L-shapes on a grid)"
-  },
-  {
    "key": "area_perimeter:composite_shapes",
    "step": "Y4.B6.S7",
    "action": "add",
-   "partial": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first",
+   "partial": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first; some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)",
    "why": "missing tag (direct); perimeter_grid stays partial",
    "opts": {
     "forms": [
