@@ -318,6 +318,570 @@
    ],
    "note": "The US customary units our skills teach are the imperial units WRM names (except stone and the UK pint), so the within-system half is covered; the approximate cross-system half is not."
   },
+  "Y6.B6.S1": {
+   "title": "Add or multiply",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_comparison",
+     "missing": "multiplicative relationships only (\"3 times as many\"); never contrasts them with an additive one (\"3 more than\") or asks the pupil to decide which"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising whether two sets of values are related additively (+ 3) or multiplicatively (× 3) and choosing the operation",
+   "build": [
+    "add_or_mult"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 / Y3.B3.S1 Add equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "Y3.B4.S10 Scaling (prior learning wk W19), no pictures"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W19)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y4.B7.S6-S7 improper fractions (prior learning wk W19)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "additive relationships: \"what do I add?\""
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "5.NF.B.5 multiplication as scaling (same CCSS)"
+    },
+    {
+     "key": "algebra:function_table_easy",
+     "why": "a table of In/Out values with a + or × rule"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "the multiplicative relationship in a ratio table (next steps)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed_plain",
+     "why": "choosing the operation in a story"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S2": {
+   "title": "Use ratio language",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:ratio_intro",
+     "missing": "writes ratios with the colon from two counts in a sentence, with no picture and no \"for every … there are …\" sentence; this step teaches the language before the symbol"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "describing a ratio in words from a picture or array: \"for every 2 red there are 3 blue\", \"there are twice as many\", before the : symbol is met",
+   "build": [
+    "ratio_language"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "Y5.B3.S4 Common factors (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "Y6.B6.S1 Add or multiply (previous step; its skill is still to build)"
+    }
+   ],
+   "preBuild": [
+    "add_or_mult"
+   ],
+   "related": [
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "equivalent ratios (later in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "the part-of-the-whole view"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "groups of a repeating pattern"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S3": {
+   "title": "Introduction to the ratio symbol",
+   "direct": [
+    {
+     "key": "conversions:ratio_intro",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:ratio_intro",
+     "why": "Y6.B6.S2 Use ratio language (previous step; variant \"Write the ratio\")"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "Y5.B3.S4 Common factors (prior learning wk W33), for simplest form"
+    }
+   ],
+   "preBuild": [
+    "ratio_language"
+   ],
+   "related": [
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "the next use of the symbol: 2 : 3 = 4 : 6"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "ratios in a table"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "part of the whole, the next step"
+    }
+   ],
+   "note": "Full with ratio_intro variant \"Write the ratio (apples to oranges)\": order matters, a : b, and simplest form. Its items have no picture; the WRM lesson starts from objects, so a teacher of ELL pupils pairs it with the ratio_language proposal page."
+  },
+  "Y6.B6.S4": {
+   "title": "Ratio and fractions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:ratio_intro",
+     "missing": "its partWhole variant writes a part-to-whole ratio (3 : 8) but never as a fraction of the whole (3/8) or back again"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "linking a ratio to the fractions of the whole (3 : 2 means 3/5 and 2/5) and back, with a bar model",
+   "build": [
+    "ratio_fraction"
+   ],
+   "pre": [
+    {
+     "key": "conversions:ratio_intro",
+     "why": "Y6.B6.S3 Introduction to the ratio symbol (previous step)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W34)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S6 Find the whole (prior learning wk W34)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:equivalent",
+     "why": "equivalent fractions of the same ratio"
+    },
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "equivalent ratios"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "the bar model"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "naming the shaded part"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S5": {
+   "title": "Scale drawing",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and making scale drawings (1 cm represents 2 m): from drawing to real length and back",
+   "build": [
+    "scale"
+   ],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "cm and m in the key"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "1 cm : 2 m scaled in a table"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:double_num_line",
+     "why": "drawing length | real length on two scales"
+    },
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "1 : 200 as an equivalent ratio"
+    },
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "multiplication as scaling"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S6": {
+   "title": "Use scale factors",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:mult_scaling",
+     "missing": "compares a product with a factor (× 3 makes it bigger); never enlarges a shape or finds the scale factor between two lengths"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "enlarging a shape by a scale factor on squared paper and finding the scale factor from two corresponding sides",
+   "build": [
+    "scale"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 / Y3.B3.S1 Add equal groups (prior learning wk W19)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W19)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "side lengths of a rectangle"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "Y3.B4.S10 Scaling, no pictures"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:mult_scaling_nv",
+     "why": "scaling without pictures"
+    },
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "corresponding sides as a ratio"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "plotting enlarged vertices"
+    }
+   ],
+   "note": "mult_scaling is the existing partial tag; it shares the word \"scaling\" and 5.NF.B.5 but teaches comparing size, so it stays partial."
+  },
+  "Y6.B6.S7": {
+   "title": "Similar shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "recognising similar shapes and finding a missing side from the scale factor",
+   "build": [
+    "scale"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:mult_scaling",
+     "why": "Y6.B6.S6 Use scale factors (previous step; partial)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "sides in the same ratio"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "short side : long side table"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S8": {
+   "title": "Ratio problems",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:equiv_ratios",
+     "missing": "\"find the missing value\" (5 : 9 = __ : 54) covers one-part-known problems as bare ratios; no story and no sharing a total in a ratio"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "missing": "missing value in a ratio table only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ratio problems in context, including sharing a total in a given ratio (share 40 in the ratio 3 : 5) with a bar model",
+   "build": [
+    "ratio_problems"
+   ],
+   "pre": [
+    {
+     "key": "conversions:ratio_intro",
+     "why": "Y6.B6.S3 the ratio symbol"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y6.B6.S4 ratio and fractions / Y5.B6.S4 fraction of a quantity"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar models for sharing"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning)"
+    }
+   ],
+   "preBuild": [
+    "ratio_fraction"
+   ],
+   "related": [
+    {
+     "key": "conversions:double_num_line",
+     "why": "another model for the same problem"
+    },
+    {
+     "key": "conversions:unit_rate_intro",
+     "why": "the value of one part"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "find the whole from a part"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S9": {
+   "title": "Proportion problems",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:double_num_line",
+     "missing": "solves a proportion from a drawn double number line, never from a story alone"
+    },
+    {
+     "key": "conversions:unit_rate_intro",
+     "missing": "finds the value of one only; does not go on to scale to a new amount"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "missing": "missing value in a given table"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "two-step proportion stories with no drawing given (3 pens cost $75, how much do 5 cost?): find one, then scale; the pupil chooses the model",
+   "build": [
+    "ratio_problems"
+   ],
+   "pre": [
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W35)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts (prior learning wk W35)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W35)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning)"
+    },
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "Y6.B6.S8 Ratio problems (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_mult_word",
+     "why": "scaling by a fraction in a story"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "unit prices with decimals"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "unit conversion is a proportion"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B6.S10": {
+   "title": "Recipes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:ratio_tables",
+     "missing": "scales one pair in a table; never a recipe with several ingredients scaled up or down, nor scaling by a non-integer factor (serves 4 → serves 6)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recipes: scaling a list of ingredients up or down for a new number of people",
+   "build": [
+    "ratio_problems"
+   ],
+   "pre": [
+    {
+     "key": "conversions:double_num_line",
+     "why": "Y6.B6.S9 Proportion problems (previous step)"
+    },
+    {
+     "key": "conversions:unit_rate_intro",
+     "why": "the amount for one person"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling / Y5.B5.S11 multiplication problems (prior learning)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning)"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "scaling by 1½"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "each ingredient keeps its ratio"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "recipe amounts in g and ml"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "amounts that become decimals"
+    }
+   ],
+   "note": ""
+  },
   "Y6.B10.S1": {
    "title": "Shapes - same area",
    "direct": [],
@@ -1756,6 +2320,24 @@
   }
  },
  "proposals": {
+  "add_or_mult": {
+   "kind": "new",
+   "skill": "algebra:add_or_multiply",
+   "name": "Add or Multiply?",
+   "teaches": "recognising additive and multiplicative relationships between two quantities",
+   "representation": "two sets of values in a table; tick \"add 3\" or \"multiply by 3\"",
+   "family": "operations",
+   "steps": [
+    "Y6.B6.S1",
+    "Y6.B6.S2"
+   ],
+   "ccss": [
+    "4.OA.A.2",
+    "5.NF.B.5"
+   ],
+   "why": "no skill contrasts additive with multiplicative relationships",
+   "reused": true
+  },
   "angle_rules": {
    "kind": "new",
    "skill": "angles_lines:angle_rules",
@@ -2073,6 +2655,60 @@
    "why": "measure_angles is multiple choice over multiples of 30/45; WRM measures any angle to the nearest degree with a protractor.",
    "reused": true
   },
+  "ratio_fraction": {
+   "kind": "option",
+   "skill": "conversions:ratio_intro",
+   "name": "Ratio and Fractions (option)",
+   "teaches": "linking ratio and fractions (3 : 2 means 3/5 of the whole) with a bar model",
+   "representation": "the partWhole variant plus a bar model support",
+   "family": "decimals",
+   "option": "ratio and fractions",
+   "steps": [
+    "Y6.B6.S4",
+    "Y6.B6.S8"
+   ],
+   "ccss": [
+    "6.RP.A.1"
+   ],
+   "why": "ratio_intro never turns a ratio into fractions of the whole",
+   "reused": true
+  },
+  "ratio_language": {
+   "kind": "option",
+   "skill": "conversions:ratio_intro",
+   "name": "Ratio Language (option)",
+   "teaches": "describing a ratio in words from a picture: \"for every 2 red counters there are 3 blue counters\", including the reverse sentence",
+   "representation": "a boxed cell with a row of line-drawn counters (filled and open circles, no colour) and the sentence frame \"For every [ ] ___ there are [ ] ___\"; word bank for the object names; numbers only to write",
+   "family": "ratio",
+   "steps": [
+    "Y6.B6.S2",
+    "Y6.B6.S3"
+   ],
+   "ccss": [
+    "6.RP.A.1"
+   ],
+   "why": "WRM teaches ratio language before the colon; ratio_intro starts at the colon",
+   "reused": false,
+   "option": "variant \"for every … there are …\" from a picture (no colon)"
+  },
+  "ratio_problems": {
+   "kind": "new",
+   "skill": "conversions:ratio_problems_bar",
+   "name": "Ratio and Proportion Problems",
+   "teaches": "ratio, proportion and recipe problems solved with a bar model or ratio table",
+   "representation": "a bar model / ratio table beside a short story; write the missing amount",
+   "family": "ratio",
+   "steps": [
+    "Y6.B6.S8",
+    "Y6.B6.S9",
+    "Y6.B6.S10"
+   ],
+   "ccss": [
+    "6.RP.A.3"
+   ],
+   "why": "sharing in a ratio, two-step proportion stories and recipes are dealt by no skill",
+   "reused": true
+  },
   "reflect_grid": {
    "kind": "new",
    "skill": "coordinates:reflect_on_grid",
@@ -2121,6 +2757,25 @@
     "3.MD.D.8"
    ],
    "why": "No skill compares several shapes with equal area and different perimeters (or the reverse); area_perimeter does one rectangle at a time.",
+   "reused": true
+  },
+  "scale": {
+   "kind": "new",
+   "skill": "conversions:scale_drawing",
+   "name": "Scale Drawing and Scale Factors",
+   "teaches": "enlarging shapes by a scale factor, scale drawings and similar shapes (find the missing side)",
+   "representation": "shapes on squared paper with one side of the image given; write the scale factor or the missing side",
+   "family": "ratio",
+   "steps": [
+    "Y6.B6.S5",
+    "Y6.B6.S6",
+    "Y6.B6.S7"
+   ],
+   "ccss": [
+    "6.RP.A.3",
+    "5.NF.B.5"
+   ],
+   "why": "no skill enlarges a shape, reads a scale drawing or compares similar shapes",
    "reused": true
   },
   "translate_grid": {
@@ -2253,6 +2908,48 @@
    "step": "Y6.B5.S5",
    "action": "partial",
    "why": "within-system imperial length only"
+  },
+  {
+   "key": "conversions:equiv_ratios",
+   "step": "Y6.B6.S3",
+   "action": "remove",
+   "why": "equivalent ratios are not this step (the colon itself); it belongs to Y6.B6.S8 Ratio problems"
+  },
+  {
+   "key": "conversions:equiv_ratios",
+   "step": "Y6.B6.S8",
+   "action": "partial",
+   "why": "bare missing-value ratios only; no story, no sharing a total"
+  },
+  {
+   "key": "conversions:ratio_tables",
+   "step": "Y6.B6.S8",
+   "action": "partial",
+   "why": "missing value in a table only"
+  },
+  {
+   "key": "conversions:ratio_intro",
+   "step": "Y6.B6.S2",
+   "action": "partial",
+   "why": "colon form only; the step is ratio language from a picture"
+  },
+  {
+   "key": "conversions:unit_rate_intro",
+   "step": "Y6.B6.S9",
+   "action": "partial",
+   "why": "finds one; never scales on to the asked amount"
+  },
+  {
+   "key": "conversions:double_num_line",
+   "step": "Y6.B6.S9",
+   "action": "partial",
+   "why": "proportion from a given drawing only"
+  },
+  {
+   "key": "multiplication:mult_comparison",
+   "step": "Y6.B6.S1",
+   "action": "add",
+   "why": "partial cover: multiplicative side only"
   }
  ]
 }
