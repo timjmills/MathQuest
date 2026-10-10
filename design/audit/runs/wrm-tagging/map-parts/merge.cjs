@@ -43,6 +43,8 @@ rows.forEach((r, i) => {
     if (!STRANDS.has(r.strand)) errs.push(`${at}: bad strand ${r.strand}`);
     if ((r.status === 'partial' || r.status === 'missing') && !r.proposal) errs.push(`${at}: ${r.status} without proposal`);
     if (r.proposal && !proposals[r.proposal]) errs.push(`${at}: unknown proposal ${r.proposal}`);
+    // Owner 2026-10-10: every gap is written as the skill that fills it, and the row says what that skill adds.
+    if ((r.status === 'partial' || r.status === 'missing') && !(r.closes && r.closes.length > 20)) errs.push(`${at}: gap row without "closes" (what the proposed skill adds)`);
     for (const k of r.skills || []) if (!live(k)) errs.push(`${at}: skill ${k} not a live skill key`);
 });
 const used = new Set(rows.map(r => r.proposal).filter(Boolean));
@@ -50,6 +52,12 @@ for (const [id, p] of Object.entries(proposals)) {
     if (!used.has(id)) errs.push(`proposal ${id} not used by any row`);
     for (const k of (p.reused ? ['name'] : ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'map'])) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);
     if (p.kind === 'option' && !p.option) errs.push(`proposal ${id}: option without option`);
+    if (!p.reused) {   // a new proposal is a whole imagined skill, not a one-liner
+        if (!Array.isArray(p.problemTypes) || p.problemTypes.length < 2) errs.push(`proposal ${id}: needs problemTypes (2-4 item forms)`);
+        if (!Array.isArray(p.levels) || p.levels.length < 2) errs.push(`proposal ${id}: needs levels (the one-change ladder)`);
+        if (!p.example || !p.example.item || p.example.answer === undefined) errs.push(`proposal ${id}: needs example {item, answer}`);
+        if (!Array.isArray(p.misconceptions) || p.misconceptions.length < 1) errs.push(`proposal ${id}: needs misconceptions`);
+    }
 }
 // Re-grades are not builds: every exists-regrade row's skills go to one list the Wave 5 lanes work from.
 const regrades = {};
