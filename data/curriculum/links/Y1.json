@@ -4126,6 +4126,561 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B6.S1": {
+   "title": "Count from 20 to 50",
+   "direct": [
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1
+     }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W08)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W08)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "consolidate"
+   ],
+   "related": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "next step: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "next step: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "same CCSS 1.NBT.A.1 in Y1.B6.S6 The number line to 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S2": {
+   "title": "20, 30, 40 and 50",
+   "direct": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "patterns:seq_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W08)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W08)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y1.B6.S1 Count from 20 to 50 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "consolidate"
+   ],
+   "related": [
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS 1.NBT.B.2 in Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS 1.NBT.B.2 in Y1.B6.S5 Partition into tens and ones"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S3": {
+   "title": "Count by making groups of tens",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "opts": {
+      "band": 50
+     },
+     "missing": "counting a large set by making groups of ten"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "grouping a loose set into tens to count it",
+   "build": [
+    "tens_ones_group"
+   ],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W22)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B6.S2 20, 30, 40 and 50 (the step before in this block)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y1.B6.S1 Count from 20 to 50 (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:base10_build",
+     "why": "next step: Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S5 Partition into tens and ones"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "same CCSS 1.NBT.A.1 in Y1.B6.S6 The number line to 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S4": {
+   "title": "Groups of tens and ones",
+   "direct": [
+    {
+     "key": "composing:base10_build",
+     "opts": {
+      "band": 50
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W22)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S3 Count by making groups of tens (the step before in this block)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B6.S2 20, 30, 40 and 50 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "next step: Y1.B6.S5 Partition into tens and ones"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S5": {
+   "title": "Partition into tens and ones",
+   "direct": [
+    {
+     "key": "composing:base10_build",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W23)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S3 Count by making groups of tens (the step before in this block)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B6.S2 20, 30, 40 and 50 (same CCSS 1.NBT.B.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "next step: Y1.B6.S6 The number line to 50"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S6": {
+   "title": "The number line to 50",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "opts": {},
+     "missing": "a whole 0-50 line counted in tens then ones (the skill shows one ten to the next)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the 0-50 line",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W08)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W08)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W08)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B6.S5 Partition into tens and ones (the step before in this block)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B6.S5 Partition into tens and ones (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "consolidate",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S7": {
+   "title": "Estimate on a number line to 50",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "opts": {},
+     "missing": "estimating on a line with only the ends marked"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "estimating on a 0-50 line",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W09)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W09)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W09)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B6.S5 Partition into tens and ones (the step before in this block)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B6.S5 Partition into tens and ones (the step before in this block)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S3 Count by making groups of tens (same CCSS 1.NBT.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "consolidate",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "next step: Y1.B6.S8 1 more, 1 less"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B6.S8": {
+   "title": "1 more, 1 less",
+   "direct": [
+    {
+     "key": "placevalue:more_less_10",
+     "opts": {
+      "step": 1,
+      "band": 50
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W09)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W09)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W09)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "same block: Y1.B6.S1 Count from 20 to 50"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B6.S2 20, 30, 40 and 50"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -4249,9 +4804,12 @@
     "Y1.B1.S15",
     "Y1.B4.S8",
     "Y1.B4.S9",
-    "Y1.B4.S10"
+    "Y1.B4.S10",
+    "Y1.B6.S6",
+    "Y1.B6.S7"
    ],
    "ccss": [
+    "1.NBT.A.1",
     "K.CC.A.2",
     "K.CC.A.3"
    ],
@@ -4475,6 +5033,23 @@
    "ccss": [
     "1.OA.C.5",
     "K.OA.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "tens_ones_group": {
+   "kind": "new",
+   "skill": "composing:count_in_tens_groups",
+   "name": "Count by Making Tens",
+   "teaches": "counting a large set by circling groups of ten, then counting tens and ones",
+   "representation": "a scattered set of 20-50 objects; circle tens, write ___ tens ___ ones = ___",
+   "family": "counting",
+   "steps": [
+    "Y1.B6.S3"
+   ],
+   "ccss": [
+    "1.NBT.A.1",
+    "K.NBT.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
