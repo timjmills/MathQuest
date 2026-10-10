@@ -3462,15 +3462,17 @@
    "strand": "Measurement",
    "ritBand": "215-230",
    "source": "strand-walk",
-   "status": "exists-ok",
+   "status": "partial",
    "skills": [
     "area_perimeter:area_triangle"
    ],
-   "note": "b×h÷2 number entry",
+   "note": "b×h÷2 number entry; no live skill deals parallelogram area (area_triangle triangles only)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "6+ chart: area items; 2-5 chart tops out at area of figure (Gr6 edge)"
-   }
+   },
+   "proposal": "parallelogram",
+   "closes": "parallelogram adds base × perpendicular height for parallelograms; area_triangle deals triangles only."
   },
   {
    "task": "Name 2-D shapes",
@@ -4062,12 +4064,15 @@
    "skills": [
     "measurement:heavier_lighter_visual"
    ],
-   "proposal": "map_heavier_lighter_bw",
+   "proposal": "vis_migrate_measures",
    "note": "--dist 200: 200/200 answers are emoji (🍃 40, 🚛 37 ...) - colour glyphs, no B&W line art, no balance scale; merged the duplicate 'Heavier / lighter (K)' row here (mass_scales does not touch K heavier/lighter)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D strand: 'measurement and estimation of ... masses of objects'"
-   }
+   },
+   "also": [
+    "map_heavier_lighter_bw"
+   ]
   },
   {
    "task": "Choose ALL measurements equal to a time (5 h = 300 min = 18,000 s)",
@@ -7038,6 +7043,10 @@
    "misconceptions": [
     "reads the end mark as the length",
     "counts tick marks instead of spaces"
+   ],
+   "after": [
+    "vis_migrate_measures",
+    "ruler_cm"
    ]
   },
   "map_shape_partition_pick": {
@@ -7046,7 +7055,7 @@
    "option": "form \"choose ALL\": 4-6 shapes, some cut unequally; choose ALL in equal halves/thirds/fourths, or ALL showing a named unit fraction shaded",
    "name": "Equal Parts of Shapes (option)",
    "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
-   "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
+   "representation": "print: B&W boxed Andika cell, 4-6 outline shapes with check boxes, shaded parts in the single grey; screen: select all that apply",
    "family": "geometry",
    "ccss": [
     "1.G.A.3",
@@ -8143,10 +8152,10 @@
   "map_heavier_lighter_bw": {
    "kind": "option",
    "skill": "measurement:heavier_lighter_visual",
-   "option": "look \"bw\": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label",
-   "name": "Heavier or Lighter, B&W pictures (option)",
-   "teaches": "comparing the mass of two objects by experience and on a pan balance",
-   "representation": "print: B&W boxed cell, two line-art objects or a pan-balance drawing, pupil writes the label from a bank ('heavier'/'lighter') or circles the object; screen: click the object (hot spot)",
+   "option": "form \"order three\": three B&W objects; number them 1-3 lightest to heaviest",
+   "name": "Order Three by Mass (option)",
+   "teaches": "ordering three objects by mass",
+   "representation": "print: B&W boxed Andika cell (the default look after vis_migrate_measures), three line-art objects with number slots; screen: drag into order (production)",
    "family": "measurement",
    "ccss": [
     "K.MD.A.2"
@@ -8158,24 +8167,23 @@
      "taskType": "select an object"
     }
    ],
-   "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw; the pan-balance form is WRM balance ('Balanced or Not?'), not repeated here",
+   "why": "heavier_lighter_visual compares two objects only; B&W is the default via vis_migrate_measures, so this option adds only the ordering of three",
    "reused": false,
    "problemTypes": [
-    "which is heavier — two objects — circle",
-    "order — three objects — number 1-3 lightest to heaviest"
+    "order three — three objects — write 1, 2, 3 under them / drag into order",
+    "heaviest and lightest — circle heaviest, cross lightest / click"
    ],
    "levels": [
-    "L1: everyday objects of very different mass (structural: picture stays)",
-    "L2: closer masses",
-    "L3: order three"
+    "L1: three very different masses (structural: number slots stay)",
+    "L2: closer masses; label 'lightest' arrow fades"
    ],
    "example": {
-    "item": "A pan balance has a book on the low side and a feather on the high side. The book is ____.",
-    "answer": "heavier"
+    "item": "Number from lightest (1) to heaviest (3): a feather, a book, a chair.",
+    "answer": "feather 1, book 2, chair 3"
    },
    "misconceptions": [
-    "thinks the higher side is heavier",
-    "thinks the bigger object is always heavier"
+    "orders by size, not mass",
+    "reverses the order (heaviest first)"
    ]
   },
   "map_volume_expressions": {
@@ -8263,7 +8271,7 @@
     "4.MD.A.2",
     "5.MD.A.1"
    ],
-   "why": "WRM time_convert (wrm.js) already plans the time option on unit_conversion_word; MAP adds the decimal/mixed-hours and choose-all clauses, so they join it instead of a duplicate",
+   "why": "WRM time_convert (wrm.js) already plans the time option on unit_conversion_word; MAP adds only the small → large decimal/mixed-hours clause (the choose-all form is map_conv_time_choose_all on unit_conversions)",
    "kind": "option",
    "skill": "measurement:unit_conversion_word",
    "option": "time",
@@ -8669,10 +8677,10 @@
   "map_graph_sentence_picto": {
    "kind": "option",
    "skill": "graphs:pictograph",
-   "option": "form \"which sentence is true?\": a picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
+   "option": "form \"which sentence is true?\": a picture graph (pictures in rows, a key) and 3 statements; tick the true one(s)",
    "name": "Which Sentence Matches the Picture Graph? (option)",
-   "teaches": "reading a graph and checking comparison statements against it",
-   "representation": "print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply",
+   "teaches": "reading a picture graph with a key and checking comparison statements against it",
+   "representation": "print: B&W boxed Andika cell, a B&W picture graph (line-art pictures in rows, key '1 picture = 2') on top, statements with check boxes below; screen: select all that apply",
    "family": "data",
    "ccss": [
     "2.MD.D.10",
@@ -8693,18 +8701,82 @@
     "fix — a false statement, write the right number"
    ],
    "levels": [
-    "L1: key 1, one true statement among 3 'most/least' sentences (structural: graph stays)",
-    "L2: 'how many more' statements",
-    "L3: scaled graph (key 2/5) and select ALL true"
+    "L1: key 2, one true statement among 3 'most/least' sentences (structural: graph and key stay; key 1 is pictograph_intro)",
+    "L2: key 5 and 'how many more' statements",
+    "L3: key 10 or 25 with half pictures, select ALL true"
    ],
    "example": {
-    "item": "Graph: Cats 6, Dogs 4, Fish 2. Which sentence is true? A 'Dogs got the most.' B '2 more chose cats than dogs.' C 'Fish got 4.'",
+    "item": "Key: 1 picture = 2 children. Apples 4 pictures, Pears 2 pictures. Which is true? A '4 children chose apples.' B '4 more children chose apples than pears.' C 'Pears got 6.'",
     "answer": "B"
    },
    "misconceptions": [
-    "reads the bar length in squares when the scale is 2",
-    "confuses 'more than' with the total"
+    "counts pictures and ignores the key",
+    "reads a half picture as a whole"
    ]
+  },
+  "vis_migrate_measures": {
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "why": "VISUAL_BUILDS vis_migrate_measures (build-list.js) already moves heavier_lighter_visual to a B&W pan balance",
+   "teaches": "redraws reading_ruler, heavier_lighter_visual (a pan balance, not emoji), mass_volume_liquid, temperature, measure_nonstandard and order_objects_length as B&W kit cells",
+   "representation": "measure-scale and balance kit templates",
+   "family": "measurement",
+   "lane": "measurement",
+   "kind": "migration",
+   "name": "Migrate Legacy Measure Visuals to B&W Kit Cells",
+   "build": "reading_ruler (cm with mm, offset start, decimal labels; inches kept as an option), heavier_lighter_visual (a pan balance, not emoji), mass_volume_liquid (dial and jug scales), temperature (createThermometerSVG → measure-scale with `orientation`, `min` / `max` / `every`, colour to a reading, below zero), measure_nonstandard, order_objects_length and compare_objects (one baseline) move onto measure-scale / balance",
+   "hosts": [
+    "measurement:reading_ruler",
+    "measurement:heavier_lighter_visual",
+    "measurement:mass_volume_liquid",
+    "measurement:temperature",
+    "shapes_early:measure_nonstandard",
+    "shapes_early:order_objects_length"
+   ],
+   "templates": [],
+   "newTemplates": [
+    "measure-scale",
+    "balance"
+   ],
+   "files": [
+    "js/modules/gen-measurement.js"
+   ],
+   "after": [],
+   "source": "VISUAL_BUILDS",
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "141-160",
+     "taskType": "heavier / lighter"
+    }
+   ],
+   "mapClause": "heavier_lighter_visual answer is a written label or a clicked object, never an emoji glyph, so the key prints",
+   "reused": true
+  },
+  "parallelogram": {
+   "ccss": [
+    "6.G.A.1"
+   ],
+   "why": "WRM parallelogram (wrm.js) already plans it",
+   "kind": "new",
+   "skill": "area_perimeter:area_parallelogram",
+   "name": "Area of a Parallelogram",
+   "teaches": "area of a parallelogram as base × perpendicular height, by cutting and moving a triangle",
+   "representation": "a parallelogram on squared paper with the height dashed; write the area",
+   "family": "measurement",
+   "steps": [
+    "Y6.B10.S6"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "221-230",
+     "taskType": "area of a parallelogram"
+    }
+   ],
+   "reused": true
   }
  },
  "regrades": {

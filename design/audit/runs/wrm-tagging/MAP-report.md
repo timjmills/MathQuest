@@ -24,7 +24,7 @@ estimate (flagged in the note).
 
 ## Counts
 
-261 rows; 114 proposals (40 new, 74 reused: WRM_PROPOSALS 40, STANDARD_PROPOSALS 28, VISUAL_BUILDS 6). 196 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
+261 rows; 116 proposals (40 new, 76 reused: WRM_PROPOSALS 41, STANDARD_PROPOSALS 28, VISUAL_BUILDS 7). 196 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
 
 | Strand | rows | exists-ok | exists-regrade | partial | missing |
 |---|---|---|---|---|---|
@@ -32,18 +32,18 @@ estimate (flagged in the note).
 | Operations & algebra | 38 | 18 | 7 | 10 | 3 |
 | Multiplication & division | 37 | 20 | 8 | 7 | 2 |
 | Fractions & decimals | 53 | 29 | 6 | 11 | 7 |
-| Measurement | 46 | 17 | 2 | 16 | 11 |
+| Measurement | 46 | 16 | 2 | 17 | 11 |
 | Geometry | 36 | 16 | 3 | 8 | 9 |
 | Data & graphing | 17 | 6 | 1 | 4 | 6 |
-| **All** | 261 | 123 | 30 | 66 | 42 |
+| **All** | 261 | 122 | 30 | 67 | 42 |
 
 | Source | rows | exists-ok | exists-regrade | partial | missing |
 |---|---|---|---|---|---|
 | 6.2 | 29 | 2 | 13 | 12 | 2 |
-| strand-walk | 206 | 114 | 15 | 39 | 38 |
+| strand-walk | 206 | 113 | 15 | 40 | 38 |
 | 6.4 | 26 | 7 | 2 | 15 | 2 |
 
-Proposals by kind: option 70, new 38, band 1, repair 2, template 3 (= 114).
+Proposals by kind: option 70, new 39, band 1, repair 2, template 3, migration 1 (= 116).
 
 ## The Wave 6.2 table, re-verified against the code today
 
@@ -100,7 +100,7 @@ Proposals by kind: option 70, new 38, band 1, repair 2, template 3 (= 114).
 
 | Task | RIT | Status | Skill to make | What it adds |
 |---|---|---|---|---|
-| Change-unknown word problems (had 5, got some, now 12) | 181-190 | partial | `map_change_unknown_story` How Many Were Added? (change unknown) (new)<br>+ `vis_story_strip` First – Then – Now Story Strip (reused) | map_change_unknown_story adds past-tense join/separate change-unknown stories with 2-digit numbers (the MAP 181-190 item) on add_word_problems / sub_word_problems. (The within-10 First–Then–Now picture strip with unknown "change" is VISUAL_BUILDS vis_story_strip, a merge-tool kind the part cannot carry; the lead should link it.) |
+| Change-unknown word problems (had 5, got some, now 12) | 181-190 | partial | `map_change_unknown_story` How Many Were Added? (change unknown) (new)<br>+ `vis_story_strip` First – Then – Now Story Strip (reused) | map_change_unknown_story adds past-tense join/separate change-unknown stories with 2-digit numbers (the MAP 181-190 item) on add_word_problems / sub_word_problems; vis_story_strip (in also) adds the within-10 First–Then–Now picture strip with unknown "change". |
 | Compare problems with bigger or smaller unknown | 181-200 | partial | `map_compare_smaller_unknown` Compare Stories: Smaller Unknown (new)<br>+ `vis_bar_family` The Bar-Model Family (every WRM bar) (reused) | Adds the smaller-unknown compare story ("Tom has 6 fewer than Maya; how many does Tom have?"); bigger-unknown is dealt by add_word_problems. Its two-bar comparison drawing is the bar-model template of vis_bar_family (comparison bars). |
 | Part-whole (put together / take apart, both addends unknown) | 151-160 | partial | `systematic_bonds` Number Bonds in Order (reused) | bonds_in_order adds listing every bond of a number systematically (both parts unknown, 0+5, 1+4 …); number_bonds always gives one part. |
 | Meaning of the equal sign (true/false equations) | 201-220 | missing | `equal_sign_repair` True or False Equations (repair) (reused) | equal_sign_repair routes equal_sign to its own generator and adds true/false forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5; today it deals column addition. |
@@ -166,7 +166,8 @@ Proposals by kind: option 70, new 38, band 1, repair 2, template 3 (= 114).
 | Area and perimeter together; same area different perimeter | 195-210 | partial | `same_area` Same Area, Different Perimeter (reused) | same_area adds same area / different perimeter comparisons. |
 | Missing side given perimeter / area | 195-210 | partial | `missing_lengths` Missing Lengths in Rectilinear Shapes (reused) | missing_lengths adds missing sides of rectilinear shapes; live covers rectangles only. |
 | Volume with fractional edges | 215-230 | missing | `volume_fractional` Volume With Fractional Edges (option) (reused) | volume_fractional adds 1/2- and 1/4-unit edges and packing with unit-fraction cubes. |
-| Heavier / lighter with B&W objects (emoji answer breaks print) | 141-160 | exists-regrade | `map_heavier_lighter_bw` Heavier or Lighter, B&W pictures (option) (new) |  |
+| Area of a triangle / parallelogram (Gr 6 edge of MAP 2-5) | 215-230 | partial | `parallelogram` Area of a Parallelogram (reused) | parallelogram adds base × perpendicular height for parallelograms; area_triangle deals triangles only. |
+| Heavier / lighter with B&W objects (emoji answer breaks print) | 141-160 | exists-regrade | `vis_migrate_measures` Migrate Legacy Measure Visuals to B&W Kit Cells (reused)<br>+ `map_heavier_lighter_bw` Order Three by Mass (option) (new) |  |
 | Choose ALL measurements equal to a time (5 h = 300 min = 18,000 s) | 211-220 | partial | `map_conv_time_choose_all` Time in Measurement Conversions (option) (new) | map_conv_time_choose_all adds time units to unit_conversions so its live click-every-equal form asks 'equal to 5 hours'. |
 | Choose ALL expressions that give the volume of a prism | 221-230 | missing | `map_volume_expressions` Volume Expressions (option) (new) | Adds choose ALL expressions (l×w×h, B×h, layers) for one prism. |
 | Show the change from $1 (drag coins) | 171-190 | partial | `map_money_build` Show the Change with Coins (option) (new) | map_money_build adds showing the change with coins; money_change gives it as a number. |
@@ -311,7 +312,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Teaches:** Order a set that mixes whole numbers and decimals with different numbers of places
 - **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the numbers in a row of boxes, pupil writes them in order in an empty box row under a least → greatest arrow. Screen: drag tiles into the ordered slots (production, never MC).
 - **Problem types:** Order 3 — three numbers, one whole (7) — write in order / drag tiles; Order 4–5 — mixed whole and 1-2 place decimals — write in order / drag tiles; Greatest or least — pick from a mixed set — ring it / click it
-- **Levels:** L1: 3 numbers, a whole and decimals with the same whole part (7, 7.4, 6.9); place-value header over each number (structural, stays); 7 written as 7.0 in grey (hint) → L2: the 7.0 grey hint fades: 7 shown bare → L3: 4–5 numbers with different digit counts (0.9, 6.85, 7, 7.1) → L4: greatest → least direction
+- **Levels:** L1: 3 numbers, a whole and decimals with the same whole part (7, 7.4, 7.25); place-value header over each number (structural, stays); 7 written as 7.0 in grey (hint) → L2: the 7.0 grey hint fades: 7 shown bare → L3: 4–5 numbers with different digit counts (0.9, 6.85, 7, 7.1) → L4: greatest → least direction
 - **Example:** Write in order, least to greatest: 7.1, 6.85, 7, 0.9 → **0.9, 6.85, 7, 7.1**
 - **Misconceptions:** A whole number has no tenths so it goes first or last; Longer number is bigger (6.85 > 7.1)
 - **MAP:** Number & place value 211-220 (drag to order)
@@ -583,8 +584,8 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Builds:** option on `division:divide`: divisor "multiple of 10" (3-digit ÷ tens, basic fact × 10) (family division; CCSS 4.NBT.B.6)
 - **Teaches:** Dividing by 10s using the basic fact (360 ÷ 40 = 36 ÷ 4), quotient a whole number
 - **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the basic fact printed above in grey support row (36 ÷ 4 = 9), then the target 360 ÷ 40 = ___ ; pupil writes the quotient. Screen: number box (production)
-- **Problem types:** divide by tens — 360 ÷ 40 — write 9 (fact 36 ÷ 4); tens ÷ ones — 360 ÷ 4 — write 90; find the fact — 2,400 ÷ 60 — write the fact and 40
-- **Levels:** L1: dividend ÷ one-digit with tens (360 ÷ 4), fact row printed (hint, fades) → L2: tens ÷ tens (360 ÷ 40), fact row printed → L3: no fact row → L4: hundreds ÷ tens (2,400 ÷ 60)
+- **Problem types:** tens ÷ tens — 360 ÷ 40 — write 9 (fact 36 ÷ 4); hundreds ÷ tens — 2,400 ÷ 60 — write 40 (fact 24 ÷ 6); find the fact — 420 ÷ 70 — write the fact 42 ÷ 7 and 6
+- **Levels:** L1: tens ÷ tens (360 ÷ 40) with the fact row printed (hint, fades) → L2: tens ÷ tens, no fact row → L3: hundreds ÷ tens (2,400 ÷ 60) with the fact row → L4: hundreds ÷ tens, no fact row
 - **Example:** Work out 420 ÷ 70. → **6**
 - **Misconceptions:** keeps the zero (420 ÷ 70 = 60); cancels unequal zeros; divides 42 by 70
 - **MAP:** Multiplication & division 201-210 (number entry)
@@ -725,7 +726,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 
 - **Builds:** option on `shapes_early:partition_shapes`: form "choose ALL": 4-6 shapes, some cut unequally; choose ALL in equal halves/thirds/fourths, or ALL showing a named unit fraction shaded (family geometry; CCSS 1.G.A.3, 2.G.A.3)
 - **Teaches:** equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share
-- **Looks like:** print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form
+- **Looks like:** print: B&W boxed Andika cell, 4-6 outline shapes with check boxes, shaded parts in the single grey; screen: select all that apply
 - **Problem types:** choose all equal — 'Choose ALL shapes cut into equal fourths' — tick / select all; choose all shaded — 'Choose ALL shapes with 1/3 shaded' — tick / select all; name then choose — write the fraction under each shape, then tick the ones equal to 1/2
 - **Levels:** L1: halves only, 4 shapes, unequal ones clearly unequal (structural: outline shapes and check boxes stay; hint: 'same size?' cue fades) → L2: fourths → L3: thirds → L4: choose ALL showing a named unit fraction shaded
 - **Example:** Tick every shape cut into equal quarters. → **the square cut by two lines through its centre and the rectangle cut into 4 equal strips (not the circle cut into 4 unequal slices)**
@@ -734,18 +735,18 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Fills:** Choose ALL the shapes that show one-third shaded; Partition shapes into equal shares
 - **Why:** partition_shapes asks fraction shaded / count parts only; MAP asks choose ALL shapes in equal shares and choose ALL shapes showing a named unit fraction. This option owns that choose-ALL form for 1/2, 1/3 and 1/4 (eighths dropped: the host is 'Halves/Thirds/Fourths') (no other proposal has it). Companions, not duplicated here: WRM fraction_parts (tick equal / not equal on one shape) and STANDARD partition_draw (draw the cuts).
 
-### `map_heavier_lighter_bw` — Heavier or Lighter, B&W pictures (option)
+### `map_heavier_lighter_bw` — Order Three by Mass (option)
 
-- **Builds:** option on `measurement:heavier_lighter_visual`: look "bw": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label (family measurement; CCSS K.MD.A.2)
-- **Teaches:** comparing the mass of two objects by experience and on a pan balance
-- **Looks like:** print: B&W boxed cell, two line-art objects or a pan-balance drawing, pupil writes the label from a bank ('heavier'/'lighter') or circles the object; screen: click the object (hot spot)
-- **Problem types:** which is heavier — two objects — circle; order — three objects — number 1-3 lightest to heaviest
-- **Levels:** L1: everyday objects of very different mass (structural: picture stays) → L2: closer masses → L3: order three
-- **Example:** A pan balance has a book on the low side and a feather on the high side. The book is ____. → **heavier**
-- **Misconceptions:** thinks the higher side is heavier; thinks the bigger object is always heavier
+- **Builds:** option on `measurement:heavier_lighter_visual`: form "order three": three B&W objects; number them 1-3 lightest to heaviest (family measurement; CCSS K.MD.A.2)
+- **Teaches:** ordering three objects by mass
+- **Looks like:** print: B&W boxed Andika cell (the default look after vis_migrate_measures), three line-art objects with number slots; screen: drag into order (production)
+- **Problem types:** order three — three objects — write 1, 2, 3 under them / drag into order; heaviest and lightest — circle heaviest, cross lightest / click
+- **Levels:** L1: three very different masses (structural: number slots stay) → L2: closer masses; label 'lightest' arrow fades
+- **Example:** Number from lightest (1) to heaviest (3): a feather, a book, a chair. → **feather 1, book 2, chair 3**
+- **Misconceptions:** orders by size, not mass; reverses the order (heaviest first)
 - **MAP:** Measurement 141-160 (select an object)
 - **Fills:** Heavier / lighter with B&W objects (emoji answer breaks print)
-- **Why:** 200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw; the pan-balance form is WRM balance ('Balanced or Not?'), not repeated here
+- **Why:** heavier_lighter_visual compares two objects only; B&W is the default via vis_migrate_measures, so this option adds only the ordering of three
 
 ### `map_volume_expressions` — Volume Expressions (option)
 
@@ -814,13 +815,13 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 
 ### `map_graph_sentence_picto` — Which Sentence Matches the Picture Graph? (option)
 
-- **Builds:** option on `graphs:pictograph`: form "which sentence is true?": a picture graph and 3 statements ("5 more chose cats than dogs"); tick the true one(s) (family data; CCSS 2.MD.D.10, 3.MD.B.3)
-- **Teaches:** reading a graph and checking comparison statements against it
-- **Looks like:** print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply
+- **Builds:** option on `graphs:pictograph`: form "which sentence is true?": a picture graph (pictures in rows, a key) and 3 statements; tick the true one(s) (family data; CCSS 2.MD.D.10, 3.MD.B.3)
+- **Teaches:** reading a picture graph with a key and checking comparison statements against it
+- **Looks like:** print: B&W boxed Andika cell, a B&W picture graph (line-art pictures in rows, key '1 picture = 2') on top, statements with check boxes below; screen: select all that apply
 - **Problem types:** which is true — tick the true statement(s); true or false — one statement, tick T/F; fix — a false statement, write the right number
-- **Levels:** L1: key 1, one true statement among 3 'most/least' sentences (structural: graph stays) → L2: 'how many more' statements → L3: scaled graph (key 2/5) and select ALL true
-- **Example:** Graph: Cats 6, Dogs 4, Fish 2. Which sentence is true? A 'Dogs got the most.' B '2 more chose cats than dogs.' C 'Fish got 4.' → **B**
-- **Misconceptions:** reads the bar length in squares when the scale is 2; confuses 'more than' with the total
+- **Levels:** L1: key 2, one true statement among 3 'most/least' sentences (structural: graph and key stay; key 1 is pictograph_intro) → L2: key 5 and 'how many more' statements → L3: key 10 or 25 with half pictures, select ALL true
+- **Example:** Key: 1 picture = 2 children. Apples 4 pictures, Pears 2 pictures. Which is true? A '4 children chose apples.' B '4 more children chose apples than pears.' C 'Pears got 6.' → **B**
+- **Misconceptions:** counts pictures and ignores the key; reads a half picture as a whole
 - **MAP:** Data & graphing 181-200 (multi-select statements)
 - **Fills:** Match: graph ↔ sentence (data)
 - **Why:** same option as map_graph_sentence, declared on Pictographs so each host's name covers its graph
@@ -929,7 +930,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `volume_fractional` | option | `area_perimeter:volume` (fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes) | Volume With Fractional Edges (option) | Measurement 215-230 — volume with fractional edges | STANDARD_PROPOSALS |
 | `draw_angles` | new | `angles_lines:draw_angles` | Draw Angles and Lines | Geometry 205-220 — draw an angle of N degrees | WRM_PROPOSALS |
 | `reflect_grid` | new | `coordinates:reflect_on_grid` | Reflect on a Grid | Geometry 211-230 — reflect on a grid | WRM_PROPOSALS |
-| `map_heavier_lighter_bw` | option | `measurement:heavier_lighter_visual` (look "bw": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label) | Heavier or Lighter, B&W pictures (option) | Measurement 141-160 — select an object | new |
+| `map_heavier_lighter_bw` | option | `measurement:heavier_lighter_visual` (form "order three": three B&W objects; number them 1-3 lightest to heaviest) | Order Three by Mass (option) | Measurement 141-160 — select an object | new |
 | `map_volume_expressions` | option | `area_perimeter:volume` (form "expressions": pick every expression that gives the volume (l×w×h, B×h, layers added)) | Volume Expressions (option) | Measurement 221-230 — multi-select | new |
 | `map_shape_attribute_sort` | new | `shapes_classify:attribute_sort_chart` | Sort Shapes by Two Attributes | Geometry 211-220 — drag into chart | new |
 | `time_convert` | option | `measurement:unit_conversion_word` (time) | Convert Units of Time (option) | Measurement 201-220 — number entry | WRM_PROPOSALS + MAP clause: small → large as h-and-min, decimal and mixed hours (90 min = 1 h 30 min = 1.5 h = 1 ½ h) |
@@ -943,7 +944,9 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `map_conv_time_choose_all` | option | `measurement:unit_conversions` (units "time" (h, min, s) for both forms, so form 1 'Click every equal measurement' can ask 'Choose ALL measurements equal to 5 hours') | Time in Measurement Conversions (option) | Measurement 211-220 — select all equivalent | new |
 | `partition_draw` | option | `shapes_early:partition_shapes` (task "draw the cuts": partition a shape into n equal-area parts and write the unit fraction of each part) | Cut Into Equal Areas (option) | Geometry 181-200 — partition a shape | STANDARD_PROPOSALS |
 | `money_uk` | option | `measurement:money_count` (notes and cents) | Count Money (option) | Measurement 171-190 — make an amount with coins | WRM_PROPOSALS |
-| `map_graph_sentence_picto` | option | `graphs:pictograph` (form "which sentence is true?": a picture graph and 3 statements ("5 more chose cats than dogs"); tick the true one(s)) | Which Sentence Matches the Picture Graph? (option) | Data & graphing 181-200 — multi-select statements | new |
+| `map_graph_sentence_picto` | option | `graphs:pictograph` (form "which sentence is true?": a picture graph (pictures in rows, a key) and 3 statements; tick the true one(s)) | Which Sentence Matches the Picture Graph? (option) | Data & graphing 181-200 — multi-select statements | new |
+| `vis_migrate_measures` | migration | `` | Migrate Legacy Measure Visuals to B&W Kit Cells | Measurement 141-160 — heavier / lighter | VISUAL_BUILDS + MAP clause: heavier_lighter_visual answer is a written label or a clicked object, never an emoji glyph, so the key prints |
+| `parallelogram` | new | `area_perimeter:area_parallelogram` | Area of a Parallelogram | Measurement 221-230 — area of a parallelogram | WRM_PROPOSALS |
 
 ## Bugs found on the way (not MAP gaps, but they break MAP practice)
 
@@ -952,7 +955,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - `measurement:heavier_lighter_visual` answers with emoji (200/200), which breaks black-and-white print (`map_heavier_lighter_bw`).
 - `order_of_operations:paren_simple` deals products near 1,400, far above MAP's small-number order-of-operations items.
 - `angles_lines:additive_angles` deals reflex parts such as 292° of 360°, beyond MAP grades 2–5.
-- `area_perimeter:volume_composite` ("composite" volume) deals single prisms only: 0 composite solids in 200 items (`map_volume_two_prisms`).
+- `area_perimeter:volume_composite` ("composite" volume) deals single prisms only: 0 composite solids in 200 items (`volume_composite_repair`, reused).
 - `graphs:line_plot` labels unsimplified fractions ("4/8 inches"); `measurement:mass_volume_liquid` answers 0 on half of its "read the scale" items.
 
 ## Owner questions (with suggested answers)

@@ -253,3 +253,14 @@ OK means agreed; X means a defect, with its number from the list below.
 **PASS (8).** Every round-4 defect is fixed, and the root causes behind them are fixed too: visual sweeps, verbatim reuse
 and host names. The statuses hold up under fresh generation. D-1 is the one substantive item left, and fixing it is a
 re-point. D-2 to D-7 are cleanup a lead can do while merging.
+
+## After the pass: round-5 defects fixed (lead, 2026-10-10)
+
+All seven round-5 defects were fixed after this report; `merge.cjs` prints OK afterwards.
+1. Heavier/lighter row → reused `vis_migrate_measures` + mapClause (label or clicked object, never emoji); `map_heavier_lighter_bw` kept only for "order three by mass" (in `also`).
+2. `map_graph_sentence_picto` rewritten for picture graphs; key ladder 2 → 5 → 10/25 (key 1 is `pictograph_intro`).
+3. Cut form removed from `map_shape_partition_pick`'s representation (cutting is `partition_draw`).
+4. "Add three numbers (sum within 20)" no longer claims properties; triangle/parallelogram area row → partial, reused WRM `parallelogram`.
+5. `time_convert`'s added `why` carries only the decimal/mixed-hours clause; choose-all is `map_conv_time_choose_all`.
+6. report-tail names `volume_composite_repair`; row 35's `closes` matches its `also` (`vis_story_strip`).
+7. `map_div_tens` divides by multiples of ten throughout; `map_frac_unit_build` after `vis_frac_bar_modes`; `map_ruler_measure_object` after `vis_migrate_measures`, `ruler_cm`; `map_order_whole_decimal_mixed` L1 example (7, 7.4, 7.25).
