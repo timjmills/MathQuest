@@ -2215,6 +2215,317 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B3.S1": {
+   "title": "Recognise and name 3-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W31)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "shape_3d_tasks",
+    "shapes_world"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same CCSS K.G.A.2, K.G.A.3 in Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same CCSS K.G.A.2, K.G.A.3 in Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same CCSS K.G.A.2 in Y1.B3.S4 Sort 2-D shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same CCSS K.G.A.2 in Y1.B3.S5 Patterns with 2-D and 3-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B3.S2": {
+   "title": "Sort 3-D shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "sorting 3-D shapes by a rule (rolls / stacks, faces)",
+   "build": [
+    "shape_sort"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes",
+    "shape_3d_tasks",
+    "shapes_world"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "naming first"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "next step: Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "next step: Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same CCSS K.G.A.2, K.G.B.4 in Y1.B3.S4 Sort 2-D shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same CCSS K.G.A.2 in Y1.B3.S5 Patterns with 2-D and 3-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B3.S3": {
+   "title": "Recognise and name 2-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W31)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W31)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "shape_3d_tasks",
+    "shapes_world",
+    "shape_sort"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "next step: Y1.B3.S4 Sort 2-D shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same CCSS K.G.A.2 in Y1.B3.S5 Patterns with 2-D and 3-D shapes"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B3.S4": {
+   "title": "Sort 2-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "opts": {},
+     "missing": "sorting into groups by a rule; the skill selects by one property"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sorting 2-D shapes into groups",
+   "build": [
+    "shape_sort"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W32)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "next step: Y1.B3.S5 Patterns with 2-D and 3-D shapes"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same block: Y1.B3.S3 Recognise and name 2-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B3.S5": {
+   "title": "Patterns with 2-D and 3-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {},
+     "missing": "patterns of 3-D shapes (the skill draws 2-D shapes only)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "repeating patterns made of 3-D shapes",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (prior learning wk W32)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W32)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "shape_3d_tasks",
+    "shape_sort"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: Y1.B3.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: Y1.B3.S3 Recognise and name 2-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "same block: Y1.B3.S3 Recognise and name 2-D shapes"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -2422,6 +2733,76 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "shape_3d_tasks": {
+   "kind": "new",
+   "skill": "shapes_early:shape_properties_3d",
+   "name": "What Can This Shape Do?",
+   "teaches": "properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes",
+   "representation": "line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape",
+   "family": "geometry",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "shapes_world": {
+   "kind": "new",
+   "skill": "shapes_early:shapes_around_us",
+   "name": "Shapes Around Us",
+   "teaches": "recognising 2-D and 3-D shapes in everyday objects (a clock is a circle, a tin is a cylinder)",
+   "representation": "line drawings of everyday objects; circle or write the matching shape name from a word bank",
+   "family": "geometry",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "shape_sort": {
+   "kind": "new",
+   "skill": "shapes_early:sort_shapes",
+   "name": "Sort 2-D and 3-D Shapes",
+   "teaches": "sorting shapes by one property (sides, corners, flat or curved faces, rolls or stacks) and naming the sorting rule",
+   "representation": "shape tiles and two labelled sorting rings or a Carroll-style two-box table",
+   "family": "geometry",
+   "steps": [
+    "Y1.B3.S2",
+    "Y1.B3.S4"
+   ],
+   "ccss": [
+    "K.G.A.2",
+    "K.G.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "compare_shapes": {
+   "kind": "new",
+   "skill": "shapes_early:compare_two_shapes",
+   "name": "Same and Different Shapes",
+   "teaches": "comparing two shapes by sides, corners and straight or curved edges",
+   "representation": "two shapes side by side with a same/different checklist (sides, corners, curved)",
+   "family": "geometry",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "pattern_make": {
+   "kind": "new",
+   "skill": "patterns:make_a_pattern",
+   "name": "Make a Pattern",
+   "teaches": "copying, continuing and creating repeating patterns (AB, ABB, ABC) and finding the part that repeats",
+   "representation": "a row of boxes with a started pattern; draw or write the next shapes; option: circle the repeating unit; option: make your own",
+   "family": "algebra",
+   "steps": [
+    "Y1.B3.S5"
+   ],
+   "ccss": [
+    "K.G.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -2442,6 +2823,12 @@
    "step": "Y1.B2.S3",
    "action": "partial",
    "why": "writing the number sentence for a picture"
+  },
+  {
+   "key": "patterns:shape_pattern",
+   "step": "Y1.B3.S5",
+   "action": "partial",
+   "why": "patterns of 3-D shapes (the skill draws 2-D shapes only)"
   }
  ]
 }
