@@ -4,6 +4,7 @@
 import { state } from './state.js';
 import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
+import { clearOfPinnedBar } from './touch-tap.js';
 import { shuffle } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
@@ -11,7 +12,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -217,7 +218,9 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'numberFamilyData',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
-    'screenInstr'];
+    'screenInstr',
+    // touch round 2: the teacher's skill options (touch dots and the other supports) travel too
+    'skillOptions'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
@@ -361,16 +364,19 @@ function renderQuizQuestion(qItem, flatIdx) {
             onchange="submitQuizTextAnswer(${flatIdx}, this.value)"
             onkeydown="if(event.key==='Enter'){submitQuizTextAnswer(${flatIdx}, this.value)}">`;
 
+    // S2: the teacher's ticked supports (touch numerals, cues) apply in the quiz as in practice
+    let qtSupports = null;
+    try { qtSupports = kind ? screenSupportsFor(qd, kind, { index: flatIdx, total: (state.quizAllQuestions || []).length || 1, categoryId: qd.categoryId || q.categoryId, skillId: qd.skillId || q.skillId, options: qd.skillOptions || null }) : null; } catch (e) { qtSupports = null; }
     let instrHtml = '';
     let cellBody;
     if (kind && kind.kind === 'stack') {
         // Digit boxes (right-to-left entry, SP-20) feed a hidden #qtAnswerInput, which every
         // save path of this module already reads.
         const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
-        cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit' }) + hidden;
+        cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit', supports: qtSupports }) + hidden;
         instrHtml = instructionForKind(kind);
     } else if (kind) {
-        cellBody = kindHTML(kind, { slotHtml: inputHtml }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
+        cellBody = kindHTML(kind, { slotHtml: inputHtml, supports: qtSupports }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
         instrHtml = instructionForKind(kind);
     } else if (twin) {
         // the paper cell's screen twin: the model the pupil works in, with the answer slot(s)
@@ -502,6 +508,9 @@ function _mountQuizCell(flatIdx) {
         // feedback is the practice card's and the online worksheet's.
         // the item's support ladder so far (support-ladder.js)
         try { drawLadder(cellEl, qd2, { kind: kind2, categoryId: qd2.categoryId, skillId: qd2.skillId || state.quizAllQuestions[flatIdx].question.skillId }); } catch (e) { /* optional */ }
+        // the message names the rung actually drawn (a touch rung the cell could not draw is dropped)
+        const fbEl = document.querySelector('#quizTakeView .qt-feedback.mq-ladder-feedback');
+        if (fbEl) { const m = ladderMessage(qd2); if (m) fbEl.textContent = m; }
     }
     monoCell(cellEl);
     // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)
@@ -537,13 +546,28 @@ export function submitQuizTextAnswer(flatIdx, value) {
 }
 
 // A pointer press in progress (the blur of a box fires its change on mousedown): the feedback
-// waits for the click to land, so nothing moves under the pupil's pointer.
+// waits for the click to land, so nothing moves under the pupil's pointer. On a touch tap the
+// compatibility mousedown (and so the blur) comes AFTER pointerup, so the tap stays "in flight"
+// from pointerdown/touchstart until its click lands or a short time passes (critic r5 Q5-1).
 let _qtPointerDown = false;
+let _qtTapPending = false;
+let _qtTapTimer = 0;
+const _qtBusy = () => _qtPointerDown || _qtTapPending;
 if (typeof document !== 'undefined') {
-    document.addEventListener('pointerdown', () => { _qtPointerDown = true; }, true);
-    const up = () => { _qtPointerDown = false; };
+    const down = () => { _qtPointerDown = true; _qtTapPending = true; clearTimeout(_qtTapTimer); };
+    const up = () => {
+        _qtPointerDown = false;
+        clearTimeout(_qtTapTimer);
+        _qtTapTimer = setTimeout(() => { _qtTapPending = false; }, 700);
+    };
+    const cancel = () => { _qtPointerDown = false; _qtTapPending = false; clearTimeout(_qtTapTimer); };
+    document.addEventListener('pointerdown', down, true);
+    document.addEventListener('touchstart', down, { capture: true, passive: true });
     document.addEventListener('pointerup', up, true);
-    document.addEventListener('pointercancel', up, true);
+    document.addEventListener('touchend', up, { capture: true, passive: true });
+    document.addEventListener('pointercancel', cancel, true);
+    document.addEventListener('touchcancel', cancel, { capture: true, passive: true });
+    document.addEventListener('click', () => { _qtPointerDown = false; _qtTapPending = false; clearTimeout(_qtTapTimer); }, true);
 }
 
 /**
@@ -555,10 +579,17 @@ if (typeof document !== 'undefined') {
 function refreshQuizFeedback(flatIdx) {
     const test = state.currentQuiz;
     if (!test || !test.settings || test.settings.showFeedback !== 'instant') return;
-    if (_qtPointerDown) {
-        const later = () => { document.removeEventListener('click', later, true); setTimeout(() => refreshQuizFeedback(flatIdx), 0); };
+    if (_qtBusy()) {
+        let done = false;
+        const later = () => {
+            if (done) return;
+            done = true;
+            document.removeEventListener('click', later, true);
+            setTimeout(() => refreshQuizFeedback(flatIdx), 0);
+        };
         document.addEventListener('click', later, true);
-        setTimeout(() => { if (!_qtPointerDown) later(); }, 600);
+        const wait = () => { if (done) return; if (!_qtBusy()) later(); else setTimeout(wait, 300); };
+        setTimeout(wait, 800);
         return;
     }
     const card = document.querySelector('#quizTakeView .qt-question-card');
@@ -581,6 +612,8 @@ function refreshQuizFeedback(flatIdx) {
         if (old.className === fb.className && old.textContent === fb.textContent) return;
         old.replaceWith(fb);
     } else card.appendChild(fb);
+    // the ladder message shows whole above the pinned Previous / Next bar (critic r5 Q5-2)
+    if (!answer.correct) requestAnimationFrame(() => requestAnimationFrame(() => clearOfPinnedBar(fb)));
 }
 
 // The answered count and the page buttons, brought up to date without rebuilding the question.
