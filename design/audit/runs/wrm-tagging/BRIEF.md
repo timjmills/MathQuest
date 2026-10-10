@@ -76,3 +76,25 @@ Scratch files only under a scratch folder outside the repo.
    and that it really closes THIS step; otherwise write a new option proposal.
 6. Self-check before you report: a random 10 of your steps re-judged by generating items; fix and repeat until you'd
    score them ≥ 8.
+
+## OWNER RULING 2026-10-10: keep every WRM step, even beyond CCSS
+Every White Rose small step is covered or gets a build proposal, even when it goes beyond (or has no) CCSS code — e.g.
+24-hour clock, Roman numerals, UK-only steps (converted to US money/units where the school does), above-grade steps,
+11/12 times-tables. Never drop a step or mark it "not needed" because CCSS does not ask for it; tag its CCSS as [] and say
+"beyond CCSS" in `note`. Build priority may be lower, but it goes on the list.
+
+## MANDATORY after critic R–Y1 r1 (FAIL, means 6.80 / 6.23)
+7. RANGE MUST MATCH: a skill+opts is `full` only if its generated items stay inside the step's number range
+   ("Find 1, 2 and 3" → only 1–3; "14–20" must include 20). A band that goes past the step is `partial` + an option proposal
+   (e.g. a shared `band_3`). Record Max Number in opts when the skill reads it (`range`).
+8. RESPONSE MODE FITS THE PUPIL: judge the generated items for the age (Reception/K: pictures, counting, tap/circle, one
+   digit; no typed words, no column layouts, no 24 counters). A wrong response mode is `partial`.
+9. MULTIPLES ARE MULTIPLES: "count in 2s/5s/10s" needs items on true multiples from 0 within the step's limit — check.
+10. RELATED ≠ PRE: never list the same key in both; related needs a reason beyond "same block / same CCSS".
+11. Reception (no xlsx sheet): pre-skills from earlier R steps on the SAME topic (counting, shape, measure, pattern …), not
+    simply the step before in the block.
+12. Partial-only prior steps still count as pre-skills (use their partial skill) — don't drop the xlsx's listed prior steps.
+Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals all the way to large numbers (one
+`roman_numerals` skill, bands to 12 / 100 / 1,000 / 3,999, read and write); times-tables up to 15 (`tables_to_15`);
+`improper_mixed` one-direction option; one-exchange / two-or-more-exchanges option on every regroup band. Reception
+"Make connections" (R.B18) keeps a build (mixed review) — never left without one.
