@@ -1,3 +1,4 @@
+// Regenerate reads_range.json (read by gen.py): node items.mjs --reads-range <every skill key in spec.py> > reads_range.json
 // node items.mjs --key cat:skill '{"opt":1,"range":10}' [n]   -> option schema + n generated items
 // node items.mjs --links R Y1 [n] [--md file]                  -> every distinct skill+opts in the links files, n items each
 // `range` in opts is passed as generateQuestionFor's Max Number (not as a skill option).
