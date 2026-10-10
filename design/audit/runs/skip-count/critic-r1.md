@@ -51,7 +51,7 @@ on the grid with no private copy, the arcs over the number line, and two lines o
 | ws-print-lint --source kit | 463 findings in 33 documents, equal to the baseline. count_by_tables has 0 findings |
 | ws-screen-answer (3 skills) | OK |
 | ws-screen-slots (3 skills) | OK |
-| ws-chromebook-fit (3 skills) | OK. Its own shots show D1 and D2 |
+| ws-chromebook-fit (3 skills) | OK. Its own shots show D1 and D2. The full-sample run hit a "detached Frame" reload error under shared load (a flake, not rerun). The full ws-screen-slots run did not start before my 2 h background limit; the focused 3-skill run is OK |
 | ws-boot-smoke | OK |
 | ws-search-terms | OK, 232/232 |
 | ws-code-snapshot | OK, 608 codes |
