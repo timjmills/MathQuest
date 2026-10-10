@@ -129,7 +129,7 @@
      }
     }
    ],
-   "note": "Pre: 0 only; the earlier steps on this idea use this step's own skill (classify_count); the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
+   "note": "Pre: 0 only; the other earlier skills on this idea do not fit this step (classify_count {\"band\": 3, \"tiles\": 2}: it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
   },
   "R.B1.S6": {
    "title": "Create sorting rules",
@@ -508,6 +508,16 @@
       "band": 5,
       "objects": "dice"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -556,6 +566,16 @@
       "band": 5,
       "objects": "pictures"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -603,6 +623,16 @@
      "opts": {
       "band": 5,
       "objects": "pictures"
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -1018,6 +1048,16 @@
       "band": 5,
       "objects": "pictures"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1026,18 +1066,21 @@
   },
   "R.B5.S6": {
    "title": "Composition of 4 and 5",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "composing:number_bonds",
      "opts": {
       "band": 5
-     }
+     },
+     "missing": "the wholes 4 and 5 only (band 5 also deals wholes 2 and 3)"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "the wholes 4 and 5 only (band 5 also deals wholes 2 and 3)",
+   "build": [
+    "number_focus"
+   ],
    "pre": [
     {
      "key": "counting:count_objects",
@@ -1066,7 +1109,7 @@
     "band_3"
    ],
    "related": [],
-   "note": "Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts. Related: none; the candidate links are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (a three-addend sum (1.OA.A.2)); add_20_no_regroup (it is a symbol equation or number line, not a Reception response)."
+   "note": "band 5 deals wholes 2-5; never 1 and never a zero part. A numeral bond, no pictured parts. Related: none; the candidate links are make_ten (it deals numbers to 10, past this step (5)); number_families_add (it is a symbol equation or number line, not a Reception response); number_bonds (a direct skill here); add_three (a three-addend sum (1.OA.A.2)); add_20_no_regroup (it is a symbol equation or number line, not a Reception response)."
   },
   "R.B5.S7": {
    "title": "Composition of 1 - 5",
@@ -1077,11 +1120,11 @@
      "opts": {
       "band": 5
      },
-     "missing": "wholes 1 and 2 never appear (band 5 deals wholes 3-5 only)"
+     "missing": "whole 1 and a zero part never appear (band 5 deals wholes 2-5)"
     }
    ],
    "verdict": "partial",
-   "missing": "composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5)",
+   "missing": "composition of every whole from 1 to 5: whole 1 and a zero part never appear (band 5 deals wholes 2-5)",
    "build": [
     "band_3"
    ],
@@ -1185,7 +1228,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Two shapes make a square or rectangle (tap the answer). Pre: 1 only; the neighbouring-idea skills of earlier steps (shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
+   "note": "Two shapes make a square or rectangle (tap the answer); compose_shapes {shapes:[1]} deals only these two items (square, rectangle). Pre: 1 only; the neighbouring-idea skills of earlier steps (shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B6.S3": {
    "title": "Shapes in the environment",
@@ -1511,6 +1554,16 @@
       "band": 5,
       "objects": "pictures"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1526,11 +1579,11 @@
      "opts": {
       "band": 5
      },
-     "missing": "wholes 1-2 and a zero part (5 and 0) never appear; band 5 deals wholes 3-5"
+     "missing": "whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5"
     }
    ],
    "verdict": "partial",
-   "missing": "composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear",
+   "missing": "composition of 0 to 5: whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5",
    "build": [
     "band_3"
    ],
@@ -1738,6 +1791,16 @@
       "band": 5,
       "objects": "dice"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1783,6 +1846,24 @@
      "opts": {
       "band": 5,
       "objects": "pictures"
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B7.S3 Subitise 0 to 5 (count a group: a building block)",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -1913,7 +1994,7 @@
      "opts": {
       "band": 10
      },
-     "missing": "wholes 6-8 only, pictured parts (band 10 dealt wholes 4-10)"
+     "missing": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)"
     }
    ],
    "verdict": "partial",
@@ -2443,6 +2524,16 @@
       "band": 5,
       "objects": "dice"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -2550,6 +2641,16 @@
      "opts": {
       "band": 5,
       "objects": "pictures"
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 10,
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -3236,7 +3337,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
+   "note": "Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_pattern {\"points\": [0]}: it asks for typed shape names); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
   },
   "R.B12.S6": {
    "title": "Copy and continue patterns",
@@ -3276,7 +3377,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
+   "note": "Pre: 1 only; the other earlier skills on this idea do not fit this step (shape_pattern {\"points\": [0]}: it asks for typed shape names; shape_pattern {\"points\": [1]}: it asks for typed shape names); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
   },
   "R.B12.S7": {
    "title": "Patterns in the environment",
@@ -3315,7 +3416,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the other earlier skills on this idea do not fit this step (shape_pattern {\"points\": [0, 1]}: it asks for typed shape names; shape_pattern {\"points\": [1]}: it asks for typed shape names); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
   },
   "R.B13.S1": {
    "title": "Build numbers beyond 10 (10 -13)",
@@ -4045,7 +4146,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
+   "note": "Pre: 1 only; the other earlier skills on this idea do not fit this step (compose_shapes {\"shapes\": [1]}: its opts deal only 2 different item(s)); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B15.S4": {
    "title": "Explain shape arrangements",
@@ -4080,7 +4181,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_shapes {\"shapes\": [1]}: its opts deal only 2 different item(s)); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (its content is past this grade); compose_shapes (a direct skill here)."
   },
   "R.B15.S5": {
    "title": "Compose shapes",
@@ -4119,7 +4220,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (a direct skill here); compose_shapes (a direct skill here)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_shapes {\"shapes\": [1]}: its opts deal only 2 different item(s)); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (a direct skill here); compose_shapes (a direct skill here)."
   },
   "R.B15.S6": {
    "title": "Decompose shapes",
@@ -4156,7 +4257,7 @@
     "shapes_world"
    ],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_hexagon: its content is past this grade); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (taught at an earlier step (R.B15.S5), but its content is past this grade)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (compose_shapes); the other earlier skills on this idea do not fit this step (compose_hexagon: its content is past this grade; compose_shapes {\"shapes\": [1]}: its opts deal only 2 different item(s)); the neighbouring-idea skills of earlier steps (name_3d_shapes, shape_attributes) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are compose_hexagon (taught at an earlier step (R.B15.S5), but its content is past this grade)."
   },
   "R.B15.S7": {
    "title": "Copy 2-D shape pictures",
@@ -4537,7 +4638,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the other earlier skills on this idea do not fit this step (shape_pattern {\"points\": [0]}: it asks for typed shape names; shape_pattern {\"points\": [1]}: it asks for typed shape names); the earlier steps R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here); shape_pattern (a direct skill here)."
   },
   "R.B17.S2": {
    "title": "Create own pattern rules",
@@ -5143,7 +5244,7 @@
     "R.B7.S6",
     "R.B7.S7"
    ],
-   "closes": "R.B3.S1: finding groups of exactly 1, 2 and 3 (the smallest band is 5); R.B3.S2: perceptual subitising of 1, 2 and 3 (seen, not counted); R.B3.S3: representing 1, 2 and 3 only; R.B3.S4: one more than 1 and 2, shown by adding one object (the skill asks \"what comes after 6?\" to 10, with no objects); R.B3.S5: one less than 2 and 3, shown by taking one object away; R.B3.S6: composition of 1, 2 and 3 only; R.B5.S4: one more within 5, shown with objects; R.B5.S5: one less within 5, shown with objects; R.B5.S7: composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5); R.B7.S5: one more within 0-5 with objects, including 1 more than 0; R.B7.S6: one less within 0-5 with objects, including 1 less than 1 is 0; R.B7.S7: composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear",
+   "closes": "R.B3.S1: finding groups of exactly 1, 2 and 3 (the smallest band is 5); R.B3.S2: perceptual subitising of 1, 2 and 3 (seen, not counted); R.B3.S3: representing 1, 2 and 3 only; R.B3.S4: one more than 1 and 2, shown by adding one object (the skill asks \"what comes after 6?\" to 10, with no objects); R.B3.S5: one less than 2 and 3, shown by taking one object away; R.B3.S6: composition of 1, 2 and 3 only; R.B5.S4: one more within 5, shown with objects; R.B5.S5: one less within 5, shown with objects; R.B5.S7: composition of every whole from 1 to 5: whole 1 and a zero part never appear (band 5 deals wholes 2-5); R.B7.S5: one more within 0-5 with objects, including 1 more than 0; R.B7.S6: one less within 0-5 with objects, including 1 less than 1 is 0; R.B7.S7: composition of 0 to 5: whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5",
    "reused": false
   },
   "subitise": {
@@ -5276,6 +5377,7 @@
    "steps": [
     "R.B5.S1",
     "R.B5.S3",
+    "R.B5.S6",
     "R.B9.S1",
     "R.B9.S2",
     "R.B9.S3",
@@ -5288,7 +5390,7 @@
     "R.B13.S3",
     "R.B13.S4"
    ],
-   "closes": "R.B5.S1: finding groups of exactly 4 and 5 (band 5 deals 1-5, mostly 1-3); R.B5.S3: representing exactly 4 and 5 (band 5 deals 1-5, mostly 1-3); R.B9.S1: finding groups of exactly 6, 7 and 8; R.B9.S2: representing 6, 7 and 8 only; R.B9.S3: one more than 5, 6 and 7 with objects; R.B9.S4: one less than 6, 7 and 8 with objects; R.B9.S5: composition of 6, 7 and 8 only, with pictured parts; R.B11.S1: finding groups of exactly 9 and 10 (band 10 deals 1-10, mostly below 9); R.B11.S3: representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9); R.B13.S1: building 10, 11, 12 and 13 only; R.B13.S2: continuing the count 10, 11, 12, 13 only; R.B13.S3: 14 to 20, with 20 as two full tens (the band stops at 19 and starts at 11); R.B13.S4: continuing the count 14, 15 … 20 only (the band and the tracks start from 1)",
+   "closes": "R.B5.S1: finding groups of exactly 4 and 5 (band 5 deals 1-5, mostly 1-3); R.B5.S3: representing exactly 4 and 5 (band 5 deals 1-5, mostly 1-3); R.B5.S6: the wholes 4 and 5 only (band 5 also deals wholes 2 and 3); R.B9.S1: finding groups of exactly 6, 7 and 8; R.B9.S2: representing 6, 7 and 8 only; R.B9.S3: one more than 5, 6 and 7 with objects; R.B9.S4: one less than 6, 7 and 8 with objects; R.B9.S5: composition of 6, 7 and 8 only, with pictured parts; R.B11.S1: finding groups of exactly 9 and 10 (band 10 deals 1-10, mostly below 9); R.B11.S3: representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9); R.B13.S1: building 10, 11, 12 and 13 only; R.B13.S2: continuing the count 10, 11, 12, 13 only; R.B13.S3: 14 to 20, with 20 as two full tens (the band stops at 19 and starts at 11); R.B13.S4: continuing the count 14, 15 … 20 only (the band and the tracks start from 1)",
    "reused": false
   },
   "day_order": {
@@ -5732,9 +5834,15 @@
   },
   {
    "key": "composing:number_bonds",
+   "step": "R.B5.S6",
+   "action": "partial",
+   "why": "the wholes 4 and 5 only (band 5 also deals wholes 2 and 3)"
+  },
+  {
+   "key": "composing:number_bonds",
    "step": "R.B5.S7",
    "action": "partial",
-   "why": "wholes 1 and 2 never appear (band 5 deals wholes 3-5 only)"
+   "why": "whole 1 and a zero part never appear (band 5 deals wholes 2-5)"
   },
   {
    "key": "counting:count_objects",
@@ -5764,7 +5872,7 @@
    "key": "composing:number_bonds",
    "step": "R.B7.S7",
    "action": "partial",
-   "why": "wholes 1-2 and a zero part (5 and 0) never appear; band 5 deals wholes 3-5"
+   "why": "whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5"
   },
   {
    "key": "counting:count_objects",
@@ -5794,7 +5902,7 @@
    "key": "composing:number_bonds",
    "step": "R.B9.S5",
    "action": "partial",
-   "why": "wholes 6-8 only, pictured parts (band 10 dealt wholes 4-10)"
+   "why": "wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)"
   },
   {
    "key": "number_sense:doubles_near_doubles",

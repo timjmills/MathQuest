@@ -42,7 +42,7 @@ S = {}
 def st(i, d=(), v='full', m='', b=(), r=(), n='', pb=(), p=(), xp=(), xr=(), xpb=()):
     # p / r entries: (key, why) or (key, why, opts). Round 3 (rule 18): a link without opts gets FIT opts for the step's range.
     # xp / xr: keys never to list as pre / related for this step; xpb: builds never to list in preBuild.
-    S[i] = dict(d=list(d), v=v, m=m, b=list(b), r=list(r), n=n, pb=list(pb), p=list(p), xp=list(xp), xr=list(xr), xpb=list(xpb))
+    S[i] = dict(d=list(d), v=v, m=m, b=list(b), r=list(r), n=n, pb=list(pb), p=list(p), xp=list(xp), xr=list(xr), xpb=list(xpb), pl=[])
 
 # ---------------- Reception ----------------
 # R.B1 Match, sort and compare
@@ -97,16 +97,17 @@ st('R.B5.S4', d=[P(CS,'one more within 5 with objects (the skill deals to 10, no
    m='one more within 5, shown with objects', b=['more_less_pictures', 'band_3'])
 st('R.B5.S5', d=[P(CS,'one less within 5 with objects (the skill deals to 10, no objects)', band=10, dir='back')], v='partial',
    m='one less within 5, shown with objects', b=['more_less_pictures', 'band_3'])
-st('R.B5.S6', d=[F(NB, band=5)], n='Wholes to 5 as a numeral bond (30 seeds: wholes 3, 4 and 5, mostly 5); no pictured parts.',
+st('R.B5.S6', d=[P(NB,'the wholes 4 and 5 only (band 5 also deals wholes 2 and 3)', band=5)], v='partial', m='the wholes 4 and 5 only (band 5 also deals wholes 2 and 3)', b=['number_focus'],
+   n='band 5 deals wholes 2-5; never 1 and never a zero part. A numeral bond, no pictured parts.',
    p=[(CO,'R.B5.S1 count the whole group of 4 or 5 first',{'band':5,'objects':'pictures'}),(TFB,'R.B5.S3 build 4 and 5 on a frame: the parts show as two colours',{'band':5}),
       (CS,'R.B5.S4 one more within 5: 4 and 1 more is 5',{'band':10,'dir':'forward'})], pb=['band_3'])
-st('R.B5.S7', d=[P(NB,'wholes 1 and 2 never appear (band 5 deals wholes 3-5 only)', band=5)], v='partial',
-   m='composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5)', b=['band_3'],
+st('R.B5.S7', d=[P(NB,'whole 1 and a zero part never appear (band 5 deals wholes 2-5)', band=5)], v='partial',
+   m='composition of every whole from 1 to 5: whole 1 and a zero part never appear (band 5 deals wholes 2-5)', b=['band_3'],
    p=[(CO,'R.B5.S1 count a group to 5 first',{'band':5,'objects':'pictures'}),(TFB,'R.B5.S3 build the amount on a frame',{'band':5})])
 # R.B6 Shapes with 4 sides
 st('R.B6.S1', d=[F(N2D, forms=[1], shapes=[2])], r=[(CORN,'count the 4 corners',{'band':4})],
    n='Tap every square / rectangle (forms 1, shapes squares and rectangles).')
-st('R.B6.S2', d=[F(CMP, shapes=[1])], r=[(HEX,'composing with pattern blocks')], n='Two shapes make a square or rectangle (tap the answer).')
+st('R.B6.S2', d=[F(CMP, shapes=[1])], r=[(HEX,'composing with pattern blocks')], n='Two shapes make a square or rectangle (tap the answer); compose_shapes {shapes:[1]} deals only these two items (square, rectangle).')
 st('R.B6.S3', v='gap', m='finding 4-sided shapes in the environment', b=['shapes_world'])
 st('R.B6.S4', v='gap', m='sequencing a day (morning, afternoon, night) and talking about routines', b=['day_order'], xr=[TH, THH, CLK, 'measurement:time_match_clock'],
    n='Related: none; the clock-face skills read the time, a Year 1 (Y1.B14) idea, not the order of a day.')
@@ -119,8 +120,8 @@ st('R.B7.S5', d=[P(CS,'one more within 5 with objects (deals to 10, no objects)'
    m='one more within 0-5 with objects, including 1 more than 0', b=['more_less_pictures', 'band_3'])
 st('R.B7.S6', d=[P(CS,'one less within 5 with objects, including 1 less than 1 (deals to 10, no objects)', band=10, dir='back')], v='partial',
    m='one less within 0-5 with objects, including 1 less than 1 is 0', b=['more_less_pictures', 'band_3'])
-st('R.B7.S7', d=[P(NB,'wholes 1-2 and a zero part (5 and 0) never appear; band 5 deals wholes 3-5', band=5)], v='partial',
-   m='composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear', b=['band_3'],
+st('R.B7.S7', d=[P(NB,'whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5', band=5)], v='partial',
+   m='composition of 0 to 5: whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5', b=['band_3'],
    r=[(A5,'a whole made from two pictured parts, to 5 (R.B9.S9)')])
 st('R.B7.S8', v='gap', m='conceptual subitising to 5: seeing 3 and 2 and knowing 5', b=['subitise'], r=[(NB,'the parts named as a bond')])
 # R.B8 Mass and capacity
@@ -135,7 +136,7 @@ st('R.B9.S3', d=[P(CS,'one more within 8 with objects (deals to 10, no objects)'
    m='one more than 5, 6 and 7 with objects', b=['more_less_pictures', 'number_focus'])
 st('R.B9.S4', d=[P(CS,'one less within 8 with objects (deals to 10, no objects)', band=10, dir='back')], v='partial',
    m='one less than 6, 7 and 8 with objects', b=['more_less_pictures', 'number_focus'])
-st('R.B9.S5', d=[P(NB,'wholes 6-8 only, pictured parts (band 10 dealt wholes 4-10)', band=10)], v='partial',
+st('R.B9.S5', d=[P(NB,'wholes 6-8 only, pictured parts (band 10 deals wholes 2-10)', band=10)], v='partial',
    m='composition of 6, 7 and 8 only, with pictured parts', b=['number_focus'],
    p=[(NB,'R.B7.S7 / R.B5.S7 bonds to 5 first',{'band':5}),(CO,'R.B9.S1 count the whole (to 10)',{'band':10,'objects':'frame'})])
 st('R.B9.S6', d=[P(OE,'making pairs of objects to see odd and even; the skill names odd or even numbers', forms=[2], range=10)], v='partial',
@@ -868,8 +869,9 @@ for _s, _sub in (('R.B3.S3', 'R.B3.S2 Subitise 1, 2 and 3'), ('R.B5.S3', 'R.B5.S
     S[_s]['p'] += [(CO, _sub + ': see the amount, then build it', {'band': 5, 'objects': 'dice'})]
 prepre('R.B11.S9', (CO, 'R.B11.S1 count that each arrangement is still 10', {'band': 10, 'objects': 'frame'}))
 prepre('R.B13.S1', (CS, 'R.B11.S5 the number after: 10 and 1 more is 11', {'band': 10, 'dir': 'forward'}))
-for _s in ('Y1.B9.S5', 'Y1.B9.S8', 'Y1.B9.S9'):
-    S[_s]['p'] += [(CG, 'Y1.B9.S4 / Y1.B1.S11 are the groups the same?', {'band': 10}), (CO, 'count the total, to 20', {'band': 20})]
+# Y1.B9.S5 / S8 / S9: the school prior-learning loop runs first; these hand links come after it ('pl', critic r10 M6)
+for _s, _co in (('Y1.B9.S5', (CO, 'count the total, to 20', {'band': 20})), ('Y1.B9.S8', (CO, 'count the total, to 10', {'band': 10})), ('Y1.B9.S9', (CO, 'count the total, to 10', {'band': 10}))):
+    S[_s]['pl'] = [(CG, 'Y1.B9.S4 / Y1.B1.S11 are the groups the same?', {'band': 10}), _co]
 S['Y1.B10.S6']['p'] += [(N2D, 'name the shape being split', {'forms': [1], 'shapes': [0, 1, 2]})]
 S['R.B17.S9']['n'] = (S['R.B17.S9']['n'] + ' ' if S['R.B17.S9']['n'] else '')
 for _s in ('R.B12.S2', 'R.B12.S3', 'R.B12.S4'):
@@ -882,3 +884,10 @@ NEW['shape_fit_turn'] = dict(kind='option', skill='shapes_early:compose_shapes',
 BLOCKS[CO] = BLOCKS[CO] | {'oddeven'}
 S['R.B11.S13']['p'] += [(CO, 'R.B9.S6 / R.B11.S1 count the objects before pairing them', {'band': 10, 'objects': 'frame'})]
 # (compose_shapes {shapes:[1]} as a lower rung on R.B15 was tried: its items are only Square / Rectangle, 2 distinct, so it is not linked)
+
+# ---------------- Round 11 (critic R-Y1 r10) ----------------
+prepre('Y1.B3.S4', (CC, 'R.B1.S4 Sort objects to a type (school prior learning, week W32; also Y1.B1.S1 Sort objects): sort a bag of shapes, count one kind', {'band': 6}))
+for _s in ('Y1.B9.S5', 'Y1.B9.S8', 'Y1.B9.S9'):
+    S[_s]['xp'] += [OE]
+    S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + ('R.B9.S6 Make pairs (school prior learning) is not linked: its skill odd_even {forms:[2]} asks '
+        '"Which number is even?" (the last-digit rule), not pairs of objects.')

@@ -98,6 +98,14 @@
       "band": 10,
       "objects": "frame"
      }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S6 1 less (count back: a building block)",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
     }
    ],
    "preBuild": [],
@@ -151,6 +159,14 @@
      "opts": {
       "band": 10,
       "objects": "frame"
+     }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S6 1 less (count back: a building block)",
+     "opts": {
+      "band": 10,
+      "dir": "back"
      }
     }
    ],
@@ -209,6 +225,16 @@
      "why": "Y1.B1.S3 Count objects from a larger group (earlier, same idea: find)",
      "opts": {
       "band": 10
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 10,
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -586,6 +612,15 @@
        1
       ]
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
@@ -654,6 +689,15 @@
      "opts": {
       "band": 10,
       "dir": "mixed"
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
      }
     }
    ],
@@ -2081,6 +2125,20 @@
        2
       ]
      }
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (name the solids: a building block)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (two shapes make a new shape: a building block)",
+     "opts": {
+      "shapes": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -2112,6 +2170,13 @@
    ],
    "pre": [
     {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (school prior learning, week W32; also Y1.B1.S1 Sort objects): sort a bag of shapes, count one kind",
+     "opts": {
+      "band": 6
+     }
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "R.B4.S1 Identify and name circles and triangles (school prior learning, week W32)",
      "opts": {
@@ -2126,19 +2191,14 @@
     },
     {
      "key": "shapes_early:name_3d_shapes",
-     "why": "R.B12.S1 Recognise and name 3-D shapes (school prior learning, week W32)",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (name the solids: a building block)"
     }
    ],
    "preBuild": [
     "shape_3d_tasks"
    ],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shape_attributes); the other earlier skills on this idea do not fit this step (shape_name_match_2d: its content is past this grade); the earlier steps R.B15.S1, R.B6.S3, R.B4.S3 have no live skill yet; the neighbouring-idea skills of earlier steps (shape_name_match_3d, compose_shapes, compose_hexagon) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s))."
+   "note": "Related: none; the candidate links are shape_corners_count (its opts deal only 2 different item(s))."
   },
   "Y1.B3.S5": {
    "title": "Patterns with 2-D and 3-D shapes",
@@ -2182,7 +2242,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B17.S3, R.B17.S2, R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here)."
+   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (shape_pattern {\"points\": [0, 1]}: it asks for typed shape names; shape_pattern {\"points\": [0]}: it asks for typed shape names; shape_pattern {\"points\": [1]}: it asks for typed shape names); the earlier steps R.B17.S3, R.B17.S2, R.B2.S6 have no live skill yet (see build). Related: none; the candidate links are name_2d_shapes (a pre-skill here)."
   },
   "Y1.B4.S1": {
    "title": "Count within 20",
@@ -2625,6 +2685,13 @@
      "why": "Y1.B4.S1 Count within 20 (count a group: a building block)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (compare two groups: more, fewer, same: a building block)",
+     "opts": {
+      "band": 10
      }
     },
     {
@@ -4531,6 +4598,13 @@
    "build": [],
    "pre": [
     {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S3 Explore grouping (school prior learning, week W19)",
+     "opts": {
+      "band": 12
+     }
+    },
+    {
      "key": "comparing:compare_groups",
      "why": "Y1.B9.S4 / Y1.B1.S11 are the groups the same?",
      "opts": {
@@ -4543,18 +4617,11 @@
      "opts": {
       "band": 20
      }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "R.B16.S3 Explore grouping (school prior learning, week W19)",
-     "opts": {
-      "band": 12
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "\"___ groups of ___ make ___ in all\" with rings of dots. Related: none; the candidate links are repeated_add_to_mult (its content is past this grade); share_into_groups (a pre-skill here); arrays_groups (a direct skill here)."
+   "note": "\"___ groups of ___ make ___ in all\" with rings of dots. R.B9.S6 Make pairs (school prior learning) is not linked: its skill odd_even {forms:[2]} asks \"Which number is even?\" (the last-digit rule), not pairs of objects. Related: none; the candidate links are repeated_add_to_mult (its content is past this grade); share_into_groups (a pre-skill here); arrays_groups (a direct skill here)."
   },
   "Y1.B9.S6": {
    "title": "Make arrays",
@@ -4681,7 +4748,7 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "count the total, to 20",
+     "why": "count the total, to 10",
      "opts": {
       "band": 10
      }
@@ -4701,7 +4768,7 @@
     "share_group"
    ],
    "related": [],
-   "note": "Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\"); share_into_groups (a direct skill here)."
+   "note": "R.B9.S6 Make pairs (school prior learning) is not linked: its skill odd_even {forms:[2]} asks \"Which number is even?\" (the last-digit rule), not pairs of objects. Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\"); share_into_groups (a direct skill here)."
   },
   "Y1.B9.S9": {
    "title": "Make equal groups - sharing",
@@ -4730,7 +4797,7 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "count the total, to 20",
+     "why": "count the total, to 10",
      "opts": {
       "band": 10
      }
@@ -4748,7 +4815,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\")."
+   "note": "R.B9.S6 Make pairs (school prior learning) is not linked: its skill odd_even {forms:[2]} asks \"Which number is even?\" (the last-digit rule), not pairs of objects. Related: none; the candidate links are arrays_groups (taught at an earlier step (Y1.B9.S6), but it deals numbers to 25, past this step (12)); equal_or_unequal_groups (it asks for the typed words \"multiply\" / \"add\")."
   },
   "Y1.B10.S1": {
    "title": "Recognise a half of an object or a shape",
@@ -5001,7 +5068,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps on this idea use this step's own skill (partition_shapes); the other earlier skills on this idea do not fit this step (shade_fraction: it shows fractions); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
+   "note": "Pre: 2 only; the other earlier skills on this idea do not fit this step (partition_shapes {\"parts\": [0]}: it asks for typed fraction notation (1/2, 3/4); shade_fraction: it shows fractions); the neighbouring-idea skills of earlier steps (fraction_of_set) are not judged building blocks of this step (spec.BLOCKS). Related: none; the candidate links are shade_fraction (it deals quarters and eighths with the 1/2 symbol)."
   },
   "Y1.B10.S6": {
    "title": "Find a quarter of an object or a shape",

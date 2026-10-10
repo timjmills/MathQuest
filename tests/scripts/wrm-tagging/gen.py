@@ -322,12 +322,14 @@ def build(step):
             if not (related_topic(step, rs) == 2 or (related_topic(step, rs) and len(pre) < 2)): continue
             for k, o in dentries(rs): addp(k, f"{fmt_step(rs)} (school prior learning, week {wk})", o)
             if S[rs]['v'] == 'gap': take_builds(rs)
+    for e in sp.get('pl', []):   # hand links that come after the school prior-learning loop (critic r10 M6)
+        k, why, o = split(e); addp(k, why, o, explicit=o is not None)
     # earlier steps on the same idea: same sub-topic first, then the same family, nearest first (rule 11);
     # rule 15: keep going through the family until 3 pre-skills are found
     cands = [x for x in reversed(SORD[:sidx[step]]) if related_topic(step, x) and (info[x]['year'] == s['year'] or s['year'] == 'Y1')]
     cands.sort(key=lambda x: -related_topic(step, x))   # stable: nearest first inside each rank
     for x in cands:
-        if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 3): break
+        if len(pre) >= 6 or (related_topic(step, x) < 2 and len({p['key'] for p in pre}) >= 3): break   # a second rung of one key does not fill the block tier (critic r10 D18)
         for k, o in dentries(x):
             if related_topic(step, x) == 2: addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
             elif is_block(k, o, step): addp(k, f"{fmt_step(x)} ({form_label(k, o)}: a building block)", o)   # judged in spec.BLOCKS (critic r8 N7)
@@ -412,7 +414,12 @@ def build(step):
                 if not S[x]['d']: why['gap'].append(x); continue
                 for k, o in dentries(x):
                     if k in {p['key'] for p in pre}: continue
-                    if sig(k, o) in dsigs or k in own: why['own'].add(k.split(':')[1])
+                    if sig(k, o) in dsigs: why['own'].add(k.split(':')[1])
+                    elif k in own:   # an earlier rung of this step's own skill: give the real reason it is left out (critic r10 M8)
+                        nl = R_NOLINK if step.startswith('R.') else NOLINK
+                        mf = NOLINK_WHY.get(k) if k in nl else misfit(k, o, step)
+                        if mf: why['past'].add(k.split(':')[1] + ' ' + json.dumps(o, sort_keys=True) + ': ' + mf)
+                        else: why['own'].add(k.split(':')[1])
                     elif not fits(k, o, step) and fit(k, step) is None: why['past'].add(k.split(':')[1] + ': ' + misfit(k, o, step))
             parts = []
             if why['own']: parts.append('the earlier steps on this idea use this step\'s own skill (' + ', '.join(sorted(why['own'])) + ')')

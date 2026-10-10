@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 10)
+# R and Y1: generated items per step (wave 2 tagging, round 11)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -153,13 +153,13 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - What number comes before 6? / A=5 / number
   - What number comes before 2? / A=1 / number
 
-### R.B5.S6 Composition of 4 and 5 — **full**
-- full `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
+### R.B5.S6 Composition of 4 and 5 — **partial** (missing: the wholes 4 and 5 only (band 5 also deals wholes 2 and 3))
+- partial `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
   - 3 + ? = 5 / A=2 / number / {whole:5,a:3,b:2,unknown:B}
   - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
   - ? + 1 = 4 / A=3 / number / {whole:4,a:3,b:1,unknown:A}
 
-### R.B5.S7 Composition of 1 - 5 — **partial** (missing: composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5))
+### R.B5.S7 Composition of 1 - 5 — **partial** (missing: composition of every whole from 1 to 5: whole 1 and a zero part never appear (band 5 deals wholes 2-5))
 - partial `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
   - 3 + ? = 5 / A=2 / number / {whole:5,a:3,b:2,unknown:B}
   - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
@@ -216,7 +216,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - What number comes before 6? / A=5 / number
   - What number comes before 2? / A=1 / number
 
-### R.B7.S7 Composition — **partial** (missing: composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear)
+### R.B7.S7 Composition — **partial** (missing: composition of 0 to 5: whole 1 and a zero part (5 = 5 + 0) never appear; band 5 deals wholes 2-5)
 - partial `composing:number_bonds` opts `{"band":5}` (6 generated; Max Number not read)
   - 3 + ? = 5 / A=2 / number / {whole:5,a:3,b:2,unknown:B}
   - 1 + 3 = ? / A=4 / number / {whole:4,a:1,b:3,unknown:whole}
