@@ -130,7 +130,7 @@ The links themselves are fair pre-skills. The reason they print is false.
 ### N7. "(X: a building block)" written without judging the link (33 of 155 uses)
 
 My r7 fix proposed this wording for the rank-1 (neighbouring-idea) candidates that rule 15 uses to reach 3 pre. gen.py
-line 315 now writes it for every such candidate. Most uses are true, for example "count a group" before subitising,
+line 311 now writes it for every such candidate. Most uses are true, for example "count a group" before subitising,
 "show the amount on a frame" before 1 more, "name the flat shapes" before composing, and "the compare words" before
 comparing capacity. These are not:
 
