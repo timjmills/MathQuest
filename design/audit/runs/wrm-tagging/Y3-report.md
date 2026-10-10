@@ -37,7 +37,7 @@ the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit
   ladders; Y3.B6.S2–S6 fractions on a number line (W18) as pre; Y3.B11.S6; Y3.B1.S3/S10/S11, B2.S1; Y3.B3.S4 coins;
   Y3.B1.S14; Y3.B7.S3). 23 steps whose only related skills were taught earlier now say so in `note`.
 - **Scans**: critic r7 `nextscan` 0, `labwhy` 0, `vscan` 0 links, `prewk` 0, `optcheck` 0; `whyscan` A 0, B 100 (all
-  related links to steps taught LATER, i.e. correct "next step" links; 0 pre), C 86 = its own false positives: count
+  related links to steps taught LATER, i.e. correct "next step" links; 0 pre), C 84 = its own false positives: count
   whys on number tracks / count rows it cannot read in the payload, "quarter past" whys on `time_quarter` (clock
   times, not fractions), "number line" on the number-line skills, and the analogy whys r7 asked to restore; `scan9`
   links: `share_into_groups` (r6: clean) and ×8 facts inside the 2, 3, 4, 5 and 10 tables (r4 false positive); r3
