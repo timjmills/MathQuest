@@ -98,3 +98,17 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
 `roman_numerals` skill, bands to 12 / 100 / 1,000 / 3,999, read and write); times-tables up to 15 (`tables_to_15`);
 `improper_mixed` one-direction option; one-exchange / two-or-more-exchanges option on every regroup band. Reception
 "Make connections" (R.B18) keeps a build (mixed review) — never left without one.
+
+## OWNER RULE 2026-10-10: every partial or gap step gets an ENVISIONED skill to be made
+13. When a step is `partial` or `gap`, imagine the exact skill (or option) that would make it `full`, and write it as a
+    skill yet to be made — a real spec, not a label. Reuse an existing proposal only if its spec really does this; otherwise
+    write a new one, or extend the reused one's spec (add `extends`). Each proposal must carry, in addition to the fields
+    above:
+    - `problemTypes`: 3–5 item types, easiest first (what the pupil sees and does), e.g. "picture of 3 apples + 2 apples →
+      write the total", "number track, missing number", "story → number sentence";
+    - `levels`: the scaffold ladder (one new thing per step, PEDAGOGY_STANDARD.md P-1) as option values;
+    - `range`: the numbers/bands it deals, matched to the step(s);
+    - `response`: the written response on paper and the screen answer mode (production stays production);
+    - `edgeCases` and `misconceptions` (2–4 real errors);
+    - `closes`: the exact missing clause(s) of each step it closes.
+    The owner will build Wave 6 straight from these specs, so a reader must be able to picture the page.
