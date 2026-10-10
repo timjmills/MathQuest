@@ -11,7 +11,7 @@
     "algebra:solve_eq_addsub",
     "algebra:solve_unknown"
    ],
-   "note": "Re-sampled n=20: \"Solve: a − 3 = 36\" number entry plus drag candidates to yes/no bins; content right, needs the 8/10 re-grade.",
+   "note": "Re-sampled n=20: \"Solve: a − 3 = 36\" number entry plus drag candidates to yes/no bins; content right, needs the 8/10 re-grade. options checked: solve_eq_addsub forms 0-4 incl. drag the numbers that work, band 10/20 — content dealt; re-grade only.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_190.pdf",
     "says": "DesCartes 181-200: solves 1-step addition linear equations using a letter; 1-step linear equations at 211-230."
@@ -27,7 +27,7 @@
     "decimals:order_decimals",
     "placevalue:order_least_to_greatest"
    ],
-   "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets. Checked order_decimals n=12: 12/12 decimal-only sets; order_least_to_greatest whole only.",
+   "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets. Checked order_decimals n=12: 12/12 decimal-only sets; order_least_to_greatest whole only. options checked: order_decimals dir, forms (write / drag) — decimal pools only; order_least_to_greatest lengths=mixed whole only.",
    "proposal": "map_order_whole_decimal_mixed",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_220.pdf",
@@ -45,7 +45,7 @@
     "placevalue:compare",
     "integers:compare_int"
    ],
-   "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only). Checked compare_groups (picture groups, row \"fewest/most\"), order_least_to_greatest (order a set) — neither asks pick-the-greater number.",
+   "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only). Checked compare_groups (picture groups, row \"fewest/most\"), order_least_to_greatest (order a set) — neither asks pick-the-greater number. options checked: compare band/closeness/lengths (symbol only); compare_int forms 1 \"click the integers that match\" (integers, a rule not pick-greatest).",
    "proposal": "map_compare_pick",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_160.pdf",
@@ -63,7 +63,7 @@
     "placevalue:compare",
     "integers:compare_int"
    ],
-   "note": "Re-sampled n=20: placevalue:compare deals \"Compare: 722 ___ 892\" symbol entry 20/20; sound, needs re-grade.",
+   "note": "Re-sampled n=20: placevalue:compare deals \"Compare: 722 ___ 892\" symbol entry 20/20; sound, needs re-grade. options checked: compare band 99…999,999 — dealt; re-grade only.",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 181-190: \"Put the correct symbol in each problem\" (drag <, >, =) for 3-digit pairs."
@@ -78,7 +78,7 @@
    "skills": [
     "order_of_operations:compare_expressions"
    ],
-   "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing. checked: compare_expressions n=12: every item says evaluate each side (symbol MC or true/false bins); 0/12 compare-by-structure. inequalities checked: numeric true/false only.",
+   "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing. checked: compare_expressions n=12: every item says evaluate each side (symbol MC or true/false bins); 0/12 compare-by-structure. inequalities checked: numeric true/false only. options checked: compare_expressions forms 0/1, band 10/20 — every form evaluates.",
    "proposal": "compare_sentences",
    "evidence": {
     "url": null,
@@ -96,12 +96,11 @@
     "order_of_operations:paren_simple",
     "order_of_operations:oop_medium"
    ],
-   "note": "Re-sampled n=20: paren_simple/oop_medium number entry plus \"click ALL expressions equal to\"; needs re-grade only. Re-grade lands in regrades; residual build = map_oop_small_band (paren_simple sampled 34 × (70 − 28) = 1428, MAP keeps results within 100).",
+   "note": "paren_simple options checked: forms (3), band 20/50/100 — band 100 n=8 deals \"7 × (10 − 6)\", \"(4 + 2) × 4\", the MAP small-number structure; re-grade only (no build).",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart 2-5 221-230 sample: evaluate 6 × (9 − 4) + (6 + 4) ÷ 2; DesCartes 191-210 grouping symbols."
-   },
-   "proposal": "map_oop_small_band"
+   }
   },
   {
    "task": "Multi-digit addition",
@@ -114,7 +113,7 @@
     "addition:add_1k_regroup",
     "addition:add_10k_regroup"
    ],
-   "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade.",
+   "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade. options: none beyond band; re-grade only.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
     "says": "DesCartes 191-200: adds 3- and 4-digit numbers with regrouping, sums over 1000."
@@ -131,14 +130,14 @@
     "placevalue:place_value_disks",
     "composing:base10_build"
    ],
-   "note": "Re-sampled n=20: place_value_disks 20/20 \"What number do the disks show?\" entry; base10_build builds; needs re-grade.",
+   "note": "Re-sampled n=20: place_value_disks 20/20 \"What number do the disks show?\" entry; base10_build builds; needs re-grade. options checked: place_value_disks task read/count, zeroPlace; base10_build band — dealt; re-grade only.",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 161-170: \"What number do the blocks show?\" (base-ten blocks → number)."
    }
   },
   {
-   "task": "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option",
+   "task": "Two-step change problems (add-add, add-sub, sub-add, sub-sub)",
    "strand": "Operations & algebra",
    "ritBand": "191-210",
    "source": "6.2",
@@ -146,8 +145,7 @@
    "skills": [
     "algebra:multi_step_word"
    ],
-   "note": "Re-sampled n=20: multi_step_word deals got/gave/lost/found two-step stories, number entry 20/20; needs re-grade and teacher option for change patterns.",
-   "proposal": "map_change_patterns",
+   "note": "Re-sampled n=20: multi_step_word deals got/gave/lost/found two-step stories, number entry 20/20; needs re-grade and teacher option for change patterns. options checked: multi_step_word forms 0-3 (add-sub, sub-add, add-add, sub-sub) already let the teacher pick the pattern — so map_change_patterns only re-grades.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: solves real-world problems involving 2-step multiple operations."
@@ -192,7 +190,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "zero",
-   "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS). checked: count_objects n=12: 0/12 empty sets (counts 2-15). Proposal zero = WRM_EXTENSIONS.zero (K.CC.A.3, write 0 for an empty set), matches the row.",
+   "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS). checked: count_objects n=12: 0/12 empty sets (counts 2-15). Proposal zero = WRM_EXTENSIONS.zero (K.CC.A.3, write 0 for an empty set), matches the row. options checked: count_objects band 5/10/20, objects, level — 0 empty sets.",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because K.CC.A.3 (write 0 for no objects) is in MAP's blueprint"
@@ -321,7 +319,7 @@
    "skills": [
     "placevalue:value"
    ],
-   "note": "value only asks the worth of one digit. Checked place_value_10x n=12: ×/÷ 10,100,1000 computations, 0/12 compare two digit values; value, identify — single digit worth.",
+   "note": "value only asks the worth of one digit. Checked place_value_10x n=12: ×/÷ 10,100,1000 computations, 0/12 compare two digit values; value, identify — single digit worth. options checked: value form value/unit/notation, zeroDigit — one digit at a time.",
    "proposal": "value_ten_times",
    "evidence": {
     "url": null,
@@ -354,15 +352,16 @@
    "status": "partial",
    "skills": [
     "composing:number_word_form",
+    "placevalue:pv_digit_drag",
     "placevalue:number_word_names"
    ],
-   "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
-   "proposal": "map_word_form_millions",
+   "note": "options checked: pv_digit_drag source=word band=999999 n=8: \"four hundred thirty-nine thousand, fifty-eight\" → 439058 placed digit by digit (words → numeral to 999,999, production); number_word_form wordform to_number/to_words (to 9,999); number_word_names band 999999 (MC name). Residual: millions.",
+   "proposal": "big_numbers",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
     "says": "DesCartes 191-210: identifies numeral and written name for numbers over 100,000."
    },
-   "closes": "Adds number names past 9,999 to millions in both directions on the live production skill number_word_form."
+   "closes": "big_numbers widens pv_digit_drag (with source=word) to 10,000,000, so words → numeral reaches millions; the numeral → name direction at millions comes with vis_pv_bands_millions on number_word_names."
   },
   {
    "task": "Place value to millions (7 digits)",
@@ -373,7 +372,7 @@
    "skills": [
     "placevalue:pv_digit_drag"
    ],
-   "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table. checked: nearest_million (rounding only), pv_digit_drag (5 digits), unit_form (3 digits), base10_build_hundreds (to 999): none name places in 7-digit numbers.",
+   "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table. checked: nearest_million (rounding only), pv_digit_drag (5 digits), unit_form (3 digits), base10_build_hundreds (to 999): none name places in 7-digit numbers. options checked: pv_digit_drag band max 999,999, source expanded/word/numeral.",
    "proposal": "vis_pv_bands_millions",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -390,7 +389,7 @@
    "skills": [
     "placevalue:compare"
    ],
-   "note": "compare starts at 3 digits in sampling. Checked compare_groups n=12: more/fewer/same picture groups with no numerals or symbols; placevalue:compare symbol entry without pictures.",
+   "note": "compare starts at 3 digits in sampling. Checked compare_groups n=12: more/fewer/same picture groups with no numerals or symbols; placevalue:compare symbol entry without pictures. options checked: compare band min 99, no pictures.",
    "proposal": "compare_small",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
@@ -441,7 +440,7 @@
    "skills": [
     "number_sense:place_on_number_line"
    ],
-   "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only. checked: place_on_number_line n=12: 12/12 \"Tap N\" on 0-100; integer_nl_drag integers only. Re-grade stands.",
+   "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only. checked: place_on_number_line n=12: 12/12 \"Tap N\" on 0-100; integer_nl_drag integers only. Re-grade stands. options checked: place_on_number_line span 10/100/1000, band — tap only; re-grade.",
    "proposal": "nl_20",
    "evidence": {
     "url": null,
@@ -457,7 +456,7 @@
    "skills": [
     "number_sense:place_on_number_line"
    ],
-   "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only). Checked integers:number_line_int n=12: \"What integer is shown\" reads a point but on −20..20 integer lines only; place_on_number_line is tap-to-place. checked: number_line_int (integers only), rounding_visual (rounds, does not read), number_line_add/sub (equations).",
+   "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only). Checked integers:number_line_int n=12: \"What integer is shown\" reads a point but on −20..20 integer lines only; place_on_number_line is tap-to-place. checked: number_line_int (integers only), rounding_visual (rounds, does not read), number_line_add/sub (equations). options checked: place_on_number_line span/band (tap to place, never read).",
    "proposal": "nl_20",
    "evidence": {
     "url": null,
@@ -586,7 +585,7 @@
     "addition:add_word_problems",
     "subtraction:unknown_start_wp"
    ],
-   "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown. Round 4: add_word_problems n=12: 3/12 \"wants N, how many more does she need?\" (change unknown in need form); sub_word_problems n=12: start-unknown and take-out only; word_problems_mixed n=8: one \"wants…need\".",
+   "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown. Round 4: add_word_problems n=12: 3/12 \"wants N, how many more does she need?\" (change unknown in need form); sub_word_problems n=12: start-unknown and take-out only; word_problems_mixed n=8: one \"wants…need\". options checked: add_word_problems forms 0 total / 1 start / 2 part, response; sub_word_problems forms 0 left / 1 difference / 2 start — no change-unknown form.",
    "proposal": "map_change_unknown_story",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -619,8 +618,8 @@
     "addition:add_word_problems",
     "addition:comparison_word"
    ],
-   "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown. checked: comparison_word n=12: 12/12 difference-unknown (how many more/fewer); word_problems_mixed n=8 one \"26 more than\" bigger-unknown item, no smaller-unknown; status kept missing for a dedicated form. Round 4: add_word_problems n=12: 3/12 bigger-unknown (\"Lena has 42 more stamps than Ben\"); sub_word_problems n=12: 0 smaller-unknown; comparison_word difference only.",
-   "proposal": "map_compare_bigger_unknown",
+   "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown. checked: comparison_word n=12: 12/12 difference-unknown (how many more/fewer); word_problems_mixed n=8 one \"26 more than\" bigger-unknown item, no smaller-unknown; status kept missing for a dedicated form. Round 4: add_word_problems n=12: 3/12 bigger-unknown (\"Lena has 42 more stamps than Ben\"); sub_word_problems n=12: 0 smaller-unknown; comparison_word difference only. options checked: sub_word_problems forms (difference only), add_word_problems forms; comparison_word response.",
+   "proposal": "map_compare_smaller_unknown",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 1.OA.1 / 2.OA.1 (compare, bigger or smaller unknown) is in MAP's blueprint"
@@ -636,7 +635,7 @@
    "skills": [
     "composing:number_bonds"
    ],
-   "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways. part_whole (any one part unknown) does not cover both-unknown; moved to map_another_way_to_make.",
+   "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways. part_whole (any one part unknown) does not cover both-unknown; moved to map_another_way_to_make. options checked: number_bonds unknown answer/first/second/mixed, band — one part always given.",
    "proposal": "systematic_bonds",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -669,7 +668,7 @@
    "skills": [
     "addition:equal_sign"
    ],
-   "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items. Checked addition:equal_sign n=12: 12/12 \"19 + 5 = ?\" column add (label says True/False — a bug); balance_addsub is the open-number form only.",
+   "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items. Checked addition:equal_sign n=12: 12/12 \"19 + 5 = ?\" column add (label says True/False — a bug); balance_addsub is the open-number form only. options: equal_sign has none.",
    "proposal": "equal_sign_repair",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
@@ -714,13 +713,13 @@
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
-   "note": "No skill asks which equation shows the same sum, or names a property. checked: mult_properties n=12: zero/one/commutative/distributive number entry, × only; add_three, distributive_expr: none name or match + properties.",
-   "proposal": "map_properties_equivalent",
+   "note": "No skill asks which equation shows the same sum, or names a property. checked: mult_properties n=12: zero/one/commutative/distributive number entry, × only; add_three, distributive_expr: none name or match + properties. options checked: add_three (no property form), mult_properties (× only).",
+   "proposal": "add_three_forms",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
     "says": "DesCartes 191-220: demonstrates understanding of commutative, then associative property."
    },
-   "closes": "Adds recognising and writing equal sums by the commutative and associative properties of addition, incl. choose-all; no live skill deals + properties (× is part B)."
+   "closes": "add_three_forms adds changing the order / grouping two addends (commutative and associative as strategies); its mapClause adds the MAP response \"write the turn-around sum and choose ALL sums equal to 8 + 5\"."
   },
   {
    "task": "Fact families / related facts",
@@ -763,7 +762,7 @@
     "algebra:function_table_hard",
     "algebra:function_table_easy"
    ],
-   "note": "function_table_hard sampled n=8: 8/8 \"Find the rule. Write the rule.\" (one- and two-operation rules, rule entry). Content dealt; re-grade only. function_table_easy gives the rule.",
+   "note": "function_table_hard sampled n=8: 8/8 \"Find the rule. Write the rule.\" (one- and two-operation rules, rule entry). Content dealt; re-grade only. function_table_easy gives the rule. options checked: function_table_hard ftTask rule / rule-check — dealt; re-grade only.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: determines the rule and completes a simple function machine output."
@@ -839,7 +838,7 @@
    "skills": [
     "algebra:write_expression"
    ],
-   "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets. checked: write_expression n=12: variable expressions (n + 47), 0/12 numeric with brackets; build_expr_* write equations, no brackets; compare_expressions evaluates.",
+   "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets. checked: write_expression n=12: variable expressions (n + 47), 0/12 numeric with brackets; build_expr_* write equations, no brackets; compare_expressions evaluates. options checked: write_expression task 0-3, forms write / click matching — variables only.",
    "proposal": "write_numeric_expression",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
@@ -871,7 +870,7 @@
    "skills": [
     "algebra:inequalities"
    ],
-   "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words. checked: inequalities n=12: 12/12 numeric true/false choice; no solution sets or line graph. Residual kept on inequality_write_graph.",
+   "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words. checked: inequalities n=12: 12/12 numeric true/false choice; no solution sets or line graph. Residual kept on inequality_write_graph. options checked: inequalities forms 0 true/false, 1 drag a marker to one solution (n=8 \"Drag the marker to a value that satisfies x ≤ 6\"), 2 sort; no write-from-words, no solution-set graph (residual of inequality_write_graph).",
    "proposal": "inequality_write_graph",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
@@ -903,7 +902,7 @@
     "addition:add_sub_10s",
     "addition:add_sub_100s"
    ],
-   "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited. checked: add_sub_10s n=12: 12/12 ±10 only (90 + 10), not any multiple of 10 (tens_any residual stands).",
+   "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited. checked: add_sub_10s n=12: 12/12 ±10 only (90 + 10), not any multiple of 10 (tens_any residual stands). options checked: add_sub_10s task/band (±10 only), add_sub_100s.",
    "proposal": "tens_any",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
@@ -935,7 +934,7 @@
    "skills": [
     "addition:add_5_pictures"
    ],
-   "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture. checked: add_5_pictures n=12: pictures with the equation given (answer the total); 0/12 write or pick the equation for the picture; sub_5_pictures same.",
+   "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture. checked: add_5_pictures n=12: pictures with the equation given (answer the total); 0/12 write or pick the equation for the picture; sub_5_pictures same. options checked: add_5_pictures pictures/objects — sentence always given.",
    "proposal": "pictures_to_sentence",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
@@ -953,7 +952,7 @@
     "placevalue:place_value_disks",
     "composing:base10_build"
    ],
-   "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items. checked: place_value_disks n=12 model→number entry; base10_build_hundreds n=12 number→build (both directions exist); residual is the MAP select-the-matching-model form, kept partial.",
+   "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items. checked: place_value_disks n=12 model→number entry; base10_build_hundreds n=12 number→build (both directions exist); residual is the MAP select-the-matching-model form, kept partial. options checked: place_value_disks task/zeroPlace, base10_build band — one model at a time.",
    "proposal": "map_match_model_number",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -971,7 +970,7 @@
     "algebra:build_expr_addsub",
     "algebra:write_equation"
    ],
-   "note": "build_expr_addsub n=8: 8/8 story → build \"89 − 3 = 86\" (build-expr, production — stronger than MAP choose-one); build_expr_multdiv n=8 the same for × ÷. Residual: only result-unknown join/separate/equal-groups stories; no unknown-in-other-positions, no compare or fraction stories. write_equation is letters (algebra).",
+   "note": "build_expr_addsub n=8: 8/8 story → build \"89 − 3 = 86\" (build-expr, production — stronger than MAP choose-one); build_expr_multdiv n=8 the same for × ÷. Residual: only result-unknown join/separate/equal-groups stories; no unknown-in-other-positions, no compare or fraction stories. write_equation is letters (algebra). options checked: build_expr_addsub task adding/subtracting, band — result-unknown only.",
    "proposal": "map_story_equation_addsub",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
@@ -988,7 +987,7 @@
    "skills": [
     "number_sense:place_on_number_line"
    ],
-   "note": "Re-sampled n=20: place_on_number_line place only; read direction missing. checked: same candidates as the read-a-number-line row; tap-to-place exists, reading at an arrow only for integers.",
+   "note": "Re-sampled n=20: place_on_number_line place only; read direction missing. checked: same candidates as the read-a-number-line row; tap-to-place exists, reading at an arrow only for integers. options checked: place_on_number_line span/band.",
    "proposal": "nl_20",
    "evidence": {
     "url": null,
@@ -1006,7 +1005,7 @@
     "addition:number_line_add",
     "subtraction:number_line_sub"
    ],
-   "note": "number_line_add n=12: 12/12 \"Use the number line: 15 + 5 = ?\" — the equation is given, pupil gives the answer; number_line_sub the same. 0/12 write the equation from the jumps.",
+   "note": "number_line_add n=12: 12/12 \"Use the number line: 15 + 5 = ?\" — the equation is given, pupil gives the answer; number_line_sub the same. 0/12 write the equation from the jumps. options checked: number_line_add / number_line_sub ticks one/some/ends — equation always given.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
     "says": "DesCartes 161-180: uses a number line to construct addition facts with sums through 20."
@@ -1022,15 +1021,16 @@
    "status": "partial",
    "skills": [
     "composing:number_word_form",
+    "placevalue:pv_digit_drag",
     "placevalue:number_word_names"
    ],
-   "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
-   "proposal": "map_word_form_millions",
+   "note": "options checked: pv_digit_drag source=word band=999999 n=8: \"four hundred thirty-nine thousand, fifty-eight\" → 439058 placed digit by digit (words → numeral to 999,999, production); number_word_form wordform to_number/to_words (to 9,999); number_word_names band 999999 (MC name). Residual: millions.",
+   "proposal": "big_numbers",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
     "says": "DesCartes 171-180: numeral and written name 21-999; 191-210 to over 100,000."
    },
-   "closes": "Adds word-name ↔ numeral production past 9,999 (to millions); number_word_names is MC only and number_word_form stops at 9,999."
+   "closes": "big_numbers widens pv_digit_drag (with source=word) to 10,000,000, so words → numeral reaches millions; the numeral → name direction at millions comes with vis_pv_bands_millions on number_word_names."
   },
   {
    "task": "Match: expanded form <-> standard form",
@@ -1058,7 +1058,7 @@
     "algebra:function_table_hard",
     "algebra:function_table_easy"
    ],
-   "note": "function_table_hard n=8: 8/8 find-and-write the rule, but 0/8 real-world tables (all bare In/Out). Residual = DesCartes 211-220 real-world function table. function_machine dropped (hard already finds rules).",
+   "note": "function_table_hard n=8: 8/8 find-and-write the rule, but 0/8 real-world tables (all bare In/Out). Residual = DesCartes 211-220 real-world function table.",
    "proposal": "map_function_table_context",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
@@ -1077,7 +1077,7 @@
     "composing:make_ten"
    ],
    "proposal": "map_another_way_to_make",
-   "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items. checked: make_ten n=12: how many more make 10 (one answer); number_bonds one missing part; 0/12 build a second decomposition.",
+   "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items. checked: make_ten n=12: how many more make 10 (one answer); number_bonds one missing part; 0/12 build a second decomposition. options checked: number_bonds unknown, make_ten band/level — fixed missing part.",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
@@ -1126,7 +1126,7 @@
     "placevalue:combine"
    ],
    "proposal": "map_units_to_number",
-   "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place. checked: unit_form n=12: 12/12 number → units (887 = _ hundreds …), not units → number; combine checked: expanded → standard only.",
+   "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place. checked: unit_form n=12: 12/12 number → units (887 = _ hundreds …), not units → number; combine checked: expanded → standard only. options checked: unit_form band/rename (number → units only); combine order=scrambled, zeroPlace=always n=8 \"30 + 400 = ?\" (expanded numerals, not unit words).",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 above 191: \"6 hundreds and 5 ones. Write the number\" with digit tiles; DesCartes 171-200 place value terms."
@@ -1161,7 +1161,7 @@
     "algebra:algebra_word_mixed_plain"
    ],
    "proposal": "multi_step_four_ops",
-   "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation.",
+   "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation. options checked: multi_step_word forms 0-3 (+/− only), wpBar; word_problems_mixed none.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: solves real-world multiple-step problems; uses division in multiple-step problems."
@@ -4372,47 +4372,6 @@
    ],
    "reused": true
   },
-  "map_change_patterns": {
-   "kind": "option",
-   "skill": "algebra:multi_step_word",
-   "option": "pattern: add-add / add-sub / sub-add / sub-sub (default all four, equal weight)",
-   "name": "Two-Step Change Stories (choose the pattern)",
-   "teaches": "Two successive changes to a start amount, the teacher choosing which change patterns",
-   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Next–Then strip with two working lines; pupil writes each step and the answer. Screen: number entry per step, then the answer.",
-   "family": "algebra",
-   "ccss": [
-    "2.OA.A.1",
-    "3.OA.D.8"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "191-210",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "Owner asked for the teacher option; re-grade with it",
-   "reused": false,
-   "problemTypes": [
-    "add-add story — two gains — write both steps",
-    "add-sub / sub-add story — a gain and a loss — write both steps",
-    "sub-sub story — two losses — write both steps"
-   ],
-   "levels": [
-    "L1: teacher picks one pattern (add-add); step boxes labelled 1 and 2 (structural, stays); key words underlined (hint)",
-    "L2: add-sub and sub-add mixed in",
-    "L3: sub-sub joins; underlining fades",
-    "L4: all four, step boxes unlabelled"
-   ],
-   "example": {
-    "item": "Ana had 30 stickers. She got 12 more. Then she gave away 9. How many now?",
-    "answer": "33"
-   },
-   "misconceptions": [
-    "Does only the first step",
-    "Adds every number in the story"
-   ]
-  },
   "ordinal": {
    "ccss": [
     "K.CC.B.4"
@@ -4608,7 +4567,7 @@
    "name": "How Many Were Added? (change unknown)",
    "teaches": "Join/separate stories where the change is unknown",
    "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box.",
-   "family": "subtraction",
+   "family": "addition",
    "ccss": [
     "1.OA.A.1",
     "2.OA.A.1"
@@ -4642,14 +4601,14 @@
     "Writes the \"now\" number as the answer"
    ]
   },
-  "map_compare_bigger_unknown": {
+  "map_compare_smaller_unknown": {
    "kind": "option",
    "skill": "subtraction:sub_word_problems",
    "option": "unknown: smaller quantity in a compare story (\"fewer than\" and \"more than\" with the bigger known)",
    "name": "Compare Stories: Smaller Unknown",
    "teaches": "Solve compare stories where the smaller quantity is unknown",
    "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar.",
-   "family": "addition",
+   "family": "subtraction",
    "ccss": [
     "1.OA.A.1",
     "2.OA.A.1"
@@ -4732,46 +4691,6 @@
     }
    ],
    "reused": true
-  },
-  "map_properties_equivalent": {
-   "kind": "new",
-   "skill": "algebra:properties_of_operations",
-   "name": "Properties of Addition",
-   "teaches": "Recognise and write equal sums by the commutative and associative properties of addition (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
-   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; an expression and an equation frame (8 + 5 = ☐ + ☐); pupil writes the equivalent expression or ticks the equal ones. Screen: tile entry in the frame / click all equal expressions (select-all).",
-   "family": "algebra",
-   "ccss": [
-    "1.OA.B.3",
-    "2.NBT.B.9"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "191-210",
-     "taskType": "number entry / select all"
-    }
-   ],
-   "why": "No skill names or applies + properties; × grouping belongs to part B (map_mult_prop_grouping / mult_three)",
-   "reused": false,
-   "problemTypes": [
-    "Write the turn-around — 8 + 5 = ☐ + ☐",
-    "Regroup three addends — (6 + 4) + 9 = 6 + (☐ + ☐)",
-    "Choose ALL sums equal to 8 + 5 — tick / click all"
-   ],
-   "levels": [
-    "L1: commutative within 20 with cube trains (hint, fades); frame (structural, stays)",
-    "L2: trains fade",
-    "L3: associative with three addends",
-    "L4: choose-all equal sums"
-   ],
-   "example": {
-    "item": "(6 + 4) + 9 = 6 + (☐ + ☐)",
-    "answer": "4, 9"
-   },
-   "misconceptions": [
-    "Thinks changing the order changes the sum",
-    "Applies turn-around to subtraction (9 − 4 = 4 − 9)"
-   ]
   },
   "write_numeric_expression": {
    "ccss": [
@@ -5091,46 +5010,6 @@
     "Writes digits in the order read when units are out of order"
    ]
   },
-  "map_oop_small_band": {
-   "kind": "option",
-   "skill": "order_of_operations:paren_simple",
-   "option": "band: small numbers (MAP) — operands to 50, every step and the result within 100, e.g. 47 − (2 × 8)",
-   "name": "Simple Parentheses: Small-Number Band",
-   "teaches": "Evaluate a two-operation expression with one set of parentheses when the arithmetic is light, so the item tests structure, not computation",
-   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the expression with the bracketed step underlined and a working line under it; pupil writes the step then the value. Screen: number entry (production).",
-   "family": "order_of_operations",
-   "ccss": [
-    "5.OA.A.1"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "191-230",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "paren_simple sampled products to 1,400; MAP grouping-symbol items use small numbers. This is a real option (new number band), not a re-grade",
-   "reused": false,
-   "problemTypes": [
-    "a − (b × c) — small numbers — write value",
-    "(a + b) × c — write value",
-    "Choose ALL expressions equal to N — select-all on screen, tick on paper"
-   ],
-   "levels": [
-    "L1: brackets first, results within 50, working line labelled \"brackets\" (hint, fades); bracket underline (structural, stays)",
-    "L2: label fades; results within 100",
-    "L3: the bracket at the end of the expression (47 − (2 × 8))",
-    "L4: choose-all equal expressions"
-   ],
-   "example": {
-    "item": "40 − (3 × 6) = ☐",
-    "answer": "22"
-   },
-   "misconceptions": [
-    "Works left to right ignoring brackets (40 − 3 = 37, × 6)",
-    "Does × first but forgets the bracket rule when + is inside"
-   ]
-  },
   "map_function_table_context": {
    "kind": "option",
    "skill": "algebra:function_table_hard",
@@ -5170,47 +5049,6 @@
    "misconceptions": [
     "Finds the rule from one row only (+5 from 1→6)",
     "Applies the rule down the column (adds 6 each row) not across"
-   ]
-  },
-  "map_word_form_millions": {
-   "kind": "option",
-   "skill": "composing:number_word_form",
-   "option": "band: to 999,999 and to millions (adds the thousands/millions period words), both directions via wordform",
-   "name": "Number Word Form to Millions",
-   "teaches": "Write the numeral for a number name to millions, and the name for a numeral, period by period",
-   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name over a digit-box row with comma gaps between periods; pupil writes the numeral (or the words from a word bank). Screen: number entry / word-bank entry.",
-   "family": "composing",
-   "ccss": [
-    "2.NBT.A.3",
-    "4.NBT.A.2"
-   ],
-   "map": [
-    {
-     "strand": "Number & place value",
-     "ritBand": "191-210",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "number_word_form is the live production skill but stops at 9,999; DesCartes 191-210 asks numeral/name over 100,000",
-   "reused": false,
-   "problemTypes": [
-    "Words → numeral to 999,999 — write digits",
-    "Words → numeral to millions incl. zero places — write digits",
-    "Numeral → words — write words from a period word bank"
-   ],
-   "levels": [
-    "L1: to 99,999, period frame \"___ thousand ___\" (structural, stays), period words underlined (hint, fades)",
-    "L2: to 999,999",
-    "L3: zero places inside a period (four hundred five thousand, twenty)",
-    "L4: millions"
-   ],
-   "example": {
-    "item": "Write the numeral: three hundred six thousand, forty-two",
-    "answer": "306,042"
-   },
-   "misconceptions": [
-    "Writes 30642 (drops the zero place)",
-    "Writes 300,6,42 (period by period without padding)"
    ]
   },
   "zero": {
@@ -5296,7 +5134,7 @@
   "map_story_equation_addsub": {
    "kind": "option",
    "skill": "algebra:build_expr_addsub",
-   "option": "stories: unknown in any position (result / change / start), compare stories (difference, bigger, smaller unknown); context: everyday | measurement (length, mass, capacity, money) | like-denominator fractions",
+   "option": "stories: unknown in any position (result / change / start), compare stories (difference, bigger, smaller unknown); context: everyday | measurement (length, mass, capacity, money) (fraction stories: map_story_equation_frac)",
    "name": "Build the +/− Equation for Any Story",
    "teaches": "Write the addition or subtraction equation for a story with a box for the unknown, wherever the unknown sits, including compare and measurement stories",
    "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown as ☐; pupil writes the numbers and + or − (does not solve first). Screen: build-expr tiles (production, never MC).",
@@ -5486,6 +5324,76 @@
      "taskType": "list all pairs"
     }
    ],
+   "reused": true
+  },
+  "big_numbers": {
+   "kind": "option",
+   "skill": "placevalue:pv_digit_drag",
+   "option": "to 10,000,000",
+   "name": "Numbers to 10,000,000 (option)",
+   "teaches": "reading, writing, partitioning, comparing and placing numbers to ten million",
+   "representation": "band 9,999,999 on pv_digit_drag, number_word_names, compare and the number-line proposal",
+   "family": "placevalue",
+   "steps": [
+    "Y6.B1.S2",
+    "Y6.B1.S3",
+    "Y6.B1.S5"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Number & place value",
+     "ritBand": "191-210",
+     "taskType": "drag digits / number entry"
+    }
+   ],
+   "reused": true
+  },
+  "add_three_forms": {
+   "kind": "option",
+   "skill": "addition:add_three",
+   "option": "form: word problem (three addends, sum ≤ 20) and \"make a ten first\" (ring the two that make 10)",
+   "name": "Add Three Numbers: Stories and Make a Ten First (option)",
+   "grade": "1",
+   "family": "operations",
+   "standards": [
+    "1.OA.A.2",
+    "1.OA.B.3"
+   ],
+   "ee": [
+    "M.EE.1.OA.2"
+   ],
+   "teaches": "solving three-addend word problems and adding three numbers by grouping two that make ten (associative and commutative properties as strategies)",
+   "problemTypes": [
+    "story with three addends",
+    "ring the pair that makes 10, then add",
+    "change the order to make it easier",
+    "which way is easier?"
+   ],
+   "templates": [
+    "word-work",
+    "equation"
+   ],
+   "newTemplates": [],
+   "answer": "write the total; ring the pair",
+   "ladder": "O2 sum ≤ 10 → ≤ 20; pair adjacent → split · O3 pair pre-ringed → first number ringed → none · O6 pictures / numbers",
+   "misconceptions": [
+    "adds only two of the three",
+    "always adds left to right even when a ten is hidden"
+   ],
+   "wrmSteps": [
+    "Y1.B5.S7"
+   ],
+   "after": [],
+   "source": "STANDARD_PROPOSALS",
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "191-220",
+     "taskType": "write the equal sum / choose all"
+    }
+   ],
+   "mapClause": "response: write the turn-around (8 + 5 = ☐ + ☐), regroup ((6 + 4) + 9 = 6 + (☐ + ☐)) and choose ALL sums equal to a given sum (select-all on screen, tick on paper)",
    "reused": true
   },
   "map_ratio_picture": {
@@ -8413,7 +8321,7 @@
    "Base-ten model → number"
   ],
   "algebra:multi_step_word": [
-   "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option"
+   "Two-step change problems (add-add, add-sub, sub-add, sub-sub)"
   ],
   "number_sense:place_on_number_line": [
    "Place a number on a number line (drag/tap)"
