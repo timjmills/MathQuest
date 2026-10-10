@@ -5382,10 +5382,6 @@
      "why": "Y5.B10.S2 Classify angles (previous step)"
     },
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y5.B10.S2 Classify angles: acute or obtuse first"
-    },
-    {
      "key": "measurement:estimate_length",
      "why": "estimating with a benchmark"
     }
