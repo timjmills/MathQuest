@@ -1673,8 +1673,9 @@ function wireSwipeRows(cellEl) {
             const conts = [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')];
             const was = w.hasAttribute('data-mq-wrapfit');
             w.removeAttribute('data-mq-wrapfit');
-            conts.forEach((c) => { c.style.flexWrap = ''; c.style.rowGap = ''; c.style.maxWidth = ''; });
-            if (was) w.style.overflowX = 'auto';
+            // restore the row's own inline style verbatim (rewriting it would turn "display:flex" into "display: flex;" and drop the
+            // worksheet's no-wrap rule, which matches the attribute text)
+            if (was) { conts.forEach((c) => { if (c.dataset.mqWrapStyle !== undefined) c.setAttribute('style', c.dataset.mqWrapStyle); }); w.style.overflowX = 'auto'; }
             if (window.innerWidth < 1024) return false;
             const cellEl2 = w.closest('.mq-scell');
             if (!cellEl2 || !conts.length) return false;
@@ -1688,7 +1689,7 @@ function wireSwipeRows(cellEl) {
             w.setAttribute('data-mq-end', '');
             w.style.overflowX = 'visible';
             const room = Math.max(120, inner - colW - 14);
-            conts.forEach((c) => { c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.floor(room)}px`; });
+            conts.forEach((c) => { if (c.dataset.mqWrapStyle === undefined) c.dataset.mqWrapStyle = c.getAttribute('style') || ''; c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.floor(room)}px`; });
             level();
             return true;
         };
