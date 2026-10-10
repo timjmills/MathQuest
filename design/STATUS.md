@@ -216,7 +216,9 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - mixed_composing more-practice S (pre-existing, identical on main): seeds whose deal opens with a wide draw-mat or
   ten-frame item still leave a large blank (seed 3: one item, 60 %; seed 2: 4 items over two pages, 52 % / 31 %). The page
   capacity comes from the run's order; the lane fixed only its own list row (seed 5: 30 % -> 4 %). Needs a deal that skips
-  an item the page cannot hold (practice capacity, not this lane).
+  an item the page cannot hold (practice capacity, not this lane). Seed 5 now prints 3 problems in a 2 x 2 grid (one cell
+  empty): a more-practice grow pass (as Independent has) was tried and reverted - the layout estimate let 4 items in and
+  the role then split them over two pages (11 of 30 seeds).
 - R8 (critic fractions-key r3): fraction_of_set independent S prints one lone item (main: one small cell, 59 % of the
   page blank). Pre-existing; the B&W glyphs and the one instruction hold.
 
