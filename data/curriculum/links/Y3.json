@@ -6695,6 +6695,537 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B7.S1": {
+   "title": "Use scales",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "reading scales with different intervals"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading scales with different intervals",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 10s on the number line to 100 (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B7.S2": {
+   "title": "Measure mass in grams",
+   "direct": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "note": "grams"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 10s on the number line to 100 (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B7.S3": {
+   "title": "Measure mass in kilograms and grams",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "mixed kg and g readings"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "mixed kg and g readings",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "mass_ops",
+    "nonstandard_mass",
+    "nonstandard_capacity"
+   ],
+   "related": [
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y3.B7.S4 Equivalent masses (kilograms and grams) (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S4": {
+   "title": "Equivalent masses (kilograms and grams)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversions",
+     "missing": "kilograms and grams, including mixed units (1 kg 250 g)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "kilograms and grams, including mixed units (1 kg 250 g)",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S3 Measure mass in kilograms and grams (step before in the block)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "mass_ops",
+    "nonstandard_mass",
+    "nonstandard_capacity"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y3.B7.S5 Compare mass (next step)"
+    },
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "same standard 4.MD.A.1: Metric Length (mm/cm/m/km)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S5": {
+   "title": "Compare mass",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "missing": "comparing masses in g and kg"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing masses in g and kg",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y3.B7.S4 Equivalent masses (kilograms and grams) (step before in the block)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "nonstandard_capacity",
+    "length_ops",
+    "frac_count"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same standard K.MD.A.2: Compare Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S6": {
+   "title": "Add and subtract mass",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y3.B7.S5 Compare mass (step before in the block)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "mass_ops",
+    "nonstandard_mass",
+    "nonstandard_capacity"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B7.S7": {
+   "title": "Measure capacity and volume in millilitres",
+   "direct": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "note": "millilitres"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "capacity_early",
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B7.S8": {
+   "title": "Measure capacity and volume in litres and millilitres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "missing": "mixed l and ml readings"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "mixed l and ml readings",
+   "build": [
+    "mass_scales"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "capacity_early",
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "measurement:capacity",
+     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S9": {
+   "title": "Equivalent capacities and volumes (litres and millilitres)",
+   "direct": [
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "note": "L and mL"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (step before in the block)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 10s on the number line to 100 (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "same standard 4.MD.A.1: Metric Length (mm/cm/m/km)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S10": {
+   "title": "Compare capacity and volume",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:capacity",
+     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (step before in the block)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S1 Compare mass (prior learning wk W18)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "nonstandard_capacity",
+    "length_ops",
+    "frac_count"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same standard K.MD.A.2: Compare Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B7.S11": {
+   "title": "Add and subtract capacity and volume",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "build": [
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W35)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "mass_ops",
+    "nonstandard_mass",
+    "nonstandard_capacity"
+   ],
+   "related": [],
+   "note": ""
   }
  },
  "proposals": {
@@ -7300,6 +7831,51 @@
     "3.NF.A.3c"
    ],
    "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "mass_scales": {
+   "kind": "new",
+   "skill": "measurement:read_scales",
+   "name": "Read Scales (g, kg, ml, l)",
+   "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100",
+   "representation": "a drawn dial or jug scale; write the reading with the unit; option: scale step",
+   "family": "measurement",
+   "steps": [
+    "Y2.B7.S2",
+    "Y2.B7.S3",
+    "Y2.B7.S7",
+    "Y3.B7.S1",
+    "Y3.B7.S3",
+    "Y3.B7.S4",
+    "Y3.B7.S8"
+   ],
+   "ccss": [
+    "3.MD.A.2",
+    "4.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "mass_ops": {
+   "kind": "new",
+   "skill": "measurement:mass_capacity_word_problems",
+   "name": "Mass and Capacity Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing masses and capacities in context",
+   "representation": "picture of scales/jugs with values; write the answer with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B7.S4",
+    "Y2.B7.S8",
+    "Y3.B7.S5",
+    "Y3.B7.S6",
+    "Y3.B7.S10",
+    "Y3.B7.S11"
+   ],
+   "ccss": [
+    "3.MD.A.2",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
   }
  },
