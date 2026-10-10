@@ -127,4 +127,4 @@ Y4.B14.S2 [W38] own ceiling 10: ok
 Y4.B14.S3 [W29] own ceiling 38: ok
 Y4.B14.S4 [W38] own ceiling 3: ok
 Y4.B14.S5 [W38] own ceiling 3: ok
-linkfit: 765 links in 129 steps; 0 misfits (0 size, 0 content/layout)
+linkfit: 760 links in 129 steps; 0 misfits (0 size, 0 content/layout)

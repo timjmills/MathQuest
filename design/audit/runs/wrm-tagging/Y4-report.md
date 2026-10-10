@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 9
+# Wave 2 tagging: Y4 (Grade 3) report, round 10
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **536 / 229** (round 9). Every step has at least 3 pre and at least 1 related. 0 keys in both |
-| Option checks | — | — | Round 9: 369 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 765 links misfit** (`linkfit.mjs`, five seed sets, 150 items a link, `why` checked; per-step result in `Y4-linkfit.txt`) |
+| Pre / related entries | 528 / — | 570 / 319 | **535 / 225** (round 10). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 10: 401 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 760 links misfit** (`linkfit.mjs`, 150 items a link, free-text whys and cited titles both checked; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,70 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 10 (after critic r9: 15 links in two classes, 1 isolated, and `why` texts)
+All changes are in `spec_zz_zzz_r10.py`, and every change is to a link. The 38 new or changed links are generated at the
+end of `Y4-items.md`. The critic's whole fix table is applied.
+
+**T. The 11s and 12s before W03.**
+- **Fact families.** On B4.S4 and B4.S7, the pre `mult_div_fact_family` → `number_families_mult`, citing Y3.B4.S6. On
+  B4.S5 the related `mult_div_fact_family` is dropped.
+- **Multiples.** B4.S5's pre `multiples` → `count_by_tables {constant:[5,10]}`, citing Y3.B3.S4. The related
+  `multiples` → a chart window held to the named rows: on B4.S4, `mult_chart {task:'fill', constant:[9], band:100}`; on
+  B4.S6, `mult_chart {task:'fill', constant:[3,6,9], band:100}`.
+- **Hops.** `nl_mult {constant:[9]}` on B4.S4 and `{constant:[7]}` on B4.S7, with the why "hops of N along a number line".
+- **The 11 and 12 steps.** On B4.S9 and B4.S10, `mult_chart {task:'fill', constant:[11] / [12], band:144}`, "the N row
+  and column of the chart", replaces `mult_chart {band:144}` and `multiples`.
+
+**S. Story factors and divisors of 13–20.**
+- `div_word_problems {range:100}` on B4.S5, S9 and S10.
+- `mult_word_problems {range:100}` on B4.S4 and B5.S14.
+- `remainder_interpret {range:100}` on B5.S13.
+
+**Isolated.** B9.S7's related `round_sort_tenths` → `round_sort_10`, with the why "sorting by the nearer ten: the same
+halfway rule between two neighbours".
+
+**Option and `why` fixes from the fix table.**
+- B9.S8: `partition_shapes {parts:[0,2], forms:[0]}`.
+- B1.S8: "4-digit numbers placed on a 0-10,000 line (where 1,000 more lands)".
+- `money_notation {currency:'usd'}` on the related links of B8.S2, S6, S8, S9, S10 and B9.S3.
+
+**Cited titles the critic's `own9.mjs` checks** (a cited step that names one table or family while the link deals
+several):
+- **Times-table facts.** The `mult_facts` and `div_facts` links that cited "12 times-table and division facts" or "Divide
+  by 5" are now free-text "the times-table facts to 10 × 10" / "the division facts to 100 ÷ 10", with `band:100`. That is
+  on B4.S13, B5.S1, B5.S11, B5.S14, B6.S8, B7.S7, B7.S8 and B7.S10.
+- **Mixed tables.**
+  - B4.S6's `count_by_tables {constant:[3,6,9]}` now reads "counting along the 3, 6 and 9 tables".
+  - B4.S7's and B4.S8's `mult_facts {constant:[2,5,10]}` and `{constant:[3,6,9]}` are labelled as the anchor facts.
+  - B7.S10's `mult_chart` is `band:100`.
+- **Halves.** `partition_shapes {parts:[0]}` (halves) where it cites "Recognise a half": B3.S2, B7.S1, B8.S1 and B12.S7.
+- **Tenths and fifths.** `write_fraction {denoms:[5]}` is labelled "tenths and fifths written as fractions" on ten steps.
+- **Times 10.** `mult_zeros {forms:[0]}` (× 10) where it cites "Multiples of 10": B5.S3 and B8.S6.
+- **Before W07.** `whole_as_fraction` dropped on B4.S12, because it shows fractions before W07.
+
+**`linkfit.mjs`: G13–G15 closed.**
+- **G13.** Untaught tables are read in every form:
+  - × and ÷ facts;
+  - "Fact Family: a, b, c";
+  - "multiples of n", "count by n", "skip count by n", and "hops" or "jumps of n";
+  - the hop line's `"step"`;
+  - the blanks of a `mult-grid`.
+- **G14.** Divisors of 13 or more are flagged: in ÷, and in story wording such as "n in each", "holds n", "among n" and
+  "groups of n". So are factors of 13–19 before W17.
+- **G15.** The `why` check now also reads a cited step's title.
+  - It covers "jumps/hops of N", "multiples of N", "common multiples", "multiply and divide by N" and "divide by N".
+  - A count-parts answer n counts as nths.
+  - Rounding to tenths is on the later-grade list.
+  - Units match their abbreviations (m, km, cm …).
+  - A cited title must be dealt by at least a third of the items. A free-text `why` must cover every denominator.
+
+**Scan results.**
+- `build.py`: OK.
+- `linkfit.mjs`: 0 of 760 links misfit.
+- `optcheck.mjs`: 401 opts entries, 0 problems. `optchange.mjs`: 0 non-default values that change nothing.
+- The critic's `own9.mjs` (150 items): only its 11 "prime" hits remain. These are the words "composite shape", already
+  ruled false positives.
 
 ## Changes in round 9 (after critic r8: 9 new misfit links found by fresh seeds, and `why` texts)
 All changes are in `spec_zz_zz_r9.py`. They touch links, except the B7.S7 and B7.S8 clauses.

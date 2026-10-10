@@ -137,6 +137,7 @@ function content(sid, e, r) {
   if (/cross-section|\bnets?\b|folds? into/i.test(said)) out.push('nets / cross-sections (6.G.A.4, 7.G.A.3)');      // G11
   if (/\bvolume\b|cubic units/i.test(said)) out.push('volume of solids (5.MD.C)');
   if (/probabilit|\blikely\b|\bunlikely\b|\bimpossible\b/i.test(said)) out.push('probability (7.SP)');
+  if (/nearest tenth|to one decimal place/i.test(said) || /round_sort_tenths|round_decimals/.test(e.key)) out.push('rounding to tenths (5.NBT.A.4)');   // G15
   if (/\bratio\b|x value|y value/i.test(said)) out.push('ratio tables (6.RP)');
   if (/\bprime\b|composite number|prime or composite/i.test(said)) out.push('prime / composite (4.OA.B.4)');
   if (/[xy]-axis/i.test(said) && /reflect/i.test(said)) out.push('reflection in an axis');
@@ -145,14 +146,27 @@ function content(sid, e, r) {
     const p10 = x => [10, 100, 1000].includes(+x);
     if (m && (+m[1] > 12 || +m[2] > 12) && !p10(m[1]) && !p10(m[2])) { out.push(`2-digit × 2-digit (${m[0] || 'long multiplication'})`); break; }
   }
-  if (wk < 'W03' && /multiplication|division/.test(e.key.split(':')[0])) {
-    const taught = tablesBy(wk);
+  if (wk < 'W03') {                                                                           // G13: every form of a table
+    const taught = tablesBy(wk), TBL = [6, 7, 9, 11, 12];
     for (const i of r.items) {
-      const facts = [...`${i.text || ''} ${i.a || ''}`.matchAll(/\b(\d{1,2})\s*×\s*(\d{1,2})\b/g)].map(m => [+m[1], +m[2]]).concat(
-        [...`${i.text || ''}`.matchAll(/\b(\d{1,3})\s*÷\s*(\d{1,2})\b/g)].map(m => [+m[2], +m[2]]));
-      const bad = facts.find(([x, y]) => x <= 12 && y <= 12 && !taught.has(x) && !taught.has(y));
+      const t = `${i.text || ''} ${i.a || ''} ${i.x || ''}`;
+      const pairs = [...t.matchAll(/\b(\d{1,2})\s*[×x]\s*(\d{1,2})\b/g)].map(m => [+m[1], +m[2]])
+        .concat([...t.matchAll(/\b(\d{1,3})\s*÷\s*(\d{1,2})\b/g)].map(m => [+m[2], +m[2]]))
+        .concat([...t.matchAll(/Fact Family:\s*(\d+),\s*(\d+)/gi)].map(m => [+m[1], +m[2]]));
+      const singles = [...t.matchAll(/multiples of (\d+)|count(?:ing)? (?:up |down )?by (\d+)s?\b|skip count by (\d+)s?\b|hops? of (\d+)|jumps? of (\d+)/gi)].map(m => +m.slice(1).find(Boolean))
+        .concat([...(i.pay || '').matchAll(/"step":(\d+)/g)].map(m => +m[1]));
+      let grid = null; if (i.tpl === 'mult-grid') { try { const p = JSON.parse(i.pay); for (const [a, b] of p.blanks || []) if (!taught.has(p.rows[a]) && !taught.has(p.cols[b])) grid = [p.rows[a], p.cols[b]]; } catch (x) {} }
+      const bad = pairs.find(([x, y]) => x <= 12 && y <= 12 && !taught.has(x) && !taught.has(y)) || (singles.find(n => TBL.includes(n) && !taught.has(n)) !== undefined ? [singles.find(n => TBL.includes(n) && !taught.has(n))] : null) || grid;
       if (bad) { out.push(`table not taught by ${wk}: ${bad.join(' × ')}`); break; }
     }
+  }
+  for (const i of r.items) {                                                                  // G14: divisors of 13+, factors of 13-19 before W17
+    const t = `${i.text || ''} ${i.x || ''} ${i.pay || ''}`;
+    const story = /div|word|remainder|share|group|mult/.test(e.key);
+    const div = [...t.matchAll(story ? /÷\s*(\d+)|(\d+) (?:\w+ )?in each|holds (\d+)|among (\d+)|groups of (\d+)|(\d+) in a (?:bag|box|row|team|group|pack)/gi : /÷\s*(\d+)/g)].map(m => +m.slice(1).find(Boolean)).find(n => n >= 13 && n <= 99);
+    if (div) { out.push(`divisor ${div} (Grade 3 divides by 12 or less)`); break; }
+    if (wk < 'W17') { const f = [...t.matchAll(/\b(\d{1,2})\s*[×x]\s*(\d{1,2})\b|(\d+) \w+,? (?:with )?(\d+) \w+ (?:each|in each)/g)].map(m => m.slice(1).filter(Boolean).map(Number)).find(a => a.some(n => n >= 13 && n <= 19));
+      if (f) { out.push(`factor ${f.find(n => n >= 13)} in ${wk} (2-digit × 1-digit is W17)`); break; } }
   }
   if (r.items.some(i => i.tpl === 'stack' && /"op":"[÷/]"/.test(i.pay))) out.push('column ÷ layout');
   if (r.items.some(i => /long division|bus stop/i.test(i.vis || '') || /long division|bus stop/i.test(i.text || ''))) out.push('long-division layout');
@@ -162,23 +176,30 @@ function content(sid, e, r) {
 // G12: a `why` that names a table, a denominator family, a unit or "one line" must match what the items deal
 const FAM = { halves: [2], half: [2], quarters: [4], fourths: [4], eighths: [8], thirds: [3], sixths: [6], ninths: [9], twelfths: [12], fifths: [5], tenths: [10], hundredths: [100] };
 function whyCheck(e, r) {
-  const w = String(e.why || ''); if (/^(R|Y\d)\.B\d+\.S\d+/.test(w)) return [];      // a cited step's title is not a claim
-  const out = [], texts = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''}`);
-  const tm = w.match(/\b(\d+)s? times-table|\bthe (\d+) row|\bwith (\d+) in a group|\bdividing by (\d+)|counting in (\d+)s\b/i);
+  const w0 = String(e.why || '');
+  // G15: a cited step's title is a claim too (the text after the id, before the bracket)
+  const w = (w0.match(/^(?:R|Y\d)\.B\d+\.S\d+\s+(.*?)(?:\(|$)/) || [])[1] ?? w0;
+  const out = [], texts = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''}` + (/^\s*\d{1,2}\s*$/.test(i.a || '') && /equal parts/i.test(i.text || '') ? ` 1/${(i.a || '').trim()}` : ''));   // a count-parts answer of n is nths (4 = fourths)
+  if (/common multiples/i.test(w) && !texts.some(t => /common multiple|in both/i.test(t))) out.push('why claims common multiples; no item asks for one');
+  const tm = w.match(/\b(\d+)s? times-tables?|multiply and divide by (\d+)|\bdivide by (\d+)\b|\bthe (\d+) row|\bwith (\d+) in a group|\bdividing by (\d+)|counting in (\d+)s\b|\b(?:jumps|hops) of (\d+)|\bmultiples of (\d+)/i);
   if (tm) { const n = tm.slice(1).find(Boolean);
     const grid = r.items.filter(i => i.tpl === 'mult-grid');
     const hitGrid = grid.filter(i => { try { const p = JSON.parse(i.pay); return (p.blanks || []).length && p.blanks.every(([a, b]) => p.rows[a] == n || p.cols[b] == n); } catch (x) { return false; } }).length;
-    const hit = hitGrid + texts.filter((t, k) => r.items[k].tpl !== 'mult-grid' && new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b`).test(t)).length;
+    const hit = hitGrid + texts.filter((t, k) => r.items[k].tpl !== 'mult-grid' && (new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b|in ${n}s|of ${n}\\b`).test(t) || new RegExp(`"step":${n}\\b`).test(r.items[k].pay || ''))).length;
     if (hit < texts.length / 2) out.push(`why names ${n} but only ${hit} of ${texts.length} items use it`); }
   const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(w));
+  const cited = w !== w0;
   if (fams.length && !/to\s+(eighths|twelfths|tenths)|halves to/i.test(w)) {
     const ok = new Set(fams.flatMap(f => FAM[f]).concat([1]));
-    const dens = new Set(texts.flatMap(t => [...t.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1])));
-    const off = [...dens].filter(d => !ok.has(d));
-    if (off.length) out.push(`why names ${fams.join('/')} but items deal /${off.join(', /')}`);
+    const per = texts.map(t => new Set([...t.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1])));
+    const withDen = per.filter(d => d.size).length, hitF = per.filter(d => [...d].some(x => ok.has(x) && x !== 1)).length;
+    if (withDen && hitF < texts.length / 3) out.push(`${cited ? 'cited step' : 'why'} names ${fams.join('/')} but only ${hitF} of ${texts.length} items deal it`);
+    const off = [...new Set(per.flatMap(d => [...d]))].filter(d => !ok.has(d));
+    if (!cited && off.length) out.push(`why names ${fams.join('/')} but items deal /${off.join(', /')}`);   // a free-text why must cover every denominator
   }
+  const UNIT = { metres: 'm|metres?|meters?', meters: 'm|metres?|meters?', kilometres: 'km|kilometres?', km: 'km|kilometres?', centimetres: 'cm|centimetres?', cm: 'cm|centimetres?', millimetres: 'mm|millimetres?', mm: 'mm|millimetres?', grams: 'g|grams?', kg: 'kg|kilograms?', litres: 'l|litres?', ml: 'ml|millilitres?', hours: 'h|hr|hours?', minutes: 'min|minutes?', seconds: 's|sec|seconds?' };
   const um = w.match(/\bin (metres|meters|kilometres|km|centimetres|cm|millimetres|mm|grams|kg|litres|ml|hours|minutes|seconds)\b/i);
-  if (um && !texts.some(t => new RegExp(`\\b${um[1]}`, 'i').test(t))) out.push(`why says "in ${um[1]}" but no item has that unit`);
+  if (um && !texts.some(t => new RegExp(`\\b(${UNIT[um[1].toLowerCase()]})\\b`, 'i').test(t))) out.push(`why says "in ${um[1]}" but no item has that unit`);
   if (/one line|share a point|same point|land on one point/i.test(w) && !/one denominator a line/i.test(w)) out.push('why claims fractions share a point on one line (unchecked: each item is one line)');
   return out;
 }

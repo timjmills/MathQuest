@@ -612,7 +612,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "jumps of 1,000 along a 0-10,000 line: the same move pictured",
+     "why": "4-digit numbers placed on a 0-10,000 line (where 1,000 more lands)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -1931,7 +1931,12 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
+     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -2393,8 +2398,8 @@
      "why": "Y3.B3.S2 Use arrays (prior learning wk W02)"
     },
     {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W02)"
+     "key": "multiplication:number_families_mult",
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea)"
     },
     {
      "key": "multiplication:mult_properties",
@@ -2405,15 +2410,30 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories (the facts the stories use)"
+     "why": "equal-groups stories (the facts the stories use)",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "multiplication:nl_mult",
-     "why": "jumps of 9 on a number line"
+     "why": "hops of 9 along a number line",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
     },
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of 9"
+     "key": "multiplication:mult_chart",
+     "why": "the 9 row of the chart",
+     "opts": {
+      "task": "fill",
+      "constant": [
+       9
+      ],
+      "band": 100
+     }
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 9 they are full."
@@ -2494,8 +2514,14 @@
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
     },
     {
-     "key": "number_theory:multiples",
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
+     "key": "multiplication:count_by_tables",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (lower grade, same idea)",
+     "opts": {
+      "constant": [
+       5,
+       10
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -2517,11 +2543,10 @@
     },
     {
      "key": "division:div_word_problems",
-     "why": "sharing and grouping stories"
-    },
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 9s"
+     "why": "sharing and grouping stories",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "note": "Direct: mult_facts and div_facts with constant [9] (generated: every item is a 9× or ÷9 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
@@ -2568,17 +2593,6 @@
      }
     },
     {
-     "key": "multiplication:count_by_tables",
-     "why": "Y4.B4.S2 Multiply and divide by 6 (taught earlier this year, wk W01)",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
-      ]
-     }
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
      "opts": {
@@ -2597,13 +2611,33 @@
     {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "counting along the 3, 6 and 9 tables (Y4.B4.S1, S2 and S4, wk W01-W02)",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "number_theory:multiples",
-     "why": "common multiples of 3, 6 and 9"
+     "key": "multiplication:mult_chart",
+     "why": "the 3, 6 and 9 rows of the chart",
+     "opts": {
+      "task": "fill",
+      "constant": [
+       3,
+       6,
+       9
+      ],
+      "band": 100
+     }
     },
     {
      "key": "patterns:pattern_relationship",
@@ -2660,23 +2694,12 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S15 The 5 times-table (prior learning wk W02)",
+     "why": "the 2, 5 and 10 facts (Y3), the anchors for the 7s",
      "opts": {
       "constant": [
        2,
        5,
        10
-      ]
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (taught the same school week, W02)",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
       ]
      }
     },
@@ -2690,8 +2713,8 @@
      }
     },
     {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W02)"
+     "key": "multiplication:number_families_mult",
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea)"
     },
     {
      "key": "multiplication:mult_properties",
@@ -2700,6 +2723,17 @@
     {
      "key": "multiplication:arrays_groups",
      "why": "Y1.B9.S5 Add equal groups (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "the 3, 6 and 9 facts (Y4 W01-W02), the anchors for the 7s",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -2713,7 +2747,12 @@
     },
     {
      "key": "multiplication:nl_mult",
-     "why": "jumps of 7 on a number line"
+     "why": "hops of 7 along a number line",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
     }
    ],
    "note": "Existing tags are partial only because opts were not recorded; with constant 7 they are full."
@@ -2769,7 +2808,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S15 The 5 times-table (prior learning wk W03)",
+     "why": "the 2, 5 and 10 facts (Y3), the anchors for the 7s",
      "opts": {
       "constant": [
        2,
@@ -2897,18 +2936,21 @@
    "related": [
     {
      "key": "multiplication:mult_chart",
-     "why": "the 12 × 12 chart",
+     "why": "the 11 row and column of the chart",
      "opts": {
+      "task": "fill",
+      "constant": [
+       11
+      ],
       "band": 144
      }
     },
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of 11"
-    },
-    {
      "key": "division:div_word_problems",
-     "why": "division stories"
+     "why": "division stories",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "multiplication:mult_div_fact_family",
@@ -3007,18 +3049,21 @@
    "related": [
     {
      "key": "multiplication:mult_chart",
-     "why": "the 12 × 12 chart",
+     "why": "the 12 row and column of the chart",
      "opts": {
+      "task": "fill",
+      "constant": [
+       12
+      ],
       "band": 144
      }
     },
     {
-     "key": "number_theory:multiples",
-     "why": "multiples of 12"
-    },
-    {
      "key": "division:div_word_problems",
-     "why": "division stories"
+     "why": "division stories",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "multiplication:mult_div_fact_family",
@@ -3168,10 +3213,6 @@
     {
      "key": "division:div_equation_parts",
      "why": "dividend, divisor, quotient named"
-    },
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "4/4 = 1 is n ÷ n = 1 in fraction form"
     }
    ],
    "note": "mult_properties is tagged here today as partial; the existing proposal mult_three also lists this step, which looks like a numbering slip (owner question).",
@@ -3207,7 +3248,10 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3268,10 +3312,6 @@
      "why": "Y3.B3.S2 Use arrays (prior learning wk W05)"
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
-    },
-    {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W05)"
     },
@@ -3279,6 +3319,13 @@
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)",
      "maxNumber": 100
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "division:share_into_groups",
@@ -3423,10 +3470,6 @@
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)",
      "maxNumber": 1000
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (lower grade, same CCSS cluster)"
     },
     {
      "key": "placevalue:value",
@@ -3989,7 +4032,10 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "Y2.B5.S16 Divide by 5 (prior learning wk W06)"
+     "why": "the division facts to 100 ÷ 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "placevalue:expand",
@@ -4167,7 +4213,10 @@
    "related": [
     {
      "key": "division:remainder_interpret",
-     "why": "remainders in context"
+     "why": "remainders in context",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "number_sense:estimate_quotient",
@@ -4192,11 +4241,17 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "multiplication:mult_word_problems",
-     "why": "Y3.B4.S11 How many ways (prior learning wk W06)"
+     "why": "Y3.B4.S11 How many ways (prior learning wk W06)",
+     "opts": {
+      "range": 100
+     }
     }
    ],
    "preBuild": [
@@ -4778,11 +4833,10 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -4791,6 +4845,13 @@
     {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "Y2/Gr.1 Count sides on 2D shapes (prior learning list; no WRM step id in our data)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "the division facts to 100 ÷ 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     }
    ],
    "preBuild": [],
@@ -4926,7 +4987,12 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W07)"
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W07)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -5285,7 +5351,10 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     }
    ],
    "preBuild": [],
@@ -5331,12 +5400,15 @@
      "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08)"
     },
     {
-     "key": "division:div_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
-    },
-    {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "the division facts to 100 ÷ 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "fraction_operations:add_fractions_like",
@@ -5454,11 +5526,17 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (taught earlier this year, wk W03)"
+     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "multiplication:mult_chart",
-     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (taught earlier this year, wk W02)"
+     "why": "the multiplication chart: equivalent fractions sit in two rows of the same columns (Y4 block 4)",
+     "opts": {
+      "band": 100
+     }
     },
     {
      "key": "fractions:identify",
@@ -5797,7 +5875,12 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W30)"
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W30)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -5865,7 +5948,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught the same school week, W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -5898,7 +5981,10 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "dimes as tenths of a dollar"
+     "why": "dimes as tenths of a dollar",
+     "opts": {
+      "currency": "usd"
+     }
     },
     {
      "key": "decimals:compare_decimal",
@@ -6163,14 +6249,22 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W31)"
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W31)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "measurement:money_notation",
-     "why": "cents as tenths and hundredths"
+     "why": "cents as tenths and hundredths",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": "",
@@ -6203,7 +6297,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6307,19 +6401,19 @@
      }
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
-     "opts": {
-      "denoms": [
-       5
-      ]
-     }
-    },
-    {
      "key": "decimals:decimal_nl_drag",
      "why": "Y4.B8.S4 Tenths on a number line (taught earlier this year, wk W30)",
      "opts": {
       "ticks": "some"
+     }
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
      }
     }
    ],
@@ -6338,7 +6432,10 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "cents are hundredths of a dollar"
+     "why": "cents are hundredths of a dollar",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": "",
@@ -6374,7 +6471,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6408,7 +6505,10 @@
    "related": [
     {
      "key": "measurement:money_notation",
-     "why": "dollars, dimes, cents"
+     "why": "dollars, dimes, cents",
+     "opts": {
+      "currency": "usd"
+     }
     },
     {
      "key": "decimals:compare_decimal",
@@ -6509,7 +6609,10 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "cents to dollars (÷100)"
+     "why": "cents to dollars (÷100)",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": "",
@@ -6597,7 +6700,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6668,7 +6771,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6695,7 +6798,10 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "$3.45 = 3 dollars 4 dimes 5 cents"
+     "why": "$3.45 = 3 dollars 4 dimes 5 cents",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": "",
@@ -6722,7 +6828,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6802,7 +6908,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
@@ -6884,19 +6990,19 @@
      "maxNumber": 10
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
-     "opts": {
-      "denoms": [
-       5
-      ]
-     }
-    },
-    {
      "key": "placevalue:order_least_to_greatest",
      "why": "Y3.B1.S13 Order numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 999
+     }
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
+     "opts": {
+      "denoms": [
+       5
+      ]
      }
     }
    ],
@@ -6961,8 +7067,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "number_sense:round_sort_tenths",
-     "why": "rounding sort"
+     "key": "number_sense:round_sort_10",
+     "why": "sorting by the nearer ten: the same halfway rule between two neighbours"
     }
    ],
    "note": "",
@@ -7019,6 +7125,7 @@
      "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)",
      "opts": {
       "parts": [
+       0,
        2
       ],
       "forms": [
@@ -7073,17 +7180,17 @@
      "why": "Y3.B9.S1 Pounds and pence (prior learning wk W37)"
     },
     {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S2 Recognise coins (lower grade, same CCSS cluster)"
+    },
+    {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (taught earlier this year, wk W30)",
+     "why": "tenths and fifths written as fractions (Y4.B8.S1 Tenths as fractions, wk W30)",
      "opts": {
       "denoms": [
        5
       ]
      }
-    },
-    {
-     "key": "measurement:coin_value",
-     "why": "Y1.B13.S2 Recognise coins (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [
@@ -7965,7 +8072,12 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
+     "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
     },
     {
      "key": "shapes_classify:classify_quads",

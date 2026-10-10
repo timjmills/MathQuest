@@ -1619,3 +1619,274 @@ Same command as round 6, against the round-8 file.
 3. Write the amount. Use the point. → 0.75
 4. Write the amount. Use the point. → 6.00
 
+
+# Round 10: generated items for every new or changed pre / related link
+
+Same command as round 6, against the round-9 file.
+
+**Y4.B3.S2 pre** `shapes_early:partition_shapes` opts `{"parts":[0]}` Max Number 10000 — Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)
+
+1. What fraction of the shape is shaded? → 1/2
+2. How many equal parts is this shape divided into? → 2
+3. How many equal parts is this shape divided into? → 2
+4. What fraction of the shape is shaded? → 1/2
+
+**Y4.B4.S4 pre** `multiplication:number_families_mult` opts `{}` Max Number 10000 — Y3.B4.S6 Link multiplication and division (lower grade, same idea)
+
+1. Number Family: Complete all equations → 3, 5, 15
+2. Number Family: Complete all equations → 4, 4, 16
+3. Number Family: Complete all equations → 2, 2, 4
+4. Number Family: Complete all equations → 2, 4, 8
+
+**Y4.B4.S4 related** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — equal-groups stories (the facts the stories use)
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B4.S4 related** `multiplication:nl_mult` opts `{"constant":[9]}` Max Number 10000 — hops of 9 along a number line
+
+1. 6 × 9 = ? → 54
+2. 9 × 9 = ? → 81
+3. 4 × 9 = ? → 36
+4. 4 × 9 = ? → 36
+
+**Y4.B4.S4 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[9],"band":100}` Max Number 10000 — the 9 row of the chart
+
+1. Fill in the missing products. → 63, 72, 90
+2. Fill in the missing products. → 45, 54, 72
+3. Fill in the missing products. → 18, 27, 54
+4. Fill in the missing products. → 63, 72, 81
+
+**Y4.B4.S5 pre** `multiplication:count_by_tables` opts `{"constant":[5,10]}` Max Number 10000 — Y3.B3.S4 Multiples of 5 and 10 (lower grade, same idea)
+
+1. Count by 5. Write the missing numbers. → 15, 25, 30, 45, 55
+2. Count by 10. Write the missing numbers. → 40, 60, 70, 100, 120
+3. Count by 5. Write the missing numbers. → 20, 25, 50, 55, 60
+4. Count by 10. Write the missing numbers. → 30, 50, 60, 90, 110
+
+**Y4.B4.S5 related** `division:div_word_problems` opts `{"range":100}` Max Number 10000 — sharing and grouping stories
+
+1. Tom has 6 stickers. Tom puts them into 3 equal groups. How many stickers are in each group? → 2
+2. Sam has 15 pencils. Sam shares them equally among 3 friends. How many pencils does each friend get? → 5
+3. Leo has 42 apples. Leo puts them into 6 equal groups. How many apples are in each group? → 7
+4. Mia has 56 cookies. Mia puts 7 cookies in each pack. How many packs does Mia fill? → 8
+
+**Y4.B4.S6 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[3,6,9],"band":100}` Max Number 10000 — the 3, 6 and 9 rows of the chart
+
+1. Fill in the missing products. → 42, 72, 63
+2. Fill in the missing products. → 18, 21, 24
+3. Fill in the missing products. → 12, 18, 12
+4. Fill in the missing products. → 42, 63, 60
+
+**Y4.B4.S7 pre** `multiplication:number_families_mult` opts `{}` Max Number 10000 — Y3.B4.S6 Link multiplication and division (lower grade, same idea)
+
+1. Number Family: Complete all equations → 3, 5, 15
+2. Number Family: Complete all equations → 4, 4, 16
+3. Number Family: Complete all equations → 2, 2, 4
+4. Number Family: Complete all equations → 2, 4, 8
+
+**Y4.B4.S7 related** `multiplication:nl_mult` opts `{"constant":[7]}` Max Number 10000 — hops of 7 along a number line
+
+1. 7 × 7 = ? → 49
+2. 10 × 7 = ? → 70
+3. 4 × 7 = ? → 28
+4. 4 × 7 = ? → 28
+
+**Y4.B4.S9 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[11],"band":144}` Max Number 10000 — the 11 row and column of the chart
+
+1. Fill in the missing products. → 99, 99, 132
+2. Fill in the missing products. → 77, 88, 110
+3. Fill in the missing products. → 33, 44, 77
+4. Fill in the missing products. → 99, 110, 110
+
+**Y4.B4.S9 related** `division:div_word_problems` opts `{"range":100}` Max Number 10000 — division stories
+
+1. Tom has 6 stickers. Tom puts them into 3 equal groups. How many stickers are in each group? → 2
+2. Sam has 15 pencils. Sam shares them equally among 3 friends. How many pencils does each friend get? → 5
+3. Leo has 42 apples. Leo puts them into 6 equal groups. How many apples are in each group? → 7
+4. Mia has 56 cookies. Mia puts 7 cookies in each pack. How many packs does Mia fill? → 8
+
+**Y4.B4.S10 related** `multiplication:mult_chart` opts `{"task":"fill","constant":[12],"band":144}` Max Number 10000 — the 12 row and column of the chart
+
+1. Fill in the missing products. → 84, 96, 120
+2. Fill in the missing products. → 84, 96, 120
+3. Fill in the missing products. → 36, 48, 84
+4. Fill in the missing products. → 96, 108, 132
+
+**Y4.B4.S10 related** `division:div_word_problems` opts `{"range":100}` Max Number 10000 — division stories
+
+1. Tom has 6 stickers. Tom puts them into 3 equal groups. How many stickers are in each group? → 2
+2. Sam has 15 pencils. Sam shares them equally among 3 friends. How many pencils does each friend get? → 5
+3. Leo has 42 apples. Leo puts them into 6 equal groups. How many apples are in each group? → 7
+4. Mia has 56 cookies. Mia puts 7 cookies in each pack. How many packs does Mia fill? → 8
+
+**Y4.B4.S13 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B5.S1 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B5.S11 pre** `division:div_facts` opts `{"band":100}` Max Number 10000 — the division facts to 100 ÷ 10 (Y3 and Y4 block 4)
+
+1. 70 ÷ 7 = ? → 10
+2. 35 ÷ 5 = ? → 7
+3. 12 ÷ 3 = ? → 4
+4. 70 ÷ 10 = ? → 7
+
+**Y4.B5.S13 related** `division:remainder_interpret` opts `{"range":100}` Max Number 10000 — remainders in context
+
+1. Noor has 34 crayons. Noor puts 11 crayons in each box. How many crayons are left over? → 1
+2. Omar has 27 stamps. Omar puts 4 stamps in each jar. How many stamps are left over? → 3
+3. 10 children go on a trip. Each car holds 4 children. How many cars do they need? → 3
+4. Ben has 74 shells. A full basket holds 11 shells. How many baskets can Ben fill? → 6
+
+**Y4.B5.S14 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B5.S14 pre** `multiplication:mult_word_problems` opts `{"range":100}` Max Number 10000 — Y3.B4.S11 How many ways (prior learning wk W06)
+
+1. Omar has 2 bags. Each bag has 2 buttons. How many buttons are there in all? → 4
+2. Kofi has 5 boxes. Each box has 8 crayons. How many crayons are there in all? → 40
+3. Ben has 6 jars. Each jar has 7 stamps. How many stamps are there in all? → 42
+4. Lena has 7 plates. Each plate has 7 beads. How many beads are there in all? → 49
+
+**Y4.B6.S8 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B6.S8 pre** `division:div_facts` opts `{"band":100}` Max Number 10000 — the division facts to 100 ÷ 10 (Y3 and Y4 block 4)
+
+1. 70 ÷ 7 = ? → 10
+2. 35 ÷ 5 = ? → 7
+3. 12 ÷ 3 = ? → 4
+4. 70 ÷ 10 = ? → 7
+
+**Y4.B7.S1 pre** `shapes_early:partition_shapes` opts `{"parts":[0]}` Max Number 10000 — Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W07)
+
+1. What fraction of the shape is shaded? → 1/2
+2. How many equal parts is this shape divided into? → 2
+3. How many equal parts is this shape divided into? → 2
+4. What fraction of the shape is shaded? → 1/2
+
+**Y4.B7.S7 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B7.S8 pre** `division:div_facts` opts `{"band":100}` Max Number 10000 — the division facts to 100 ÷ 10 (Y3 and Y4 block 4)
+
+1. 70 ÷ 7 = ? → 10
+2. 35 ÷ 5 = ? → 7
+3. 12 ÷ 3 = ? → 4
+4. 70 ÷ 10 = ? → 7
+
+**Y4.B7.S10 pre** `multiplication:mult_facts` opts `{"band":100}` Max Number 10000 — the times-table facts to 10 × 10 (Y3 and Y4 block 4)
+
+1. 7 × 10 = ? → 70
+2. 5 × 7 = ? → 35
+3. 3 × 4 = ? → 12
+4. 10 × 7 = ? → 70
+
+**Y4.B7.S10 pre** `multiplication:mult_chart` opts `{"band":100}` Max Number 10000 — the multiplication chart: equivalent fractions sit in two rows of the same columns (Y4 block 4)
+
+1. Fill in the missing products. → 7, 12, 24
+2. Fill in the missing products. → 30, 35, 56
+3. Fill in the missing products. → 5, 10, 6
+4. Fill in the missing products. → 30, 35, 54
+
+**Y4.B8.S1 pre** `shapes_early:partition_shapes` opts `{"parts":[0]}` Max Number 10000 — Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W30)
+
+1. What fraction of the shape is shaded? → 1/2
+2. How many equal parts is this shape divided into? → 2
+3. How many equal parts is this shape divided into? → 2
+4. What fraction of the shape is shaded? → 1/2
+
+**Y4.B8.S2 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — dimes as tenths of a dollar
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B8.S6 pre** `multiplication:mult_zeros` opts `{"forms":[0]}` Max Number 10000 — Y3.B4.S1 Multiples of 10 (prior learning wk W31)
+
+1. 5 × 10 = ? → 50
+2. 7 × 10 = ? → 70
+3. 3 × 10 = ? → 30
+4. 3 × 10 = ? → 30
+
+**Y4.B8.S6 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — cents as tenths and hundredths
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B8.S8 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — cents are hundredths of a dollar
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B8.S9 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — dollars, dimes, cents
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B8.S10 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — cents to dollars (÷100)
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B9.S3 related** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — $3.45 = 3 dollars 4 dimes 5 cents
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+
+**Y4.B9.S7 related** `number_sense:round_sort_10` opts `{}` Max Number 10000 — sorting by the nearer ten: the same halfway rule between two neighbours
+
+1. Sort the numbers by what they round to (nearest ten). → {"t0":"bin_1","t1":"bin_0","t2":"bin_1","t3":"bin_
+2. Sort the numbers by what they round to (nearest ten). → {"t0":"bin_1","t1":"bin_0","t2":"bin_0","t3":"bin_
+3. Sort the numbers by what they round to (nearest ten). → {"t0":"bin_0","t1":"bin_0","t2":"bin_0","t3":"bin_
+4. Sort the numbers by what they round to (nearest ten). → {"t0":"bin_0","t1":"bin_1","t2":"bin_1","t3":"bin_
+
+**Y4.B9.S8 pre** `shapes_early:partition_shapes` opts `{"parts":[0,2],"forms":[0]}` Max Number 10000 — Y2.B8.S3 Recognise a half (prior learning wk W33)
+
+1. How many equal parts is this shape divided into? → 4
+2. How many equal parts is this shape divided into? → 4
+3. How many equal parts is this shape divided into? → 2
+4. How many equal parts is this shape divided into? → 2
+
+**Y4.B12.S7 pre** `shapes_early:partition_shapes` opts `{"parts":[0]}` Max Number 10000 — Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)
+
+1. What fraction of the shape is shaded? → 1/2
+2. How many equal parts is this shape divided into? → 2
+3. How many equal parts is this shape divided into? → 2
+4. What fraction of the shape is shaded? → 1/2
+
