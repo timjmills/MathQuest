@@ -3325,6 +3325,759 @@
    ],
    "note": ""
   },
+  "Y5.B5.S1": {
+   "title": "Multiply up to a 4-digit number by a 1-digit number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:multiply",
+     "missing": "4-digit × 1-digit: its largest size is 3-digit × 1-digit",
+     "opts": {
+      "tiles": 31
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "missing": "4-digit × 1-digit: sizes stop at 3-digit × 1-digit",
+     "opts": {
+      "tiles": 31
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "multiplying a 4-digit number by a 1-digit number (column method and area model)",
+   "build": [
+    "mult_4x1"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S8 Informal written methods for multiplication (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "reason about a column"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate first"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "multiplication stories"
+    },
+    {
+     "key": "division:divide",
+     "why": "the inverse: 4-digit ÷ 1-digit (Y5.B5.S8)"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S2": {
+   "title": "Multiply a 2-digit number by a 2-digit number (area model)",
+   "direct": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "opts": {
+      "tiles": 22
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:multiply",
+     "why": "the column method for the same product (Y5.B5.S3)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "distributive property"
+    },
+    {
+     "key": "algebra:distributive_expr",
+     "why": "distribute over a sum"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate the product"
+    }
+   ],
+   "note": "The legacy area-model drawing moves to the kit with vis_area_model_rows; content is complete."
+  },
+  "Y5.B5.S3": {
+   "title": "Multiply a 2-digit number by a 2-digit number",
+   "direct": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "tiles": 22
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "missing": "the full calculation: it asks only for the placeholder 0 at the start of the second row",
+     "opts": {
+      "tiles": 22
+     }
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (previous step)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "reason about the column"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "check by estimating"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "partial products"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S4": {
+   "title": "Multiply a 3-digit number by a 2-digit number",
+   "direct": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "opts": {
+      "tiles": 23
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "missing": "the full long multiplication: only the placeholder 0 of row two is asked",
+     "opts": {
+      "tiles": 32
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the whole column (long) multiplication of a 3-digit by a 2-digit number (multiply tiles stop at 2-digit × 2-digit)",
+   "build": [
+    "long_mult"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step)"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (earlier Y5 step)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (earlier Y5 step)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate the product"
+    },
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "reason about the column"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "distributive property"
+    },
+    {
+     "key": "division:long_div_2digit",
+     "why": "the inverse: divide by a 2-digit number"
+    }
+   ],
+   "note": "School week W34 is an assessment week; prior learning from Y5.B5 and Y5.B3."
+  },
+  "Y5.B5.S5": {
+   "title": "Multiply a 4-digit number by a 2-digit number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "missing": "4-digit × 2-digit worked to the end: top number stops at 3 digits and only the placeholder is asked",
+     "opts": {
+      "tiles": 32
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "long multiplication of a 4-digit by a 2-digit number worked to the end",
+   "build": [
+    "long_mult"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "Y5.B5.S4 Multiply a 3-digit number by a 2-digit number (previous step)"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "Y5.B5.S4 Multiply a 3-digit number by a 2-digit number (previous step)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W35)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W35)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate the product"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "2-digit × 2-digit column"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "the same method with decimals (Y6)"
+    },
+    {
+     "key": "division:long_div_2digit",
+     "why": "the inverse"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S6": {
+   "title": "Solve problems with multiplication",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "missing": "multi-digit numbers: stories stay within table facts (9 boxes of 11)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "missing": "multi-digit ×: one-step stories with table facts"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "multiplication problems with multi-digit numbers (4-digit × 1-digit, 2-digit × 2-digit) and two-step problems with a × step",
+   "build": [
+    "mult_wp_multidigit",
+    "multi_step_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [
+    "correspondence"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "times as many (scaling)"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "scaling without pictures"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar model of the story"
+    },
+    {
+     "key": "division:remainder_interpret",
+     "why": "the division twin (Y5.B5.S11)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step + − stories (no × step)"
+    }
+   ],
+   "note": "Prior-learning Y4.B5.S14 Correspondence problems has no skill (correspondence)."
+  },
+  "Y5.B5.S7": {
+   "title": "Short division",
+   "direct": [
+    {
+     "key": "division:div_zero_in_quotient",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "division:box_division_hard",
+     "missing": "the short-division (bus stop) layout with exchange digits; it uses the box method",
+     "opts": {
+      "regroup": "none"
+     }
+    },
+    {
+     "key": "division:divide",
+     "missing": "the bus-stop layout: tiles 31 / 41 use the long-division grid",
+     "opts": {
+      "tiles": 31
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "short division written in the bus-stop layout with small exchange digits carried to the next place",
+   "build": [
+    "vis_division_layouts"
+   ],
+   "pre": [
+    {
+     "key": "division:box_division_hard",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W11)"
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W11)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 (prior learning wk W11)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W12)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check by multiplying"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate the quotient"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "is the remainder finished?"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "the area-model method for the same division"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S8": {
+   "title": "Divide a 4-digit number by a 1-digit number",
+   "direct": [
+    {
+     "key": "division:divide",
+     "opts": {
+      "tiles": 41,
+      "regroup": "none"
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "division:box_division_hard",
+     "missing": "4-digit dividends: it deals 3-digit ÷ 1-digit",
+     "opts": {
+      "regroup": "none"
+     }
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:div_zero_in_quotient",
+     "why": "Y5.B5.S7 Short division (previous step)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (prior learning wk W12)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W12)"
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "Y4.B5.S2 Use factor pairs (prior learning wk W12)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check by multiplying"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate the quotient"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "the inverse: 4-digit × 1-digit"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "division stories"
+    }
+   ],
+   "note": "Bus-stop layout comes with vis_division_layouts (Y5.B5.S7); the 4-digit ÷ 1-digit content is fully dealt by divide tiles 41."
+  },
+  "Y5.B5.S9": {
+   "title": "Divide with remainders",
+   "direct": [
+    {
+     "key": "division:divide",
+     "opts": {
+      "tiles": 41,
+      "regroup": "always"
+     }
+    },
+    {
+     "key": "division:box_division_hard",
+     "opts": {
+      "regroup": "always"
+     }
+    },
+    {
+     "key": "division:div_remainders",
+     "opts": {}
+    },
+    {
+     "key": "division:remainder_too_big",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:divide",
+     "why": "Y5.B5.S8 Divide a 4-digit number by a 1-digit number (previous step)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W12)"
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (prior learning wk W12)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W12)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S4 Grouping (prior learning wk W12)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:remainder_interpret",
+     "why": "what the remainder means in a story"
+    },
+    {
+     "key": "division:remainder_contexts",
+     "why": "remainder contexts"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check: quotient × divisor + remainder"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "parts of a division equation"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S10": {
+   "title": "Efficient division",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:area_model_div_3by1",
+     "missing": "choosing an efficient method (known facts, factors, partitioning, short division) for a given division"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "choosing and justifying an efficient division method (known fact, halving twice for ÷ 4, partitioning, short division)",
+   "build": [
+    "long_mult",
+    "div_factors"
+   ],
+   "pre": [
+    {
+     "key": "division:divide",
+     "why": "Y5.B5.S9 Divide with remainders (previous step)"
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "Y4.B5.S2 Use factor pairs (prior learning wk W12)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts – multiplication and division (prior learning wk W12)"
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (prior learning wk W12)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W12)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W12)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:box_division_hard",
+     "why": "box method"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate first"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "factors used to split the divisor"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check the result"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B5.S11": {
+   "title": "Solve problems with multiplication and division",
+   "direct": [
+    {
+     "key": "multiplication:mult_comparison",
+     "opts": {}
+    },
+    {
+     "key": "division:remainder_interpret",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "missing": "multi-digit × and ÷ numbers: table-fact stories only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −",
+   "build": [
+    "mult_wp_multidigit",
+    "multi_step_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (prior learning wk W03)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W04)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W04)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W04)"
+    },
+    {
+     "key": "division:divide",
+     "why": "Y5.B5.S9 Divide with remainders (earlier Y5 step)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [
+    "correspondence"
+   ],
+   "related": [
+    {
+     "key": "division:remainder_contexts",
+     "why": "remainder contexts"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "times as many, no pictures"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "one-step division stories"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar model of the story"
+    }
+   ],
+   "note": ""
+  },
   "Y5.B6.S1": {
    "title": "Multiply a unit fraction by an integer",
    "direct": [],
@@ -7844,6 +8597,199 @@
    ],
    "why": "closes Y5.B3.S10 Multiples of 10, 100 and 1,000 (existing wrm_props entry, reused)"
   },
+  "mult_4x1": {
+   "kind": "option",
+   "skill": "multiplication:multiply",
+   "also": [
+    "multiplication:area_model_mult"
+   ],
+   "option": "size \"4-digit × 1-digit\" (tiles 41) on the column method and the area model",
+   "name": "Multiply a 4-Digit Number by a 1-Digit Number (option)",
+   "grade": "4",
+   "family": "operations",
+   "standards": [
+    "4.NBT.B.5"
+   ],
+   "ee": [],
+   "teaches": "multiplying a whole number of up to four digits by a one-digit number, with the area model and the column method side by side",
+   "problemTypes": [
+    "area model with four parts",
+    "column method with carries",
+    "match the model to the column",
+    "estimate first"
+   ],
+   "templates": [
+    "stack",
+    "area-model"
+   ],
+   "newTemplates": [],
+   "answer": "write the product in the grid",
+   "ladder": "O2 no carry → carries → zero digits (3,045 × 6) · O3 carry boxes and partial products → none · O6 area model / column",
+   "misconceptions": [
+    "forgets a carry into the thousands",
+    "multiplies a zero digit as 1"
+   ],
+   "wrmSteps": [
+    "Y4.B5.S11"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B5.S1"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.5"
+   ],
+   "representation": "area model with four parts; column method with carries; match the model to the column; estimate first",
+   "why": "closes Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number (existing std_props entry, reused)"
+  },
+  "long_mult": {
+   "kind": "new",
+   "skill": "multiplication:long_multiplication_4x2",
+   "name": "Long Multiplication and Division (4-digit)",
+   "teaches": "long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method",
+   "representation": "a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes",
+   "family": "operations",
+   "steps": [
+    "Y5.B5.S4",
+    "Y5.B5.S5",
+    "Y5.B5.S10"
+   ],
+   "improves": [
+    "Y6.B2.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.6",
+    "5.NBT.B.5"
+   ],
+   "why": "closes Y5.B5.S4 Multiply a 3-digit number by a 2-digit number; Y5.B5.S5 Multiply a 4-digit number by a 2-digit number; Y5.B5.S10 Efficient division (existing wrm_props entry, reused)"
+  },
+  "mult_wp_multidigit": {
+   "kind": "option",
+   "skill": "multiplication:mult_word_problems_plain",
+   "option": "numbers \"multi-digit\" (4-digit × 1-digit and 2-digit × 2-digit)",
+   "name": "Multiplication Problems With Larger Numbers (option)",
+   "teaches": "one- and two-step multiplication and division stories whose calculation is 4-digit × 1-digit, 2-digit × 2-digit or 4-digit ÷ 1-digit",
+   "representation": "B&W boxed cell: a two-line story, a bar model or equal-groups bar with the numbers in big Andika digits, a write-on calculation space and one answer box with its unit label",
+   "family": "operations",
+   "steps": [
+    "Y5.B5.S6",
+    "Y5.B5.S11"
+   ],
+   "ccss": [
+    "4.OA.A.3",
+    "4.NBT.B.5",
+    "4.NBT.B.6"
+   ],
+   "why": "every × / ÷ story skill deals table facts only, so Y5 problems with multi-digit calculations are never produced",
+   "reused": false
+  },
+  "multi_step_four_ops": {
+   "kind": "option",
+   "skill": "algebra:multi_step_word",
+   "also": [
+    "algebra:multi_step_word_plain"
+   ],
+   "option": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate",
+   "name": "Two-Step Problems With All Four Operations (option)",
+   "grade": "3-4",
+   "family": "algebra",
+   "standards": [
+    "3.OA.D.8",
+    "4.OA.A.3"
+   ],
+   "ee": [
+    "M.EE.3.OA.7",
+    "M.EE.4.OA.3"
+   ],
+   "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+   "problemTypes": [
+    "× then −",
+    "÷ then +",
+    "write the equation with n",
+    "remainder decides the answer",
+    "is the answer reasonable? (round)"
+   ],
+   "templates": [
+    "word-work"
+   ],
+   "newTemplates": [
+    "bar-model"
+   ],
+   "answer": "write each step answer; write the equation",
+   "ladder": "O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain",
+   "misconceptions": [
+    "answers the first step",
+    "uses the letter as a label, not a number",
+    "ignores the remainder"
+   ],
+   "wrmSteps": [
+    "Y3.B4.S10",
+    "Y4.B5.S13"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B5.S6",
+    "Y5.B5.S11"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.A.2",
+    "4.OA.A.3"
+   ],
+   "representation": "× then −; ÷ then +; write the equation with n; remainder decides the answer; is the answer reasonable? (round)",
+   "why": "closes Y5.B5.S6 Solve problems with multiplication; Y5.B5.S11 Solve problems with multiplication and division (existing std_props entry, reused)"
+  },
+  "vis_division_layouts": {
+   "lane": "operations",
+   "kind": "option",
+   "name": "Division Layouts: Bus Stop, Notes, Missing Digits",
+   "build": "the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path",
+   "hosts": [
+    "division:long_div_2digit",
+    "division:box_division_easy",
+    "division:box_division_hard"
+   ],
+   "templates": [
+    "division",
+    "long-division"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/sheet/cells/division.js",
+    "js/modules/sheet/cells/long-division.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B5.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.6"
+   ],
+   "skill": "division:long_div_2digit",
+   "family": "operations",
+   "teaches": "the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path",
+   "representation": "the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path",
+   "why": "closes Y5.B5.S7 Short division (existing vis_builds entry, reused)"
+  },
+  "div_factors": {
+   "kind": "new",
+   "skill": "division:divide_using_factors",
+   "name": "Division Using Factors",
+   "teaches": "dividing by a 2-digit number by dividing by its factors in turn (420 ÷ 12 = 420 ÷ 2 ÷ 6)",
+   "representation": "a two-step arrow diagram with the factor pair chosen",
+   "family": "operations",
+   "steps": [
+    "Y5.B5.S10"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.6"
+   ],
+   "why": "closes Y5.B5.S10 Efficient division (existing wrm_props entry, reused)"
+  },
   "equiv_from_unit": {
    "kind": "option",
    "skill": "fractions:equivalent",
@@ -8862,6 +9808,18 @@
    "reused": true,
    "ccss": [],
    "why": "needed as a pre-skill for Y5.B3.S7 (existing entry, reused)"
+  },
+  "correspondence": {
+   "kind": "new",
+   "skill": "multiplication:correspondence_problems",
+   "name": "Correspondence Problems",
+   "teaches": "one-to-many correspondence (each of 3 hats with each of 4 scarves; 1 bag holds 5) as multiplication",
+   "representation": "a table or tree diagram to complete, then the multiplication",
+   "family": "operations",
+   "steps": [],
+   "reused": true,
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B5.S6, Y5.B5.S11 (existing entry, reused)"
   }
  },
  "tagFixes": [
@@ -9110,6 +10068,90 @@
    "step": "Y5.B3.S10",
    "action": "add",
    "why": "partial: multiples of 10 (divisible by 10) only"
+  },
+  {
+   "key": "multiplication:area_model_mult",
+   "step": "Y5.B5.S1",
+   "action": "add",
+   "why": "partial: area model to 3-digit × 1-digit"
+  },
+  {
+   "key": "multiplication:area_model_mult_hard",
+   "step": "Y5.B5.S2",
+   "action": "add",
+   "why": "upgrade the partial tag: tiles 22 is exactly the 2 × 2 grid"
+  },
+  {
+   "key": "multiplication:multiply",
+   "step": "Y5.B5.S3",
+   "action": "add",
+   "why": "upgrade the partial tag: tiles 22 deals 2-digit × 2-digit column multiplication"
+  },
+  {
+   "key": "multiplication:mult_placeholder_zero",
+   "step": "Y5.B5.S3",
+   "action": "partial",
+   "why": "partial: only the placeholder digit of row two is asked"
+  },
+  {
+   "key": "multiplication:area_model_mult_hard",
+   "step": "Y5.B5.S4",
+   "action": "add",
+   "why": "upgrade the partial tag: tiles 23 is the 2 × 3 grid (3-digit × 2-digit)"
+  },
+  {
+   "key": "multiplication:mult_placeholder_zero",
+   "step": "Y5.B5.S4",
+   "action": "partial",
+   "why": "partial: only the placeholder digit of row two is asked"
+  },
+  {
+   "key": "number_ops_mixed:word_problems_mixed",
+   "step": "Y5.B5.S6",
+   "action": "partial",
+   "why": "partial: table-fact stories only"
+  },
+  {
+   "key": "algebra:multi_step_word",
+   "step": "Y5.B5.S6",
+   "action": "remove",
+   "why": "its variants are + and − only (add_then_sub ...); it does not teach a multiplication problem"
+  },
+  {
+   "key": "multiplication:mult_word_problems_plain",
+   "step": "Y5.B5.S6",
+   "action": "add",
+   "why": "partial: one-step × stories, table facts only"
+  },
+  {
+   "key": "division:box_division_hard",
+   "step": "Y5.B5.S7",
+   "action": "partial",
+   "why": "partial: box method, not the short-division layout the step names"
+  },
+  {
+   "key": "division:divide",
+   "step": "Y5.B5.S7",
+   "action": "add",
+   "why": "partial: tiles 31/41 deal the sizes in a long-division grid"
+  },
+  {
+   "key": "division:divide",
+   "step": "Y5.B5.S8",
+   "action": "add",
+   "why": "tiles 41: 4-digit ÷ 1-digit (5,016 ÷ 8)"
+  },
+  {
+   "key": "division:divide",
+   "step": "Y5.B5.S9",
+   "action": "add",
+   "why": "tiles 41 + remainders always: 4-digit ÷ 1-digit with remainders"
+  },
+  {
+   "key": "number_ops_mixed:word_problems_mixed",
+   "step": "Y5.B5.S11",
+   "action": "partial",
+   "why": "partial: table-fact stories only"
   },
   {
    "key": "fractions:equiv_frac_visual",
