@@ -49,7 +49,7 @@ async function digest() {
         const d = fr.contentDocument;
         try { await d.fonts.ready; } catch (e) { /* measure anyway */ }
         await new Promise((r) => setTimeout(r, 50));
-        let maxBand = 0, empty = 0, n = 0, worst = '';
+        let maxBand = 0, empty = 0, n = 0, worst = '', lastBottom = -Infinity, lastH = 0;
         for (const cell of d.querySelectorAll('.ws-cell')) {
           const cr = cell.getBoundingClientRect();
           if (cr.height < 4) continue;
@@ -70,12 +70,18 @@ async function digest() {
             lo = Math.min(lo, er.top); hi = Math.max(hi, er.bottom);
           }
           const h = bot - top;
+          if (cr.bottom > lastBottom) { lastBottom = cr.bottom; lastH = cr.height; }
           if (!(hi > lo)) { empty++; continue; }
           const band = Math.max(0, lo - top, bot - hi) / h;
           if (band > maxBand) { maxBand = band; worst = (cell.textContent || '').trim().slice(0, 16) + ` (top ${((lo - top) / h * 100).toFixed(0)} %, foot ${((bot - hi) / h * 100).toFixed(0)} %, cell ${(h / 3.7795).toFixed(1)} mm)`; }
         }
+        // the blank foot: from the last cell's bottom to the top of the page footer (first page), in mm
+        const foot = d.querySelector('.ws-foot');
+        const pxmm = 96 / 25.4;
+        const rawFoot = foot ? (foot.getBoundingClientRect().top - lastBottom) / pxmm : 0;
+        const footMm = Math.max(0, rawFoot);
         fr.remove();
-        resolve({ n, empty, maxBand: Math.round(maxBand * 1000) / 1000, worst });
+        resolve({ n, empty, maxBand: Math.round(maxBand * 1000) / 1000, worst, footMm: Math.round(footMm * 10) / 10, overMm: Math.round(Math.max(0, -rawFoot) * 10) / 10, lastRowMm: Math.round(lastH / pxmm * 10) / 10 });
       };
       fr.srcdoc = doc.replace(/<head>/i, `<head><base href="${location.href}">`);
     }) : null;
@@ -86,7 +92,7 @@ async function digest() {
         const note = String((r.fits && r.fits.note) || '');
         const ind = /(\d+) independent/.exec(note);
         res[k] = { pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null };
-        if (role === 'opener' && measureCells) res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper }));
+        if (role === 'opener' && measureCells) { res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper })); res[k].cells.strip = size === 'L' ? 9.5 : 7.5; }
       } catch (e) { res[k] = { error: String(e && e.message || e).slice(0, 80) }; }
     }
     return res;
@@ -116,11 +122,14 @@ async function digest() {
       if (k.includes('| scripted-model |') && a.sha !== b.sha) errs.push('scripted model differs from base');
     }
     if (a.cells) {
+      // critic r4 N12 (PT-OPN-7): fewer than 2 Independent rows while the blank foot could hold an Independent strip and a row
+      if (a.indep !== null && a.indep < 2 && a.cells.footMm >= a.cells.strip + a.cells.lastRowMm) errs.push(`${a.indep} Independent row(s) with ${a.cells.footMm} mm blank (a strip + row is ${(a.cells.strip + a.cells.lastRowMm).toFixed(1)} mm)`);
+      if (a.cells.overMm > 0.5) errs.push(`the last row runs ${a.cells.overMm} mm into the footer`);
       if (a.cells.empty) errs.push(`${a.cells.empty} empty cell(s)`);
       if (a.cells.maxBand >= 0.3) errs.push(`empty band ${Math.round(a.cells.maxBand * 100)} % (>= 30 %) in "${a.cells.worst}"`);
     }
     if (errs.length) bad++;
-    const ind = k.includes('| opener |') ? `  independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %` : ''}` : '';
+    const ind = k.includes('| opener |') ? `  independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm` : ''}` : '';
     console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
   }
   console.log(`small-fixes-model-pages: ${bad ? 'FAIL' : 'OK'} (${Object.keys(now).length} sheets${bad ? `, ${bad} failing` : ''})`);
