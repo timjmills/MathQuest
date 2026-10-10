@@ -18,6 +18,8 @@ the owner's — keep. Follow-up for the first two goes with the skip_count grid/
 
 **Owner request 2026-10-10 (regroup boxes, build NEXT SESSION with Lane B):** on screen the needed regroup / carry boxes are required and marked; a right subtraction regroup number crosses out the old top digit live (78 − 29: 7 → 6, 8 → 18); addition carries a 1, no crossing; paper unchanged; per-skill option marked (default) / unmarked / optional. Spec: `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`.
 
+**Owner request 2026-10-10 (placevalue:identify, NEXT SESSION):** pupils also WRITE the value of the underlined digit on a line at the bottom of the cell (132 → 30); new appended option `writeValue`, default on; key shows ring + value in orange; screen adds a value box. Spec: `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`.
+
 **Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
 passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
 
