@@ -83,8 +83,8 @@ st('R.B3.S6', d=[P(NB,'wholes of 2 and 3 only (band 5 deals wholes 4 and 5)', ba
 # R.B4 Circles and triangles
 st('R.B4.S1', d=[F(N2D, forms=[1], shapes=[0, 1])], r=[(M2D,'match the word to the shape'),(CORN,'count corners: a circle has none')],
    n='Tap every circle / triangle (forms 1, shapes circles + triangles); ovals also appear as the circle family.')
-st('R.B4.S2', d=[P(ATT,'comparing two shapes side by side: curved / straight sides, corners')], v='partial',
-   m='comparing a circle and a triangle (same / different, curved / straight)', b=['compare_shapes'])
+st('R.B4.S2', d=[P(ATT,'comparing two shapes side by side (curved / straight, corners); the skill asks how many sides or vertices one shape has', forms=[0], band=4)], v='partial',
+   m='comparing a circle and a triangle (same / different, curved / straight); {forms:[0], band:4} asks only how many sides or vertices a triangle, square or rectangle has (the word "vertices" is still used)', b=['compare_shapes'])
 st('R.B4.S3', v='gap', m='finding circles and triangles in real objects', b=['shapes_world'])
 st('R.B4.S4', d=[P(POS,'in front of, behind, on top of, under (the skill does above / below / beside / between)')], v='partial',
    m='the full early position vocabulary (in front, behind, on top, under)', b=['position_map'])
@@ -104,11 +104,12 @@ st('R.B5.S7', d=[P(NB,'wholes 1 and 2 never appear (band 5 deals wholes 3-5 only
    m='composition of every whole from 1 to 5: the wholes 1 and 2 never appear (band 5 deals wholes 3-5)', b=['band_3'],
    p=[(CO,'R.B5.S1 count a group to 5 first',{'band':5,'objects':'pictures'}),(TFB,'R.B5.S3 build the amount on a frame',{'band':5})])
 # R.B6 Shapes with 4 sides
-st('R.B6.S1', d=[F(N2D, forms=[1], shapes=[2])], r=[(SV2,'count the 4 sides'),(M2D,'match the word to the shape')],
+st('R.B6.S1', d=[F(N2D, forms=[1], shapes=[2])], r=[(CORN,'count the 4 corners',{'band':4})],
    n='Tap every square / rectangle (forms 1, shapes squares and rectangles).')
 st('R.B6.S2', d=[F(CMP, shapes=[1])], r=[(HEX,'composing with pattern blocks')], n='Two shapes make a square or rectangle (tap the answer).')
 st('R.B6.S3', v='gap', m='finding 4-sided shapes in the environment', b=['shapes_world'])
-st('R.B6.S4', v='gap', m='sequencing a day (morning, afternoon, night) and talking about routines', b=['day_order'])
+st('R.B6.S4', v='gap', m='sequencing a day (morning, afternoon, night) and talking about routines', b=['day_order'], xr=[TH, THH, CLK, 'measurement:time_match_clock'],
+   n='Related: none; the clock-face skills read the time, a Year 1 (Y1.B14) idea, not the order of a day.')
 # R.B7 Alive in 5
 st('R.B7.S1', v='gap', m='zero as none: an empty set and the numeral 0', b=['zero'])
 st('R.B7.S2', d=[P(CO,'a group of zero (the skill always draws at least one)', band=5, objects='pictures')], v='partial', m='finding a group of zero', b=['zero'])
@@ -119,7 +120,8 @@ st('R.B7.S5', d=[P(CS,'one more within 5 with objects (deals to 10, no objects)'
 st('R.B7.S6', d=[P(CS,'one less within 5 with objects, including 1 less than 1 (deals to 10, no objects)', band=10, dir='back')], v='partial',
    m='one less within 0-5 with objects, including 1 less than 1 is 0', b=['more_less_pictures', 'band_3'])
 st('R.B7.S7', d=[P(NB,'wholes 1-2 and a zero part (5 and 0) never appear; band 5 deals wholes 3-5', band=5)], v='partial',
-   m='composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear', b=['band_3', 'zero'])
+   m='composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear', b=['band_3'],
+   r=[(A5,'a whole made from two pictured parts, to 5 (R.B9.S9)')])
 st('R.B7.S8', v='gap', m='conceptual subitising to 5: seeing 3 and 2 and knowing 5', b=['subitise'], r=[(NB,'the parts named as a bond')])
 # R.B8 Mass and capacity
 st('R.B8.S1', d=[F(HL)], n='"Which is heavier?" about two pictured objects; the balance comes in S2.')
@@ -156,8 +158,9 @@ st('R.B10.S6', v='gap', m='ordering events in time (first, next, then)', b=['day
 # R.B11 Building 9 and 10
 st('R.B11.S1', d=[P(CO,'groups of exactly 9 and 10: band 10 deals 1-10, mostly below 9', band=10, objects='frame')], v='partial',
    m='finding groups of exactly 9 and 10 (band 10 deals 1-10, mostly below 9)', b=['number_focus'])
-st('R.B11.S2', d=[F(CG, band=10, level=[1]), P(PVC,'numbers within 10 (the lowest band is 99)', band=99)], v='partial',
-   m='comparing two numerals to 10 (not groups) with more / fewer', b=['compare_small'])
+st('R.B11.S2', d=[F(CG, band=10, level=[1])], v='partial',
+   m='comparing two numerals to 10 (not groups) with more / fewer', b=['compare_small'],
+   n='placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = (81 _ 52), none within 10.')
 st('R.B11.S3', d=[P(TFB,'9 and 10 only: band 10 builds 1-10', band=10)], v='partial', m='representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9)', b=['number_focus'])
 st('R.B11.S4', v='gap', m='conceptual subitising to 10 on frames and dice', b=['subitise'])
 st('R.B11.S5', d=[P(CS,'one more within 10 shown with objects (the skill is a number-name question)', band=10, dir='forward')], v='partial',
@@ -173,8 +176,8 @@ st('R.B11.S11', d=[P(DND,'finding a double in a picture to 10', forms=[0])], v='
 st('R.B11.S12', d=[P(DBL,'building a double with objects to 10', band=20)], v='partial', m='making a double with objects to 10', b=['doubles_pictured'])
 st('R.B11.S13', d=[P(OE,'making pairs to see odd and even', forms=[2], range=10)], v='partial', m='pairing objects to see odd and even', b=['odd_even_pairs'])
 # R.B12 Explore 3-D shapes
-st('R.B12.S1', d=[F(N3D, forms=[1])], r=[(M3D,'the same shapes named by dragging written names: a Year 1 response (Y1.B3.S1), so related, not direct (rule 8)')],
-   n='Tap every cube / sphere ... (forms 1).')
+st('R.B12.S1', d=[F(N3D, forms=[1])], p=[(N2D,'R.B4.S1 / R.B6.S1 name the flat shapes first',{'forms':[1],'shapes':[0,1,2]})],
+   n='Tap every cube / sphere ... (forms 1). Related: none in Reception; the written-name match (shape_name_match_3d) is a drag of written words, a Year 1 response.')
 st('R.B12.S2', v='gap', m='finding the flat (2-D) faces on 3-D shapes', b=['shape_3d_tasks'], r=[(N2D,'naming the face shapes')])
 st('R.B12.S3', v='gap', m='choosing a 3-D shape for a job (it rolls, it stacks)', b=['shape_3d_tasks'])
 st('R.B12.S4', v='gap', m='finding 3-D shapes in the environment', b=['shapes_world'])
@@ -209,7 +212,7 @@ st('R.B14.S3', d=[P(S5,'taking away from 6-10: the skill stops at 5'), P(SWP,'a 
 st('R.B14.S4', d=[P(S5,'finding how many were taken away (change unknown)')], v='partial', m='change unknown: how many were taken away',
    b=['pictures_change_unknown'], r=[(MAS,'the abstract missing-number form, later')])
 # R.B15 Manipulate, compose and decompose
-st('R.B15.S1', d=[P(ATT,'choosing a shape for a purpose (it rolls, it stacks, it fits)', forms=[1])], v='partial', m='selecting a shape for a purpose', b=['shape_3d_tasks'])
+st('R.B15.S1', v='gap', m='selecting a shape for a purpose (it rolls, it stacks, it fits); no live skill asks this', b=['shape_3d_tasks'])
 st('R.B15.S2', d=[P(N2D,'recognising a shape when it is turned', forms=[1])], v='partial', m='recognising a turned shape as the same shape', b=['defining_attributes'],
    p=[(N2D,'R.B6.S1 / R.B4.S1 name the shape first')])
 st('R.B15.S3', d=[F(CMP)])
@@ -219,7 +222,7 @@ st('R.B15.S6', d=[P(CMP,'decomposing: finding the shapes inside a shape (the ski
 st('R.B15.S7', v='gap', m='copying a picture made of 2-D shapes', b=['scenes'], r=[(CMP,'combining shapes')])
 st('R.B15.S8', v='gap', m='finding 2-D faces within 3-D shapes', b=['shape_3d_tasks'], r=[(N3D,'naming the 3-D shape')])
 # R.B16 Sharing and grouping
-st('R.B16.S1', v='gap', m='exploring sharing an amount fairly', b=['share_group'], r=[(SHG,'grouping, the inverse view')])
+st('R.B16.S1', v='gap', m='exploring sharing an amount fairly', b=['share_group'], r=[(SHG,'grouping, the inverse view',{'band':12})])
 st('R.B16.S2', d=[P(SHG,'sharing one at a time (how many each); the skill makes groups of a size', band=12)], v='partial',
    m='sharing one by one between a given number (how many each)', b=['share_group'])
 st('R.B16.S3', d=[P(SHG,'exploring: making equal groups freely; the skill gives the group size', band=12)], v='partial', m='exploring making equal groups', b=['share_group'])
@@ -244,8 +247,9 @@ st('R.B17.S11', v='gap', m='creating maps and plans from a story', b=['position_
 st('R.B18.S1', v='gap', m='a consolidation review across the Reception year', b=['consolidate'],
    p=[(CO,'R.B11.S1 counting to 10'),(NB,'R.B11.S7 composition to 10'),(CG,'R.B11.S2 compare to 10'),(TFT,'R.B13.S3 numbers to 20'),(A5,'R.B14.S1 add more'),(S5,'R.B14.S3 take away')],
    r=[(SP,'patterns, reviewed in S2')], n='A review step: no single skill; served by the consolidate review pool.')
-st('R.B18.S2', d=[P(SP,'relationships between numbers (1 more, doubles, bonds)', points=[0])], v='partial', m='number relationships (1 more, doubles, bonds) reviewed together',
-   b=['consolidate'], p=[(CS,'1 more / 1 less'),(NB,'bonds'),(DND,'doubles')])
+st('R.B18.S2', d=[P(SP,'relationships between numbers (1 more, doubles, bonds); and its response is typed shape names, not a Reception response', points=[0])], v='partial',
+   m='number relationships (1 more, doubles, bonds) reviewed together; the live pattern skill asks for typed shape names, not a Reception response',
+   b=['consolidate'], p=[(CS,'R.B11.S5 / S6 1 more / 1 less',{'band':10}),(NB,'R.B11.S7 bonds to 10',{'band':10}),(HALF,'R.B16.S5 sharing between two: halves to 10',{'band':10})])
 
 # ---------------- Year 1 (Kindergarten) ----------------
 st('Y1.B1.S1', d=[P(CC,'sorting every object into groups by a rule; the skill counts one kind', band=6)], v='partial', m='sorting all objects into groups and naming the rule', b=['sort_groups'])
@@ -262,9 +266,11 @@ st('Y1.B1.S10', d=[F(CG, band=10, level=[1])])
 st('Y1.B1.S11', d=[F(CG, band=10, dir='mixed')])
 st('Y1.B1.S12', d=[P(CG,'the symbols <, > and = and the words greater than / less than', band=10)], v='partial',
    m='the symbols <, >, = and the words greater than, less than, equal to within 10', b=['compare_small'])
-st('Y1.B1.S13', d=[P(PVC,'numbers within 10 (the lowest band is 99)', band=99)], v='partial', m='comparing two numbers within 10', b=['compare_small'],
-   p=[(CG,'Y1.B1.S11 / S12 compare two groups within 10: more, fewer, same',{'band':10})])
-st('Y1.B1.S14', d=[P(OLG,'ordering objects and numbers within 10 (the lowest band is 99)', band=99)], v='partial', m='ordering groups and numbers within 10', b=['compare_small'], r=[(OGL,'the reverse order')])
+st('Y1.B1.S13', v='gap', m='comparing two numbers within 10 (numerals, with the words greater / less)', b=['compare_small'],
+   p=[(CG,'Y1.B1.S11 / S12 compare two groups within 10: more, fewer, same',{'band':10})],
+   n='placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = only.')
+st('Y1.B1.S14', v='gap', m='ordering groups and numbers within 10', b=['compare_small'],
+   n='placevalue:order_least_to_greatest is not tagged: its lowest band (99) orders 2-digit numbers only.')
 st('Y1.B1.S15', v='gap', m='the 0-10 number line: reading, counting along and placing numbers', b=['nl_20'], r=[(NLA,'jumps on a line, next block')])
 # Y1.B2 Addition and subtraction within 10
 st('Y1.B2.S1', d=[P(NB,'parts and wholes of real objects and groups, named in words (not yet a bond)', band=5)], v='partial',
@@ -279,8 +285,12 @@ st('Y1.B2.S6', v='gap', m='listing bonds of a number in order (0 + 5, 1 + 4 ...)
 st('Y1.B2.S7', d=[F(MT, band=10)], r=[(NB,'bonds of other wholes: 10 is the special case',{'band':10,'unknown':'second'})])
 st('Y1.B2.S8', d=[P(A5,'pictured parts with totals 6-10 (the skill stops at 5)')], v='partial', m='adding two pictured groups with totals to 10',
    b=['add_10_pictures'], r=[(A10,'the same facts as numbers (across)')])
-st('Y1.B2.S9', d=[F(AWP, band=10), F(NLA, range=10)])
-st('Y1.B2.S10', d=[F(AWP, band=10), F(AWPP, band=10)])
+st('Y1.B2.S9', d=[P(AWP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank', band=10), F(NLA, range=10)], v='partial',
+   m='add-more stories as a Kindergarten response: a pictured story read aloud and one answer box (the word-work cell adds columns, a sign row and a label bank)', b=['k_story'],
+   p=[(CS,'Y1.B1.S6 count on from any number: the main building block of add more',{'band':10,'dir':'forward'})])
+st('Y1.B2.S10', d=[P(AWP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank', band=10), P(AWPP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank; the picture row is off', band=10)], v='partial',
+   m='addition stories within 10 as a Kindergarten response: a pictured story and one answer box (the word-work cell adds columns, a sign row and a label bank)', b=['k_story'],
+   p=[(CS,'Y1.B1.S6 count on from any number',{'band':10,'dir':'forward'})])
 st('Y1.B2.S11', d=[F(NB, band=10, unknown='first')])
 st('Y1.B2.S12', d=[F(NB, band=10, unknown='second'), F(MAS, range=10)])
 st('Y1.B2.S13', d=[F(FF, range=10), F(NFA, band=10)], n='fact_family_sort (is it a fact family?) is not listed: its answer is a typed yes / no, not a Kindergarten response (rules 8 and 18).')
@@ -292,9 +302,12 @@ st('Y1.B2.S16', d=[F(NLS, range=10), F(NLS2, range=10)])
 st('Y1.B2.S17', d=[P(A10,'adding or subtracting only 1 or 2 (counting on or back by 1 or 2)', notation=['across'])], v='partial', m='+1, +2, −1, −2 as a fluency set', b=['add_sub_1_2'])
 # Y1.B3 Shape
 st('Y1.B3.S1', d=[F(N3D), F(M3D)])
-st('Y1.B3.S2', v='gap', m='sorting 3-D shapes by a rule (rolls / stacks, faces)', b=['shape_sort'], r=[(N3D,'naming first')])
+st('Y1.B3.S2', v='gap', m='sorting 3-D shapes by a rule (rolls / stacks, faces)', b=['shape_sort'],
+   p=[(N3D,'Y1.B3.S1 name the 3-D shapes first',{'forms':[1]}),(CC,'Y1.B1.S1 sort and count one kind',{'band':6})], xr=[M2D, M3D],
+   n='Related: none; no live skill sorts 3-D shapes in another form.')
 st('Y1.B3.S3', d=[F(N2D, shapes=[0, 1, 2, 4]), F(M2D)], n='Circles, triangles, squares, rectangles, pentagons, hexagons (no rhombus).')
-st('Y1.B3.S4', d=[P(ATT,'sorting into groups by a rule; the skill picks every shape with n sides', forms=[1])], v='partial', m='sorting 2-D shapes into groups', b=['shape_sort'])
+st('Y1.B3.S4', d=[P(ATT,'sorting into groups by a rule; the skill picks every shape with a property, and even at band 4 asks "4 right angles" and "parallel sides" in 5 of 12 items', forms=[1], band=4)], v='partial',
+   m='sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill picks shapes by a property and still asks right angles and parallel sides', b=['shape_sort'])
 st('Y1.B3.S5', d=[P(SP,'patterns of 3-D shapes (the skill draws 2-D shapes only)')], v='partial', m='repeating patterns made of 3-D shapes', b=['pattern_make'])
 # Y1.B4 Place value within 20
 st('Y1.B4.S1', d=[F(CO, band=20)])
@@ -310,8 +323,12 @@ st('Y1.B4.S8', v='gap', m='the 0-20 number line: reading and labelling ticks', b
    xp=[PVC], r=[(PNL,'the same line read in tens later (to 100)',{'span':10,'band':100})])
 st('Y1.B4.S9', d=[F(NLA, range=20), F(NLS2, range=20)], n='At Max Number 20 both skills draw a 0-20 line (13 + 2, 16 − 7): count on and back along it.')
 st('Y1.B4.S10', v='gap', m='estimating where a number lies on a 0-20 line with only the ends marked', b=['nl_20'])
-st('Y1.B4.S11', d=[P(PVC,'numbers within 20 (the lowest band is 99)', band=99)], v='partial', m='comparing numbers within 20', b=['compare_small'])
-st('Y1.B4.S12', d=[P(OLG,'numbers within 20 (the lowest band is 99)', band=99)], v='partial', m='ordering numbers within 20', b=['compare_small'], r=[(OGL,'reverse order')])
+st('Y1.B4.S11', v='gap', m='comparing numbers within 20', b=['compare_small'],
+   p=[(CG,'Y1.B1.S11 compare two groups: more, fewer',{'band':10}),(CS,'Y1.B4.S7 the order of the numbers to 20',{'band':20,'dir':'forward'})],
+   n='placevalue:compare is not tagged: its lowest band (99) deals 2-digit numbers with < > = only.')
+st('Y1.B4.S12', v='gap', m='ordering numbers within 20', b=['compare_small'],
+   p=[(CS,'Y1.B4.S7 the order of the numbers to 20',{'band':20,'dir':'forward'}),(CG,'Y1.B1.S11 compare two groups',{'band':10})],
+   n='placevalue:order_least_to_greatest is not tagged: its lowest band (99) orders 2-digit numbers only.')
 # Y1.B5 Add and subtract within 20
 st('Y1.B5.S1', d=[F(A20N, band=20, notation=['across']), F(NLA, range=20)], n='Counting on within 20, no bridging; number_line_add at Max Number 20 draws the 0-20 line (14 + 4).')
 st('Y1.B5.S2', d=[P(A20N,'using the bond 3 + 4 to add 13 + 4 (a ten-frame or part-whole picture); the skill is abstract', band=20, notation=['across'])], v='partial',
@@ -354,9 +371,9 @@ st('Y1.B8.S7', v='gap', m='comparing capacities measured in cups', b=['nonstanda
 st('Y1.B9.S1', d=[P(SKL,'2s alone on a page; 2s, 5s and 10s come mixed, and no pictured pairs', step=[0], band=50)], v='partial',
    m='counting in 2s from 0 on true multiples, a page of 2s alone, with pictured pairs', b=['multiples_from_0'],
    p=[(DBL,'R.B9.S8 / Y1.B5.S4 doubles: two equal groups of 2',{'band':20}),(OE,'R.B9.S6 / R.B11.S13 pairs: odd and even',{'forms':[2],'range':10}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20 one by one',{'band':20})])
-st('Y1.B9.S2', d=[P(SKL,'10s alone on a page; mixed with 2s and 5s, no ten frames', step=[0], band=50)], v='partial',
-   m='counting in 10s from 0 on true multiples to 100, a page of 10s alone', b=['multiples_from_0'],
-   p=[(TFV,'Y1.B6.S2 20, 30, 40 … as tens',{'band':90}),(HCF,'the tens column of the hundred square',{'band':100,'gaps':'column'}),(NSF,'count on in ones to 50 (Y1.B6.S1)',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})])
+st('Y1.B9.S2', d=[P(SKL,'10s alone on a page: the page mixes 2s, 5s and 10s, and 10s are only 2 of 30 items', step=[0], band=50)], v='partial',
+   m='counting in 10s from 0 on true multiples to 100, a page of 10s alone (skip_count_line {step:[0]} deals 10s in only 2 of 30 items)', b=['multiples_from_0'],
+   p=[(TFV,'Y1.B6.S2 20, 30, 40 and 50 as tens (school week 8)',{'band':50}),(NSF,'Y1.B6.S1 count on in ones to 50 (week 8)',{'step':1,'range':50}),(HCF,'the tens column of the hundred square, to 50',{'band':50,'gaps':'column'}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})])
 st('Y1.B9.S3', d=[P(SKL,'5s alone on a page; mixed with 2s and 10s, no hands', step=[0], band=50)], v='partial',
    m='counting in 5s from 0 on true multiples, a page of 5s alone', b=['multiples_from_0'],
    p=[(TFV,'Y1.B9.S2 counting in 10s first: two 5s make each ten',{'band':50}),(DBL,'Y1.B9.S1 counting in equal steps: doubles',{'band':20}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})],
@@ -387,8 +404,8 @@ st('Y1.B10.S8', d=[P(FOS,'a quarter only: family 2 deals 1/2 and 2/4 too, and th
    m='finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths)', b=['halves_quarters_only'])
 # Y1.B11 Position and direction
 st('Y1.B11.S1', v='gap', m='whole, half and quarter turns', b=['turns'])
-st('Y1.B11.S2', d=[P(POS,'left and right (the skill does above / below / beside)')], v='partial', m='left and right', b=['position_map'],
-   p=[(POS,'R.B4.S4 / R.B17.S6 the position words above, below, beside first',{'forms':[0,1]}),(N2D,'name the shapes being placed',{'forms':[1]})])
+st('Y1.B11.S2', v='gap', m='left and right: shape_positions deals only above, below, beside and between', b=['position_map'],
+   p=[(POS,'R.B4.S4 / R.B17.S6 the position words above, below, beside first',{'forms':[0,1]}),(N2D,'name the shapes being placed',{'forms':[1],'shapes':[0,1,2]})])
 st('Y1.B11.S3', v='gap', m='forwards and backwards moves', b=['position_map'])
 st('Y1.B11.S4', d=[F(POS, forms=[0])], n='Above and below only (forms 0).')
 st('Y1.B11.S5', v='gap', m='ordinal numbers 1st, 2nd, 3rd ...', b=['ordinal'])
@@ -399,7 +416,7 @@ st('Y1.B12.S2', d=[P(TFV,'100 as ten tens never appears: band 90 deals 1-9 tens,
    m='counting the tens to 100, with 100 as ten tens (band 90 stops at 9 tens) and naming each multiple of ten', b=['tens_name_100'])
 st('Y1.B12.S3', d=[F(B10, band=99), F(UF, band=99)])
 st('Y1.B12.S4', d=[P(PNL,'a whole 0-100 line counted in tens then ones', span=10, band=100)], v='partial', m='the 0-100 line', b=['nl_20'])
-st('Y1.B12.S5', d=[F(ML10, step=1, band=100)])
+st('Y1.B12.S5', d=[F(ML10, step=1, band=100)], xp=[PVC])
 st('Y1.B12.S6', d=[P(PVC,'two numbers with the same tens (the skill mixes any two)', band=99)], v='partial', m='comparing numbers with the same number of tens', b=['compare_small'])
 st('Y1.B12.S7', d=[F(PVC, band=99)])
 # Y1.B13 Money
@@ -516,7 +533,7 @@ FORMS = {
  AWPP: [(AWP, _f+'with a picture row')], NLA: [(NLS2, _i+'subtract on the line')], NLS: [(NLA, _i+'add on the line')], NLS2: [(NLA, _i+'add on the line')],
  CG: [(CC, _f+'count one kind of a sort'), (PVC, _f+'compare numerals, later')], COB: [(OOL, _f+'order three'), (HL, _f+'compare mass')],
  HL: [(COB, _f+'compare length and height')], OOL: [(COB, _f+'compare two'), (MNS, _f+'measure with units')],
- N2D: [(M2D, _f+'match the word to the shape'), (SV2, _f+'count sides and corners')], N3D: [(M3D, _f+'match the word to the shape')],
+ N2D: [(CORN, _f+'count the corners', {'band': 4})], N3D: [(M3D, _f+'match the word to the shape')],
  M2D: [(N2D, _f+'tap the shapes')], M3D: [(N3D, _f+'tap the shapes')], CMP: [(HEX, _f+'fill a hexagon with blocks')], HEX: [(CMP, _f+'two shapes make one')],
  TC: [(TFT, _f+'build on two ten frames'), (B10, _f+'base-10 blocks')], TFT: [(TC, _f+'10 and n more')],
  TFV: [(B10, _f+'build with rods and cubes')], B10: [(TFV, _f+'count the tens'), (UF, _f+'write tens and ones')], UF: [(B10, _f+'build it with blocks')],
@@ -529,7 +546,7 @@ FORMS = {
  MNS: [(RUL, _f+'a ruler'), (OOL, _f+'order by length')], FF: [(NFA, _f+'the number family'), (FFS, _f+'is it a fact family?')], NFA: [(FF, _f+'the fact family')],
  FFS: [(FF, _f+'complete the family')], MAS: [(CLZ, _f+'pick numbers to make a total'), (NB, _f+'the part-whole picture')], CLZ: [(MAS, _f+'missing number sentences')],
  A20N: [(S20N, _i+'subtract ones'), (NLA, _f+'count on along a line')], S20N: [(A20N, _i+'add ones')], CMPW: [(CG, _f+'compare two groups')],
- A3: [(NB, _f+'a two-part bond')], A10: [(S10, _i+'subtract within 10')], S10: [(A10, _i+'add within 10')], ATT: [(SV2, _f+'count sides and vertices')],
+ A3: [(NB, _f+'a two-part bond')], A10: [(S10, _i+'subtract within 10')], S10: [(A10, _i+'add within 10')], ATT: [(CORN, _f+'count the corners', {'band': 4})],
  CFA: [(ATT, _f+'one property at a time')], NWF: [(CO, _f+'count the objects')], PNL: [(NLA, _f+'jumps along a line')], CC: [(CG, _f+'compare the groups')],
  SKL: [(TFV, _f+'tens as rods')], POS: [(N2D, 'naming the shapes being placed')], SP: [(N2D, 'naming the shapes in the pattern')],
 }
@@ -601,14 +618,17 @@ FIT = {
  SWP: [(10, {})], A5: [(5, {})], S5: [(5, {})], EQG: [(30, {'forms': [0]})],
  MON: [(50, {'currency': 'usd', 'kind': 'like', 'band': 50, 'values': [1, 5, 10]}), (100, {'currency': 'usd', 'band': 100})],
  COIN: [(25, {'currency': 'usd'})], PNL: [(100, {'span': 10, 'band': 100})], NWF: [(20, {'range': 20})],
- SHF: [(20, {'denoms': [2]})], N2D: [(100, {'forms': [1]})], N3D: [(100, {'forms': [1]})],
+ SHF: [(20, {'denoms': [2]})], N2D: [(4, {'forms': [1], 'shapes': [0, 1, 2]})], N3D: [(100, {'forms': [1]})],
+ # shapes (rule 18 content, critic r3): sides and corners of 3- and 4-sided shapes only; no octagons, angles, written-name drags
+ ATT: [(4, {'forms': [0], 'band': 4})], SV2: [], CORN: [(4, {'band': 4})], HEX: [], M2D: [], M3D: [],
+ CMP: [(4, {'shapes': [1]}), (4, {'shapes': [0, 1]}), (4, {'shapes': [0, 1, 2]})], PART: [(2, {'parts': [0], 'forms': [0]})],
  SEQ2: [], SEQ5: [], SEQ10: [], RAM: [], DAM: [], A10R: [], S10R: [], A20: [], S20: [],
 }
 
 # Round 3 (rules 14-15): more building blocks where earlier learning exists (composition, position, sharing, doubles, patterns)
 def addpre(step, *links): S[step]['p'] += list(links)
 _cg5 = (CG, 'R.B1.S7 compare two amounts: which part is more, or the same', {'band': 5})
-_cg10 = (CG, 'R.B11.S2 compare two groups to 10: the same or not', {'band': 10})
+_cg10 = (CG, 'R.B1.S7 compare two groups: the same or not', {'band': 10})
 for _s in ('R.B3.S6', 'R.B5.S6', 'R.B5.S7'): addpre(_s, _cg5)
 addpre('R.B7.S7', (CO, 'R.B7.S2 find groups of 0 to 5', {'band': 5, 'objects': 'pictures'}), (TFB, 'R.B7.S4 represent 0 to 5 on a frame', {'band': 5}), _cg5)
 addpre('R.B9.S5', (TFB, 'R.B9.S2 build 6, 7 and 8 on a frame: the parts show as two rows', {'band': 10}))
@@ -629,9 +649,9 @@ for _s in ('Y1.B10.S1', 'Y1.B10.S2'):
 addpre('Y1.B10.S2', (PART, 'Y1.B10.S1 recognise a half of a shape', {'parts': [0]}))
 addpre('Y1.B13.S2', (MON, 'count 1-cent coins one by one (pennies only: totals 1-6)', {'currency': 'usd', 'kind': 'like', 'values': [1]}))
 for _s in ('R.B9.S7', 'R.B9.S8'):
-    addpre(_s, (CO, 'R.B9.S1 count each group, to 8', {'band': 10, 'objects': 'frame'}), (CG, 'R.B1.S7 / R.B11.S2 two groups are the same', {'band': 5}))
+    addpre(_s, (CO, 'R.B9.S1 count each group, to 8', {'band': 10, 'objects': 'frame'}), (CG, 'R.B1.S7 two groups are the same', {'band': 5}))
 for _s in ('R.B9.S6', 'R.B11.S13'):
-    addpre(_s, (TFB, 'R.B9.S2 / R.B11.S3 a frame fills in pairs', {'band': 10}), _cg10)
+    addpre(_s, (TFB, 'R.B9.S2 a frame fills in pairs', {'band': 10}), _cg10)
 for _s in ('R.B16.S1', 'R.B16.S2', 'R.B16.S3', 'R.B16.S4', 'R.B16.S5'):
     addpre(_s, (CO, 'R.B11.S1 count the amount to share, to 10', {'band': 10}), (CG, 'R.B11.S2 are the groups the same?', {'band': 10}))
 for _s in ('R.B12.S5', 'R.B12.S6', 'R.B12.S7', 'R.B17.S1', 'R.B17.S2', 'R.B17.S3'):
@@ -670,3 +690,53 @@ addpre('Y1.B3.S5', (N2D, 'Y1.B3.S3 name the 2-D shapes in the pattern', {'forms'
 addpre('Y1.B10.S5', (N2D, 'Y1.B3.S3 name the shape being split', {'forms': [1]}), (CMP, 'R.B15.S5 / S6 shapes put together and split', {}))
 addpre('Y1.B10.S8', (SHG, 'Y1.B9.S9 share into equal groups', {'band': 12}))
 addpre('Y1.B10.S3', (DBL, 'Y1.B9.S7 doubles: two equal groups', {'band': 20}))
+
+# ---------------- Round 4 (critic R-Y1 r3): main building blocks first (rule 14) ----------------
+def prepre(step, *links): S[step]['p'] = list(links) + S[step]['p']
+prepre('Y1.B5.S1', (CS, 'Y1.B4.S7 count on within 20: the main building block', {'band': 20, 'dir': 'forward'}), (NSF, 'Y1.B4.S1 / R.B13.S4 a number track to 20', {'step': 1, 'range': 20}))
+prepre('R.B14.S2', (CS, 'R.B11.S5 one more: count on', {'band': 10, 'dir': 'forward'}), (NB, 'R.B11.S7 the two parts of 10', {'band': 10}))
+prepre('Y1.B5.S8', (CG, 'Y1.B1.S11 compare two groups: how many more', {'band': 10}))
+for _s in ('Y1.B8.S6', 'Y1.B8.S7'):
+    prepre(_s, (MNS, 'Y1.B7.S2 measure with units (cubes): the same measuring, now with cups', {}), (CO, 'Y1.B4.S1 count the cups, to 20', {'band': 20}))
+prepre('Y1.B8.S4', (COB, 'R.B2.S1 / R.B10 compare: the compare words', {}), (HL, 'R.B8.S1 heavier / lighter', {}))
+prepre('Y1.B6.S1', (CS, 'Y1.B4.S7 count on to 20: the count continues past 20', {'band': 20, 'dir': 'forward'}), (NSF, 'R.B13.S4 / Y1.B4.S1 a number track to 20', {'step': 1, 'range': 20}))
+prepre('Y1.B12.S1', (NSF, 'Y1.B6.S1 count from 20 to 50 on a track (school week 8)', {'step': 1, 'range': 50}), (HCF, 'Y1.B6.S1 the hundred square to 50', {'band': 50}),
+       (TFV, 'Y1.B6.S2 20, 30, 40 and 50 as tens', {'band': 50}))
+prepre('Y1.B12.S2', (SKL, 'Y1.B9.S2 count in 10s (school week 9)', {'step': [0], 'band': 50}), (TFV, 'Y1.B6.S2 tens to 50', {'band': 50}),
+       (HCF, 'Y1.B12.S1 the tens column of the hundred square', {'band': 100, 'gaps': 'column'}))
+for _s in ('R.B11.S7', 'R.B11.S8'):
+    prepre(_s, (TFB, 'R.B11.S3 a full ten frame: the whole is 10', {'band': 10}), (CO, 'R.B11.S1 count to 10', {'band': 10, 'objects': 'frame'}))
+for _s in ('R.B11.S11', 'R.B11.S12'):
+    prepre(_s, (CO, 'R.B9.S1 / R.B11.S1 count each group', {'band': 10, 'objects': 'frame'}), (CG, 'R.B1.S7 the two groups are the same', {'band': 10}))
+    S[_s]['xp'] += [A3]
+S['R.B14.S2']['xp'] += [A3]
+prepre('R.B3.S3', (CO, 'R.B3.S1 find groups of 1, 2 and 3', {'band': 5, 'objects': 'pictures'}), (CC, 'R.B1.S4 count one kind, to 3', {'band': 3}))
+prepre('R.B3.S1', (CC, 'R.B1.S4 count one kind, to 3', {'band': 3}))
+prepre('Y1.B1.S6', (CS, 'R.B13.S4 count on past 10', {'band': 20, 'dir': 'forward'}), (NSF, 'R.B13.S2 / S4 a number track to 20', {'step': 1, 'range': 20}))
+prepre('Y1.B2.S9', (CS, 'Y1.B1.S6 count on from any number', {'band': 10, 'dir': 'forward'}))
+for _s in ('R.B16.S2', 'R.B16.S4'): S[_s]['r'] += [(HALF, 'sharing between two is halving (to 10)', {'band': 10})]
+S['Y1.B14.S3']['xr'] += ['measurement:time_match_clock']
+for _s, _k in (('R.B11.S2', PVC), ('Y1.B1.S13', PVC), ('Y1.B4.S11', PVC)):
+    RM[(_s, _k)] = 'placevalue:compare {band:99} (its lowest band) deals only 2-digit numbers with < > =; none of its items is within 10 or 20'
+RM[('R.B15.S1', ATT)] = 'shape_attributes asks for sides / vertices; 0 of 40 items choose a shape for a purpose'
+RM[('Y1.B11.S2', POS)] = 'shape_positions deals above, below, beside and between; never left or right'
+
+# Proposals (critic r3): one `focus` window option; band_3 gets a zero part usable at band 5; k_story
+NEW['number_focus'] = dict(kind='option', skill='counting:count_objects',
+   option='focus (a window, not a cap): 4-5 / 6-8 / 9-10 on count_objects, ten_frame_build, number_bonds and count_sequence; 10-13 / 14-20 (Reception) and 11-13 / 14-16 / 17-19 (Kindergarten) on teen_compose, ten_frame_build_teen and count_sequence; 20-50 / 50-100 on number_seq_fill and hundreds_chart_fill',
+   name='Number Focus Window (option)', teaches='deal only the numbers the step works on (4 and 5, 6 to 8, 9 and 10, 10 to 13, 14 to 20, 11 to 13, 14 to 16, 17 to 19, 20 to 50 or 50 to 100), with a smaller number as at most one review item',
+   representation='the skill\'s own cell; amounts, wholes, tracks and chart windows held to the window', family='counting', ccss=['K.CC.B.4', 'K.CC.B.5', 'K.OA.A.3', 'K.NBT.A.1', 'K.CC.A.1', '1.NBT.A.1'],
+   why='band and range are caps ("within N"): every live band deals mostly numbers below the step\'s window')
+NEW['band_3']['option'] += '; and a zero part (n = n + 0) usable at band 5 on number_bonds'
+NEW['band_3']['teaches'] = 'count, build and split groups of 1, 2 and 3 only; split any whole to 5 with a zero part (5 = 5 + 0); ask one more / one less within 5'
+NEW['k_story'] = dict(kind='option', skill='addition:add_wp_10', option='layout: k_story (the same on add_wp_10_plain and sub_wp_10)',
+   name='Kindergarten Story Layout (option)', teaches='hear a pictured add-more or take-away story within 10 and write the answer in one box',
+   representation='the story line with its picture row, read aloud; one answer box; no sign row, no column boxes, no label bank', family='operations', ccss=['K.OA.A.2', 'K.OA.A.1'],
+   why='the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank: not a Kindergarten response')
+for _st in S.values():
+    _st['b'] = ['number_focus' if b in ('teen_bands', 'count_start_at') else b for b in _st['b']]
+    _st['b'] = list(dict.fromkeys(_st['b']))
+for _gone in ('teen_bands', 'count_start_at'): NEW.pop(_gone, None)
+for _s in ('R.B13.S1', 'R.B13.S2'): S[_s]['r'] = [(HCF, 'the hundred square to 20: the teen numbers in rows', {'band': 20})] + S[_s]['r']
+for _s, _k in (('Y1.B1.S14', OLG), ('Y1.B4.S12', OLG)):
+    RM[(_s, _k)] = 'order_least_to_greatest {band:99} (its lowest band) orders only 2-digit numbers; none within 10 or 20'

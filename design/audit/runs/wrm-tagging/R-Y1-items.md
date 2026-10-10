@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 3)
+# R and Y1: generated items per step (wave 2 tagging, round 4)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -108,11 +108,11 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Click ALL the circles. / A=["opt1","opt3"] / multi-select-check
   - Click ALL the triangles. / A=["opt3"] / multi-select-check
 
-### R.B4.S2 Compare circles and triangles — **partial** (missing: comparing a circle and a triangle (same / different, curved / straight))
-- partial `shapes_early:shape_attributes` opts `{}` (6 generated; Max Number not read)
-  - How many vertices does a hexagon have? / A=6 / number
-  - How many sides does a hexagon have? / A=6 / number
-  - Click ALL shapes with 4 sides. / A=["opt1","opt3"] / multi-select-check
+### R.B4.S2 Compare circles and triangles — **partial** (missing: comparing a circle and a triangle (same / different, curved / straight); {forms:[0], band:4} asks only how many sides or vertices a triangle, square or rectangle has (the word "vertices" is still used))
+- partial `shapes_early:shape_attributes` opts `{"forms":[0],"band":4}` (6 generated; Max Number not read)
+  - How many sides does a square have? / A=4 / number
+  - How many vertices does a triangle have? / A=3 / number
+  - How many sides does a square have? / A=4 / number
 
 ### R.B4.S3 Shapes in the environment — **gap** (missing: finding circles and triangles in real objects)
 - no live skill; build: shapes_world
@@ -345,10 +345,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Do the groups have the same number of counters? / A="not the same" / text / {a:6,b:4,labels:[Same,Not the same],values:[same,not the same],correct:1}
   - Which group has fewer counters? / A="B" / text / {a:9,b:6,labels:[A has fewer,B has fewer],values:[A,B],correct:1}
   - Which group has more counters? / A="B" / text / {a:3,b:4,labels:[A has more,B has more],values:[A,B],correct:1}
-- partial `placevalue:compare` opts `{"band":99}` (6 generated; Max Number not read)
-  - Compare: 53 ___ 77 / A="<" / symbol / {keyValue:<,kind:compare,a:53,b:77}
-  - Compare: 71 ___ 76 / A="<" / symbol / {keyValue:<,kind:compare,a:71,b:76}
-  - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
 
 ### R.B11.S3 Represent 9 and 10 — **partial** (missing: representing exactly 9 and 10 (band 10 builds 1-10, mostly below 9))
 - partial `composing:ten_frame_build` opts `{"band":10}` (6 generated; Max Number not read)
@@ -530,11 +526,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Start with 4, take away 4. How many are left? / A=0 / number / {kind:takeaway,n:4,m:4,shape:triangle,ans:0}
   - Start with 2, take away 1. How many are left? / A=1 / number / {kind:takeaway,n:2,m:1,shape:star,ans:1}
 
-### R.B15.S1 Select shapes for a purpose — **partial** (missing: selecting a shape for a purpose)
-- partial `shapes_early:shape_attributes` opts `{"forms":[1]}` (6 generated; Max Number not read)
-  - Click ALL shapes with 4 sides. / A=["opt1","opt2"] / multi-select-check
-  - Click ALL shapes with at least one pair of parallel sides. / A=["opt0","opt3"] / multi-select-check
-  - Click ALL shapes with 4 sides. / A=["opt1","opt3"] / multi-select-check
+### R.B15.S1 Select shapes for a purpose — **gap** (missing: selecting a shape for a purpose (it rolls, it stacks, it fits); no live skill asks this)
+- no live skill; build: shape_3d_tasks
 
 ### R.B15.S2 Rotate shapes — **partial** (missing: recognising a turned shape as the same shape)
 - partial `shapes_early:name_2d_shapes` opts `{"forms":[1]}` (6 generated; Max Number not read)
@@ -654,7 +647,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### R.B18.S1 Deepen understanding — **gap** (missing: a consolidation review across the Reception year)
 - no live skill; build: consolidate
 
-### R.B18.S2 Patterns and relationships — **partial** (missing: number relationships (1 more, doubles, bonds) reviewed together)
+### R.B18.S2 Patterns and relationships — **partial** (missing: number relationships (1 more, doubles, bonds) reviewed together; the live pattern skill asks for typed shape names, not a Reception response)
 - partial `patterns:shape_pattern` opts `{"points":[0]}` (6 generated; Max Number not read)
   - Look at the pattern. Fill in the missing shapes. / A="circle, diamond" / text
   - Look at the pattern. Fill in the missing shapes. / A="diamond, diamond" / text
@@ -743,17 +736,11 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Which group has fewer counters? / A="B" / text / {a:9,b:6,labels:[A has fewer,B has fewer],values:[A,B],correct:1}
   - Which group has more counters? / A="B" / text / {a:3,b:4,labels:[A has more,B has more],values:[A,B],correct:1}
 
-### Y1.B1.S13 Compare numbers — **partial** (missing: comparing two numbers within 10)
-- partial `placevalue:compare` opts `{"band":99}` (6 generated; Max Number not read)
-  - Compare: 53 ___ 77 / A="<" / symbol / {keyValue:<,kind:compare,a:53,b:77}
-  - Compare: 71 ___ 76 / A="<" / symbol / {keyValue:<,kind:compare,a:71,b:76}
-  - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
+### Y1.B1.S13 Compare numbers — **gap** (missing: comparing two numbers within 10 (numerals, with the words greater / less))
+- no live skill; build: compare_small
 
-### Y1.B1.S14 Order objects and numbers — **partial** (missing: ordering groups and numbers within 10)
-- partial `placevalue:order_least_to_greatest` opts `{"band":99}` (6 generated; Max Number not read)
-  - Put the numbers in order. Start with the least. / A="53,77,87" / interactive / {keyValue:53, 77, 87,kind:order,nums:[87,77,53],sorted:[53,77,87]}
-  - Put the numbers in order. Start with the least. / A="71,72,76" / interactive / {keyValue:71, 72, 76,kind:order,nums:[76,72,71],sorted:[71,72,76]}
-  - Put the numbers in order. Start with the least. / A="30,32,33" / interactive / {keyValue:30, 32, 33,kind:order,nums:[32,33,30],sorted:[30,32,33]}
+### Y1.B1.S14 Order objects and numbers — **gap** (missing: ordering groups and numbers within 10)
+- no live skill; build: compare_small
 
 ### Y1.B1.S15 The number line — **gap** (missing: the 0-10 number line: reading, counting along and placing numbers)
 - no live skill; build: nl_20
@@ -811,22 +798,22 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - How many in all? 3 + 1 = ? / A=4 / number / {kind:join,n:3,m:1,shape:star,ans:4}
   - How many in all? 1 + 1 = ? / A=2 / number / {kind:join,n:1,m:1,shape:square,ans:2}
 
-### Y1.B2.S9 Addition - add more — **full**
-- full `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
-  - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
-  - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
-  - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
+### Y1.B2.S9 Addition - add more — **partial** (missing: add-more stories as a Kindergarten response: a pictured story read aloud and one answer box (the word-work cell adds columns, a sign row and a label bank))
 - full `addition:number_line_add` opts `{"range":10}` (6 generated; Max Number 10)
   - Use the number line: 4 + 5 = ? / A=9 / number / {min:0,max:10,start:4,add:5,op:+,unknown:result}
   - Use the number line: 6 + 3 = ? / A=9 / number / {min:0,max:10,start:6,add:3,op:+,unknown:result}
   - Use the number line: 2 + 1 = ? / A=3 / number / {min:0,max:10,start:2,add:1,op:+,unknown:result}
-
-### Y1.B2.S10 Addition problems — **full**
-- full `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
+- partial `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
   - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
   - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
   - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
-- full `addition:add_wp_10_plain` opts `{"band":10}` (6 generated; Max Number not read)
+
+### Y1.B2.S10 Addition problems — **partial** (missing: addition stories within 10 as a Kindergarten response: a pictured story and one answer box (the word-work cell adds columns, a sign row and a label bank))
+- partial `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
+  - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
+  - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
+  - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
+- partial `addition:add_wp_10_plain` opts `{"band":10}` (6 generated; Max Number not read)
   - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
   - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
   - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
@@ -912,8 +899,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Drag each name onto the matching 2D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
   - Drag each name onto the matching 2D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
 
-### Y1.B3.S4 Sort 2-D shapes — **partial** (missing: sorting 2-D shapes into groups)
-- partial `shapes_early:shape_attributes` opts `{"forms":[1]}` (6 generated; Max Number not read)
+### Y1.B3.S4 Sort 2-D shapes — **partial** (missing: sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill picks shapes by a property and still asks right angles and parallel sides)
+- partial `shapes_early:shape_attributes` opts `{"forms":[1],"band":4}` (6 generated; Max Number not read)
   - Click ALL shapes with 4 sides. / A=["opt1","opt2"] / multi-select-check
   - Click ALL shapes with at least one pair of parallel sides. / A=["opt0","opt3"] / multi-select-check
   - Click ALL shapes with 4 sides. / A=["opt1","opt3"] / multi-select-check
@@ -998,17 +985,11 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### Y1.B4.S10 Estimate on a number line to 20 — **gap** (missing: estimating where a number lies on a 0-20 line with only the ends marked)
 - no live skill; build: nl_20
 
-### Y1.B4.S11 Compare numbers to 20 — **partial** (missing: comparing numbers within 20)
-- partial `placevalue:compare` opts `{"band":99}` (6 generated; Max Number not read)
-  - Compare: 53 ___ 77 / A="<" / symbol / {keyValue:<,kind:compare,a:53,b:77}
-  - Compare: 71 ___ 76 / A="<" / symbol / {keyValue:<,kind:compare,a:71,b:76}
-  - Compare: 30 ___ 32 / A="<" / symbol / {keyValue:<,kind:compare,a:30,b:32}
+### Y1.B4.S11 Compare numbers to 20 — **gap** (missing: comparing numbers within 20)
+- no live skill; build: compare_small
 
-### Y1.B4.S12 Order numbers to 20 — **partial** (missing: ordering numbers within 20)
-- partial `placevalue:order_least_to_greatest` opts `{"band":99}` (6 generated; Max Number not read)
-  - Put the numbers in order. Start with the least. / A="53,77,87" / interactive / {keyValue:53, 77, 87,kind:order,nums:[87,77,53],sorted:[53,77,87]}
-  - Put the numbers in order. Start with the least. / A="71,72,76" / interactive / {keyValue:71, 72, 76,kind:order,nums:[76,72,71],sorted:[71,72,76]}
-  - Put the numbers in order. Start with the least. / A="30,32,33" / interactive / {keyValue:30, 32, 33,kind:order,nums:[32,33,30],sorted:[30,32,33]}
+### Y1.B4.S12 Order numbers to 20 — **gap** (missing: ordering numbers within 20)
+- no live skill; build: compare_small
 
 ### Y1.B5.S1 Add by counting on within 20 — **full**
 - full `addition:add_20_no_regroup` opts `{"band":20,"notation":["across"]}` (6 generated; Max Number not read)
@@ -1189,7 +1170,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Fill in the missing numbers. Skip count by 2s. / A="2, 8, 12" / text
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 12" / text
 
-### Y1.B9.S2 Count in 10s — **partial** (missing: counting in 10s from 0 on true multiples to 100, a page of 10s alone)
+### Y1.B9.S2 Count in 10s — **partial** (missing: counting in 10s from 0 on true multiples to 100, a page of 10s alone (skip_count_line {step:[0]} deals 10s in only 2 of 30 items))
 - partial `patterns:skip_count_line` opts `{"step":[0],"band":50}` (6 generated; Max Number 10)
   - Fill in the missing numbers. Skip count by 2s. / A="6, 8, 16" / text
   - Fill in the missing numbers. Skip count by 2s. / A="2, 8, 12" / text
@@ -1292,11 +1273,8 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### Y1.B11.S1 Describe turns — **gap** (missing: whole, half and quarter turns)
 - no live skill; build: turns
 
-### Y1.B11.S2 Describe position - left and right — **partial** (missing: left and right)
-- partial `shapes_early:shape_positions` opts `{}` (6 generated; Max Number not read)
-  - Where is the ball compared to the heart? / A="Below" / multiple-choice
-  - Where is the star compared to the ball? / A="Beside" / multiple-choice
-  - Where is the ball compared to the star? / A="Above" / multiple-choice
+### Y1.B11.S2 Describe position - left and right — **gap** (missing: left and right: shape_positions deals only above, below, beside and between)
+- no live skill; build: position_map
 
 ### Y1.B11.S3 Describe position - forwards and backwards — **gap** (missing: forwards and backwards moves)
 - no live skill; build: position_map

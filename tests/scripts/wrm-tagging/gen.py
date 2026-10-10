@@ -99,28 +99,90 @@ MD = json.load(open(MD_PATH)) if os.path.exists(MD_PATH) else {}
 MISSING = set()
 FIXED = re.compile(r'^measurement:(time_|clock_)')   # a clock face: its numerals are the domain, not a number range
 def dsig(k, o): return k + ' ' + json.dumps(o or {}, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
-def dealt(k, o):
-    """The largest number the skill+opts deals (8 generated items, maxdealt.mjs); 0 for a clock face."""
-    if FIXED.match(k): return 0
+def md(k, o):
     s = dsig(k, o)
-    if s not in MD: MISSING.add(s); return 0
+    if s not in MD: MISSING.add(s); return {'max': 0, 'flags': {}}
     return MD[s]
-def ceiling(step):
-    """Rule 18, judged per step: the step's own top = its block number range, what its own skills deal, the title's numbers."""
-    c = hi(step)
-    for k, o, miss in S[step]['d']:
-        if miss is None: c = max(c, dealt(k, o))   # a full direct skill only: a partial may deal past the step
-    for m in re.findall(r'\d+', info[step]['title']): c = max(c, int(m))
-    return c
-def lcap(step):
-    c = ceiling(step); return max(c * 1.5, c + 2)
-def fits(k, o, step):
+def dealt(k, o):
+    """The largest number the skill+opts deals (24 generated items, maxdealt.mjs); 0 for a clock face."""
+    return 0 if FIXED.match(k) else md(k, o)['max']
+NUMCAT = re.compile(r'^(counting|composing|comparing|addition|subtraction|placevalue|number_sense|patterns:(double|halve|skip)|division|measurement:money|measurement:coin)')
+BADFLAGS = ('times', 'parallel', 'vert', 'column', 'coord', 'word', 'poly', 'units', 'frac')
+def content_ok(k, o):
+    """Rule 18 content / layout: no x or ÷, angles or parallel sides, vertices, polygons past 4 sides, columns, standard units,
+    fractions (a link may show halves / quarters only through partition_shapes), coordinates, typed words, written-name drags."""
     if k in FIT and not FIT[k]: return False
-    return dealt(k, o) <= lcap(step)
-def fit(k, step):
-    """The opts a pre / related link uses for this step: the largest FIT row whose items stay under the step's cap; None if none."""
-    if k not in FIT: return {} if fits(k, {}, step) else None
-    ok = [o for c, o in FIT[k] if fits(k, o, step)]
+    if 'name_match' in k: return False
+    f = md(k, o)['flags']
+    for n in BADFLAGS:
+        if not f.get(n): continue
+        if k == 'shapes_early:partition_shapes' and n in ('times', 'frac'): continue   # "divided into 2 equal parts", halves
+        return False
+    return True
+def title_nums(x): return [int(m) for m in re.findall(r'(?<![23]-)\b\d+\b(?!-D)', info[x]['title'])]
+def own2(x):
+    """The numbers a step itself works with: its title and what its direct and partial number skills deal."""
+    c = max(title_nums(x) or [0])
+    for k, o, miss in S[x]['d']:
+        if NUMCAT.match(k): c = max(c, dealt(k, o))
+    return c
+def own1(x):
+    c = max(title_nums(x) or [0])
+    for k, o, miss in S[x]['d']:
+        if miss is None and NUMCAT.match(k): c = max(c, dealt(k, o))
+    return c
+def cum(x):
+    """The largest number met so far in school order (Reception, then the Kindergarten xlsx weeks)."""
+    return max(own1(y) for y in SORD[:sidx[x] + 1])
+def rel_c(x):
+    c = own2(x); return c if c >= 3 else min(cum(x), 20)
+def ceil_for(step, why=''):
+    cited = [c for c in re.findall(r'\b(?:R|Y1)\.B\d+\.S\d+', why or '') if c in info]
+    if cited:
+        c = max([own2(c2) for c2 in cited] + [own2(step)])
+        return c if c >= 3 else rel_c(step)
+    return rel_c(step)
+def lcap_c(c): return max(c * 1.5, c + 2)
+CTYPES = [  # rule 19: content types and the skill keys / sizes that carry them
+ ('coins and notes', lambda k, o, m: re.match(r'^measurement:(coin|money|equiv_coin)', k)),
+ ('clock time', lambda k, o, m: re.match(r'^measurement:(time_|clock_)', k)),
+ ('halves and quarters', lambda k, o, m: re.match(r'^(fractions:|patterns:halve|shapes_early:partition)', k)),
+ ('number lines', lambda k, o, m: re.search(r'number_line|:nl_|place_on_number_line', k)),
+ ('tens as rods / base-10', lambda k, o, m: re.search(r'tens_foundation|base10|unit_form', k)),
+ ('counting in 2s, 5s, 10s', lambda k, o, m: re.search(r'skip_count|patterns:seq_', k)),
+ ('equal groups and arrays', lambda k, o, m: re.match(r'^(multiplication|division):', k)),
+ ('measuring with units', lambda k, o, m: re.search(r'measure_nonstandard|reading_ruler', k)),
+ ('numbers 21-50', lambda k, o, m: NUMCAT.match(k) and 20 < m <= 50),
+ ('numbers 51-100', lambda k, o, m: NUMCAT.match(k) and m > 50),
+]
+def ctypes(k, o):
+    m = dealt(k, o); return [n for n, f in CTYPES if f(k, o, m)]
+_FW = {}
+def first_week(t):
+    """The school week a content type is first taught: 0 when Reception (an earlier grade) teaches it, else the earliest
+    Kindergarten week whose step deals it (its title numbers or its skills; for number ranges a full skill only)."""
+    key = (t, len(MD))
+    if key in _FW: return _FW[key]
+    w = 999
+    for x in SORD:
+        hit = any(t in ctypes(k, o) for k, o, miss in S[x]['d'] if miss is None or not t.startswith('numbers'))   # a written number range counts only from a full skill
+        if t.startswith('numbers') and not hit:
+            n = max(title_nums(x) or [0]); hit = (t == 'numbers 21-50' and 20 < n <= 50) or (t == 'numbers 51-100' and n > 50)
+        if hit: w = 0 if x.startswith('R.') else school_week(x); break
+    _FW[key] = w; return w
+def week_ok(k, o, step):
+    """Rule 19: a Kindergarten link carries only content the school has taught by the step's week."""
+    if step.startswith('R.'): return True
+    return all(first_week(t) <= school_week(step) for t in ctypes(k, o))
+def fits(k, o, step, why=''):
+    if not content_ok(k, o): return False
+    if not week_ok(k, o, step): return False
+    if FIXED.match(k): return True
+    return dealt(k, o) <= lcap_c(ceil_for(step, why))
+def fit(k, step, why=''):
+    """The opts a pre / related link uses: the broadest FIT row that passes content and size for this step; None if none."""
+    if k not in FIT: return {} if fits(k, {}, step, why) else None
+    ok = [o for c, o in FIT[k] if fits(k, o, step, why)]
     return dict(ok[-1]) if ok else None
 def split(e):
     return (e[0], e[1], e[2] if len(e) > 2 else None)
@@ -150,10 +212,10 @@ def build(step):
         if k in xp or not live(k) or len(pre) >= 8: return False
         if o is None:
             if k in own: return False
-            o = fit(k, step)
+            o = fit(k, step, why)
             if o is None: return False
-        elif not fits(k, o, step):
-            o = fit(k, step) if k not in own else None
+        elif not fits(k, o, step, why):
+            o = fit(k, step, why) if k not in own else None
             if o is None: return False
         if sig(k, o) in seen: return False
         if k in seen_keys and k not in own: return False
@@ -190,22 +252,29 @@ def build(step):
     def earlier(k):   # rule 14: the latest earlier step that teaches k
         ts = [(x, o) for x, o in TAUGHT.get(k, []) if sidx[x] < sidx[step]]
         return ts[-1] if ts else None
-    promoted = []
+    promoted = []; rej = {}
     def addr(k, why, o=None):
-        if k in rseen or not live(k) or len(rel) >= 6: return
+        if k in rseen or not live(k) or len(rel) >= 6:
+            if live(k) and k not in {r['key'] for r in rel}:
+                rej.setdefault(k, 'a direct skill here' if k in own else 'a pre-skill here' if k in {p['key'] for p in pre} else 'left out here (rules 8 and 18)' if k in xr else None)
+            return
         ex = earlier(k)
         if ex:   # an earlier step's skill is a building block: pre, never only related (rule 14)
             rseen.add(k)
             x, eo = ex
             if related_topic(step, x) or any(k == e[0] for e in sp['r']):
-                use = eo if fits(k, eo, step) else fit(k, step)
-                if use is not None and addp(k, f"{fmt_step(x)} (earlier step; {why})", use): promoted.append(k)
+                use = eo if fits(k, eo, step, fmt_step(x)) else fit(k, step, fmt_step(x))
+                base = 'the same idea' if re.match(r'(the next|a later) step', why) else why
+                if use is not None and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
+            rej[k] = 'taught at an earlier step (' + x + ') but not a building block that fits here'
             return
-        if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])): return   # WRM-earlier but school-later: neither pre nor related
+        if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])):   # WRM-earlier but school-later: neither pre nor related
+            rej[k] = 'an earlier WRM step teaches it, but the school teaches it after this week'; return
         if o is None:
             o = fit(k, step)
-            if o is None: return
-        elif not fits(k, o, step): return
+            if o is None: rej[k] = 'does not fit this step (size, content or school week; rules 18-19)'; return
+        elif not fits(k, o, step):
+            rej[k] = 'does not fit this step (size, content or school week; rules 18-19)'; return
         rseen.add(k); e = {'key': k, 'why': why}
         if o: e['opts'] = o
         rel.append(e)
@@ -244,11 +313,18 @@ def build(step):
                     elif not fits(k, o, step) and fit(k, step) is None: why['past'].add(k.split(':')[1])
             parts = []
             if why['own']: parts.append('the earlier steps on this idea use this step\'s own skill (' + ', '.join(sorted(why['own'])) + ')')
-            if why['past']: parts.append('the other earlier skills on this idea deal numbers past this step (' + ', '.join(sorted(why['past'])) + '; rule 18)')
+            if why['past']: parts.append('the other earlier skills on this idea do not fit this step (' + ', '.join(sorted(why['past'])) + '; size, content or school week, rules 18-19)')
             if why['gap']: parts.append('the earlier steps ' + ', '.join(why['gap'][:3]) + ' have no live skill yet (see preBuild)')
-            add_note(f"Pre: {len(pre)} only; " + ('; '.join(parts) if parts else 'no other live skill teaches an earlier step on this idea') + '.')
+            if not parts:
+                live_c = [x for x in cands if S[x]['d']][:4]
+                parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')
+            add_note(f"Pre: {len(pre)} only; " + '; '.join(parts) + '.')
     if not rel:
-        add_note('Related: no live skill shows this idea in another form yet (see build).' if v == 'gap' else 'Related: none; every other live form of this idea is already a pre-skill or a direct skill.')
+        rr = {k: r for k, r in rej.items() if r}
+        if rr:
+            add_note('Related: none; the other forms of this idea are ' + '; '.join(f"{k.split(':')[1]} ({r})" for k, r in list(rr.items())[:5]) + '.')
+        else:
+            add_note('Related: no live skill shows this idea in another form yet (see build).' if v == 'gap' else 'Related: none; no other live skill shows this idea in another form.')
     return {'title': s['title'], 'direct': direct, 'partial': partial, 'verdict': v,
             'missing': '' if v == 'full' else sp['m'], 'build': sp['b'], 'pre': pre, 'preBuild': pb,
             'related': rel, 'note': note}
@@ -316,3 +392,7 @@ for y in ('R', 'Y1'):
     c = {v: sum(1 for s in doc['steps'].values() if s['verdict'] == v) for v in ('full', 'partial', 'gap')}
     nr = sum(1 for p in doc['proposals'].values() if p['reused']); nn = len(doc['proposals']) - nr
     print(y, len(doc['steps']), c, 'proposals new', nn, 'reused', nr, 'tagFixes', len(doc['tagFixes']))
+# Rule 19: the first-taught school week of each Kindergarten content type (0 = taught in Reception), as the link check used it
+CW = {t: first_week(t) for t, _ in CTYPES}
+json.dump(CW, open(f'{HERE}/content_weeks.json', 'w'), indent=1)
+print('content first weeks (K):', CW)
