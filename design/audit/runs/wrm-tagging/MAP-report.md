@@ -16,32 +16,34 @@ still has to pass the 8/10 re-grade, or the answer form is weaker than MAP's; th
 **Evidence.** Each row's `evidence` cites public NWEA material: the MAP Growth RIT Reference Charts (sample items by RIT band,
 both the NWEA CDN copy and a district copy), the NWEA DesCartes learning-continuum statements by band (2014 files M2_NO,
 M2_OAT, M6_OAT … served by Bismarck Public Schools), and the NWEA item-pool blog on technology-enhanced items. NWEA's own
-concept PDFs on teach.mapnwea.org returned 503 during the audit, so they are not cited. Nothing was copied into the repo.
+concept PDFs on teach.mapnwea.org returned 503 during the audit; where a row cites one, it says "(search summary; page
+returned 503)". An evidence entry must show the row's own task; where no public item does, `url` is null and the note
+names the CCSS code that keeps the row in MAP's blueprint. Nothing was copied into the repo.
 RIT bands are those the evidence gives where it gives one; otherwise the band of the skill's RIT list in `data.js`, or an
 estimate (flagged in the note).
 
 ## Counts
 
-258 rows; 101 proposals (43 new, 58 reused: WRM_PROPOSALS 34, STANDARD_PROPOSALS 23, VISUAL_BUILDS 1). 236 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
+259 rows; 106 proposals (47 new, 59 reused: WRM_PROPOSALS 35, STANDARD_PROPOSALS 23, VISUAL_BUILDS 1). 205 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
 
 | Strand | rows | exists-ok | exists-regrade | partial | missing |
 |---|---|---|---|---|---|
-| Number & place value | 33 | 17 | 3 | 10 | 3 |
-| Operations & algebra | 38 | 19 | 7 | 7 | 5 |
-| Multiplication & division | 38 | 19 | 9 | 6 | 4 |
-| Fractions & decimals | 51 | 29 | 4 | 13 | 5 |
-| Measurement | 45 | 18 | 3 | 14 | 10 |
-| Geometry | 35 | 17 | 3 | 7 | 8 |
-| Data & graphing | 18 | 7 | 2 | 3 | 6 |
-| **All** | 258 | 126 | 31 | 60 | 41 |
+| Number & place value | 34 | 17 | 3 | 10 | 4 |
+| Operations & algebra | 38 | 18 | 7 | 10 | 3 |
+| Multiplication & division | 37 | 19 | 9 | 7 | 2 |
+| Fractions & decimals | 53 | 29 | 4 | 13 | 7 |
+| Measurement | 45 | 18 | 2 | 15 | 10 |
+| Geometry | 35 | 16 | 3 | 8 | 8 |
+| Data & graphing | 17 | 6 | 2 | 3 | 6 |
+| **All** | 259 | 123 | 30 | 66 | 40 |
 
 | Source | rows | exists-ok | exists-regrade | partial | missing |
 |---|---|---|---|---|---|
 | 6.2 | 29 | 2 | 14 | 11 | 2 |
-| strand-walk | 203 | 117 | 15 | 35 | 36 |
-| 6.4 | 26 | 7 | 2 | 14 | 3 |
+| strand-walk | 204 | 115 | 14 | 39 | 36 |
+| 6.4 | 26 | 6 | 2 | 16 | 2 |
 
-Proposals by kind: new 37, option 62.
+Proposals by kind: option 66, new 38, band 1, repair 1 (= 106).
 
 ## The Wave 6.2 table, re-verified against the code today
 
@@ -68,7 +70,7 @@ Proposals by kind: new 37, option 62.
 | Symmetry: is this proposed line correct? | missing | **partial** | `angles_lines:symmetry` | `map_symmetry_check_line` Is This a Line of Symmetry? (option) (new) | "Click ALL the lines of symmetry" (39/200) judges candidate lines but never a single yes/no line; was "missing" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line |
 | Area: pick the picture with area N | partial (`area_unit_squares` counts) | **partial** | `area_perimeter:area_unit_squares` | `map_area_pick` Which Shape Has Area N? (option) (new) | area_unit_squares: "Count the unit squares. What is the area?" number entry on one shape only |
 | Nets of 3-D solids | exists `net_identify` | **exists-regrade** | `shapes_classify:net_identify` |  | net_identify: "Which net folds into a cube/triangular prism?" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade; no residual build: net_identify already deals 'which net folds into', shapes_3d_props (property select-all) stays on rows 64/89 only |
-| Missing angle in a triangle | missing | **missing** |  | `angle_rules` Angle Rules (reused) | no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle |
+| Missing angle in a triangle | missing | **missing** |  | `angle_rules` Angle Rules (reused) | no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle; CCSS: the triangle angle sum is 8.G.A.5, not 7.G.B.5; the reused angle_rules source text (WRM build list) is not ours to change |
 | Volume by unit cubes | partial (formula and composite only) | **partial** | `area_perimeter:volume`, `area_perimeter:volume_composite` | `volume_cubes` Volume by Counting Cubes (reused) | volume: "length = 3, width = 2, height = 2"; volume_composite deals single prisms with dimensions (no cube-count form) |
 | Perimeter | exists | **exists-regrade** | `area_perimeter:perimeter`, `area_perimeter:perimeter_grid`, `area_perimeter:perimeter_intro` | `missing_lengths` Missing Lengths in Rectilinear Shapes (reused) | number entry, rectangles + rare missing-side; perimeter "Find the perimeter of a rectangle: length = 5, width = 2" text-only — regrade; missing-side/rectilinear via missing_lengths |
 | Reading clocks | exists | **exists-ok** | `measurement:time_hour`, `measurement:time_half_hour`, `measurement:time_quarter`, `measurement:time_5min`, `measurement:time_1min`, `measurement:time_match_clock` |  | kit clock cell, write the time / draw hands / match clock (response + stimulus options); MAP select-the-clock and number entry both covered |
@@ -92,38 +94,38 @@ Proposals by kind: new 37, option 62.
 | Place a number on a number line (drag/tap) | 171-200 | exists-regrade | `nl_20` Numbers on a Number Line (any scale) (reused) |  |
 | Read a number shown on a number line (which number is at the arrow) | 171-200 | partial | `nl_20` Numbers on a Number Line (any scale) (reused) | number_line_scales adds reading the number at an arrow on lines of any scale (whole numbers); only integer lines are read today. |
 | Write the number from place-value words (6 hundreds and 5 ones) | 181-200 | partial | `map_units_to_number` Write the Number from Units (new) | Adds unit form → number (6 hundreds 5 ones → 605), incl. zero places and out-of-order units; unit_form goes number → units only. |
+| Move cubes to make two groups equal (equalise) | 141-150 | missing | `equal_groups_early` Make Equal Groups (reused) | equal_groups_early's MAP clause (move objects so two groups are equal, drag on screen) closes it; no live skill moves objects. |
 
 ### Operations & algebra
 
 | Task | RIT | Status | Skill to make | What it adds |
 |---|---|---|---|---|
-| Change-unknown word problems (had 5, got some, now 12) | 181-190 | missing | `map_change_unknown_story` How Many Were Added? (change unknown) (new) | Adds join/separate stories with the change unknown (had 8, got some, now 13); unknown_start_wp is start-unknown only. |
-| Compare problems with bigger or smaller unknown | 181-200 | missing | `map_compare_bigger_unknown` Compare Stories: Find the Bigger or Smaller Amount (new) | Adds stories whose bigger or smaller quantity is unknown ("6 fewer than Maya"); comparison_word asks the difference only. |
-| Part-whole (put together / take apart, both addends unknown) | 151-160 | partial | `map_another_way_to_make` Another Way to Make It (new) | map_another_way_to_make adds both-parts-unknown bonds and "list all pairs" for a number; number_bonds always gives one part. |
+| Change-unknown word problems (had 5, got some, now 12) | 181-190 | partial | `map_change_unknown_story` How Many Were Added? (change unknown) (new) | Adds past-tense join and separate stories with the change unknown ("had 8, got some, now 13"; "had 15, some went, 9 left"); only the "wants … need" form is dealt today. |
+| Compare problems with bigger or smaller unknown | 181-200 | partial | `map_compare_bigger_unknown` Compare Stories: Smaller Unknown (new) | Adds the smaller-unknown compare story ("Tom has 6 fewer than Maya; how many does Tom have?"); bigger-unknown is dealt by add_word_problems. |
+| Part-whole (put together / take apart, both addends unknown) | 151-160 | partial | `systematic_bonds` Number Bonds in Order (reused) | bonds_in_order adds listing every bond of a number systematically (both parts unknown, 0+5, 1+4 …); number_bonds always gives one part. |
 | Meaning of the equal sign (true/false equations) | 201-220 | missing | `equal_sign_repair` True or False Equations (repair) (reused) | equal_sign_repair routes equal_sign to its own generator and adds true/false forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5; today it deals column addition. |
-| Identify the property (commutative/associative) / equivalent sum | 191-220 | missing | `map_properties_equivalent` Same Answer? Properties of Operations (new) | Adds recognising and writing equivalent sums/products by commutative and associative properties (8 + 5 = 5 + 8, choose all equal); no skill deals + properties, mult_properties only fills facts. |
+| Identify the property of addition (commutative/associative) / equivalent sum | 191-220 | missing | `map_properties_equivalent` Properties of Addition (new) | Adds recognising and writing equal sums by the commutative and associative properties of addition, incl. choose-all; no live skill deals + properties (× is part B). |
 | Find the rule of an input-output table | 201-220 | exists-regrade |  |  |
 | Write a numerical expression with brackets from words | 201-230 | missing | `write_numeric_expression` Write Number Expressions (option) (reused) | write_numeric_expression adds numbers-only expressions with brackets from words (2 × (8 + 7)); write_expression deals variables only. |
 | Inequalities: true/false, solutions on a line | 221-230 | exists-regrade | `inequality_write_graph` Write and Graph Inequalities (option) (reused) |  |
 | Add/sub 10s and 100s mentally | 171-195 | exists-regrade | `tens_any` Add and Subtract Multiples of Ten (option) (reused) |  |
-| Show another way to make a number (move dots to an empty domino) | 151-160 | partial | `map_another_way_to_make` Another Way to Make It (new) | Adds an open "show another way" decomposition on an empty domino/ten frame and listing all pairs; number_bonds and make_ten ask one fixed missing part. |
+| Show another way to make a number (move dots to an empty domino) | 151-160 | partial | `map_another_way_to_make` Another Way to Make It (new) | Adds the open "show a different way" response on an empty domino / ten frame (any correct new pair accepted); number_bonds and make_ten ask one fixed missing part. |
 | Multi-step word problems, all four operations, letter for the unknown (4.OA.A.3) | 201-220 | partial | `multi_step_four_ops` Two-Step Problems With All Four Operations (option) (reused) | multi_step_four_ops adds two-step stories with × and ÷ steps and writing the equation with a letter for the unknown; live multi-step skills are +/− only and never use a letter. |
 
 ### Multiplication & division
 
 | Task | RIT | Status | Skill to make | What it adds |
 |---|---|---|---|---|
-| Make equal groups (early, K-2 sharing) | 171-190 | missing | `share_group` Share and Make Groups (reused) | share_group adds K-2 sharing and grouping with counters on plates/rings (no ÷ sign); no live skill deals it. |
+| Make equal groups (early, K-2 sharing) | 171-190 | partial | `share_group` Share and Make Groups (reused) | share_group adds only sharing one-by-one into a given number of plates/rings ("share 8 between 2 plates"); grouping by size is already dealt by share_into_groups. |
 | Repeated addition <-> multiplication | 181-190 | exists-regrade | `map_array_to_eq` Picture to Multiplication Equation (option) (new) | map_array_to_eq problem type 2 adds writing both the repeated addition and the × equation from groups. |
-| Properties of multiplication (commutative, distributive, zero) | 181-230 | exists-regrade | `map_mult_prop_grouping` Multiplication Properties: Grouping and Choose All (option) (new) | map_mult_prop_grouping adds the associative (three-factor grouping) form and choose ALL equal expressions; order, breaking apart, ×0, ×1 are live. |
-| Choose the equation for a × / ÷ story | 191-200 | exists-regrade | `map_story_equation_match` Build the Equation for Any Story (new) | map_story_equation_match (part A) adds the "write the equation only, no solving" form for ×/÷ stories; build_expr_multdiv already builds and solves. |
+| Properties of multiplication (commutative, distributive, zero) | 181-230 | exists-regrade | `map_mult_prop_grouping` Multiplication Properties: Choose All Equal (option) (new) | map_mult_prop_grouping adds the choose-ALL-equal-expressions response; associative grouping is closed by mult_three (row "Multiply three numbers / associative"). |
+| Choose the equation for a × / ÷ story | 191-200 | exists-regrade | `map_story_equation_multdiv` Build the ×/÷ Equation for Any Story (new) | map_story_equation_multdiv (part A, option on build_expr_multdiv) adds the "write the equation only, no solving" form for ×/÷ stories; build_expr_multdiv already builds and solves. |
 | Multiplicative comparison (times as many) | 191-210 | exists-regrade | `comparison_statements` Times as Many: Statements and Equations (option) (reused) | comparison_statements adds the comparison sentence ↔ equation form. |
 | Multi-digit multiplication (standard algorithm, 3-/4-digit × 2-digit) | 201-220 | partial | `long_mult` Long Multiplication and Division (4-digit) (reused) | long_mult adds the standard column algorithm for multi-digit × 2-digit; live skills stop at area models. |
 | Divide by 2-digit divisor with remainders | 211-230 | partial | `long_div_rem` Long Division with Remainders (option) (reused) | long_div_rem adds remainders to the 2-digit-divisor long division. |
-| Multiply three numbers / associative | 201-210 | missing | `mult_three` Multiply Three Numbers (reused) | mult_three adds products of three factors (choose the easy pair first); no live skill multiplies three numbers. |
+| Multiply three numbers / associative | 201-210 | missing | `mult_three` Multiply Three Numbers (reused) | mult_three adds products of three factors and the associative property (choose the easy pair first, (2 × 3) × 4 = 2 × (3 × 4)); no live skill multiplies three numbers. |
 | Estimate products and quotients | 211-220 | exists-regrade | `map_est_both_factors` Estimate Products: Round Both Factors (option) (new) | map_est_both_factors adds rounding both factors of 3-/4-digit × 2-digit products; one-factor rounding, quotients and reasonableness are live. |
 | Divide by a multiple of 10 (e.g. 360 ÷ 40, 3-digit ÷ tens) | 201-210 | missing | `map_div_tens` Divide by Multiples of Ten (option) (new) | map_div_tens adds dividing by tens using the basic fact; no live skill divides by 20-90. |
-| Move cubes to make two groups equal (equalise) | 161-180 | missing | `equal_groups_early` Make Equal Groups (reused) | equal_groups_early's MAP clause (move objects so two groups are equal, drag on screen) closes it; no live skill moves objects. |
 
 ### Fractions & decimals
 
@@ -134,14 +136,16 @@ Proposals by kind: new 37, option 62.
 | Compare fractions with benchmark 1/2 | 201-220 | partial | `map_frac_compare_reason` Compare Fractions Using 1/2 (option) (new) | map_frac_compare_reason adds comparing two fractions by placing each against 1/2 or 1, with the reason; benchmark_fractions only names the nearest benchmark. |
 | Fractions greater than 1 from models | 201-210 | partial | `frac_beyond_1` Fractions Beyond 1 (reused) | frac_beyond_1 adds reading and writing fractions > 1 from several whole models before the mixed/improper conversion. |
 | Divide fraction by fraction | 221-230 | missing | `div_frac_frac` Divide Fractions by Fractions (reused) | div_frac_frac adds fraction ÷ fraction (models then the rule); live skills divide unit fractions and wholes only. |
-| Decimal place value (value of a digit) | 211-220 | missing | `decimal_pv` Tenths and Hundredths in a Place-Value Chart (reused) | decimal_pv adds the value of a digit in tenths/hundredths/thousandths; placevalue skills stop at ones. |
+| Decimal place value (value of a digit) | 211-220 | missing | `decimal_pv` Tenths and Hundredths in a Place-Value Chart (reused) | decimal_pv (with its MAP clause) adds the value of a digit in tenths, hundredths and thousandths in a place-value chart; placevalue skills stop at ones. |
 | Multiply decimals (by whole, by decimal) | 191-230 | partial | `mult_dec_dec` Multiply Decimals by Decimals (option) (reused) | mult_dec_dec adds decimal × decimal; decimal × whole is live. |
 | Powers of ten with decimals and exponents | 221-230 | partial | `map_power10_exponent` Powers of Ten: Patterns and Exponents (new) | map_power10_exponent adds decimal × / ÷ 10, 100, 1000 and 10^n notation; whole numbers are live in place_value_10x. |
 | Percent of a number | 221-230 | exists-regrade | `map_percent_of_grid_bar` Percent of a Number with a Bar (option) (new) | map_percent_of_grid_bar adds the percent bar model (10%, 25%, 50% steps); the abstract percent-of is live. |
 | Ratio word problems with bar model | 211-230 | missing | `ratio_problems` Ratio and Proportion Problems (reused) | ratio_problems adds ratio stories solved with a bar model; no live skill deals them. |
 | Build fractions equal to a whole or mixed number (move digits into boxes) | 221-230 | partial | `map_equal_frac_build` Fractions Equal to a Mixed Number (option) (new) | map_equal_frac_build adds filling several equivalent fractions for a whole or mixed number from a digit bank. |
 | Multiply a mixed number by a whole number | 211-220 | missing | `mult_mixed_int` Multiply a Mixed Number by an Integer (option) (reused) | mult_mixed_int adds a mixed-number factor to mult_frac_whole. |
-| Choose ALL the shapes that show one-third shaded | 171-190 | partial | `map_frac_choose_all_shaded` Choose All Models That Show a Fraction (option) (new) | map_frac_choose_all_shaded adds the choose-ALL response with unequal-part distractors; identify picks one model. |
+| Choose ALL the shapes that show one-third shaded | 171-190 | partial | `map_shape_partition_pick` Equal Parts of Shapes (option) (new) | map_shape_partition_pick (part C) adds the choose-ALL form for 1/2, 1/3, 1/4 of shapes with unequal-part distractors; fractions:identify picks one model. |
+| Decimal expanded form (3.472 = 3 + 4 × 1/10 + 7 × 1/100 + 2 × 1/1000) | 211-220 | missing | `map_decimal_expanded` Expanded Form with Decimals (option) (new) | map_decimal_expanded adds decimal expanded form (both directions) to placevalue:expand; it deals whole numbers only today. |
+| Decimal word form ↔ numeral (four and twenty-six hundredths = 4.26) | 211-220 | missing | `map_decimal_word_form` Decimal Word Form (option) (new) | map_decimal_word_form adds decimals (tenths to thousandths) to number_word_form in both directions. |
 
 ### Measurement
 
@@ -151,7 +155,6 @@ Proposals by kind: new 37, option 62.
 | Compare two lengths: how much longer | 161-185 | missing | `compare_lengths` Compare Lengths (reused) | compare_lengths adds 'how much longer' and comparing in mixed units; compare_objects only picks longer. |
 | Measure an object with a ruler (incl. not at 0) | 171-190 | partial | `map_ruler_measure_object` Measure an Object Not at Zero (option) (new) | Adds measuring an object that does not start at 0 (distance between marks). |
 | Two objects on a ruler: difference | 181-195 | missing | `ruler_difference` How Much Longer? (option) (reused) | ruler_difference adds two objects on one ruler and the difference. |
-| Heavier / lighter (K) | 141-160 | exists-regrade | `mass_scales` Read Scales (g, kg, ml, l) (reused) |  |
 | Read a scale or measuring jug (g, kg, mL, L) | 181-200 | partial | `mass_scales` Read Scales (g, kg, ml, l) (reused) | mass_scales adds reading scales with steps 2, 5, 10, 100 and kg scales (live kg reading has the answer-0 bug). |
 | Mass / liquid volume word problems | 191-205 | missing | `mass_ops` Mass and Capacity Word Problems (reused) | mass_ops adds +, −, ×, ÷ word problems with masses and volumes. |
 | Length word problems (add/sub lengths) | 181-195 | missing | `length_ops` Length Word Problems (reused) | length_ops adds length word problems; none today. |
@@ -167,6 +170,7 @@ Proposals by kind: new 37, option 62.
 | Choose ALL expressions that give the volume of a prism | 221-230 | missing | `map_volume_expressions` Volume Expressions (option) (new) | Adds choose ALL expressions (l×w×h, B×h, layers) for one prism. |
 | Show the change from $1 (drag coins) | 171-190 | partial | `map_money_build` Make the Amount With Coins (option) (new) | map_money_build's 'show the change' form adds dragging the change from $1. |
 | Area of a rectangle with fractional side lengths | 211-220 | partial | `map_frac_side_area` Area With Fractional Sides (option) (new) | Adds tiling with unit-fraction squares to find area; live skills only multiply. |
+| Composite volume: two rectangular prisms added (5.MD.C.5c) | 211-230 | missing | `map_volume_two_prisms` Composite Volume: Two Prisms (option) (new) | Adds solids made of two prisms: find each volume and add; no live item is composite. |
 
 ### Geometry
 
@@ -182,6 +186,7 @@ Proposals by kind: new 37, option 62.
 | Four quadrants problems | 215-230 | partial | `four_quadrants` Coordinates in Four Quadrants (option) (reused) | four_quadrants' 'problems' option adds missing vertices and distances across quadrants. |
 | Horizontal / vertical lines | 171-185 | missing | `hv_lines` Horizontal and Vertical Lines (reused) | hv_lines adds horizontal/vertical lines in shapes and on a grid. |
 | Reflections / translations on a grid | 205-225 | exists-regrade | `reflect_grid` Reflect on a Grid (reused) |  |
+| Choose ALL figures that show a line of symmetry | 191-200 | partial | `map_symmetry_check_line` Is This a Line of Symmetry? (option) (new) | map_symmetry_check_line's 'sort' form adds judging DRAWN lines across several figures (tick every correct one); live symmetry asks which shapes HAVE a line. |
 | Sort shapes into a two-attribute chart (symmetry / acute angle / both) | 211-220 | missing | `map_shape_attribute_sort` Sort Shapes by Two Attributes (new) | Adds the two-attribute sort chart; live skills click one property. |
 | Choose ALL objects with six faces (3-D attributes, K-2) | 171-180 | partial | `shapes_3d_props` 3-D Shapes: Names and Properties (reused) | shapes_3d_props' MAP clause adds choose ALL solids with six faces. |
 | Angle as a turn: degrees as a fraction of 360 (quarter turn = 90°) | 201-215 | missing | `turns_angles` Turns and Angles (reused) | turns_angles' MAP clause adds degrees as a fraction of 360. |
@@ -206,29 +211,29 @@ Proposals by kind: new 37, option 62.
 |---|---|---|---|---|---|
 | Match: picture <-> equation (addition/subtraction) | Operations & algebra | partial | `addition:add_5_pictures` | `pictures_to_sentence` Write the Number Sentence for the Picture (option) (reused) | pictures_to_sentence adds writing the number sentence for a picture; add_5_pictures gives the sentence and asks the total. |
 | Match: model <-> number (base-ten / place-value) | Number & place value | partial | `placevalue:place_value_disks`, `composing:base10_build` | `map_match_model_number` Match the Model to the Number (new) | Adds matching several models to several numbers (incl. zero-place distractors); live skills go one model → one number or number → build. |
-| Match: story <-> operation / equation | Operations & algebra | partial | `algebra:build_expr_addsub`, `algebra:build_expr_multdiv`, `algebra:write_equation` | `map_story_equation_match` Build the Equation for Any Story (new) | Adds unknown-in-any-position, compare, × ÷ and fraction stories to the build-the-equation form; build_expr_* deal result-unknown +/− and ×/÷ stories only. |
+| Match: story <-> operation / equation (+ −) | Operations & algebra | partial | `algebra:build_expr_addsub`, `algebra:write_equation` | `map_story_equation_addsub` Build the +/− Equation for Any Story (new) | Adds change-, start-, bigger- and smaller-unknown and measurement stories to the build-the-equation form; build_expr_addsub today builds result-unknown join/separate only. (×/÷ and fraction stories: map_story_equation_multdiv / _frac, part B rows.) |
 | Match: number line <-> number | Number & place value | partial | `number_sense:place_on_number_line` | `nl_20` Numbers on a Number Line (any scale) (reused) | number_line_scales adds reading the number at a point on a whole-number line of any scale; place_on_number_line is tap-to-place only. |
-| Match: number line <-> addition/subtraction equation | Operations & algebra | exists-ok | `addition:number_line_add`, `subtraction:number_line_sub` |  |  |
+| Match: number line <-> addition/subtraction equation | Operations & algebra | partial | `addition:number_line_add`, `subtraction:number_line_sub` | `map_nl_jumps_equation_addsub` Write the Equation the Jumps Show (+ −) (new) | Adds writing the equation a drawn set of jumps shows (start, jump, end → 8 + 6 = 14); today the equation is given. |
 | Match: word form <-> number | Number & place value | partial | `composing:number_word_form`, `placevalue:number_word_names` | `map_word_form_millions` Number Word Form to Millions (new) | Adds word-name ↔ numeral production past 9,999 (to millions); number_word_names is MC only and number_word_form stops at 9,999. |
 | Match: expanded form <-> standard form | Number & place value | exists-ok | `placevalue:expand`, `placevalue:combine` |  |  |
 | Match: table <-> rule (input-output) | Operations & algebra | partial | `algebra:function_table_hard`, `algebra:function_table_easy` | `map_function_table_context` Function Tables in a Story (new) | Adds real-world function tables (word headers, find the rule and a missing row); function_table_hard uses bare In/Out tables. |
 | Match: picture <-> equation (multiplication) | Multiplication & division | partial | `multiplication:arrays_groups`, `multiplication:dot_array_mult` | `map_array_to_eq` Picture to Multiplication Equation (option) (new) | map_array_to_eq adds both directions of picture ↔ × equation. |
 | Match: array <-> multiplication | Multiplication & division | partial | `multiplication:arrays_groups`, `multiplication:dot_array_mult` | `map_array_to_eq` Picture to Multiplication Equation (option) (new) | map_array_to_eq adds array → equation and equation → shade the array. |
-| Match: story <-> operation (× / ÷) | Multiplication & division | exists-regrade | `algebra:build_expr_multdiv`, `multiplication:mult_word_problems`, `division:div_word_problems` | `map_story_equation_match` Build the Equation for Any Story (new) | map_story_equation_match (part A) adds the operation-only equation form for ×/÷ stories. |
+| Match: story <-> operation (× / ÷) | Multiplication & division | exists-regrade | `algebra:build_expr_multdiv`, `multiplication:mult_word_problems`, `division:div_word_problems` | `map_story_equation_multdiv` Build the ×/÷ Equation for Any Story (new) | map_story_equation_multdiv (part A, option on build_expr_multdiv) adds the "write the equation only, no solving" form for ×/÷ stories; build_expr_multdiv already builds and solves. |
 | Match: number line <-> multiplication (hops) | Multiplication & division | exists-regrade | `multiplication:nl_mult`, `division:nl_div` | `map_nl_hops_equation` Number Line Hops to Equation (option) (new) | map_nl_hops_equation adds writing the × equation from drawn hops and picking the matching line. |
 | Match: model <-> number (fraction models) | Fractions & decimals | partial | `fractions:identify`, `fractions:shade_fraction` | `map_frac_model_match` Match Fraction Models and Numbers (option) (new) | map_frac_model_match adds matching several models (area, bar, set) to a bank of fractions in both directions. |
 | Match: model <-> number (decimal grids) | Fractions & decimals | missing | `conversions:percent_visual` | `map_decimal_grid` Decimal Grids and Numbers (new) | map_decimal_grid adds reading, shading and matching tenths strips and hundred squares as decimals; percent_visual deals percent only. |
 | Match: number line <-> number (fractions) | Fractions & decimals | exists-ok | `composing:fraction_number_line`, `fractions:fraction_nl_drag` |  |  |
 | Match: number line <-> number (decimals) | Fractions & decimals | partial | `decimals:decimal_nl_drag` | `map_nl_read_decimal` Read a Decimal on a Number Line (option) (new) | map_nl_read_decimal adds reading the decimal at a marked point; placing is live. |
-| Match: story <-> operation (fractions) | Fractions & decimals | partial | `fraction_operations:frac_word_problems`, `fraction_operations:frac_mult_word`, `algebra:build_expr_addsub` | `map_story_equation_match` Build the Equation for Any Story (new) | map_story_equation_match (part A) must add a FRACTION POOL (fraction +/−/× stories → equation only); build_expr_* are whole numbers today. Part A to add the pool. |
+| Match: story <-> operation (fractions) | Fractions & decimals | partial | `fraction_operations:frac_word_problems`, `fraction_operations:frac_mult_word`, `algebra:build_expr_addsub` | `map_story_equation_frac` Build the Equation for a Fraction Story (new) | map_story_equation_frac (part A) adds fraction stories (+ − like denominators, fraction × whole) → equation; build_expr_* deal whole numbers only. |
 | Match: picture <-> equation (fractions: model <-> 1/4 + 1/4 + 1/4 = 3/4) | Fractions & decimals | partial | `fraction_operations:decompose_fractions`, `fraction_operations:add_fractions_like` | `map_frac_unit_build` Build a Fraction from Unit Fractions (option) (new) | map_frac_unit_build problem types 1-2 add model → unit-fraction sum and sum → shaded model. |
 | Match: graph ↔ sentence (data) | Data & graphing | missing | `graphs:bar_graph`, `graphs:pictograph` | `map_graph_sentence` Which Sentence Matches the Graph? (option) (new) | Adds statements to check against a graph (select all true); live graphs ask one number. |
 | Match: shape ↔ property (geometry) | Geometry | exists-ok | `shapes_early:compose_from_attributes`, `shapes_early:shape_attributes`, `shapes_classify:classify_quads` |  |  |
 | Match: clock ↔ time words (measurement) | Measurement | exists-ok | `measurement:time_5min`, `measurement:time_match_clock` |  |  |
 | Match: number line ↔ number (rulers, scales) | Measurement | exists-ok | `measurement:reading_ruler`, `measurement:reading_ruler_hard`, `measurement:temperature` |  |  |
 | Match: picture ↔ equation (area / perimeter) | Measurement | partial | `area_perimeter:area_distributive_visual` | `map_area_equation` Picture to Area Equation (option) (new) | Adds ticking every area and perimeter equation for a grid rectangle; distributive_visual only splits area. |
-| Match: model ↔ number (unit cubes) | Measurement | missing | `area_perimeter:volume` | `volume_cubes` Volume by Counting Cubes (reused) | volume_cubes adds writing the number of unit cubes for a drawn model. |
-| Match: measurement story ↔ operation (length / mass / money) | Measurement | partial | `measurement:money_change`, `area_perimeter:perimeter` | `map_measure_story_equation` Measurement Story to Equation (option) (new) | Adds writing the equation for length, mass, volume and money stories (build_expr pool 'measurement'). |
+| Match: model ↔ number (unit cubes) | Measurement | partial | `area_perimeter:volume` | `volume_cubes` Volume by Counting Cubes (reused) | volume_cubes adds writing the number of unit cubes for a drawn model. |
+| Match: measurement story ↔ operation (length / mass / money) | Measurement | partial | `measurement:money_change`, `area_perimeter:perimeter` | `map_story_equation_addsub` Build the +/− Equation for Any Story (new) | map_story_equation_addsub's 'context: measurement' value adds writing the equation for length, mass, capacity and money stories (+ −); live build_expr_addsub uses number stories only. |
 | Match: coordinate grid ↔ ordered pair | Geometry | exists-ok | `coordinates:coordinate_graph`, `coordinates:coordinate_q1`, `coordinates:coordinate_all` |  |  |
 
 ## Re-grades (not builds)
@@ -285,10 +290,10 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `graphs:line_plot` | Line / dot plots; Line plot with fractions: operations (total, difference) |
 | `graphs:line_plot_g2` | Line / dot plots |
 | `graphs:line_plot_fractions` | Line / dot plots; Line plot with fractions: operations (total, difference) |
-| `measurement:heavier_lighter_visual` | Heavier / lighter (K); Heavier / lighter with B&W objects (emoji answer breaks print) |
 | `angles_lines:measure_angles` | Measure an angle with a protractor |
 | `coordinates:geo_reflect` | Reflections / translations on a grid |
 | `coordinates:geo_translate` | Reflections / translations on a grid |
+| `measurement:heavier_lighter_visual` | Heavier / lighter with B&W objects (emoji answer breaks print) |
 
 ## Skills yet to be made (every new proposal, in full)
 
@@ -333,7 +338,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 
 ### `map_change_unknown_story` — How Many Were Added? (change unknown)
 
-- **Builds:** option on `subtraction:unknown_start_wp`: unknown: change (start known, result known) (family subtraction; CCSS 1.OA.A.1, 2.OA.A.1)
+- **Builds:** option on `addition:add_word_problems`: unknown: change — past-tense join (had 8, got some, now 13); the same option is declared on subtraction:sub_word_problems for separate stories (had 15, some went, 9 left) (family subtraction; CCSS 1.OA.A.1, 2.OA.A.1)
 - **Teaches:** Join/separate stories where the change is unknown
 - **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box.
 - **Problem types:** join, change unknown — had 5, got some, now 12 — write how many were added; separate, change unknown — had 15, some went, 9 left — write how many went; write the equation 5 + ☐ = 12 and solve — equation frame + number
@@ -342,33 +347,33 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Misconceptions:** Adds the two numbers (8 + 13 = 21); Writes the "now" number as the answer
 - **MAP:** Operations & algebra 171-190 (number entry)
 - **Fills:** Change-unknown word problems (had 5, got some, now 12)
-- **Why:** CGI change-unknown is a MAP problem type with no skill
+- **Why:** add_word_problems deals change-unknown only as "wants N, needs how many more"; past-tense join/separate change-unknown is the MAP K-2 181-190 item. Each skill gets the stories its name covers.
 
-### `map_compare_bigger_unknown` — Compare Stories: Find the Bigger or Smaller Amount
+### `map_compare_bigger_unknown` — Compare Stories: Smaller Unknown
 
-- **Builds:** option on `addition:comparison_word`: unknown: bigger / smaller quantity (family addition; CCSS 1.OA.A.1, 2.OA.A.1)
-- **Teaches:** 'Zoe has 4 more than Owen, who has 7' — find the unknown quantity
+- **Builds:** option on `subtraction:sub_word_problems`: unknown: smaller quantity in a compare story ("fewer than" and "more than" with the bigger known) (family addition; CCSS 1.OA.A.1, 2.OA.A.1)
+- **Teaches:** Solve compare stories where the smaller quantity is unknown
 - **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar.
-- **Problem types:** bigger unknown — Sam has 7, Ben has 4 more — write Ben's amount; smaller unknown — Sam has 12, Ben has 5 fewer — write Ben's amount; mixed with difference-unknown — choose which bar is missing — write it
-- **Levels:** L1: bigger unknown, within 10, bars drawn to scale with the extra part shaded (hint, fades); two-bar frame (structural, stays) → L2: shading fades → L3: smaller unknown ("fewer") → L4: within 100, "more/fewer" in either sentence order
+- **Problem types:** fewer than — Maya 14, Tom 6 fewer — write Tom; more than, bigger known — Maya has 6 more than Tom, Maya 14 — write Tom
+- **Levels:** L1: "fewer than", within 20, two-bar diagram with the difference shaded (hint, fades); two-bar frame (structural, stays) → L2: shading fades → L3: "more than" with the bigger known (the language trap) → L4: within 100
 - **Example:** Maya has 14 shells. Tom has 6 fewer shells than Maya. How many shells does Tom have? → **8**
 - **Misconceptions:** "fewer" means subtract always / "more" means add always (the language trap: "Tom has 6 more than Maya" with Tom known); Writes the difference instead of the quantity
 - **MAP:** Operations & algebra 181-200 (number entry)
 - **Fills:** Compare problems with bigger or smaller unknown
-- **Why:** The hardest CGI compare forms are MAP items; not dealt
+- **Why:** add_word_problems already deals bigger-unknown; the smaller unknown is solved by subtraction, so it belongs on sub_word_problems
 
-### `map_properties_equivalent` — Same Answer? Properties of Operations
+### `map_properties_equivalent` — Properties of Addition
 
-- **Builds:** new skill `algebra:properties_of_operations` (family algebra; CCSS 1.OA.B.3, 3.OA.B.5)
-- **Teaches:** Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))
+- **Builds:** new skill `algebra:properties_of_operations` (family algebra; CCSS 1.OA.B.3, 2.NBT.B.9)
+- **Teaches:** Recognise and write equal sums by the commutative and associative properties of addition (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))
 - **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; an expression and an equation frame (8 + 5 = ☐ + ☐); pupil writes the equivalent expression or ticks the equal ones. Screen: tile entry in the frame / click all equal expressions (select-all).
-- **Problem types:** Write the turn-around — 8 + 5 = ☐ + ☐ — write numbers; Choose ALL equal to — 4 expressions — tick all / click all; Regroup — (2 + 3) + 7 = 2 + (☐ + ☐) — write numbers
-- **Levels:** L1: commutative + within 20, cube trains shown (hint, fades); frame (structural, stays) → L2: trains fade → L3: associative with three addends → L4: × versions (3 × 4 = 4 × 3; (2 × 5) × 3) and choose-all
+- **Problem types:** Write the turn-around — 8 + 5 = ☐ + ☐; Regroup three addends — (6 + 4) + 9 = 6 + (☐ + ☐); Choose ALL sums equal to 8 + 5 — tick / click all
+- **Levels:** L1: commutative within 20 with cube trains (hint, fades); frame (structural, stays) → L2: trains fade → L3: associative with three addends → L4: choose-all equal sums
 - **Example:** (6 + 4) + 9 = 6 + (☐ + ☐) → **4, 9**
 - **Misconceptions:** Thinks changing the order changes the sum; Applies turn-around to subtraction (9 − 4 = 4 − 9)
 - **MAP:** Operations & algebra 191-210 (number entry / select all)
-- **Fills:** Identify the property (commutative/associative) / equivalent sum
-- **Why:** MAP asks property recognition; no skill
+- **Fills:** Identify the property of addition (commutative/associative) / equivalent sum
+- **Why:** No skill names or applies + properties; × grouping belongs to part B (map_mult_prop_grouping / mult_three)
 
 ### `map_match_model_number` — Match the Model to the Number
 
@@ -383,31 +388,18 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Fills:** Match: model <-> number (base-ten / place-value)
 - **Why:** 6.4 match form for model↔number
 
-### `map_story_equation_match` — Build the Equation for Any Story
-
-- **Builds:** option on `algebra:build_expr_addsub`: stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv (family algebra; CCSS 1.OA.A.1, 2.OA.A.1, 3.OA.A.3, 3.OA.D.8, 4.NF.B.3d, 4.NF.B.4c, 5.NF.B.6)
-- **Teaches:** Represent a story with an equation using a box for the unknown (9 + ☐ = 14, 4 × ☐ = 28, 3/8 + ☐ = 7/8), across + − × ÷ and fraction stories, without solving first
-- **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown shown as ☐; pupil writes the numbers and the sign (does not solve first). Screen: build-expr tiles (production, never MC).
-- **Problem types:** + / − story, unknown in any position — join, separate, part-whole — build e.g. 9 + ☐ = 14; compare story — more/fewer — build e.g. 14 − 6 = ☐ or 6 + ☐ = 14; × / ÷ story — equal groups, arrays, sharing, unknown factor — build e.g. 4 × ☐ = 28; fraction story — + − of like fractions, × fraction by whole — build e.g. 3/8 + ☐ = 7/8
-- **Levels:** L1: +/− result unknown (the live skill today); frame with ☐ (structural, stays); key action word underlined (hint) → L2: change unknown and start unknown (☐ moves) → L3: compare stories (bigger, smaller, difference unknown); underlining fades → L4: × ÷ stories, incl. unknown factor and sharing → L5: fraction stories (like denominators; fraction × whole)
-- **Example:** Ravi had some stickers. He got 6 more. Now he has 15. Build the equation. → **☐ + 6 = 15**
-- **Misconceptions:** Writes the numbers in story order whatever the unknown (6 + 15 = ☐); Picks + for every "more" (compare story with smaller unknown); Uses × for any two numbers in a sharing story
-- **MAP:** Operations & algebra 171-200 (build/choose the equation); Multiplication & division 181-210 (build/choose the equation); Fractions & decimals 201-230 (build/choose the equation)
-- **Fills:** Match: story <-> operation / equation; Choose the equation for a × / ÷ story; Match: story <-> operation (× / ÷); Match: story <-> operation (fractions)
-- **Why:** One option grows the live build_expr_* production form instead of three separate story→equation proposals; it closes the 6.4 story↔equation pair for +/−, ×/÷ and fraction stories
-
 ### `map_another_way_to_make` — Another Way to Make It
 
-- **Builds:** option on `composing:number_bonds`: response: show another way (open decomposition), both parts unknown, list all pairs (family composing; CCSS K.OA.3, K.OA.A.3, 1.OA.A.1)
+- **Builds:** option on `composing:number_bonds`: response: show another way (open decomposition on an empty domino / ten frame) (family composing; CCSS K.OA.A.3)
 - **Teaches:** Given one split of a number to 10 (domino/bond), show a different split
 - **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a number with a filled domino / ten-frame and an empty one beside it; pupil draws dots or writes a different pair (part + part). Screen: tap dots onto the empty domino / ten-frame, or fill a number bond (production).
-- **Problem types:** Show another way — 5 shown as 4 + 1, make it differently — draw dots / tap dots; List all ways — all pairs for 6 (both addends unknown) — write the pairs in a table; Number bond — whole given, both parts blank — write two parts
-- **Levels:** L1: to 5, dots on a domino, the given way drawn (hint, fades); empty domino frame (structural, stays) → L2: to 10 on ten frames → L3: both parts unknown in a bond (any correct pair accepted) → L4: list all pairs for a number to 10 in an ordered table
+- **Problem types:** Show another way — 5 shown as 4 + 1 — draw dots / tap dots on the empty domino; Show another way on a ten frame — 8 shown as 5 + 3 — draw / tap counters
+- **Levels:** L1: to 5 on dominoes, the given way drawn (structural, stays) and its equation written (hint, fades) → L2: equation hint fades → L3: to 10 on ten frames
 - **Example:** 7 is 5 + 2. Show 7 another way. → **any other pair, e.g. 4 + 3**
 - **Misconceptions:** Repeats the given way in the other order and thinks it is new (or that it is not); Pairs that do not total the number
 - **MAP:** Operations & algebra 151-160 (drag dots to domino)
-- **Fills:** Part-whole (put together / take apart, both addends unknown); Show another way to make a number (move dots to an empty domino)
-- **Why:** number_bonds asks for one missing part; MAP asks for an open, different decomposition with more than one right answer.
+- **Fills:** Show another way to make a number (move dots to an empty domino)
+- **Why:** No skill takes an open "different way" response; listing all pairs is WRM bonds_in_order (row Part-whole)
 
 ### `map_units_to_number` — Write the Number from Units
 
@@ -460,6 +452,58 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **MAP:** Number & place value 191-210 (number entry)
 - **Fills:** Word form ↔ number to millions; Match: word form <-> number
 - **Why:** number_word_form is the live production skill but stops at 9,999; DesCartes 191-210 asks numeral/name over 100,000
+
+### `map_story_equation_addsub` — Build the +/− Equation for Any Story
+
+- **Builds:** option on `algebra:build_expr_addsub`: stories: unknown in any position (result / change / start), compare stories (difference, bigger, smaller unknown); context: everyday \| measurement (length, mass, capacity, money) \| like-denominator fractions (family algebra; CCSS 1.OA.A.1, 2.OA.A.1, 2.MD.B.5, 2.MD.C.8, 4.MD.A.2)
+- **Teaches:** Write the addition or subtraction equation for a story with a box for the unknown, wherever the unknown sits, including compare and measurement stories
+- **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown as ☐; pupil writes the numbers and + or − (does not solve first). Screen: build-expr tiles (production, never MC).
+- **Problem types:** Join/separate, unknown in any position — build e.g. ☐ + 6 = 15 — tiles; Compare story — more/fewer, any quantity unknown — build e.g. 14 − 6 = ☐; Measurement story — cm, kg, l, $ — build e.g. 45 − ☐ = 28 (cm)
+- **Levels:** L1: result unknown (live today); frame with ☐ (structural, stays); action word underlined (hint) → L2: change unknown → L3: start unknown; underlining fades → L4: compare stories (difference, bigger, smaller unknown) → L5: context: measurement units on the numbers
+- **Example:** Ravi had some stickers. He got 6 more. Now he has 15. Build the equation. → **☐ + 6 = 15**
+- **Misconceptions:** Writes the numbers in story order whatever the unknown (6 + 15 = ☐); Uses + for every "more", even when the smaller amount is unknown
+- **MAP:** Operations & algebra 171-200 (build/choose the equation); Measurement 181-210 (build/choose the equation)
+- **Fills:** Match: story <-> operation / equation (+ −); Match: measurement story ↔ operation (length / mass / money)
+- **Why:** Grows the live production form (build_expr_addsub) to every +/− story structure MAP asks; declares only + and −, so the name holds
+
+### `map_story_equation_multdiv` — Build the ×/÷ Equation for Any Story
+
+- **Builds:** option on `algebra:build_expr_multdiv`: stories: equal groups and arrays with the product, group size or number of groups unknown; sharing and grouping ÷; × compare ("3 times as many"); context: everyday \| measurement (family algebra; CCSS 3.OA.A.3, 3.OA.A.4, 4.OA.A.2)
+- **Teaches:** Write the multiplication or division equation for a story with a box for the unknown in any position
+- **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame with one operation box and ☐; pupil writes the numbers and × or ÷. Screen: build-expr tiles (production, never MC).
+- **Problem types:** Equal groups / array, product unknown — build 4 × 7 = ☐; Unknown factor / sharing / grouping — build 4 × ☐ = 28 or 28 ÷ 4 = ☐; × compare — "3 times as many" — build 3 × 5 = ☐
+- **Levels:** L1: product unknown (live today); frame (structural); "each" underlined (hint) → L2: sharing ÷ (group size unknown) → L3: grouping ÷ / unknown factor; underlining fades → L4: × compare → L5: measurement contexts
+- **Example:** 28 pencils are put in 4 equal cups. How many in each cup? Build the equation. → **28 ÷ 4 = ☐ (or 4 × ☐ = 28)**
+- **Misconceptions:** Uses × for any two numbers; Writes 4 ÷ 28 (order reversed)
+- **MAP:** Multiplication & division 181-210 (build/choose the equation)
+- **Fills:** Choose the equation for a × / ÷ story; Match: story <-> operation (× / ÷)
+- **Why:** build_expr_multdiv deals product-unknown and sharing only; this adds the other structures, × and ÷ only
+
+### `map_story_equation_frac` — Build the Equation for a Fraction Story
+
+- **Builds:** option on `fraction_operations:frac_word_mixed`: response: build the equation (fraction + − like denominators, fraction × whole number) before or instead of solving (family fraction_operations; CCSS 4.NF.B.3d, 4.NF.B.4c)
+- **Teaches:** Write the equation for a fraction story (3/8 + ☐ = 7/8, 4 × 2/3 = ☐) with a box for the unknown
+- **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame with fraction boxes (numerator over denominator) and one operation box; pupil writes the fractions and the sign. Screen: build-expr tiles with fraction tiles (production, never MC).
+- **Problem types:** Fraction + / − story, result unknown — build 3/8 + 2/8 = ☐; Change unknown — build 3/8 + ☐ = 7/8; Fraction × whole — build 4 × 2/3 = ☐
+- **Levels:** L1: + like denominators, result unknown; fraction bar drawn (hint, fades); frame (structural, stays) → L2: − stories → L3: unknown change; bar fades → L4: whole × fraction stories
+- **Example:** A ribbon is 7/8 m. Mia cuts off 3/8 m. How much is left? Build the equation. → **7/8 − 3/8 = ☐**
+- **Misconceptions:** Adds denominators in the equation (3/8 + 2/8 = 5/16); Writes 2/3 × 4 as 2/12
+- **MAP:** Fractions & decimals 201-230 (build/choose the equation)
+- **Fills:** Match: story <-> operation (fractions)
+- **Why:** frac_word_mixed ("Mixed Fraction Word Problems") covers + − and ×, so the option fits its name; today it asks only the answer
+
+### `map_nl_jumps_equation_addsub` — Write the Equation the Jumps Show (+ −)
+
+- **Builds:** option on `addition:number_line_add`: task: write the equation the jumps show (jumps drawn, equation blank); the same option is declared on subtraction:number_line_sub for backward jumps (family addition; CCSS 1.OA.C.5, 2.MD.B.6)
+- **Teaches:** Read a start point, a jump and an end point on a number line and write the matching equation
+- **Looks like:** Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number line with jumps drawn, equation frame ☐ + ☐ = ☐ under it; pupil writes the three numbers. Screen: number entry in the frame (production, never MC).
+- **Problem types:** One jump — write a + b = c; Two jumps of 1s counted — write a + b = c; Backward jump (on number_line_sub) — write a − b = c
+- **Levels:** L1: one jump to 10, jump length labelled (hint, fades); equation frame (structural, stays) → L2: jump label fades, pupil counts the jump → L3: to 20 with the jump drawn as unit hops → L4: backward jumps on number_line_sub
+- **Example:** A jump goes from 8 to 14. Write the equation. → **8 + 6 = 14**
+- **Misconceptions:** Writes the end point as the jump (8 + 14); Counts the tick marks including the start (8 + 7)
+- **MAP:** Operations & algebra 161-190 (write the equation for the model)
+- **Fills:** Match: number line <-> addition/subtraction equation
+- **Why:** Matches the ×-twin option map_nl_hops_equation (part B); each skill declares only its own operation
 
 ### `map_ratio_picture` — Ratios from a Picture (option)
 
@@ -630,18 +674,18 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Fills:** Estimate products and quotients
 - **Why:** estimate_products rounds only the bigger factor of 2-4-digit × 1-digit; MAP 211-220 estimates multi-digit × multi-digit. Option on the live skill, not a new skill.
 
-### `map_mult_prop_grouping` — Multiplication Properties: Grouping and Choose All (option)
+### `map_mult_prop_grouping` — Multiplication Properties: Choose All Equal (option)
 
-- **Builds:** option on `multiplication:mult_properties`: forms: add "Grouping (2 × 3 × 4 = 2 × 12)" and a "choose ALL equal products" response (family multiplication; CCSS 3.OA.B.5)
-- **Teaches:** Associative property with three factors, and recognising every expression equal to a product (commutative/associative/distributive)
-- **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three factors with bracket slots, or a list of 4-5 expressions; pupil writes the missing number or ticks every expression equal to the product. Screen: number boxes; click ALL equal expressions (multi-select)
-- **Problem types:** grouping — (2 × 3) × 4 = 2 × (___ × 4) — write 3; choose all — "Tick every expression equal to 6 × 8" (8 × 6, 6 × 4 + 6 × 4, 3 × 2 × 8, 6 + 8) — tick; easy pair — 5 × 7 × 2 = 7 × ___ — write 10
-- **Levels:** L1: grouping with a bracket drawn round the first pair (hint, fades) → L2: grouping, no bracket hint → L3: make a ten (5 × 2) first → L4: choose ALL equal expressions mixing order, grouping, breaking apart
-- **Example:** Fill the box: (4 × 5) × 3 = 4 × (___ × 3) → **5**
-- **Misconceptions:** adds inside the brackets; thinks changing grouping changes the product; ticks 6 + 8 as equal to 6 × 8
-- **MAP:** Multiplication & division 191-230 (number entry; select all that apply)
+- **Builds:** option on `multiplication:mult_properties`: response: "choose ALL equal products" (order, breaking apart, ×1/×0 expressions mixed with distractors) (family multiplication; CCSS 3.OA.B.5)
+- **Teaches:** Recognise every expression equal to a given product using the properties the skill already teaches (order, breaking apart, ×1, ×0). Three-factor grouping is NOT here: reused mult_three owns it.
+- **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a target product and 4-5 expressions, pupil ticks every equal one. Screen: click ALL (multi-select-check), production of the set
+- **Problem types:** order — "Tick every expression equal to 6 × 8" (8 × 6, 6 + 8, 6 × 9) — tick / click all; breaking apart — "equal to 7 × 6" (7 × 5 + 7 × 1, 7 × 3 + 7 × 3, 7 + 6) — tick; ×1 / ×0 — "equal to 9" (9 × 1, 9 × 0, 1 × 9) — tick
+- **Levels:** L1: one property per item, 3 expressions, property named above (hint, fades) → L2: one property, 4 expressions, no name → L3: two properties mixed → L4: 5 expressions with an addition distractor (6 + 8)
+- **Example:** Tick every expression equal to 4 × 7. → **7 × 4 and 4 × 5 + 4 × 2**
+- **Misconceptions:** ticks 4 + 7 as equal to 4 × 7; rejects 7 × 4 (thinks order changes the product); splits both factors in breaking apart (4 × 7 = 2 × 5 + 2 × 2)
+- **MAP:** Multiplication & division 191-230 (select all that apply)
 - **Fills:** Properties of multiplication (commutative, distributive, zero)
-- **Why:** mult_properties forms cover order, breaking apart, ×1, ×0 only; MAP asks associative and "which are equal". Real residual, not a re-grade.
+- **Why:** mult_properties asks for one missing number; MAP asks which expressions are equal. Associative/three factors is owned by mult_three (row "Multiply three numbers").
 
 ### `map_nl_hops_equation` — Number Line Hops to Equation (option)
 
@@ -656,18 +700,31 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Fills:** Match: number line <-> multiplication (hops)
 - **Why:** nl_mult always prints the equation and asks the product; MAP shows the hops and asks the equation.
 
-### `map_frac_choose_all_shaded` — Choose All Models That Show a Fraction (option)
+### `map_decimal_expanded` — Expanded Form with Decimals (option)
 
-- **Builds:** option on `fractions:identify`: response: "choose ALL the models that show a/b" (4-6 models, distractors with unequal parts or wrong count) (family fractions; CCSS 3.NF.A.1, 2.G.A.3)
-- **Teaches:** Recognise a unit or non-unit fraction only when the whole is cut into equal parts, across shapes
-- **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 4-6 small outline shapes in the cell, some cut equally, some unequally; pupil ticks every shape showing a/b. Screen: click ALL (multi-select-check)
-- **Problem types:** unit fraction — "Tick ALL the shapes with one-third shaded" — tick; non-unit — "Tick ALL showing 2/4" — tick; different shapes — circles, bars, rectangles mixed — tick
-- **Levels:** L1: same shape, only part-count distractors → L2: unequal-part distractors added → L3: mixed shapes → L4: non-unit fractions
-- **Example:** Tick ALL the shapes that show one-quarter shaded. → **every shape cut into 4 equal parts with 1 part shaded**
-- **Misconceptions:** ticks a shape cut into 3 unequal parts with 1 shaded; ticks 1 of 4 parts unshaded; misses a different-shaped model
-- **MAP:** Fractions & decimals 171-190 (select all that apply)
-- **Fills:** Choose ALL the shapes that show one-third shaded
-- **Why:** identify asks "which model shows 1/3" with one answer; MAP asks choose ALL, with unequal-part distractors (the equal-parts misconception).
+- **Builds:** option on `placevalue:expand`: band: "decimals" (tenths, hundredths, thousandths) + direction (to expanded / to standard) (family place value; CCSS 5.NBT.A.3a, 4.NF.C.6)
+- **Teaches:** Write a decimal to thousandths in expanded form with fractions or decimals, and the reverse (5.NBT.A.3a)
+- **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a place-value chart header (ones . tenths hundredths thousandths) in grey, slots "___ + ___ × 1/10 + ___ × 1/100"; pupil writes digits. Screen: number boxes in the frame (production, never MC)
+- **Problem types:** to expanded (decimal form) — 3.47 — write 3 + 0.4 + 0.07 / number boxes; to expanded (fraction form) — 3.47 — write 3 + 4 × 1/10 + 7 × 1/100; to standard — 5 + 0.2 + 0.006 — write 5.206 / number box
+- **Levels:** L1: tenths only, chart header with digits under it (hint row, fades) → L2: hundredths, decimal form (0.4 + 0.07); chart header stays (structural) → L3: fraction form (4 × 1/10) → L4: thousandths with a zero digit; reverse direction
+- **Example:** Write 6.25 in expanded form. → **6 + 0.2 + 0.05**
+- **Misconceptions:** writes 0.25 as 0.2 + 0.5; drops the zero place in the reverse (5 + 0.2 + 0.006 = 5.26); writes 2 × 1/100 for the tenths digit
+- **MAP:** Fractions & decimals 211-220 (number entry)
+- **Fills:** Decimal expanded form (3.472 = 3 + 4 × 1/10 + 7 × 1/100 + 2 × 1/1000)
+- **Why:** expand stops at whole numbers; MAP 211-220 asks decimal expanded form.
+
+### `map_decimal_word_form` — Decimal Word Form (option)
+
+- **Builds:** option on `composing:number_word_form`: band: "decimals" (tenths, hundredths, thousandths), with the existing wordform direction (to_number / to_words) (family place value; CCSS 5.NBT.A.3a, 4.NF.C.6)
+- **Teaches:** Read and write decimals in words using the last place ("four and twenty-six hundredths") (5.NBT.A.3a)
+- **Looks like:** Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the words on one line, numeral slots with a fixed decimal point below (or the numeral and a word bank to build the words). Screen: number entry for to_number; word tiles (drag) for to_words — production, never MC
+- **Problem types:** words → numeral — "seven and three tenths" — write 7.3; words → numeral with a zero — "two and five hundredths" — write 2.05; numeral → words — 4.26 — build "four and twenty-six hundredths" from tiles
+- **Levels:** L1: tenths, the decimal point slot printed (structural) → L2: hundredths without a zero → L3: hundredths/thousandths with a zero place → L4: numeral → words from a tile bank
+- **Example:** Write as a number: nine and fourteen hundredths. → **9.14**
+- **Misconceptions:** writes 2.5 for two and five hundredths; reads "and" as the point anywhere (writes 900.14); names the place of the first digit (4.26 = "twenty-six tenths")
+- **MAP:** Fractions & decimals 211-220 (number entry; build from word tiles)
+- **Fills:** Decimal word form ↔ numeral (four and twenty-six hundredths = 4.26)
+- **Why:** number_word_form deals whole numbers only; MAP 211-220 asks decimals in words and numerals.
 
 ### `map_symmetry_compare` — Compare Lines of Symmetry (option)
 
@@ -692,7 +749,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Example:** A dashed line goes corner to corner across a rectangle. Is it a line of symmetry? → **No**
 - **Misconceptions:** accepts a diagonal of a rectangle because the halves have equal area; rejects a correct line that is not vertical
 - **MAP:** Geometry 191-200 (true/false on a drawn line)
-- **Fills:** Symmetry: is this proposed line correct?
+- **Fills:** Symmetry: is this proposed line correct?; Choose ALL figures that show a line of symmetry
 - **Why:** MAP shows one proposed line and asks if it is a line of symmetry; we only have click-all candidate lines (39/200 symmetry items), never a single yes/no judgement with the rectangle-diagonal trap
 
 ### `map_area_pick` — Which Shape Has Area N? (option)
@@ -775,16 +832,16 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 
 ### `map_shape_partition_pick` — Equal Parts of Shapes (option)
 
-- **Builds:** option on `shapes_early:partition_shapes`: forms "equal or not?", "cut it" and "choose all that show a fraction": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth shaded (family geometry; CCSS 1.G.A.3, 2.G.A.3, 3.G.A.2)
+- **Builds:** option on `shapes_early:partition_shapes`: forms "equal or not?", "cut it" and "choose all that show a fraction": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth / one-eighth shaded (family geometry; CCSS 1.G.A.3, 2.G.A.3, 3.G.A.2, 3.NF.A.1)
 - **Teaches:** equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share
 - **Looks like:** print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form
 - **Problem types:** equal or not — shapes cut into parts — tick those in equal halves/quarters / select all; cut it — a blank rectangle or circle — draw lines into halves or quarters / place cut line; choose all that show — 'Choose ALL shapes with one-third shaded' — tick / select all
-- **Levels:** L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades) → L2: quarters (fourths) → L3: cut it yourself (halves, quarters) → L4: thirds and choose ALL showing a named fraction
+- **Levels:** L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades) → L2: quarters (fourths) → L3: cut it yourself (halves, quarters) → L4: thirds; choose ALL shapes showing a named unit fraction (1/2, 1/3, 1/4) → L5: eighths (cut and choose all showing 1/8)
 - **Example:** Tick every shape cut into equal quarters. → **the square cut by two lines through its centre and the rectangle cut into 4 equal strips (not the circle cut into 4 unequal slices)**
 - **Misconceptions:** counts parts and ignores size (4 unequal parts called quarters); thinks a quarter is bigger than a half because 4 > 2; names one-third as 1/2 when one of three parts is shaded
 - **MAP:** Geometry 161-180 (multi-select figures)
-- **Fills:** Equal parts / halves and quarters of shapes; Partition shapes into equal shares
-- **Why:** partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares
+- **Fills:** Equal parts / halves and quarters of shapes; Choose ALL the shapes that show one-third shaded; Partition shapes into equal shares
+- **Why:** partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares; owns the choose-ALL-shaded form for unit fractions 1/2, 1/3, 1/4, 1/8 of shapes (part B's fractions:identify option keeps only non-unit fractions and sets)
 
 ### `map_heavier_lighter_bw` — Heavier or Lighter, B&W pictures (option)
 
@@ -838,18 +895,18 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - **Fills:** Area of a rectangle with fractional side lengths
 - **Why:** frac_mult_word deals garden-area stories (55/200 dist) and mult_frac_frac an overlap model with no area framing; neither tiles with unit-fraction squares, the clause 5.NF.B.4b names
 
-### `map_measure_story_equation` — Measurement Story to Equation (option)
+### `map_volume_two_prisms` — Composite Volume: Two Prisms (option)
 
-- **Builds:** option on `algebra:build_expr_addsub`: pool "measurement": length, mass, liquid-volume and money stories; build the equation only (no solving) (family measurement; CCSS 2.MD.B.5, 3.MD.A.2, 4.MD.A.2)
-- **Teaches:** choosing the operation for a measurement story and writing the equation with units (lengths, masses, volumes, money)
-- **Looks like:** print: B&W boxed Andika cell, the story with a bar model under it, slots '__ ○ __ = __' with an operation bank; screen: build-expr (drag numbers and sign), never MC
-- **Problem types:** build — story — write the equation; which operation — story — circle + or −; both — write the equation then the answer with its unit
-- **Levels:** L1: length + and − within 100 (structural: bar model stays) → L2: mass and liquid volume → L3: money and two-step (bar model fades)
-- **Example:** A ribbon is 45 cm. Ana cuts off 18 cm. Write the equation for the length left. → **45 − 18 = 27 (27 cm)**
-- **Misconceptions:** adds whenever the story has two numbers; drops or mixes units (45 cm − 18 = 27 m)
-- **MAP:** Measurement 181-200 (choose/write the equation for a story)
-- **Fills:** Match: measurement story ↔ operation (length / mass / money)
-- **Why:** build_expr_addsub builds equations from number stories only; MAP pairs measurement stories with their operation
+- **Builds:** option on `area_perimeter:volume_composite`: form "two prisms": an L- or step-shaped solid made of two rectangular prisms; find each volume and add (family geometry; CCSS 5.MD.C.5c)
+- **Teaches:** volume is additive: split a solid made of two non-overlapping rectangular prisms, find each volume and add (5.MD.C.5c)
+- **Looks like:** print: B&W boxed Andika cell, isometric line drawing of the solid with edge labels and a dashed split line, slots '__ × __ × __ = __', '__ × __ × __ = __', '__ + __ = __'; screen: number entry for each slot, never MC
+- **Problem types:** split given — dashed split line drawn — write both volumes and the total; split yourself — no line — draw the split, then compute; missing edge — the total and one prism given — find the missing edge
+- **Levels:** L1: split line drawn, all edges labelled (structural: labelled drawing and three slot rows stay; hint: split line) → L2: split line faded; pupil chooses the split → L3: one edge must be worked out from two others (subtract lengths)
+- **Example:** A step shape is a 6 × 2 × 3 cm block with a 2 × 2 × 3 cm block on top. Find the total volume. → **36 + 12 = 48 cm³**
+- **Misconceptions:** multiplies the outer edges as if the solid were one box; counts the shared face twice or uses an edge in both prisms; adds edge lengths instead of volumes
+- **MAP:** Measurement 211-230 (volume of a composite solid)
+- **Fills:** Composite volume: two rectangular prisms added (5.MD.C.5c)
+- **Why:** volume_composite's name promises composite solids but 0/200 items are composite (143 prisms, 57 cubes) — this is the build that makes the skill match its name
 
 
 ## Every proposal
@@ -865,23 +922,27 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `vis_pv_bands_millions` | band | `` | Widen Place Value to 7 Digits (millions) | Number & place value 201-220 — drag digits into chart | VISUAL_BUILDS |
 | `compare_small` | option | `placevalue:compare` (band 10/20 and pictures) | Compare Numbers to 10 and 20 (option) | Number & place value 151-170 — symbol select | WRM_PROPOSALS |
 | `nl_20` | new | `number_sense:number_line_scales` | Numbers on a Number Line (any scale) | Number & place value 171-200 — drag/click point on number line | WRM_PROPOSALS |
-| `map_change_unknown_story` | option | `subtraction:unknown_start_wp` (unknown: change (start known, result known)) | How Many Were Added? (change unknown) | Operations & algebra 171-190 — number entry | new |
-| `map_compare_bigger_unknown` | option | `addition:comparison_word` (unknown: bigger / smaller quantity) | Compare Stories: Find the Bigger or Smaller Amount | Operations & algebra 181-200 — number entry | new |
+| `map_change_unknown_story` | option | `addition:add_word_problems` (unknown: change — past-tense join (had 8, got some, now 13); the same option is declared on subtraction:sub_word_problems for separate stories (had 15, some went, 9 left)) | How Many Were Added? (change unknown) | Operations & algebra 171-190 — number entry | new |
+| `map_compare_bigger_unknown` | option | `subtraction:sub_word_problems` (unknown: smaller quantity in a compare story ("fewer than" and "more than" with the bigger known)) | Compare Stories: Smaller Unknown | Operations & algebra 181-200 — number entry | new |
 | `equal_sign_repair` | repair | `addition:equal_sign` (route the skill to its own generator (it deals plain column addition today) and add the forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2) | True or False Equations (repair) | Operations & algebra 181-200 — true/false select | STANDARD_PROPOSALS |
-| `map_properties_equivalent` | new | `algebra:properties_of_operations` | Same Answer? Properties of Operations | Operations & algebra 191-210 — number entry / select all | new |
+| `map_properties_equivalent` | new | `algebra:properties_of_operations` | Properties of Addition | Operations & algebra 191-210 — number entry / select all | new |
 | `write_numeric_expression` | option | `algebra:write_expression` (numbers only, with brackets ("add 8 and 7, then multiply by 2" = 2 × (8 + 7)) and "interpret without calculating") | Write Number Expressions (option) | Operations & algebra 211-225 — expression entry | STANDARD_PROPOSALS |
 | `inequality_write_graph` | option | `algebra:inequalities` (task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow)) | Write and Graph Inequalities (option) | Operations & algebra 211-230 — graph on number line | STANDARD_PROPOSALS |
 | `tens_any` | option | `addition:add_sub_10s` (task: any multiple of 10 from a multiple of 10 (70 − 30), and a 2-digit number ± a multiple of 10 (34 + 20); support: tens rods) | Add and Subtract Multiples of Ten (option) | Operations & algebra 171-195 — number entry | STANDARD_PROPOSALS |
 | `pictures_to_sentence` | option | `addition:add_5_pictures` (response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture)) | Write the Number Sentence for the Picture (option) | Operations & algebra 141-170 — equation entry from a picture | STANDARD_PROPOSALS |
 | `map_match_model_number` | option | `placevalue:place_value_disks` (form: match 3 models to 3 numbers) | Match the Model to the Number | Number & place value 161-190 — drag to match | new |
-| `map_story_equation_match` | option | `algebra:build_expr_addsub` (stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv) | Build the Equation for Any Story | Operations & algebra 171-200 — build/choose the equation<br>Multiplication & division 181-210 — build/choose the equation<br>Fractions & decimals 201-230 — build/choose the equation | new |
-| `map_another_way_to_make` | option | `composing:number_bonds` (response: show another way (open decomposition), both parts unknown, list all pairs) | Another Way to Make It | Operations & algebra 151-160 — drag dots to domino | new |
+| `map_another_way_to_make` | option | `composing:number_bonds` (response: show another way (open decomposition on an empty domino / ten frame)) | Another Way to Make It | Operations & algebra 151-160 — drag dots to domino | new |
 | `map_units_to_number` | option | `placevalue:unit_form` (direction: units → number (incl. zero place)) | Write the Number from Units | Number & place value 181-200 — digit tiles to boxes | new |
 | `map_oop_small_band` | option | `order_of_operations:paren_simple` (band: small numbers (MAP) — operands to 50, every step and the result within 100, e.g. 47 − (2 × 8)) | Simple Parentheses: Small-Number Band | Operations & algebra 191-230 — number entry | new |
 | `map_function_table_context` | option | `algebra:function_table_hard` (context: real-world table (headers such as Boxes / Pencils, Hours / Dollars) instead of In / Out) | Function Tables in a Story | Operations & algebra 211-220 — rule entry | new |
 | `map_word_form_millions` | option | `composing:number_word_form` (band: to 999,999 and to millions (adds the thousands/millions period words), both directions via wordform) | Number Word Form to Millions | Number & place value 191-210 — number entry | new |
 | `zero` | new | `counting:zero_none` | Zero Means None | Number & place value 131-150 — number entry | WRM_PROPOSALS |
 | `multi_step_four_ops` | option | `algebra:multi_step_word` (two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate) | Two-Step Problems With All Four Operations (option) | Operations & algebra 201-220 — number entry + write the equation | STANDARD_PROPOSALS |
+| `map_story_equation_addsub` | option | `algebra:build_expr_addsub` (stories: unknown in any position (result / change / start), compare stories (difference, bigger, smaller unknown); context: everyday \| measurement (length, mass, capacity, money) \| like-denominator fractions) | Build the +/− Equation for Any Story | Operations & algebra 171-200 — build/choose the equation<br>Measurement 181-210 — build/choose the equation | new |
+| `map_story_equation_multdiv` | option | `algebra:build_expr_multdiv` (stories: equal groups and arrays with the product, group size or number of groups unknown; sharing and grouping ÷; × compare ("3 times as many"); context: everyday \| measurement) | Build the ×/÷ Equation for Any Story | Multiplication & division 181-210 — build/choose the equation | new |
+| `map_story_equation_frac` | option | `fraction_operations:frac_word_mixed` (response: build the equation (fraction + − like denominators, fraction × whole number) before or instead of solving) | Build the Equation for a Fraction Story | Fractions & decimals 201-230 — build/choose the equation | new |
+| `map_nl_jumps_equation_addsub` | option | `addition:number_line_add` (task: write the equation the jumps show (jumps drawn, equation blank); the same option is declared on subtraction:number_line_sub for backward jumps) | Write the Equation the Jumps Show (+ −) | Operations & algebra 161-190 — write the equation for the model | new |
+| `systematic_bonds` | new | `composing:bonds_in_order` | Number Bonds in Order | Operations & algebra 151-170 — list all pairs | WRM_PROPOSALS |
 | `map_ratio_picture` | option | `conversions:ratio_intro` (form "from a picture") | Ratios from a Picture (option) | Fractions & decimals 221-230 — picture -> ratio, number entry | new |
 | `map_share_among` | option | `division:share_into_groups` (mode "share among M" + response "drag") | Share Among M, and Make Groups by Dragging (option) | Multiplication & division 181-190 — drag objects into groups; number entry | new |
 | `map_array_to_eq` | option | `multiplication:arrays_groups` (form "write the equation") | Picture to Multiplication Equation (option) | Multiplication & division 181-190 — picture -> equation; equation -> picture | new |
@@ -892,7 +953,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `map_power10_exponent` | new | `decimals:powers_of_ten` | Powers of Ten: Patterns and Exponents | Fractions & decimals 211-220 — number entry | new |
 | `map_frac_compare_reason` | option | `fractions:compare` (support "benchmark 1/2") | Compare Fractions Using 1/2 (option) | Fractions & decimals 201-210 — select symbol | new |
 | `map_percent_of_grid_bar` | option | `conversions:percent_of_number` (support "percent bar") | Percent of a Number with a Bar (option) | Fractions & decimals 221-230 — model -> number | new |
-| `decimal_pv` | new | `decimals:decimal_place_value` | Tenths and Hundredths in a Place-Value Chart | Fractions & decimals 191-210 — value of the digit, number entry | WRM_PROPOSALS |
+| `decimal_pv` | new | `decimals:decimal_place_value` | Tenths and Hundredths in a Place-Value Chart | Fractions & decimals 191-210 — value of the digit, number entry | WRM_PROPOSALS + MAP clause: value of a digit to thousandths: the 7 in 3.072 is 7 hundredths (0.07); chart extends to thousandths |
 | `div_frac_frac` | new | `fraction_operations:div_frac_frac` | Divide Fractions by Fractions | Fractions & decimals 221-230 — number entry | STANDARD_PROPOSALS |
 | `comparison_statements` | option | `multiplication:mult_comparison` (form "statement ↔ equation": 35 = 5 × 7 read as "35 is 5 times as many as 7" (and 7 times as many as 5), and the equation written for a comparison sentence) | Times as Many: Statements and Equations (option) | Multiplication & division 201-210 — sentence -> equation | STANDARD_PROPOSALS |
 | `long_div_rem` | option | `division:long_div_2digit` (remainders) | Long Division with Remainders (option) | Multiplication & division 211-220 — number entry | WRM_PROPOSALS |
@@ -904,14 +965,15 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `mult_dec_dec` | option | `decimals:mult_decimal` (factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm) | Multiply Decimals by Decimals (option) | Fractions & decimals 211-220 — number entry | STANDARD_PROPOSALS |
 | `share_group` | new | `division:share_and_group_early` | Share and Make Groups | Multiplication & division 161-180 — number entry / drag | WRM_PROPOSALS |
 | `long_mult` | new | `multiplication:long_multiplication_4x2` | Long Multiplication and Division (4-digit) | Multiplication & division 211-220 — number entry / drag | WRM_PROPOSALS |
-| `mult_three` | new | `multiplication:multiply_three_numbers` | Multiply Three Numbers | Multiplication & division 201-210 — number entry / drag | WRM_PROPOSALS |
+| `mult_three` | new | `multiplication:multiply_three_numbers` | Multiply Three Numbers | Multiplication & division 201-210 — number entry / drag | WRM_PROPOSALS + MAP clause: associative property with brackets: (2 × 3) × 4 = 2 × (3 × 4), fill the missing factor |
 | `map_div_tens` | option | `division:divide` (divisor "multiple of 10" (3-digit ÷ tens, basic fact × 10)) | Divide by Multiples of Ten (option) | Multiplication & division 201-210 — number entry | new |
 | `map_equal_frac_build` | option | `composing:whole_as_fraction` (target "mixed number" + response "digit bank") | Fractions Equal to a Mixed Number (option) | Fractions & decimals 221-230 — move digits into boxes | new |
 | `map_est_both_factors` | option | `number_sense:estimate_products` (factors: "both multi-digit" (3-/4-digit × 2-digit, round both factors), beside the existing place and task (compute / closest / reasonable) options) | Estimate Products: Round Both Factors (option) | Multiplication & division 211-220 — number entry; is it reasonable? | new |
-| `map_mult_prop_grouping` | option | `multiplication:mult_properties` (forms: add "Grouping (2 × 3 × 4 = 2 × 12)" and a "choose ALL equal products" response) | Multiplication Properties: Grouping and Choose All (option) | Multiplication & division 191-230 — number entry; select all that apply | new |
+| `map_mult_prop_grouping` | option | `multiplication:mult_properties` (response: "choose ALL equal products" (order, breaking apart, ×1/×0 expressions mixed with distractors)) | Multiplication Properties: Choose All Equal (option) | Multiplication & division 191-230 — select all that apply | new |
 | `map_nl_hops_equation` | option | `multiplication:nl_mult` (task: "write the equation the hops show" (hops drawn, no equation printed)) | Number Line Hops to Equation (option) | Multiplication & division 181-190 — picture -> equation | new |
-| `map_frac_choose_all_shaded` | option | `fractions:identify` (response: "choose ALL the models that show a/b" (4-6 models, distractors with unequal parts or wrong count)) | Choose All Models That Show a Fraction (option) | Fractions & decimals 171-190 — select all that apply | new |
-| `equal_groups_early` | new | `multiplication:make_equal_groups` | Make Equal Groups | Multiplication & division 161-180 — drag objects to make groups equal | WRM_PROPOSALS + MAP clause: move objects so two groups are equal |
+| `equal_groups_early` | new | `multiplication:make_equal_groups` | Make Equal Groups | Number & place value 141-150 — drag objects to make groups equal | WRM_PROPOSALS + MAP clause: move objects so two groups are equal |
+| `map_decimal_expanded` | option | `placevalue:expand` (band: "decimals" (tenths, hundredths, thousandths) + direction (to expanded / to standard)) | Expanded Form with Decimals (option) | Fractions & decimals 211-220 — number entry | new |
+| `map_decimal_word_form` | option | `composing:number_word_form` (band: "decimals" (tenths, hundredths, thousandths), with the existing wordform direction (to_number / to_words)) | Decimal Word Form (option) | Fractions & decimals 211-220 — number entry; build from word tiles | new |
 | `map_symmetry_compare` | option | `angles_lines:symmetry` (form "compare": two shapes side by side; which has more lines of symmetry (or write both counts and >, <, =)) | Compare Lines of Symmetry (option) | Geometry 201-210 — compare two figures; number entry / select | new |
 | `map_symmetry_check_line` | option | `angles_lines:symmetry` (form "is this a line of symmetry?": one dashed line drawn on a shape; tick Yes or No (fold check), half the items wrong lines (diagonal of a rectangle, off-centre)) | Is This a Line of Symmetry? (option) | Geometry 191-200 — true/false on a drawn line | new |
 | `map_area_pick` | option | `area_perimeter:area_unit_squares` (form "pick the area": 3–4 grid shapes, click the one with area N square units (distractor: same perimeter, different area)) | Which Shape Has Area N? (option) | Measurement 181-190 — hot spot: select the figure | new |
@@ -920,7 +982,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `map_area_equation` | option | `area_perimeter:area_unit_squares` (form "match the equation": a grid rectangle and equations (3 × 4, 3 + 4, 3 + 4 + 3 + 4, 4 × 4); tick the one that gives the area (or the perimeter)) | Picture to Area Equation (option) | Measurement 191-200 — select the expression | new |
 | `map_ruler_measure_object` | option | `measurement:reading_ruler` (task "measure the object": an object drawn beside the ruler, not starting at 0 on some items; write its length) | Measure an Object Not at Zero (option) | Measurement 171-190 — number entry from a ruler picture | new |
 | `map_tally_build` | option | `graphs:tally_chart` (task "make the tally": a list or picture of items; complete the tally marks and totals) | Complete a Tally Chart (option) | Data & graphing 161-180 — complete the table | new |
-| `map_shape_partition_pick` | option | `shapes_early:partition_shapes` (forms "equal or not?", "cut it" and "choose all that show a fraction": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth shaded) | Equal Parts of Shapes (option) | Geometry 161-180 — multi-select figures | new |
+| `map_shape_partition_pick` | option | `shapes_early:partition_shapes` (forms "equal or not?", "cut it" and "choose all that show a fraction": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth / one-eighth shaded) | Equal Parts of Shapes (option) | Geometry 161-180 — multi-select figures | new |
 | `angle_rules` | new | `angles_lines:angle_rules` | Angle Rules | Geometry 211-230 — number entry: missing angle in a triangle | WRM_PROPOSALS |
 | `volume_cubes` | new | `area_perimeter:volume_counting_cubes` | Volume by Counting Cubes | Measurement 201-215 — number entry: count unit cubes | WRM_PROPOSALS |
 | `coord_context` | option | `coordinates:coordinate_q1` (form "in context": points are data (hours and pages, days and height); plot them and say what a point means) | Graph Points in a Real Problem (option) | Geometry 211-230 — plot / interpret a point in a story | STANDARD_PROPOSALS |
@@ -956,7 +1018,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 | `time_convert` | option | `measurement:unit_conversion_word` (time) | Convert Units of Time (option) | Measurement 201-220 — number entry; select all equivalent | WRM_PROPOSALS + MAP clause: small → large as h-and-min, decimal and mixed hours (90 min = 1 h 30 min = 1.5 h = 1 ½ h), and choose ALL measurements equal to a time |
 | `map_frac_side_area` | option | `fraction_operations:mult_frac_frac` (form "area": a rectangle with fractional sides (e.g. 2/3 × 3/4 unit) drawn inside a unit square tiled by unit-fraction rectangles; count the tiles, then write the area as a product) | Area With Fractional Sides (option) | Measurement 211-220 — area with fractional sides | new |
 | `turns_angles` | new | `angles_lines:turns_and_angles` | Turns and Angles | Geometry 201-215 — angle as a turn of a circle | WRM_PROPOSALS + MAP clause: degrees as a fraction of 360 (a quarter turn = 90°, 1/360 of a turn = 1°) |
-| `map_measure_story_equation` | option | `algebra:build_expr_addsub` (pool "measurement": length, mass, liquid-volume and money stories; build the equation only (no solving)) | Measurement Story to Equation (option) | Measurement 181-200 — choose/write the equation for a story | new |
+| `map_volume_two_prisms` | option | `area_perimeter:volume_composite` (form "two prisms": an L- or step-shaped solid made of two rectangular prisms; find each volume and add) | Composite Volume: Two Prisms (option) | Measurement 211-230 — volume of a composite solid | new |
 
 ## Bugs found on the way (not MAP gaps, but they break MAP practice)
 
@@ -965,6 +1027,7 @@ Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lane
 - `measurement:heavier_lighter_visual` answers with emoji (200/200), which breaks black-and-white print (`map_heavier_lighter_bw`).
 - `order_of_operations:paren_simple` deals products near 1,400, far above MAP's small-number order-of-operations items.
 - `angles_lines:additive_angles` deals reflex parts such as 292° of 360°, beyond MAP grades 2–5.
+- `area_perimeter:volume_composite` ("composite" volume) deals single prisms only: 0 composite solids in 200 items (`map_volume_two_prisms`).
 - `graphs:line_plot` labels unsimplified fractions ("4/8 inches"); `measurement:mass_volume_liquid` answers 0 on half of its "read the scale" items.
 
 ## Owner questions (with suggested answers)

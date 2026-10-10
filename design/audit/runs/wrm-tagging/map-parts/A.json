@@ -80,8 +80,8 @@
       "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing. checked: compare_expressions n=12: every item says evaluate each side (symbol MC or true/false bins); 0/12 compare-by-structure. inequalities checked: numeric true/false only.",
       "proposal": "compare_sentences",
       "evidence": {
-        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-        "says": "DesCartes 201-220: understands equivalence and extends it to number sentences; calculations on both sides."
+        "url": null,
+        "says": "not found in public NWEA material; kept because 5.OA.A.2 (interpret expressions without evaluating) is in MAP's blueprint"
       },
       "closes": "compare_number_sentences adds comparing two expressions by what changed (37 + 25 vs 37 + 28) without working them out; compare_expressions always evaluates both sides."
     },
@@ -477,8 +477,8 @@
       ],
       "note": "compare_int multi-select and symbol; drag to line.",
       "evidence": {
-        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_220.pdf",
-        "says": "DesCartes (6+) 211-230: solves linear equations with integers; integer comparison is 6.NS.7."
+        "url": null,
+        "says": "not found in public NWEA material; kept because 6.NS.C.7 (order and compare integers) is in MAP's blueprint"
       }
     },
     {
@@ -580,17 +580,18 @@
       "strand": "Operations & algebra",
       "ritBand": "181-190",
       "source": "strand-walk",
-      "status": "missing",
+      "status": "partial",
       "skills": [
-        "subtraction:missing_add_sub"
+        "addition:add_word_problems",
+        "subtraction:unknown_start_wp"
       ],
-      "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown.",
+      "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown. Round 4: add_word_problems n=12: 3/12 \"wants N, how many more does she need?\" (change unknown in need form); sub_word_problems n=12: start-unknown and take-out only; word_problems_mixed n=8: one \"wants…need\".",
       "proposal": "map_change_unknown_story",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
         "says": "RIT chart K-2 181-190: change-unknown story (47 then 89 points), answer by moving digit tiles."
       },
-      "closes": "Adds join/separate stories with the change unknown (had 8, got some, now 13); unknown_start_wp is start-unknown only."
+      "closes": "Adds past-tense join and separate stories with the change unknown (\"had 8, got some, now 13\"; \"had 15, some went, 9 left\"); only the \"wants … need\" form is dealt today."
     },
     {
       "task": "Compare word problems (how many more/fewer)",
@@ -612,17 +613,18 @@
       "strand": "Operations & algebra",
       "ritBand": "181-200",
       "source": "strand-walk",
-      "status": "missing",
+      "status": "partial",
       "skills": [
+        "addition:add_word_problems",
         "addition:comparison_word"
       ],
-      "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown. checked: comparison_word n=12: 12/12 difference-unknown (how many more/fewer); word_problems_mixed n=8 one \"26 more than\" bigger-unknown item, no smaller-unknown; status kept missing for a dedicated form.",
+      "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown. checked: comparison_word n=12: 12/12 difference-unknown (how many more/fewer); word_problems_mixed n=8 one \"26 more than\" bigger-unknown item, no smaller-unknown; status kept missing for a dedicated form. Round 4: add_word_problems n=12: 3/12 bigger-unknown (\"Lena has 42 more stamps than Ben\"); sub_word_problems n=12: 0 smaller-unknown; comparison_word difference only.",
       "proposal": "map_compare_bigger_unknown",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 1.OA.1 / 2.OA.1 (compare, bigger or smaller unknown) is in MAP's blueprint"
       },
-      "closes": "Adds stories whose bigger or smaller quantity is unknown (\"6 fewer than Maya\"); comparison_word asks the difference only."
+      "closes": "Adds the smaller-unknown compare story (\"Tom has 6 fewer than Maya; how many does Tom have?\"); bigger-unknown is dealt by add_word_problems."
     },
     {
       "task": "Part-whole (put together / take apart, both addends unknown)",
@@ -634,12 +636,12 @@
         "composing:number_bonds"
       ],
       "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways. part_whole (any one part unknown) does not cover both-unknown; moved to map_another_way_to_make.",
-      "proposal": "map_another_way_to_make",
+      "proposal": "systematic_bonds",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
         "says": "RIT chart K-2 151-160: \"Move dots to the empty domino to show a different way to make 5\"."
       },
-      "closes": "map_another_way_to_make adds both-parts-unknown bonds and \"list all pairs\" for a number; number_bonds always gives one part."
+      "closes": "bonds_in_order adds listing every bond of a number systematically (both parts unknown, 0+5, 1+4 …); number_bonds always gives one part."
     },
     {
       "task": "Missing addend / missing number in +/− equation",
@@ -705,7 +707,7 @@
       }
     },
     {
-      "task": "Identify the property (commutative/associative) / equivalent sum",
+      "task": "Identify the property of addition (commutative/associative) / equivalent sum",
       "strand": "Operations & algebra",
       "ritBand": "191-220",
       "source": "strand-walk",
@@ -717,7 +719,7 @@
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
         "says": "DesCartes 191-220: demonstrates understanding of commutative, then associative property."
       },
-      "closes": "Adds recognising and writing equivalent sums/products by commutative and associative properties (8 + 5 = 5 + 8, choose all equal); no skill deals + properties, mult_properties only fills facts."
+      "closes": "Adds recognising and writing equal sums by the commutative and associative properties of addition, incl. choose-all; no live skill deals + properties (× is part B)."
     },
     {
       "task": "Fact families / related facts",
@@ -959,23 +961,22 @@
       "closes": "Adds matching several models to several numbers (incl. zero-place distractors); live skills go one model → one number or number → build."
     },
     {
-      "task": "Match: story <-> operation / equation",
+      "task": "Match: story <-> operation / equation (+ −)",
       "strand": "Operations & algebra",
       "ritBand": "171-200",
       "source": "6.4",
       "status": "partial",
       "skills": [
         "algebra:build_expr_addsub",
-        "algebra:build_expr_multdiv",
         "algebra:write_equation"
       ],
       "note": "build_expr_addsub n=8: 8/8 story → build \"89 − 3 = 86\" (build-expr, production — stronger than MAP choose-one); build_expr_multdiv n=8 the same for × ÷. Residual: only result-unknown join/separate/equal-groups stories; no unknown-in-other-positions, no compare or fraction stories. write_equation is letters (algebra).",
-      "proposal": "map_story_equation_match",
+      "proposal": "map_story_equation_addsub",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
         "says": "DesCartes 171-200: determines the operation needed; writes a number sentence for a simple problem."
       },
-      "closes": "Adds unknown-in-any-position, compare, × ÷ and fraction stories to the build-the-equation form; build_expr_* deal result-unknown +/− and ×/÷ stories only."
+      "closes": "Adds change-, start-, bigger- and smaller-unknown and measurement stories to the build-the-equation form; build_expr_addsub today builds result-unknown join/separate only. (×/÷ and fraction stories: map_story_equation_multdiv / _frac, part B rows.)"
     },
     {
       "task": "Match: number line <-> number",
@@ -999,16 +1000,18 @@
       "strand": "Operations & algebra",
       "ritBand": "161-200",
       "source": "6.4",
-      "status": "exists-ok",
+      "status": "partial",
       "skills": [
         "addition:number_line_add",
         "subtraction:number_line_sub"
       ],
-      "note": "Jumps on a line with the equation.",
+      "note": "number_line_add n=12: 12/12 \"Use the number line: 15 + 5 = ?\" — the equation is given, pupil gives the answer; number_line_sub the same. 0/12 write the equation from the jumps.",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
         "says": "DesCartes 161-180: uses a number line to construct addition facts with sums through 20."
-      }
+      },
+      "proposal": "map_nl_jumps_equation_addsub",
+      "closes": "Adds writing the equation a drawn set of jumps shows (start, jump, end → 8 + 6 = 14); today the equation is given."
     },
     {
       "task": "Match: word form <-> number",
@@ -1078,7 +1081,7 @@
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
         "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
       },
-      "closes": "Adds an open \"show another way\" decomposition on an empty domino/ten frame and listing all pairs; number_bonds and make_ten ask one fixed missing part."
+      "closes": "Adds the open \"show a different way\" response on an empty domino / ten frame (any correct new pair accepted); number_bonds and make_ten ask one fixed missing part."
     },
     {
       "task": "Pick the group with the fewest / most (coatracks)",
@@ -1141,8 +1144,8 @@
       ],
       "note": "Our number entry is the production equivalent of MAP digit tiles; sampled n=20 both skills answerType number.",
       "evidence": {
-        "url": "https://www.nwea.org/blog/2025/how-the-map-growth-item-pool-stays-deep-aligned-and-up-to-date/",
-        "says": "NWEA: MAP items use text-entry boxes and drag-and-drop (e.g. digit tiles 0-9 in RIT chart samples)."
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 sample items answer by moving digit tiles 0-9 into boxes (e.g. 181-190 change story)."
       }
     },
     {
@@ -1159,8 +1162,8 @@
       "proposal": "multi_step_four_ops",
       "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation.",
       "evidence": {
-        "url": null,
-        "says": "not found in public NWEA material (DesCartes OAT_210 lists rules/function tables, not multi-step); kept because 4.OA.A.3 is in MAP blueprint"
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: solves real-world multiple-step problems; uses division in multiple-step problems."
       },
       "closes": "multi_step_four_ops adds two-step stories with × and ÷ steps and writing the equation with a letter for the unknown; live multi-step skills are +/− only and never use a letter."
     }
@@ -1402,8 +1405,8 @@
     },
     "map_change_unknown_story": {
       "kind": "option",
-      "skill": "subtraction:unknown_start_wp",
-      "option": "unknown: change (start known, result known)",
+      "skill": "addition:add_word_problems",
+      "option": "unknown: change — past-tense join (had 8, got some, now 13); the same option is declared on subtraction:sub_word_problems for separate stories (had 15, some went, 9 left)",
       "name": "How Many Were Added? (change unknown)",
       "teaches": "Join/separate stories where the change is unknown",
       "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box.",
@@ -1417,7 +1420,7 @@
         "ritBand": "171-190",
         "taskType": "number entry"
       },
-      "why": "CGI change-unknown is a MAP problem type with no skill",
+      "why": "add_word_problems deals change-unknown only as \"wants N, needs how many more\"; past-tense join/separate change-unknown is the MAP K-2 181-190 item. Each skill gets the stories its name covers.",
       "reused": false,
       "problemTypes": [
         "join, change unknown — had 5, got some, now 12 — write how many were added",
@@ -1441,10 +1444,10 @@
     },
     "map_compare_bigger_unknown": {
       "kind": "option",
-      "skill": "addition:comparison_word",
-      "option": "unknown: bigger / smaller quantity",
-      "name": "Compare Stories: Find the Bigger or Smaller Amount",
-      "teaches": "'Zoe has 4 more than Owen, who has 7' — find the unknown quantity",
+      "skill": "subtraction:sub_word_problems",
+      "option": "unknown: smaller quantity in a compare story (\"fewer than\" and \"more than\" with the bigger known)",
+      "name": "Compare Stories: Smaller Unknown",
+      "teaches": "Solve compare stories where the smaller quantity is unknown",
       "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar.",
       "family": "addition",
       "ccss": [
@@ -1456,18 +1459,17 @@
         "ritBand": "181-200",
         "taskType": "number entry"
       },
-      "why": "The hardest CGI compare forms are MAP items; not dealt",
+      "why": "add_word_problems already deals bigger-unknown; the smaller unknown is solved by subtraction, so it belongs on sub_word_problems",
       "reused": false,
       "problemTypes": [
-        "bigger unknown — Sam has 7, Ben has 4 more — write Ben's amount",
-        "smaller unknown — Sam has 12, Ben has 5 fewer — write Ben's amount",
-        "mixed with difference-unknown — choose which bar is missing — write it"
+        "fewer than — Maya 14, Tom 6 fewer — write Tom",
+        "more than, bigger known — Maya has 6 more than Tom, Maya 14 — write Tom"
       ],
       "levels": [
-        "L1: bigger unknown, within 10, bars drawn to scale with the extra part shaded (hint, fades); two-bar frame (structural, stays)",
+        "L1: \"fewer than\", within 20, two-bar diagram with the difference shaded (hint, fades); two-bar frame (structural, stays)",
         "L2: shading fades",
-        "L3: smaller unknown (\"fewer\")",
-        "L4: within 100, \"more/fewer\" in either sentence order"
+        "L3: \"more than\" with the bigger known (the language trap)",
+        "L4: within 100"
       ],
       "example": {
         "item": "Maya has 14 shells. Tom has 6 fewer shells than Maya. How many shells does Tom have?",
@@ -1499,31 +1501,31 @@
     "map_properties_equivalent": {
       "kind": "new",
       "skill": "algebra:properties_of_operations",
-      "name": "Same Answer? Properties of Operations",
-      "teaches": "Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
+      "name": "Properties of Addition",
+      "teaches": "Recognise and write equal sums by the commutative and associative properties of addition (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
       "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; an expression and an equation frame (8 + 5 = ☐ + ☐); pupil writes the equivalent expression or ticks the equal ones. Screen: tile entry in the frame / click all equal expressions (select-all).",
       "family": "algebra",
       "ccss": [
         "1.OA.B.3",
-        "3.OA.B.5"
+        "2.NBT.B.9"
       ],
       "map": {
         "strand": "Operations & algebra",
         "ritBand": "191-210",
         "taskType": "number entry / select all"
       },
-      "why": "MAP asks property recognition; no skill",
+      "why": "No skill names or applies + properties; × grouping belongs to part B (map_mult_prop_grouping / mult_three)",
       "reused": false,
       "problemTypes": [
-        "Write the turn-around — 8 + 5 = ☐ + ☐ — write numbers",
-        "Choose ALL equal to — 4 expressions — tick all / click all",
-        "Regroup — (2 + 3) + 7 = 2 + (☐ + ☐) — write numbers"
+        "Write the turn-around — 8 + 5 = ☐ + ☐",
+        "Regroup three addends — (6 + 4) + 9 = 6 + (☐ + ☐)",
+        "Choose ALL sums equal to 8 + 5 — tick / click all"
       ],
       "levels": [
-        "L1: commutative + within 20, cube trains shown (hint, fades); frame (structural, stays)",
+        "L1: commutative within 20 with cube trains (hint, fades); frame (structural, stays)",
         "L2: trains fade",
         "L3: associative with three addends",
-        "L4: × versions (3 × 4 = 4 × 3; (2 × 5) × 3) and choose-all"
+        "L4: choose-all equal sums"
       ],
       "example": {
         "item": "(6 + 4) + 9 = 6 + (☐ + ☐)",
@@ -1651,95 +1653,32 @@
         "Ignores the empty place"
       ]
     },
-    "map_story_equation_match": {
-      "kind": "option",
-      "skill": "algebra:build_expr_addsub",
-      "option": "stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv",
-      "name": "Build the Equation for Any Story",
-      "teaches": "Represent a story with an equation using a box for the unknown (9 + ☐ = 14, 4 × ☐ = 28, 3/8 + ☐ = 7/8), across + − × ÷ and fraction stories, without solving first",
-      "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown shown as ☐; pupil writes the numbers and the sign (does not solve first). Screen: build-expr tiles (production, never MC).",
-      "family": "algebra",
-      "ccss": [
-        "1.OA.A.1",
-        "2.OA.A.1",
-        "3.OA.A.3",
-        "3.OA.D.8",
-        "4.NF.B.3d",
-        "4.NF.B.4c",
-        "5.NF.B.6"
-      ],
-      "map": [
-        {
-          "strand": "Operations & algebra",
-          "ritBand": "171-200",
-          "taskType": "build/choose the equation"
-        },
-        {
-          "strand": "Multiplication & division",
-          "ritBand": "181-210",
-          "taskType": "build/choose the equation"
-        },
-        {
-          "strand": "Fractions & decimals",
-          "ritBand": "201-230",
-          "taskType": "build/choose the equation"
-        }
-      ],
-      "why": "One option grows the live build_expr_* production form instead of three separate story→equation proposals; it closes the 6.4 story↔equation pair for +/−, ×/÷ and fraction stories",
-      "reused": false,
-      "problemTypes": [
-        "+ / − story, unknown in any position — join, separate, part-whole — build e.g. 9 + ☐ = 14",
-        "compare story — more/fewer — build e.g. 14 − 6 = ☐ or 6 + ☐ = 14",
-        "× / ÷ story — equal groups, arrays, sharing, unknown factor — build e.g. 4 × ☐ = 28",
-        "fraction story — + − of like fractions, × fraction by whole — build e.g. 3/8 + ☐ = 7/8"
-      ],
-      "levels": [
-        "L1: +/− result unknown (the live skill today); frame with ☐ (structural, stays); key action word underlined (hint)",
-        "L2: change unknown and start unknown (☐ moves)",
-        "L3: compare stories (bigger, smaller, difference unknown); underlining fades",
-        "L4: × ÷ stories, incl. unknown factor and sharing",
-        "L5: fraction stories (like denominators; fraction × whole)"
-      ],
-      "example": {
-        "item": "Ravi had some stickers. He got 6 more. Now he has 15. Build the equation.",
-        "answer": "☐ + 6 = 15"
-      },
-      "misconceptions": [
-        "Writes the numbers in story order whatever the unknown (6 + 15 = ☐)",
-        "Picks + for every \"more\" (compare story with smaller unknown)",
-        "Uses × for any two numbers in a sharing story"
-      ]
-    },
     "map_another_way_to_make": {
       "kind": "option",
       "skill": "composing:number_bonds",
-      "option": "response: show another way (open decomposition), both parts unknown, list all pairs",
+      "option": "response: show another way (open decomposition on an empty domino / ten frame)",
       "name": "Another Way to Make It",
       "teaches": "Given one split of a number to 10 (domino/bond), show a different split",
       "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a number with a filled domino / ten-frame and an empty one beside it; pupil draws dots or writes a different pair (part + part). Screen: tap dots onto the empty domino / ten-frame, or fill a number bond (production).",
       "family": "composing",
       "ccss": [
-        "K.OA.3",
-        "K.OA.A.3",
-        "1.OA.A.1"
+        "K.OA.A.3"
       ],
       "map": {
         "strand": "Operations & algebra",
         "ritBand": "151-160",
         "taskType": "drag dots to domino"
       },
-      "why": "number_bonds asks for one missing part; MAP asks for an open, different decomposition with more than one right answer.",
+      "why": "No skill takes an open \"different way\" response; listing all pairs is WRM bonds_in_order (row Part-whole)",
       "reused": false,
       "problemTypes": [
-        "Show another way — 5 shown as 4 + 1, make it differently — draw dots / tap dots",
-        "List all ways — all pairs for 6 (both addends unknown) — write the pairs in a table",
-        "Number bond — whole given, both parts blank — write two parts"
+        "Show another way — 5 shown as 4 + 1 — draw dots / tap dots on the empty domino",
+        "Show another way on a ten frame — 8 shown as 5 + 3 — draw / tap counters"
       ],
       "levels": [
-        "L1: to 5, dots on a domino, the given way drawn (hint, fades); empty domino frame (structural, stays)",
-        "L2: to 10 on ten frames",
-        "L3: both parts unknown in a bond (any correct pair accepted)",
-        "L4: list all pairs for a number to 10 in an ordered table"
+        "L1: to 5 on dominoes, the given way drawn (structural, stays) and its equation written (hint, fades)",
+        "L2: equation hint fades",
+        "L3: to 10 on ten frames"
       ],
       "example": {
         "item": "7 is 5 + 2. Show 7 another way.",
@@ -1930,6 +1869,186 @@
         "strand": "Operations & algebra",
         "ritBand": "201-220",
         "taskType": "number entry + write the equation"
+      },
+      "reused": true
+    },
+    "map_story_equation_addsub": {
+      "kind": "option",
+      "skill": "algebra:build_expr_addsub",
+      "option": "stories: unknown in any position (result / change / start), compare stories (difference, bigger, smaller unknown); context: everyday | measurement (length, mass, capacity, money) | like-denominator fractions",
+      "name": "Build the +/− Equation for Any Story",
+      "teaches": "Write the addition or subtraction equation for a story with a box for the unknown, wherever the unknown sits, including compare and measurement stories",
+      "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown as ☐; pupil writes the numbers and + or − (does not solve first). Screen: build-expr tiles (production, never MC).",
+      "family": "algebra",
+      "ccss": [
+        "1.OA.A.1",
+        "2.OA.A.1",
+        "2.MD.B.5",
+        "2.MD.C.8",
+        "4.MD.A.2"
+      ],
+      "map": [
+        {
+          "strand": "Operations & algebra",
+          "ritBand": "171-200",
+          "taskType": "build/choose the equation"
+        },
+        {
+          "strand": "Measurement",
+          "ritBand": "181-210",
+          "taskType": "build/choose the equation"
+        }
+      ],
+      "problemTypes": [
+        "Join/separate, unknown in any position — build e.g. ☐ + 6 = 15 — tiles",
+        "Compare story — more/fewer, any quantity unknown — build e.g. 14 − 6 = ☐",
+        "Measurement story — cm, kg, l, $ — build e.g. 45 − ☐ = 28 (cm)"
+      ],
+      "levels": [
+        "L1: result unknown (live today); frame with ☐ (structural, stays); action word underlined (hint)",
+        "L2: change unknown",
+        "L3: start unknown; underlining fades",
+        "L4: compare stories (difference, bigger, smaller unknown)",
+        "L5: context: measurement units on the numbers"
+      ],
+      "example": {
+        "item": "Ravi had some stickers. He got 6 more. Now he has 15. Build the equation.",
+        "answer": "☐ + 6 = 15"
+      },
+      "misconceptions": [
+        "Writes the numbers in story order whatever the unknown (6 + 15 = ☐)",
+        "Uses + for every \"more\", even when the smaller amount is unknown"
+      ],
+      "why": "Grows the live production form (build_expr_addsub) to every +/− story structure MAP asks; declares only + and −, so the name holds",
+      "reused": false
+    },
+    "map_story_equation_multdiv": {
+      "kind": "option",
+      "skill": "algebra:build_expr_multdiv",
+      "option": "stories: equal groups and arrays with the product, group size or number of groups unknown; sharing and grouping ÷; × compare (\"3 times as many\"); context: everyday | measurement",
+      "name": "Build the ×/÷ Equation for Any Story",
+      "teaches": "Write the multiplication or division equation for a story with a box for the unknown in any position",
+      "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame with one operation box and ☐; pupil writes the numbers and × or ÷. Screen: build-expr tiles (production, never MC).",
+      "family": "algebra",
+      "ccss": [
+        "3.OA.A.3",
+        "3.OA.A.4",
+        "4.OA.A.2"
+      ],
+      "map": {
+        "strand": "Multiplication & division",
+        "ritBand": "181-210",
+        "taskType": "build/choose the equation"
+      },
+      "problemTypes": [
+        "Equal groups / array, product unknown — build 4 × 7 = ☐",
+        "Unknown factor / sharing / grouping — build 4 × ☐ = 28 or 28 ÷ 4 = ☐",
+        "× compare — \"3 times as many\" — build 3 × 5 = ☐"
+      ],
+      "levels": [
+        "L1: product unknown (live today); frame (structural); \"each\" underlined (hint)",
+        "L2: sharing ÷ (group size unknown)",
+        "L3: grouping ÷ / unknown factor; underlining fades",
+        "L4: × compare",
+        "L5: measurement contexts"
+      ],
+      "example": {
+        "item": "28 pencils are put in 4 equal cups. How many in each cup? Build the equation.",
+        "answer": "28 ÷ 4 = ☐ (or 4 × ☐ = 28)"
+      },
+      "misconceptions": [
+        "Uses × for any two numbers",
+        "Writes 4 ÷ 28 (order reversed)"
+      ],
+      "why": "build_expr_multdiv deals product-unknown and sharing only; this adds the other structures, × and ÷ only",
+      "reused": false
+    },
+    "map_story_equation_frac": {
+      "kind": "option",
+      "skill": "fraction_operations:frac_word_mixed",
+      "option": "response: build the equation (fraction + − like denominators, fraction × whole number) before or instead of solving",
+      "name": "Build the Equation for a Fraction Story",
+      "teaches": "Write the equation for a fraction story (3/8 + ☐ = 7/8, 4 × 2/3 = ☐) with a box for the unknown",
+      "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame with fraction boxes (numerator over denominator) and one operation box; pupil writes the fractions and the sign. Screen: build-expr tiles with fraction tiles (production, never MC).",
+      "family": "fraction_operations",
+      "ccss": [
+        "4.NF.B.3d",
+        "4.NF.B.4c"
+      ],
+      "map": {
+        "strand": "Fractions & decimals",
+        "ritBand": "201-230",
+        "taskType": "build/choose the equation"
+      },
+      "problemTypes": [
+        "Fraction + / − story, result unknown — build 3/8 + 2/8 = ☐",
+        "Change unknown — build 3/8 + ☐ = 7/8",
+        "Fraction × whole — build 4 × 2/3 = ☐"
+      ],
+      "levels": [
+        "L1: + like denominators, result unknown; fraction bar drawn (hint, fades); frame (structural, stays)",
+        "L2: − stories",
+        "L3: unknown change; bar fades",
+        "L4: whole × fraction stories"
+      ],
+      "example": {
+        "item": "A ribbon is 7/8 m. Mia cuts off 3/8 m. How much is left? Build the equation.",
+        "answer": "7/8 − 3/8 = ☐"
+      },
+      "misconceptions": [
+        "Adds denominators in the equation (3/8 + 2/8 = 5/16)",
+        "Writes 2/3 × 4 as 2/12"
+      ],
+      "why": "frac_word_mixed (\"Mixed Fraction Word Problems\") covers + − and ×, so the option fits its name; today it asks only the answer",
+      "reused": false
+    },
+    "map_nl_jumps_equation_addsub": {
+      "kind": "option",
+      "skill": "addition:number_line_add",
+      "option": "task: write the equation the jumps show (jumps drawn, equation blank); the same option is declared on subtraction:number_line_sub for backward jumps",
+      "name": "Write the Equation the Jumps Show (+ −)",
+      "teaches": "Read a start point, a jump and an end point on a number line and write the matching equation",
+      "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number line with jumps drawn, equation frame ☐ + ☐ = ☐ under it; pupil writes the three numbers. Screen: number entry in the frame (production, never MC).",
+      "family": "addition",
+      "ccss": [
+        "1.OA.C.5",
+        "2.MD.B.6"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "161-190",
+        "taskType": "write the equation for the model"
+      },
+      "problemTypes": [
+        "One jump — write a + b = c",
+        "Two jumps of 1s counted — write a + b = c",
+        "Backward jump (on number_line_sub) — write a − b = c"
+      ],
+      "levels": [
+        "L1: one jump to 10, jump length labelled (hint, fades); equation frame (structural, stays)",
+        "L2: jump label fades, pupil counts the jump",
+        "L3: to 20 with the jump drawn as unit hops",
+        "L4: backward jumps on number_line_sub"
+      ],
+      "example": {
+        "item": "A jump goes from 8 to 14. Write the equation.",
+        "answer": "8 + 6 = 14"
+      },
+      "misconceptions": [
+        "Writes the end point as the jump (8 + 14)",
+        "Counts the tick marks including the start (8 + 7)"
+      ],
+      "why": "Matches the ×-twin option map_nl_hops_equation (part B); each skill declares only its own operation",
+      "reused": false
+    },
+    "systematic_bonds": {
+      "kind": "new",
+      "skill": "composing:bonds_in_order",
+      "name": "Number Bonds in Order",
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "151-170",
+        "taskType": "list all pairs"
       },
       "reused": true
     }
