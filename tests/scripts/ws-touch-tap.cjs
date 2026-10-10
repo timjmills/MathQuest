@@ -24,6 +24,8 @@ const startCard = (page, c, k) => page.evaluate((c, k) => {
     window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion(); window.scrollTo(0, 0);
 }, c, k);
 const centre = (page, sel, i = 0) => page.evaluate((s, i) => { const e = document.querySelectorAll(s)[i]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel, i);
+// Start again: the element at its own centre, and above any pinned bottom bar
+const CLEAR = (root) => `(() => { const b = document.querySelector('${root} .mq-tn-reset'); if (!b) return false; const r = b.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e === b && r.bottom <= innerHeight; })()`;
 const said = (page, root) => page.evaluate((r) => { const b = document.querySelector(`${r} .mq-tn-said`); return b ? b.textContent : null; }, root);
 const aeIsTn = (page) => page.evaluate(() => !!(document.activeElement && document.activeElement.matches('.ws-tn[data-mq-tn]')));
 
@@ -225,6 +227,34 @@ const wrongQuiz = (page) => page.evaluate(() => {
     window.scrollTo(0, 0);
 });
 
+/** Critic r5 Q5-1: a typed answer then ONE touch tap on Next moves to the next question (instant feedback). */
+async function realQuizTapNext(fails) {
+    for (const vp of [VP, { width: 1280, height: 600, deviceScaleFactor: 1, hasTouch: true }]) {
+        const { page, problems, close } = await open({ seed: 17, viewport: vp });
+        try {
+            await READY(page);
+            await page.evaluate(() => { window.clearSetOptions({ silent: true }); window.setHelpAfterWrong('ladder'); });
+            for (const [c, k] of [['addition', 'add_facts'], ['subtraction', 'subtract'], ['multiplication', 'mult_facts']]) for (const ans of ['wrong', 'right']) {
+                await startQuiz(page, c, k, 990); await sleep(1200);
+                const v = await page.evaluate((ans) => { const s = window.state; const a = Number(String(s.quizAllQuestions[s.quizOrder[s.quizQuestionIndex]].question.questionData.ans).replace(/,/g, '')); return String(ans === 'right' ? a : a + 1); }, ans);
+                if (!(await page.$('#qtAnswerInput'))) { fails.push(`tap Next ${vp.width} ${k}: no one-box answer`); continue; }
+                await page.focus('#qtAnswerInput'); await page.keyboard.type(v);
+                const nx = await page.evaluate(() => { const n = document.querySelector('#quizTakeView .qt-nav-btn.next'); const r = n.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+                await page.touchscreen.tap(nx.x, nx.y); await sleep(1100);
+                const idx = await page.evaluate(() => window.state.quizQuestionIndex);
+                if (idx !== 1) fails.push(`tap Next ${vp.width} ${k} ${ans}: one touch tap on Next after typing did not move on (index ${idx})`);
+                // back: the instant feedback is there for the answered question
+                await page.evaluate(() => window.navigateQuizQuestion(-1)); await sleep(500);
+                const fb = await page.evaluate(() => (document.querySelector('#quizTakeView .qt-feedback') || {}).textContent || '');
+                if (idx === 1 && !fb.trim()) fails.push(`tap Next ${vp.width} ${k} ${ans}: Previous shows no feedback`);
+            }
+        } finally {
+            if (problems.length) fails.push('tap Next console: ' + JSON.stringify(problems.slice(0, 3)));
+            await close();
+        }
+    }
+}
+
 /** R4-1, owner ruling (b): a wrong answer keeps the teacher's touch marks and ADDS the next support, on every host. */
 async function realKeep(fails) {
     const { page, problems, close } = await open({ seed: 21, viewport: VP });
@@ -289,17 +319,26 @@ async function realStack(fails) {
                 if (phase === 'wrong1') { await wrongCard(page); await sleep(1000); }
                 const fb = await page.evaluate(() => (document.getElementById('feedbackArea') || {}).textContent || '');
                 if (phase === 'wrong1') ok(!/Say \d+\. Touch the dots on \d+/.test(fb), `${at} R4-3: column words, not the whole sum: "${fb}"`);
+                await page.click('#gameView .mq-tn-reset').catch(() => {});
+                await page.evaluate(() => window.scrollTo(0, 0)); await sleep(150);
                 // two numerals in different columns: x centres differ
                 const pts = await page.evaluate(() => [...document.querySelectorAll('#gameView .ws-tn[role="button"]')].map((b) => { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, n: Number((/: (\d+) touch/.exec(b.getAttribute('aria-label')) || [])[1]) }; }));
                 pts.sort((a, b) => b.x - a.x);
                 const ones = pts[0];
                 const other = pts.find((p) => Math.abs(p.x - ones.x) > 20);
-                await page.click('#gameView .mq-tn-reset').catch(() => {});
                 await page.touchscreen.tap(ones.x, ones.y); await sleep(200);
-                if (ones.n >= 2) { await page.touchscreen.tap(ones.x, ones.y); await sleep(200); }
+                // Q5-2: from the page top, the first count brings the line clear of the pinned bar
+                ok(await page.evaluate(CLEAR('#gameView')), `${at} ${phase} Q5-2: after the first tap at the page top, Start again is under the pinned bar`);
+                if (ones.n >= 2) {
+                    // the first count may scroll the line clear of the pinned bar: tap where the ones numeral is now
+                    const now = await page.evaluate((x0) => { const b = [...document.querySelectorAll('#gameView .ws-tn[role="button"]')].map((e) => e.getBoundingClientRect()).sort((a, c) => c.left - a.left)[0]; return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, ones.x);
+                    await page.touchscreen.tap(now.x, now.y); await sleep(200);
+                }
                 const want = Math.min(2, ones.n);
                 ok((await said(page, '#gameView')) === `Touched ${want}`, `${at} ${phase} R4-3: the ones column counts alone: "${await said(page, '#gameView')}" (want Touched ${want})`);
                 if (other) {
+                    const dy = await page.evaluate(() => window.scrollY);
+                    other.y -= dy;
                     await page.touchscreen.tap(other.x, other.y); await sleep(200);
                     ok((await said(page, '#gameView')) === 'Touched 1', `${at} ${phase} R4-3: another column starts its own count: "${await said(page, '#gameView')}"`);
                 }
@@ -319,6 +358,25 @@ async function realStack(fails) {
                 ok(hit.h >= 44, `${at} ${phase} Start again is at least 44 px tall: ${hit.h}`);
                 await page.touchscreen.tap(hit.x, hit.y); await sleep(250);
                 ok((await page.evaluate(GREYS('#gameView'))) === 0, `${at} ${phase} R4-2: a tap on Start again clears the stack`);
+            }
+            // Q5-2 on the quiz: the first tap from the page top clears the line; a wrong answer's message shows whole
+            await page.evaluate(() => { window.state.quizMode = false; });
+            let qn = 0;
+            for (let t = 0; t < 6 && qn < 1; t++) { await startQuiz(page, 'addition', 'add_column_multi', 301 + 7 * t); await sleep(1000); qn = await page.evaluate(() => document.querySelectorAll('#quizTakeView .ws-tn[role="button"]').length); }
+            if (!qn) fails.push(`stack: ${at} quiz: no numerals`);
+            else {
+                await page.evaluate(() => window.scrollTo(0, 0)); await sleep(150);
+                const q1 = await centre(page, '#quizTakeView .ws-tn[role="button"]', 0);
+                await page.touchscreen.tap(q1.x, q1.y); await sleep(250);
+                ok(await page.evaluate(CLEAR('#quizTakeView')), `${at} quiz Q5-2: after the first tap at the page top, Start again is under the pinned bar`);
+                await page.evaluate(() => { window.scrollTo(0, 0); const st = window.state; const flat = st.quizOrder[st.quizQuestionIndex]; const q = st.quizAllQuestions[flat].question.questionData; window.submitQuizTextAnswer(flat, String(Number(String(q.ans).replace(/,/g, '')) + 1)); }); await sleep(900);
+                const whole = await page.evaluate(() => {
+                    const f = document.querySelector('#quizTakeView .qt-feedback'); const n = document.querySelector('#quizTakeView .qt-nav');
+                    if (!f || !n) return 'missing';
+                    const a = f.getBoundingClientRect(), b = n.getBoundingClientRect();
+                    return a.bottom <= b.top + 1 && a.top >= 0 ? 'ok' : `message ${Math.round(a.top)}-${Math.round(a.bottom)}, bar top ${Math.round(b.top)}`;
+                });
+                ok(whole === 'ok', `${at} quiz Q5-2: the ladder message after a wrong answer shows whole above the bar: ${whole}`);
             }
         } finally {
             if (problems.length) fails.push('stack console: ' + JSON.stringify(problems.slice(0, 3)));
@@ -425,7 +483,7 @@ async function realRow(fails) {
         await close();
     }
     // R3-8: the REAL hosts (practice card, online worksheet, quiz) at Chromebook size, touch screen
-    for (const run of [realCard, realTimes, realWorksheet, realQuiz, realKeep, realStack, realRow]) {
+    for (const run of [realCard, realTimes, realWorksheet, realQuiz, realQuizTapNext, realKeep, realStack, realRow]) {
         try { await run(fails); } catch (e) { fails.push(`${run.name}: ${String(e && e.stack || e)}`); }
     }
     if (problems.length) fails.push('console: ' + JSON.stringify(problems.slice(0, 3)));

@@ -306,14 +306,44 @@ function nextInOrder(g) {
     return null;
 }
 
+/**
+ * The top of the bars pinned to the bottom edge (card Hint / Check, quiz Previous / Next) that
+ * cover content, or innerHeight when none does.
+ */
+function pinnedTop() {
+    let t = innerHeight;
+    document.querySelectorAll('#questionCard > .mq-qactions, #questionCard > .next-btn-container, #quizTakeView .qt-nav').forEach((b) => {
+        const cs = getComputedStyle(b);
+        if (cs.position !== 'fixed' && cs.position !== 'sticky') return;
+        const r = b.getBoundingClientRect();
+        if (r.height && r.top < innerHeight && r.bottom >= innerHeight - 2) t = Math.min(t, r.top);
+    });
+    return t;
+}
+
+/**
+ * Critic r5 Q5-2: bring an element (a count line, a ladder message) clear of the pinned bar by the
+ * least scroll, never past its own top.
+ */
+export function clearOfPinnedBar(el) {
+    if (!el || !el.getClientRects().length) return;
+    const r = el.getBoundingClientRect();
+    const over = r.bottom + 6 - pinnedTop();
+    if (over <= 0) return;
+    const d = Math.min(over, Math.max(0, r.top - 8));
+    if (d > 0) window.scrollBy(0, Math.ceil(d));
+}
+
 function count(g, hit) {
     if (!hit) return;
+    const first = g.counted.every((c) => !c.some(Boolean));
     const c = g.counted[hit.di];
     c[hit.i] = (c[hit.i] || 0) + 1;
     paint(g.run[hit.di], c);
     const cell = cellOf(g.run[0]);
     lastTap.set(cell, g.run[hit.di]);
     show(cell);
+    if (first) clearOfPinnedBar(barOf.get(cell));
 }
 
 export function installTouchTap() {

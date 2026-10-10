@@ -4,6 +4,7 @@
 import { state } from './state.js';
 import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
+import { clearOfPinnedBar } from './touch-tap.js';
 import { shuffle } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
@@ -545,13 +546,28 @@ export function submitQuizTextAnswer(flatIdx, value) {
 }
 
 // A pointer press in progress (the blur of a box fires its change on mousedown): the feedback
-// waits for the click to land, so nothing moves under the pupil's pointer.
+// waits for the click to land, so nothing moves under the pupil's pointer. On a touch tap the
+// compatibility mousedown (and so the blur) comes AFTER pointerup, so the tap stays "in flight"
+// from pointerdown/touchstart until its click lands or a short time passes (critic r5 Q5-1).
 let _qtPointerDown = false;
+let _qtTapPending = false;
+let _qtTapTimer = 0;
+const _qtBusy = () => _qtPointerDown || _qtTapPending;
 if (typeof document !== 'undefined') {
-    document.addEventListener('pointerdown', () => { _qtPointerDown = true; }, true);
-    const up = () => { _qtPointerDown = false; };
+    const down = () => { _qtPointerDown = true; _qtTapPending = true; clearTimeout(_qtTapTimer); };
+    const up = () => {
+        _qtPointerDown = false;
+        clearTimeout(_qtTapTimer);
+        _qtTapTimer = setTimeout(() => { _qtTapPending = false; }, 700);
+    };
+    const cancel = () => { _qtPointerDown = false; _qtTapPending = false; clearTimeout(_qtTapTimer); };
+    document.addEventListener('pointerdown', down, true);
+    document.addEventListener('touchstart', down, { capture: true, passive: true });
     document.addEventListener('pointerup', up, true);
-    document.addEventListener('pointercancel', up, true);
+    document.addEventListener('touchend', up, { capture: true, passive: true });
+    document.addEventListener('pointercancel', cancel, true);
+    document.addEventListener('touchcancel', cancel, { capture: true, passive: true });
+    document.addEventListener('click', () => { _qtPointerDown = false; _qtTapPending = false; clearTimeout(_qtTapTimer); }, true);
 }
 
 /**
@@ -563,10 +579,17 @@ if (typeof document !== 'undefined') {
 function refreshQuizFeedback(flatIdx) {
     const test = state.currentQuiz;
     if (!test || !test.settings || test.settings.showFeedback !== 'instant') return;
-    if (_qtPointerDown) {
-        const later = () => { document.removeEventListener('click', later, true); setTimeout(() => refreshQuizFeedback(flatIdx), 0); };
+    if (_qtBusy()) {
+        let done = false;
+        const later = () => {
+            if (done) return;
+            done = true;
+            document.removeEventListener('click', later, true);
+            setTimeout(() => refreshQuizFeedback(flatIdx), 0);
+        };
         document.addEventListener('click', later, true);
-        setTimeout(() => { if (!_qtPointerDown) later(); }, 600);
+        const wait = () => { if (done) return; if (!_qtBusy()) later(); else setTimeout(wait, 300); };
+        setTimeout(wait, 800);
         return;
     }
     const card = document.querySelector('#quizTakeView .qt-question-card');
@@ -589,6 +612,8 @@ function refreshQuizFeedback(flatIdx) {
         if (old.className === fb.className && old.textContent === fb.textContent) return;
         old.replaceWith(fb);
     } else card.appendChild(fb);
+    // the ladder message shows whole above the pinned Previous / Next bar (critic r5 Q5-2)
+    if (!answer.correct) requestAnimationFrame(() => requestAnimationFrame(() => clearOfPinnedBar(fb)));
 }
 
 // The answered count and the page buttons, brought up to date without rebuilding the question.
