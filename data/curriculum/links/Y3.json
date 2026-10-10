@@ -9564,6 +9564,295 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B12.S1": {
+   "title": "Interpret pictograms",
+   "direct": [
+    {
+     "key": "graphs:pictograph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "Y2.B10.S6 Draw pictograms (2, 5 and 10) (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (prior learning wk W23)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2.B10.S1 Make tally charts (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W23)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "time_facts"
+   ],
+   "related": [
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 2.MD.D.10: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B12.S2": {
+   "title": "Draw pictograms",
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:build_pictograph",
+     "missing": "a key where one picture stands for 2, 5 or 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a key where one picture stands for 2, 5 or 10",
+   "build": [
+    "pictogram_scale"
+   ],
+   "pre": [
+    {
+     "key": "graphs:pictograph",
+     "why": "Y3.B12.S1 Interpret pictograms (step before in the block)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (prior learning wk W23)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2.B10.S1 Make tally charts (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W23)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "time_facts"
+   ],
+   "related": [
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3.B12.S3 Interpret bar charts (next step)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3.B12.S3 Interpret bar charts (next step)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B12.S3": {
+   "title": "Interpret bar charts",
+   "direct": [
+    {
+     "key": "measurement:bar_graph_intro",
+     "opts": {}
+    },
+    {
+     "key": "graphs:bar_graph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "graphs:build_pictograph",
+     "why": "Y3.B12.S2 Draw pictograms (step before in the block)"
+    },
+    {
+     "key": "graphs:pictograph",
+     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (prior learning wk W24)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (prior learning wk W24)"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y2.B10.S1 Make tally charts (prior learning wk W24)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W24)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W24)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W24)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W24)"
+    }
+   ],
+   "preBuild": [
+    "block_diagram",
+    "table_data"
+   ],
+   "related": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B12.S4": {
+   "title": "Draw bar charts",
+   "direct": [
+    {
+     "key": "graphs:build_bar_graph",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "Y3.B12.S3 Interpret bar charts (step before in the block)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y3.B12.S3 Interpret bar charts (step before in the block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 2.MD.D.10: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_pictograph",
+     "why": "same standard 2.MD.D.10: Build a Pictograph"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B12.S5": {
+   "title": "Collect and represent data",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "collecting data into a tally, then choosing a table, pictogram or bar chart to show it; measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+   "build": [
+    "collect_data",
+    "make_line_plot"
+   ],
+   "pre": [
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (step before in the block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 2.MD.D.10: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 2.MD.D.10: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_pictograph",
+     "why": "same standard 2.MD.D.10: Build a Pictograph"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B12.S6": {
+   "title": "Two-way tables",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading and completing two-way tables",
+   "build": [
+    "two_way"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "same standard 2.MD.D.10: Picture Graph Intro (Visual)"
+    },
+    {
+     "key": "measurement:bar_graph_intro",
+     "why": "same standard 2.MD.D.10: Bar Graph Intro (Visual)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "same standard 2.MD.D.10: Build a Bar Graph"
+    },
+    {
+     "key": "graphs:build_pictograph",
+     "why": "same standard 2.MD.D.10: Build a Pictograph"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -10561,6 +10850,113 @@
     "1.G.A.1",
     "K.G.B.5",
     "1.G.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "pictogram_scale": {
+   "kind": "option",
+   "skill": "graphs:build_pictograph",
+   "option": "key 2, 5, 10",
+   "name": "Pictograms with a Key (option)",
+   "teaches": "drawing pictograms where one picture stands for 2, 5 or 10, including half pictures",
+   "representation": "a key option (1, 2, 5, 10) on build_pictograph",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S6",
+    "Y3.B12.S2"
+   ],
+   "ccss": [
+    "2.MD.D.10",
+    "3.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "block_diagram": {
+   "kind": "new",
+   "skill": "graphs:block_diagrams",
+   "name": "Block Diagrams",
+   "teaches": "reading and drawing block diagrams (one square = one) with a scale in 1s or 2s",
+   "representation": "a squared grid with labelled columns; count the blocks or colour to build",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S3"
+   ],
+   "ccss": [
+    "1.MD.C.4",
+    "2.MD.D.10"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "table_data": {
+   "kind": "new",
+   "skill": "graphs:read_and_make_tables",
+   "name": "Tables",
+   "teaches": "reading and completing simple tables and tally-to-number tables",
+   "representation": "a two-column table with blanks; fill in the counts; answer one question",
+   "family": "data",
+   "steps": [
+    "Y2.B10.S2",
+    "Y5.B9.S3"
+   ],
+   "ccss": [
+    "1.MD.C.4",
+    "4.OA.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "collect_data": {
+   "kind": "new",
+   "skill": "graphs:collect_and_represent",
+   "name": "Collect and Represent Data",
+   "teaches": "collecting data into a tally, then choosing a table, pictogram or bar chart to show it",
+   "representation": "a list of raw data; tally it, then draw the chart on a grid",
+   "family": "data",
+   "steps": [
+    "Y3.B12.S5"
+   ],
+   "ccss": [
+    "2.MD.D.10"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "make_line_plot": {
+   "kind": "new",
+   "skill": "graphs:make_a_line_plot",
+   "name": "Make a Line Plot",
+   "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+   "representation": "legacy; draw the × marks; write the answers",
+   "family": "data",
+   "steps": [
+    "Y3.B12.S5"
+   ],
+   "ccss": [
+    "2.MD.D.9",
+    "3.MD.B.4",
+    "4.MD.B.4",
+    "5.MD.B.2"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "two_way": {
+   "kind": "new",
+   "skill": "graphs:two_way_tables",
+   "name": "Two-Way Tables",
+   "teaches": "reading and completing two-way tables",
+   "representation": "a two-way table with blanks and totals; fill them in",
+   "family": "data",
+   "steps": [
+    "Y3.B12.S6",
+    "Y5.B9.S4"
+   ],
+   "ccss": [
+    "2.MD.D.10",
+    "4.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
