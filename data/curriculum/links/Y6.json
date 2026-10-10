@@ -2,6 +2,501 @@
  "year": "Y6",
  "generatedBy": "wave2-tagging",
  "steps": {
+  "Y6.B1.S1": {
+   "title": "Numbers to 1,000,000",
+   "direct": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "opts": {
+      "band": 999999
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 999999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 - build with disks first (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (value of a digit) (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (name the place) (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y5.B1.S8 Partition numbers to 1,000,000 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y4.B1.S4 Thousands - 1,000 as ten hundreds, unit form (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:combine",
+     "why": "inverse of expanded form: parts back to the numeral, band 999,999"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit in a 6-digit number"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "next use of the place-value chart (Y6.B1.S6)"
+    },
+    {
+     "key": "number_sense:nearest_100000",
+     "why": "rounding 6-digit numbers (Y6.B1.S7)"
+    }
+   ],
+   "note": "pv_digit_drag at band 999,999 with source \"word\" or \"expanded\" is the core; the numeral source is only copying."
+  },
+  "Y6.B1.S2": {
+   "title": "Numbers to 10,000,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "missing": "numbers with a millions digit (band stops at 999,999)"
+    },
+    {
+     "key": "placevalue:expand",
+     "missing": "7-digit numbers partitioned (band stops at 999,999)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "representing and partitioning 7-digit numbers (1,000,000 to 9,999,999) in a place-value chart with a Millions period",
+   "build": [
+    "big_numbers",
+    "vis_pv_bands_millions"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y6.B1.S1 Numbers to 1,000,000 (previous step), band 999,999"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y5.B1.S8 Partition numbers to 1,000,000 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B1.S6 Powers of 10 - 1,000,000 as ten 100,000s (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y4.B1.S5 Represent numbers (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:number_word_names",
+     "why": "reading the same numbers in words (Y6.B1.S3)"
+    },
+    {
+     "key": "number_sense:nearest_million",
+     "why": "deals 7-digit numbers to round - the only skill that already shows numbers to 10,000,000"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "standard form from parts"
+    }
+   ],
+   "note": "Partial, not gap: the method (chart, partition) is taught to 999,999; only the millions period is missing."
+  },
+  "Y6.B1.S3": {
+   "title": "Read and write numbers to 10,000,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:number_word_names",
+     "missing": "7-digit numbers and the word \"million\" (band stops at 999,999)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "missing": "the words source for 7-digit numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading and writing numbers from 1,000,000 to 10,000,000 in words and numerals, with commas in threes",
+   "build": [
+    "big_numbers",
+    "vis_pv_bands_millions"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:number_word_names",
+     "why": "Y5.B1.S5 Read and write numbers to 1,000,000 (prior learning wk W01)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y2.B1.S6 Write numbers to 100 in words (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y6.B1.S2 Numbers to 10,000,000 (previous step)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "unit form bridges digits and words"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:combine",
+     "why": "standard form from expanded parts"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "expanded form of the same number"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "next: compare numbers read here"
+    }
+   ],
+   "note": "number_word_names is choose-the-word-name (multiple choice); writing the numeral from words lives on pv_digit_drag source \"word\"."
+  },
+  "Y6.B1.S4": {
+   "title": "Powers of 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:place_value_10x",
+     "missing": "the x10 relationship between neighbouring places and 10/100/.../1,000,000 named as powers of ten (it multiplies and divides numbers by 10, 100, 1,000)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising that each place is ten times the place to its right up to 1,000,000, and naming 10, 100 ... 1,000,000 as powers of ten",
+   "build": [
+    "value_ten_times",
+    "pv10_exponents"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B1.S6 Powers of 10 (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "x 10 and x 100 fact pattern"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit in each place"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y6.B1.S2 Numbers to 10,000,000"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "why": "exponent notation 10² as repeated multiplication"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "10 hundreds = 1 thousand"
+    },
+    {
+     "key": "number_sense:nearest_million",
+     "why": "powers of ten as rounding places"
+    }
+   ],
+   "note": "place_value_10x is the WRM Y5 lesson; the Y6 lesson asks \"how many times greater\" between places, so partial."
+  },
+  "Y6.B1.S5": {
+   "title": "Number line to 10,000,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "lines between hundred-thousands and millions (spans stop at 1,000, numbers at 10,000)"
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "missing": "reading/placing a number on a line to 10,000,000 (it only rounds 6-digit numbers on a line)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading, placing and estimating 6- and 7-digit numbers on number lines to 10,000,000",
+   "build": [
+    "nl_millions",
+    "big_numbers"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y5.B1.S9 Number line to 1,000,000 (prior learning wk W02) - the 10,000 band"
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "why": "Y5.B1.S14 Round within 1,000,000 (prior learning wk W02)"
+    },
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "why": "Y5.B1.S13 Round within 100,000 (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y6.B1.S2 Numbers to 10,000,000"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "rounding on a number line"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "a number line through zero (Y6.B1.S8)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "order numbers by position on the line"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B1.S6": {
+   "title": "Compare and order any integers",
+   "direct": [
+    {
+     "key": "integers:compare_int",
+     "opts": {}
+    },
+    {
+     "key": "integers:order_negatives",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:compare",
+     "missing": "7-digit numbers (band stops at 999,999)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "missing": "7-digit numbers (band stops at 999,999)"
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "missing": "7-digit numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing and ordering whole numbers to 10,000,000",
+   "build": [
+    "big_numbers"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y5.B1.S11 Compare and order numbers to 1,000,000 (prior learning wk W02), band 999,999"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y5.B1.S11 Compare and order numbers to 1,000,000 (prior learning wk W02)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y5.B1.S9 Number line to 1,000,000 (prior learning wk W02)"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "negative numbers on a line before comparing them"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y6.B1.S1 value of a digit"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "integers:ordering_rationals",
+     "why": "order on a number line including negatives"
+    },
+    {
+     "key": "integers:integer_nl_drag",
+     "why": "place integers on a line"
+    },
+    {
+     "key": "integers:abs_value",
+     "why": "distance from zero"
+    }
+   ],
+   "note": "\"Any integers\" = large whole numbers AND negatives; negatives are covered, the 7-digit band is not."
+  },
+  "Y6.B1.S7": {
+   "title": "Round any integer",
+   "direct": [
+    {
+     "key": "number_sense:nearest_million",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_100000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:round_sort_million",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "why": "Y5.B1.S14 Round within 1,000,000 (prior learning wk W02)"
+    },
+    {
+     "key": "number_sense:round_nl_ten_thousands",
+     "why": "Y5.B1.S13 Round within 100,000 (prior learning wk W02)"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "rounding to 1,000 first"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "round on a number line"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y5.B1.S9 Number line to 1,000,000 (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_100000",
+     "why": "sort by nearest 100,000"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "use rounding to estimate (Y6.B2.S16)"
+    },
+    {
+     "key": "number_sense:round_nl_hundred_thousands",
+     "why": "rounding on a line"
+    }
+   ],
+   "note": "nearest_million deals numbers to 10,000,000, so \"any integer\" is met; rounding_table rounds one number to several places."
+  },
+  "Y6.B1.S8": {
+   "title": "Negative numbers",
+   "direct": [
+    {
+     "key": "integers:number_line_int",
+     "opts": {}
+    },
+    {
+     "key": "integers:integer_nl_drag",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "integers:compare_int",
+     "missing": "context and intervals across zero"
+    },
+    {
+     "key": "integers:sub_int",
+     "missing": "the difference across zero in context (temperature); it is abstract integer subtraction"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding the interval (difference) between a positive and a negative number in context, e.g. from -6 °C to 4 °C",
+   "build": [
+    "negative_count",
+    "vis_value_line_vertical"
+   ],
+   "pre": [
+    {
+     "key": "integers:compare_int",
+     "why": "Y5.B13.S4 Compare and order negative numbers"
+    },
+    {
+     "key": "integers:order_negatives",
+     "why": "Y5.B13.S4 Compare and order negative numbers"
+    },
+    {
+     "key": "integers:number_line_int",
+     "why": "Y5.B13.S2 Count through zero (on a line)"
+    },
+    {
+     "key": "integers:opposite_numbers",
+     "why": "same distance from 0"
+    }
+   ],
+   "preBuild": [
+    "negative_count"
+   ],
+   "related": [
+    {
+     "key": "integers:order_negatives",
+     "why": "order integers"
+    },
+    {
+     "key": "integers:add_int",
+     "why": "moving up a number line through zero"
+    },
+    {
+     "key": "integers:abs_value",
+     "why": "distance from zero"
+    },
+    {
+     "key": "coordinates:coordinate_all",
+     "why": "negative numbers on axes (Y6.B13)"
+    }
+   ],
+   "note": "The school week W32 prior list is 3D-shape lessons (data mismatch); pre-skills come from the Y5 negative-number block instead."
+  },
   "Y6.B5.S1": {
    "title": "Metric measures",
    "direct": [
@@ -2397,6 +2892,27 @@
    "why": "area_triangle deals only right-angled triangles by formula; counting squares, the half-rectangle picture and non-right triangles with a dashed perpendicular height are missing.",
    "reused": true
   },
+  "big_numbers": {
+   "kind": "option",
+   "skill": "placevalue:pv_digit_drag",
+   "option": "to 10,000,000",
+   "name": "Numbers to 10,000,000 (option)",
+   "teaches": "reading, writing, partitioning, comparing and placing numbers to ten million",
+   "representation": "band 9,999,999 on pv_digit_drag, number_word_names, compare and the number-line proposal",
+   "family": "placevalue",
+   "steps": [
+    "Y6.B1.S2",
+    "Y6.B1.S3",
+    "Y6.B1.S5",
+    "Y6.B1.S6"
+   ],
+   "ccss": [
+    "5.NBT.A.1",
+    "4.NBT.A.2"
+   ],
+   "why": "Every place-value skill stops at 999,999; Y6 reads, writes and compares 7-digit numbers.",
+   "reused": true
+  },
   "circles": {
    "kind": "new",
    "skill": "shapes_classify:parts_of_a_circle",
@@ -2584,6 +3100,24 @@
    "why": "no skill uses 5 miles ≈ 8 km",
    "reused": true
   },
+  "negative_count": {
+   "kind": "new",
+   "skill": "integers:count_through_zero",
+   "name": "Count Through Zero",
+   "teaches": "negative numbers in context (temperature), counting through zero in 1s and multiples, and the difference between a positive and a negative number",
+   "representation": "a vertical thermometer or number line; write the next numbers or the difference",
+   "family": "integers",
+   "steps": [
+    "Y6.B1.S8",
+    "Y6.B1.S8"
+   ],
+   "ccss": [
+    "6.NS.C.5",
+    "6.NS.C.7"
+   ],
+   "why": "Y6 negative numbers finds intervals across zero in context (temperature); no skill asks the difference across 0.",
+   "reused": true
+  },
   "net_draw": {
    "kind": "option",
    "skill": "shapes_classify:net_identify",
@@ -2600,6 +3134,24 @@
    ],
    "reused": false,
    "option": "net_identify only matches a net to its solid (multiple choice); WRM also draws and checks nets."
+  },
+  "nl_millions": {
+   "kind": "option",
+   "skill": "number_sense:place_on_number_line",
+   "option": "spans of 10,000 / 100,000 / 1,000,000 with numbers to 10,000,000",
+   "name": "Number Lines to 10,000,000 (option)",
+   "teaches": "reading, placing and estimating 6- and 7-digit numbers on a number line whose ends are consecutive ten-thousands, hundred-thousands or millions",
+   "representation": "one boxed cell, a black 0.8 mm line with the two end values printed and 10 interval ticks; an arrow to read (write the number in the slot) or a number to mark; grey only for the minor ticks",
+   "family": "placevalue",
+   "ccss": [
+    "5.NBT.A.1",
+    "4.NBT.A.2"
+   ],
+   "why": "place_on_number_line stops at 10,000; Y6 reads and places numbers to 10,000,000 on a line.",
+   "steps": [
+    "Y6.B1.S5"
+   ],
+   "reused": false
   },
   "parallelogram": {
    "kind": "new",
@@ -2653,6 +3205,23 @@
     "4.MD.C.6"
    ],
    "why": "measure_angles is multiple choice over multiples of 30/45; WRM measures any angle to the nearest degree with a protractor.",
+   "reused": true
+  },
+  "pv10_exponents": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "notation \"powers written with exponents\" (× 10³) and task \"compare powers of ten by counting zeros\"",
+   "name": "Powers of Ten With Exponents (option)",
+   "teaches": "the pattern of zeros and of the decimal point when multiplying or dividing by powers of 10, written with whole-number exponents",
+   "family": "placevalue",
+   "representation": "write the number or the exponent",
+   "steps": [
+    "Y6.B1.S4"
+   ],
+   "ccss": [
+    "5.NBT.A.2"
+   ],
+   "why": "10, 100, 1,000 ... 1,000,000 named as powers of ten.",
    "reused": true
   },
   "ratio_fraction": {
@@ -2795,6 +3364,23 @@
    "why": "geo_translate is multiple choice; Y6 needs the image drawn in four quadrants and the translation described (and new coordinates written).",
    "reused": true
   },
+  "value_ten_times": {
+   "kind": "option",
+   "skill": "placevalue:value",
+   "option": "form \"ten times / one tenth\": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10)",
+   "name": "Ten Times the Place to the Right (option)",
+   "teaches": "a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left",
+   "family": "placevalue",
+   "representation": "write 10, 100 or 1/10",
+   "steps": [
+    "Y6.B1.S4"
+   ],
+   "ccss": [
+    "5.NBT.A.1"
+   ],
+   "why": "Y6 Powers of 10 is the x10 relationship between neighbouring places, which no skill asks directly.",
+   "reused": true
+  },
   "vis_mean_levelling": {
    "kind": "option",
    "name": "The Mean as Levelling",
@@ -2811,6 +3397,42 @@
    "option": "support: 'level'",
    "teaches": "the mean as levelling: pool the objects and share them into equal rows or towers",
    "family": "data"
+  },
+  "vis_pv_bands_millions": {
+   "kind": "option",
+   "name": "Widen Place Value to 7 Digits (millions)",
+   "representation": "bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`",
+   "skill": "placevalue:place_value_disks",
+   "teaches": "bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`",
+   "family": "placevalue",
+   "option": "Widen Place Value to 7 Digits (millions)",
+   "steps": [
+    "Y6.B1.S2",
+    "Y6.B1.S3"
+   ],
+   "ccss": [
+    "4.NBT.A.2",
+    "5.NBT.A.1"
+   ],
+   "why": "The place-value chart needs a Millions period (M | HTh TTh Th | H T O) to show 7-digit numbers.",
+   "reused": true
+  },
+  "vis_value_line_vertical": {
+   "kind": "option",
+   "name": "Vertical Number Line Through Zero",
+   "representation": "value-line gains `orientation: 'vertical'` (a lift panel, a sea-level scale) and a thermometer look (`line: 'thermometer'`) through zero",
+   "skill": "integers:number_line_int",
+   "teaches": "value-line gains `orientation: 'vertical'` (a lift panel, a sea-level scale) and a thermometer look (`line: 'thermometer'`) through zero",
+   "family": "placevalue",
+   "option": "Vertical Number Line Through Zero",
+   "steps": [
+    "Y6.B1.S8"
+   ],
+   "ccss": [
+    "6.NS.C.6"
+   ],
+   "why": "A vertical thermometer line through zero is the WRM picture for temperature intervals.",
+   "reused": true
   },
   "volume_cubes": {
    "kind": "new",
@@ -2831,6 +3453,60 @@
   }
  },
  "tagFixes": [
+  {
+   "key": "placevalue:expand",
+   "step": "Y6.B1.S1",
+   "action": "add",
+   "why": "Partitioning numbers to 1,000,000 at band 999,999 is part of this step."
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y6.B1.S4",
+   "action": "partial",
+   "why": "Teaches x/÷ by 10/100/1,000, not the x10 relationship between places to 1,000,000."
+  },
+  {
+   "key": "placevalue:compare",
+   "step": "Y6.B1.S6",
+   "action": "partial",
+   "why": "Band stops at 999,999; \"any integers\" reaches 10,000,000."
+  },
+  {
+   "key": "placevalue:order_least_to_greatest",
+   "step": "Y6.B1.S6",
+   "action": "partial",
+   "why": "Band stops at 999,999."
+  },
+  {
+   "key": "number_sense:nearest_10000",
+   "step": "Y6.B1.S7",
+   "action": "add",
+   "why": "Rounding to 10,000 is one of the places this step uses."
+  },
+  {
+   "key": "number_sense:rounding_table",
+   "step": "Y6.B1.S7",
+   "action": "add",
+   "why": "Rounds one number to several places."
+  },
+  {
+   "key": "integers:compare_int",
+   "step": "Y6.B1.S8",
+   "action": "partial",
+   "why": "No interval across zero in context."
+  },
+  {
+   "key": "integers:order_negatives",
+   "step": "Y6.B1.S8",
+   "action": "remove",
+   "why": "Ordering integers is Y6.B1.S6; it is not the S8 interval lesson (kept there as pre/related)."
+  },
+  {
+   "key": "integers:integer_nl_drag",
+   "step": "Y6.B1.S8",
+   "action": "add",
+   "why": "Places integers on a number line through zero."
+  },
   {
    "key": "shapes_classify:net_identify",
    "step": "Y6.B12.S11",
