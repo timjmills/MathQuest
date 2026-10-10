@@ -101,33 +101,53 @@ FIXED = re.compile(r'^measurement:(time_|clock_)')   # a clock face: its numeral
 def dsig(k, o): return k + ' ' + json.dumps(o or {}, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 def md(k, o):
     s = dsig(k, o)
-    if s not in MD: MISSING.add(s); return {'max': 0, 'flags': {}}
+    if s not in MD: MISSING.add(s); return {'max': 0, 'flags': {}, 'c19': {}, 'distinct': 24}
     return MD[s]
 def dealt(k, o):
     """The largest number the skill+opts deals (24 generated items, maxdealt.mjs); 0 for a clock face."""
     return 0 if FIXED.match(k) else md(k, o)['max']
 NUMCAT = re.compile(r'^(counting|composing|comparing|addition|subtraction|placevalue|number_sense|patterns:(double|halve|skip)|division|measurement:money|measurement:coin)')
 BADFLAGS = ('times', 'parallel', 'vert', 'column', 'coord', 'word', 'poly', 'units', 'frac')
-def content_ok(k, o):
-    """Rule 18 content / layout: no x or ÷, angles or parallel sides, vertices, polygons past 4 sides, columns, standard units,
-    fractions (a link may show halves / quarters only through partition_shapes), coordinates, typed words, written-name drags."""
-    if k in FIT and not FIT[k]: return False
-    if 'name_match' in k: return False
-    f = md(k, o)['flags']
+# Reception links stay pictured (critic r4 D1): no symbol-only equations, number lines, missing-number or three-addend sums
+R_EQ = re.compile(r'^(addition:(nl_add|number_line_add|add_three|add_10_no_regroup|add_10_mixed|cloze_addition|number_families_add|add_sub_fact_family|add_20|equal_sign|add_facts)|subtraction:(nl_sub|number_line_sub|missing_add_sub|sub_10|sub_20))')
+def content_why(k, o, step):
+    """Rule 18 content / layout: the one content reason a link cannot be used, or None."""
+    if k in FIT and not FIT[k]: return 'its content is past this grade'
+    if 'name_match' in k: return 'it drags written names'
+    if step.startswith('R.') and R_EQ.match(k): return 'it is a symbol equation or number line, not a Reception response'
+    d = md(k, o)
+    if d.get('distinct', 24) < 3: return f"its opts deal only {d.get('distinct')} different item(s)"
+    f = d['flags']
     for n in BADFLAGS:
         if not f.get(n): continue
         if k == 'shapes_early:partition_shapes' and n in ('times', 'frac'): continue   # "divided into 2 equal parts", halves
-        return False
-    return True
+        return {'times': 'it uses x or ÷', 'parallel': 'it asks about angles or parallel sides', 'vert': 'it asks about vertices',
+                'column': 'it uses a column layout', 'coord': 'it uses coordinates', 'word': 'it asks for typed words', 'poly': 'it shows shapes past 4 sides',
+                'units': 'it uses standard units', 'frac': 'it shows fractions'}[n]
+    return None
+def content_ok(k, o, step=''): return content_why(k, o, step) is None
 def title_nums(x): return [int(m) for m in re.findall(r'(?<![23]-)\b\d+\b(?!-D)', info[x]['title'])]
+# Reception ceilings are the step's title number or its block's number, never a partial's dealt maximum (critic r4)
+R_BLOCK_CEIL = {'R.B1': 5, 'R.B3': 3, 'R.B5': 5, 'R.B7': 5, 'R.B9': 8, 'R.B11': 10, 'R.B13': 20, 'R.B14': 10, 'R.B16': 12, 'R.B18': 10}
+def r_own(x, full_only=False):
+    """Reception: the title's number when it has one; else the block's number when the step has a number skill; else 0
+    (a matching or shape step works with no number, so its links are held to what earlier steps met)."""
+    t = title_nums(x)
+    if t: return max(t)
+    if x.startswith('R.B18.'): return R_BLOCK_CEIL['R.B18']   # the review block: its own level
+    if any(NUMCAT.match(k) and (m is None or not full_only) for k, o, m in S[x]['d']): return R_BLOCK_CEIL.get(x.rsplit('.', 1)[0], 0)
+    return 0
 def own2(x):
-    """The numbers a step itself works with: its title and what its direct and partial number skills deal."""
+    """The numbers a step itself works with. Reception: the title or block number. Year 1: the title and what its
+    direct and partial number skills deal."""
     c = max(title_nums(x) or [0])
+    if x.startswith('R.'): return r_own(x)
     for k, o, miss in S[x]['d']:
         if NUMCAT.match(k): c = max(c, dealt(k, o))
     return c
 def own1(x):
     c = max(title_nums(x) or [0])
+    if x.startswith('R.'): return r_own(x, full_only=True)
     for k, o, miss in S[x]['d']:
         if miss is None and NUMCAT.match(k): c = max(c, dealt(k, o))
     return c
@@ -137,53 +157,62 @@ def cum(x):
 def rel_c(x):
     c = own2(x); return c if c >= 3 else min(cum(x), 20)
 def ceil_for(step, why=''):
+    if step.startswith('R.') and own2(step) >= 3: return own2(step)   # R: the step's own number only (title or block)
     cited = [c for c in re.findall(r'\b(?:R|Y1)\.B\d+\.S\d+', why or '') if c in info]
     if cited:
         c = max([own2(c2) for c2 in cited] + [own2(step)])
         return c if c >= 3 else rel_c(step)
     return rel_c(step)
 def lcap_c(c): return max(c * 1.5, c + 2)
-CTYPES = [  # rule 19: content types and the skill keys / sizes that carry them
- ('coins and notes', lambda k, o, m: re.match(r'^measurement:(coin|money|equiv_coin)', k)),
- ('clock time', lambda k, o, m: re.match(r'^measurement:(time_|clock_)', k)),
- ('halves and quarters', lambda k, o, m: re.match(r'^(fractions:|patterns:halve|shapes_early:partition)', k)),
- ('number lines', lambda k, o, m: re.search(r'number_line|:nl_|place_on_number_line', k)),
- ('tens as rods / base-10', lambda k, o, m: re.search(r'tens_foundation|base10|unit_form', k)),
- ('counting in 2s, 5s, 10s', lambda k, o, m: re.search(r'skip_count|patterns:seq_', k)),
- ('equal groups and arrays', lambda k, o, m: re.match(r'^(multiplication|division):', k)),
- ('measuring with units', lambda k, o, m: re.search(r'measure_nonstandard|reading_ruler', k)),
- ('numbers 21-50', lambda k, o, m: NUMCAT.match(k) and 20 < m <= 50),
- ('numbers 51-100', lambda k, o, m: NUMCAT.match(k) and m > 50),
-]
+# Rule 19: the first-taught Kindergarten week of each content type, read from the Kindergarten sheet (0 = taught in Reception).
+CONTENT_WEEKS = {'number lines': 5, 'tens as rods': 8, 'counting in 10s': 9, 'number sentences': 11, 'coins': 11, 'addition sentences': 14,
+                 'subtraction sentences': 14, 'equal groups': 19, 'arrays': 20, 'measuring with units': 24, 'counting in 2s and 5s': 33,
+                 'notes (bills)': 35, 'clock time': 36, 'halves and quarters': 36, '< > symbols': 4}
+SENT = re.compile(r'^(addition:(nl_add|number_line_add|add_three|add_10_no_regroup|add_10_mixed|cloze_addition|number_families_add|add_sub_fact_family|add_20|equal_sign|add_facts)|subtraction:(nl_sub|number_line_sub|missing_add_sub|sub_10|sub_20))')
 def ctypes(k, o):
-    m = dealt(k, o); return [n for n, f in CTYPES if f(k, o, m)]
-_FW = {}
-def first_week(t):
-    """The school week a content type is first taught: 0 when Reception (an earlier grade) teaches it, else the earliest
-    Kindergarten week whose step deals it (its title numbers or its skills; for number ranges a full skill only)."""
-    key = (t, len(MD))
-    if key in _FW: return _FW[key]
-    w = 999
-    for x in SORD:
-        hit = any(t in ctypes(k, o) for k, o, miss in S[x]['d'] if miss is None or not t.startswith('numbers'))   # a written number range counts only from a full skill
-        if t.startswith('numbers') and not hit:
-            n = max(title_nums(x) or [0]); hit = (t == 'numbers 21-50' and 20 < n <= 50) or (t == 'numbers 51-100' and n > 50)
-        if hit: w = 0 if x.startswith('R.') else school_week(x); break
-    _FW[key] = w; return w
-def week_ok(k, o, step):
-    """Rule 19: a Kindergarten link carries only content the school has taught by the step's week."""
-    if step.startswith('R.'): return True
-    return all(first_week(t) <= school_week(step) for t in ctypes(k, o))
-def fits(k, o, step, why=''):
-    if not content_ok(k, o): return False
-    if not week_ok(k, o, step): return False
-    if FIXED.match(k): return True
-    return dealt(k, o) <= lcap_c(ceil_for(step, why))
+    """The rule-19 content types a skill+opts deals (key-based, plus the critic's per-item classes on >= 3 of 24 items)."""
+    c = md(k, o).get('c19', {}); t = set()
+    hit = lambda n: c.get(n, 0) >= 3
+    if hit('nline') or re.search(r'number_line|:nl_|place_on_number_line', k): t.add('number lines')
+    if re.search(r'tens_foundation|base10|unit_form', k): t.add('tens as rods')
+    if re.match(r'^patterns:seq_10', k): t.add('counting in 10s')
+    if hit('skip25') or re.match(r'^patterns:(seq_2|seq_5|skip_count_line)', k): t.add('counting in 2s and 5s')
+    if SENT.match(k):
+        t.add('number sentences'); t.add('subtraction sentences' if k.startswith('subtraction:') else 'addition sentences')
+    if hit('money') or re.match(r'^measurement:(coin|money|equiv_coin)', k): t.add('coins')
+    if k == 'measurement:money_count' and o.get('kind') in ('note', 'both'): t.add('notes (bills)')
+    if k == 'multiplication:equal_or_unequal_groups': t.add('equal groups')
+    if hit('array') or k == 'multiplication:arrays_groups': t.add('arrays')
+    if hit('units') or re.search(r'measure_nonstandard|reading_ruler', k): t.add('measuring with units')
+    if hit('clock') or FIXED.match(k): t.add('clock time')
+    if hit('frac') or re.match(r'^(fractions:|patterns:halve|shapes_early:partition)', k): t.add('halves and quarters')
+    if hit('lt') or k.startswith('placevalue:compare'): t.add('< > symbols')
+    return sorted(t)
+def week_limit(w): return 20 if w < 8 else 50 if w < 10 else 100
+def week_why(k, o, step):
+    """Rule 19: the reason a Kindergarten link carries content (or numbers) the school has not taught by the step's week."""
+    if step.startswith('R.'): return None
+    w = school_week(step)
+    for t in ctypes(k, o):
+        if CONTENT_WEEKS[t] > w: return f'{t} are taught from week {CONTENT_WEEKS[t]}' if t.endswith('s') else f'{t} is taught from week {CONTENT_WEEKS[t]}'
+    if not FIXED.match(k) and dealt(k, o) > week_limit(w): return f'it deals numbers to {dealt(k, o)}, past {week_limit(w)} at week {w}'
+    return None
+def size_why(k, o, step, why=''):
+    if FIXED.match(k): return None
+    c = ceil_for(step, why)
+    return f'it deals numbers to {dealt(k, o)}, past this step ({c})' if dealt(k, o) > lcap_c(c) else None
+def misfit(k, o, step, why=''):
+    """The ONE reason a link does not fit this step (content, school week or size), or None."""
+    return content_why(k, o, step) or week_why(k, o, step) or size_why(k, o, step, why)
+def fits(k, o, step, why=''): return misfit(k, o, step, why) is None
 def fit(k, step, why=''):
-    """The opts a pre / related link uses: the broadest FIT row that passes content and size for this step; None if none."""
+    """The opts a pre / related link uses: the broadest FIT row that fits this step; None if none."""
     if k not in FIT: return {} if fits(k, {}, step, why) else None
     ok = [o for c, o in FIT[k] if fits(k, o, step, why)]
     return dict(ok[-1]) if ok else None
+def fit_reason(k, step, why=''):
+    rows = [o for c, o in FIT[k]] if k in FIT and FIT[k] else [{}]
+    return misfit(k, rows[0], step, why) or 'it does not fit this step'
 def split(e):
     return (e[0], e[1], e[2] if len(e) > 2 else None)
 TAUGHT = {}   # key -> [(step, opts)] in curriculum order
@@ -266,15 +295,15 @@ def build(step):
                 use = eo if fits(k, eo, step, fmt_step(x)) else fit(k, step, fmt_step(x))
                 base = 'the same idea' if re.match(r'(the next|a later) step', why) else why
                 if use is not None and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
-            rej[k] = 'taught at an earlier step (' + x + ') but not a building block that fits here'
+            rej[k] = 'taught at an earlier step (' + x + '), but ' + (misfit(k, eo, step, fmt_step(x)) or 'not a building block of this step')
             return
         if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])):   # WRM-earlier but school-later: neither pre nor related
             rej[k] = 'an earlier WRM step teaches it, but the school teaches it after this week'; return
         if o is None:
             o = fit(k, step)
-            if o is None: rej[k] = 'does not fit this step (size, content or school week; rules 18-19)'; return
+            if o is None: rej[k] = fit_reason(k, step); return
         elif not fits(k, o, step):
-            rej[k] = 'does not fit this step (size, content or school week; rules 18-19)'; return
+            rej[k] = misfit(k, o, step); return
         rseen.add(k); e = {'key': k, 'why': why}
         if o: e['opts'] = o
         rel.append(e)
@@ -310,10 +339,10 @@ def build(step):
                 for k, o in dentries(x):
                     if k in {p['key'] for p in pre}: continue
                     if sig(k, o) in dsigs or k in own: why['own'].add(k.split(':')[1])
-                    elif not fits(k, o, step) and fit(k, step) is None: why['past'].add(k.split(':')[1])
+                    elif not fits(k, o, step) and fit(k, step) is None: why['past'].add(k.split(':')[1] + ': ' + misfit(k, o, step))
             parts = []
             if why['own']: parts.append('the earlier steps on this idea use this step\'s own skill (' + ', '.join(sorted(why['own'])) + ')')
-            if why['past']: parts.append('the other earlier skills on this idea do not fit this step (' + ', '.join(sorted(why['past'])) + '; size, content or school week, rules 18-19)')
+            if why['past']: parts.append('the other earlier skills on this idea do not fit this step (' + '; '.join(sorted(why['past'])) + ')')
             if why['gap']: parts.append('the earlier steps ' + ', '.join(why['gap'][:3]) + ' have no live skill yet (see preBuild)')
             if not parts:
                 live_c = [x for x in cands if S[x]['d']][:4]
@@ -393,6 +422,6 @@ for y in ('R', 'Y1'):
     nr = sum(1 for p in doc['proposals'].values() if p['reused']); nn = len(doc['proposals']) - nr
     print(y, len(doc['steps']), c, 'proposals new', nn, 'reused', nr, 'tagFixes', len(doc['tagFixes']))
 # Rule 19: the first-taught school week of each Kindergarten content type (0 = taught in Reception), as the link check used it
-CW = {t: first_week(t) for t, _ in CTYPES}
+CW = CONTENT_WEEKS
 json.dump(CW, open(f'{HERE}/content_weeks.json', 'w'), indent=1)
 print('content first weeks (K):', CW)

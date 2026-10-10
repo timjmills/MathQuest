@@ -185,7 +185,7 @@ st('R.B12.S5', d=[P(SP,'a response a 4-year-old can give (the skill asks for typ
    m='identifying ABB / ABC patterns by choosing or drawing the next shape (typed names are not a Reception response)', b=['pattern_make'])
 st('R.B12.S6', d=[P(SP,'copying; choosing or drawing the shape instead of typing its name', points=[0, 1])], v='partial',
    m='copying a pattern and continuing it by choosing or drawing', b=['pattern_make'])
-st('R.B12.S7', d=[P(SP,'patterns in real objects and scenes', points=[0])], v='partial', m='spotting patterns in the environment', b=['pattern_make'])
+st('R.B12.S7', d=[P(SP,'patterns in real objects and scenes; and its response is typed shape names, not a Reception response', points=[0])], v='partial', m='spotting patterns in the environment', b=['pattern_make'])
 # R.B13 To 20 and beyond
 st('R.B13.S1', d=[P(TC,'10-13 only (band 15 deals 11-15)', band=15), P(TFT,'10-13 only (band 15 deals 11-15)', band=15)], v='partial',
    m='building 10, 11, 12 and 13 only', b=['teen_bands'])
@@ -213,7 +213,7 @@ st('R.B14.S4', d=[P(S5,'finding how many were taken away (change unknown)')], v=
    b=['pictures_change_unknown'], r=[(MAS,'the abstract missing-number form, later')])
 # R.B15 Manipulate, compose and decompose
 st('R.B15.S1', v='gap', m='selecting a shape for a purpose (it rolls, it stacks, it fits); no live skill asks this', b=['shape_3d_tasks'])
-st('R.B15.S2', d=[P(N2D,'recognising a shape when it is turned', forms=[1])], v='partial', m='recognising a turned shape as the same shape', b=['defining_attributes'],
+st('R.B15.S2', d=[P(N2D,'recognising a shape when it is turned; the skill taps shapes by name (circles, triangles, squares and rectangles here)', forms=[1], shapes=[0, 1, 2])], v='partial', m='recognising a turned shape as the same shape', b=['defining_attributes'],
    p=[(N2D,'R.B6.S1 / R.B4.S1 name the shape first')])
 st('R.B15.S3', d=[F(CMP)])
 st('R.B15.S4', d=[P(CMP,'explaining an arrangement of shapes')], v='partial', m='describing how shapes are arranged', b=['scenes'])
@@ -229,9 +229,10 @@ st('R.B16.S3', d=[P(SHG,'exploring: making equal groups freely; the skill gives 
 st('R.B16.S4', d=[F(SHG, band=12)], n='Make groups of a size from up to 12 counters.')
 st('R.B16.S5', d=[P(OE,'sharing an amount between two and seeing it is fair (even) or not (odd)', forms=[2], range=10)], v='partial',
    m='odd and even through sharing between two', b=['share_group'])
-st('R.B16.S6', d=[P(DND,'building doubles with objects; the skill is abstract', forms=[0])], v='partial', m='playing with and building doubles with objects', b=['doubles_pictured'])
+st('R.B16.S6', d=[P(DND,'building doubles with objects; the skill is abstract and deals doubles to 20 (9 + 9, 10 + 10)', forms=[0])], v='partial', m='playing with and building doubles with objects (the live skill is abstract and deals doubles to 20)', b=['doubles_pictured'],
+   p=[(CO,'R.B9.S1 / R.B11.S1 count each group',{'band':10,'objects':'frame'}),(CG,'R.B1.S7 the two groups are the same',{'band':10})])
 # R.B17 Visualise, build and map
-st('R.B17.S1', d=[P(SP,'circling the unit that repeats', points=[0, 1])], v='partial', m='identifying the repeating unit', b=['pattern_make'])
+st('R.B17.S1', d=[P(SP,'circling the unit that repeats; and its response is typed shape names, not a Reception response', points=[0, 1])], v='partial', m='identifying the repeating unit', b=['pattern_make'])
 st('R.B17.S2', v='gap', m='creating a pattern rule of one\'s own', b=['pattern_make'])
 st('R.B17.S3', v='gap', m='explaining one\'s own pattern rule', b=['pattern_make'])
 st('R.B17.S4', v='gap', m='replicating a scene or construction from a model', b=['scenes'], r=[(CMP,'combine shapes')])
@@ -296,8 +297,8 @@ st('Y1.B2.S12', d=[F(NB, band=10, unknown='second'), F(MAS, range=10)])
 st('Y1.B2.S13', d=[F(FF, range=10), F(NFA, band=10)], n='fact_family_sort (is it a fact family?) is not listed: its answer is a typed yes / no, not a Kindergarten response (rules 8 and 18).')
 st('Y1.B2.S14', d=[P(S5,'crossing out from amounts 6 to 10 (the pictures skill stops at 5)')], v='partial', m='crossing out to take away from amounts to 10',
    b=['sub_10_pictures'], r=[(SWP,'take-away stories')])
-st('Y1.B2.S15', d=[P(S5,'amounts 6 to 10 (stops at 5)'), P(SWP,'a pictured take-away; the stories are text with a picture row')], v='partial',
-   m='pictured take-away from amounts to 10 (how many left)', b=['sub_10_pictures'], r=[(S10,'the same facts as numbers')])
+st('Y1.B2.S15', d=[P(S5,'amounts 6 to 10 (stops at 5)'), P(SWP,'a pictured take-away as a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank')], v='partial',
+   m='pictured take-away from amounts to 10 (how many left), as a Kindergarten response (no word-work columns, sign row or label bank)', b=['sub_10_pictures', 'k_story'], r=[(S10,'the same facts as numbers')])
 st('Y1.B2.S16', d=[F(NLS, range=10), F(NLS2, range=10)])
 st('Y1.B2.S17', d=[P(A10,'adding or subtracting only 1 or 2 (counting on or back by 1 or 2)', notation=['across'])], v='partial', m='+1, +2, −1, −2 as a fluency set', b=['add_sub_1_2'])
 # Y1.B3 Shape
@@ -306,8 +307,8 @@ st('Y1.B3.S2', v='gap', m='sorting 3-D shapes by a rule (rolls / stacks, faces)'
    p=[(N3D,'Y1.B3.S1 name the 3-D shapes first',{'forms':[1]}),(CC,'Y1.B1.S1 sort and count one kind',{'band':6})], xr=[M2D, M3D],
    n='Related: none; no live skill sorts 3-D shapes in another form.')
 st('Y1.B3.S3', d=[F(N2D, shapes=[0, 1, 2, 4]), F(M2D)], n='Circles, triangles, squares, rectangles, pentagons, hexagons (no rhombus).')
-st('Y1.B3.S4', d=[P(ATT,'sorting into groups by a rule; the skill picks every shape with a property, and even at band 4 asks "4 right angles" and "parallel sides" in 5 of 12 items', forms=[1], band=4)], v='partial',
-   m='sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill picks shapes by a property and still asks right angles and parallel sides', b=['shape_sort'])
+st('Y1.B3.S4', d=[P(ATT,'sorting into groups by a rule: the skill asks how many sides or vertices a triangle, square or rectangle has (forms 0, band 4); it never sorts', forms=[0], band=4)], v='partial',
+   m='sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill only counts the sides or vertices of one shape', b=['shape_sort'])
 st('Y1.B3.S5', d=[P(SP,'patterns of 3-D shapes (the skill draws 2-D shapes only)')], v='partial', m='repeating patterns made of 3-D shapes', b=['pattern_make'])
 # Y1.B4 Place value within 20
 st('Y1.B4.S1', d=[F(CO, band=20)])
@@ -321,7 +322,9 @@ st('Y1.B4.S8', v='gap', m='the 0-20 number line: reading and labelling ticks', b
    p=[(CS,'Y1.B4.S7 the order of the numbers to 20 (school week 5)',{'band':20,'dir':'forward'}),(NSF,'a number track to 20: the line is a track of equal steps',{'step':1,'range':20}),(CO,'Y1.B4.S1 count to 20',{'band':20})],
    n='The 0-10 line jumps (Y1.B2.S9, S16) come after this step in the school order (weeks 14 and 16), so they are not pre-skills here.',
    xp=[PVC], r=[(PNL,'the same line read in tens later (to 100)',{'span':10,'band':100})])
-st('Y1.B4.S9', d=[F(NLA, range=20), F(NLS2, range=20)], n='At Max Number 20 both skills draw a 0-20 line (13 + 2, 16 − 7): count on and back along it.')
+st('Y1.B4.S9', d=[P(NLA,'moving along the line without a sentence: it deals addition sentences (7 + 6), which the school teaches from week 14', range=20), P(NLS2,'it deals subtraction sentences (18 − 9), taught from week 14', range=20)], v='partial',
+   m='moving forwards and backwards along a 0-20 line (counting on and back, 1 more / 1 less) without a number sentence; both live skills deal + / − sentences, taught from week 14', b=['nl_20'],
+   p=[(CS,'Y1.B4.S7 count on and back to 20',{'band':20,'dir':'mixed'}),(NSF,'a number track to 20',{'step':1,'range':20}),(CO,'Y1.B4.S1 count to 20',{'band':20})])
 st('Y1.B4.S10', v='gap', m='estimating where a number lies on a 0-20 line with only the ends marked', b=['nl_20'])
 st('Y1.B4.S11', v='gap', m='comparing numbers within 20', b=['compare_small'],
    p=[(CG,'Y1.B1.S11 compare two groups: more, fewer',{'band':10}),(CS,'Y1.B4.S7 the order of the numbers to 20',{'band':20,'dir':'forward'})],
@@ -351,7 +354,9 @@ st('Y1.B6.S2', d=[P(TFV,'naming the multiple of ten: the skill asks "how many te
 st('Y1.B6.S3', d=[P(TFV,'counting a large set by making groups of ten', band=50)], v='partial', m='grouping a loose set into tens to count it', b=['tens_ones_group'])
 st('Y1.B6.S4', d=[F(B10, band=50)])
 st('Y1.B6.S5', d=[F(B10, band=50)], r=[(UF,'the same partition written in words (to 99)')])
-st('Y1.B6.S6', d=[P(PNL,'a whole 0-50 line counted in tens then ones (the skill shows one ten to the next)', span=10, band=100)], v='partial', m='the 0-50 line', b=['nl_20'])
+st('Y1.B6.S6', d=[P(PNL,'a whole 0-50 line counted in tens then ones; the skill shows one ten to the next, and its lowest band (100) deals 51-100 (84, 95), taught from week 10', span=10, band=100)], v='partial',
+   m='the 0-50 line (the live skill shows one ten to the next and deals 51-100, taught from week 10)', b=['nl_20'],
+   p=[(NSF,'Y1.B6.S1 count from 20 to 50 on a track',{'step':1,'range':50}),(HCF,'Y1.B6.S1 the hundred square to 50',{'band':50}),(CS,'Y1.B4.S7 the order of the numbers to 20',{'band':20,'dir':'forward'})])
 st('Y1.B6.S7', d=[P(PNL,'estimating on a line with only the ends marked', span=10, band=100)], v='partial', m='estimating on a 0-50 line', b=['nl_20'])
 st('Y1.B6.S8', d=[F(ML10, step=1, band=50)], p=[(NSF,'Y1.B6.S1 count to 50 in ones: the next and the previous number',{'step':1,'range':50})])
 # Y1.B7 Length and height
@@ -373,7 +378,7 @@ st('Y1.B9.S1', d=[P(SKL,'2s alone on a page; 2s, 5s and 10s come mixed, and no p
    p=[(DBL,'R.B9.S8 / Y1.B5.S4 doubles: two equal groups of 2',{'band':20}),(OE,'R.B9.S6 / R.B11.S13 pairs: odd and even',{'forms':[2],'range':10}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20 one by one',{'band':20})])
 st('Y1.B9.S2', d=[P(SKL,'10s alone on a page: the page mixes 2s, 5s and 10s, and 10s are only 2 of 30 items', step=[0], band=50)], v='partial',
    m='counting in 10s from 0 on true multiples to 100, a page of 10s alone (skip_count_line {step:[0]} deals 10s in only 2 of 30 items)', b=['multiples_from_0'],
-   p=[(TFV,'Y1.B6.S2 20, 30, 40 and 50 as tens (school week 8)',{'band':50}),(NSF,'Y1.B6.S1 count on in ones to 50 (week 8)',{'step':1,'range':50}),(HCF,'the tens column of the hundred square, to 50',{'band':50,'gaps':'column'}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})])
+   p=[(TFV,'Y1.B6.S2 20, 30, 40 and 50 as tens (school week 8)',{'band':50}),(NSF,'Y1.B6.S1 count on in ones to 50 (week 8)',{'step':1,'range':50}),(HCF,'Y1.B6.S1 the hundred square to 50, gaps down one column',{'band':50,'gaps':'column'}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})])
 st('Y1.B9.S3', d=[P(SKL,'5s alone on a page; mixed with 2s and 10s, no hands', step=[0], band=50)], v='partial',
    m='counting in 5s from 0 on true multiples, a page of 5s alone', b=['multiples_from_0'],
    p=[(TFV,'Y1.B9.S2 counting in 10s first: two 5s make each ten',{'band':50}),(DBL,'Y1.B9.S1 counting in equal steps: doubles',{'band':20}),(NSF,'Y1.B6.S1 count to 50 in ones',{'step':1,'range':50}),(CO,'Y1.B4.S1 count objects to 20',{'band':20})],
@@ -675,7 +680,6 @@ SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'm
 EXTRA = {
  'sort': [(PIC, 'the sorted groups shown as rows of pictures and counted (K.MD.B.3)', {})],
  'compare': [(PIC, 'compare two rows of pictures: which has more', {})],
- 'more1': [(NLAV, 'one more as one jump on a 0-10 number line', {'range': 10})],
  'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10})],
  'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10}), (EQS2, 'is the sentence true? the = sign', {'range': 10})],
  'oddeven': [(SEO, 'circle the even or the odd numbers to 10', {'range': 10})],
@@ -703,7 +707,7 @@ prepre('Y1.B6.S1', (CS, 'Y1.B4.S7 count on to 20: the count continues past 20', 
 prepre('Y1.B12.S1', (NSF, 'Y1.B6.S1 count from 20 to 50 on a track (school week 8)', {'step': 1, 'range': 50}), (HCF, 'Y1.B6.S1 the hundred square to 50', {'band': 50}),
        (TFV, 'Y1.B6.S2 20, 30, 40 and 50 as tens', {'band': 50}))
 prepre('Y1.B12.S2', (SKL, 'Y1.B9.S2 count in 10s (school week 9)', {'step': [0], 'band': 50}), (TFV, 'Y1.B6.S2 tens to 50', {'band': 50}),
-       (HCF, 'Y1.B12.S1 the tens column of the hundred square', {'band': 100, 'gaps': 'column'}))
+       (HCF, 'Y1.B12.S1 the hundred square to 100, gaps down one column', {'band': 100, 'gaps': 'column'}))
 for _s in ('R.B11.S7', 'R.B11.S8'):
     prepre(_s, (TFB, 'R.B11.S3 a full ten frame: the whole is 10', {'band': 10}), (CO, 'R.B11.S1 count to 10', {'band': 10, 'objects': 'frame'}))
 for _s in ('R.B11.S11', 'R.B11.S12'):
@@ -740,3 +744,18 @@ for _gone in ('teen_bands', 'count_start_at'): NEW.pop(_gone, None)
 for _s in ('R.B13.S1', 'R.B13.S2'): S[_s]['r'] = [(HCF, 'the hundred square to 20: the teen numbers in rows', {'band': 20})] + S[_s]['r']
 for _s, _k in (('Y1.B1.S14', OLG), ('Y1.B4.S12', OLG)):
     RM[(_s, _k)] = 'order_least_to_greatest {band:99} (its lowest band) orders only 2-digit numbers; none within 10 or 20'
+
+# ---------------- Round 5 (critic R-Y1 r4) ----------------
+S['R.B1.S6']['pb'] += ['match_same']
+prepre('R.B14.S4', (CS, 'R.B11.S6 one less: count back, the main building block', {'band': 10, 'dir': 'back'}), (CO, 'R.B11.S1 count what is left', {'band': 10}), (A5, 'R.B14.S1 the add-more picture, the inverse', {}))
+S['R.B14.S4']['xp'] += [DBL, DND]
+S['R.B11.S10']['r'] = [(MT, 'bonds to 10 in two parts on a frame', {'band': 10})]
+prepre('R.B9.S10', (CO, 'R.B5.S2 / R.B7.S3 subitise dice patterns', {'band': 5, 'objects': 'dice'}))
+prepre('Y1.B12.S7', (UF, 'Y1.B12.S3 tens and ones: the main building block of comparing 2-digit numbers', {'band': 99}), (B10, 'Y1.B6.S4 groups of tens and ones', {'band': 50}),
+       (ML10, 'Y1.B12.S5 1 more, 1 less to 100', {'step': 1, 'band': 100}))
+for _s in ('Y1.B12.S2', 'Y1.B13.S4', 'Y1.B9.S4'): S[_s]['pb'] += ['multiples_from_0']
+prepre('Y1.B13.S4', (TFV, 'Y1.B6.S2 20, 30, 40 and 50 as tens: a dime is ten', {'band': 50}))
+prepre('Y1.B9.S4', (CG, 'Y1.B1.S11 compare two groups: are they the same?', {'band': 10}))
+S['Y1.B9.S9']['p'] += [(HALF, 'R.B16.S5 sharing between two is halving (to 10)', {'band': 10})]
+S['Y1.B6.S3']['xr'] += [B10]   # base10_build {band:50}: past the step's own count of rods (critic scans count rods, not tens)
+S['R.B16.S6']['xp'] += [S5]   # take-away is not a building block of doubles

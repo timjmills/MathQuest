@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 4)
+# R and Y1: generated items per step (wave 2 tagging, round 5)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -530,7 +530,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 - no live skill; build: shape_3d_tasks
 
 ### R.B15.S2 Rotate shapes — **partial** (missing: recognising a turned shape as the same shape)
-- partial `shapes_early:name_2d_shapes` opts `{"forms":[1]}` (6 generated; Max Number not read)
+- partial `shapes_early:name_2d_shapes` opts `{"forms":[1],"shapes":[0,1,2]}` (6 generated; Max Number not read)
   - Click ALL the rectangles. / A=["opt1","opt2"] / multi-select-check
   - Click ALL the circles. / A=["opt1","opt3"] / multi-select-check
   - Click ALL the triangles. / A=["opt3"] / multi-select-check
@@ -596,7 +596,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Which number is odd? / A="7" / text
   - Which number is odd? / A="1" / text
 
-### R.B16.S6 Play with and build doubles — **partial** (missing: playing with and building doubles with objects)
+### R.B16.S6 Play with and build doubles — **partial** (missing: playing with and building doubles with objects (the live skill is abstract and deals doubles to 20))
 - partial `number_sense:doubles_near_doubles` opts `{"forms":[0]}` (6 generated; Max Number not read)
   - Double it! 5 + 5 = ? / A=10 / number
   - Double it! 8 + 8 = ? / A=16 / number
@@ -850,7 +850,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Start with 4, take away 4. How many are left? / A=0 / number / {kind:takeaway,n:4,m:4,shape:triangle,ans:0}
   - Start with 2, take away 1. How many are left? / A=1 / number / {kind:takeaway,n:2,m:1,shape:star,ans:1}
 
-### Y1.B2.S15 Subtraction - take away (How many left ) — **partial** (missing: pictured take-away from amounts to 10 (how many left))
+### Y1.B2.S15 Subtraction - take away (How many left ) — **partial** (missing: pictured take-away from amounts to 10 (how many left), as a Kindergarten response (no word-work columns, sign row or label bank))
 - partial `subtraction:sub_5_pictures` opts `{}` (6 generated; Max Number not read)
   - Start with 4, take away 1. How many are left? / A=3 / number / {kind:takeaway,n:4,m:1,shape:square,ans:3}
   - Start with 4, take away 4. How many are left? / A=0 / number / {kind:takeaway,n:4,m:4,shape:triangle,ans:0}
@@ -899,11 +899,11 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Drag each name onto the matching 2D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
   - Drag each name onto the matching 2D shape. / A={"t0":"b0","t1":"b1","t2":"b2","t3":"b3" / dnd-generic
 
-### Y1.B3.S4 Sort 2-D shapes — **partial** (missing: sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill picks shapes by a property and still asks right angles and parallel sides)
-- partial `shapes_early:shape_attributes` opts `{"forms":[1],"band":4}` (6 generated; Max Number not read)
-  - Click ALL shapes with 4 sides. / A=["opt1","opt2"] / multi-select-check
-  - Click ALL shapes with at least one pair of parallel sides. / A=["opt0","opt3"] / multi-select-check
-  - Click ALL shapes with 4 sides. / A=["opt1","opt3"] / multi-select-check
+### Y1.B3.S4 Sort 2-D shapes — **partial** (missing: sorting 2-D shapes into groups by a rule (sides, curved / straight); the live skill only counts the sides or vertices of one shape)
+- partial `shapes_early:shape_attributes` opts `{"forms":[0],"band":4}` (6 generated; Max Number not read)
+  - How many sides does a square have? / A=4 / number
+  - How many vertices does a triangle have? / A=3 / number
+  - How many sides does a square have? / A=4 / number
 
 ### Y1.B3.S5 Patterns with 2-D and 3-D shapes — **partial** (missing: repeating patterns made of 3-D shapes)
 - partial `patterns:shape_pattern` opts `{}` (6 generated; Max Number not read)
@@ -972,12 +972,12 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 ### Y1.B4.S8 The number line to 20 — **gap** (missing: the 0-20 number line: reading and labelling ticks)
 - no live skill; build: nl_20
 
-### Y1.B4.S9 Use a number line to 20 — **full**
-- full `addition:number_line_add` opts `{"range":20}` (6 generated; Max Number 20)
+### Y1.B4.S9 Use a number line to 20 — **partial** (missing: moving forwards and backwards along a 0-20 line (counting on and back, 1 more / 1 less) without a number sentence; both live skills deal + / − sentences, taught from week 14)
+- partial `addition:number_line_add` opts `{"range":20}` (6 generated; Max Number 20)
   - Use the number line: 9 + 8 = ? / A=17 / number / {min:0,max:20,start:9,add:8,op:+,unknown:result}
   - Use the number line: 14 + 5 = ? / A=19 / number / {min:0,max:20,start:14,add:5,op:+,unknown:result}
   - Use the number line: 5 + 1 = ? / A=6 / number / {min:0,max:20,start:5,add:1,op:+,unknown:result}
-- full `subtraction:number_line_sub` opts `{"range":20}` (6 generated; Max Number 20)
+- partial `subtraction:number_line_sub` opts `{"range":20}` (6 generated; Max Number 20)
   - Use the number line: 12 − 8 = ? / A=4 / number / {min:0,max:20,start:12,add:8,op:-,unknown:result}
   - Use the number line: 16 − 7 = ? / A=9 / number / {min:0,max:20,start:16,add:7,op:-,unknown:result}
   - Use the number line: 8 − 1 = ? / A=7 / number / {min:0,max:20,start:8,add:1,op:-,unknown:result}
@@ -1097,7 +1097,7 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - Build 43 with base-10 blocks. / A=43 / base10-build / {target:43,places:[10,1],counts:{1:3,10:4}}
   - Build 30 with base-10 blocks. / A=30 / base10-build / {target:30,places:[10,1],counts:{1:0,10:3}}
 
-### Y1.B6.S6 The number line to 50 — **partial** (missing: the 0-50 line)
+### Y1.B6.S6 The number line to 50 — **partial** (missing: the 0-50 line (the live skill shows one ten to the next and deals 51-100, taught from week 10))
 - partial `number_sense:place_on_number_line` opts `{"span":10,"band":100}` (6 generated; Max Number not read)
   - Tap 57 on the number line. / A=57 / number-line-extended / {keyValue:57,kind:line-mark,n:57,lo:50,hi:60}
   - Tap 75 on the number line. / A=75 / number-line-extended / {keyValue:75,kind:line-mark,n:75,lo:70,hi:80}
