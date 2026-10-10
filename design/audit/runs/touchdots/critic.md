@@ -634,3 +634,180 @@ Either way only the ladder's message line grows.
 ## What would raise each screen host to 8+
 
 Fix R4-1 to R4-4, take R4-5's one-row placement, and add R4-6's cases to the gate. Then resolve the merge as above. Paper needs nothing.
+
+# Round 5 (head aaa2b2dd, main merged at 26b59084: teacher dots kept on every skill, column words and per-column count, count line in the ladder row, quiz in-place feedback)
+
+Critic: independent, fresh start (an earlier round-5 run was killed by a container restart and wrote nothing here;
+its logs were only read for leads, every result below was re-measured). Date: 2026-10-10. Every browser run went
+through `/tmp/mq-browser-run.sh`, one at a time, from one sequential queue. Evidence is in the session scratchpad
+under `tn-r5/c/` (`logs/`, `out/`, `ladder/`, `print/S|M|L/`, the probe `probe.cjs`). Hosts were driven for real at
+**1366 × 650 and 1280 × 600** with **touch taps, mouse clicks and the keyboard**. The owner rulings and the lead's two
+decisions are the spec. The worktree is unchanged apart from this section.
+
+## Verdict: FAIL, on the quiz host only
+
+Every round-4 defect is closed on the card, the worksheet and the quiz, at both sizes, with all three inputs
+(table below). Paper still passes at S, M and L. The practice card and the online worksheet now pass.
+
+The quiz fails on one new Major defect, and it is in the builder's `quiz-take.js` change, which is **already live on
+main** as the instant-feedback hotfix (`d77d5d24`):
+
+- **Q5-1 · Major.** In a quiz with instant feedback, a pupil who types an answer and then **taps** Next on a
+  touch screen does not move on. The feedback line is inserted between the tap and its click, Next jumps down
+  52 to 74 px, and the click lands on the question card. A second tap is needed. Mouse clicks and the keyboard are
+  fine. The same run against main (`c4188955`) fails the same way.
+
+One Minor defect remains on the stacks (Q5-2): the count line can sit under the pinned Check / Next bar.
+
+## Gates (head aaa2b2dd)
+
+| Gate | Result |
+|---|---|
+| ws-boot-smoke | OK |
+| ws-touch-tap | OK (it misses Q5-1 and Q5-2: its quiz cases call `submitQuizTextAnswer` directly, and its stack case scrolls Start again to the centre first) |
+| ws-touchdots | OK, 2289 / 2289 |
+| ws-support-ladder (default set) | OK |
+| ws-support-ladder add_facts, subtract, add_column_multi with `{"support":["touch"]}` --shots | OK, and the shots keep the teacher's dots at wrong 1 to 3 |
+| same with `{"support":["touchall"]}` --shots | OK, same |
+| ws-screen-answer | OK |
+| ws-screen-slots | OK (609 skills, 2436 renders, 0 doubled) |
+| wave1-a-probe, wave1-a2-perbox, wave1-a3-wrongdigits | OK, OK, OK |
+| ws-chromebook-fit | OK (it misses Q5-1: its Next check is a mouse click) |
+| ws-print-lint --source kit | 463 findings in 33 documents = baseline (not raised) |
+| ws-grade-render, touch + touchall, S / M / L | independent, more-practice, guided, review and test for add_facts, subtract, add_column_multi and mult_facts. Pupil pages and keys are unchanged since r4 (the lane changed no print code). |
+| probe (`tn-r5/c/probe.cjs`): keep / stack / quizall / row / nits / quizflow / quizflow2 / swallow / cover | 42 / 42 keep cases OK at both sizes; findings below |
+
+## Merge into claude/sweet-newton-c8wrv1 (c4188955)
+
+A throwaway `git merge-tree` (nothing pushed):
+- **`design/STATUS.md`** conflicts on one line. The lane's escalation line and main's search-lane escalation line
+  both land on the same spot in the escalation list. Keep both lines.
+- **`js/modules/quiz-take.js`** merges cleanly. Main already has the hotfix (`d77d5d24`), and the result equals the
+  lane's file.
+- Nothing else conflicts.
+
+## Round-4 defects
+
+| Id | Status | Proof (1366 × 650 and 1280 × 600) |
+|---|---|---|
+| R4-1 teacher dots dropped on − and stacks | **closed** | add_facts, subtract, add_column_multi with touch and touchall, and mult_facts with touch, on card, worksheet and quiz. The numerals are the same digits before, at wrong 1 and at wrong 2 (for example `463062 -> 463062 -> 463062`). The arrow, sign or tiles are added. The message is the "too" form: "Not yet. Now use the arrow too." then "Not yet. Now use the sign too." |
+| R4-2 stack Start again under the answer row | **closed** as written | No answer box overlaps the line, on any host or input. A touch tap, a mouse click or Enter on Start again clears the stack. The line can still be under the pinned bar: see Q5-2. |
+| R4-3 column words and the whole-sum count | **closed** | The rung reads "Not yet. Start with the ones. Say the biggest number. Touch the dots and count on." Two taps on the ones column read "Touched 2". The first tap on another column reads "Touched 1". Touch, mouse and keyboard all match. No 0 is a target. |
+| R4-4 quiz count-all never says "Touched N" | **closed** | Quiz add_facts with touchall: "" before the answer, then "Touched 2" after a typed wrong or right answer (Enter). Touch, mouse and keyboard all match. |
+| R4-5 a wrong answer adds the count line too | **closed** | Ladder-only numerals on the card and the quiz (add_facts, subtract, mult_facts, add_column_multi): the cell height does not change, and one bar sits inside the message row. Only the message row is added: Check goes 458 → 552 on the card and Next 450 → 524 on the quiz. Check and Next stay on screen at both sizes. At wrong 2, no Start again is left behind when the numerals go. |
+| R4-6 gate holes | **closed** for R4-1 to R4-5 | The gate now has realKeep, realStack and realRow. It misses Q5-1 and Q5-2. |
+| Nits | **closed** | "How much is 1 six?", "1 ten?", "1 twelve?" (40 items, no stripped s). Past twelve: "groups of 70". A long run shows "… 70, 80, 90 (counting by tens)". Start again has `nowrap`. |
+
+## Owner rulings and lead decisions, as built
+
+| Ruling | Card | Worksheet | Quiz |
+|---|---|---|---|
+| (a) × "How much is 4 threes?" then "3, 6, 9 (counting by threes)" | yes | yes | yes |
+| (b) a wrong answer keeps the teacher's dots and adds the next support, on every skill | yes | yes | yes |
+| (c) count-all: the count shows only after answering | yes | yes | yes |
+| (d) ÷ tally taps are a follow-up | recorded in S1.8 | | |
+| Lead: a column stack counts per column, and the line shows only the column touched | yes | yes | yes |
+| Lead: after a wrong answer, the count shares the ladder message row | yes | not applicable (reserved line) | yes |
+
+## Score table (round 5)
+
+| Version | C1 | C2 | C3 | C4 | Pass |
+|---|---|---|---|---|---|
+| Print S / M / L, all roles in scope, pupil + key | 9 | 9 | 9 | 9 | yes |
+| Practice card, 1366 × 650 and 1280 × 600, mouse + touch + keyboard | 8 | 9 | 8 | 8 | **yes** |
+| Online worksheet, same | 8 | 9 | 8 | 8 | **yes** |
+| Quiz, same | 8 | 9 | **7** | 8 | **no** (Q5-1) |
+| Basic 390 (ladder gate shots, card, worksheet, quiz) | no h-scroll; the boxes and Start again can be tapped | | | | basic OK (phone polish deferred) |
+
+## Defects (round 5)
+
+**Q5-1 · Major · C3 −2 · quiz with instant feedback, touch. The first tap on Next after typing is swallowed. Live on main.**
+
+Measured (add_facts, subtract, mult_facts, with a wrong or a right answer, at both sizes):
+- Type the answer in the box, then tap Next.
+- The question does not change, and the pupil has to tap again.
+- Next moves from top 402 to 476 (wrong answer, ladder message) or to 454 ("Correct!").
+- Main (`c4188955`) does the same: 402 → 452 / 454.
+- Every "end" quiz, every mouse click, and Enter / Tab are fine.
+- Multi-box items (the column stack, time_quarter, write_fraction, add_wp_20) are not hit: their change does not
+  fire on the tap.
+
+Cause. The event order for a touch tap is:
+- pointerdown, then pointerup;
+- then the compatibility **mousedown**, and that is where the box blurs and fires `change`;
+- then mouseup and click.
+
+`_qtPointerDown` is already false by the time `change` fires. So `refreshQuizFeedback` inserts the feedback (and draws the ladder)
+at once, and the button moves before the click lands.
+
+This is exactly the Chromebook-fit R2-1 failure ("the first Next after typing was swallowed"). It came back with the
+in-place feedback.
+
+Fix. Treat the whole gesture as "pointer down":
+- set the flag on `mousedown` too, and clear it on `click` (or after a short timeout);
+- or defer whenever the box's blur `relatedTarget` is a quiz nav button.
+
+Either way, nothing may move under a press that has not ended.
+
+Proof:
+- a touch tap on Next right after typing moves on at 1366 × 650 and 1280 × 600, with instant feedback, wrong and right;
+- Previous then shows the feedback and the ladder;
+- add a touch case to `ws-touch-tap` or `ws-chromebook-fit`.
+
+**Q5-2 · Minor · C3 −1 (quiz, card at 1280 × 600) · column stacks. The count line and Start again can start under the pinned bar.**
+
+Measured with add_column_multi and the teacher's touch, at scroll 0:
+- **Quiz, both sizes:** the line's top is at 580 (650 after a wrong answer), under the pinned Previous / Next bar.
+- **Card at 1280 × 600:** the line is at 544–588, under the pinned Hint / Check bar.
+- **Card at 1366 × 650, after a wrong answer:** the line is at 619–663, under the same bar.
+
+So the pupil taps the dots, but "Touched N" is hidden until they scroll 110 to 290 px. A tap on what shows of Start
+again lands on the bar.
+
+After a ladder-only wrong answer on the quiz at 1280 × 600, the message row itself shows only its top half above the
+bar (`out/row-add_column_multi-quiz-1280.png`).
+
+The page does scroll, and everything is reachable. The worksheet is fine: there is no pinned bar over a card.
+
+Fix. On the first count in a cell, if the line is under a pinned bar, scroll the page by the least amount that clears
+it. The tap itself already moves nothing, so this is the one allowed move. Or keep the stack line beside the
+stack (right of the answer row) when there is room.
+
+Proof: at scroll 0, after one tap, `elementFromPoint` at Start again's centre is the button, on the quiz at both
+sizes and on the card at 1280 × 600.
+
+## The quiz-take.js change (refreshQuizFeedback), judged on its own
+
+What works:
+- **Instant feedback is back.** 11 skills were run with instant feedback: add_facts, subtract, mult_facts, div_facts,
+  add_column_multi, time_quarter, write_fraction, nearest_100, value, add_wp_20 and number_bonds (compare_groups has no typed box and was skipped).
+  - Enter on a wrong answer shows the ladder message in place and draws the rung in the cell.
+  - Tab does the same, and keeps the focus on Next.
+  - Previous redraws the feedback and the ladder.
+  - Review & Submit, then Back, keeps them.
+  - The console is clean.
+- **"end" quizzes show nothing:** no feedback line and no ladder, on every skill, before or after Next / Previous.
+- **The pointer deferral works for the mouse.** A mouse click on Next after typing moves on first time.
+- ws-chromebook-fit still passes.
+
+What fails:
+- Touch: Q5-1.
+
+## View: the column stack's earlier greys
+
+**Keep them, as built.**
+- The greys are the pupil's record of which columns are done. On paper, the pupil's marks stay too.
+- Clearing them on a new column would make the pupil lose their place in a 3- or 4-addend sum.
+- The count line already starts again for each column, so the number the pupil reads is never mixed up.
+- Start again clears everything, which is the right way out.
+
+## Out of lane (recorded, not scored)
+
+- On the quiz, once the ladder is spent the answer is revealed ("Incorrect. The answer is: 900"). This is
+  pre-existing ladder design, not a lane change.
+- A count-all quiz item answered right also shows "Touched N" after the answer. That follows ruling (c).
+
+## What would raise the quiz to 8+
+
+Fix Q5-1 (the touch gesture flag), with a touch case in a gate. Q5-2 is a Minor fix and should ride along. Paper,
+card and worksheet need nothing more.
