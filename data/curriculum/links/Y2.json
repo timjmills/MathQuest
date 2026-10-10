@@ -2837,6 +2837,796 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B3.S1": {
+   "title": "Recognise 2-D and 3-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W15)"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "Y1.B3.S5 Patterns with 2-D and 3-D shapes (prior learning wk W15)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (next step)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S2": {
+   "title": "Count sides on 2-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "opts": {
+      "note": "sides"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (next step)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S3": {
+   "title": "Count vertices on 2-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:shape_corners_count",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "opts": {
+      "note": "vertices"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S4": {
+   "title": "Draw 2-D shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "drawing 2-D shapes on a dot grid from a name or a description (4 sides, 2 long and 2 short)",
+   "build": [
+    "shape_draw"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (next step)"
+    },
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (next step)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same standard 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "same cluster 2.G.A.2: Compose a Rectangle from Squares"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S5": {
+   "title": "Lines of symmetry on shapes",
+   "direct": [
+    {
+     "key": "angles_lines:symmetry",
+     "opts": {}
+    },
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W13)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "same cluster 4.G.A.2: Classify Triangles"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S6": {
+   "title": "Use lines of symmetry to complete shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "using a vertical line of symmetry to complete a shape or pattern on a square grid",
+   "build": [
+    "symmetry_complete"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:symmetry",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (step before in the block)"
+    },
+    {
+     "key": "angles_lines:place_symmetry_lines",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y2.B3.S7 Sort 2-D shapes (next step)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_classify:classify_triangles",
+     "why": "same cluster 4.G.A.2: Classify Triangles"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "same cluster 4.G.A.2: Classify Quadrilaterals"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "same cluster 4.G.A.1: Identify Angles"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S7": {
+   "title": "Sort 2-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "missing": "sorting into labelled groups"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sorting into labelled groups",
+   "build": [
+    "shape_sort"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S8 Count faces on 3-D shapes (next step)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "same standard K.G.B.4: Count Corners on a Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same standard K.G.B.4: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S8": {
+   "title": "Count faces on 3-D shapes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "missing": "faces only, one property per page"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "faces only, one property per page",
+   "build": [
+    "shape_faces"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y2.B3.S7 Sort 2-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same standard 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S9": {
+   "title": "Count edges on 3-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same standard 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S10": {
+   "title": "Count vertices on 3-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same standard 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S11": {
+   "title": "Sort 3-D shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "sorting shapes by one property (sides, corners, flat or curved faces, rolls or stacks) and naming the sorting rule",
+   "build": [
+    "shape_sort"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S10 Count vertices on 3-D shapes (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (next step)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same standard 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "same standard K.G.B.4: Count Corners on a Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same standard K.G.B.4: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same cluster 1.G.A.3: Halves/Thirds/Fourths (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B3.S12": {
+   "title": "Make patterns with 2-D and 3-D shapes",
+   "direct": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "shape_sort",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same cluster K.G.A.1: Shape Positions: Above/Below/Beside (Visual)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3079,6 +3869,124 @@
     "1.OA.D.7"
    ],
    "why": "existing STANDARD_PROPOSALS entry (repair); reused",
+   "reused": true
+  },
+  "shape_sort": {
+   "kind": "new",
+   "skill": "shapes_early:sort_shapes",
+   "name": "Sort 2-D and 3-D Shapes",
+   "teaches": "sorting shapes by one property (sides, corners, flat or curved faces, rolls or stacks) and naming the sorting rule",
+   "representation": "shape tiles and two labelled sorting rings or a Carroll-style two-box table",
+   "family": "geometry",
+   "steps": [
+    "Y1.B3.S2",
+    "Y1.B3.S4",
+    "Y2.B3.S7",
+    "Y2.B3.S11"
+   ],
+   "ccss": [
+    "K.G.A.2",
+    "K.G.B.4",
+    "1.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "shape_3d_tasks": {
+   "kind": "new",
+   "skill": "shapes_early:shape_properties_3d",
+   "name": "What Can This Shape Do?",
+   "teaches": "properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes",
+   "representation": "line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape",
+   "family": "geometry",
+   "steps": [
+    "R.B12.S2",
+    "R.B12.S3",
+    "R.B15.S1",
+    "R.B15.S8"
+   ],
+   "ccss": [
+    "K.G.A.3",
+    "K.G.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "scenes": {
+   "kind": "new",
+   "skill": "shapes_early:build_and_copy",
+   "name": "Copy and Build",
+   "teaches": "copying a picture or construction made of shapes, visualising from another viewpoint, replicating a scene",
+   "representation": "a model picture made of shapes beside an empty frame; draw or choose the matching copy",
+   "family": "geometry",
+   "steps": [
+    "R.B15.S4",
+    "R.B15.S6",
+    "R.B15.S7",
+    "R.B17.S4",
+    "R.B17.S5"
+   ],
+   "ccss": [
+    "K.G.B.6",
+    "K.G.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "shape_draw": {
+   "kind": "new",
+   "skill": "shapes_early:draw_2d_shapes",
+   "name": "Draw 2-D Shapes",
+   "teaches": "drawing 2-D shapes on a dot grid from a name or a description (4 sides, 2 long and 2 short)",
+   "representation": "a square dot grid; draw the shape; the key shows one correct drawing",
+   "family": "geometry",
+   "steps": [
+    "Y2.B3.S4",
+    "Y3.B11.S8"
+   ],
+   "ccss": [
+    "1.G.A.1",
+    "2.G.A.1",
+    "K.G.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "symmetry_complete": {
+   "kind": "new",
+   "skill": "angles_lines:complete_symmetric_shape",
+   "name": "Complete the Symmetric Shape",
+   "teaches": "using a vertical line of symmetry to complete a shape or pattern on a square grid",
+   "representation": "half a shape on squared paper beside a dashed mirror line; draw the other half",
+   "family": "geometry",
+   "steps": [
+    "Y2.B3.S6",
+    "Y4.B12.S8"
+   ],
+   "ccss": [
+    "1.G.A.1",
+    "4.G.A.3",
+    "3.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "shape_faces": {
+   "kind": "option",
+   "skill": "shapes_early:count_edges_faces_vertices",
+   "option": "by part",
+   "name": "Faces, Edges or Vertices (option)",
+   "teaches": "counting faces, edges and vertices of 3-D shapes one property per page (the skill mixes them)",
+   "representation": "a \"count\" option: faces / edges / vertices / mixed",
+   "family": "geometry",
+   "steps": [
+    "Y2.B3.S8"
+   ],
+   "ccss": [
+    "1.G.A.1",
+    "2.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
   }
  },
