@@ -121,6 +121,10 @@
     {
      "key": "composing:tens_foundation_visual",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W11)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -131,10 +135,6 @@
      "opts": {
       "band": 999
      }
-    },
-    {
-     "key": "placevalue:identify",
-     "why": "naming the place of each part"
     },
     {
      "key": "addition:add_sub_100s",
@@ -332,6 +332,21 @@
    "build": [],
    "pre": [
     {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W33)"
+    },
+    {
      "key": "placevalue:compare",
      "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W33)",
      "opts": {
@@ -344,14 +359,6 @@
      "opts": {
       "band": 999
      }
-    },
-    {
-     "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W33)"
-    },
-    {
-     "key": "composing:base10_build_hundreds",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [],
@@ -401,6 +408,13 @@
    "build": [],
    "pre": [
     {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (step before in the block)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
      "key": "placevalue:place_value_disks",
      "why": "Y4.B1.S5 Represent numbers to 10,000 (step before in the block)",
      "opts": {
@@ -425,13 +439,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:pv_digit_drag",
-     "why": "the parts placed in a place-value chart",
-     "opts": {
-      "band": 9999
-     }
-    },
     {
      "key": "addition:add_10k_no_regroup",
      "why": "recombining parts by column addition"
@@ -569,19 +576,27 @@
      "opts": {
       "band": 9999
      }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
+     "opts": {
+      "band": 9999
+     }
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_sub_100s",
-     "why": "adding and subtracting 100s is the same move"
-    },
-    {
-     "key": "placevalue:value",
-     "why": "which digit changes and why",
+     "key": "number_sense:place_on_number_line",
+     "why": "jumps of 1,000 along a 0-10,000 line: the same move pictured",
      "opts": {
-      "band": 9999
+      "span": 1000,
+      "band": 10000
      }
     }
    ],
@@ -888,6 +903,10 @@
      "opts": {
       "band": 99
      }
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -895,13 +914,9 @@
     {
      "key": "placevalue:number_word_names",
      "why": "another way of writing a number"
-    },
-    {
-     "key": "placevalue:combine",
-     "why": "Roman numerals are additive like expanded form"
     }
    ],
-   "note": "Beyond CCSS (UK National Curriculum); taught as enrichment in W12. The prior learning \"Y3 Roman numerals to 12\" is band 12 of the same roman_numerals proposal, so it is not a separate preBuild.",
+   "note": "Beyond CCSS (UK National Curriculum); taught as enrichment in W12. The prior learning \"Y3 Roman numerals to 12\" is band 12 of the same roman_numerals proposal, so it is not a separate preBuild. Pre-skills are few because Roman numerals have no earlier WRM step except \"Roman numerals to 12\" (band 12 of the same build).",
    "envision": [
     {
      "proposal": "roman_numerals",
@@ -1165,6 +1180,14 @@
       "span": 100,
       "band": 1000
      }
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (step before in the block)"
+    },
+    {
+     "key": "number_sense:round_sort_1000",
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (step before in the block)"
     }
    ],
    "preBuild": [],
@@ -1179,14 +1202,6 @@
      "opts": {
       "place": 1000
      }
-    },
-    {
-     "key": "number_sense:round_sort_1000",
-     "why": "sort by rounded value"
-    },
-    {
-     "key": "number_sense:round_nl_thousands",
-     "why": "rounding to 1,000 shown on a number line"
     }
    ],
    "note": "Generated: rounding_table {places:[10,100,1000], blank:\"row\"} rounds one 4-digit number to 10, 100 and 1,000 (6,745 → 6,750; 6,700; 7,000); the column form rounds four numbers to one place. rounding_table {} only reaches 10 and 100 on 3-digit numbers."
@@ -1213,6 +1228,13 @@
     "add_sub_place_units"
    ],
    "pre": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier block this year)",
+     "opts": {
+      "band": 9999
+     }
+    },
     {
      "key": "addition:add_sub_100s",
      "why": "Y3.B2.S4 Add and subtract 100s (prior learning wk W14)",
@@ -1249,13 +1271,6 @@
     {
      "key": "addition:add_10k_no_regroup",
      "why": "the next step: column addition"
-    },
-    {
-     "key": "placevalue:unit_form",
-     "why": "thinking of 300 as 3 hundreds",
-     "opts": {
-      "band": 9999
-     }
     }
    ],
    "note": "",
@@ -1646,6 +1661,10 @@
    ],
    "pre": [
     {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S6 Subtract two 4-digit numbers - one exchange (earlier step in the block)"
+    },
+    {
      "key": "subtraction:sub_across_zeros",
      "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (step before in the block)",
      "opts": {
@@ -1670,18 +1689,14 @@
     {
      "key": "addition:number_families_add",
      "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W16)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y3.B2.S6 Add 1s across a 10 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "subtraction:sub_10k_regroup",
-     "why": "the column method it is compared with"
-    },
-    {
-     "key": "number_sense:make_a_ten",
-     "why": "bridging as a mental method"
-    },
     {
      "key": "subtraction:sub_check_by_adding",
      "why": "counting on is the inverse"
@@ -1730,6 +1745,10 @@
    "build": [],
    "pre": [
     {
+     "key": "number_sense:rounding_table",
+     "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (earlier block this year)"
+    },
+    {
      "key": "number_sense:nearest_1000",
      "why": "Y4.B1.S16 Round to the nearest 1,000 (earlier block this year)"
     },
@@ -1755,10 +1774,6 @@
     {
      "key": "number_sense:estimate_diff",
      "why": "differences only"
-    },
-    {
-     "key": "number_sense:rounding_table",
-     "why": "which place to round to"
     },
     {
      "key": "subtraction:sub_check_by_adding",
@@ -1805,6 +1820,10 @@
     {
      "key": "subtraction:sub_10k_regroup",
      "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (earlier step in the block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -1812,10 +1831,6 @@
     {
      "key": "division:div_check_by_multiplying",
      "why": "the same inverse check for division"
-    },
-    {
-     "key": "addition:number_families_add",
-     "why": "the four related facts"
     },
     {
      "key": "algebra:tape_diagram",
@@ -2097,12 +2112,13 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
+     "opts": {
+      "step": [
+       1
+      ]
+     }
     },
     {
      "key": "multiplication:mult_facts",
@@ -2123,17 +2139,16 @@
      }
     },
     {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
     },
     {
-     "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
-     "opts": {
-      "step": [
-       1
-      ]
-     }
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
     }
    ],
    "preBuild": [],
@@ -2186,14 +2201,6 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W01)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W01)"
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S8 The 3 times-table (prior learning wk W01)",
      "opts": {
@@ -2203,6 +2210,10 @@
      }
     },
     {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W01)"
+    },
+    {
      "key": "division:div_facts",
      "why": "Y3.B3.S7 Divide by 3 (prior learning wk W01)",
      "opts": {
@@ -2210,6 +2221,14 @@
        3
       ]
      }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W01)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W01)"
     },
     {
      "key": "multiplication:dot_array_mult",
@@ -2223,10 +2242,6 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W01)"
     }
    ],
    "preBuild": [],
@@ -2278,6 +2293,18 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S2 Multiply and divide by 6 (step before in the block)",
+     "opts": {
+      "constant": [
+       6
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
     {
      "key": "multiplication:count_by_tables",
      "why": "Y4.B4.S2 Multiply and divide by 6 (step before in the block)",
@@ -2472,6 +2499,18 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S4 Multiply and divide by 9 (step before in the block)",
+     "opts": {
+      "constant": [
+       9
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
+    {
      "key": "multiplication:count_by_tables",
      "why": "Y4.B4.S4 Multiply and divide by 9 (step before in the block)",
      "opts": {
@@ -2596,6 +2635,17 @@
     {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S2 Multiply and divide by 6 (earlier step in the block)",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -2607,17 +2657,6 @@
     {
      "key": "patterns:pattern_relationship",
      "why": "two patterns compared"
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "count in 3s, 6s, 9s side by side",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
-      ]
-     }
     }
    ],
    "note": "",
@@ -2762,6 +2801,18 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S7 Multiply and divide by 7 (step before in the block)",
+     "opts": {
+      "constant": [
+       7
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
+    {
      "key": "multiplication:count_by_tables",
      "why": "Y4.B4.S7 Multiply and divide by 7 (step before in the block)",
      "opts": {
@@ -2895,14 +2946,14 @@
        7
       ]
      }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "11 × n split as 10 × n + 1 × n"
-    },
     {
      "key": "multiplication:mult_chart",
      "why": "the 12 × 12 chart",
@@ -3006,14 +3057,14 @@
     {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "12 × n split as 10 × n + 2 × n"
-    },
     {
      "key": "multiplication:mult_chart",
      "why": "the 12 × 12 chart",
@@ -3158,6 +3209,10 @@
     {
      "key": "multiplication:arrays_groups",
      "why": "Y3.B3.S2 Use arrays (prior learning wk W04)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -3165,10 +3220,6 @@
     {
      "key": "division:div_equation_parts",
      "why": "dividend, divisor, quotient named"
-    },
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "n × 1 = n so n ÷ 1 = n"
     },
     {
      "key": "composing:whole_as_fraction",
@@ -3217,14 +3268,14 @@
     {
      "key": "addition:add_three",
      "why": "adding three numbers (Grade 1, 1.OA.A.2), the additive form of the same regrouping idea"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "making 10 first (2 × 5)"
-    },
     {
      "key": "number_theory:factor_links_easy",
      "why": "factor pairs inside the product"
@@ -3326,6 +3377,10 @@
    ],
    "pre": [
     {
+     "key": "number_theory:factors_identify",
+     "why": "Y4.B5.S1 Factor pairs (step before in the block)"
+    },
+    {
      "key": "number_theory:factor_tchart_easy",
      "why": "Y4.B5.S1 Factor pairs (step before in the block)"
     },
@@ -3345,26 +3400,22 @@
     {
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)"
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "number_theory:factors_identify",
-     "why": "listing the factor pairs"
-    },
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "another way to make a product easy"
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the ×10 fact the pair makes",
+     "why": "Y4.B4.S11 Multiply by 1 and 0 (earlier block this year)",
      "opts": {
       "constant": [
        10
       ]
      }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "another way to make a product easy"
     }
    ],
    "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form.",
@@ -3770,6 +3821,15 @@
    ],
    "pre": [
     {
+     "key": "multiplication:mult_properties",
+     "why": "Y4.B5.S2 Use factor pairs (earlier step in the block)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "multiplication:mult_zeros",
      "why": "Y4.B5.S7 Related facts – multiplication and division (step before in the block)",
      "opts": {
@@ -3807,15 +3867,6 @@
     {
      "key": "area_perimeter:area_distributive_visual",
      "why": "the distributive area picture"
-    },
-    {
-     "key": "multiplication:mult_properties",
-     "why": "breaking apart",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
     }
    ],
    "note": "",
@@ -4001,16 +4052,8 @@
    ],
    "pre": [
     {
-     "key": "division:share_into_groups",
-     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W06)"
-    },
-    {
      "key": "division:div_facts",
      "why": "Y2.B5.S16 Divide by 5 (prior learning wk W06)"
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
     },
     {
      "key": "placevalue:expand",
@@ -4018,6 +4061,14 @@
      "opts": {
       "band": 99
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
     },
     {
      "key": "multiplication:multiply",
@@ -4078,8 +4129,8 @@
    ],
    "pre": [
     {
-     "key": "division:div_remainders",
-     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
+     "key": "composing:base10_regroup",
+     "why": "trading 1 ten for 10 ones (the exchange inside the division)"
     },
     {
      "key": "placevalue:unit_form",
@@ -4090,8 +4141,8 @@
      }
     },
     {
-     "key": "composing:base10_regroup",
-     "why": "trading 1 ten for 10 ones (the exchange inside the division)"
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [],
@@ -4280,18 +4331,18 @@
     {
      "key": "division:area_model_div_2by1",
      "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (prior learning wk W06)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (earlier step in the block)"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y4.B2.S8 Efficient subtraction (earlier block this year)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "multiplication:area_model_mult",
-     "why": "partitioning as a method"
-    },
-    {
-     "key": "number_sense:compensation",
-     "why": "compensation in addition"
-    },
     {
      "key": "number_sense:estimate_products",
      "why": "estimate to check"
@@ -4362,6 +4413,16 @@
        1
       ]
      }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (earlier block this year)",
+     "opts": {
+      "op": "x",
+      "power": [
+       1000
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -4375,16 +4436,6 @@
     {
      "key": "measurement:unit_conversion_word",
      "why": "conversion stories"
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "× 1,000 is the km → m move",
-     "opts": {
-      "op": "x",
-      "power": [
-       1000
-      ]
-     }
     }
    ],
    "note": "School teaches this as enrichment (W36).",
@@ -4792,8 +4843,8 @@
    ],
    "pre": [
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (step before in the block)",
+     "key": "area_perimeter:perimeter",
+     "why": "Y4.B6.S4 Perimeter of a rectangle (earlier step in the block)",
      "opts": {
       "forms": [
        0
@@ -4805,8 +4856,21 @@
      "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
+    },
+    {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "Y2/Gr.1 Count sides on 2D shapes (prior learning list; no WRM step id in our data)"
+    },
+    {
+     "key": "area_perimeter:composite_shapes",
+     "why": "Y4.B6.S7 Calculate the perimeter of rectilinear shapes (step before in the block)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "division:div_facts",
@@ -4818,10 +4882,6 @@
     {
      "key": "shapes_classify:classify_triangles",
      "why": "equilateral triangles are regular"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "naming the polygons"
     },
     {
      "key": "multiplication:mult_word_problems",
@@ -4999,6 +5059,10 @@
     {
      "key": "fractions:graph_fractions",
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -5010,10 +5074,6 @@
     {
      "key": "fractions:mixed_improper_visual",
      "why": "pictures of mixed numbers"
-    },
-    {
-     "key": "patterns:count_by_step_up",
-     "why": "counting in equal steps"
     }
    ],
    "note": "",
@@ -5109,6 +5169,10 @@
    "build": [],
    "pre": [
     {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
+    },
+    {
      "key": "fractions:graph_fractions",
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W08)"
     },
@@ -5140,10 +5204,6 @@
     {
      "key": "decimals:decimal_nl_drag",
      "why": "decimals on a line (Y4.B8.S4)"
-    },
-    {
-     "key": "composing:fraction_number_line",
-     "why": "reading a fraction at an arrow; mostly 0-1 lines, sometimes past 1 (3/2)"
     }
    ],
    "note": "Generated mixed_nl_drag {}: mixed numbers and improper fractions placed on 0-3 lines with every whole labelled."
@@ -5229,6 +5289,10 @@
    "build": [],
    "pre": [
     {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier step in the block)"
+    },
+    {
      "key": "composing:fraction_number_line",
      "why": "Y3.B6.S8 Count in fractions on a number line (prior learning wk W09)"
     },
@@ -5249,10 +5313,6 @@
     "frac_count"
    ],
    "related": [
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "improper fractions on a line"
-    },
     {
      "key": "fraction_operations:add_fractions_like",
      "why": "sums past 1 make improper fractions"
@@ -5294,6 +5354,10 @@
     {
      "key": "fractions:equiv_frac_visual",
      "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W09)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -5301,10 +5365,6 @@
     {
      "key": "fraction_operations:add_mixed_like",
      "why": "converting inside addition"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "both forms at one point"
     },
     {
      "key": "fractions:mixed_fractions",
@@ -5357,14 +5417,14 @@
     {
      "key": "fraction_operations:add_fractions_like",
      "why": "Y3.B8.S1 Add fractions (prior learning wk W10)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier step in the block)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "both forms at one point"
-    },
     {
      "key": "division:remainder_interpret",
      "why": "the remainder becomes the fraction"
@@ -5409,6 +5469,10 @@
     {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -5420,10 +5484,6 @@
     {
      "key": "fractions:select_equiv_frac",
      "why": "circle the equivalent fractions"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "fractions on a line beyond 1"
     }
    ],
    "note": "",
@@ -5641,24 +5701,20 @@
    "build": [],
    "pre": [
     {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (earlier step in the block)"
+    },
+    {
      "key": "fractions:shade_fraction",
      "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W11)"
     },
     {
      "key": "composing:compose_whole",
      "why": "Y3.B6.S4 Understand the whole (prior learning wk W11)"
-    },
-    {
-     "key": "placevalue:place_value_disks",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (prior learning wk W11)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "the inverse"
-    },
     {
      "key": "fraction_operations:frac_word_problems",
      "why": "stories"
@@ -5974,16 +6030,16 @@
     {
      "key": "placevalue:value",
      "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W29)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier block this year)"
     }
    ],
    "preBuild": [
     "dec_fraction_basics"
    ],
    "related": [
-    {
-     "key": "placevalue:expand",
-     "why": "the same chart for whole numbers"
-    },
     {
      "key": "decimals:decimal_nl_drag",
      "why": "tenths on a line"
@@ -6049,6 +6105,10 @@
     {
      "key": "fractions:fraction_nl_drag",
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W30)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier block this year)"
     }
    ],
    "preBuild": [
@@ -6058,10 +6118,6 @@
     {
      "key": "decimals:round_decimals",
      "why": "rounding uses the same line"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "mixed numbers on a line"
     },
     {
      "key": "decimals:compare_decimal",
@@ -6103,6 +6159,10 @@
    ],
    "pre": [
     {
+     "key": "conversions:d_to_f",
+     "why": "Y4.B8.S2 Tenths as decimals (earlier step in the block)"
+    },
+    {
      "key": "placevalue:place_value_10x",
      "why": "Y4.B5.S5 Divide by 10 (earlier block this year)",
      "opts": {
@@ -6129,16 +6189,16 @@
     {
      "key": "conversions:f_to_d",
      "why": "Y4.B8.S2 Tenths as decimals (earlier step in the block)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (step before in the block)"
     }
    ],
    "preBuild": [
     "decimal_pv"
    ],
    "related": [
-    {
-     "key": "conversions:d_to_f",
-     "why": "7 ÷ 10 = 7/10 = 0.7"
-    },
     {
      "key": "measurement:length_metric",
      "why": "mm to cm (÷10)",
@@ -6147,10 +6207,6 @@
        0
       ]
      }
-    },
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "tenths on a line"
     }
    ],
    "note": "Needs the decimals option ON; verify the generator gives 1-digit ÷ 10 = 0.n items.",
@@ -6188,6 +6244,10 @@
    ],
    "pre": [
     {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 Tenths as decimals (earlier step in the block)"
+    },
+    {
      "key": "placevalue:place_value_10x",
      "why": "Y4.B8.S5 Divide a 1-digit number by 10 (step before in the block)",
      "opts": {
@@ -6224,10 +6284,6 @@
     {
      "key": "measurement:money_notation",
      "why": "cents as tenths and hundredths"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "34 ÷ 10 = 34/10 = 3.4: the same number as a fraction and a decimal"
     }
    ],
    "note": "",
@@ -6443,14 +6499,14 @@
     {
      "key": "composing:base10_regroup",
      "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier block this year)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:expand",
-     "why": "whole-number partition in the same chart"
-    },
     {
      "key": "measurement:money_notation",
      "why": "dollars, dimes, cents"
@@ -6503,6 +6559,10 @@
    ],
    "pre": [
     {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier step in the block)"
+    },
+    {
      "key": "placevalue:place_value_10x",
      "why": "Y4.B8.S6 Divide a 2-digit number by 10 (earlier step in the block)",
      "opts": {
@@ -6552,10 +6612,6 @@
     {
      "key": "measurement:money_notation",
      "why": "cents to dollars (÷100)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "7/100 = 0.07"
     }
    ],
    "note": "",
@@ -6581,6 +6637,10 @@
    ],
    "pre": [
     {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (earlier block this year)"
+    },
+    {
      "key": "composing:make_ten",
      "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W31)"
     },
@@ -6604,10 +6664,6 @@
     {
      "key": "decimals:add_decimal",
      "why": "adding decimals"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "3/10 + 7/10 = 1"
     },
     {
      "key": "measurement:money_change",
@@ -6638,20 +6694,20 @@
    ],
    "pre": [
     {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W32)"
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W32)"
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (earlier block this year)"
     },
     {
      "key": "composing:make_ten",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W32)"
     },
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (earlier block this year)"
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W32)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W32)"
     }
    ],
    "preBuild": [],
@@ -7173,6 +7229,10 @@
       ],
       "decimals": true
      }
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)"
     }
    ],
    "preBuild": [],
@@ -7184,10 +7244,6 @@
     {
      "key": "measurement:length_metric",
      "why": "another ×100 / ÷100 conversion"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "cents as hundredths"
     }
    ],
    "note": "School swaps pounds and pence for dollars and cents.",
@@ -7221,6 +7277,10 @@
    ],
    "pre": [
     {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (earlier block this year)"
+    },
+    {
      "key": "measurement:money_compare",
      "why": "Y2.B4.S6 Compare amounts of money (lower grade, same idea)"
     },
@@ -7242,6 +7302,10 @@
     {
      "key": "measurement:coin_value",
      "why": "Y1.B13.S2 Recognise coins (prior learning wk W22)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y4.B1.S12 Order numbers to 10,000 (earlier block this year)"
     }
    ],
    "preBuild": [
@@ -7249,16 +7313,8 @@
    ],
    "related": [
     {
-     "key": "decimals:compare_decimal",
-     "why": "comparing decimals"
-    },
-    {
      "key": "measurement:enough_money",
      "why": "is there enough?"
-    },
-    {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "ordering"
     }
    ],
    "note": "money_compare has no usd value: the money_compare_written option should add it.",
@@ -7283,6 +7339,14 @@
     "money_estimate"
    ],
    "pre": [
+    {
+     "key": "measurement:money",
+     "why": "Y3.B9.S3 Add money (lower grade, same idea)"
+    },
+    {
+     "key": "decimals:round_decimals",
+     "why": "Y4.B9.S7 Round to the nearest whole number (earlier block this year)"
+    },
     {
      "key": "number_sense:estimate_sums_diffs",
      "why": "Y3.B2.S20 Estimate answers (prior learning wk W17)",
@@ -7310,14 +7374,6 @@
     {
      "key": "measurement:enough_money",
      "why": "is there enough money?"
-    },
-    {
-     "key": "measurement:money",
-     "why": "exact totals"
-    },
-    {
-     "key": "decimals:round_decimals",
-     "why": "rounding decimals"
     }
    ],
    "note": "",
@@ -7632,6 +7688,10 @@
     {
      "key": "measurement:time_sense",
      "why": "Y3.B10.S5 Use a.m. and p.m (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -7643,10 +7703,6 @@
     {
      "key": "measurement:elapsed_mixed",
      "why": "time later"
-    },
-    {
-     "key": "measurement:time_quarter",
-     "why": "quarter past/to wording"
     }
    ],
    "note": ""
@@ -7661,6 +7717,10 @@
     "time_24h_convert"
    ],
    "pre": [
+    {
+     "key": "measurement:time_1min",
+     "why": "Y3.B10.S3 Tell the time to the minute (lower grade, same idea)"
+    },
     {
      "key": "measurement:time_analog_digital",
      "why": "Y4.B11.S3 Convert between analogue and digital times (step before in the block)"
@@ -7679,10 +7739,6 @@
     {
      "key": "measurement:elapsed_mixed",
      "why": "time intervals"
-    },
-    {
-     "key": "measurement:time_1min",
-     "why": "reading the clock"
     }
    ],
    "note": "The US school uses a.m./p.m.; 24-hour time is a WRM/UK step (owner question).",
@@ -7923,6 +7979,10 @@
     {
      "key": "angles_lines:symmetry",
      "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y2.B3.S7 Sort 2-D shapes (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -7930,10 +7990,6 @@
     {
      "key": "shapes_classify:classify_quads",
      "why": "the next step"
-    },
-    {
-     "key": "shapes_early:compose_from_attributes",
-     "why": "shapes by attributes"
     },
     {
      "key": "area_perimeter:perimeter_intro",
@@ -8019,6 +8075,10 @@
     {
      "key": "shapes_classify:classify_quads",
      "why": "Y4.B12.S5 Quadrilaterals (step before in the block)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "Y2.B3.S7 Sort 2-D shapes (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -8028,10 +8088,6 @@
     {
      "key": "area_perimeter:perimeter_intro",
      "why": "perimeter of polygons (Y4.B6.S9)"
-    },
-    {
-     "key": "shapes_early:compose_from_attributes",
-     "why": "find shapes by attributes"
     },
     {
      "key": "angles_lines:symmetry",
@@ -8166,12 +8222,16 @@
    "build": [],
    "pre": [
     {
-     "key": "graphs:build_bar_graph",
-     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W25)"
-    },
-    {
      "key": "measurement:bar_graph_intro",
      "why": "Y3.B12.S3 Interpret bar charts (prior learning wk W25)"
+    },
+    {
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S3 Block diagrams (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "graphs:build_bar_graph",
+     "why": "Y3.B12.S4 Draw bar charts (prior learning wk W25)"
     },
     {
      "key": "comparing:classify_count",
@@ -8180,10 +8240,6 @@
     {
      "key": "patterns:seq_5",
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W25)"
-    },
-    {
-     "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S3 Block diagrams (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [
@@ -8335,6 +8391,16 @@
    ],
    "pre": [
     {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts (earlier step in the block)",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
      "key": "graphs:build_bar_graph",
      "why": "Y3.B12.S4 Draw bar charts (prior learning wk W37)"
     },
@@ -8348,16 +8414,6 @@
     {
      "key": "coordinates:coordinate_graph",
      "why": "plotting points"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "reading back the values a drawn graph shows",
-     "opts": {
-      "forms": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "note": "",
@@ -11321,7 +11377,7 @@
    "key": "number_sense:round_nl_thousands",
    "step": "Y4.B1.S17",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a related skill"
+   "why": "generated items do not teach this step; kept as a pre skill"
   },
   {
    "key": "number_theory:multiples",

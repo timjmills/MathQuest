@@ -91,6 +91,7 @@ for sp in ns['STEPS']:
     if both: errs.append(f'{sid}: R10 key in both pre and related: {sorted(both)}')
     if not rel: errs.append(f'{sid}: no related')
     if not pre: errs.append(f'{sid}: no pre')
+    if len(pre) < 3 and 'Pre-skills are few' not in sp.get('note', ''): errs.append(f'{sid}: rule 15, fewer than 3 pre and no note why')
     v = sp['verdict']
     if v == 'full' and (sp.get('build') or partial): errs.append(sid + ' full but build/partial')
     if v != 'full' and not sp.get('build'): errs.append(sid + ' not full but no build')
@@ -145,6 +146,7 @@ for sid, st in out_steps.items():
     for e in env:
         for f in ('name', 'kind', 'teaches', 'closes', 'representation'):
             if not e.get(f): errs.append(f"{sid}: envisioned {e['proposal']} has no {f}")
+        if e['closes'] == proposals.get(e['proposal'], {}).get('teaches'): errs.append(f"{sid}: rule 16, closes copies the proposal's teaches")
 
 # Tag fixes, DERIVED: what this file says each Y4 step's direct (full) and partial skills are, against SKILL_WRM now.
 # action: add (no tag yet; `partial` carries the missing clause when it is a partial cover), full (an existing partial

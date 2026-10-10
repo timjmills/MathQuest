@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | **68 (20 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | **151, derived** (add 45, full 36, opts 31, partial 28, remove 11) |
-| Pre / related entries | 528 / — | 517 / 367; none empty, **0 keys in both** |
-| Option values checked | — | 310 opts entries, 0 problems (`optcheck.mjs`) |
+| Pre / related entries | 528 / — | 570 / 319; every step has at least 3 pre and 1 related; **0 keys in both** |
+| Option values checked | — | 316 opts entries: 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -114,6 +114,36 @@ of these actions:
 | `remove` | Tagged now, but not a direct or partial skill here. The `why` says where it went. |
 
 `opts` and `maxNumber` travel with each fix. The hand-written reason is kept where there is one.
+
+### Rules 14–17 (added after the Y2–Y3 critic, round 2), applied across Y4
+- **14. An earlier step's skill the step builds on is pre, never only related.** A script listed every related skill that
+  is taught at an earlier step. I judged each one, and moved 49 into pre, citing the step it comes from. Examples:
+  - B7.S4 ← `fraction_number_line` (Y3 fractions on a line);
+  - B2.S9 ← `rounding_table` (B1.S17);
+  - B8.S5 ← `d_to_f` (B8.S2);
+  - B10.S3 ← `compare_decimal` (B9.S5);
+  - B10.S4 ← `round_decimals` and `money`;
+  - B5.S2 ← `factors_identify` (B5.S1);
+  - B13.S4 ← `bar_graph`.
+
+  The ones left in related are another form of the idea, the inverse, or the next step, and their `why` says so.
+- **14. Pre lists are ranked by how directly each skill is a building block**, with the main one first. Examples:
+  - B4.S1 starts with counting in 3s;
+  - B4.S3, B4.S5 and B4.S8 start with the same table's facts from the step before;
+  - B6.S8 starts with the perimeter of a rectangle;
+  - B7.S13 starts with adding fractions (its inverse), and a noise pre-skill (`place_value_disks`) is dropped;
+  - B5.S12 starts with the exchange;
+  - B13.S1 starts with reading a chart.
+
+  No step passes the cap of 8, so no main block was dropped.
+- **15. Every step has at least 3 pre-skills.** B1.S13 has 3, and its note explains why there are so few.
+  `build.py` fails a step with fewer than 3 unless its note says why.
+- **16. `closes` is the step's own missing clause.** It defaults to the step's `missing`, or to the part of it that one
+  proposal closes. `build.py` fails if `closes` equals the proposal's `teaches`.
+- **17. Option values must change what is dealt.** `optchange.mjs` generates each skill+opts pair and the same skill
+  with no options (same seeds, print path). Of 149 pairs, none has a non-default value that changes nothing. 41 entries
+  record a default value explicitly (for example `band:999`), and their items are the step's deal. The money options
+  (`currency:'usd'`, `step:5`, `band:2000`, `paid:'note'`) were checked in the items log.
 
 ## Defect for the lead (not a tagging question)
 `coordinate_q1 {forms:[0]}` works in live play: every item reads coordinates. Through `generateQuestionFor` with
