@@ -95,6 +95,8 @@ for sp in ns['STEPS']:
     if v == 'full' and (sp.get('build') or partial): errs.append(sid + ' full but build/partial')
     if v != 'full' and not sp.get('build'): errs.append(sid + ' not full but no build')
     if v == 'gap' and direct: errs.append(sid + ' gap with direct')
+    if v == 'partial' and direct: errs.append(sid + ' partial step lists a direct skill (make it a partial with its clause)')
+    if v == 'partial' and not partial: errs.append(sid + ' partial with no partial skill')
     sp['preBuild'] = [p for p in sp.get('preBuild', []) if p not in sp.get('build', [])]
     for p in sp.get('build', []) + sp.get('preBuild', []):
         used.setdefault(p, []).append(sid)
@@ -140,6 +142,9 @@ for sid, st in out_steps.items():
         env.append({'proposal': pid, 'name': p.get('name', pid), 'kind': kind_s.strip(), 'teaches': t or p.get('teaches', ''),
                     'closes': CLOSES.get(sid, {}).get(pid, st['missing']), 'representation': ENVREP.get(pid) or short_rep(p.get('representation') or p.get('build', ''))})
     st['envision'] = env
+    for e in env:
+        for f in ('name', 'kind', 'teaches', 'closes', 'representation'):
+            if not e.get(f): errs.append(f"{sid}: envisioned {e['proposal']} has no {f}")
 
 # Tag fixes, DERIVED: what this file says each Y4 step's direct (full) and partial skills are, against SKILL_WRM now.
 # action: add (no tag yet; `partial` carries the missing clause when it is a partial cover), full (an existing partial
@@ -154,10 +159,12 @@ hand = {(t['key'], t['step']): t for t in ns['TAGFIXES']}
 want = {}
 for sid, st in out_steps.items():
     for d in st['direct']:
-        want.setdefault((d['key'], sid), {'status': 'full', 'opts': []})['opts'].append(d['opts'])
+        w = want.setdefault((d['key'], sid), {'status': 'full', 'opts': []}); w['opts'].append(d['opts'])
+        if d.get('maxNumber'): w['maxNumber'] = d['maxNumber']
     for pz in st['partial']:
         w = want.setdefault((pz['key'], sid), {'status': 'partial', 'opts': [], 'missing': pz['missing']})
         w['opts'].append(pz.get('opts', {}))
+        if pz.get('maxNumber'): w['maxNumber'] = pz['maxNumber']
         if w['status'] == 'partial': w['missing'] = pz['missing']
 tagfixes = []
 def why_of(key, sid, dflt):
@@ -178,6 +185,7 @@ for (key, sid), w in sorted(want.items(), key=lambda x: (order.index(x[0][1]), x
     else:
         continue
     if opts: t['opts'] = opts if len(opts) > 1 else opts[0]
+    if w.get('maxNumber'): t['maxNumber'] = w['maxNumber']
     tagfixes.append(t)
 for (key, sid), pz in sorted(cur.items(), key=lambda x: (order.index(x[0][1]), x[0][0])):
     if (key, sid) in want: continue

@@ -518,26 +518,27 @@
   },
   "Y4.B1.S8": {
    "title": "Find 1, 10, 100, 1,000 more or less",
-   "direct": [
-    {
-     "key": "placevalue:more_less_100",
-     "opts": {
-      "step": 1000
-     }
-    },
-    {
-     "key": "placevalue:more_less_100",
-     "opts": {
-      "step": 100
-     }
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "placevalue:more_less_10",
      "missing": "generated: 1 and 10 more or less, but only to 120 (99 + 1, 86 − 10); never a 4-digit number",
      "opts": {
       "step": 0
+     }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "missing": "only 1,000 more or less (4,890 + 1,000); never 1 or 10, never the four steps mixed",
+     "opts": {
+      "step": 1000
+     }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "missing": "100 more or less on 3-digit numbers only (489 + 100); the skill has no 4-digit band",
+     "opts": {
+      "step": 100
      }
     }
    ],
@@ -1120,11 +1121,24 @@
    "direct": [
     {
      "key": "number_sense:rounding_table",
-     "opts": {}
+     "opts": {
+      "places": [
+       10,
+       100,
+       1000
+      ],
+      "blank": "row"
+     }
     },
     {
-     "key": "number_sense:round_nl_thousands",
-     "opts": {}
+     "key": "number_sense:rounding_table",
+     "opts": {
+      "places": [
+       10,
+       100,
+       1000
+      ]
+     }
     }
    ],
    "partial": [],
@@ -1169,9 +1183,13 @@
     {
      "key": "number_sense:round_sort_1000",
      "why": "sort by rounded value"
+    },
+    {
+     "key": "number_sense:round_nl_thousands",
+     "why": "rounding to 1,000 shown on a number line"
     }
    ],
-   "note": ""
+   "note": "Generated: rounding_table {places:[10,100,1000], blank:\"row\"} rounds one 4-digit number to 10, 100 and 1,000 (6,745 → 6,750; 6,700; 7,000); the column form rounds four numbers to one place. rounding_table {} only reaches 10 and 100 on 3-digit numbers."
   },
   "Y4.B2.S1": {
    "title": "Add and subtract 1s, 10s, 100s and 1,000s",
@@ -1818,20 +1836,20 @@
   },
   "Y4.B3.S1": {
    "title": "What is area",
-   "direct": [
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "missing": "covers a shape with squares but never names \"area\" or compares surfaces"
+    },
     {
      "key": "area_perimeter:area_unit_squares",
+     "missing": "counts the unit squares of a drawn shape (area 25, 35); never compares two surfaces or asks why squares",
      "opts": {
       "forms": [
        0
       ]
      }
-    }
-   ],
-   "partial": [
-    {
-     "key": "shapes_early:compose_rect_from_squares",
-     "missing": "covers a shape with squares but never names \"area\" or compares surfaces"
     }
    ],
    "verdict": "partial",
@@ -3087,16 +3105,7 @@
   },
   "Y4.B4.S12": {
    "title": "Divide a number by 1 and itself",
-   "direct": [
-    {
-     "key": "division:div_facts",
-     "opts": {
-      "constant": [
-       1
-      ]
-     }
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "multiplication:mult_properties",
@@ -3104,6 +3113,15 @@
      "opts": {
       "forms": [
        2
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "missing": "n ÷ 1 = n only (11 ÷ 1, 8 ÷ 1); never n ÷ n = 1 and no sharing picture",
+     "opts": {
+      "constant": [
+       1
       ]
      }
     }
@@ -3285,12 +3303,7 @@
   },
   "Y4.B5.S2": {
    "title": "Use factor pairs",
-   "direct": [
-    {
-     "key": "number_theory:factor_links_easy",
-     "opts": {}
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "multiplication:mult_properties",
@@ -3300,6 +3313,10 @@
        1
       ]
      }
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "missing": "finds the factor pairs of a number (24: 1 × 24, 2 × 12 …); never uses one to multiply"
     }
    ],
    "verdict": "partial",
@@ -4119,7 +4136,9 @@
     },
     {
      "key": "division:box_division_hard",
-     "opts": {}
+     "opts": {
+      "regroup": "none"
+     }
     },
     {
      "key": "division:area_model_div_3by1",
@@ -4173,7 +4192,7 @@
      "why": "estimate first"
     }
    ],
-   "note": ""
+   "note": "Generated: divide {tiles:31} (775 ÷ 5 = 155), box_division_hard {regroup:\"none\"} (816 ÷ 4 = 204) and area_model_div_3by1 (215 ÷ 5 = 43): 3-digit ÷ 1-digit with no remainder. box_division_hard {} gives remainders (195 ÷ 8 = 24 R 3), which is Y5."
   },
   "Y4.B5.S14": {
    "title": "Correspondence problems",
@@ -4693,20 +4712,20 @@
   },
   "Y4.B6.S7": {
    "title": "Calculate the perimeter of rectilinear shapes",
-   "direct": [
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "missing": "on a grid only (lengths counted, not calculated)"
+    },
     {
      "key": "area_perimeter:composite_shapes",
+     "missing": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first",
      "opts": {
       "forms": [
        0
       ]
      }
-    }
-   ],
-   "partial": [
-    {
-     "key": "area_perimeter:perimeter_grid",
-     "missing": "on a grid only (lengths counted, not calculated)"
     }
    ],
    "verdict": "partial",
@@ -5486,16 +5505,15 @@
   },
   "Y4.B7.S11": {
    "title": "Add two or more fractions",
-   "direct": [
-    {
-     "key": "fraction_operations:add_frac_like_nv",
-     "opts": {}
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "fraction_operations:add_fractions_like",
      "missing": "two addends only; no three or more addends"
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "missing": "two addends only (10/11 + 3/11, 7/8 + 5/8); never three or more"
     }
    ],
    "verdict": "partial",
@@ -5546,20 +5564,22 @@
   },
   "Y4.B7.S12": {
    "title": "Add fractions and mixed numbers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:add_mixed_like",
-     "opts": {}
+     "missing": "generated: mixed + mixed only (3 3/4 + 1 2/4, 4 1/2 + 3 1/2) and \"sums greater than 3\"; never a proper fraction added to a mixed number"
     },
     {
      "key": "fraction_operations:add_mixed_like_nv",
-     "opts": {}
+     "missing": "generated: mixed + mixed and missing addends (2 2/6 + ? = 5 2/3); never fraction + mixed number"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "adding a proper fraction to a mixed number (2 1/5 + 3/5, 1 3/4 + 2/4)",
+   "build": [
+    "frac_add_multi"
+   ],
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
@@ -5591,7 +5611,17 @@
      "why": "estimating with mixed numbers"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "frac_add_multi",
+     "name": "Add and Subtract More Fractions (option)",
+     "kind": "option on fraction_operations:add_fractions_like",
+     "teaches": "add a proper fraction to a mixed number (2 1/5 + 3/5 = 2 4/5), with a bar model as a fading hint",
+     "closes": "adding a proper fraction to a mixed number (2 1/5 + 3/5, 1 3/4 + 2/4)",
+     "representation": "addend-count and \"from a whole\" options with a bar-model support"
+    }
+   ]
   },
   "Y4.B7.S13": {
    "title": "Subtract two fractions",
@@ -5705,20 +5735,22 @@
   },
   "Y4.B7.S15": {
    "title": "Subtract from mixed numbers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:sub_mixed_like",
-     "opts": {}
+     "missing": "generated: mixed − mixed with a bar model, but some items break a whole (4 2/8 − 3 5/8 = 5/8), which WRM keeps for Y5 (Y5.B4.S16); a page cannot be held to no exchange"
     },
     {
      "key": "fraction_operations:sub_mixed_like_nv",
-     "opts": {}
+     "missing": "generated: some items break a whole (9 1/5 − 6 4/5) or write a whole as 2/2 (4 1/2 − 1 2/2)"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of mixed-number subtractions with no exchange of a whole (3 4/5 − 1 2/5, 3 4/5 − 2/5)",
+   "build": [
+    "sub_break_whole"
+   ],
    "pre": [
     {
      "key": "fraction_operations:sub_fractions_like",
@@ -5733,9 +5765,7 @@
      "why": "Y4.B7.S12 Add fractions and mixed numbers (earlier step in the block)"
     }
    ],
-   "preBuild": [
-    "sub_break_whole"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "fraction_operations:frac_word_mixed",
@@ -5746,7 +5776,17 @@
      "why": "estimate the difference"
     }
    ],
-   "note": "WRM (1) and (2) are no-exchange and exchange; sub_mixed_like samples include exchange (5 1/6 − 2 2/6), so full."
+   "note": "sub_break_whole is an option on sub_mixed_like (\"breaking the whole\"): set to never it gives this step, set to always it gives Y5.B4.S16.",
+   "envision": [
+    {
+     "proposal": "sub_break_whole",
+     "name": "Subtract from a Mixed Number: Break the Whole (option)",
+     "kind": "option on fraction_operations:sub_mixed_like",
+     "teaches": "set breaking \"never\": subtract mixed numbers where the fraction parts subtract without an exchange (3 4/5 − 1 2/5)",
+     "closes": "a page of mixed-number subtractions with no exchange of a whole (3 4/5 − 1 2/5, 3 4/5 − 2/5)",
+     "representation": "an \"exchange a whole\" band with a bar-model support"
+    }
+   ]
   },
   "Y4.B8.S1": {
    "title": "Tenths as fractions",
@@ -6763,7 +6803,7 @@
    "partial": [
     {
      "key": "decimals:compare_decimal",
-     "missing": "generated: 1- and 2-place decimals below 10 compared with < > (6.36 vs 5.99, 6.1 vs 2.88), but the whole parts nearly always differ; no same-whole items (0.4 vs 0.38) and no hundred-square model",
+     "missing": "generated: hundredths below 10 compared with < > (8.23 vs 9.92, 9.29 vs 1.42); the whole parts differ on nearly every item, so the decimal places seldom decide; no same-whole pair with 1 and 2 places (0.4 vs 0.38) and no hundred-square model",
      "opts": {
       "decimals": 2,
       "forms": [
@@ -6839,7 +6879,7 @@
      "kind": "option on decimals:compare_decimal",
      "teaches": "shade both on hundred squares, then compare",
      "closes": "reasoning with hundred squares",
-     "representation": ""
+     "representation": "two hundred squares side by side with a sign box between them"
     }
    ]
   },
@@ -6849,7 +6889,7 @@
    "partial": [
     {
      "key": "decimals:order_decimals",
-     "missing": "generated: 3-5 decimals below 10 ordered both ways (1.36, 2.41, 3.46, 5.99, 6.36), but nearly every number has a different whole part, so the places are never compared",
+     "missing": "generated: 3-6 decimals below 10 ordered both ways (9.92, 9.26, 8.23, 7.33 …); every number has exactly two places, so 1 and 2 places are never mixed (3.6, 3.65, 3.06), and same-whole sets come only by chance",
      "opts": {
       "decimals": 2
      },
@@ -6857,7 +6897,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "ordering decimals that share the whole part, with 1 and 2 places mixed (3.6, 3.65, 3.06)",
+   "missing": "ordering decimals that share the whole part with 1 and 2 places mixed (3.6, 3.65, 3.06)",
    "build": [
     "dec_same_whole"
    ],
@@ -6903,7 +6943,7 @@
      "name": "Decimals With the Same Whole Part (option)",
      "kind": "option on decimals:compare_decimal",
      "teaches": "order three to five decimals that share the whole part (3.6, 3.65, 3.06), least to greatest or back",
-     "closes": "ordering decimals that share the whole part, with 1 and 2 places mixed (3.6, 3.65, 3.06)",
+     "closes": "ordering decimals that share the whole part with 1 and 2 places mixed (3.6, 3.65, 3.06)",
      "representation": "the existing compare / order cell"
     }
    ]
@@ -8334,9 +8374,11 @@
   },
   "Y4.B14.S1": {
    "title": "Describe position using coordinates",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "coordinates:coordinate_q1",
+     "missing": "right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to reading",
      "opts": {
       "forms": [
        0
@@ -8344,10 +8386,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a printed page of reading only (the forms option is lost on the print path)",
+   "build": [
+    "coord_forms_fix"
+   ],
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
@@ -8375,13 +8418,25 @@
      "why": "distance between points"
     }
    ],
-   "note": "forms [0] \"Read the coordinates\": generated without itemIndex, every item asks for the coordinates of drawn points. DEFECT for the lead: the forms filter is honoured in live play, but generateQuestionFor with itemIndex (the print path, print-sheet.js) deals the other form too (3 of 8 items), because the page deal gives the same variant on every redraw of one item. Not a tagging question; reported in Y4-report.md."
+   "note": "forms [0] is the right option and live play honours it; the print path does not (see coord_forms_fix and the report).",
+   "envision": [
+    {
+     "proposal": "coord_forms_fix",
+     "name": "Read Only or Plot Only, on Every Page (option fix)",
+     "kind": "option on coordinates:coordinate_q1",
+     "teaches": "read the coordinates of drawn points on a first-quadrant grid, every item, on screen and on paper",
+     "closes": "a printed page of reading only (the forms option is lost on the print path)",
+     "representation": "the existing first-quadrant grid cell"
+    }
+   ]
   },
   "Y4.B14.S2": {
    "title": "Plot coordinates",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "coordinates:coordinate_q1",
+     "missing": "right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to plotting",
      "opts": {
       "forms": [
        1
@@ -8389,10 +8444,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a printed page of plotting only (the forms option is lost on the print path)",
+   "build": [
+    "coord_forms_fix"
+   ],
    "pre": [
     {
      "key": "coordinates:coordinate_q1",
@@ -8427,7 +8483,17 @@
      "why": "coordinate graphing"
     }
    ],
-   "note": "forms [1] \"Plot the points\": generated without itemIndex, every item plots given points. DEFECT for the lead: the forms filter is honoured in live play, but generateQuestionFor with itemIndex (the print path, print-sheet.js) deals the other form too (3 of 8 items), because the page deal gives the same variant on every redraw of one item. Not a tagging question; reported in Y4-report.md."
+   "note": "forms [1] is the right option and live play honours it; the print path does not (see coord_forms_fix and the report).",
+   "envision": [
+    {
+     "proposal": "coord_forms_fix",
+     "name": "Read Only or Plot Only, on Every Page (option fix)",
+     "kind": "option on coordinates:coordinate_q1",
+     "teaches": "plot given points on a first-quadrant grid, every item, on screen and on paper",
+     "closes": "a printed page of plotting only (the forms option is lost on the print path)",
+     "representation": "the existing first-quadrant grid cell"
+    }
+   ]
   },
   "Y4.B14.S3": {
    "title": "Draw 2-D shapes on a grid",
@@ -9234,6 +9300,7 @@
    "family": "fractions",
    "steps": [
     "Y4.B7.S11",
+    "Y4.B7.S12",
     "Y4.B7.S14"
    ],
    "reused": true,
@@ -9434,7 +9501,7 @@
    "ccss": [
     "4.NF.C.7"
    ],
-   "why": "generated compare_decimal / order_decimals {decimals:2} at Max Number 10 almost always differ in the whole part (6.36 vs 5.99, 1.36 < 2.41 < 3.46), so the decimal places are never compared",
+   "why": "generated compare_decimal / order_decimals {decimals:2} at Max Number 10: whole parts differ on nearly every compare item (8.23 vs 9.92), and every number has exactly two places, so 0.4 vs 0.38 (the length misconception) never comes up",
    "steps": [
     "Y4.B9.S5",
     "Y4.B9.S6"
@@ -9742,6 +9809,25 @@
    "reused": true,
    "source": "WRM_PROPOSALS"
   },
+  "coord_forms_fix": {
+   "kind": "option",
+   "skill": "coordinates:coordinate_q1",
+   "option": "forms honoured on every page: read-only / plot-only as a pickVariant forms option (variantKey), not a redraw filter",
+   "name": "Read Only or Plot Only, on Every Page (option fix)",
+   "teaches": "a page of only reading coordinates of drawn points, or only plotting given points, on screen and on paper",
+   "representation": "the existing first-quadrant grid cell; only the dealing changes",
+   "family": "coordinates",
+   "ccss": [
+    "5.G.A.1",
+    "5.G.A.2"
+   ],
+   "why": "generated with itemIndex (the print path), coordinate_q1 {forms:[0]} still deals \"Plot point A\" on 3 of 6 items: the page deal gives the same variant on every redraw, so the forms filter keeps the last draw",
+   "steps": [
+    "Y4.B14.S1",
+    "Y4.B14.S2"
+   ],
+   "reused": false
+  },
   "position_map": {
    "kind": "new",
    "skill": "shapes_early:position_and_maps",
@@ -9977,8 +10063,8 @@
   {
    "key": "placevalue:more_less_100",
    "step": "Y4.B1.S8",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": [
     {
      "step": 1000
@@ -10066,6 +10152,29 @@
    }
   },
   {
+   "key": "number_sense:rounding_table",
+   "step": "Y4.B1.S17",
+   "action": "opts",
+   "why": "places [10, 100, 1,000]: 4-digit numbers rounded to all three places; the default reaches only 10 and 100 on 3-digit numbers",
+   "opts": [
+    {
+     "places": [
+      10,
+      100,
+      1000
+     ],
+     "blank": "row"
+    },
+    {
+     "places": [
+      10,
+      100,
+      1000
+     ]
+    }
+   ]
+  },
+  {
    "key": "placevalue:more_less_100",
    "step": "Y4.B2.S1",
    "action": "add",
@@ -10145,7 +10254,8 @@
   {
    "key": "area_perimeter:area_unit_squares",
    "step": "Y4.B3.S1",
-   "action": "opts",
+   "action": "partial",
+   "partial": "counts the unit squares of a drawn shape (area 25, 35); never compares two surfaces or asks why squares",
    "why": "kept as direct (forms rectangles) but the step verdict is partial: comparing surfaces is missing",
    "opts": {
     "forms": [
@@ -10481,6 +10591,7 @@
    "key": "division:div_facts",
    "step": "Y4.B4.S12",
    "action": "add",
+   "partial": "n ÷ 1 = n only (11 ÷ 1, 8 ÷ 1); never n ÷ n = 1 and no sharing picture",
    "why": "missing tag: constant [1] covers n ÷ 1",
    "opts": {
     "constant": [
@@ -10509,6 +10620,13 @@
      1
     ]
    }
+  },
+  {
+   "key": "number_theory:factor_links_easy",
+   "step": "Y4.B5.S2",
+   "action": "partial",
+   "partial": "finds the factor pairs of a number (24: 1 × 24, 2 × 12 …); never uses one to multiply",
+   "why": "tagged full; generated items teach only part of the step"
   },
   {
    "key": "multiplication:mult_zeros",
@@ -10655,7 +10773,7 @@
    "step": "Y4.B5.S11",
    "action": "partial",
    "partial": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to no exchange",
-   "why": "direct method; page not held to no exchange"
+   "why": "mixes exchange and no-exchange items and 1-digit quotients; partial until div_exchange"
   },
   {
    "key": "division:box_division_easy",
@@ -10680,7 +10798,7 @@
    "step": "Y4.B5.S12",
    "action": "add",
    "partial": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to an exchange of a ten",
-   "why": "not tagged yet; generated items teach this step in part"
+   "why": "mixes exchange and no-exchange items and 1-digit quotients; partial until div_exchange"
   },
   {
    "key": "division:divide",
@@ -10690,6 +10808,15 @@
    "why": "not tagged yet; generated items teach this step in part",
    "opts": {
     "tiles": 21,
+    "regroup": "none"
+   }
+  },
+  {
+   "key": "division:box_division_hard",
+   "step": "Y4.B5.S13",
+   "action": "opts",
+   "why": "regroup \"none\" (shares exactly): 3-digit ÷ 1-digit with no remainder; the default deals remainders (195 ÷ 8 = 24 R 3)",
+   "opts": {
     "regroup": "none"
    }
   },
@@ -10757,6 +10884,7 @@
    "key": "area_perimeter:composite_shapes",
    "step": "Y4.B6.S7",
    "action": "add",
+   "partial": "perimeter of a composite shape; generated items label the sides, so no missing length has to be found first",
    "why": "missing tag (direct); perimeter_grid stays partial",
    "opts": {
     "forms": [
@@ -10776,7 +10904,7 @@
    "step": "Y4.B6.S9",
    "action": "partial",
    "partial": "generated: triangles, rectangles and squares only (7 + 7 + 5, 9 + 8 + 9 + 8); no pentagon, hexagon or irregular polygon",
-   "why": "tagged full; generated items teach only part of the step"
+   "why": "generated: triangles, rectangles and squares only; no 5- or 6-sided polygons"
   },
   {
    "key": "composing:fraction_number_line",
@@ -10803,14 +10931,14 @@
    "step": "Y4.B7.S7",
    "action": "partial",
    "partial": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper",
-   "why": "tagged full; generated items teach only part of the step"
+   "why": "generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)"
   },
   {
    "key": "fractions:improper_mixed",
    "step": "Y4.B7.S8",
    "action": "partial",
    "partial": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed",
-   "why": "tagged full; generated items teach only part of the step"
+   "why": "generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)"
   },
   {
    "key": "fractions:select_equiv_frac",
@@ -10822,19 +10950,36 @@
    "key": "fraction_operations:add_frac_like_nv",
    "step": "Y4.B7.S11",
    "action": "add",
+   "partial": "two addends only (10/11 + 3/11, 7/8 + 5/8); never three or more",
    "why": "missing tag (two-addend part)"
+  },
+  {
+   "key": "fraction_operations:add_mixed_like",
+   "step": "Y4.B7.S12",
+   "action": "partial",
+   "partial": "generated: mixed + mixed only (3 3/4 + 1 2/4, 4 1/2 + 3 1/2) and \"sums greater than 3\"; never a proper fraction added to a mixed number",
+   "why": "mixed + mixed only; never a proper fraction added to a mixed number"
   },
   {
    "key": "fraction_operations:add_mixed_like_nv",
    "step": "Y4.B7.S12",
    "action": "add",
-   "why": "missing tag"
+   "partial": "generated: mixed + mixed and missing addends (2 2/6 + ? = 5 2/3); never fraction + mixed number",
+   "why": "mixed + mixed only; never a proper fraction added to a mixed number"
+  },
+  {
+   "key": "fraction_operations:sub_mixed_like",
+   "step": "Y4.B7.S15",
+   "action": "partial",
+   "partial": "generated: mixed − mixed with a bar model, but some items break a whole (4 2/8 − 3 5/8 = 5/8), which WRM keeps for Y5 (Y5.B4.S16); a page cannot be held to no exchange",
+   "why": "some items break a whole (4 2/8 − 3 5/8), which WRM keeps for Y5.B4.S16; a page cannot be held to no exchange"
   },
   {
    "key": "fraction_operations:sub_mixed_like_nv",
    "step": "Y4.B7.S15",
    "action": "add",
-   "why": "missing tag"
+   "partial": "generated: some items break a whole (9 1/5 − 6 4/5) or write a whole as 2/2 (4 1/2 − 1 2/2)",
+   "why": "some items break a whole (4 2/8 − 3 5/8), which WRM keeps for Y5.B4.S16; a page cannot be held to no exchange"
   },
   {
    "key": "fractions:write_fraction",
@@ -10870,7 +11015,7 @@
    "step": "Y4.B8.S4",
    "action": "partial",
    "partial": "generated: places a tenth on a 0-1 line with 0, 0.5 and 1 labelled (0.9, 0.2, 0.6); never a line past 1 and never reads the decimal at a marked point",
-   "why": "tagged full; generated items teach only part of the step",
+   "why": "ticks \"some\": tenths placed on 0-1 lines only, never past 1 or read at a point; partial until dec_nl_past_1",
    "opts": {
     "ticks": "some"
    }
@@ -10943,24 +11088,26 @@
    "key": "decimals:compare_decimal",
    "step": "Y4.B9.S5",
    "action": "partial",
-   "partial": "generated: 1- and 2-place decimals below 10 compared with < > (6.36 vs 5.99, 6.1 vs 2.88), but the whole parts nearly always differ; no same-whole items (0.4 vs 0.38) and no hundred-square model",
+   "partial": "generated: hundredths below 10 compared with < > (8.23 vs 9.92, 9.29 vs 1.42); the whole parts differ on nearly every item, so the decimal places seldom decide; no same-whole pair with 1 and 2 places (0.4 vs 0.38) and no hundred-square model",
    "why": "with decimals 2, forms [0] and Max Number 10 the page is held to hundredths; partial because no same-whole items and no model",
    "opts": {
     "decimals": 2,
     "forms": [
      0
     ]
-   }
+   },
+   "maxNumber": 10
   },
   {
    "key": "decimals:order_decimals",
    "step": "Y4.B9.S6",
    "action": "partial",
-   "partial": "generated: 3-5 decimals below 10 ordered both ways (1.36, 2.41, 3.46, 5.99, 6.36), but nearly every number has a different whole part, so the places are never compared",
-   "why": "with decimals 2 and Max Number 10 the page is held to hundredths; partial because the whole parts nearly always differ, so the decimal places are never compared",
+   "partial": "generated: 3-6 decimals below 10 ordered both ways (9.92, 9.26, 8.23, 7.33 …); every number has exactly two places, so 1 and 2 places are never mixed (3.6, 3.65, 3.06), and same-whole sets come only by chance",
+   "why": "with decimals 2 and Max Number 10 the page is held to hundredths; partial because every number has exactly two places (no 3.6 vs 3.65)",
    "opts": {
     "decimals": 2
-   }
+   },
+   "maxNumber": 10
   },
   {
    "key": "decimals:round_decimals",
@@ -11136,8 +11283,9 @@
   {
    "key": "coordinates:coordinate_q1",
    "step": "Y4.B14.S1",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to reading",
+   "why": "forms option set to reading; partial because a printed page (itemIndex) still deals the other form on about half the items",
    "opts": {
     "forms": [
      0
@@ -11147,8 +11295,9 @@
   {
    "key": "coordinates:coordinate_q1",
    "step": "Y4.B14.S2",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to plotting",
+   "why": "forms option set to plotting; partial because a printed page (itemIndex) still deals the other form on about half the items",
    "opts": {
     "forms": [
      1
@@ -11169,6 +11318,12 @@
    "why": "unit form is the partition step (Y4.B1.S2), not representing"
   },
   {
+   "key": "number_sense:round_nl_thousands",
+   "step": "Y4.B1.S17",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a related skill"
+  },
+  {
    "key": "number_theory:multiples",
    "step": "Y4.B4.S1",
    "action": "remove",
@@ -11178,19 +11333,19 @@
    "key": "multiplication:mult_div_fact_family",
    "step": "Y4.B4.S3",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a related skill"
+   "why": "no table option: generated families are any table (12 × 9, 5 × 10, 11 × 2); kept as a related skill"
   },
   {
    "key": "multiplication:mult_div_fact_family",
    "step": "Y4.B4.S5",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a related skill"
+   "why": "no table option: generated families are any table (12 × 9, 5 × 10, 11 × 2); kept as a related skill"
   },
   {
    "key": "multiplication:mult_div_fact_family",
    "step": "Y4.B4.S8",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a related skill"
+   "why": "no table option: generated families are any table (12 × 9, 5 × 10, 11 × 2); kept as a related skill"
   },
   {
    "key": "division:box_division_easy",
@@ -11202,13 +11357,13 @@
    "key": "division:div_remainders",
    "step": "Y4.B5.S12",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a pre skill"
+   "why": "the step has no remainders (52 ÷ 4 = 13); div_remainders is the next idea, kept as a pre skill"
   },
   {
    "key": "composing:fraction_number_line",
    "step": "Y4.B7.S4",
    "action": "remove",
-   "why": "generated items do not teach this step; kept as a related skill"
+   "why": "generated items are mostly 0-1 lines (2/5 shaded, 1/2 at the arrow), seldom a mixed number; kept as a related skill"
   },
   {
    "key": "fractions:compare",

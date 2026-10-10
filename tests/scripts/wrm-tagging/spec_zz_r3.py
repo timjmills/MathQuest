@@ -70,17 +70,17 @@ NEW_PROPOSALS['dec_same_whole'] = dict(kind='option', skill='decimals:compare_de
     name='Decimals With the Same Whole Part (option)',
     teaches='comparing and ordering decimals that share the whole-number part, with 1 and 2 places mixed (0.4 vs 0.38; 3.6, 3.65, 3.06), so the tenths digit decides',
     representation='the existing compare / order cell; a ones . tenths hundredths column header over the numbers (hint, fades)',
-    family='decimals', ccss=['4.NF.C.7'], why='generated compare_decimal / order_decimals {decimals:2} at Max Number 10 almost always differ in the whole part (6.36 vs 5.99, 1.36 < 2.41 < 3.46), so the decimal places are never compared')
-P('Y4.B9.S5', partial=[('decimals:compare_decimal{"decimals":2,"forms":[0]}@10', 'generated: 1- and 2-place decimals below 10 compared with < > (6.36 vs 5.99, 6.1 vs 2.88), but the whole parts nearly always differ; no same-whole items (0.4 vs 0.38) and no hundred-square model')],
+    family='decimals', ccss=['4.NF.C.7'], why='generated compare_decimal / order_decimals {decimals:2} at Max Number 10: whole parts differ on nearly every compare item (8.23 vs 9.92), and every number has exactly two places, so 0.4 vs 0.38 (the length misconception) never comes up')
+P('Y4.B9.S5', partial=[('decimals:compare_decimal{"decimals":2,"forms":[0]}@10', 'generated: hundredths below 10 compared with < > (8.23 vs 9.92, 9.29 vs 1.42); the whole parts differ on nearly every item, so the decimal places seldom decide; no same-whole pair with 1 and 2 places (0.4 vs 0.38) and no hundred-square model')],
   verdict='partial', missing='comparing decimals with the same whole part (0.4 vs 0.38), reasoning with hundred squares',
   build=['dec_same_whole', 'dec_compare_model'],
   note='decimals 2 and Max Number 10 (maxNumber) hold the page to hundredths below 10: the old "cannot be held" reason was wrong. maxNumber is the generateQuestionFor range, not the skill\'s own range option.')
-P('Y4.B9.S6', partial=[('decimals:order_decimals{"decimals":2}@10', 'generated: 3-5 decimals below 10 ordered both ways (1.36, 2.41, 3.46, 5.99, 6.36), but nearly every number has a different whole part, so the places are never compared')],
-  verdict='partial', missing='ordering decimals that share the whole part, with 1 and 2 places mixed (3.6, 3.65, 3.06)',
+P('Y4.B9.S6', partial=[('decimals:order_decimals{"decimals":2}@10', 'generated: 3-6 decimals below 10 ordered both ways (9.92, 9.26, 8.23, 7.33 …); every number has exactly two places, so 1 and 2 places are never mixed (3.6, 3.65, 3.06), and same-whole sets come only by chance')],
+  verdict='partial', missing='ordering decimals that share the whole part with 1 and 2 places mixed (3.6, 3.65, 3.06)',
   build=['dec_same_whole'],
   note='decimals 2 and Max Number 10 hold the page to hundredths below 10.')
 drop_rel('Y4.B9.S5', 'decimals:order_decimals'); add_rel('Y4.B9.S5', ('decimals:order_decimals{"decimals":2}', 'the next step: the same comparison made three or more times to order'))
-HAND_WHY[('decimals:order_decimals', 'Y4.B9.S6')] = 'with decimals 2 and Max Number 10 the page is held to hundredths; partial because the whole parts nearly always differ, so the decimal places are never compared'
+HAND_WHY[('decimals:order_decimals', 'Y4.B9.S6')] = 'with decimals 2 and Max Number 10 the page is held to hundredths; partial because every number has exactly two places (no 3.6 vs 3.65)'
 HAND_WHY[('decimals:compare_decimal', 'Y4.B9.S5')] = 'with decimals 2, forms [0] and Max Number 10 the page is held to hundredths; partial because no same-whole items and no model'
 
 # ── S3: B11.S2 unit_conversion_word {units:[0]} converts h → min → s (time_convert already built) ───────
@@ -169,6 +169,16 @@ for st in STEPS:  # de-duplicate related (same key and opts)
         if r[0] in seen: continue
         seen.add(r[0]); out.append(r)
     st['related'] = out
+for _s in ('Y4.B4.S3', 'Y4.B4.S5', 'Y4.B4.S8', 'Y4.B4.S9', 'Y4.B4.S10'):
+    HAND_WHY[('multiplication:mult_div_fact_family', _s)] = 'no table option: generated families are any table (12 × 9, 5 × 10, 11 × 2); kept as a related skill'
+HAND_WHY[('composing:fraction_number_line', 'Y4.B7.S4')] = 'generated items are mostly 0-1 lines (2/5 shaded, 1/2 at the arrow), seldom a mixed number; kept as a related skill'
+HAND_WHY[('division:div_remainders', 'Y4.B5.S12')] = 'the step has no remainders (52 ÷ 4 = 13); div_remainders is the next idea, kept as a pre skill'
+HAND_WHY[('fractions:improper_mixed', 'Y4.B7.S7')] = 'generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)'
+HAND_WHY[('fractions:improper_mixed', 'Y4.B7.S8')] = 'generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)'
+HAND_WHY[('decimals:decimal_nl_drag', 'Y4.B8.S4')] = 'ticks "some": tenths placed on 0-1 lines only, never past 1 or read at a point; partial until dec_nl_past_1'
+HAND_WHY[('area_perimeter:perimeter_intro', 'Y4.B6.S9')] = 'generated: triangles, rectangles and squares only; no 5- or 6-sided polygons'
+HAND_WHY[('division:area_model_div_2by1', 'Y4.B5.S11')] = 'mixes exchange and no-exchange items and 1-digit quotients; partial until div_exchange'
+HAND_WHY[('division:area_model_div_2by1', 'Y4.B5.S12')] = 'mixes exchange and no-exchange items and 1-digit quotients; partial until div_exchange'
 TAGFIXES[:] = [dict(t, why=HAND_WHY.get((t['key'], t['step']), t['why'])) for t in TAGFIXES]
 for (k, s), w in HAND_WHY.items():
     if not any(t['key'] == k and t['step'] == s for t in TAGFIXES): TAGFIXES.append(dict(key=k, step=s, action='partial', why=w))
@@ -181,3 +191,68 @@ for _sid, _cl in (('Y4.B5.S11', 'no exchange'), ('Y4.B5.S12', 'an exchange of a 
     _by[_sid]['note'] = 'Generated: area_model_div_2by1, divide {tiles:21} and box_division_easy all mix exchange and no-exchange items; div_exchange is one shared option on the three.'
 NEW_PROPOSALS['div_exchange'].update(skills=['division:divide', 'division:area_model_div_2by1', 'division:box_division_easy'],
     option='exchange "none" / "in the tens" (no remainder), on divide (tiles 21, 31), area_model_div_2by1 and box_division_easy')
+
+# ── Whole-file sweep (r3): every FULL step re-generated (print path: seeded, itemIndex) ───────────────
+# B1.S17: rounding_table {} rounds 3-digit numbers to 10 or 100 only; places [10,100,1000] deals 4-digit numbers to all three
+P('Y4.B1.S17', direct=['number_sense:rounding_table{"places":[10,100,1000],"blank":"row"}', 'number_sense:rounding_table{"places":[10,100,1000]}'],
+  note='Generated: rounding_table {places:[10,100,1000], blank:"row"} rounds one 4-digit number to 10, 100 and 1,000 (6,745 → 6,750; 6,700; 7,000); the column form rounds four numbers to one place. rounding_table {} only reaches 10 and 100 on 3-digit numbers.')
+add_rel('Y4.B1.S17', ('number_sense:round_nl_thousands', 'rounding to 1,000 shown on a number line'))
+# B5.S13: box_division_hard {} gives remainders (195 ÷ 8 = 24 R 3); the step has none; regroup "none" = shares exactly
+P('Y4.B5.S13', direct=['division:divide{"tiles":31}', 'division:box_division_hard{"regroup":"none"}', 'division:area_model_div_3by1'],
+  note='Generated: divide {tiles:31} (775 ÷ 5 = 155), box_division_hard {regroup:"none"} (816 ÷ 4 = 204) and area_model_div_3by1 (215 ÷ 5 = 43): 3-digit ÷ 1-digit with no remainder. box_division_hard {} gives remainders (195 ÷ 8 = 24 R 3), which is Y5.')
+# B7.S15: sub_mixed_like breaks a whole on some items (4 2/8 − 3 5/8); WRM keeps that for Y5.B4.S16
+P('Y4.B7.S15', direct=[], partial=[
+    ('fraction_operations:sub_mixed_like', 'generated: mixed − mixed with a bar model, but some items break a whole (4 2/8 − 3 5/8 = 5/8), which WRM keeps for Y5 (Y5.B4.S16); a page cannot be held to no exchange'),
+    ('fraction_operations:sub_mixed_like_nv', 'generated: some items break a whole (9 1/5 − 6 4/5) or write a whole as 2/2 (4 1/2 − 1 2/2)')],
+  verdict='partial', missing='a page of mixed-number subtractions with no exchange of a whole (3 4/5 − 1 2/5, 3 4/5 − 2/5)',
+  build=['sub_break_whole'], preBuild=[],
+  note='sub_break_whole is an option on sub_mixed_like ("breaking the whole"): set to never it gives this step, set to always it gives Y5.B4.S16.')
+# B7.S12: add_mixed_like adds two mixed numbers only; never a fraction to a mixed number (2 1/5 + 3/5)
+P('Y4.B7.S12', direct=[], partial=[
+    ('fraction_operations:add_mixed_like', 'generated: mixed + mixed only (3 3/4 + 1 2/4, 4 1/2 + 3 1/2) and "sums greater than 3"; never a proper fraction added to a mixed number'),
+    ('fraction_operations:add_mixed_like_nv', 'generated: mixed + mixed and missing addends (2 2/6 + ? = 5 2/3); never fraction + mixed number')],
+  verdict='partial', missing='adding a proper fraction to a mixed number (2 1/5 + 3/5, 1 3/4 + 2/4)', build=['frac_add_multi'])
+# B14.S1 / S2: forms is not honoured on the print path → partial until it is (generated with itemIndex: 3 of 6 off-form)
+NEW_PROPOSALS['coord_forms_fix'] = dict(kind='option', skill='coordinates:coordinate_q1', option='forms honoured on every page: read-only / plot-only as a pickVariant forms option (variantKey), not a redraw filter',
+    name='Read Only or Plot Only, on Every Page (option fix)',
+    teaches='a page of only reading coordinates of drawn points, or only plotting given points, on screen and on paper',
+    representation='the existing first-quadrant grid cell; only the dealing changes',
+    family='coordinates', ccss=['5.G.A.1', '5.G.A.2'],
+    why='generated with itemIndex (the print path), coordinate_q1 {forms:[0]} still deals "Plot point A" on 3 of 6 items: the page deal gives the same variant on every redraw, so the forms filter keeps the last draw')
+for _sid, _f, _cl in (('Y4.B14.S1', 0, 'reading'), ('Y4.B14.S2', 1, 'plotting')):
+    P(_sid, direct=[], partial=[(f'coordinates:coordinate_q1{{"forms":[{_f}]}}', f'right form in live play, but on a printed page (generated with itemIndex) half the items are the other form; the page is not held to {_cl}')],
+      verdict='partial', missing=f'a printed page of {_cl} only (the forms option is lost on the print path)', build=['coord_forms_fix'],
+      note=f'forms [{_f}] is the right option and live play honours it; the print path does not (see coord_forms_fix and the report).')
+
+# A partial step lists no "direct" skill: each skill that teaches part of it is a partial, with its own clause.
+_MOVE = {
+ 'Y4.B1.S8': {'placevalue:more_less_100{"step":1000}': 'only 1,000 more or less (4,890 + 1,000); never 1 or 10, never the four steps mixed',
+              'placevalue:more_less_100{"step":100}': '100 more or less on 3-digit numbers only (489 + 100); the skill has no 4-digit band'},
+ 'Y4.B3.S1': {'area_perimeter:area_unit_squares{"forms":[0]}': 'counts the unit squares of a drawn shape (area 25, 35); never compares two surfaces or asks why squares'},
+ 'Y4.B4.S12': {'division:div_facts{"constant":[1]}': 'n ÷ 1 = n only (11 ÷ 1, 8 ÷ 1); never n ÷ n = 1 and no sharing picture'},
+ 'Y4.B5.S2': {'number_theory:factor_links_easy': 'finds the factor pairs of a number (24: 1 × 24, 2 × 12 …); never uses one to multiply'},
+ 'Y4.B6.S7': {'area_perimeter:composite_shapes{"forms":[0]}': 'perimeter of a composite shape; generated items label the sides, so no missing length has to be found first'},
+ 'Y4.B7.S11': {'fraction_operations:add_frac_like_nv': 'two addends only (10/11 + 3/11, 7/8 + 5/8); never three or more'},
+}
+for _sid, _m in _MOVE.items():
+    _st = _by[_sid]
+    _norm = lambda k: k.split('{')[0] + (json.dumps(json.loads(k[k.index('{'):]), sort_keys=True) if '{' in k else '')
+    import json
+    _left = []
+    for d in _st.get('direct', []):
+        hit = [k for k in _m if _norm(k) == _norm(d)]
+        if hit: _st['partial'] = list(_st.get('partial', [])) + [(d, _m[hit[0]])]
+        else: _left.append(d)
+    _st['direct'] = _left
+for _s, _f in (('Y4.B14.S1', 'reading'), ('Y4.B14.S2', 'plotting')):
+    HAND_WHY[('coordinates:coordinate_q1', _s)] = f'forms option set to {_f}; partial because a printed page (itemIndex) still deals the other form on about half the items'
+for _s in ('Y4.B7.S12',):
+    for _k in ('fraction_operations:add_mixed_like', 'fraction_operations:add_mixed_like_nv'):
+        HAND_WHY[(_k, _s)] = 'mixed + mixed only; never a proper fraction added to a mixed number'
+for _k in ('fraction_operations:sub_mixed_like', 'fraction_operations:sub_mixed_like_nv'):
+    HAND_WHY[(_k, 'Y4.B7.S15')] = 'some items break a whole (4 2/8 − 3 5/8), which WRM keeps for Y5.B4.S16; a page cannot be held to no exchange'
+HAND_WHY[('division:box_division_hard', 'Y4.B5.S13')] = 'regroup "none" (shares exactly): 3-digit ÷ 1-digit with no remainder; the default deals remainders (195 ÷ 8 = 24 R 3)'
+HAND_WHY[('number_sense:rounding_table', 'Y4.B1.S17')] = 'places [10, 100, 1,000]: 4-digit numbers rounded to all three places; the default reaches only 10 and 100 on 3-digit numbers'
+TAGFIXES[:] = [dict(t, why=HAND_WHY.get((t['key'], t['step']), t['why'])) for t in TAGFIXES]
+for (k, s), w in HAND_WHY.items():
+    if not any(t['key'] == k and t['step'] == s for t in TAGFIXES): TAGFIXES.append(dict(key=k, step=s, action='partial', why=w))

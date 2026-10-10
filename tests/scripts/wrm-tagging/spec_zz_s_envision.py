@@ -124,3 +124,10 @@ ENVREP = {
  'vis_pv_decimal_places': 'the pv chart with tenths and hundredths columns after the point',
  'vis_round_line_decimals': 'a rounding line between two wholes, bounds circled',
 }
+ENVISION.update({
+ 'Y4.B7.S12': {'frac_add_multi': 'add a proper fraction to a mixed number (2 1/5 + 3/5 = 2 4/5), with a bar model as a fading hint'},
+ 'Y4.B7.S15': {'sub_break_whole': 'set breaking "never": subtract mixed numbers where the fraction parts subtract without an exchange (3 4/5 − 1 2/5)'},
+ 'Y4.B14.S1': {'coord_forms_fix': 'read the coordinates of drawn points on a first-quadrant grid, every item, on screen and on paper'},
+ 'Y4.B14.S2': {'coord_forms_fix': 'plot given points on a first-quadrant grid, every item, on screen and on paper'},
+})
+ENVREP['dec_compare_model'] = 'two hundred squares side by side with a sign box between them'
