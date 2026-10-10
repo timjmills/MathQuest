@@ -98,3 +98,11 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
 `roman_numerals` skill, bands to 12 / 100 / 1,000 / 3,999, read and write); times-tables up to 15 (`tables_to_15`);
 `improper_mixed` one-direction option; one-exchange / two-or-more-exchanges option on every regroup band. Reception
 "Make connections" (R.B18) keeps a build (mixed review) — never left without one.
+
+## OWNER RULE 2026-10-10 (revised): every partial or gap step gets an envisioned skill — SHORT now, full design NEXT
+13. When a step is `partial` or `gap`, imagine the skill (or option) that would make it `full` and write it as a skill yet to
+    be made. FOR NOW keep it short: `name`, `kind` (new skill / option on <skill>), `teaches` (one or two sentences: what the
+    pupil does, e.g. "count 1–3 pictured objects and write the number"), `closes` (the step's exact missing clause), and
+    `representation` in a few words. No problem-type lists, level ladders, edge cases or misconceptions in this round — the
+    full design of every proposal is the NEXT job, after the tagging passes its critics. Reuse an existing proposal only if
+    it really does this; else write a new one.
