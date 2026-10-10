@@ -2455,8 +2455,8 @@
      "why": "Y5.B7.S9 decimals to 3 dp, needed to read 0.65 kg"
     },
     {
-     "key": "measurement:elapsed_find_duration",
-     "why": "4.MD.A.1 lower-grade link on the same standard (relative sizes of units)"
+     "key": "measurement:unit_conversion_word",
+     "why": "Y5.B14.S3 Convert units of length (prior learning wk W21)"
     }
    ],
    "preBuild": [],
@@ -3798,6 +3798,523 @@
     }
    ],
    "note": ""
+  },
+  "Y6.B8.S1": {
+   "title": "Place value within 1",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:compare_thousandths",
+     "missing": "compares decimals within 1 to thousandths, but never asks the value of a digit, the place-value chart or the partition 0.375 = 0.3 + 0.07 + 0.005"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the value of each digit in decimals within 1 to 3 dp, on a place-value chart with counters, and partitioning them",
+   "build": [
+    "dec_pv_within1"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W05/W06/W08)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line / Y5.B7.S1 decimals to 2 dp (prior learning wk W05/W06)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y5.B7.S1 decimals to 2 dp / Y4.B8.S2 tenths as decimals (prior learning)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 tenths and hundredths as fractions"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S2 Related calculations (prior learning wk W05)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare decimals to 3 dp (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [
+    "thousandths_pv"
+   ],
+   "related": [
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the digits shift one place for each × or ÷ 10"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "why": "rounding needs the place of each digit"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B8.S2": {
+   "title": "Place value – integers and decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:compare_thousandths",
+     "missing": "compares numbers with integer and decimal parts but never asks the value of a digit or partitions the number"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "missing": "orders decimals; no digit value"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the value of each digit in numbers with integer and decimal parts (the 4 in 34.517), place-value chart and partitioning",
+   "build": [
+    "dec_pv_within1"
+   ],
+   "pre": [
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y6.B8.S1 Place value within 1 (previous step, partial)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W05/W06/W08)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line / Y5.B7.S1 decimals to 2 dp (prior learning wk W05/W06)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (prior learning wk W06)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W06)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [
+    "thousandths_pv"
+   ],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "why": "expanded form of the whole-number part"
+    },
+    {
+     "key": "decimals:round_decimals",
+     "why": "round to a place (next step)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "digit shifts"
+    }
+   ],
+   "note": "The previous lane tagged no skill here; compare and order work on the same numbers, so they are honest partials, not direct."
+  },
+  "Y6.B8.S3": {
+   "title": "Round decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:round_decimals",
+     "missing": "rounds to the nearest tenth or hundredth with a number line; no rounding to the nearest whole number"
+    },
+    {
+     "key": "decimals:round_thousandths",
+     "missing": "numbers within 1 to the nearest tenth or hundredth only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "rounding decimals to the nearest whole number (as well as to 1 and 2 dp)",
+   "build": [
+    "round_whole"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:round_sort_tenths",
+     "why": "Y5.B7.S11 Round to 1 decimal place (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "Y5.B1.S12 rounding (prior learning wk W06)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line / Y5.B7.S1 decimals to 2 dp (prior learning wk W05/W06)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y6.B8.S2 Place value (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:round_sort_hundredths",
+     "why": "5.NBT.A.4 sort by rounding to hundredths"
+    },
+    {
+     "key": "number_sense:rounding_visual",
+     "why": "rounding on a line, whole numbers"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "estimating sums by rounding"
+    }
+   ],
+   "note": "Y4.B9.S7 Round to the nearest whole number is in this week's prior learning and also has no skill; round_whole closes both."
+  },
+  "Y6.B8.S4": {
+   "title": "Add and subtract decimals",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:add_decimal",
+     "missing": "both addends always have the same number of decimal places (3.42 + 5.17); never 3.4 + 2.15 or 7 + 2.36"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "missing": "same number of places in both numbers; never 5 − 2.36 or 4.2 − 1.75 where a zero must be written"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding and subtracting decimals with different numbers of decimal places, including whole numbers (placeholder zeros), which is the point of the Y6 lesson",
+   "build": [
+    "dec_unequal_places"
+   ],
+   "pre": [
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S6 Add decimals with different numbers of decimal places (prior learning wk W06)"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "Y5.B12.S7 Subtract decimals with different numbers of decimal places (prior learning wk W06)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y6.B8.S2 place value lines up the digits"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line / Y5.B7.S1 decimals to 2 dp (prior learning wk W05/W06)"
+    }
+   ],
+   "preBuild": [
+    "dec_known_facts"
+   ],
+   "related": [
+    {
+     "key": "decimals:round_decimals",
+     "why": "estimate first"
+    },
+    {
+     "key": "measurement:money",
+     "why": "money is two-place decimal addition"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "the next operation"
+    }
+   ],
+   "note": "Same-places items make the column automatic; the misconception WRM targets (lining up the last digits) never arises, so it stays partial."
+  },
+  "Y6.B8.S5": {
+   "title": "Multiply by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W07/W08)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 / Y4.B5.S3-S4 Multiply by 10 and 100 (prior learning wk W07)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W07, count in 10s)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 / S3 Multiply up to 4 digits (prior learning wk W07/W08)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y6.B8.S1-S2 place value of decimals"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:mult_decimal",
+     "why": "decimal × integer, the step after"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "metric conversion uses × 10, 100, 1,000"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "value of a digit"
+    }
+   ],
+   "note": "Full with op \"×\" and \"Decimals (grade 5)\" on; the shift chart is the WRM place-value-chart model."
+  },
+  "Y6.B8.S6": {
+   "title": "Divide by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "decimals": true
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y6.B8.S5 Multiply by 10, 100 and 1,000 (previous step) / Y5.B3.S9 (prior learning wk W08)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W08)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 / Y4.B8.S8 tenths and hundredths as decimals (prior learning wk W08)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S5 Divide a 1-digit number by 10 (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:div_decimal",
+     "why": "decimal ÷ integer (Y6.B8.S8)"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "to the larger unit is ÷ 10, 100, 1,000"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "0.07 as 7/100"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B8.S7": {
+   "title": "Multiply decimals by integers",
+   "direct": [
+    {
+     "key": "decimals:mult_decimal",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y6.B8.S5 Multiply by 10, 100 and 1,000"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 / S3 Multiply up to 4 digits (prior learning wk W07/W08)"
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "Y5.B5.S3 Multiply 2-digit by 2-digit (prior learning wk W08)"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "repeated addition of a decimal"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "decimal place value"
+    }
+   ],
+   "preBuild": [
+    "dec_missing"
+   ],
+   "related": [
+    {
+     "key": "decimals:div_decimal",
+     "why": "the inverse"
+    },
+    {
+     "key": "measurement:money",
+     "why": "money × integer"
+    },
+    {
+     "key": "fraction_operations:mult_frac_whole",
+     "why": "the same structure with fractions"
+    }
+   ],
+   "note": "mult_decimal deals a 1- or 2-dp decimal × a 1-digit integer, which is the WRM step. The proposal mult_dec_dec (decimal × decimal, 6.NS.B.3) that names this step is Grade 6 work and does not belong to it."
+  },
+  "Y6.B8.S8": {
+   "title": "Divide decimals by integers",
+   "direct": [
+    {
+     "key": "decimals:div_decimal",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y6.B8.S6 Divide by 10, 100 and 1,000 (previous)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y5.B5.S7 Short division (prior learning wk W08)"
+    },
+    {
+     "key": "division:div_zero_in_quotient",
+     "why": "Y5.B5.S7 Short division with a zero in the quotient (prior learning wk W08)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B8.S2 / Y4.B8.S8 tenths and hundredths as decimals (prior learning wk W08)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W08)"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "Y6.B8.S7 Multiply decimals by integers (inverse)"
+    }
+   ],
+   "preBuild": [
+    "dec_missing"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:frac_as_division",
+     "why": "division that gives a decimal (3 ÷ 4)"
+    },
+    {
+     "key": "division:remainder_interpret",
+     "why": "what a remainder means"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "money shared out"
+    }
+   ],
+   "note": "Full only with \"Which division\" = \"A decimal ÷ a whole number\"; the default mixes in whole ÷ decimal and decimal ÷ decimal, which are Grade 6."
+  },
+  "Y6.B8.S9": {
+   "title": "Multiply and divide decimals in context",
+   "direct": [],
+   "partial": [
+    {
+     "key": "decimals:mult_decimal",
+     "missing": "bare calculations only, no context"
+    },
+    {
+     "key": "decimals:div_decimal",
+     "missing": "bare calculations only, no context"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "multiplying and dividing decimals by integers in context (money, measures), choosing the operation from the story",
+   "build": [
+    "dec_context"
+   ],
+   "pre": [
+    {
+     "key": "decimals:mult_decimal",
+     "why": "Y6.B8.S7 Multiply decimals by integers"
+    },
+    {
+     "key": "decimals:div_decimal",
+     "why": "Y6.B8.S8 Divide decimals by integers"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "choosing × or ÷ in a story"
+    },
+    {
+     "key": "measurement:money",
+     "why": "money calculations"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y6.B8.S5-S6"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "measures in stories"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "multi-step stories"
+    },
+    {
+     "key": "conversions:unit_rate_intro",
+     "why": "price of one"
+    }
+   ],
+   "note": "The week's prior-learning slot is the Base Ten test, so pre-skills come from the block."
   },
   "Y6.B10.S1": {
    "title": "Shapes - same area",
@@ -5367,6 +5884,93 @@
    "why": "Compare skills convert to a common denominator; none teaches the same-numerator strategy (3/5 > 3/7) or a common numerator.",
    "reused": true
   },
+  "dec_context": {
+   "kind": "option",
+   "skill": "decimals:mult_decimal",
+   "name": "Multiply and Divide Decimals in Context (option)",
+   "teaches": "word problems multiplying and dividing decimals by integers (money, measures)",
+   "representation": "a word-problem mode on mult_decimal and div_decimal",
+   "family": "decimals",
+   "option": "context",
+   "steps": [
+    "Y6.B8.S9"
+   ],
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "why": "no decimal × / ÷ skill has a context mode",
+   "reused": true
+  },
+  "dec_known_facts": {
+   "kind": "new",
+   "skill": "decimals:decimal_known_facts",
+   "name": "Decimals from Known Facts",
+   "teaches": "adding and subtracting decimals within 1 using known facts (3 + 4 = 7 so 0.3 + 0.4 = 0.7), complements to 1 and efficient strategies",
+   "representation": "a fact and its decimal twin; write the answer; option: complements to 1",
+   "family": "decimals",
+   "steps": [
+    "Y6.B8.S4"
+   ],
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "why": "Y5 decimal fact strategies are the pre-skill of written decimal + and −",
+   "reused": true
+  },
+  "dec_missing": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "name": "Multiply and Divide Decimals: Missing Values (option)",
+   "teaches": "finding the missing number or the missing power of 10 (3.4 × __ = 340)",
+   "representation": "an \"unknown\" option on place_value_10x",
+   "family": "placevalue",
+   "option": "missing number",
+   "steps": [
+    "Y6.B8.S7",
+    "Y6.B8.S8"
+   ],
+   "ccss": [
+    "5.NBT.A.2"
+   ],
+   "why": "Y5.B12.S12 Multiply and divide decimals, missing values (prior learning wk W07/W08) has no skill",
+   "reused": true
+  },
+  "dec_pv_within1": {
+   "kind": "option",
+   "skill": "decimals:decimal_place_value",
+   "name": "Decimal Place Value (option)",
+   "teaches": "the value of each digit in decimals within 1 and in numbers with integer and decimal parts",
+   "representation": "the decimal_pv proposal with thousandths and integer parts",
+   "family": "decimals",
+   "option": "within 1 and integers",
+   "steps": [
+    "Y6.B8.S1",
+    "Y6.B8.S2"
+   ],
+   "ccss": [
+    "5.NBT.A.1",
+    "5.NBT.A.3"
+   ],
+   "why": "no skill asks the value of a digit in a decimal",
+   "reused": true
+  },
+  "dec_unequal_places": {
+   "kind": "option",
+   "skill": "decimals:add_decimal",
+   "name": "Decimals With Different Numbers of Places (option)",
+   "teaches": "adding and subtracting decimals with different numbers of decimal places and with whole numbers (3.4 + 2.15; 7 − 2.36), writing placeholder zeros",
+   "representation": "the column (stack) cell with the decimal-point track; the shorter number is set in by the pupil, empty boxes show where a placeholder 0 goes; support fades from \"boxes shown\" to a blank grid",
+   "family": "decimals",
+   "steps": [
+    "Y6.B8.S4"
+   ],
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "why": "both decimal column skills always deal equal numbers of places, so the alignment misconception is never met",
+   "reused": false,
+   "option": "places \"different\" (1 dp with 2 dp, whole with decimal), also on sub_decimal"
+  },
   "div_factors": {
    "kind": "new",
    "skill": "division:divide_using_factors",
@@ -6052,6 +6656,23 @@
    "reused": false,
    "option": "identify_angles offers right, acute, obtuse and straight but not reflex, which Y6 classifies."
   },
+  "round_whole": {
+   "kind": "option",
+   "skill": "decimals:round_decimals",
+   "name": "Round Decimals to the Nearest Whole (option)",
+   "teaches": "rounding a 1-dp or 2-dp decimal to the nearest whole number on a number line",
+   "representation": "a \"nearest whole\" target option with a number-line support",
+   "family": "decimals",
+   "option": "nearest whole",
+   "steps": [
+    "Y6.B8.S3"
+   ],
+   "ccss": [
+    "5.NBT.A.4"
+   ],
+   "why": "no skill rounds a decimal to the nearest whole number",
+   "reused": true
+  },
   "same_area": {
    "kind": "new",
    "skill": "area_perimeter:same_area_different_perimeter",
@@ -6103,6 +6724,24 @@
     "4.OA.B.4"
    ],
    "why": "exponents_simple evaluates 5² but never shows squares as arrays or cubes as cubes, nor asks \"is it a square number?\".",
+   "reused": true
+  },
+  "thousandths_pv": {
+   "kind": "option",
+   "skill": "decimals:decimal_place_value",
+   "name": "Thousandths (option)",
+   "teaches": "thousandths as fractions and decimals and on a place-value chart",
+   "representation": "the decimal_pv proposal extended to 3 dp",
+   "family": "decimals",
+   "option": "thousandths",
+   "steps": [
+    "Y6.B8.S1",
+    "Y6.B8.S2"
+   ],
+   "ccss": [
+    "5.NBT.A.3"
+   ],
+   "why": "Y5.B7.S7 Thousandths on a place value chart (prior learning) has no skill",
    "reused": true
   },
   "translate_grid": {
@@ -6619,6 +7258,48 @@
    "step": "Y6.B7.S9",
    "action": "add",
    "why": "partial cover: pairs that multiply to n"
+  },
+  {
+   "key": "decimals:round_decimals",
+   "step": "Y6.B8.S3",
+   "action": "partial",
+   "why": "no nearest whole number"
+  },
+  {
+   "key": "decimals:round_thousandths",
+   "step": "Y6.B8.S3",
+   "action": "partial",
+   "why": "numbers within 1, tenth or hundredth only"
+  },
+  {
+   "key": "decimals:add_decimal",
+   "step": "Y6.B8.S4",
+   "action": "partial",
+   "why": "equal numbers of decimal places only"
+  },
+  {
+   "key": "decimals:sub_decimal",
+   "step": "Y6.B8.S4",
+   "action": "partial",
+   "why": "equal numbers of decimal places only"
+  },
+  {
+   "key": "decimals:compare_thousandths",
+   "step": "Y6.B8.S2",
+   "action": "add",
+   "why": "partial cover, as on Y6.B8.S1"
+  },
+  {
+   "key": "decimals:mult_decimal",
+   "step": "Y6.B8.S9",
+   "action": "add",
+   "why": "partial cover: no context"
+  },
+  {
+   "key": "decimals:div_decimal",
+   "step": "Y6.B8.S9",
+   "action": "add",
+   "why": "partial cover: no context"
   }
  ]
 }
