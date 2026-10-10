@@ -7101,6 +7101,218 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B14.S1": {
+   "title": "Before and after",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "before and after; sequencing events",
+   "build": [
+    "day_order"
+   ],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W35)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "same CCSS 1.MD.B.3 in Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "same CCSS 1.MD.B.3 in Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B14.S2": {
+   "title": "Days of the week",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "days of the week in order",
+   "build": [
+    "time_talk"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "same block: Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "same block: Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B14.S3": {
+   "title": "Months of the year",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "months of the year in order",
+   "build": [
+    "time_talk"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (prior learning wk W28)"
+    }
+   ],
+   "preBuild": [
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "same block: Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "same block: Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B14.S4": {
+   "title": "Hours, minutes and seconds",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "choosing hours, minutes or seconds for an activity",
+   "build": [
+    "time_units"
+   ],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "time_talk",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:clock_parts",
+     "why": "parts of a clock"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "next step: Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "same CCSS 1.MD.B.3 in Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B14.S5": {
+   "title": "Tell the time to the hour",
+   "direct": [
+    {
+     "key": "measurement:time_hour",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "time_talk",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:clock_parts",
+     "why": "parts of a clock"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "next step: Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B14.S6": {
+   "title": "Tell the time to the half hour",
+   "direct": [
+    {
+     "key": "measurement:time_half_hour",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "same block: Y1.B14.S5 Tell the time to the hour"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -7664,6 +7876,53 @@
    ],
    "ccss": [
     "2.MD.C.8"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "day_order": {
+   "kind": "new",
+   "skill": "measurement:order_events",
+   "name": "First, Next, Then",
+   "teaches": "sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then)",
+   "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
+   "family": "measurement",
+   "steps": [
+    "Y1.B14.S1"
+   ],
+   "ccss": [
+    "1.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "time_talk": {
+   "kind": "new",
+   "skill": "measurement:time_words",
+   "name": "Time Words",
+   "teaches": "the language of time (today, yesterday, tomorrow, days of the week, months, seasons, before, after)",
+   "representation": "calendar strip or picture timeline; circle or write the word from a bank",
+   "family": "measurement",
+   "steps": [
+    "Y1.B14.S2",
+    "Y1.B14.S3"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "time_units": {
+   "kind": "new",
+   "skill": "measurement:hours_minutes_seconds",
+   "name": "Hours, Minutes or Seconds?",
+   "teaches": "a sense of time units: which activities take seconds, minutes or hours",
+   "representation": "activity pictures with a unit word bank; option: longer/shorter",
+   "family": "measurement",
+   "steps": [
+    "Y1.B14.S4"
+   ],
+   "ccss": [
+    "1.MD.B.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
