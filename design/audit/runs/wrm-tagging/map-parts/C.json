@@ -13,8 +13,8 @@
       "proposal": "map_symmetry_compare",
       "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare; re-check --n 12, checked: symmetry (count one shape / click-all / click lines), place_symmetry_lines (draw) — none compare two shapes",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.G.A.3 is in MAP's blueprint"
       },
       "closes": "Adds the two-shape compare (count both, say which has more); live symmetry only counts one shape."
     },
@@ -30,8 +30,8 @@
       "proposal": "map_symmetry_check_line",
       "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.G.A.3 is in MAP's blueprint"
       },
       "closes": "Adds judging a given line (yes/no, then fix it); live skills only have the pupil draw or click lines."
     },
@@ -63,8 +63,8 @@
       ],
       "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade; no residual build: net_identify already deals 'which net folds into', shapes_3d_props (property select-all) stays on rows 64/89 only",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 6.G.A.4 is in MAP's blueprint"
       }
     },
     {
@@ -75,10 +75,10 @@
       "status": "missing",
       "skills": [],
       "proposal": "angle_rules",
-      "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle",
+      "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle; CCSS: the triangle angle sum is 8.G.A.5, not 7.G.B.5; the reused angle_rules source text (WRM build list) is not ours to change",
       "evidence": {
         "url": null,
-        "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
+        "says": "not found in public NWEA material; kept because 8.G.A.5 (triangle angle sum; 4.MD.C.7 for the additive part) is in MAP's blueprint"
       },
       "closes": "angle_rules' 'angles in a triangle (180°)' clause adds finding the missing angle; no live skill does."
     },
@@ -95,8 +95,8 @@
       "proposal": "volume_cubes",
       "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form)",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 5.MD.C.4 is in MAP's blueprint"
       },
       "closes": "volume_cubes adds counting unit cubes in a drawn solid; volume only multiplies edges."
     },
@@ -188,8 +188,8 @@
       ],
       "note": "order 3 clocks by writing 1,2,3; time-line duration \"__ h __ min\"; kit cells",
       "evidence": {
-        "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.A.1 is in MAP's blueprint"
       }
     },
     {
@@ -299,15 +299,15 @@
       "strand": "Measurement",
       "ritBand": "201-215",
       "source": "6.4",
-      "status": "missing",
+      "status": "partial",
       "skills": [
         "area_perimeter:volume"
       ],
       "proposal": "volume_cubes",
-      "note": "no cube-drawing volume item",
+      "note": "no cube-drawing volume item; partial like the 'Volume by unit cubes' row: volume deals cubic units from edges, not from counting a cube model",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 5.MD.C.4 is in MAP's blueprint"
       },
       "closes": "volume_cubes adds writing the number of unit cubes for a drawn model."
     },
@@ -369,8 +369,8 @@
       "proposal": "compare_lengths",
       "note": "no difference item; checked: compare_objects (--n 12 'which is longer' A/B only), order_objects_length — no difference",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.A.4 is in MAP's blueprint"
       },
       "closes": "compare_lengths adds 'how much longer' and comparing in mixed units; compare_objects only picks longer."
     },
@@ -401,8 +401,8 @@
       "proposal": "ruler_difference",
       "note": "none",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.A.4 is in MAP's blueprint"
       },
       "closes": "ruler_difference adds two objects on one ruler and the difference."
     },
@@ -422,22 +422,6 @@
       }
     },
     {
-      "task": "Heavier / lighter (K)",
-      "strand": "Measurement",
-      "ritBand": "141-160",
-      "source": "strand-walk",
-      "status": "exists-regrade",
-      "skills": [
-        "measurement:heavier_lighter_visual"
-      ],
-      "proposal": "mass_scales",
-      "note": "MC with emoji answers (ans=\"📕\"), not B&W; regrade",
-      "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 M&D strand: measurement of masses of objects (Measurement and Data summary)"
-      }
-    },
-    {
       "task": "Read a scale or measuring jug (g, kg, mL, L)",
       "strand": "Measurement",
       "ritBand": "181-200",
@@ -449,8 +433,8 @@
       "proposal": "mass_scales",
       "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading)",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.A.2 is in MAP's blueprint"
       },
       "closes": "mass_scales adds reading scales with steps 2, 5, 10, 100 and kg scales (live kg reading has the answer-0 bug)."
     },
@@ -513,8 +497,8 @@
       "proposal": "conversion_table",
       "note": "none; checked: capacity, unit_conversions, ratio_tables — no conversion-table item",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.MD.A.1 is in MAP's blueprint"
       },
       "closes": "conversion_table adds completing and using a two-column conversion table."
     },
@@ -530,8 +514,8 @@
       ],
       "note": "kit coin cell, number entry",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.C.8 is in MAP's blueprint"
       }
     },
     {
@@ -579,8 +563,8 @@
       "proposal": "money_2step",
       "note": "none",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.C.8 is in MAP's blueprint"
       },
       "closes": "money_2step adds buy-two-items-then-change problems."
     },
@@ -611,8 +595,8 @@
       ],
       "note": "a.m./p.m. choice; units choice still in WRM time_units",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.C.7 is in MAP's blueprint"
       }
     },
     {
@@ -629,7 +613,7 @@
       "note": "time-line cell, \"__ h __ min\" production",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+        "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; page returned 503)"
       }
     },
     {
@@ -645,7 +629,7 @@
       "note": "time line only, no story context",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+        "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; page returned 503)"
       },
       "closes": "elapsed_stories adds the story form with a time line; elapsed_mixed is bare times."
     },
@@ -709,8 +693,8 @@
       ],
       "note": "L/T/U total area and perimeter, number entry",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.C.7d is in MAP's blueprint"
       }
     },
     {
@@ -726,8 +710,8 @@
       "proposal": "missing_lengths",
       "note": "--n 12: perimeter 4/12 and area 4/12 give a missing side (rectangles only); residual = missing sides of rectilinear/polygon shapes (missing_lengths)",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.D.8 is in MAP's blueprint"
       },
       "closes": "missing_lengths adds missing sides of rectilinear shapes; live covers rectangles only."
     },
@@ -849,8 +833,8 @@
       "proposal": "defining_attributes",
       "note": "none; re-check --n 12, checked: shape_attributes (count sides, click 4 right angles), compose_from_attributes, classify_quads — no defining vs non-defining (colour/size/turn)",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 1.G.A.1 is in MAP's blueprint"
       },
       "closes": "defining_attributes adds sorting defining vs non-defining attributes."
     },
@@ -900,8 +884,8 @@
       "proposal": "polygons",
       "note": "sides/vertices counts only; re-check --n 12, checked: shape_attributes (sides by name), shape_corners_count, classify_quads — no regular/irregular",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 5.G.B.4 is in MAP's blueprint"
       },
       "closes": "polygons adds regular vs irregular and naming polygons by sides."
     },
@@ -962,8 +946,8 @@
       "proposal": "protractor_read",
       "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor",
       "evidence": {
-        "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
-        "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.MD.C.6 is in MAP's blueprint"
       }
     },
     {
@@ -976,8 +960,8 @@
       "proposal": "draw_angles",
       "note": "none; re-check --n 12, checked: measure_angles (read only), identify_angles — no draw",
       "evidence": {
-        "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
-        "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.MD.C.6 is in MAP's blueprint"
       },
       "closes": "draw_angles adds drawing an angle of a given size."
     },
@@ -992,8 +976,8 @@
       ],
       "note": "missing part number entry; note sampled \"One part is 292°\" of 360 — odd but valid",
       "evidence": {
-        "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
-        "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.MD.C.7 is in MAP's blueprint"
       }
     },
     {
@@ -1007,8 +991,8 @@
       ],
       "note": "MC + click all equilateral",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 Geometry: 'All rectangles are parallelograms'; 'choose all the quadrilaterals'; 'choose all terms'"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.G.A.2 is in MAP's blueprint"
       }
     },
     {
@@ -1120,8 +1104,8 @@
       "proposal": "hv_lines",
       "note": "none; re-check --n 12, checked: identify_lines, coordinate_graph, coord_distance_q1 — no horizontal/vertical line items",
       "evidence": {
-        "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
-        "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.G.A.1 is in MAP's blueprint"
       },
       "closes": "hv_lines adds horizontal/vertical lines in shapes and on a grid."
     },
@@ -1158,7 +1142,7 @@
       }
     },
     {
-      "task": "Read a picture graph (key = 1)",
+      "task": "Read a picture graph (key = 1): how many, who has the most",
       "strand": "Data & graphing",
       "ritBand": "161-180",
       "source": "strand-walk",
@@ -1167,7 +1151,7 @@
         "measurement:pictograph_intro",
         "graphs:pictograph"
       ],
-      "note": "kit pictograph cell; how many / how many more",
+      "note": "kit pictograph cell; how many / how many more; merged the duplicate 'who has the most' row (pictograph and pictograph_intro ask it)",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
@@ -1185,8 +1169,8 @@
       "proposal": "pictogram_scale",
       "note": "build uses each picture = 1; re-check --n 12, checked: build_pictograph — 12/12 key = 1; pictograph read only",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.B.3 is in MAP's blueprint"
       },
       "closes": "pictogram_scale adds keys of 2, 5, 10 and half pictures to build_pictograph."
     },
@@ -1233,8 +1217,8 @@
       "proposal": "bar_graph_scale",
       "note": "scale 1 only; re-check --n 12, checked: build_bar_graph — 12/12 values ≤ 10, unit scale",
       "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
+        "url": null,
+        "says": "not found in public NWEA material; kept because 3.MD.B.3 is in MAP's blueprint"
       },
       "closes": "bar_graph_scale adds scales of 2, 5, 10 to build_bar_graph."
     },
@@ -1250,7 +1234,7 @@
       "note": "kit tally cell; how many more, most",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
+        "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary; page returned 503)"
       }
     },
     {
@@ -1266,7 +1250,7 @@
       "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
+        "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary; page returned 503)"
       },
       "closes": "Adds making the tally from raw data; tally_chart only reads one."
     },
@@ -1281,7 +1265,7 @@
       "note": "none (tables only inside other items); re-check --n 12, checked: tally_chart, function_table_*, ratio_tables — no data table read",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
-        "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
+        "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary; page returned 503)"
       },
       "closes": "table_data adds reading and completing data tables."
     },
@@ -1362,7 +1346,7 @@
         "measurement:heavier_lighter_visual"
       ],
       "proposal": "map_heavier_lighter_bw",
-      "note": "--dist 200: 200/200 answers are emoji (🍃 40, 🚛 37 ...) - colour glyphs, no B&W line art, no balance scale",
+      "note": "--dist 200: 200/200 answers are emoji (🍃 40, 🚛 37 ...) - colour glyphs, no B&W line art, no balance scale; merged the duplicate 'Heavier / lighter (K)' row here (mass_scales does not touch K heavier/lighter)",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D strand: 'measurement and estimation of ... masses of objects'"
@@ -1407,15 +1391,17 @@
       "strand": "Geometry",
       "ritBand": "191-200",
       "source": "strand-walk",
-      "status": "exists-ok",
+      "status": "partial",
       "skills": [
         "angles_lines:symmetry"
       ],
-      "note": "--dist 200: 57/200 'Click ALL shapes that have a line of symmetry' multi-select",
+      "note": "--dist 200: 57/200 'Click ALL shapes that have a line of symmetry' multi-select; MAP item judges a drawn line on each figure; symmetry's 'Click ALL shapes that have a line of symmetry' is a different question",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'Some figures are shown. Choose all the figures that show a line of symmetry'"
-      }
+      },
+      "proposal": "map_symmetry_check_line",
+      "closes": "map_symmetry_check_line's 'sort' form adds judging DRAWN lines across several figures (tick every correct one); live symmetry asks which shapes HAVE a line."
     },
     {
       "task": "Sort shapes into a two-attribute chart (symmetry / acute angle / both)",
@@ -1485,22 +1471,6 @@
       "closes": "map_money_build's 'show the change' form adds dragging the change from $1."
     },
     {
-      "task": "Read a picture graph: who has the most (key = 1)",
-      "strand": "Data & graphing",
-      "ritBand": "171-180",
-      "source": "strand-walk",
-      "status": "exists-ok",
-      "skills": [
-        "graphs:pictograph",
-        "measurement:pictograph_intro"
-      ],
-      "note": "--dist 200 pictograph: totals 'in all' 36, 'fewest' 18+, most/which-category items present; key 2-25 scaled",
-      "evidence": {
-        "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-        "says": "2-5 M&D: 'Who has the most library books?' picture graph, key = 1 book"
-      }
-    },
-    {
       "task": "Total from a fraction line plot (sum of lengths)",
       "strand": "Data & graphing",
       "ritBand": "211-220",
@@ -1560,13 +1530,13 @@
         "measurement:money_change",
         "area_perimeter:perimeter"
       ],
-      "proposal": "map_measure_story_equation",
+      "proposal": "map_story_equation_addsub",
       "note": "money_change and perimeter trim stories carry an operation; no length/mass add-subtract stories (checked unit_conversion_word, capacity, mass_volume_liquid --n 12: convert/read only); story→equation building itself lives on algebra:build_expr_* (parts A/B)",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume' word problems"
       },
-      "closes": "Adds writing the equation for length, mass, volume and money stories (build_expr pool 'measurement')."
+      "closes": "map_story_equation_addsub's 'context: measurement' value adds writing the equation for length, mass, capacity and money stories (+ −); live build_expr_addsub uses number stories only."
     },
     {
       "task": "Match: coordinate grid ↔ ordered pair",
@@ -1602,6 +1572,23 @@
         "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"
       },
       "closes": "table_data's MAP clause adds completing the graph from a two-column table."
+    },
+    {
+      "task": "Composite volume: two rectangular prisms added (5.MD.C.5c)",
+      "strand": "Measurement",
+      "ritBand": "211-230",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "area_perimeter:volume_composite"
+      ],
+      "proposal": "map_volume_two_prisms",
+      "note": "--n 8 re-sample: 8/8 single prism or cube, 0 composite (critic --dist 200: 143 prisms, 57 cubes). BUG: volume_composite ('Composite 3D Volume') does not deal what its name says",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 5.MD.C.5c is in MAP's blueprint"
+      },
+      "closes": "Adds solids made of two prisms: find each volume and add; no live item is composite."
     }
   ],
   "proposals": {
@@ -1909,7 +1896,7 @@
     "map_shape_partition_pick": {
       "kind": "option",
       "skill": "shapes_early:partition_shapes",
-      "option": "forms \"equal or not?\", \"cut it\" and \"choose all that show a fraction\": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth shaded",
+      "option": "forms \"equal or not?\", \"cut it\" and \"choose all that show a fraction\": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth / one-eighth shaded",
       "name": "Equal Parts of Shapes (option)",
       "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
       "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
@@ -1917,14 +1904,15 @@
       "ccss": [
         "1.G.A.3",
         "2.G.A.3",
-        "3.G.A.2"
+        "3.G.A.2",
+        "3.NF.A.1"
       ],
       "map": {
         "strand": "Geometry",
         "ritBand": "161-180",
         "taskType": "multi-select figures"
       },
-      "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares",
+      "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares; owns the choose-ALL-shaded form for unit fractions 1/2, 1/3, 1/4, 1/8 of shapes (part B's fractions:identify option keeps only non-unit fractions and sets)",
       "reused": false,
       "problemTypes": [
         "equal or not — shapes cut into parts — tick those in equal halves/quarters / select all",
@@ -1935,7 +1923,8 @@
         "L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades)",
         "L2: quarters (fourths)",
         "L3: cut it yourself (halves, quarters)",
-        "L4: thirds and choose ALL showing a named fraction"
+        "L4: thirds; choose ALL shapes showing a named unit fraction (1/2, 1/3, 1/4)",
+        "L5: eighths (cut and choose all showing 1/8)"
       ],
       "example": {
         "item": "Tick every shape cut into equal quarters.",
@@ -2675,43 +2664,42 @@
       "why": "WRM turns_angles already planned (wrm.js); standards-audit gives 4.MD.C.5a/b a gap verdict",
       "reused": true
     },
-    "map_measure_story_equation": {
+    "map_volume_two_prisms": {
       "kind": "option",
-      "skill": "algebra:build_expr_addsub",
-      "option": "pool \"measurement\": length, mass, liquid-volume and money stories; build the equation only (no solving)",
-      "name": "Measurement Story to Equation (option)",
-      "teaches": "choosing the operation for a measurement story and writing the equation with units (lengths, masses, volumes, money)",
-      "representation": "print: B&W boxed Andika cell, the story with a bar model under it, slots '__ ○ __ = __' with an operation bank; screen: build-expr (drag numbers and sign), never MC",
-      "family": "measurement",
+      "skill": "area_perimeter:volume_composite",
+      "option": "form \"two prisms\": an L- or step-shaped solid made of two rectangular prisms; find each volume and add",
+      "name": "Composite Volume: Two Prisms (option)",
+      "teaches": "volume is additive: split a solid made of two non-overlapping rectangular prisms, find each volume and add (5.MD.C.5c)",
+      "representation": "print: B&W boxed Andika cell, isometric line drawing of the solid with edge labels and a dashed split line, slots '__ × __ × __ = __', '__ × __ × __ = __', '__ + __ = __'; screen: number entry for each slot, never MC",
+      "family": "geometry",
       "ccss": [
-        "2.MD.B.5",
-        "3.MD.A.2",
-        "4.MD.A.2"
+        "5.MD.C.5c"
       ],
       "map": {
         "strand": "Measurement",
-        "ritBand": "181-200",
-        "taskType": "choose/write the equation for a story"
+        "ritBand": "211-230",
+        "taskType": "volume of a composite solid"
       },
-      "why": "build_expr_addsub builds equations from number stories only; MAP pairs measurement stories with their operation",
+      "why": "volume_composite's name promises composite solids but 0/200 items are composite (143 prisms, 57 cubes) — this is the build that makes the skill match its name",
       "reused": false,
       "problemTypes": [
-        "build — story — write the equation",
-        "which operation — story — circle + or −",
-        "both — write the equation then the answer with its unit"
+        "split given — dashed split line drawn — write both volumes and the total",
+        "split yourself — no line — draw the split, then compute",
+        "missing edge — the total and one prism given — find the missing edge"
       ],
       "levels": [
-        "L1: length + and − within 100 (structural: bar model stays)",
-        "L2: mass and liquid volume",
-        "L3: money and two-step (bar model fades)"
+        "L1: split line drawn, all edges labelled (structural: labelled drawing and three slot rows stay; hint: split line)",
+        "L2: split line faded; pupil chooses the split",
+        "L3: one edge must be worked out from two others (subtract lengths)"
       ],
       "example": {
-        "item": "A ribbon is 45 cm. Ana cuts off 18 cm. Write the equation for the length left.",
-        "answer": "45 − 18 = 27 (27 cm)"
+        "item": "A step shape is a 6 × 2 × 3 cm block with a 2 × 2 × 3 cm block on top. Find the total volume.",
+        "answer": "36 + 12 = 48 cm³"
       },
       "misconceptions": [
-        "adds whenever the story has two numbers",
-        "drops or mixes units (45 cm − 18 = 27 m)"
+        "multiplies the outer edges as if the solid were one box",
+        "counts the shared face twice or uses an edge in both prisms",
+        "adds edge lengths instead of volumes"
       ]
     }
   }

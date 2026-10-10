@@ -13,8 +13,8 @@
    "proposal": "map_ratio_picture",
    "note": "Sampled 4 each: ratio_intro/equiv_ratios are text-only (\"5 boys and 3 girls\"), no picture form. Still partial. Re-sampled ratio_intro n=20: 0/20 from a picture; all text stories with a:b entry.",
    "evidence": {
-    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-    "says": "NWEA RIT Reference Chart sample item: 6+ chart 201-210 asks unit price from a priced bag (rate from a quantity)"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 6.RP.A.1 (ratio language from a picture) is in MAP's blueprint"
    },
    "closes": "map_ratio_picture adds writing a ratio (part:part, part:whole) from a picture of objects; ratio_intro deals ratios from text only."
   },
@@ -165,15 +165,17 @@
    "strand": "Multiplication & division",
    "ritBand": "171-190",
    "source": "strand-walk",
-   "status": "missing",
-   "skills": [],
+   "status": "partial",
+   "skills": [
+    "division:share_into_groups"
+   ],
    "proposal": "share_group",
-   "note": "No live skill deals K-2 sharing counters into groups (share_into_groups starts at quotitive ÷). Reused share_group (WRM: counters by plates/rings, draw shared or grouped, how many each) matches. Split vs map_share_among: share_group is K-2 (no ÷ sign, counters by plates/rings); map_share_among is the Grade 3 ÷ option on share_into_groups.",
+   "note": "Sampled share_into_groups n=12: \"There are 12 counters. Make groups of 4. How many groups?\" — K-2 grouping with counters, no ÷ sign, is dealt. 0/12 share one-by-one into a given number of plates. Split vs map_share_among: share_group is the K-2 sharing with no ÷ sign; map_share_among is the Grade 3 ÷ option.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: uses manipulatives to divide a small set into equal groups; uses sharing for division"
    },
-   "closes": "share_group adds K-2 sharing and grouping with counters on plates/rings (no ÷ sign); no live skill deals it."
+   "closes": "share_group adds only sharing one-by-one into a given number of plates/rings (\"share 8 between 2 plates\"); grouping by size is already dealt by share_into_groups."
   },
   {
    "task": "Repeated addition <-> multiplication",
@@ -264,12 +266,12 @@
     "multiplication:mult_properties"
    ],
    "proposal": "map_mult_prop_grouping",
-   "note": "Sampled mult_properties n=12: forms order, breaking apart, ×1, ×0, number entry. 0/12 associative (three factors) or \"choose ALL equal products\". Residual = option map_mult_prop_grouping.",
+   "note": "Sampled mult_properties n=12: order, breaking apart, ×1, ×0, number entry; 0/12 choose-all. Split: the associative (three-factor) clause is closed by reused mult_three; map_mult_prop_grouping is only the choose-ALL response.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_OAT_190/230: zero property of multiplication (181-200); understanding of multiple properties (221-230)"
    },
-   "closes": "map_mult_prop_grouping adds the associative (three-factor grouping) form and choose ALL equal expressions; order, breaking apart, ×0, ×1 are live."
+   "closes": "map_mult_prop_grouping adds the choose-ALL-equal-expressions response; associative grouping is closed by mult_three (row \"Multiply three numbers / associative\")."
   },
   {
    "task": "Multiplication on a number line (hops)",
@@ -282,8 +284,8 @@
    ],
    "note": "hop-line cell, number entry.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 3.OA.A.1 / 2.OA.C.4 (equal jumps on a number line) is in MAP's blueprint"
    }
   },
   {
@@ -329,13 +331,13 @@
     "multiplication:mult_word_problems",
     "division:div_word_problems"
    ],
-   "proposal": "map_story_equation_match",
+   "proposal": "map_story_equation_multdiv",
    "note": "Sampled algebra:build_expr_multdiv n=12: story → pupil builds \"4 × 7 = 28\" / \"18 ÷ 9 = 2\" (build-expr), a production form stronger than MAP choose-one. Re-grade; the \"operation only, no solving\" form is part A's single proposal map_story_equation_match (not redefined here).",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: \"Which number sentence means 3 times as many as 12?\" choose the equation"
    },
-   "closes": "map_story_equation_match (part A) adds the \"write the equation only, no solving\" form for ×/÷ stories; build_expr_multdiv already builds and solves."
+   "closes": "map_story_equation_multdiv (part A, option on build_expr_multdiv) adds the \"write the equation only, no solving\" form for ×/÷ stories; build_expr_multdiv already builds and solves."
   },
   {
    "task": "Multiplicative comparison (times as many)",
@@ -562,7 +564,7 @@
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210: multiplies multiple 1-digit numbers, RIT 201-210"
    },
-   "closes": "mult_three adds products of three factors (choose the easy pair first); no live skill multiplies three numbers."
+   "closes": "mult_three adds products of three factors and the associative property (choose the easy pair first, (2 × 3) × 4 = 2 × (3 × 4)); no live skill multiplies three numbers."
   },
   {
    "task": "Estimate products and quotients",
@@ -631,8 +633,8 @@
    "proposal": "map_frac_unit_build",
    "note": "compose_whole builds 1 only; decompose is a grade 4 sum form.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
-    "says": "NWEA DesCartes continuum M2_NO_200: uses models to add and subtract fractions and connect the actions, RIT 191-200"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 3.NF.A.1 / 4.NF.B.3a (fraction as unit fractions) is in MAP's blueprint"
    },
    "closes": "map_frac_unit_build adds writing the unit-fraction sum from a model and shading from a sum; decompose_fractions has no model link."
   },
@@ -968,7 +970,7 @@
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
    },
-   "closes": "decimal_pv adds the value of a digit in tenths/hundredths/thousandths; placevalue skills stop at ones."
+   "closes": "decimal_pv (with its MAP clause) adds the value of a digit in tenths, hundredths and thousandths in a place-value chart; placevalue skills stop at ones."
   },
   {
    "task": "Decimal on a number line (place)",
@@ -1240,13 +1242,13 @@
     "multiplication:mult_word_problems",
     "division:div_word_problems"
    ],
-   "proposal": "map_story_equation_match",
+   "proposal": "map_story_equation_multdiv",
    "note": "Sampled algebra:build_expr_multdiv n=12: story → pupil builds \"4 × 7 = 28\" / \"18 ÷ 9 = 2\" (build-expr), a production form stronger than MAP choose-one. Re-grade; the \"operation only, no solving\" form is part A's single proposal map_story_equation_match (not redefined here).",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: choose the number sentence that matches a times-as-many statement"
    },
-   "closes": "map_story_equation_match (part A) adds the operation-only equation form for ×/÷ stories."
+   "closes": "map_story_equation_multdiv (part A, option on build_expr_multdiv) adds the \"write the equation only, no solving\" form for ×/÷ stories; build_expr_multdiv already builds and solves."
   },
   {
    "task": "Match: number line <-> multiplication (hops)",
@@ -1261,8 +1263,8 @@
    "proposal": "map_nl_hops_equation",
    "note": "Sampled nl_mult n=12: \"3 × 7 = ?\" with the hops drawn, number entry; 0/12 \"write the equation the hops show\". Residual = option map_nl_hops_equation on nl_mult.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 3.OA.A.1 (equal jumps on a number line) is in MAP's blueprint"
    },
    "closes": "map_nl_hops_equation adds writing the × equation from drawn hops and picking the matching line."
   },
@@ -1345,13 +1347,13 @@
     "fraction_operations:frac_mult_word",
     "algebra:build_expr_addsub"
    ],
-   "proposal": "map_story_equation_match",
+   "proposal": "map_story_equation_frac",
    "note": "Checked build_expr_addsub/multdiv n=12: whole numbers only; frac_word_problems/frac_mult_word n=12 solve, never write the equation. Residual (fraction pool) folded into part A's map_story_equation_match.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: solves 1-step real-world problems involving fractions with multiplication and division, RIT 211-220"
    },
-   "closes": "map_story_equation_match (part A) must add a FRACTION POOL (fraction +/−/× stories → equation only); build_expr_* are whole numbers today. Part A to add the pool."
+   "closes": "map_story_equation_frac (part A) adds fraction stories (+ − like denominators, fraction × whole) → equation; build_expr_* deal whole numbers only."
   },
   {
    "task": "Divide by a multiple of 10 (e.g. 360 ÷ 40, 3-digit ÷ tens)",
@@ -1415,15 +1417,15 @@
    "proposal": "mult_mixed_int",
    "note": "Checked mult_frac_whole n=12, mult_frac_frac, mult_scaling, frac_mult_word: 0/12 have a mixed-number factor (all a/b × n). Reused WRM mult_mixed_int.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
-    "says": "DesCartes NO_220: multiplies mixed numbers by whole numbers, RIT 211-220"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 5.NF.B.4 / 4.NF.B.4 (fraction and mixed number × whole) is in MAP's blueprint"
    },
    "closes": "mult_mixed_int adds a mixed-number factor to mult_frac_whole."
   },
   {
    "task": "Move cubes to make two groups equal (equalise)",
-   "strand": "Multiplication & division",
-   "ritBand": "161-180",
+   "strand": "Number & place value",
+   "ritBand": "141-150",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
@@ -1431,7 +1433,7 @@
    "note": "Checked comparing:compare_groups (more/fewer/same, no moving), multiplication:equal_or_unequal_groups (judge only), division:share_into_groups (quotitive): none ask to move objects so the groups are equal. Reused WRM equal_groups_early (making equal groups).",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-    "says": "K-2 sample item: move cubes to the circles so the groups are equal"
+    "says": "K-2 Number & Operations 141-150 sample: move cubes to the circles to make the groups equal"
    },
    "closes": "equal_groups_early's MAP clause (move objects so two groups are equal, drag on screen) closes it; no live skill moves objects."
   },
@@ -1445,13 +1447,13 @@
     "fractions:identify",
     "shapes_early:partition_shapes"
    ],
-   "proposal": "map_frac_choose_all_shaded",
+   "proposal": "map_shape_partition_pick",
    "note": "Sampled fractions:identify n=12: \"Which model shows 1/3?\" single choice A-D; partition_shapes names the fraction of one shape. 0/24 choose-all with distractors cut unequally. Option map_frac_choose_all_shaded.",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry sample: choose ALL the shapes that show one-third shaded"
    },
-   "closes": "map_frac_choose_all_shaded adds the choose-ALL response with unequal-part distractors; identify picks one model."
+   "closes": "map_shape_partition_pick (part C) adds the choose-ALL form for 1/2, 1/3, 1/4 of shapes with unequal-part distractors; fractions:identify picks one model."
   },
   {
    "task": "Match: picture <-> equation (fractions: model <-> 1/4 + 1/4 + 1/4 = 3/4)",
@@ -1466,10 +1468,40 @@
    "proposal": "map_frac_unit_build",
    "note": "Sampled decompose_fractions n=12: \"Write 3/4 as a sum of unit fractions\" + \"Click ALL ways to decompose 5/8\"; no model → equation or equation → shade-the-model pair. Closed with map_frac_unit_build (row \"Unit fractions / build a fraction\").",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
-    "says": "DesCartes NO_200: uses models to represent a fraction as a sum of unit fractions, RIT 191-210"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.NF.B.3b (decompose a fraction into a sum of unit fractions) is in MAP's blueprint"
    },
    "closes": "map_frac_unit_build problem types 1-2 add model → unit-fraction sum and sum → shaded model."
+  },
+  {
+   "task": "Decimal expanded form (3.472 = 3 + 4 × 1/10 + 7 × 1/100 + 2 × 1/1000)",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "map_decimal_expanded",
+   "note": "Checked placevalue:expand / combine / unit_form (bands 99-999,999, whole numbers only), decimals:* (compare, round, operations), conversions:d_to_f: 0 items write a decimal in expanded form.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "DesCartes M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
+   },
+   "closes": "map_decimal_expanded adds decimal expanded form (both directions) to placevalue:expand; it deals whole numbers only today."
+  },
+  {
+   "task": "Decimal word form ↔ numeral (four and twenty-six hundredths = 4.26)",
+   "strand": "Fractions & decimals",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "map_decimal_word_form",
+   "note": "Checked composing:number_word_form (whole numbers to 9,999), placevalue:number_word_names (whole, MC), decimals:*: 0 items read or write a decimal in words.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "DesCartes M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
+   },
+   "closes": "map_decimal_word_form adds decimals (tenths to thousandths) to number_word_form in both directions."
   }
  ],
  "proposals": {
@@ -1881,7 +1913,8 @@
     "taskType": "value of the digit, number entry"
    },
    "why": "MAP asks the value of a decimal digit; no decimal place-value skill exists",
-   "reused": true
+   "reused": true,
+   "mapClause": "value of a digit to thousandths: the 7 in 3.072 is 7 hundredths (0.07); chart extends to thousandths"
   },
   "div_frac_frac": {
    "kind": "new",
@@ -2105,7 +2138,8 @@
     "taskType": "number entry / drag"
    },
    "why": "No three-factor skill; WRM proposal reused.",
-   "reused": true
+   "reused": true,
+   "mapClause": "associative property with brackets: (2 × 3) × 4 = 2 × (3 × 4), fill the missing factor"
   },
   "map_div_tens": {
    "kind": "option",
@@ -2230,10 +2264,10 @@
   "map_mult_prop_grouping": {
    "kind": "option",
    "skill": "multiplication:mult_properties",
-   "option": "forms: add \"Grouping (2 × 3 × 4 = 2 × 12)\" and a \"choose ALL equal products\" response",
-   "name": "Multiplication Properties: Grouping and Choose All (option)",
-   "teaches": "Associative property with three factors, and recognising every expression equal to a product (commutative/associative/distributive)",
-   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three factors with bracket slots, or a list of 4-5 expressions; pupil writes the missing number or ticks every expression equal to the product. Screen: number boxes; click ALL equal expressions (multi-select)",
+   "option": "response: \"choose ALL equal products\" (order, breaking apart, ×1/×0 expressions mixed with distractors)",
+   "name": "Multiplication Properties: Choose All Equal (option)",
+   "teaches": "Recognise every expression equal to a given product using the properties the skill already teaches (order, breaking apart, ×1, ×0). Three-factor grouping is NOT here: reused mult_three owns it.",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a target product and 4-5 expressions, pupil ticks every equal one. Screen: click ALL (multi-select-check), production of the set",
    "family": "multiplication",
    "ccss": [
     "3.OA.B.5"
@@ -2241,29 +2275,29 @@
    "map": {
     "strand": "Multiplication & division",
     "ritBand": "191-230",
-    "taskType": "number entry; select all that apply"
+    "taskType": "select all that apply"
    },
-   "why": "mult_properties forms cover order, breaking apart, ×1, ×0 only; MAP asks associative and \"which are equal\". Real residual, not a re-grade.",
+   "why": "mult_properties asks for one missing number; MAP asks which expressions are equal. Associative/three factors is owned by mult_three (row \"Multiply three numbers\").",
    "reused": false,
    "problemTypes": [
-    "grouping — (2 × 3) × 4 = 2 × (___ × 4) — write 3",
-    "choose all — \"Tick every expression equal to 6 × 8\" (8 × 6, 6 × 4 + 6 × 4, 3 × 2 × 8, 6 + 8) — tick",
-    "easy pair — 5 × 7 × 2 = 7 × ___ — write 10"
+    "order — \"Tick every expression equal to 6 × 8\" (8 × 6, 6 + 8, 6 × 9) — tick / click all",
+    "breaking apart — \"equal to 7 × 6\" (7 × 5 + 7 × 1, 7 × 3 + 7 × 3, 7 + 6) — tick",
+    "×1 / ×0 — \"equal to 9\" (9 × 1, 9 × 0, 1 × 9) — tick"
    ],
    "levels": [
-    "L1: grouping with a bracket drawn round the first pair (hint, fades)",
-    "L2: grouping, no bracket hint",
-    "L3: make a ten (5 × 2) first",
-    "L4: choose ALL equal expressions mixing order, grouping, breaking apart"
+    "L1: one property per item, 3 expressions, property named above (hint, fades)",
+    "L2: one property, 4 expressions, no name",
+    "L3: two properties mixed",
+    "L4: 5 expressions with an addition distractor (6 + 8)"
    ],
    "example": {
-    "item": "Fill the box: (4 × 5) × 3 = 4 × (___ × 3)",
-    "answer": "5"
+    "item": "Tick every expression equal to 4 × 7.",
+    "answer": "7 × 4 and 4 × 5 + 4 × 2"
    },
    "misconceptions": [
-    "adds inside the brackets",
-    "thinks changing grouping changes the product",
-    "ticks 6 + 8 as equal to 6 × 8"
+    "ticks 4 + 7 as equal to 4 × 7",
+    "rejects 7 × 4 (thinks order changes the product)",
+    "splits both factors in breaking apart (4 × 7 = 2 × 5 + 2 × 2)"
    ]
   },
   "map_nl_hops_equation": {
@@ -2306,46 +2340,6 @@
     "reads the end point as the number of hops"
    ]
   },
-  "map_frac_choose_all_shaded": {
-   "kind": "option",
-   "skill": "fractions:identify",
-   "option": "response: \"choose ALL the models that show a/b\" (4-6 models, distractors with unequal parts or wrong count)",
-   "name": "Choose All Models That Show a Fraction (option)",
-   "teaches": "Recognise a unit or non-unit fraction only when the whole is cut into equal parts, across shapes",
-   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 4-6 small outline shapes in the cell, some cut equally, some unequally; pupil ticks every shape showing a/b. Screen: click ALL (multi-select-check)",
-   "family": "fractions",
-   "ccss": [
-    "3.NF.A.1",
-    "2.G.A.3"
-   ],
-   "map": {
-    "strand": "Fractions & decimals",
-    "ritBand": "171-190",
-    "taskType": "select all that apply"
-   },
-   "why": "identify asks \"which model shows 1/3\" with one answer; MAP asks choose ALL, with unequal-part distractors (the equal-parts misconception).",
-   "reused": false,
-   "problemTypes": [
-    "unit fraction — \"Tick ALL the shapes with one-third shaded\" — tick",
-    "non-unit — \"Tick ALL showing 2/4\" — tick",
-    "different shapes — circles, bars, rectangles mixed — tick"
-   ],
-   "levels": [
-    "L1: same shape, only part-count distractors",
-    "L2: unequal-part distractors added",
-    "L3: mixed shapes",
-    "L4: non-unit fractions"
-   ],
-   "example": {
-    "item": "Tick ALL the shapes that show one-quarter shaded.",
-    "answer": "every shape cut into 4 equal parts with 1 part shaded"
-   },
-   "misconceptions": [
-    "ticks a shape cut into 3 unequal parts with 1 shaded",
-    "ticks 1 of 4 parts unshaded",
-    "misses a different-shaped model"
-   ]
-  },
   "equal_groups_early": {
    "kind": "new",
    "skill": "multiplication:make_equal_groups",
@@ -2358,12 +2352,92 @@
     "K.CC.C.6"
    ],
    "map": {
-    "strand": "Multiplication & division",
-    "ritBand": "161-180",
+    "strand": "Number & place value",
+    "ritBand": "141-150",
     "taskType": "drag objects to make groups equal"
    },
    "why": "No live skill moves objects to equalise groups; WRM equal_groups_early reused.",
    "reused": true
+  },
+  "map_decimal_expanded": {
+   "kind": "option",
+   "skill": "placevalue:expand",
+   "option": "band: \"decimals\" (tenths, hundredths, thousandths) + direction (to expanded / to standard)",
+   "name": "Expanded Form with Decimals (option)",
+   "teaches": "Write a decimal to thousandths in expanded form with fractions or decimals, and the reverse (5.NBT.A.3a)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a place-value chart header (ones . tenths hundredths thousandths) in grey, slots \"___ + ___ × 1/10 + ___ × 1/100\"; pupil writes digits. Screen: number boxes in the frame (production, never MC)",
+   "family": "place value",
+   "ccss": [
+    "5.NBT.A.3a",
+    "4.NF.C.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "number entry"
+   },
+   "why": "expand stops at whole numbers; MAP 211-220 asks decimal expanded form.",
+   "reused": false,
+   "problemTypes": [
+    "to expanded (decimal form) — 3.47 — write 3 + 0.4 + 0.07 / number boxes",
+    "to expanded (fraction form) — 3.47 — write 3 + 4 × 1/10 + 7 × 1/100",
+    "to standard — 5 + 0.2 + 0.006 — write 5.206 / number box"
+   ],
+   "levels": [
+    "L1: tenths only, chart header with digits under it (hint row, fades)",
+    "L2: hundredths, decimal form (0.4 + 0.07); chart header stays (structural)",
+    "L3: fraction form (4 × 1/10)",
+    "L4: thousandths with a zero digit; reverse direction"
+   ],
+   "example": {
+    "item": "Write 6.25 in expanded form.",
+    "answer": "6 + 0.2 + 0.05"
+   },
+   "misconceptions": [
+    "writes 0.25 as 0.2 + 0.5",
+    "drops the zero place in the reverse (5 + 0.2 + 0.006 = 5.26)",
+    "writes 2 × 1/100 for the tenths digit"
+   ]
+  },
+  "map_decimal_word_form": {
+   "kind": "option",
+   "skill": "composing:number_word_form",
+   "option": "band: \"decimals\" (tenths, hundredths, thousandths), with the existing wordform direction (to_number / to_words)",
+   "name": "Decimal Word Form (option)",
+   "teaches": "Read and write decimals in words using the last place (\"four and twenty-six hundredths\") (5.NBT.A.3a)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the words on one line, numeral slots with a fixed decimal point below (or the numeral and a word bank to build the words). Screen: number entry for to_number; word tiles (drag) for to_words — production, never MC",
+   "family": "place value",
+   "ccss": [
+    "5.NBT.A.3a",
+    "4.NF.C.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-220",
+    "taskType": "number entry; build from word tiles"
+   },
+   "why": "number_word_form deals whole numbers only; MAP 211-220 asks decimals in words and numerals.",
+   "reused": false,
+   "problemTypes": [
+    "words → numeral — \"seven and three tenths\" — write 7.3",
+    "words → numeral with a zero — \"two and five hundredths\" — write 2.05",
+    "numeral → words — 4.26 — build \"four and twenty-six hundredths\" from tiles"
+   ],
+   "levels": [
+    "L1: tenths, the decimal point slot printed (structural)",
+    "L2: hundredths without a zero",
+    "L3: hundredths/thousandths with a zero place",
+    "L4: numeral → words from a tile bank"
+   ],
+   "example": {
+    "item": "Write as a number: nine and fourteen hundredths.",
+    "answer": "9.14"
+   },
+   "misconceptions": [
+    "writes 2.5 for two and five hundredths",
+    "reads \"and\" as the point anywhere (writes 900.14)",
+    "names the place of the first digit (4.26 = \"twenty-six tenths\")"
+   ]
   }
  }
 }
