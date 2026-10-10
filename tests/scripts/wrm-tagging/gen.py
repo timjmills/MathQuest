@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA, FORM_LABEL
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA, FORM_LABEL, BLOCKS, BLOCK_EXCEPT, NOLINK_WHY
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -193,6 +193,7 @@ def ctypes(k, o):
     if hit('skip25') or re.match(r'^patterns:(seq_2|seq_5|skip_count_line)', k): t.add('counting in 2s and 5s')
     if SENT.match(k):
         t.add('number sentences'); t.add('subtraction sentences' if k.startswith('subtraction:') else 'addition sentences')
+    if hit('minus') and (SENT.match(k) or k.startswith('addition:')): t.add('subtraction sentences')   # families deal "8 − 6" too (critic r8 M1)
     if hit('money') or re.match(r'^measurement:(coin|money|equiv_coin)', k): t.add('coins')
     if k == 'measurement:money_count' and o.get('kind') in ('note', 'both'): t.add('notes (bills)')
     if k == 'multiplication:equal_or_unequal_groups': t.add('equal groups')
@@ -232,12 +233,28 @@ def fit_reason(k, step, why=''):
 # A related why must say what the link's items do (critic r5 N1 / N2): checked when the file is generated.
 FALSE_WHY = [(re.compile(r'which has more|one jump'), lambda k, o: True),
              (re.compile(r'rows of a picture graph'), lambda k, o: md(k, o).get('c19', {}).get('diff', 0) > 0)]
+def xr_why(k, step):
+    """The one reason a key is left out of this step's links (no generic 'rules 8 and 18')."""
+    if k in NOLINK_WHY: return NOLINK_WHY[k]
+    if k in S[step]['xr'] or k in S[step]['xp']: return 'left out here (see the note)' if S[step]['n'] else 'left out here by hand: not the same idea'
+    return 'left out here (rules 8 and 18)'
+def is_block(k, o, step):
+    """A neighbouring-idea skill is a building block only when spec.BLOCKS says so for the step's sub-idea."""
+    if (k, step) in BLOCK_EXCEPT: return False
+    ks = k + json.dumps(o or {}, sort_keys=True)
+    subs = BLOCKS.get(ks, BLOCKS.get(k, set()))
+    return topic(step) in subs or (topic(step).startswith('other:') and 'other' in subs)
 def form_label(k, o):
     return FORM_LABEL.get(k + json.dumps(o or {}, sort_keys=True)) or FORM_LABEL.get(k) or label(k)
 def check_claims(step, rel, pre=(), note=''):
     for e in list(pre) + list(rel):   # critic r7 N5: "(earlier, same idea: X)" only for the step's own sub-idea
         m = re.search(r'earlier, same idea: ([\w:.]+)\)', e['why'])
         assert not m or m.group(1) == topic(step), (step, e)
+    for e in list(pre) + list(rel):
+        if 'same idea' in e['why'] or 'on this idea' in e['why']:
+            for c in re.findall(r'(?:R|Y1)\.B\d+\.S\d+', e['why']):
+                assert c in info and related_topic(step, c) == 2, (step, e)   # critic r8 sameidea2: cited steps share the sub-idea
+        if ': a building block' in e['why']: assert is_block(e['key'], e.get('opts', {}), step), (step, e)
     for m in re.finditer(r'every earlier step on this idea \(([^)]*)\)', note):
         for c in re.findall(r'(?:R|Y1)\.B\d+\.S\d+', m.group(1)): assert related_topic(step, c) == 2, (step, c)
     for e in rel:
@@ -308,7 +325,7 @@ def build(step):
         if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 3): break
         for k, o in dentries(x):
             if related_topic(step, x) == 2: addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
-            else: addp(k, f"{fmt_step(x)} ({form_label(k, o)}: a building block)", o)   # critic r7 N5: a neighbouring idea
+            elif is_block(k, o, step): addp(k, f"{fmt_step(x)} ({form_label(k, o)}: a building block)", o)   # judged in spec.BLOCKS (critic r8 N7)
     for x in [c for c in cands if related_topic(step, c) == 2][:3]:
         if S[x]['v'] == 'gap': take_builds(x)   # a needed earlier step with no live skill: its build is a pre-build
     pb = pb[:3]
@@ -320,7 +337,7 @@ def build(step):
     def addr(k, why, o=None):
         if k in rseen or not live(k) or len(rel) >= 6:
             if live(k) and k not in {r['key'] for r in rel}:
-                rej.setdefault(k, 'a direct skill here' if k in own else 'a pre-skill here' if k in {p['key'] for p in pre} else 'left out here (rules 8 and 18)' if k in xr else None)
+                rej.setdefault(k, 'a direct skill here' if k in own else 'a pre-skill here' if k in {p['key'] for p in pre} else xr_why(k, step) if k in xr else None)
             return
         ex = earlier(k)
         if ex:   # an earlier step's skill is a building block: pre, never only related (rule 14)
@@ -328,8 +345,13 @@ def build(step):
             x, eo = ex
             if related_topic(step, x) or any(k == e[0] for e in sp['r']):
                 use = eo if fits(k, eo, step, fmt_step(x)) else fit(k, step, fmt_step(x))
-                base = 'the same idea' if re.match(r'(the next|a later) step|the same idea in another form', why) else why
-                if use is not None and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
+                if related_topic(step, x) == 2:
+                    base = 'the same idea' if re.match(r'(the next|a later) step|the same idea in another form', why) else why
+                elif is_block(k, use or eo, step):
+                    base = f'{form_label(k, use or eo)}: a building block'
+                else:
+                    base = None   # a neighbouring idea that is not a judged building block: not a pre (critic r8 N5r)
+                if use is not None and base and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
             rej[k] = 'taught at an earlier step (' + x + '), but ' + (misfit(k, eo, step, fmt_step(x)) or 'not a building block of this step')
             return
         if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])):   # WRM-earlier but school-later: neither pre nor related
@@ -356,11 +378,11 @@ def build(step):
         if o2 is None: addr(k, '', None); return   # records the misfit reason
         d = dealt(k, o2); t = max(title_nums(step) or [0])
         if NUMCAT.match(k) and t and d < t:   # the refitted rung stops below the step's numbers: say so (critic r6 N4)
-            addr(k, f"the same idea in another form: {label(k)}, to {d} (this step continues past {d})", o2)
+            addr(k, f"the same idea in another form: {form_label(k, o2)}, to {d} (this step continues past {d})", o2)
         elif NUMCAT.match(k) and t and d >= t:
-            addr(k, f"the same idea in another form: {label(k)}, at this step's size (to {d})", o2)
+            addr(k, f"the same idea in another form: {form_label(k, o2)}, at this step's size (to {d})", o2)
         else:   # no number to claim: name the form only
-            addr(k, f"the same idea in another form: {label(k)}", o2)
+            addr(k, f"the same idea in another form: {form_label(k, o2)}", o2)
     for x in later[:3]:
         for k, o in dentries(x): add_later(x, k, o, 'the next step on this idea')
     if len(rel) < 2:   # a later step on the SAME sub-idea (critic r5 N1: never a family-only step) whose skill is not taught yet
@@ -397,14 +419,17 @@ def build(step):
                 parts.append('the earlier steps ' + ', '.join(gaps) + ' have no live skill yet' + (' (see build)' if own_b else ' (see preBuild)' if held else ''))
             if not parts:
                 live_c = [x for x in cands if S[x]['d'] and related_topic(step, x) == 2][:4]
+                pk = {p['key'] for p in pre} | own
+                live_c = [x for x in live_c if set(dkeys(x)) & pk]   # only steps whose skill really is above (or is this step's own)
                 if live_c: parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')
-                else: parts.append('earlier steps on neighbouring ideas give the building blocks above')
+                elif pre: parts.append('the pre-skills above come from earlier steps on neighbouring ideas, judged as building blocks')
+                else: parts.append('no earlier skill on this idea or a neighbouring one fits this step')
             add_note(f"Pre: {len(pre)} only; " + '; '.join(parts) + '.')
     check_claims(step, rel, pre, note)
     if not rel and 'Related:' not in note:
         rr = {k: r for k, r in rej.items() if r}
         if rr:
-            add_note('Related: none; the other forms of this idea are ' + '; '.join(f"{k.split(':')[1]} ({r})" for k, r in list(rr.items())[:5]) + '.')
+            add_note('Related: none; the candidate links are ' + '; '.join(f"{k.split(':')[1]} ({r})" for k, r in list(rr.items())[:5]) + '.')
         else:
             add_note('Related: no live skill shows this idea in another form yet (see build).' if v == 'gap' else 'Related: none; no other live skill shows this idea in another form.')
     return {'title': s['title'], 'direct': direct, 'partial': partial, 'verdict': v,

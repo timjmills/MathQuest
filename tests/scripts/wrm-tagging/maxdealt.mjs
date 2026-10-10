@@ -24,6 +24,7 @@ for(const [key,opts] of JSON.parse(fs.readFileSync(0,'utf8'))){const [c,k]=key.s
     if(!q)continue;const t=strip(q.text)+' '+JSON.stringify(q.ans??'');for(const m of t.matchAll(/\d+/g))max=Math.max(max,+m[0]);
     const walk=(v,kk)=>{if(v==null||SKIPK.has(kk))return;if(typeof v==='number'&&Number.isFinite(v))max=Math.max(max,v);else if(Array.isArray(v))v.forEach(x=>walk(x,kk));else if(typeof v==='object')for(const[a,b]of Object.entries(v))walk(b,a);};
     if(q.cell)walk(q.cell.payload,'');
+    for(const op of (Array.isArray(q.options)?q.options:[]))for(const m of strip(typeof op==='object'?(op.label??op.text??JSON.stringify(op)):op).matchAll(/\d+/g))max=Math.max(max,+m[0]);   /* option labels (critic r8 M2) */
     if(k==='tens_foundation_visual'&&q.cell?.payload?.n)max=Math.max(max,q.cell.payload.n*10);
     const full=t+' '+(q.cell?JSON.stringify(q.cell.payload):'')+' '+strip(q.visual||'').slice(0,400);
     for(const[n,r]of Object.entries(FLAGS))if(r.test(full))flags[n]=(flags[n]||0)+1;
