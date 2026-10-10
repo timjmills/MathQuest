@@ -57,7 +57,7 @@ const used = new Set(rows.flatMap(r => [r.proposal, ...(r.also || [])]).filter(B
 for (const [id, p] of Object.entries(proposals)) {
     if (!used.has(id)) errs.push(`proposal ${id} not used by any row`);
     for (const k of (p.reused ? ['name'] : ['kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why', 'map'])) if (p[k] === undefined) errs.push(`proposal ${id}: missing ${k}`);
-    if (p.kind === 'option' && !p.option) errs.push(`proposal ${id}: option without option`);
+    if (!p.reused && p.kind === 'option' && !p.option) errs.push(`proposal ${id}: option without option`);
     if (!p.reused) {   // a new proposal is a whole imagined skill, not a one-liner
         if (!Array.isArray(p.problemTypes) || p.problemTypes.length < 2) errs.push(`proposal ${id}: needs problemTypes (2-4 item forms)`);
         if (!Array.isArray(p.levels) || p.levels.length < 2) errs.push(`proposal ${id}: needs levels (the one-change ladder)`);

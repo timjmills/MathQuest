@@ -72,7 +72,10 @@
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division using arrays; multiplication as repeated addition"
    },
-   "closes": "map_array_to_eq adds writing the full × equation from an array/groups and the reverse (equation → shade the array)."
+   "closes": "map_array_to_eq adds writing the full × equation from an array/groups and the reverse (equation → shade the array).",
+   "also": [
+    "vis_array_options"
+   ]
   },
   {
    "task": "Compare / order decimals",
@@ -157,8 +160,8 @@
    ],
    "note": "Sampled: decide multiply/add from a picture of groups.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes OAT 181-190: divides a small set of objects into groups of equal size"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 2.OA.C.4 / 3.OA.A.1 (equal groups) is in MAP's blueprint"
    }
   },
   {
@@ -634,12 +637,12 @@
     "fractions:compose_target_frac"
    ],
    "proposal": "map_frac_unit_build",
-   "note": "compose_whole builds 1 only; decompose is a grade 4 sum form. Sampled fractions:compose_target_frac n=6: \"Drag fraction tiles into the bar to make 7/10\" (6/6) — building a fraction from unit tiles is live.",
+   "note": "compose_whole builds 1 only; decompose is a grade 4 sum form. Sampled fractions:compose_target_frac n=6: \"Drag fraction tiles into the bar to make 7/10\" (6/6) — building a fraction from unit tiles is live. Drawings checked: decompose_fractions draws the labelled shaded bar.",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 3.NF.A.1 / 4.NF.B.3a (fraction as unit fractions) is in MAP's blueprint"
    },
-   "closes": "map_frac_unit_build adds only writing the unit-fraction sum from a shaded model (1/4 + 1/4 + 1/4 = 3/4); building from tiles is live in compose_target_frac."
+   "closes": "map_frac_unit_build (option on decompose_fractions) adds only: part labels off, the \"how many unit parts?\" count, and models past 1. Model → sum with labels is live in decompose_fractions; building from tiles is live in compose_target_frac."
   },
   {
    "task": "Fraction of a set",
@@ -776,17 +779,17 @@
    "strand": "Fractions & decimals",
    "ritBand": "201-210",
    "source": "strand-walk",
-   "status": "partial",
+   "status": "exists-regrade",
    "skills": [
-    "fractions:mixed_improper_visual"
+    "fractions:mixed_improper_visual",
+    "fractions:mixed_nl_drag",
+    "composing:fraction_number_line"
    ],
-   "proposal": "frac_beyond_1",
-   "note": "Pizza model only. Options checked: mixed_improper_visual denoms only.",
+   "note": "Drawings checked: mixed_improper_visual draws models past 1 (23/6, 12/5) and asks for the mixed number AND the improper fraction; mixed_nl_drag places them on a line. Live; re-grade (legacy colour pizza visual, not the B&W kit).",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210: writes mixed numbers as improper fractions and the reverse, RIT 201-210"
-   },
-   "closes": "frac_beyond_1 adds reading and writing fractions > 1 from several whole models before the mixed/improper conversion."
+   }
   },
   {
    "task": "Mixed numbers <-> improper fractions",
@@ -971,10 +974,13 @@
    "proposal": "dec_pv_within1",
    "note": "No decimals:decimal_place_value skill. Checked: placevalue:value / identify place sets stop at ones (whole numbers only); decimals:* deal compare/round, not value of a digit. Built on decimal_pv (WRM, new skill decimals:decimal_place_value) + its option dec_pv_within1.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
-    "says": "NWEA DesCartes continuum M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 5.NBT.A.1 / 5.NBT.A.3 (value of a digit in decimals) is in MAP's blueprint"
    },
-   "closes": "decimal_pv (the new skill) with its option dec_pv_within1 adds the value of each digit in tenths, hundredths, thousandths and in numbers with integer parts; placevalue skills stop at ones."
+   "closes": "decimal_pv (the new skill) with its option dec_pv_within1 adds the value of each digit in tenths, hundredths, thousandths and in numbers with integer parts; placevalue skills stop at ones.",
+   "also": [
+    "decimal_pv"
+   ]
   },
   {
    "task": "Decimal on a number line (place)",
@@ -1135,7 +1141,10 @@
     "url": null,
     "says": "not found in public NWEA material; kept because 6.RP.A.3c (percent of a quantity) is in MAP's blueprint"
    },
-   "closes": "map_percent_of_grid_bar adds the percent bar model (10%, 25%, 50% steps); the abstract percent-of is live."
+   "closes": "map_percent_of_grid_bar adds the percent bar model (10%, 25%, 50% steps); the abstract percent-of is live.",
+   "also": [
+    "vis_double_scale"
+   ]
   },
   {
    "task": "Unit rate",
@@ -1215,7 +1224,10 @@
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division using arrays"
    },
-   "closes": "map_array_to_eq adds both directions of picture ↔ × equation."
+   "closes": "map_array_to_eq adds both directions of picture ↔ × equation.",
+   "also": [
+    "vis_array_options"
+   ]
   },
   {
    "task": "Match: array <-> multiplication",
@@ -1233,7 +1245,10 @@
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division algorithms using arrays"
    },
-   "closes": "map_array_to_eq adds array → equation and equation → shade the array."
+   "closes": "map_array_to_eq adds array → equation and equation → shade the array.",
+   "also": [
+    "vis_array_options"
+   ]
   },
   {
    "task": "Match: story <-> operation (× / ÷)",
@@ -1297,13 +1312,16 @@
    "skills": [
     "conversions:percent_visual"
    ],
-   "proposal": "map_decimal_grid",
+   "proposal": "decimal_pv",
    "note": "Only percent grid. Options checked: percent_visual forms 0-3 (percent/fraction only).",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_190: identifies tenths from a region or set, RIT 181-190"
    },
-   "closes": "map_decimal_grid adds reading, shading and matching tenths strips and hundred squares as decimals; percent_visual deals percent only."
+   "closes": "decimal_pv (decimals:decimal_place_value, flat = 1) drawn on vis_hundred_square (shade or read hundredths, labels decimal | fraction) adds reading and shading tenths/hundredths grids both ways, which is the grid ↔ number pair; percent_visual deals percent/fraction only.",
+   "also": [
+    "vis_hundred_square"
+   ]
   },
   {
    "task": "Match: number line <-> number (fractions)",
@@ -1336,7 +1354,7 @@
     "url": null,
     "says": "not found in public NWEA material; kept because 4.NF.C.6 (decimal at a point on a number line) is in MAP's blueprint"
    },
-   "closes": "map_nl_read_decimal adds reading the decimal at a marked point; placing is live."
+   "closes": "map_nl_read_decimal (new skill decimals:read_decimal_number_line) adds reading the decimal at a marked point; placing is live in decimal_nl_drag."
   },
   {
    "task": "Match: story <-> operation (fractions)",
@@ -1461,19 +1479,17 @@
    "strand": "Fractions & decimals",
    "ritBand": "191-210",
    "source": "6.4",
-   "status": "partial",
+   "status": "exists-regrade",
    "skills": [
     "fraction_operations:decompose_fractions",
     "fraction_operations:add_fractions_like",
     "fractions:compose_target_frac"
    ],
-   "proposal": "map_frac_unit_build",
-   "note": "Sampled decompose_fractions n=12: \"Write 3/4 as a sum of unit fractions\" + \"Click ALL ways to decompose 5/8\"; no model → equation or equation → shade-the-model pair. Closed with map_frac_unit_build (row \"Unit fractions / build a fraction\").",
+   "note": "Drawings checked (--fields visual): decompose_fractions draws a bar with the parts shaded, each labelled 1/den, and asks for the unit-fraction sum (model → equation); compose_target_frac drags unit tiles to make the fraction (equation → model). Both directions live. Re-grade: the decompose_fractions visual is a legacy colour strip (accent-cyan), not the B&W kit cell.",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.NF.B.3b (decompose a fraction into a sum of unit fractions) is in MAP's blueprint"
-   },
-   "closes": "map_frac_unit_build adds model → unit-fraction sum written; equation → model (drag tiles to make the fraction) is live in compose_target_frac."
+   }
   },
   {
    "task": "Decimal expanded form (3.472 = 3 + 4 × 1/10 + 7 × 1/100 + 2 × 1/1000)",
@@ -1485,10 +1501,13 @@
    "proposal": "thousandths_pv",
    "note": "Checked placevalue:expand / combine / unit_form (bands 99-999,999, whole numbers only), decimals:* (compare, round, operations), conversions:d_to_f: 0 items write a decimal in expanded form.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
-    "says": "DesCartes M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 5.NBT.A.3a (decimal expanded form) is in MAP's blueprint"
    },
-   "closes": "thousandths_pv (WRM option on decimals:decimal_place_value) with its build-list extension \"number names and expanded form to thousandths (347.392 = 3 × 100 + … + 2 × 1/1000)\" closes this row."
+   "closes": "thousandths_pv (WRM option on decimals:decimal_place_value) with its build-list extension \"number names and expanded form to thousandths (347.392 = 3 × 100 + … + 2 × 1/1000)\" closes this row.",
+   "also": [
+    "decimal_pv"
+   ]
   },
   {
    "task": "Decimal word form ↔ numeral (four and twenty-six hundredths = 4.26)",
@@ -1503,7 +1522,10 @@
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "DesCartes M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
    },
-   "closes": "thousandths_pv (WRM option on decimals:decimal_place_value) with its build-list extension \"number names and expanded form to thousandths (347.392 = 3 × 100 + … + 2 × 1/1000)\" closes this row."
+   "closes": "thousandths_pv (WRM option on decimals:decimal_place_value) with its build-list extension \"number names and expanded form to thousandths (347.392 = 3 × 100 + … + 2 × 1/1000)\" closes this row.",
+   "also": [
+    "decimal_pv"
+   ]
   }
  ],
  "proposals": {
@@ -1601,7 +1623,7 @@
     "ritBand": "181-190",
     "taskType": "picture -> equation; equation -> picture"
    },
-   "why": "arrays_groups uses a sentence frame \"rows of make in all\"; MAP shows a picture and asks which/what equation, and the reverse direction is not dealt",
+   "why": "arrays_groups uses a sentence frame \"rows of make in all\"; MAP shows a picture and asks which/what equation, and the reverse direction is not dealt Drawing reuse: the array pictures (split, hidden, expression matching) come from VISUAL_BUILDS vis_array_options; this option adds only the written equation form on arrays_groups.",
    "reused": false,
    "problemTypes": [
     "picture → equation — 3 rows of 4 dots — write 3 × 4 = 12 / number boxes",
@@ -1663,50 +1685,10 @@
     "accepts unequal parts as fractions"
    ]
   },
-  "map_decimal_grid": {
-   "kind": "new",
-   "skill": "decimals:decimal_grid_model",
-   "name": "Decimal Grids and Numbers",
-   "teaches": "Read a tenths strip or hundred square as a decimal and fraction, shade a grid for a given decimal, and match grids to decimals",
-   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a tenths strip or hundred square in a boxed cell; pupil writes the decimal and the fraction, or shades the grid for a given decimal. Screen: number boxes; shade by clicking squares (production)",
-   "family": "decimals",
-   "ccss": [
-    "4.NF.C.6",
-    "4.NF.C.5"
-   ],
-   "map": {
-    "strand": "Fractions & decimals",
-    "ritBand": "191-200",
-    "taskType": "model -> decimal, click to shade"
-   },
-   "why": "No decimal skill reads or shades a decimal grid (percent_visual does percent only)",
-   "reused": false,
-   "problemTypes": [
-    "grid → decimal — 37 of 100 squares shaded — write 0.37 and 37/100 / number boxes",
-    "decimal → grid — 0.6 given — shade the strip / click to shade",
-    "match — 3 grids, 3 decimals — pair them / drag"
-   ],
-   "levels": [
-    "L1: tenths strip, write the decimal; place-value header \"ones . tenths\" printed (structural, stays)",
-    "L2: hundred square, whole rows + loose squares",
-    "L3: shade for a given decimal",
-    "L4: match 3 grids to 3 decimals including 0.4 vs 0.04"
-   ],
-   "example": {
-    "item": "A hundred square has 52 squares shaded. Write the shaded part as a decimal.",
-    "answer": "0.52"
-   },
-   "misconceptions": [
-    "writes 52 instead of 0.52",
-    "reads 4 tenths as 0.04",
-    "counts rows as hundredths"
-   ]
-  },
   "map_nl_read_decimal": {
-   "kind": "option",
-   "skill": "decimals:decimal_nl_drag",
-   "option": "task \"read the point\"",
-   "name": "Read a Decimal on a Number Line (option)",
+   "kind": "new",
+   "skill": "decimals:read_decimal_number_line",
+   "name": "Read Decimals on a Number Line",
    "teaches": "Name the decimal at a marked point on a tenths/hundredths line (the reverse of placing)",
    "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a tenths or hundredths number line with an arrow at one tick; pupil writes the decimal in a box. Screen: number box (production, never MC)",
    "family": "decimals",
@@ -1718,7 +1700,7 @@
     "ritBand": "191-200",
     "taskType": "number line -> number, number entry"
    },
-   "why": "decimal_nl_drag only places; fractions have both directions, decimals do not",
+   "why": "decimal_nl_drag (\"Place Decimals on a Number Line\") only places; reading is the other direction, so it is a new skill whose name declares reading, not an option on the placing skill.",
    "reused": false,
    "problemTypes": [
     "read tenths — 0 to 1 by tenths, arrow at 7th tick — write 0.7",
@@ -1743,11 +1725,11 @@
   },
   "map_frac_unit_build": {
    "kind": "option",
-   "skill": "fractions:shade_fraction",
-   "option": "form \"build from unit fractions\"",
-   "name": "Build a Fraction from Unit Fractions (option)",
-   "teaches": "Write a shaded model as a sum of unit fractions (3/4 = 1/4 + 1/4 + 1/4); the reverse (build from tiles) is live in fractions:compose_target_frac",
-   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a bar or area model cut into equal parts with some shaded; pupil writes the unit-fraction sum and the total (1/4 + 1/4 + 1/4 = 3/4). Screen: number boxes for the sum (production)",
+   "skill": "fraction_operations:decompose_fractions",
+   "option": "support \"part labels\" on/off (the 1/den labels fade) + task \"how many unit parts?\" + models past 1 (two bars)",
+   "name": "Decompose to Unit Fractions: Labels Off and Past 1 (option)",
+   "teaches": "Write a shaded model as unit fractions when the parts are NOT labelled, count the unit parts (\"how many fifths?\"), and decompose fractions greater than 1 shown on two bars",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the decompose bar with the 1/den part labels removed (or two bars for fractions past 1); pupil writes the count of unit parts or the unit-fraction sum in slots. Screen: number boxes (production, never MC)",
    "family": "fractions",
    "ccss": [
     "3.NF.A.1",
@@ -1758,21 +1740,21 @@
     "ritBand": "181-190",
     "taskType": "model -> number"
    },
-   "why": "decompose_fractions asks for the sum from a number, with no model; compose_target_frac builds from tiles. Writing the sum FROM the model is not dealt.",
+   "why": "decompose_fractions already draws the shaded bar and asks for the unit-fraction sum, but every part is labelled 1/den (the hint never fades) and it stops at 1. The option adds the faded labels, the count task and models past 1.",
    "reused": false,
    "problemTypes": [
-    "model → sum — 3 of 4 parts shaded — write 1/4 + 1/4 + 1/4 = 3/4 / number boxes",
-    "model → count — \"how many fifths are shaded?\" — write 3 fifths = 3/5",
-    "model past 1 — two bars, 5 quarters shaded — write the sum and 5/4"
+    "labels off — 3 of 5 parts shaded, no labels — write 1/5 + 1/5 + 1/5 = 3/5",
+    "count the unit parts — \"how many fifths are shaded?\" — write 3 fifths = 3/5",
+    "past 1 — two bars in quarters, 5 parts shaded — write 1/4 × 5 terms = 5/4"
    ],
    "levels": [
-    "L1: count the shaded unit parts, \"___ quarters\" frame (hint, fades)",
-    "L2: write the unit-fraction sum, one slot per addend (structural)",
-    "L3: no slots drawn, write the sum",
-    "L4: models past 1 (two bars)"
+    "L1: live skill (labels on every part)",
+    "L2: labels off; the slot frame for each addend stays (structural)",
+    "L3: \"how many unit parts?\" count task",
+    "L4: models past 1 on two bars"
    ],
    "example": {
-    "item": "A bar is cut into 6 equal parts and 4 are shaded. Write the shaded part as a sum of unit fractions.",
+    "item": "A bar is cut into 6 equal parts with no labels; 4 parts are shaded. Write the shaded part as a sum of unit fractions.",
     "answer": "1/6 + 1/6 + 1/6 + 1/6 = 4/6"
    },
    "misconceptions": [
@@ -1836,7 +1818,7 @@
     "ritBand": "221-230",
     "taskType": "model -> number"
    },
-   "why": "percent_of_number is text-only",
+   "why": "percent_of_number is text-only Drawing reuse: the percent bar is the fraction | percent double scale of VISUAL_BUILDS vis_double_scale; this option adds only its use on percent_of_number.",
    "reused": false,
    "problemTypes": [
     "50% / 25% — bar of 80 — write 40, 20",
@@ -1969,25 +1951,6 @@
     "taskType": "number entry"
    },
    "why": "not dealt today",
-   "reused": true
-  },
-  "frac_beyond_1": {
-   "kind": "new",
-   "skill": "fractions:mixed_numbers_intro",
-   "name": "Fractions Beyond 1",
-   "teaches": "Fractions greater than 1 from models",
-   "representation": "B&W several-wholes model; fraction entry",
-   "family": "fractions",
-   "ccss": [
-    "3.NF.A.3c",
-    "4.NF.B.3"
-   ],
-   "map": {
-    "strand": "Fractions & decimals",
-    "ritBand": "191-200",
-    "taskType": "model -> number"
-   },
-   "why": "models of several wholes not dealt",
    "reused": true
   },
   "mult_dec_dec": {
@@ -2311,6 +2274,75 @@
     "strand": "Fractions & decimals",
     "ritBand": "171-180",
     "taskType": "equal or not; click"
+   },
+   "reused": true
+  },
+  "decimal_pv": {
+   "kind": "new",
+   "skill": "decimals:decimal_place_value",
+   "name": "Tenths and Hundredths in a Place-Value Chart",
+   "teaches": "tenths and hundredths as decimals in a place-value chart, with counters and base-10 (flat = 1)",
+   "representation": "a place-value chart with counters; write the decimal; option: partition 0.36 = 0.3 + 0.06",
+   "family": "decimals",
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.1"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "181-220",
+    "taskType": "number entry; shade"
+   },
+   "reused": true
+  },
+  "vis_hundred_square": {
+   "kind": "template",
+   "skill": "decimals:decimal_place_value",
+   "name": "Hundred Square as One Whole (and the thousand square)",
+   "teaches": "a 10 × 10 square as one whole (columns = tenths, cells = hundredths), shade or read, labels decimal | fraction | percent",
+   "representation": "new hundred-square kit template; hosts percent_visual, frac_10_100, decimal_place_value",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.C.6"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "181-200",
+    "taskType": "shade / read a grid"
+   },
+   "reused": true
+  },
+  "vis_array_options": {
+   "kind": "option",
+   "skill": "multiplication:dot_array_mult",
+   "name": "Array Options (split, hidden, place-value counters, three factors)",
+   "teaches": "arrays gain a split line, a hidden part, finish-the-array, place-value counters, an array of arrays for three factors, and expression matching",
+   "representation": "kit arrays / mult-grid template options",
+   "family": "multiplication",
+   "ccss": [
+    "3.OA.A.1"
+   ],
+   "map": {
+    "strand": "Multiplication & division",
+    "ritBand": "181-190",
+    "taskType": "picture ↔ equation"
+   },
+   "reused": true
+  },
+  "vis_double_scale": {
+   "kind": "template",
+   "skill": "conversions:double_num_line",
+   "name": "Double and Triple Number Lines",
+   "teaches": "two or three aligned scales (units, fraction | decimal | percent, ratio) with blanks and operator arcs",
+   "representation": "new double-scale kit template",
+   "family": "fractions",
+   "ccss": [
+    "6.RP.A.3"
+   ],
+   "map": {
+    "strand": "Fractions & decimals",
+    "ritBand": "211-230",
+    "taskType": "number entry on a bar"
    },
    "reused": true
   }
