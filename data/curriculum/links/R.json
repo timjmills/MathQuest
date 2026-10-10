@@ -4103,6 +4103,249 @@
     }
    ],
    "note": ""
+  },
+  "R.B16.S1": {
+   "title": "Explore sharing",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "exploring sharing an amount fairly",
+   "build": [
+    "share_group"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:share_into_groups",
+     "why": "grouping, the inverse view"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B16.S5 Even and odd sharing"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B16.S2": {
+   "title": "Sharing",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {
+      "band": 12
+     },
+     "missing": "sharing one at a time (how many each); the skill makes groups of a size, and works to 20"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sharing one by one between a given number (how many each)",
+   "build": [
+    "share_group"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B16.S5 Even and odd sharing"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B16.S3": {
+   "title": "Explore grouping",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "exploring making equal groups",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:share_into_groups",
+     "why": "equal groups drawn"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B16.S5 Even and odd sharing"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B16.S4": {
+   "title": "Grouping",
+   "direct": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {
+      "band": 12
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "composing:odd_even",
+     "why": "next step: R.B16.S5 Even and odd sharing"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same block: R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B16.S5": {
+   "title": "Even and odd sharing",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:odd_even",
+     "opts": {},
+     "missing": "sharing an amount between two and seeing it is fair (even) or not (odd)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "odd and even through sharing between two",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S4 Grouping (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:double",
+     "why": "next step: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "next step: R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "same block: R.B16.S2 Sharing"
+    }
+   ],
+   "note": ""
+  },
+  "R.B16.S6": {
+   "title": "Play with and build doubles",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:double",
+     "opts": {},
+     "missing": "building doubles with objects"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "building doubles with objects; the skill is abstract"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "playing with and building doubles with objects",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (the step before in this block)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S4 Grouping (the step before in this block)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S4 How many did I take away (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "share_group"
+   ],
+   "related": [
+    {
+     "key": "division:share_into_groups",
+     "why": "same block: R.B16.S2 Sharing"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same block: R.B16.S5 Even and odd sharing"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -4339,7 +4582,11 @@
    "family": "operations",
    "steps": [
     "R.B9.S6",
-    "R.B11.S13"
+    "R.B11.S13",
+    "R.B16.S1",
+    "R.B16.S2",
+    "R.B16.S3",
+    "R.B16.S5"
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -4361,7 +4608,8 @@
     "R.B9.S7",
     "R.B9.S8",
     "R.B11.S11",
-    "R.B11.S12"
+    "R.B11.S12",
+    "R.B16.S6"
    ],
    "reused": false
   },
@@ -4512,6 +4760,18 @@
    "step": "R.B11.S11",
    "action": "partial",
    "why": "finding a double in a picture to 10"
+  },
+  {
+   "key": "number_sense:doubles_near_doubles",
+   "step": "R.B16.S6",
+   "action": "partial",
+   "why": "building doubles with objects; the skill is abstract"
+  },
+  {
+   "key": "patterns:double",
+   "step": "R.B16.S6",
+   "action": "partial",
+   "why": "building doubles with objects"
   }
  ]
 }
