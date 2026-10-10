@@ -49,7 +49,7 @@ rows.forEach((r, i) => {
     if ((r.status === 'partial' || r.status === 'missing') && !(r.closes && r.closes.length > 20)) errs.push(`${at}: gap row without "closes" (what the proposed skill adds)`);
     for (const k of r.skills || []) if (!live(k)) errs.push(`${at}: skill ${k} not a live skill key`);
 });
-const norm = t => String(t).toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const norm = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const seenTask = {}; rows.forEach((r, i) => { const k = r.strand + '|' + norm(r.task); if (seenTask[k] !== undefined) errs.push(`row ${i} "${r.task}": duplicates row ${seenTask[k]}`); else seenTask[k] = i; });
 const used = new Set(rows.map(r => r.proposal).filter(Boolean));
 for (const [id, p] of Object.entries(proposals)) {
