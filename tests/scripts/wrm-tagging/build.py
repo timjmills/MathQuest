@@ -313,4 +313,11 @@ print('steps', len(out_steps), dict(c), 'remaining', len(missing_steps))
 print('proposals new', sum(1 for p in proposals.values() if not p['reused']), 'reused', sum(1 for p in proposals.values() if p['reused']), 'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')}, 'hand fixes now moot', len(stale))
 if os.environ.get('SHOW_STALE'): print('\n'.join(f'stale: {k}' for k in stale))
 print('pre labels re-cited to a tagged step (G18):', recited)
+# Critic r13: the merge is checked a second time by mergecheck.mjs, which reads the LIVE wrm.js on its own (not K['tags']),
+# so one misreading of the old tags cannot pass both checks.
+import subprocess
+_mc = subprocess.run(['node', os.path.join(H, 'mergecheck.mjs'), R + 'data/curriculum/links/Y4.json'], capture_output=True, text=True)
+print(_mc.stdout.strip().splitlines()[-1] if _mc.stdout.strip() else 'mergecheck: no output')
+if _mc.returncode != 0: errs.append('mergecheck.mjs FAILED:\n' + _mc.stdout.strip() + _mc.stderr.strip()[-500:])
 print('\n'.join(errs) or 'OK')
+sys.exit(1 if errs else 0)

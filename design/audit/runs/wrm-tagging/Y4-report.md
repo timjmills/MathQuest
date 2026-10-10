@@ -30,6 +30,32 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
 
+## Tidy-ups after critic r13 (PASS)
+
+**1. `build.py` now runs `mergecheck.mjs` at the end.**
+- `mergecheck.mjs` reads the live `js/modules/wrm.js` itself, not `build.py`'s parsed tags.
+- `build.py` exits 1 when either the internal simulation or `mergecheck.mjs` fails.
+- **Proof:** a scratch copy of `build.py` with the r12 misreading put back (`cur = None if isinstance(e, str) else e.get('partial', '')`):
+  - its internal simulation passes, because it shares the misreading;
+  - `mergecheck.mjs` fails with 50 problems: 33 "full on a tag already full" and 17 "why says tagged partial" on full tags;
+  - so `build.py` exits 1.
+
+**2. No per-seed counts in clauses.**
+
+| Clause | Was | Now |
+|---|---|---|
+| B8.S2 and B8.S8 `f_to_d` | "49 of 150" | "about a third of the items" |
+| B2.S9 `estimate_sums_diffs` | "56 of 150" | "about a third of the items" |
+| B9.S8 `f_to_d` | "85-101 of 150" | "most items" |
+
+**3. B8.S5's `place_value_10x` tagFix why** now says the tag was full: "tagged full (note '÷ 10, decimals on'); generated items divide 3-digit numbers by 10, the step needs only 1-digit numbers".
+
+**Re-run:**
+- `build.py`: OK and exit 0. The output is byte-identical under `PYTHONHASHSEED` 0, 1 and 7.
+- `linkfit`: 0 of 747.
+- `mergecheck`: OK.
+- `optcheck`: 398 entries, 0 problems.
+
 ## Changes in round 13 (after critic r12: tagFix derivation, f_to_d bin branch, B2.S9, 4 isolated cites)
 
 **N. The tagFix derivation in `build.py`** (the lead's merge depends on it).

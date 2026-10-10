@@ -1728,7 +1728,7 @@
     },
     {
      "key": "number_sense:estimate_sums_diffs",
-     "missing": "4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
+     "missing": "4-digit sums pass 10,000 in about a third of the items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
      "opts": {
       "place": 1000,
       "task": "reasonable"
@@ -5923,7 +5923,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "mixes fifths and hundredths with tenths; no tenths model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+     "missing": "mixes fifths and hundredths with tenths; no tenths model; about a third of the items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
      "opts": {
       "denoms": [
        5
@@ -6367,7 +6367,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "hundredths mixed with fifths and tenths; no hundred-square model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+     "missing": "hundredths mixed with fifths and tenths; no hundred-square model; about a third of the items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
      "opts": {
       "denoms": [
        5
@@ -7060,7 +7060,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "halves and quarters mixed with eighths; no hundred-square model; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
+     "missing": "halves and quarters mixed with eighths; no hundred-square model; most items are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
      "opts": {
       "denoms": [
        2
@@ -10312,7 +10312,7 @@
    "key": "number_sense:estimate_sums_diffs",
    "step": "Y4.B2.S9",
    "action": "partial",
-   "partial": "with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers; 4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
+   "partial": "with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers; 4-digit sums pass 10,000 in about a third of the items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
    "why": "tagged full (note 'nearest 100 or 1,000'); generated items teach only part of the step",
    "opts": [
     {
@@ -11180,7 +11180,7 @@
    "key": "conversions:f_to_d",
    "step": "Y4.B8.S2",
    "action": "partial",
-   "partial": "mixes fifths and hundredths with tenths; no tenths model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+   "partial": "mixes fifths and hundredths with tenths; no tenths model; about a third of the items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
    "why": "tagged full (note 'tenths'); generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11203,7 +11203,7 @@
    "step": "Y4.B8.S5",
    "action": "partial",
    "partial": "generated items divide 3-digit numbers (274 ÷ 10); the step needs only 1-digit numbers ÷ 10 (7 ÷ 10 = 0.7)",
-   "why": "generated 3-digit ÷ 10; step is 1-digit (S6 2-digit, S10 ÷100 likewise)",
+   "why": "tagged full (note '÷ 10, decimals on'); generated items divide 3-digit numbers by 10, the step needs only 1-digit numbers",
    "opts": {
     "op": "/",
     "power": [
@@ -11249,7 +11249,7 @@
    "key": "conversions:f_to_d",
    "step": "Y4.B8.S8",
    "action": "partial",
-   "partial": "hundredths mixed with fifths and tenths; no hundred-square model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+   "partial": "hundredths mixed with fifths and tenths; no hundred-square model; about a third of the items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
    "why": "tagged full (note 'hundredths'); generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11307,7 +11307,7 @@
    "key": "conversions:f_to_d",
    "step": "Y4.B9.S8",
    "action": "partial",
-   "partial": "halves and quarters mixed with eighths; no hundred-square model; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
+   "partial": "halves and quarters mixed with eighths; no hundred-square model; most items are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
    "why": "tagged full (note 'halves and quarters'); generated items teach only part of the step",
    "opts": {
     "denoms": [

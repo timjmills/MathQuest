@@ -22,11 +22,11 @@ for t in TAGFIXES:
         t['why'] = "tagged full (note 'tenths'); with denoms [5] the items mix fifths and hundredths with tenths"
 
 # B. f_to_d has a drag-bin branch: halves and quarters sorted as percents, quarters as decimals, eighths/twelfths
-BIN5 = ('; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths '
+BIN5 = ('; about a third of the items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths '
         '(percent is later-grade; quarters as decimals are W33)')
 for sid in ('Y4.B8.S2', 'Y4.B8.S8'):
     _by[sid]['partial'] = [((k, m + BIN5) if k == 'conversions:f_to_d{"denoms":[5]}' else (k, m)) for k, m in _by[sid]['partial']]
-_by['Y4.B9.S8']['partial'] = [((k, m + '; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths')
+_by['Y4.B9.S8']['partial'] = [((k, m + '; most items are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths')
                                if k == 'conversions:f_to_d{"denoms":[2]}' else (k, m)) for k, m in _by['Y4.B9.S8']['partial']]
 NEW_PROPOSALS['f_to_d_one_item'] = dict(kind='option', skill='conversions:f_to_d', option='form "convert one fraction" / "drag-bin sort" (the _dragOrNot option d_to_f, f_to_p and p_to_f already have)',
     name='Fraction to Decimal: One Item (option)', teaches='convert one fraction to a decimal per cell (7/10 = 0.7); no percent or bin-sort items on the page',
@@ -43,7 +43,7 @@ for sid, txt in (('Y4.B8.S2', 'convert one tenth per cell (7/10 = 0.7), with no 
 P('Y4.B2.S9', direct=[],
   partial=[('number_sense:estimate_sums_diffs{"place":100}', 'with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers'),
            ('number_sense:estimate_sums_diffs{"place":1000,"task":"reasonable"}',
-            "4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000")],
+            "4-digit sums pass 10,000 in about a third of the items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000")],
   verdict='partial', missing='estimating 4-digit sums and differences, and judging answers, within 10,000',
   note='Both option sets are partial covers: {place:100} rounds 3-digit numbers only (sums to 2,000); {place:1000, task:"reasonable"} '
        'deals 4-digit numbers but its sums pass 10,000. The build list holds both within 10,000.')
@@ -77,3 +77,8 @@ relabel('Y4.B5.S3', 'pre', 'patterns:seq_10', text='Y1.B9.S2 Count in 10s (prior
 relabel('Y4.B5.S4', 'pre', 'patterns:seq_10', text='Y1.B9.S2 Count in 10s (lower grade, same idea; counting on in 10s from any number)')
 for sid in ('Y4.B11.S2', 'Y4.B13.S1'):
     relabel(sid, 'pre', 'patterns:seq_5', text='Y1.B9.S3 Count in 5s (lower grade, same idea; counting on in 5s from any number)')
+
+# critic r13 tidy-up: B8.S5's why says the tag was full (as B8.S6 and B8.S10 do)
+for t in TAGFIXES:
+    if t['key'] == 'placevalue:place_value_10x' and t['step'] == 'Y4.B8.S5':
+        t['why'] = "tagged full (note '÷ 10, decimals on'); generated items divide 3-digit numbers by 10, the step needs only 1-digit numbers"
