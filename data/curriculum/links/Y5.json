@@ -1999,7 +1999,7 @@
     },
     {
      "key": "fractions:equivalent",
-     "missing": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control (use opts {\"forms\": [0]})"
+     "missing": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control"
     }
    ],
    "verdict": "partial",
@@ -2035,10 +2035,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "fractions:equiv_frac_nv",
-     "why": "same equivalence, numbers only, yes/no and sort"
-    },
     {
      "key": "fractions:select_equiv_frac",
      "why": "recognise equivalents (next step Y5.B4.S3)"
@@ -2092,7 +2088,9 @@
      "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (prior learning wk W15)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "equiv_from_unit"
+   ],
    "related": [
     {
      "key": "fractions:select_equiv_frac",
@@ -2154,10 +2152,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "equivalence with models"
-    },
-    {
      "key": "fractions:simplify",
      "why": "simplest form"
     },
@@ -2168,27 +2162,45 @@
     {
      "key": "fraction_operations:frac_10_100",
      "why": "tenths and hundredths equivalents"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "Y5.B4.S4 Convert improper fractions to mixed numbers (next step)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y5.B4.S4 Convert improper fractions to mixed numbers (next step)"
     }
    ],
    "note": ""
   },
   "Y5.B4.S4": {
    "title": "Convert improper fractions to mixed numbers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:improper_mixed",
-     "opts": {}
+     "missing": "no direction option; mixes mixed → improper items in"
     },
     {
      "key": "fractions:mixed_improper_visual",
-     "opts": {}
+     "missing": "asks both forms of a drawn amount; no improper → mixed only page"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of improper → mixed only: improper_mixed and mixed_improper_visual have no direction option and also deal mixed → improper (sampled 2 2/4 → 10/4)",
+   "build": [
+    "improper_direction"
+   ],
    "pre": [
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "counting in fractions past 1 on a number line (Y4.B7.S2–S5 Fractions beyond 1, lower grade CCSS 4.NF.B.3)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "wholes as n/n: 3/4 + 1/4 = 1 (Y4.B7.S11, prior learning wk W16)"
+    },
     {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole: 1 = 4/4 (prior learning wk W16)"
@@ -2196,10 +2208,6 @@
     {
      "key": "composing:compose_whole",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "mixed numbers on a number line (lower grade, same cluster CCSS 4.NF.B.3)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -2215,41 +2223,43 @@
    ],
    "related": [
     {
-     "key": "fractions:mixed_nl_drag",
-     "why": "mixed numbers on a number line"
-    },
-    {
      "key": "fractions:round_fractions",
      "why": "mixed numbers to the nearest whole"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "sums beyond 1 are converted"
     },
     {
      "key": "fractions:compare",
      "why": "comparing fractions"
     }
    ],
-   "note": "improper_mixed has no direction control; mixed_improper_visual asks both forms of a drawn amount."
+   "note": ""
   },
   "Y5.B4.S5": {
    "title": "Convert mixed numbers to improper fractions",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:improper_mixed",
-     "opts": {}
+     "missing": "no direction option; mixes improper → mixed items in"
     },
     {
      "key": "fractions:mixed_improper_visual",
-     "opts": {}
+     "missing": "asks both forms of a drawn amount; no mixed → improper only page"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of mixed → improper only: improper_mixed and mixed_improper_visual have no direction option and also deal improper → mixed",
+   "build": [
+    "improper_direction"
+   ],
    "pre": [
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y5.B4.S4 idea: mixed numbers on a number line (previous step)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "wholes as n/n (Y4.B7.S11, prior learning wk W16)"
+    },
     {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
@@ -2257,14 +2267,16 @@
     {
      "key": "multiplication:mult_facts",
      "why": "times tables: wholes × denominator"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y4.B7.S1 (prior learning wk W16)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "improper_direction"
+   ],
    "related": [
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "mixed numbers on a number line"
-    },
     {
      "key": "fraction_operations:mult_frac_whole",
      "why": "products beyond 1"
@@ -2276,6 +2288,14 @@
     {
      "key": "fractions:round_fractions",
      "why": "mixed numbers to the nearest whole"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (next step)"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "Y5.B4.S6 Compare fractions less than 1 (next step)"
     }
    ],
    "note": ""
@@ -2318,19 +2338,13 @@
      "why": "Y4.B7.S4 fractions on a number line (prior learning wk W16)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "improper_direction"
+   ],
    "related": [
-    {
-     "key": "fractions:benchmark_fractions",
-     "why": "compare with 0, 1/2, 1"
-    },
     {
      "key": "fractions:order_fractions",
      "why": "next step: order"
-    },
-    {
-     "key": "fractions:fraction_nl_drag",
-     "why": "size on a number line"
     },
     {
      "key": "decimals:compare_decimal",
@@ -2376,14 +2390,6 @@
      "why": "order on a number line"
     },
     {
-     "key": "fractions:compare_frac_lcd",
-     "why": "includes ordering drag items"
-    },
-    {
-     "key": "fractions:benchmark_fractions",
-     "why": "benchmark reasoning"
-    },
-    {
      "key": "decimals:order_decimals",
      "why": "order decimals"
     }
@@ -2422,20 +2428,24 @@
    ],
    "related": [
     {
-     "key": "fractions:mixed_nl_drag",
-     "why": "mixed numbers on a number line"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "convert before comparing"
-    },
-    {
      "key": "fractions:round_fractions",
      "why": "mixed numbers near wholes"
     },
     {
-     "key": "fractions:order_fractions",
-     "why": "order below 1"
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
     }
    ],
    "note": ""
@@ -2482,12 +2492,10 @@
      "why": "Y3.B6 unit fractions (prior learning wk W17)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "frac_compare_gt1"
+   ],
    "related": [
-    {
-     "key": "fraction_operations:decompose_fractions",
-     "why": "fraction as a sum of unit fractions"
-    },
     {
      "key": "fraction_operations:frac_word_problems",
      "why": "in stories"
@@ -2499,6 +2507,10 @@
     {
      "key": "fraction_operations:add_mixed_like",
      "why": "mixed numbers"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike_nv",
+     "why": "Y5.B4.S10 Add fractions within 1 (next step)"
     }
    ],
    "note": ""
@@ -2541,14 +2553,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "fractions:equivalent",
-     "why": "convert to the common denominator"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "same denominator"
-    },
     {
      "key": "fraction_operations:sub_frac_unlike",
      "why": "inverse"
@@ -2598,12 +2602,10 @@
      "why": "Y5.B4.S2 (earlier step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "frac_total_band"
+   ],
    "related": [
-    {
-     "key": "fractions:improper_mixed",
-     "why": "convert the total to a mixed number"
-    },
     {
      "key": "fraction_operations:sub_frac_unlike",
      "why": "inverse"
@@ -2615,6 +2617,10 @@
     {
      "key": "fraction_operations:estimate_frac_ops",
      "why": "estimate first"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "why": "Y5.B4.S12 Add to a mixed number (next step)"
     }
    ],
    "note": "denoms takes one family per page ([2] halves/quarters/eighths, [3], [5]); any one family keeps denominators related."
@@ -2662,16 +2668,8 @@
      "why": "numbers-only mixed addition"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "renaming the total"
-    },
-    {
      "key": "fraction_operations:sub_mixed_like",
      "why": "inverse"
-    },
-    {
-     "key": "fractions:mixed_nl_drag",
-     "why": "count on along a line"
     }
    ],
    "note": ""
@@ -2714,15 +2712,13 @@
      "why": "Y5.B4.S5 (earlier step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "mixed_plus_frac"
+   ],
    "related": [
     {
      "key": "fraction_operations:sub_mixed_like",
      "why": "inverse"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "the improper-fraction method"
     },
     {
      "key": "fraction_operations:frac_word_mixed",
@@ -2731,6 +2727,18 @@
     {
      "key": "fraction_operations:mixed_fraction_ops",
      "why": "mixed review"
+    },
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y5.B4.S14 Subtract fractions (next step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike",
+     "why": "Y5.B4.S14 Subtract fractions (next step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_unlike_nv",
+     "why": "Y5.B4.S14 Subtract fractions (next step)"
     }
    ],
    "note": ""
@@ -2745,11 +2753,11 @@
     },
     {
      "key": "fraction_operations:sub_frac_unlike",
-     "missing": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4) (use opts {\"denoms\": [2]})"
+     "missing": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4)"
     },
     {
      "key": "fraction_operations:sub_frac_unlike_nv",
-     "missing": "numbers only; minuend within 1, no whole or improper minuend (use opts {\"denoms\": [2]})"
+     "missing": "numbers only; minuend within 1, no whole or improper minuend"
     }
    ],
    "verdict": "partial",
@@ -2782,16 +2790,16 @@
      "why": "inverse"
     },
     {
-     "key": "fractions:equivalent",
-     "why": "common denominator"
-    },
-    {
      "key": "fraction_operations:frac_word_problems",
      "why": "in stories"
     },
     {
      "key": "fraction_operations:sub_mixed_like",
      "why": "next: mixed numbers"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_unlike",
+     "why": "Y5.B4.S15 Subtract from a mixed number (next step)"
     }
    ],
    "note": "WRM includes subtracting from a whole/improper fraction; sub_fractions_like covers same denominator, {denoms:[one family]} keeps the others related."
@@ -2832,19 +2840,13 @@
      "why": "Y5.B4.S4 (earlier step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "frac_whole_minuend"
+   ],
    "related": [
     {
      "key": "fraction_operations:sub_mixed_like_nv",
      "why": "numbers-only mixed subtraction"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "inverse"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "renaming"
     },
     {
      "key": "fractions:mixed_nl_drag",
@@ -2886,19 +2888,13 @@
      "why": "Y5.B4.S14 (earlier step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "mixed_plus_frac"
+   ],
    "related": [
-    {
-     "key": "fractions:improper_mixed",
-     "why": "1 whole = 5/5"
-    },
     {
      "key": "fraction_operations:sub_mixed_like_nv",
      "why": "numbers only"
-    },
-    {
-     "key": "fraction_operations:sub_mixed_unlike",
-     "why": "related denominators"
     },
     {
      "key": "fraction_operations:add_mixed_like",
@@ -2945,19 +2941,14 @@
      "why": "Y5.B4.S5 (earlier step)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "mixed_plus_frac",
+    "sub_break_whole"
+   ],
    "related": [
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "inverse"
-    },
     {
      "key": "fraction_operations:frac_word_mixed",
      "why": "in stories"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "the improper-fraction method"
     },
     {
      "key": "fraction_operations:mixed_fraction_ops",
@@ -3734,14 +3725,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:decompose_fractions",
-     "why": "unit fractions as repeated addition"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "repeated addition"
-    },
-    {
      "key": "fractions:fraction_of_set_nv",
      "why": "1/n of an amount"
     },
@@ -3782,15 +3765,13 @@
      "why": "Y5.B4.S4 (prior learning wk W19)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "mult_unit_frac_int"
+   ],
    "related": [
     {
      "key": "fraction_operations:decompose_fractions",
      "why": "3/5 = 1/5+1/5+1/5"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "products beyond 1 as mixed numbers"
     },
     {
      "key": "fraction_operations:frac_mult_word",
@@ -3837,20 +3818,20 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:mult_frac_whole",
-     "why": "fraction × integer"
-    },
-    {
-     "key": "fractions:improper_mixed",
-     "why": "convert first"
-    },
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "repeated addition of mixed numbers"
-    },
-    {
      "key": "fraction_operations:frac_mult_word",
-     "why": "in stories"
+     "why": "fraction × whole in stories"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like_nv",
+     "why": "repeated addition of mixed numbers, numbers only"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "next step: a fraction of a quantity"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (next step)"
     }
    ],
    "note": ""
@@ -3898,23 +3879,21 @@
      "why": "halving (prior learning wk W20)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "mult_mixed_int"
+   ],
    "related": [
     {
      "key": "fractions:fraction_of_set_hard",
      "why": "larger amounts"
     },
     {
-     "key": "fraction_operations:mult_frac_whole",
-     "why": "fraction × whole"
-    },
-    {
      "key": "fractions:identify",
      "why": "fraction of a shape"
     },
     {
-     "key": "fractions:shade_fraction",
-     "why": "divide by the denominator"
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S5 Fraction of an amount (next step)"
     }
    ],
    "note": ""
@@ -3960,10 +3939,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "fractions:fraction_of_set_nv",
-     "why": "smaller amounts"
-    },
     {
      "key": "fraction_operations:frac_mult_word",
      "why": "in stories"
@@ -4016,18 +3991,6 @@
     {
      "key": "conversions:find_whole_from_pct",
      "why": "same idea with percent"
-    },
-    {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "fraction of an amount, forward"
-    },
-    {
-     "key": "fractions:fraction_of_set_nv",
-     "why": "unit fraction of an amount"
-    },
-    {
-     "key": "division:missing_mult_div",
-     "why": "inverse operations"
     }
    ],
    "note": ""
@@ -4064,16 +4027,10 @@
      "why": "÷ by the denominator (prior learning wk W20)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "frac_find_whole"
+   ],
    "related": [
-    {
-     "key": "fractions:fraction_of_set_hard_nv",
-     "why": "fraction of an amount"
-    },
-    {
-     "key": "fraction_operations:mult_frac_whole_nv",
-     "why": "fraction × whole"
-    },
     {
      "key": "fraction_operations:mult_scaling",
      "why": "multiplying as scaling"
@@ -4130,16 +4087,8 @@
    ],
    "related": [
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "tenths as hundredths"
-    },
-    {
      "key": "decimals:compare_decimal",
      "why": "compare"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "fraction to decimal"
     },
     {
      "key": "conversions:percent_visual",
@@ -4154,7 +4103,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip (use opts {\"denoms\": [5]})"
+     "missing": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip"
     },
     {
      "key": "conversions:d_to_f",
@@ -4188,14 +4137,6 @@
     "decimal_pv"
    ],
    "related": [
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "tenths on a number line"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "tenths as hundredths"
-    },
     {
      "key": "conversions:percent_visual",
      "why": "hundred square"
@@ -4242,7 +4183,8 @@
     }
    ],
    "preBuild": [
-    "decimal_pv"
+    "decimal_pv",
+    "fd_place_band"
    ],
    "related": [
     {
@@ -4297,20 +4239,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:equivalent",
-     "why": "scale to /10 or /100 first"
-    },
-    {
      "key": "conversions:order_fdp",
      "why": "order mixed forms"
     },
     {
      "key": "conversions:f_to_p",
      "why": "fraction to percent"
-    },
-    {
-     "key": "fractions:simplify",
-     "why": "simplest form"
     }
    ],
    "note": ""
@@ -4351,10 +4285,6 @@
     {
      "key": "decimals:compare_thousandths",
      "why": "thousandths compared"
-    },
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "tenths as hundredths"
     },
     {
      "key": "decimals:round_thousandths",
@@ -4400,7 +4330,9 @@
     }
    ],
    "preBuild": [
-    "decimal_pv"
+    "decimal_pv",
+    "fd_place_band",
+    "thousandths_pv"
    ],
    "related": [
     {
@@ -4414,10 +4346,6 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "÷ 1,000 gives thousandths"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "decimal to fraction"
     }
    ],
    "note": "The W12 xlsx prior list (division) is off-topic for thousandths and was dropped."
@@ -4454,16 +4382,13 @@
     }
    ],
    "preBuild": [
-    "decimal_pv"
+    "decimal_pv",
+    "thousandths_pv"
    ],
    "related": [
     {
      "key": "placevalue:place_value_10x",
      "why": "the shift chart moves digits into thousandths"
-    },
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "compare"
     },
     {
      "key": "decimals:order_decimals",
@@ -4472,6 +4397,10 @@
     {
      "key": "decimals:round_thousandths",
      "why": "round"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y5.B7.S8 Order and compare decimals (same number of decimal places) (next step)"
     }
    ],
    "note": "The W13 xlsx prior list (column addition) is off-topic and was dropped."
@@ -4516,16 +4445,10 @@
      "why": "Y4.B8.S7 (prior learning wk W22)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "thousandths_pv"
+   ],
    "related": [
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "3 dp"
-    },
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "on a number line"
-    },
     {
      "key": "fractions:compare",
      "why": "compare fractions"
@@ -4567,12 +4490,10 @@
      "why": "compare whole numbers (prior learning wk W22)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_dp_match"
+   ],
    "related": [
-    {
-     "key": "decimals:compare_decimal",
-     "why": "2 dp"
-    },
     {
      "key": "decimals:round_thousandths",
      "why": "rounding"
@@ -4580,10 +4501,6 @@
     {
      "key": "conversions:order_fdp",
      "why": "mixed forms"
-    },
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "number line"
     }
    ],
    "note": "order_decimals at Decimal Places 3 mixes 1–3 dp (6.88, 0.425, 7.7)."
@@ -4630,12 +4547,12 @@
      "why": "mixed numbers to the nearest whole"
     },
     {
-     "key": "number_sense:rounding_visual",
-     "why": "rounding on a number line"
+     "key": "number_sense:round_sort_tenths",
+     "why": "Y5.B7.S11 Round to 1 decimal place (next step)"
     },
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "decimals on a line"
+     "key": "decimals:round_thousandths",
+     "why": "Y5.B7.S11 Round to 1 decimal place (next step)"
     }
    ],
    "note": ""
@@ -4683,19 +4600,21 @@
      "why": "round to the nearest 10 (prior learning wk W35)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "round_whole"
+   ],
    "related": [
     {
      "key": "number_sense:round_sort_hundredths",
      "why": "to a hundredth"
     },
     {
-     "key": "number_sense:rounding_visual",
-     "why": "number line"
-    },
-    {
      "key": "fractions:round_fractions",
      "why": "round mixed numbers"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (next step)"
     }
    ],
    "note": "round_decimals {precision:[0]} = nearest tenth, with the number line and midpoint."
@@ -4741,12 +4660,12 @@
      "why": "decimal to percent"
     },
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "hundredths"
-    },
-    {
      "key": "conversions:percent_of_number",
      "why": "next grade: percent of"
+    },
+    {
+     "key": "conversions:p_to_f",
+     "why": "Y5.B7.S13 Percentages as fractions (next step)"
     }
    ],
    "note": ""
@@ -4788,20 +4707,16 @@
    "preBuild": [],
    "related": [
     {
-     "key": "conversions:percent_visual",
-     "why": "hundred square"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "scale to /100"
-    },
-    {
-     "key": "fractions:simplify",
-     "why": "simplify the fraction"
-    },
-    {
      "key": "conversions:order_fdp",
      "why": "mixed forms"
+    },
+    {
+     "key": "conversions:d_to_p",
+     "why": "Y5.B7.S14 Percentages as decimals (next step)"
+    },
+    {
+     "key": "conversions:p_to_d",
+     "why": "Y5.B7.S14 Percentages as decimals (next step)"
     }
    ],
    "note": ""
@@ -4843,20 +4758,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "conversions:percent_visual",
-     "why": "hundred square"
-    },
-    {
      "key": "conversions:d_to_f",
      "why": "decimal to fraction"
     },
     {
      "key": "conversions:order_fdp",
      "why": "mixed forms"
-    },
-    {
-     "key": "conversions:f_to_p",
-     "why": "fraction to percent"
     }
    ],
    "note": ""
@@ -4902,18 +4809,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "conversions:percent_visual",
-     "why": "hundred square"
-    },
-    {
-     "key": "conversions:p_to_f",
-     "why": "percent to fraction"
-    },
-    {
-     "key": "conversions:p_to_d",
-     "why": "percent to decimal"
-    },
-    {
      "key": "conversions:mixed_conversions",
      "why": "mixed review"
     }
@@ -4937,14 +4832,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "area_perimeter:perimeter",
-     "why": "Y4.B6.S4 Perimeter of a rectangle (lower grade, same cluster CCSS 3.MD.D.8)"
-    },
-    {
-     "key": "area_perimeter:perimeter_grid",
-     "why": "Y4.B6.S3 Perimeter on a grid (lower grade, same cluster CCSS 3.MD.D.8)"
-    },
     {
      "key": "area_perimeter:perimeter_intro",
      "why": "Y3.B5.S10 What is perimeter (lower grade, same cluster CCSS 3.MD.D.8)"
@@ -5007,10 +4894,6 @@
      "why": "Y3/Gr.2 What is perimeter? (prior learning wk W29)"
     },
     {
-     "key": "area_perimeter:perimeter_grid",
-     "why": "Y4.B6.S5 Perimeter of rectilinear shapes (lower grade, same cluster CCSS 3.MD.D.8)"
-    },
-    {
      "key": "subtraction:subtract",
      "why": "missing side = whole side − known part (lower grade, same cluster CCSS 3.NBT.A.2)"
     },
@@ -5048,10 +4931,6 @@
    ],
    "pre": [
     {
-     "key": "area_perimeter:perimeter_intro",
-     "why": "Y3/Gr.2 What is perimeter? (prior learning wk W29)"
-    },
-    {
      "key": "area_perimeter:perimeter",
      "why": "Y3/Gr.2 Calculate perimeter (prior learning wk W29)"
     },
@@ -5070,10 +4949,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:perimeter",
-     "why": "perimeter of rectangles"
-    },
     {
      "key": "coordinates:coord_polygon",
      "why": "perimeter of a polygon drawn on a grid"
@@ -5098,10 +4973,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "Y4/Gr.3 What is area? / Count squares (prior learning wk W29)"
-    },
     {
      "key": "multiplication:dot_array_mult",
      "why": "Y3/Gr.2 Use arrays (prior learning wk W29)"
@@ -5170,20 +5041,16 @@
      "why": "Y4/Gr.3 Count squares (prior learning wk W29)"
     },
     {
-     "key": "area_perimeter:composite_shapes",
-     "why": "Y5.B8.S2 Perimeter of rectilinear shapes (same shapes)"
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "split a rectangle into two parts (lower grade, CCSS 3.MD.C.7c)"
     },
     {
-     "key": "addition:add",
-     "why": "add the part areas (lower grade, same cluster CCSS 3.MD.C.7d)"
+     "key": "subtraction:subtract",
+     "why": "missing lengths in the shape"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:area_distributive_visual",
-     "why": "splitting a rectangle into two"
-    },
     {
      "key": "area_perimeter:volume_composite",
      "why": "the same split idea in 3-D (Grade 5)"
@@ -5265,16 +5132,8 @@
      "why": "plotting ordered pairs (same CCSS 5.G.A.2)"
     },
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "first-quadrant points"
-    },
-    {
      "key": "graphs:line_plot",
      "why": "a line PLOT is not a line graph: name the difference"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "another chart of the same data"
     }
    ],
    "note": "Line graphs are not in K-5 CCSS; tag 5.G.A.2 as the nearest. Owner: the school pairs 4.MD.B.4 line plots as a supplement (not a WRM step)."
@@ -5315,18 +5174,6 @@
     {
      "key": "coordinates:coordinate_graph",
      "why": "plotting ordered pairs (same CCSS 5.G.A.2)"
-    },
-    {
-     "key": "coordinates:coordinate_q1",
-     "why": "first-quadrant points"
-    },
-    {
-     "key": "graphs:line_plot",
-     "why": "a line PLOT is not a line graph: name the difference"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "another chart of the same data"
     }
    ],
    "note": "Line graphs are not in K-5 CCSS; tag 5.G.A.2 as the nearest. Owner: the school pairs 4.MD.B.4 line plots as a supplement (not a WRM step)."
@@ -5360,14 +5207,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "graphs:tally_chart",
-     "why": "a tally chart is a two-column table"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "the same data as a chart"
-    },
     {
      "key": "graphs:mixed_graphs",
      "why": "reading data in several forms"
@@ -5403,12 +5242,12 @@
    ],
    "related": [
     {
-     "key": "graphs:tally_chart",
-     "why": "one-way table"
+     "key": "graphs:pictograph",
+     "why": "the same counts as a picture graph"
     },
     {
-     "key": "graphs:bar_graph",
-     "why": "chart of the same data"
+     "key": "graphs:build_bar_graph",
+     "why": "draw the totals as bars"
     }
    ],
    "note": "Pre-skill table_data (Y5.B9.S3) is itself unbuilt."
@@ -5445,10 +5284,6 @@
    ],
    "related": [
     {
-     "key": "measurement:elapsed_find_duration",
-     "why": "durations between two times"
-    },
-    {
      "key": "measurement:time_sense",
      "why": "a.m. / p.m. on a timetable"
     }
@@ -5475,20 +5310,20 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3/Gr.2 Right angles (prior learning)"
-    },
-    {
      "key": "angles_lines:identify_lines",
      "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same cluster CCSS 4.G.A.1)"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "quarter and half turns of a clock hand (lower grade)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "quarter, half, whole of a turn (lower grade, CCSS 3.NF.A.1)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "measurement:time_quarter",
-     "why": "quarter and half turns of the minute hand"
-    },
     {
      "key": "angles_lines:additive_angles",
      "why": "angles that add to 90°/180°/360°"
@@ -5512,16 +5347,16 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 Identify angles (lower grade, same cluster CCSS 4.G.A.1)"
-    },
-    {
      "key": "angles_lines:measure_angles",
      "why": "Y5.B10.S1 Understand and use degrees (previous step)"
     },
     {
      "key": "shapes_early:name_2d_shapes",
      "why": "angles inside shapes (prior learning)"
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "perpendicular lines make right angles (Y3.B11.S6)"
     }
    ],
    "preBuild": [],
@@ -5529,10 +5364,6 @@
     {
      "key": "shapes_classify:classify_triangles",
      "why": "classify triangles by their angles"
-    },
-    {
-     "key": "angles_lines:identify_lines",
-     "why": "perpendicular lines make right angles"
     },
     {
      "key": "shapes_classify:classify_quads",
@@ -5561,18 +5392,18 @@
      "why": "Y5.B10.S2 Classify angles (previous step)"
     },
     {
-     "key": "angles_lines:measure_angles",
-     "why": "Y5.B10.S1 Understand and use degrees"
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Classify angles: acute or obtuse first"
+    },
+    {
+     "key": "measurement:estimate_length",
+     "why": "estimating with a benchmark"
     }
    ],
    "preBuild": [
     "reflex_angles"
    ],
    "related": [
-    {
-     "key": "measurement:estimate_length",
-     "why": "estimating another measure"
-    },
     {
      "key": "angles_lines:additive_angles",
      "why": "benchmark 90° plus a part"
@@ -5595,10 +5426,6 @@
     "protractor_read"
    ],
    "pre": [
-    {
-     "key": "angles_lines:measure_angles",
-     "why": "Y5.B10.S3 Estimate angles (previous step)"
-    },
     {
      "key": "measurement:reading_ruler",
      "why": "reading a scale from 0 (prior learning)"
@@ -5678,10 +5505,6 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:additive_angles",
-     "why": "two parts of 90° first (same skill, easier form)"
-    },
-    {
      "key": "angles_lines:measure_angles",
      "why": "Y5.B10.S4 Measure angles"
     },
@@ -5719,19 +5542,23 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:additive_angles",
-     "why": "Y5.B10.S6 Calculate angles around a point (previous step)"
-    },
-    {
      "key": "angles_lines:identify_angles",
      "why": "a straight angle is 180°"
+    },
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 measure angles"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "180 − known parts (lower grade)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "angles_lines:measure_angles",
-     "why": "check by measuring"
+     "key": "graphs:pie_chart",
+     "why": "parts of a whole turn add up (360°)"
     }
    ],
    "note": ""
@@ -5849,10 +5676,6 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "Y3.B11.S9 Recognise and describe 3-D shapes (lower grade, same cluster CCSS 1.G.A.1)"
-    },
-    {
      "key": "shapes_early:shape_name_match_3d",
      "why": "match names to 3-D shapes (prior learning)"
     },
@@ -5892,16 +5715,16 @@
    "build": [],
    "pre": [
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S1 Describe position using coordinates (lower grade, same cluster CCSS 5.G.A.1)"
+     "key": "number_sense:place_on_number_line",
+     "why": "an axis is a number line"
     },
     {
      "key": "shapes_early:shape_positions",
      "why": "position words (prior learning)"
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "reading an axis as a number line"
+     "key": "graphs:bar_graph",
+     "why": "reading values off an axis"
     }
    ],
    "preBuild": [],
@@ -5978,10 +5801,6 @@
      "why": "Y5.B11.S1 Read and plot coordinates"
     },
     {
-     "key": "coordinates:geo_translate",
-     "why": "Y4.B14.S5 Describe translation on a grid (lower grade)"
-    },
-    {
      "key": "coordinates:coord_polygon",
      "why": "Y4.B14.S3 Draw 2-D shapes on a grid (prior learning wk W27)"
     },
@@ -6019,19 +5838,23 @@
    ],
    "pre": [
     {
-     "key": "coordinates:geo_translate",
-     "why": "Y5.B11.S3 Translation (previous step)"
-    },
-    {
      "key": "coordinates:coordinate_q1",
      "why": "read coordinates"
+    },
+    {
+     "key": "coordinates:coord_polygon",
+     "why": "vertices as coordinates (Y4.B14.S3)"
+    },
+    {
+     "key": "addition:add",
+     "why": "add/subtract the move to each coordinate"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "coordinates:coord_polygon",
-     "why": "polygon vertices as coordinates"
+     "key": "coordinates:geo_reflect",
+     "why": "Y5.B11.S6 reflection, another transformation"
     }
    ],
    "note": ""
@@ -6054,12 +5877,16 @@
    "build": [],
    "pre": [
     {
-     "key": "angles_lines:symmetry",
-     "why": "Y4.B12.S7 Lines of symmetry (lower grade, same cluster CCSS 4.G.A.3)"
+     "key": "shapes_early:partition_shapes",
+     "why": "equal halves of shapes (lower grade, same cluster CCSS 2.G.A.3)"
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "halves of shapes (lower grade)"
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name the shape first (prior learning)"
+    },
+    {
+     "key": "shapes_classify:classify_quads",
+     "why": "properties of quadrilaterals (Y4.B12.S5)"
     }
    ],
    "preBuild": [],
@@ -6067,10 +5894,6 @@
     {
      "key": "coordinates:geo_reflect",
      "why": "Y5.B11.S6 Reflection (next step)"
-    },
-    {
-     "key": "shapes_classify:classify_quads",
-     "why": "symmetry of quadrilaterals"
     }
    ],
    "note": ""
@@ -6192,13 +6015,10 @@
     }
    ],
    "preBuild": [
+    "dec_known_facts",
     "decimal_whole"
    ],
    "related": [
-    {
-     "key": "composing:make_ten",
-     "why": "bonds to 10"
-    },
     {
      "key": "decimals:sub_decimal",
      "why": "subtract from 1"
@@ -6210,6 +6030,10 @@
     {
      "key": "decimals:decimal_nl_drag",
      "why": "number line"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S3 Add and subtract decimals across 1 (next step)"
     }
    ],
    "note": "The W35 xlsx prior list (rounding review) is off-topic and was dropped."
@@ -6263,14 +6087,6 @@
     {
      "key": "placevalue:place_value_10x",
      "why": "decimal place value"
-    },
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "number line"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "tenths"
     }
    ],
    "note": ""
@@ -6292,6 +6108,10 @@
    ],
    "pre": [
     {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y5.B12.S3 idea: decimals on a number line (previous step is a partial; across 1)"
+    },
+    {
      "key": "addition:add_10k_regroup",
      "why": "Y4 Add two 4-digit numbers with exchange (prior learning wk W13)"
     },
@@ -6301,14 +6121,15 @@
     },
     {
      "key": "conversions:d_to_f",
-     "why": "Y4.B8.S8 (prior learning wk W13)"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "decimal place value (Y5.B7.S8)"
+     "why": "Y4.B8.S8 Hundredths as decimals (prior learning wk W13)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_across_one",
+    "dec_known_facts",
+    "decimal_models",
+    "decimal_pv"
+   ],
    "related": [
     {
      "key": "decimals:sub_decimal",
@@ -6320,7 +6141,7 @@
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "column method"
+     "why": "compares decimals: same place-value reasoning that lines up the points"
     }
    ],
    "note": ""
@@ -6354,19 +6175,14 @@
      "why": "decimal place value (Y5.B7.S8)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_dp_match",
+    "decimal_models"
+   ],
    "related": [
-    {
-     "key": "decimals:add_decimal",
-     "why": "inverse"
-    },
     {
      "key": "decimals:mixed_decimals",
      "why": "mixed review"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "place value"
     },
     {
      "key": "decimals:order_decimals",
@@ -6403,16 +6219,11 @@
      "why": "column addition with exchange (prior learning wk W14)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_dp_match",
+    "decimal_models"
+   ],
    "related": [
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "0.450 = 0.45 place holder"
-    },
-    {
-     "key": "decimals:sub_decimal",
-     "why": "inverse"
-    },
     {
      "key": "decimals:mixed_decimals",
      "why": "mixed review"
@@ -6452,16 +6263,10 @@
      "why": "Y5.B7.S9 place-holder zero (earlier block)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_dp_match"
+   ],
    "related": [
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "place holder zero"
-    },
-    {
-     "key": "decimals:add_decimal",
-     "why": "inverse"
-    },
     {
      "key": "decimals:mixed_decimals",
      "why": "mixed review"
@@ -6496,20 +6301,10 @@
      "why": "Y5.B7.S11 round to adjust (earlier block)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_dp_match"
+   ],
    "related": [
-    {
-     "key": "decimals:add_decimal",
-     "why": "column method"
-    },
-    {
-     "key": "decimals:sub_decimal",
-     "why": "column method"
-    },
-    {
-     "key": "decimals:round_decimals",
-     "why": "round to adjust"
-    },
     {
      "key": "decimals:mixed_decimals",
      "why": "mixed review"
@@ -6548,23 +6343,13 @@
      "why": "Y4.B8.S4 decimals on a number line"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_known_facts"
+   ],
    "related": [
     {
-     "key": "patterns:count_by_step_up",
-     "why": "whole-number sequences"
-    },
-    {
-     "key": "patterns:count_by_step_down",
-     "why": "counting down by a step"
-    },
-    {
-     "key": "patterns:number_pattern",
-     "why": "find the rule"
-    },
-    {
-     "key": "decimals:decimal_nl_drag",
-     "why": "decimals on a line"
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B12.S10 Multiply by 10, 100 and 1,000 (next step)"
     }
    ],
    "note": ""
@@ -6606,12 +6391,10 @@
      "why": "decimal places (Y5.B7)"
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "dec_sequence"
+   ],
    "related": [
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "× multiples of 10"
-    },
     {
      "key": "decimals:mult_decimal",
      "why": "decimal ×"
@@ -6619,10 +6402,6 @@
     {
      "key": "decimals:compare_thousandths",
      "why": "decimal place value"
-    },
-    {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "powers of 10"
     }
    ],
    "note": "decimals:true deals 34.1 × 10, 43.9 × 1,000 with the shift chart; exponent notation is grade 5 (pv10_exponents)."
@@ -6663,10 +6442,6 @@
      "why": "decimal ÷"
     },
     {
-     "key": "decimals:compare_thousandths",
-     "why": "thousandths produced"
-    },
-    {
      "key": "patterns:count_by_powers_of_10",
      "why": "powers of 10"
     },
@@ -6705,14 +6480,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "the forward calculation"
-    },
-    {
-     "key": "division:missing_mult_div",
-     "why": "missing numbers in × and ÷"
-    },
     {
      "key": "decimals:mult_decimal",
      "why": "decimal ×"
@@ -6912,7 +6679,14 @@
    "partial": [
     {
      "key": "integers:sub_int",
-     "missing": "formal a − b with negatives (Grade 7 notation); not the difference between a positive and a negative temperature by counting on a line"
+     "missing": "formal a − b with negatives (Grade 7 notation); not the difference between a positive and a negative temperature by counting on a line; with {forms:[1],band:10,ticks:\"one\"} it deals 2 − (−6) on a −1..9 tick line, the nearest form",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "band": 10,
+      "ticks": "one"
+     }
     }
    ],
    "verdict": "partial",
@@ -6986,10 +6760,6 @@
     {
      "key": "measurement:mass_volume_liquid",
      "why": "Y3.B7.S3 Measure mass in kilograms and grams (lower grade)"
-    },
-    {
-     "key": "measurement:length_metric",
-     "why": "Y4.B6.S2 Equivalent lengths km and m (lower grade)"
     }
    ],
    "preBuild": [
@@ -7050,10 +6820,6 @@
    ],
    "related": [
     {
-     "key": "measurement:unit_conversions",
-     "why": "other metric pairs"
-    },
-    {
      "key": "measurement:unit_conversion_word",
      "why": "metric stories"
     }
@@ -7085,10 +6851,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:length_metric",
-     "why": "Y5.B14.S2 Millimetres and millilitres (previous step); Y3.B5.S4 m, cm, mm (lower grade)"
-    },
-    {
      "key": "measurement:reading_ruler",
      "why": "measure before converting (lower grade)"
     },
@@ -7106,10 +6868,6 @@
     {
      "key": "measurement:length_customary",
      "why": "customary lengths"
-    },
-    {
-     "key": "measurement:reading_ruler",
-     "why": "measure, then convert"
     }
    ],
    "note": ""
@@ -7265,10 +7023,6 @@
     {
      "key": "area_perimeter:volume",
      "why": "l × w × h (Grade 5 next)"
-    },
-    {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "area as squares, volume as cubes"
     }
    ],
    "note": "area_perimeter:volume uses l × w × h; WRM Y5 counts cubes first. Not tagged direct."
@@ -7301,10 +7055,6 @@
     {
      "key": "placevalue:compare",
      "why": "compare the two counts"
-    },
-    {
-     "key": "area_perimeter:volume",
-     "why": "compute instead of count"
     }
    ],
    "note": ""
@@ -7363,10 +7113,6 @@
     {
      "key": "measurement:mass_volume_liquid",
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade, same cluster CCSS 3.MD.A.2)"
-    },
-    {
-     "key": "measurement:capacity",
-     "why": "Y5.B14.S2 Millilitres (earlier step)"
     }
    ],
    "preBuild": [
@@ -7376,10 +7122,6 @@
     {
      "key": "measurement:unit_conversions",
      "why": "l↔ml"
-    },
-    {
-     "key": "measurement:mass_volume_liquid",
-     "why": "read a jug after estimating"
     }
    ],
    "note": "volume_cubes also lists this step; capacity estimation is a separate option, so the lead may drop Y5.B15.S4 from volume_cubes."
@@ -8030,7 +7772,30 @@
    ],
    "why": "equivalent / equiv_frac_visual mix unit and non-unit starts, so the WRM unit-fraction lesson cannot be printed on its own",
    "steps": [
-    "Y5.B4.S1"
+    "Y5.B4.S1",
+    "Y5.B4.S2"
+   ],
+   "reused": false
+  },
+  "improper_direction": {
+   "kind": "option",
+   "skill": "fractions:improper_mixed",
+   "also": [
+    "fractions:mixed_improper_visual"
+   ],
+   "option": "direction \"improper → mixed\" / \"mixed → improper\" / both",
+   "name": "Improper ↔ Mixed: One Direction (option)",
+   "teaches": "converting improper fractions to mixed numbers (14/4 = 3 2/4) on one page, and mixed numbers to improper fractions (3 2/4 = 14/4) on another",
+   "representation": "boxed cell: the fraction with a bar model of wholes drawn as full bars; answer in a mixed-number slot (whole box + fraction boxes) or a fraction slot; the bars fade to none",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "why": "WRM teaches the two directions as two steps (Y5.B4.S4, S5); improper_mixed always mixes them",
+   "steps": [
+    "Y5.B4.S4",
+    "Y5.B4.S5",
+    "Y5.B4.S6"
    ],
    "reused": false
   },
@@ -8061,11 +7826,13 @@
    "representation": "a band option on compare / order_fractions",
    "family": "fractions",
    "steps": [
-    "Y5.B4.S8"
+    "Y5.B4.S8",
+    "Y5.B4.S9"
    ],
    "reused": true,
    "ccss": [
-    "4.NF.A.2"
+    "4.NF.A.2",
+    "4.NF.B.3"
    ],
    "why": "closes the listed Y5 steps"
   },
@@ -8086,7 +7853,8 @@
    ],
    "why": "WRM splits within-1 and over-1 into two steps; today the sums are mixed",
    "steps": [
-    "Y5.B4.S10"
+    "Y5.B4.S10",
+    "Y5.B4.S11"
    ],
    "reused": false
   },
@@ -8109,8 +7877,10 @@
    "why": "every mixed-number skill deals mixed ± mixed; WRM Y5.B4.S12/S15/S16 start from mixed ± fraction",
    "steps": [
     "Y5.B4.S12",
+    "Y5.B4.S13",
     "Y5.B4.S15",
-    "Y5.B4.S16"
+    "Y5.B4.S16",
+    "Y5.B4.S17"
    ],
    "reused": false
   },
@@ -8131,7 +7901,8 @@
    ],
    "why": "WRM Y5.B4.S14 subtracts from wholes and improper fractions; every dealt item stays within 1",
    "steps": [
-    "Y5.B4.S14"
+    "Y5.B4.S14",
+    "Y5.B4.S15"
    ],
    "reused": false
   },
@@ -8144,7 +7915,8 @@
    "representation": "an \"exchange a whole\" band with a bar-model support",
    "family": "fractions",
    "steps": [
-    "Y5.B4.S16"
+    "Y5.B4.S16",
+    "Y5.B4.S17"
    ],
    "reused": true,
    "ccss": [
@@ -8168,7 +7940,8 @@
    ],
    "why": "mult_frac_whole mixes unit and non-unit fractions, so the first WRM step cannot be isolated",
    "steps": [
-    "Y5.B6.S1"
+    "Y5.B6.S1",
+    "Y5.B6.S2"
    ],
    "reused": false
   },
@@ -8178,16 +7951,17 @@
    "option": "mixed numbers",
    "name": "Multiply a Mixed Number by an Integer (option)",
    "teaches": "multiplying a mixed number by a whole number (2 1/3 × 4)",
-   "representation": "a mixed-number band on mult_frac_whole",
+   "representation": "boxed cell: 2 1/3 × 4 with a part-whole bar split into the wholes and the fraction (4 × 2 wholes + 4 × 1/3 = 8 + 4/3 = 9 1/3); write the answer as a mixed number in two boxes; the partition hint fades to none",
    "family": "fractions",
    "steps": [
-    "Y5.B6.S3"
+    "Y5.B6.S3",
+    "Y5.B6.S4"
    ],
    "reused": true,
+   "why": "no skill multiplies a mixed number by an integer; mult_frac_whole deals proper and improper fractions only (checked)",
    "ccss": [
     "4.NF.B.4"
-   ],
-   "why": "closes the listed Y5 steps"
+   ]
   },
   "frac_find_whole": {
    "kind": "option",
@@ -8198,7 +7972,8 @@
    "representation": "a \"find the whole\" task option with a bar model support",
    "family": "fractions",
    "steps": [
-    "Y5.B6.S6"
+    "Y5.B6.S6",
+    "Y5.B6.S7"
    ],
    "reused": true,
    "ccss": [
@@ -8236,7 +8011,8 @@
     "Y5.B7.S5",
     "Y5.B7.S6",
     "Y5.B7.S7",
-    "Y5.B12.S1"
+    "Y5.B12.S1",
+    "Y5.B12.S4"
    ],
    "reused": true,
    "ccss": [
@@ -8286,7 +8062,9 @@
    "why": "d_to_f / f_to_d mix tenths, hundredths and 3/4-type items and stop at hundredths",
    "steps": [
     "Y5.B7.S2",
-    "Y5.B7.S5"
+    "Y5.B7.S3",
+    "Y5.B7.S5",
+    "Y5.B7.S6"
    ],
    "reused": false
   },
@@ -8301,12 +8079,14 @@
    "steps": [
     "Y5.B7.S5",
     "Y5.B7.S6",
-    "Y5.B7.S7"
+    "Y5.B7.S7",
+    "Y5.B7.S8"
    ],
    "reused": true,
    "ccss": [
     "4.NBT.A.1",
     "4.NF.C.6",
+    "4.NF.C.7",
     "5.NBT.A.3"
    ],
    "why": "closes the listed Y5 steps"
@@ -8331,10 +8111,12 @@
    "why": "WRM separates same-dp and different-dp steps (add/sub B12.S4–S7, compare/order B7.S8); today the Decimal Places setting mixes them at 2–3 dp and compare pairs differ in the whole part",
    "steps": [
     "Y5.B7.S8",
+    "Y5.B7.S9",
     "Y5.B12.S4",
     "Y5.B12.S5",
     "Y5.B12.S6",
-    "Y5.B12.S7"
+    "Y5.B12.S7",
+    "Y5.B12.S8"
    ],
    "reused": false
   },
@@ -8347,7 +8129,8 @@
    "representation": "a \"nearest whole\" target option with a number-line support",
    "family": "decimals",
    "steps": [
-    "Y5.B7.S10"
+    "Y5.B7.S10",
+    "Y5.B7.S11"
    ],
    "reused": true,
    "ccss": [
@@ -8366,11 +8149,14 @@
     "Y5.B12.S1",
     "Y5.B12.S2",
     "Y5.B12.S3",
-    "Y5.B12.S8"
+    "Y5.B12.S4",
+    "Y5.B12.S8",
+    "Y5.B12.S9"
    ],
    "reused": true,
    "ccss": [
     "4.NBT.B.4",
+    "4.OA.C.5",
     "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
@@ -8392,7 +8178,8 @@
    ],
    "why": "decimal_models adds pictures but no across-1 item control; add_decimal crosses 1 only at random",
    "steps": [
-    "Y5.B12.S3"
+    "Y5.B12.S3",
+    "Y5.B12.S4"
    ],
    "reused": false
   },
@@ -8442,7 +8229,8 @@
    "steps": [
     "Y5.B12.S3",
     "Y5.B12.S4",
-    "Y5.B12.S5"
+    "Y5.B12.S5",
+    "Y5.B12.S6"
    ],
    "ccss": [
     "4.NBT.B.4",
@@ -8459,11 +8247,14 @@
    "representation": "a number track with decimal steps; write the missing terms and the rule",
    "family": "decimals",
    "steps": [
-    "Y5.B12.S9"
+    "Y5.B12.S9",
+    "Y5.B12.S10"
    ],
    "reused": true,
    "ccss": [
+    "4.NBT.A.1",
     "4.OA.C.5",
+    "5.NBT.A.2",
     "5.NBT.B.7"
    ],
    "why": "closes the listed Y5 steps"
@@ -8892,6 +8683,7 @@
     "Y5.B14.S3"
    ],
    "reused": true,
+   "extendNote": "For Y5.B14.S1/S3 it must also convert smaller to larger (3,500 m = 3 km 500 m = 3.5 km), not only mixed units.",
    "ccss": [
     "4.MD.A.1",
     "5.MD.A.1"
@@ -8928,6 +8720,7 @@
     "Y5.B14.S3"
    ],
    "reused": true,
+   "extendNote": "For Y5.B14.S2/S3 it must also convert smaller to larger (450 cm = 4 m 50 cm; 63 mm = 6 cm 3 mm), not only larger to smaller.",
    "ccss": [
     "4.MD.A.1",
     "5.MD.A.1"
@@ -9378,7 +9171,7 @@
    "key": "fractions:equivalent",
    "step": "Y5.B4.S1",
    "action": "partial",
-   "why": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control (use opts {\"forms\": [0]})"
+   "why": "starting fractions mix unit and non-unit (2/4 = 6/__); no unit-fraction-only control"
   },
   {
    "key": "fractions:equiv_frac_nv",
@@ -9397,6 +9190,30 @@
    "step": "Y5.B4.S3",
    "action": "add",
    "why": "teaches the step"
+  },
+  {
+   "key": "fractions:improper_mixed",
+   "step": "Y5.B4.S4",
+   "action": "partial",
+   "why": "no direction option; mixes mixed → improper items in"
+  },
+  {
+   "key": "fractions:mixed_improper_visual",
+   "step": "Y5.B4.S4",
+   "action": "partial",
+   "why": "asks both forms of a drawn amount; no improper → mixed only page"
+  },
+  {
+   "key": "fractions:improper_mixed",
+   "step": "Y5.B4.S5",
+   "action": "partial",
+   "why": "no direction option; mixes improper → mixed items in"
+  },
+  {
+   "key": "fractions:mixed_improper_visual",
+   "step": "Y5.B4.S5",
+   "action": "partial",
+   "why": "asks both forms of a drawn amount; no mixed → improper only page"
   },
   {
    "key": "fraction_operations:add_frac_like_nv",
@@ -9456,13 +9273,13 @@
    "key": "fraction_operations:sub_frac_unlike",
    "step": "Y5.B4.S14",
    "action": "partial",
-   "why": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4) (use opts {\"denoms\": [2]})"
+   "why": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4)"
   },
   {
    "key": "fraction_operations:sub_frac_unlike_nv",
    "step": "Y5.B4.S14",
    "action": "add",
-   "why": "partial: numbers only; minuend within 1, no whole or improper minuend (use opts {\"denoms\": [2]})"
+   "why": "partial: numbers only; minuend within 1, no whole or improper minuend"
   },
   {
    "key": "fraction_operations:sub_mixed_like",
@@ -9522,7 +9339,7 @@
    "key": "conversions:f_to_d",
    "step": "Y5.B7.S2",
    "action": "partial",
-   "why": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip (use opts {\"denoms\": [5]})"
+   "why": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip"
   },
   {
    "key": "conversions:d_to_f",
