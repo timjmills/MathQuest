@@ -2266,6 +2266,715 @@
     }
    ],
    "note": ""
+  },
+  "R.B11.S1": {
+   "title": "Find 9 and 10",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B9.S4 1 less (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B9.S2 Represent 6, 7 and 8 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "next step: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "next step: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B11.S3 Represent 9 and 10"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in R.B11.S5 1 more"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S2": {
+   "title": "Compare numbers to 10",
+   "direct": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 10,
+      "level": [
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "placevalue:compare",
+     "opts": {},
+     "missing": "numbers within 10 (the lowest band is 99)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two numerals to 10 (not groups) with more / fewer",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B11.S3 Represent 9 and 10"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B11.S5 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B11.S7 Composition to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S3": {
+   "title": "Represent 9 and 10",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (the step before in this block)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_small"
+   ],
+   "related": [
+    {
+     "key": "composing:teen_compose",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S4": {
+   "title": "Conceptual subitising to 10",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "conceptual subitising to 10 on frames and dice",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (the step before in this block)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (the step before in this block)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B9.S5 Composition of 6, 7 and 8 (same CCSS K.OA.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "compare_small"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B11.S5 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same CCSS K.OA.A.3 in R.B11.S7 Composition to 10"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "same CCSS K.OA.A.3 in R.B11.S8 Bonds to 10 (2 parts)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5, K.OA.A.3 in R.B11.S9 Make arrangements of 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S5": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same CCSS K.CC.B.4 in R.B13.S2 Continue patterns beyond 10 (10-13)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S6": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: R.B11.S7 Composition to 10"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same CCSS K.CC.B.4 in R.B13.S2 Continue patterns beyond 10 (10-13)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S7": {
+   "title": "Composition to 10",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S6 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:make_ten",
+     "why": "next step: R.B11.S8 Bonds to 10 (2 parts)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.OA.A.3 in R.B11.S9 Make arrangements of 10"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S8": {
+   "title": "Bonds to 10 (2 parts)",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10,
+      "unknown": "second"
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S6 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B11.S9 Make arrangements of 10"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "same CCSS K.OA.A.4 in R.B11.S10 Bonds to 10 (3 parts)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S9": {
+   "title": "Make arrangements of 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     },
+     "missing": "different arrangements of 10 (5 and 5, 4 and 6) seen as the same 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "seeing different arrangements of 10 as the same amount",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (the step before in this block)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_three",
+     "why": "next step: R.B11.S10 Bonds to 10 (3 parts)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same CCSS K.CC.B.5 in R.B13.S1 Build numbers beyond 10 (10 -13)"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S10": {
+   "title": "Bonds to 10 (3 parts)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_three",
+     "opts": {},
+     "missing": "three parts that make 10, shown as a part-whole picture"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "bonds to 10 in three parts",
+   "build": [
+    "bonds_3_parts"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (the step before in this block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (the step before in this block)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (the step before in this block)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B9.S7 Double to 8 (find a double) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "next step: R.B11.S11 Doubles to 10 (find a double)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B11.S12 Doubles to 10 (make a double)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S11": {
+   "title": "Doubles to 10 (find a double)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "finding a double in a picture to 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising a pictured double to 10",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (the step before in this block)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "bonds_3_parts",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "patterns:double",
+     "why": "next step: R.B11.S12 Doubles to 10 (make a double)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S12": {
+   "title": "Doubles to 10 (make a double)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:double",
+     "opts": {},
+     "missing": "building a double with objects to 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making a double with objects to 10",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (the step before in this block)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (the step before in this block)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "bonds_3_parts"
+   ],
+   "related": [
+    {
+     "key": "composing:odd_even",
+     "why": "next step: R.B11.S13 Explore even and odd"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    }
+   ],
+   "note": ""
+  },
+  "R.B11.S13": {
+   "title": "Explore even and odd",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:odd_even",
+     "opts": {},
+     "missing": "making pairs to see odd and even"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "pairing objects to see odd and even",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "R.B11.S12 Doubles to 10 (make a double) (the step before in this block)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B11.S1 Find 9 and 10"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "same block: R.B11.S2 Compare numbers to 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B11.S3 Represent 9 and 10"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -2378,7 +3087,9 @@
     "R.B5.S2",
     "R.B7.S3",
     "R.B7.S8",
-    "R.B9.S10"
+    "R.B9.S10",
+    "R.B11.S4",
+    "R.B11.S9"
    ],
    "ccss": [
     "K.CC.B.5",
@@ -2495,7 +3206,8 @@
    "representation": "counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair",
    "family": "operations",
    "steps": [
-    "R.B9.S6"
+    "R.B9.S6",
+    "R.B11.S13"
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -2515,7 +3227,9 @@
    "why": "doubles_near_doubles deals abstract doubles up to 10 + 10; Reception finds and builds doubles from pictures",
    "steps": [
     "R.B9.S7",
-    "R.B9.S8"
+    "R.B9.S8",
+    "R.B11.S11",
+    "R.B11.S12"
    ],
    "reused": false
   },
@@ -2532,6 +3246,41 @@
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "compare_small": {
+   "kind": "option",
+   "skill": "placevalue:compare",
+   "option": "band 10/20 and pictures",
+   "name": "Compare Numbers to 10 and 20 (option)",
+   "teaches": "comparing and ordering numbers and groups of objects within 10 and 20 (and tens-and-ones pictures to 100) with <, >, = and the words greater than / less than / equal to (the lowest band today is 99)",
+   "representation": "band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level",
+   "family": "placevalue",
+   "steps": [
+    "R.B11.S2"
+   ],
+   "ccss": [
+    "K.CC.C.6",
+    "K.CC.C.7"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "bonds_3_parts": {
+   "kind": "option",
+   "skill": "composing:number_bonds",
+   "option": "parts: 3",
+   "name": "Bonds to 10 in Three Parts (option)",
+   "teaches": "a whole of 10 split into three parts (2, 3 and 5)",
+   "representation": "a part-whole diagram with one whole and three part circles; write the missing part",
+   "family": "counting",
+   "ccss": [
+    "K.OA.A.3"
+   ],
+   "why": "number_bonds has two parts only; add_three is an addition fact, not a part-whole",
+   "steps": [
+    "R.B11.S10"
+   ],
+   "reused": false
   }
  },
  "tagFixes": [
@@ -2546,6 +3295,18 @@
    "step": "R.B9.S7",
    "action": "partial",
    "why": "finding a double in a picture to 8 (the skill is abstract doubles to 10 + 10)"
+  },
+  {
+   "key": "placevalue:compare",
+   "step": "R.B11.S2",
+   "action": "partial",
+   "why": "numbers within 10 (the lowest band is 99)"
+  },
+  {
+   "key": "number_sense:doubles_near_doubles",
+   "step": "R.B11.S11",
+   "action": "partial",
+   "why": "finding a double in a picture to 10"
   }
  ]
 }
