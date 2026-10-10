@@ -76,3 +76,9 @@ Scratch files only under a scratch folder outside the repo.
    and that it really closes THIS step; otherwise write a new option proposal.
 6. Self-check before you report: a random 10 of your steps re-judged by generating items; fix and repeat until you'd
    score them ≥ 8.
+
+## OWNER RULING 2026-10-10: keep every WRM step, even beyond CCSS
+Every White Rose small step is covered or gets a build proposal, even when it goes beyond (or has no) CCSS code — e.g.
+24-hour clock, Roman numerals, UK-only steps (converted to US money/units where the school does), above-grade steps,
+11/12 times-tables. Never drop a step or mark it "not needed" because CCSS does not ask for it; tag its CCSS as [] and say
+"beyond CCSS" in `note`. Build priority may be lower, but it goes on the list.
