@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 3
+# Wave 2 tagging: Year 2 (US Grade 1) — round 4
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,9 +6,43 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 124 | 66 | 34 | 24 | 8 | 37 | 47 | 74 |
+| 124 | 63 | 36 | 25 | 10 | 37 | 52 | 75 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 4 (after critic Y2–Y3 r3, 7.55 / 7.60): rule 18 content and layout of every link
+
+- **S9, year-wide link swaps** (`overrides.mjs` `linkSwap`, applied in `build.mjs` after the link opts). Rule 12 (an
+  earlier partial stays as pre) yields to rule 18 when that partial deals content above the pupil.
+  - Y2 fractions: `shade_fraction`, `identify`, `write_fraction` → `partition_shapes {parts:[0,1,2]}` (halves, thirds,
+    quarters only); `equiv_frac_*`, `select_equiv_frac`, `compose_whole`, `fraction_number_line` dropped with
+    `single_fraction` in `preBuild`; `fraction_of_set(_nv)` → `halve {band:20}`. A `frac` topic ladder refills pre.
+  - Y2: `which_sign` and `balance_addsub` dropped; `pictograph` links → `pictograph_intro`; `add_50_regroup` /
+    `sub_50_regroup` before Y2.B2.S15 → `add_10_regroup` / `sub_10_regroup {notation:['across']}`; the 2-digit column
+    steps are no longer "next step" related before S15; 1-digit facts are written across before S15
+    (`add_facts`, `sub_facts`, `add_10_mixed`, `add_20_mixed`).
+  - Y3: `fractions:compare` and `order_fractions` dropped (unlike pairs are 4.NF.A.2) with `compare_kind` in
+    `preBuild`; `missing_mult_div` (deals × 12) → `div_facts {constant:[2,3,4,5,8,10]}`; `unit_conversions` dropped;
+    3-digit column steps are no longer related before Y3.B2.S11; 1-digit facts across before S11.
+  - Both years: every `coordinates:` link dropped. Steps left without a related skill got hand entries that share the
+    idea (quarter / half past for quarter / half turns and fractions, `compose_shapes`, `between_tens`, the inverse
+    across-10 fact …); Y2.B11.S2–S4 say in `note` why none fits.
+- **`linkscan.mjs`, rewritten**: week-relative by default (a link must fit the largest number the pupil has met by that
+  school week, xlsx order, never below the previous year's range: K counts to 100, Grade 1 to 120), plus content and
+  layout checks: Y2 denominators 2/3/4 only, Y3 compares sharing a numerator or denominator, no coordinate skills (no
+  longer skipped), no × ÷ in Y2 sign/balance links, no customary units, no 2-digit column layout before Y2.B2.S15 and no
+  3-digit column layout before Y3.B2.S11. **Result: `linkscan (week mode): OK`** (0 flags; the year mode is `--year`).
+  The critic's own scripts: `fit.mjs` **0**; `relfit.mjs week` **Y3 0, Y2 6 links on Y2.B1.S1 only** (counting and
+  2-digit place value to 100 on the "Numbers to 20" step: K learning, noted on the step, which the critic allowed);
+  `sys3.py` Y3 clean, Y2 3 empty related (Y2.B11.S2–S4, noted); `swap.py` 0 / 0; `optcheck.mjs` 0. `steplink.mjs`
+  still lists `add_50_regroup` / `sub_50_regroup` as stacked on Y3.B2.S4–S10 pre: 2-digit columns the pupil met in
+  Y2.B2.S15–S18 (the skill has no `notation` option).
+- **Step fixes (Y2)**: B7.S1 Compare mass → partial (pictures only; balance scale and "same mass" missing) with
+  `compare_measures` (balance-scale form added); B2.S20 → gap (`equal_sign` deals plain sums), own clause, build
+  `compare_sentences`; B3.S5 → partial (diagonals, "4 lines") + new option `symmetry_vertical`; B3.S12 → partial (no 3-D
+  shapes) + new option `pattern_3d`; B10.S7 `pictograph {range:50, scale:[0,1,2]}` (keys 2, 5, 10; values ≤ 50);
+  pre rungs: B2.S11 bonds to 10 first, B9.S5 counting in 5s, B10.S6 counting in 2s/5s/10s; B10.S3 pre no longer cites
+  the later S5; B1.S14 single missing clause; `enough_money` links carry `currency:'usd'`.
 
 ## Round 3 (after critic Y2–Y3 r2, 7.53 / 7.45) — fixed in the generator, file-wide
 

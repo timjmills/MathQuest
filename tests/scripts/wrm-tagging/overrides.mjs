@@ -680,3 +680,145 @@ relR3['Y2.B5.S1'] = [R('multiplication:repeated_add_to_mult', 'adding the equal 
 relR3['Y2.B5.S2'] = [R('multiplication:repeated_add_to_mult', 'adding the equal groups made (Y2.B5.S3)', { band: 25 }), R('multiplication:dot_array_mult', 'equal groups set out in rows as an array', { band: 25 })];
 relR3['Y2.B5.S1'].push(R('multiplication:mult_facts', 'equal groups written as a multiplication fact (Y2.B5.S9): where this leads', { constant: [2, 5, 10], band: 100 }));
 relR3['Y2.B5.S2'].push(R('multiplication:mult_facts', 'equal groups written as a multiplication fact (Y2.B5.S9): where this leads', { constant: [2, 5, 10], band: 100 }));
+
+// ======================= round 4 (critic Y2-Y3 r3: S9 = rule 18 CONTENT of links, step fixes) =======================
+const FR_DROP = { to: null, preBuild: 'single_fraction' };
+const PS = { to: 'shapes_early:partition_shapes', opts: { parts: [0, 1, 2] } }; // halves, thirds, quarters only (1.G.A.3)
+const BEFORE_COLUMNS_Y2 = /^Y2\.B(1|2)\.S([1-9]|1[0-4])$/; // Y2.B2.S15 is the first 2-digit column step
+export const linkSwap = {
+  Y2: {
+    // fractions: every fraction skill deals eighths, fifths or sixths whatever `denoms` says (denoms picks a FAMILY)
+    'fractions:shade_fraction': PS, 'fractions:identify': PS, 'fractions:write_fraction': PS,
+    'fractions:equiv_frac_visual': FR_DROP, 'fractions:select_equiv_frac': FR_DROP, 'fractions:equiv_frac_nv': FR_DROP,
+    'composing:compose_whole': FR_DROP, 'composing:fraction_number_line': FR_DROP,
+    'fractions:fraction_of_set': { to: 'patterns:halve', opts: { band: 20 } }, 'fractions:fraction_of_set_nv': { to: 'patterns:halve', opts: { band: 20 } },
+    // × ÷ and sums past 120 at Grade 1
+    'number_ops_mixed:which_sign': { to: null }, 'algebra:balance_addsub': { to: null },
+    // pictograph totals pass 150 whatever `range` says; the 1-to-1 intro fits
+    'graphs:pictograph': { to: 'measurement:pictograph_intro', opts: {} },
+    // coordinate plane and transformations are Grade 5-8
+    'coordinates:geo_rotate': { to: null }, 'coordinates:geo_translate': { to: null }, 'coordinates:geo_reflect': { to: null },
+    'coordinates:coordinate_q1': { to: null }, 'coordinates:coord_polygon': { to: null },
+    // no 2-digit column regrouping before the column steps: the 1-digit-across-10 facts, written across
+    'addition:add_50_regroup': { to: 'addition:add_10_regroup', opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 },
+    'subtraction:sub_50_regroup': { to: 'subtraction:sub_10_regroup', opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 },
+    'addition:add_10_regroup': { to: 'addition:add_10_regroup', opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 },
+    'subtraction:sub_10_regroup': { to: 'subtraction:sub_10_regroup', opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 },
+    'measurement:unit_conversions': { to: null },
+  },
+  Y3: {
+    // unlike-fraction compares and orders are 4.NF.A.2; the same-denominator / unit-fraction compare is compare_kind (to build)
+    'fractions:compare': { to: null, preBuild: 'compare_kind' }, 'fractions:order_fractions': { to: null, preBuild: 'compare_kind' },
+    // missing_mult_div deals "__ × 12 = 144" (range ignored); the 12 times-table is not Y3
+    'division:missing_mult_div': { to: 'division:div_facts', opts: { constant: [2, 3, 4, 5, 8, 10], band: 100 } },
+    // customary conversions on metric and time steps
+    'measurement:unit_conversions': { to: null },
+    'coordinates:geo_rotate': { to: null }, 'coordinates:geo_translate': { to: null }, 'coordinates:geo_reflect': { to: null },
+    'coordinates:coordinate_q1': { to: null }, 'coordinates:coord_polygon': { to: null },
+  },
+};
+ladders.frac = [C('shapes_early:partition_shapes', 'Y1.B10 / Y2.B8 halves, thirds and quarters of a shape', { parts: [0, 1, 2] }), C('patterns:halve', 'Y2.B5.S11 halving an amount within 20', { band: 20 }),
+  C('division:share_into_groups', 'Y2.B5.S8 sharing into equal groups', { band: 12 }), C('multiplication:equal_or_unequal_groups', 'Y2.B5.S1 equal and unequal groups')];
+Object.assign(linkOpts.Y2, { 'measurement:enough_money': { currency: 'usd' }, 'addition:add_10_regroup': { notation: ['across'] }, 'subtraction:sub_10_regroup': { notation: ['across'] } });
+Object.assign(linkFix, {
+  'Y3.B11.S2': { 'measurement:reading_ruler': null }, 'Y3.B11.S3': { 'measurement:reading_ruler': null }, 'Y3.B11.S7': { 'measurement:reading_ruler': null },
+  'Y3.B7.S7': { 'measurement:capacity': null },
+  'Y3.B7.S3': { 'multiplication:count_by_tables': ZR(100) },
+  'Y3.B6.S6': { 'shapes_early:shape_corners_count': null },
+});
+Object.assign(r3, {
+  'Y2.B7.S1': { partials: [P('measurement:heavier_lighter_visual', 'picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and "equal mass / the same as", are not dealt')], build: ['compare_measures'] },
+  'Y2.B2.S20': { partials: [], verdict: 'gap', build: ['compare_sentences'], why: { 'addition:equal_sign': 'deals plain sums (12 + 12 = ?, 16 + 20 = ?) on every item: it compares nothing' } },
+  'Y2.B3.S5': { direct: [], partials: [P('angles_lines:symmetry', 'deals diagonal and horizontal lines and counts of lines ("a square has 4"), 4.G.A.3; a page of vertical lines of symmetry only is not available'), P('angles_lines:place_symmetry_lines', 'draws every line of symmetry, diagonals included; a vertical line only is not available')], verdict: 'partial', build: ['symmetry_vertical'] },
+  'Y2.B3.S12': { partials: [P('patterns:shape_pattern', '2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt')], verdict: 'partial', build: ['pattern_3d'] },
+  'Y2.B10.S7': { direct: [D('graphs:pictograph', { range: 50, scale: [0, 1, 2] })] },
+  'Y2.B2.S11': { ...r3['Y2.B2.S11'], core: [C('composing:make_ten', 'Y2.B2.S1 bonds to 10: 10 − 3 = 7, so 40 − 3 = 37'), C('composing:number_bonds', 'Y1 bonds within 10')] },
+  'Y2.B9.S5': { core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0: the minutes round the clock', ZR(5))] },
+  'Y2.B10.S6': { core: [C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key of 2, 5 or 10', ZR(2, 5, 10))] },
+  'Y2.B10.S3': { ...r3['Y2.B10.S3'], core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts: the counts a block diagram shows'), C('comparing:compare_groups', 'Y1.B1.S12 more, fewer, the same')] },
+  'Y2.B1.S14': { ...r3['Y2.B1.S14'], missing: 'orders numerals only; ordering objects or base-10 pictures of numbers is not dealt' },
+  'Y3.B2.S20': { direct: [], partials: [P('number_sense:estimate_sum', 'rounds 2-digit numbers to the nearest 10 (56 + 24); estimating 3-digit sums to the nearest 100 within 1,000 is not dealt (place 100 also deals sums past 1,000: 538 + 775)', { place: 10 }), P('number_sense:estimate_sums_diffs', 'the same: 2-digit only at place 10', { place: 10 })],
+    verdict: 'partial', build: ['estimate_1000'], core: [C('number_sense:place_on_number_line', 'Y3.B1.S11 estimating on a number line to 1,000: which hundred is nearer', { span: 100, band: 1000 }), C('placevalue:more_less_100', 'Y3.B1.S9 100 more, 100 less', { step: 100 })] },
+  'Y3.B6.S6': { preOnly: true, pre: [R('number_sense:place_on_number_line', 'Y2.B1.S9 reading a number line in equal steps', { span: 10, band: 100 }), R('measurement:reading_ruler', 'Y2.B6.S1 / Y3.B5.S2 reading a scale (a ruler)'), R('shapes_early:partition_shapes', 'Y2.B8 halves, thirds and quarters of a whole', { parts: [0, 1, 2] })], preBuild: ['frac_count'] },
+  'Y3.B3.S2': { direct: [D('multiplication:arrays_groups', { forms: [0] }), D('multiplication:dot_array_mult', { band: 25 })] },
+  'Y3.B2.S16': { direct: [], partials: [P('subtraction:sub_1k_regroup', 'exchanges are mixed; one exchange from the hundreds only is not available')], verdict: 'partial', build: ['exchange_count'],
+    related: [R('subtraction:sub_across_zeros', 'subtracting across zeros (302 − 264): the double exchange that comes next', { band: 500 })] },
+  'Y3.B7.S7': { core: [C('number_sense:place_on_number_line', 'Y3.B1.S10 a jug scale is a vertical number line', { span: 100, band: 1000 }), C(CBT, 'Y2.B1.S15 counting in 10s to read the jug marks', ZR(10)), C('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug', { forms: [0] })], preBuild: ['nonstandard_capacity'] },
+});
+// related replacements where the S9 swaps emptied a step
+relR3['Y2.B2.S20'] = [R('addition:cloze_addition', 'a missing number in a sentence (Y2.B2.S21): the next idea'), R('subtraction:missing_add_sub', 'missing-number sentences (Y2.B2.S21)')];
+relR3['Y2.B2.S21'] = [R('algebra:tape_diagram', 'a bar model shows the missing part', { band: 20 })];
+gapMissing['Y2.B2.S20'] = 'comparing two number sentences with <, > or = by reasoning about their parts (4 + 5 ○ 4 + 6) rather than always working both out';
+Object.assign(proposals, {
+  symmetry_vertical: { kind: 'option', skill: 'angles_lines:symmetry', skills: ['angles_lines:symmetry', 'angles_lines:place_symmetry_lines'], option: 'lines: vertical only (no diagonal or horizontal lines, no "how many lines")', name: 'Vertical Line of Symmetry (option)',
+    teaches: 'deciding whether a vertical line splits a picture or shape into two matching halves, and drawing that one vertical line',
+    representation: 'one shape per boxed cell with a dashed vertical line to judge (tick or cross), or a shape to draw the vertical line on', family: 'geometry',
+    steps: ['Y2.B3.S5'], ccss: ['4.G.A.3'], why: 'both skills deal diagonal lines and counts of lines (Grade 4); WRM Y2 uses a vertical mirror line only' },
+  pattern_3d: { kind: 'option', skill: 'patterns:shape_pattern', option: 'shapes: 3-D (cube, sphere, cone, cylinder pictures) as well as 2-D', name: 'Patterns With 3-D Shapes (option)',
+    teaches: 'continuing and completing repeating patterns made of 3-D shapes, and of 2-D and 3-D shapes together',
+    representation: 'a row of drawn 3-D shapes in boxes with the next one or two boxes empty; answer: draw or name the shape', family: 'patterns',
+    steps: ['Y2.B3.S12'], ccss: ['1.G.A.1'], why: 'shape_pattern draws 2-D shapes and stars only' },
+  estimate_1000: { kind: 'option', skill: 'number_sense:estimate_sum', skills: ['number_sense:estimate_sum', 'number_sense:estimate_sums_diffs'], option: 'place 100 with every sum and difference within 1,000', name: 'Estimate 3-Digit Sums Within 1,000 (option)',
+    teaches: 'estimating the answer to a 3-digit addition or subtraction by rounding each number to the nearest 100 on a number line, with every answer within 1,000',
+    representation: 'the existing estimate cell "309 + 186 ≈ ___ + ___ = ___" with a 0-1,000 number line marked in hundreds as the support', family: 'number sense',
+    steps: ['Y3.B2.S20'], ccss: ['2.NBT.B.7', '3.NBT.A.1'], why: 'place 10 rounds 2-digit numbers only; place 100 deals sums past 1,000 (538 + 775)' },
+});
+proposals.compare_measures.steps.push('Y2.B7.S1');
+proposals.compare_measures.teaches += '; the balance-scale form shows two objects on a pan balance (heavier, lighter, or the same mass)';
+const TQ = R('measurement:time_quarter', 'quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)');
+const TH = R('measurement:time_half_hour', 'half past: half a turn of the minute hand (Y2.B9.S1)');
+const CS = R('shapes_early:compose_shapes', 'two or more equal parts put back together make the whole shape');
+Object.assign(relR3, {
+  'Y2.B2.S8': [R('subtraction:sub_10_regroup', 'the inverse: subtracting back across 10', { notation: ['across'] }), R('number_sense:between_tens', 'which ten comes next after a number')],
+  'Y2.B2.S10': [R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] }), R('number_sense:between_tens', 'the ten a number crosses back over')],
+  'Y2.B3.S6': [CS],
+  'Y2.B8.S1': [CS, R('composing:number_bonds', 'part-part-whole with numbers: the same idea with a quantity')],
+  'Y2.B8.S2': [CS, R('multiplication:equal_or_unequal_groups', 'equal and unequal groups of objects: the same idea with a set')],
+  'Y2.B8.S3': [TH, R('patterns:double', 'doubling undoes halving', { band: 20 })], 'Y2.B8.S4': [TH, R('patterns:double', 'doubling undoes halving', { band: 20 })],
+  'Y2.B8.S5': [TQ, CS], 'Y2.B8.S6': [TQ, CS], 'Y2.B8.S7': [CS], 'Y2.B8.S8': [CS],
+  'Y2.B8.S9': [R('patterns:double', 'the whole is double the half', { band: 20 }), CS],
+  'Y2.B8.S10': [CS, TQ], 'Y2.B8.S11': [CS, TQ], 'Y2.B8.S12': [TQ, TH], 'Y2.B8.S13': [TQ], 'Y2.B8.S14': [TQ], 'Y2.B8.S15': [TQ, TH],
+  'Y2.B10.S5': [R('graphs:build_bar_graph', 'the same data drawn as a bar chart (Grade 2)')], 'Y2.B10.S6': [R('graphs:build_bar_graph', 'the same data drawn as a bar chart (Grade 2)')],
+  'Y2.B11.S1': [R('counting:count_sequence', 'first, next, last: the position of a number in a count')],
+  'Y2.B11.S2': [R('number_sense:place_on_number_line', 'moving right and left along a line by a number of steps', { span: 10, band: 20 })],
+  'Y2.B11.S3': [TQ, TH], 'Y2.B11.S4': [TQ, R('number_sense:place_on_number_line', 'moving along a line by a number of steps', { span: 10, band: 20 })],
+  'Y3.B1.S13': [R('measurement:order_clocks_digital_asc', 'putting times in order: the same ordering idea with another kind of number')],
+  'Y3.B6.S1': [R('fractions:graph_fractions', 'placing a unit fraction on a number line (the next idea)', { denoms: [2, 3] })],
+  'Y3.B7.S9': [R('measurement:money_notation', '345 cents = $3.45: another exchange between a big and a small unit', { currency: 'usd', task: 'words' })],
+  'Y3.B10.S10': [R('measurement:elapsed_visual_easy', 'a short duration on a time line')], 'Y3.B10.S11': [R('measurement:elapsed_visual_easy', 'comparing durations on a time line')],
+  'Y3.B11.S8': [CS],
+  'Y3.B12.S6': [R('multiplication:mult_chart_easy', 'a times-table chart is read by row and column, like a two-way table', { constant: [2, 3, 4, 5, 8, 10], band: 100 })],
+});
+relR3['Y2.B2.S20'] = [R('number_sense:doubles_near_doubles', '4 + 5 is one more than 4 + 4: comparing sentences by their parts')];
+const NOREL_POS = 'no related skill: every skill that shares the idea (position words, quarter and half turns on the clock, moving along a line) is earlier learning and is listed as pre; the grid and coordinate skills are Grade 5+ (rule 18)';
+for (const id of ['Y2.B11.S2', 'Y2.B11.S3', 'Y2.B11.S4']) r3[id] = { ...(r3[id] || {}), relNote: NOREL_POS };
+Object.assign(linkFix, {
+  'Y3.B1.S1': { ...linkFix['Y3.B1.S1'], 'placevalue:place_value_disks': { band: 99 }, 'composing:base10_build_hundreds': null },
+  'Y3.B1.S2': { ...linkFix['Y3.B1.S2'], 'composing:base10_build_hundreds': null },
+});
+relR3['Y3.B1.S2'] = [...(relR3['Y3.B1.S2'] || []), R('placevalue:place_value_disks', 'the same partition shown with place-value counters', { band: 99 })];
+r3['Y2.B1.S1'] = { ...(r3['Y2.B1.S1'] || {}), note: 'pre and related links count to 100 (Y1.B12 tens to 100, Y1.B6 count to 50; the next steps write 2-digit numbers): K learning (K.CC.A.1), already met before this Grade 1 week' };
+// no 2-digit (Y2) / 3-digit (Y3) column steps as the "next idea" before the column steps begin (rule 18 layout)
+const BEFORE_COLUMNS_Y3 = /^Y3\.B(1|2)\.S([1-9]|10)$/;
+for (const k of ['addition:add_100_no_regroup', 'addition:add_100_regroup', 'subtraction:sub_100_no_regroup', 'subtraction:sub_100_regroup']) linkSwap.Y2[k] = { to: null, only: BEFORE_COLUMNS_Y2 };
+for (const k of ['addition:add_1k_no_regroup', 'addition:add_1k_regroup', 'addition:add_1k_mixed', 'subtraction:sub_1k_no_regroup', 'subtraction:sub_1k_regroup', 'subtraction:sub_1k_mixed']) linkSwap.Y3[k] = { to: null, only: BEFORE_COLUMNS_Y3 };
+linkOpts.Y3['area_perimeter:perimeter'] = { forms: [0, 1] };
+r3['Y3.B5.S12'] = { direct: [D('area_perimeter:perimeter', { forms: [0, 1] })], note: 'forms [0, 1]: perimeter from side lengths and the missing side, in cm; form 2 is stories in feet and inches (customary)' };
+Object.assign(linkFix, {
+  'Y2.B1.S9': { 'multiplication:count_by_tables': null }, 'Y2.B1.S13': { 'multiplication:count_by_tables': null },
+  'Y2.B5.S13': { 'multiplication:mult_chart_easy': { constant: [5, 10], band: 100 } }, 'Y2.B5.S15': { 'multiplication:mult_chart_easy': { constant: [5, 10], band: 100 } },
+});
+const BT = R('number_sense:between_tens', 'which two tens a number sits between');
+const SCL = R('patterns:skip_count_line', 'counting in 10s as jumps on a number line', { band: 50 });
+const HCF = R('composing:hundreds_chart_fill', 'one row down a hundred square is 10 more', { band: 100 });
+Object.assign(relR3, {
+  'Y2.B1.S9': [BT, HCF], 'Y2.B2.S11': [R('subtraction:nl_sub', 'counting back from a ten on a number line'), BT, R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] })],
+  'Y2.B2.S12': [R('subtraction:nl_sub', 'counting back across a ten on a number line'), R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] }), BT],
+  'Y2.B2.S13': [SCL, HCF, BT], 'Y2.B2.S14': [SCL, HCF, BT],
+  'Y3.B2.S10': [R('number_sense:doubles_near_doubles', 'another known-fact strategy (near doubles)'), R('addition:add_sub_fact_family', 'related facts: the same connections between + and −', { range: 100 })],
+});
+Object.assign(linkOpts.Y2, { 'addition:add_facts': { notation: ['across'] }, 'subtraction:sub_facts': { notation: ['across'] } });
+r3['Y2.B3.S5'] = { ...r3['Y2.B3.S5'], relOnly: true, related: [R('shapes_early:compose_shapes', 'two matching halves put together make a symmetrical shape'), R('angles_lines:symmetry', 'x', {})].slice(0, 1) };
+// 1-digit facts written across (WRM writes them as sentences and part-whole models), wherever the skill takes `notation`
+for (const k of ['addition:add_20_mixed', 'addition:add_10_mixed']) linkSwap.Y2[k] = { to: k, opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y2 };
+for (const k of ['addition:add_10_regroup', 'subtraction:sub_10_regroup', 'addition:add_20_mixed', 'addition:add_10_mixed']) linkSwap.Y3[k] = { to: k, opts: { notation: ['across'] }, only: BEFORE_COLUMNS_Y3 };

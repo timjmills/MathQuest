@@ -173,16 +173,26 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    // last resort: a skill tagged to the step's OWN standard code that no earlier step uses (the same idea in another form)
    if(false)for(const c of s.ccss){for(const k of byStd[c]||[]){if(related.length>=2)break;if(SAMESTD_SKIP.test(k))continue;addRel(k,`also teaches ${c} (this step's standard): ${label[k]}`);}}
   }
-  if(!related.length)console.error('NOREL',s.id,s.title);
+  if(!related.length&&!o.relNote)console.error('NOREL',s.id,s.title);
   for(const e of [...pre,...related])e.opts=linkOpts(e);
   const yo=OV.linkOpts?.[YEAR]||{};
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--)if(yo[list[j].key]===null&&!Object.keys(list[j].opts||{}).length)list.splice(j,1);
   const lf=OV.linkFix?.[s.id]||{};
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const f=lf[list[j].key];if(f===null)list.splice(j,1);else if(f)list[j].opts=f;}
-  if(!related.length)console.error('NOREL(after linkFix)',s.id,s.title);
+  // r4 (critic r3 S9, rule 18 content): year-wide link swaps. {to:null} drops the link (and may name a preBuild that
+  // stands in for it); {to:key, opts} replaces it. `only` limits a swap to matching step ids. Rule 12 (keep an earlier
+  // partial as pre) yields to rule 18 when that partial deals content above the pupil.
+  const SW=OV.linkSwap?.[YEAR]||{};
+  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];const sw=SW[e.key];if(!sw||(sw.only&&!sw.only.test(s.id))||(sw.not&&sw.not.test(s.id)))continue;
+    if(sw.preBuild&&list===pre&&!build.includes(sw.preBuild)&&!preBuild.includes(sw.preBuild)){preBuild.push(sw.preBuild);usedProps.add(sw.preBuild);}
+    if(!sw.to){list.splice(j,1);continue;}
+    list[j]={key:sw.to,why:sw.to===e.key?`${e.why} [rule 18: opts ${JSON.stringify(sw.opts||{})} for this pupil]`:`${e.why} [rule 18: ${e.key.split(':')[1]} deals content above this pupil; ${sw.to.split(':')[1]} instead]`,opts:sw.opts||{}};}
+  for(const list of [pre,related]){const seen=new Set(list===related?pre.map(x=>x.key):[]);for(let j=0;j<list.length;j++){const k=list[j].key;if(allDirect.has(k)||seen.has(k)){list.splice(j,1);j--;}else seen.add(k);}}
+  if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(allDirect.has(k)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);pre.push({key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}});}
+  if(!related.length&&!o.relNote)console.error('NOREL(after linkFix)',s.id,s.title);
   if(pre.length<3)console.error('THINPRE(after linkFix)',s.id,s.title,pre.length);
   for(const id of build)usedProps.add(id);
-  out.steps[s.id]={title:s.title,direct,partial,verdict,missing,build,pre,preBuild,related,note:o.note||(lessonWeek[s.id]?'':'not in the school sequence xlsx; pre-skills from the block and the previous year')};
+  out.steps[s.id]={title:s.title,direct,partial,verdict,missing,build,pre,preBuild,related,note:[o.note||(lessonWeek[s.id]?'':'not in the school sequence xlsx; pre-skills from the block and the previous year'),!related.length&&o.relNote?o.relNote:''].filter(Boolean).join('. ')};
  });
 }
 function propText(id){const p=OV.proposals?.[id]||WRM_PROPOSALS[id];if(p)return p.teaches;for(const n of ['STANDARD_PROPOSALS','WRM_EXTENSIONS','VISUAL_BUILDS']){const q=BL[n]?.[id];if(q)return q.teaches||q.name;}return id;}

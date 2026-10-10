@@ -95,7 +95,7 @@
      }
     }
    ],
-   "note": ""
+   "note": "pre and related links count to 100 (Y1.B12 tens to 100, Y1.B6 count to 50; the next steps write 2-digit numbers): K learning (K.CC.A.1), already met before this Grade 1 week"
   },
   "Y2.B1.S2": {
    "title": "Count objects to 100 by making 10s",
@@ -793,26 +793,15 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:count_by_tables",
-     "why": "counting in 10s from 0, the count the line is marked in",
+     "key": "number_sense:between_tens",
+     "why": "which two tens a number sits between",
+     "opts": {}
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "one row down a hundred square is 10 more",
      "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 5,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 10,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
+      "band": 100
      }
     }
    ],
@@ -1109,29 +1098,6 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (a later step of the block: the same idea one step further)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 5,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 10,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
-     }
     }
    ],
    "note": ""
@@ -1156,7 +1122,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "orders numerals only; ordering objects or base-10 pictures of numbers is not dealt; orders numerals only; objects are not ordered",
+   "missing": "orders numerals only; ordering objects or base-10 pictures of numbers is not dealt",
    "build": [
     "order_pictures"
    ],
@@ -1418,8 +1384,12 @@
     },
     {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)",
-     "opts": {}
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1428,8 +1398,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1437,7 +1411,11 @@
     {
      "key": "subtraction:sub_facts",
      "why": "the inverse: 10 − 3 = 7 from 3 + 7 = 10",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:fact_family_sort",
@@ -1471,8 +1449,12 @@
     },
     {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)",
-     "opts": {}
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1481,8 +1463,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "composing:number_bonds",
@@ -1539,8 +1525,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1549,8 +1539,12 @@
     },
     {
      "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:number_line_add",
@@ -1559,8 +1553,12 @@
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1706,8 +1704,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1716,8 +1718,12 @@
     },
     {
      "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "preBuild": [],
@@ -1725,11 +1731,6 @@
     {
      "key": "addition:add_three",
      "why": "Y2.B2.S7 Add three 1-digit numbers (a later step of the block: the same idea one step further)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (a later step of the block: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -1801,11 +1802,6 @@
      "key": "addition:add_three",
      "why": "Y2.B2.S7 Add three 1-digit numbers (next step: the same idea one step further)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (a later step of the block: the same idea one step further)",
-     "opts": {}
     }
    ],
    "note": ""
@@ -1825,8 +1821,12 @@
    "pre": [
     {
      "key": "addition:add_10_regroup",
-     "why": "Y2.B2.S6 Add by making 10 (step before in the block)",
-     "opts": {}
+     "why": "Y2.B2.S6 Add by making 10 (step before in the block) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1855,8 +1855,12 @@
     },
     {
      "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)",
-     "opts": {}
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:number_line_add",
@@ -1867,14 +1871,13 @@
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (a later step of the block: the same idea one step further)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (a later step of the block: the same idea one step further)",
-     "opts": {}
+     "why": "Y2.B2.S10 Subtract across 10 (a later step of the block: the same idea one step further) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "note": ""
@@ -1901,8 +1904,12 @@
     },
     {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -1916,8 +1923,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:add_sub_fact_family",
@@ -1933,16 +1944,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (next step: the same idea one step further)",
+     "key": "number_sense:between_tens",
+     "why": "which ten comes next after a number",
      "opts": {}
-    },
-    {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (a later step of the block: the same idea one step further)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "note": ""
@@ -1973,8 +1977,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "composing:number_bonds",
@@ -2015,14 +2023,11 @@
    "related": [
     {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (next step: the same idea one step further)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (a later step of the block: the same idea one step further)",
+     "why": "Y2.B2.S10 Subtract across 10 (next step: the same idea one step further) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
      "opts": {
-      "band": 50
+      "notation": [
+       "across"
+      ]
      }
     }
    ],
@@ -2042,9 +2047,13 @@
    "build": [],
    "pre": [
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (step before in the block)",
-     "opts": {}
+     "key": "addition:add_10_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (step before in the block) [rule 18: add_50_regroup deals content above this pupil; add_10_regroup instead]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2075,21 +2084,14 @@
      "key": "addition:add_sub_fact_family",
      "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
      "opts": {}
-    },
-    {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
-     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (a later step of the block: the same idea one step further)",
-     "opts": {
-      "band": 50
-     }
+     "key": "number_sense:between_tens",
+     "why": "the ten a number crosses back over",
+     "opts": {}
     }
    ],
    "note": ""
@@ -2105,9 +2107,32 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (step before in the block)",
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 bonds to 10: 10 − 3 = 7, so 40 − 3 = 37",
      "opts": {}
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1 bonds within 10",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (step before in the block) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "the inverse: adding across 10 (earlier step this builds on: Y2.B2.S6 Add by making 10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:cloze_addition",
@@ -2128,35 +2153,13 @@
      "key": "subtraction:number_line_sub",
      "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)",
      "opts": {}
-    },
-    {
-     "key": "number_sense:make_a_ten",
-     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_sub_fact_family",
-     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
-     "opts": {}
-    },
-    {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
-     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (next step: the same idea one step further)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (a later step of the block: the same idea one step further)",
+     "key": "number_sense:between_tens",
+     "why": "which two tens a number sits between",
      "opts": {}
     }
    ],
@@ -2181,6 +2184,15 @@
    ],
    "pre": [
     {
+     "key": "addition:add_10_regroup",
+     "why": "the inverse: adding across 10 (earlier step this builds on: Y2.B2.S6 Add by making 10) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
      "key": "addition:add_sub_fact_family",
      "why": "Y1.B5.S9 Related facts (prior learning wk W09)",
      "opts": {}
@@ -2192,17 +2204,16 @@
     },
     {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)",
-     "opts": {}
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)",
      "opts": {}
     },
     {
@@ -2214,23 +2225,18 @@
      "key": "composing:make_ten",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W09)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (earlier in the block)",
-     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_100_regroup",
-     "why": "the next step: 2-digit − 2-digit across a ten",
+     "key": "subtraction:nl_sub",
+     "why": "counting back across a ten on a number line",
      "opts": {}
     },
     {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (a later step of the block: the same idea one step further)",
+     "key": "number_sense:between_tens",
+     "why": "which two tens a number sits between",
      "opts": {}
     }
    ],
@@ -2273,10 +2279,12 @@
      }
     },
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (step before in the block)",
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (step before in the block) [rule 18: sub_50_regroup deals content above this pupil; sub_10_regroup instead]",
      "opts": {
-      "band": 50
+      "notation": [
+       "across"
+      ]
      }
     },
     {
@@ -2286,8 +2294,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2303,13 +2315,22 @@
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (a later step of the block: the same idea one step further)",
-     "opts": {}
+     "key": "patterns:skip_count_line",
+     "why": "counting in 10s as jumps on a number line",
+     "opts": {
+      "band": 50
+     }
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (a later step of the block: the same idea one step further)",
+     "key": "composing:hundreds_chart_fill",
+     "why": "one row down a hundred square is 10 more",
+     "opts": {
+      "band": 100
+     }
+    },
+    {
+     "key": "number_sense:between_tens",
+     "why": "which two tens a number sits between",
      "opts": {}
     }
    ],
@@ -2344,8 +2365,12 @@
     },
     {
      "key": "addition:add_10_regroup",
-     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)",
-     "opts": {}
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07) [rule 18: opts {\"notation\":[\"across\"]} for this pupil]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2358,33 +2383,34 @@
      "opts": {}
     },
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (earlier in the block)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
      "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (earlier in the block)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (earlier in the block)",
-     "opts": {}
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (earlier in the block) [rule 18: sub_50_regroup deals content above this pupil; sub_10_regroup instead]",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (next step: the same idea one step further)",
-     "opts": {}
+     "key": "patterns:skip_count_line",
+     "why": "counting in 10s as jumps on a number line",
+     "opts": {
+      "band": 50
+     }
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (a later step of the block: the same idea one step further)",
+     "key": "composing:hundreds_chart_fill",
+     "why": "one row down a hundred square is 10 more",
+     "opts": {
+      "band": 100
+     }
+    },
+    {
+     "key": "number_sense:between_tens",
+     "why": "which two tens a number sits between",
      "opts": {}
     }
    ],
@@ -2416,7 +2442,11 @@
     {
      "key": "subtraction:sub_10_regroup",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2431,7 +2461,11 @@
     {
      "key": "addition:add_10_regroup",
      "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:add_sub_fact_family",
@@ -2485,7 +2519,11 @@
     {
      "key": "addition:add_10_regroup",
      "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2563,7 +2601,11 @@
     {
      "key": "subtraction:sub_10_regroup",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2578,7 +2620,11 @@
     {
      "key": "addition:add_10_regroup",
      "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:add_sub_fact_family",
@@ -2632,7 +2678,11 @@
     {
      "key": "subtraction:sub_10_regroup",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2647,7 +2697,11 @@
     {
      "key": "addition:add_10_regroup",
      "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:add_sub_fact_family",
@@ -2731,14 +2785,9 @@
   "Y2.B2.S20": {
    "title": "Compare number sentences",
    "direct": [],
-   "partial": [
-    {
-     "key": "addition:equal_sign",
-     "missing": "comparing two number sentences with <, > or = (the skill judges true/false)"
-    }
-   ],
-   "verdict": "partial",
-   "missing": "comparing two number sentences with <, > or = (the skill judges true/false)",
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing two number sentences with <, > or = by reasoning about their parts (4 + 5 ○ 4 + 6) rather than always working both out",
    "build": [
     "compare_sentences"
    ],
@@ -2776,7 +2825,11 @@
     {
      "key": "subtraction:sub_10_regroup",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2787,13 +2840,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:balance_addsub",
-     "why": "7 + 5 = __ + 3: the two sides of a number sentence balance",
-     "opts": {}
-    },
-    {
-     "key": "number_ops_mixed:which_sign",
-     "why": "choosing the sign that makes a sentence true",
+     "key": "number_sense:doubles_near_doubles",
+     "why": "4 + 5 is one more than 4 + 4: comparing sentences by their parts",
      "opts": {}
     }
    ],
@@ -2829,7 +2877,11 @@
     {
      "key": "subtraction:sub_10_regroup",
      "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)",
-     "opts": {}
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "number_sense:make_a_ten",
@@ -2860,15 +2912,10 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:balance_addsub",
-     "why": "a missing number that makes both sides equal",
-     "opts": {}
-    },
-    {
      "key": "algebra:tape_diagram",
      "why": "a bar model shows the missing part",
      "opts": {
-      "band": 50
+      "band": 20
      }
     }
    ],
@@ -3100,20 +3147,22 @@
   },
   "Y2.B3.S5": {
    "title": "Lines of symmetry on shapes",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "angles_lines:symmetry",
-     "opts": {}
+     "missing": "deals diagonal and horizontal lines and counts of lines (\"a square has 4\"), 4.G.A.3; a page of vertical lines of symmetry only is not available"
     },
     {
      "key": "angles_lines:place_symmetry_lines",
-     "opts": {}
+     "missing": "draws every line of symmetry, diagonals included; a vertical line only is not available"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "deals diagonal and horizontal lines and counts of lines (\"a square has 4\"), 4.G.A.3; a page of vertical lines of symmetry only is not available; draws every line of symmetry, diagonals included; a vertical line only is not available",
+   "build": [
+    "symmetry_vertical"
+   ],
    "pre": [
     {
      "key": "shapes_early:compose_from_attributes",
@@ -3148,13 +3197,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "shapes_early:count_edges_faces_vertices",
-     "why": "Y2.B3.S8 Count faces on 3-D shapes (a later step of the block: the same idea one step further)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two matching halves put together make a symmetrical shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -3188,8 +3233,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "coordinates:geo_reflect",
-     "why": "reflecting a shape in a mirror line (later years): the same idea on a coordinate grid",
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
      "opts": {}
     }
    ],
@@ -3530,16 +3575,18 @@
   },
   "Y2.B3.S12": {
    "title": "Make patterns with 2-D and 3-D shapes",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "patterns:shape_pattern",
-     "opts": {}
+     "missing": "2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt",
+   "build": [
+    "pattern_3d"
+   ],
    "pre": [
     {
      "key": "shapes_early:compose_from_attributes",
@@ -4139,7 +4186,9 @@
     {
      "key": "measurement:enough_money",
      "why": "compare an amount with a price, the reasoning behind a difference",
-     "opts": {}
+     "opts": {
+      "currency": "usd"
+     }
     },
     {
      "key": "measurement:money_change",
@@ -4350,7 +4399,9 @@
     {
      "key": "measurement:enough_money",
      "why": "is there enough money: the check after a two-step total",
-     "opts": {}
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "note": ""
@@ -5537,7 +5588,8 @@
       "constant": [
        5,
        10
-      ]
+      ],
+      "band": 100
      }
     }
    ],
@@ -5734,7 +5786,8 @@
       "constant": [
        5,
        10
-      ]
+      ],
+      "band": 100
      }
     }
    ],
@@ -6187,16 +6240,18 @@
   },
   "Y2.B7.S1": {
    "title": "Compare mass",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:heavier_lighter_visual",
-     "opts": {}
+     "missing": "picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and \"equal mass / the same as\", are not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and \"equal mass / the same as\", are not dealt",
+   "build": [
+    "compare_measures"
+   ],
    "pre": [
     {
      "key": "comparing:compare_objects",
@@ -6464,10 +6519,12 @@
    ],
    "related": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "half full is a half of the container (Y2.B8 halves)",
+     "key": "shapes_early:partition_shapes",
+     "why": "half full is a half of the container (Y2.B8 halves) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
@@ -6735,42 +6792,40 @@
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W16)",
-     "opts": {}
     },
     {
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)",
      "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 halving an amount within 20 (topic ladder)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "naming a part of a whole as a fraction, where parts and wholes lead",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B8.S4 Find a half (a later step of the block: the same idea one step further)",
-     "opts": {
-      "band": 20
-     }
+     "key": "composing:number_bonds",
+     "why": "part-part-whole with numbers: the same idea with a quantity",
+     "opts": {}
     }
    ],
    "note": ""
@@ -6786,33 +6841,35 @@
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16)",
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "equal and unequal groups of objects: the same idea with a set (earlier step this builds on: Y2.B5.S1 Recognise equal groups)",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W16)",
-     "opts": {}
-    },
-    {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)",
-     "opts": {}
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 halving an amount within 20 (topic ladder)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "patterns:halve",
-     "why": "Y2.B8.S4 Find a half (a later step of the block: the same idea one step further)",
-     "opts": {
-      "band": 20
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -6835,12 +6892,10 @@
    "build": [],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17)",
+     "key": "patterns:double",
+     "why": "doubling undoes halving (earlier step this builds on: Y2.B5.S11 Doubling and halving)",
      "opts": {
-      "denoms": [
-       2
-      ]
+      "band": 20
      }
     },
     {
@@ -6866,13 +6921,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "name the fraction shaded: 1/2 among others",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "measurement:time_half_hour",
+     "why": "half past: half a turn of the minute hand (Y2.B9.S1)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -6909,15 +6960,6 @@
      }
     },
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)",
      "opts": {
@@ -6933,8 +6975,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "composing:compose_whole",
-     "why": "two halves make a whole",
+     "key": "measurement:time_half_hour",
+     "why": "half past: half a turn of the minute hand (Y2.B9.S1)",
      "opts": {}
     }
    ],
@@ -6965,32 +7007,29 @@
      }
     },
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W18)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)",
      "opts": {
       "band": 12
      }
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y2.B5.S1 equal and unequal groups (topic ladder)",
+     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "name the fraction shaded, quarters among others",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7042,23 +7081,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "name the fraction shaded: 1/4 among others",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
+     "opts": {}
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7080,15 +7110,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S6 Find a quarter (step before in the block)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
     {
      "key": "patterns:halve",
      "why": "Y2.B8.S4 Find a half (earlier in the block)",
@@ -7112,23 +7133,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "name the fraction shaded, thirds among others",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7185,24 +7192,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7218,18 +7210,22 @@
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S8 Find a third (step before in the block)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S8 Find a third (step before in the block) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
-       3
+      "parts": [
+       0,
+       1,
+       2
       ]
      }
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W18)",
-     "opts": {}
+     "key": "patterns:double",
+     "why": "the whole is double the half (earlier step this builds on: Y2.B5.S11 Doubling and halving)",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "patterns:halve",
@@ -7249,24 +7245,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (next step: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S10 Unit fractions (next step: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7303,18 +7284,15 @@
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W18)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W18) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W18)",
-     "opts": {}
     },
     {
      "key": "patterns:halve",
@@ -7334,13 +7312,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (a later step of the block: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7377,19 +7356,15 @@
    ],
    "pre": [
     {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (step before in the block)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S10 Unit fractions (step before in the block) [rule 18: identify deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
-       2,
-       3
+      "parts": [
+       0,
+       1,
+       2
       ]
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)",
-     "opts": {}
     },
     {
      "key": "patterns:halve",
@@ -7409,13 +7384,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (next step: the same idea one step further)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "shapes_early:compose_shapes",
+     "why": "two or more equal parts put back together make the whole shape",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7441,45 +7417,21 @@
    ],
    "pre": [
     {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (step before in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (step before in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
-     }
-    },
-    {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W17)",
-     "opts": {}
+     "why": "Y2.B8.S11 Non-unit fractions (step before in the block) [rule 18: write_fraction deals content above this pupil; partition_shapes instead]",
+     "opts": {
+      "parts": [
+       0,
+       1,
+       2
+      ]
+     }
     },
     {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
      }
     },
     {
@@ -7498,22 +7450,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:select_equiv_frac",
-     "why": "circle the fractions equal to 1/2",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
+     "opts": {}
     },
     {
-     "key": "fractions:equiv_frac_nv",
-     "why": "1/2 = 2/4 without a picture, the next idea",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
+     "key": "measurement:time_half_hour",
+     "why": "half past: half a turn of the minute hand (Y2.B9.S1)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -7548,38 +7492,10 @@
    ],
    "pre": [
     {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (step before in the block)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
      }
     },
     {
@@ -7598,8 +7514,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "composing:compose_whole",
-     "why": "three quarters and one more quarter make the whole",
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
      "opts": {}
     }
    ],
@@ -7635,38 +7551,10 @@
      }
     },
     {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S13 Recognise three-quarters (step before in the block)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
      }
     },
     {
@@ -7680,8 +7568,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "composing:compose_whole",
-     "why": "3/4 and 1/4 make the whole",
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
      "opts": {}
     }
    ],
@@ -7698,10 +7586,12 @@
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S14 Find three-quarters (step before in the block)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S14 Find three-quarters (step before in the block) [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
@@ -7720,34 +7610,10 @@
      }
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)",
-     "opts": {}
-    },
-    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (earlier in the block)",
-     "opts": {
-      "denoms": [
-       2,
-       3
-      ]
      }
     },
     {
@@ -7758,16 +7624,18 @@
      }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "single_fraction"
+   ],
    "related": [
     {
-     "key": "composing:fraction_number_line",
-     "why": "reading fractions at points on a line",
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
      "opts": {}
     },
     {
-     "key": "composing:compose_whole",
-     "why": "counting quarters up to one whole",
+     "key": "measurement:time_half_hour",
+     "why": "half past: half a turn of the minute hand (Y2.B9.S1)",
      "opts": {}
     }
    ],
@@ -8013,6 +7881,19 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S15 counting in 5s from 0: the minutes round the clock",
+     "opts": {
+      "rows": [
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "measurement:time_half_hour",
      "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W37)",
      "opts": {}
@@ -8166,11 +8047,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "graphs:pictograph",
-     "why": "the same data shown as a pictogram",
-     "opts": {
-      "range": 20
-     }
+     "key": "measurement:pictograph_intro",
+     "why": "the same data shown as a pictogram [rule 18: pictograph deals content above this pupil; pictograph_intro instead]",
+     "opts": {}
     },
     {
      "key": "measurement:bar_graph_intro",
@@ -8242,18 +8121,13 @@
      "opts": {}
     },
     {
-     "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S5 one picture = one: the same 1-to-1 idea",
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 more, fewer, the same",
      "opts": {}
     },
     {
      "key": "addition:comparison_word",
      "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W25)",
-     "opts": {}
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W25)",
      "opts": {}
     },
     {
@@ -8280,11 +8154,9 @@
      "opts": {}
     },
     {
-     "key": "graphs:pictograph",
-     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (a later step of the block: the same idea one step further)",
-     "opts": {
-      "range": 20
-     }
+     "key": "measurement:pictograph_intro",
+     "why": "Y2.B10.S5 Interpret pictograms (1-1) (a later step of the block: the same idea one step further)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -8344,13 +8216,6 @@
      "key": "measurement:pictograph_intro",
      "why": "Y2.B10.S5 Interpret pictograms (1-1) (next step: the same idea one step further)",
      "opts": {}
-    },
-    {
-     "key": "graphs:pictograph",
-     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (a later step of the block: the same idea one step further)",
-     "opts": {
-      "range": 20
-     }
     }
    ],
    "note": ""
@@ -8412,11 +8277,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "graphs:pictograph",
-     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (a later step of the block: the same idea one step further)",
-     "opts": {
-      "range": 20
-     }
+     "key": "graphs:build_bar_graph",
+     "why": "the same data drawn as a bar chart (Grade 2)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -8436,6 +8299,29 @@
     "pictogram_scale"
    ],
    "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key of 2, 5 or 10",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
     {
      "key": "measurement:pictograph_intro",
      "why": "Y2.B10.S5 Interpret pictograms (1-1) (step before in the block)",
@@ -8465,11 +8351,9 @@
    "preBuild": [],
    "related": [
     {
-     "key": "graphs:pictograph",
-     "why": "Y2.B10.S7 Interpret pictograms (2, 5 and 10) (next step: the same idea one step further)",
-     "opts": {
-      "range": 20
-     }
+     "key": "graphs:build_bar_graph",
+     "why": "the same data drawn as a bar chart (Grade 2)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -8479,7 +8363,14 @@
    "direct": [
     {
      "key": "graphs:pictograph",
-     "opts": {}
+     "opts": {
+      "range": 50,
+      "scale": [
+       0,
+       1,
+       2
+      ]
+     }
     }
    ],
    "partial": [],
@@ -8550,8 +8441,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "describing position on a grid, where this language leads",
+     "key": "counting:count_sequence",
+     "why": "first, next, last: the position of a number in a count",
      "opts": {}
     }
    ],
@@ -8573,13 +8464,16 @@
      "opts": {}
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)",
-     "opts": {}
+     "key": "number_sense:place_on_number_line",
+     "why": "moving right and left along a line by a number of steps (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
     },
     {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 naming the shapes that are moved and turned (topic ladder)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)",
      "opts": {}
     }
    ],
@@ -8588,14 +8482,8 @@
     "position_map",
     "turns"
    ],
-   "related": [
-    {
-     "key": "coordinates:geo_translate",
-     "why": "movement on a grid as a translation (later years)",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: every skill that shares the idea (position words, quarter and half turns on the clock, moving along a line) is earlier learning and is listed as pre; the grid and coordinate skills are Grade 5+ (rule 18)"
   },
   "Y2.B11.S3": {
    "title": "Describe turns",
@@ -8613,29 +8501,30 @@
      "opts": {}
     },
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y2.B8 halves and quarters: a half turn and a quarter turn",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8 halves and quarters: a half turn and a quarter turn [rule 18: shade_fraction deals content above this pupil; partition_shapes instead]",
      "opts": {
-      "denoms": [
+      "parts": [
+       0,
+       1,
        2
       ]
      }
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 quarters: a quarter turn is a quarter of a whole turn (topic ladder)",
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2) (earlier step this builds on: Y2.B9.S2 Quarter past and quarter to)",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "half past: half a turn of the minute hand (Y2.B9.S1) (earlier step this builds on: Y2.B9.S1 O'clock and half past)",
      "opts": {}
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "coordinates:geo_rotate",
-     "why": "turns of a shape as a rotation (later years)",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: every skill that shares the idea (position words, quarter and half turns on the clock, moving along a line) is earlier learning and is listed as pre; the grid and coordinate skills are Grade 5+ (rule 18)"
   },
   "Y2.B11.S4": {
    "title": "Describe movement and turns",
@@ -8648,6 +8537,19 @@
    ],
    "pre": [
     {
+     "key": "measurement:time_quarter",
+     "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2) (earlier step this builds on: Y2.B9.S2 Quarter past and quarter to)",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "moving along a line by a number of steps (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
+    },
+    {
      "key": "shapes_early:shape_positions",
      "why": "Y1.B11.S4 Describe position - above and below (prior learning wk W19)",
      "opts": {}
@@ -8656,11 +8558,6 @@
      "key": "shapes_early:partition_shapes",
      "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19)",
      "opts": {}
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 naming the shapes that are moved and turned (topic ladder)",
-     "opts": {}
     }
    ],
    "preBuild": [
@@ -8668,19 +8565,8 @@
     "position_map",
     "turns"
    ],
-   "related": [
-    {
-     "key": "coordinates:geo_translate",
-     "why": "movement on a grid as a translation",
-     "opts": {}
-    },
-    {
-     "key": "coordinates:geo_rotate",
-     "why": "turns as a rotation",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: every skill that shares the idea (position words, quarter and half turns on the clock, moving along a line) is earlier learning and is listed as pre; the grid and coordinate skills are Grade 5+ (rule 18)"
   },
   "Y2.B11.S5": {
    "title": "Shape patterns with turns",
@@ -8710,11 +8596,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "coordinates:geo_rotate",
-     "why": "turning a shape as a rotation (later years)",
-     "opts": {}
-    },
     {
      "key": "patterns:number_pattern",
      "why": "continuing a repeating pattern",
@@ -8869,7 +8750,7 @@
    "why": "the order skills show numerals only; WRM Y2 orders objects and numbers",
    "reused": false,
    "closes": {
-    "Y2.B1.S14": "orders numerals only; ordering objects or base-10 pictures of numbers is not dealt; orders numerals only; objects are not ordered"
+    "Y2.B1.S14": "orders numerals only; ordering objects or base-10 pictures of numbers is not dealt"
    },
    "kindText": "option on placevalue:order_least_to_greatest, placevalue:order_greatest_to_least"
   },
@@ -9014,7 +8895,7 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y2.B2.S20": "comparing two number sentences with <, > or = (the skill judges true/false)"
+    "Y2.B2.S20": "comparing two number sentences with <, > or = by reasoning about their parts (4 + 5 ○ 4 + 6) rather than always working both out"
    },
    "kindText": "new skill"
   },
@@ -9077,6 +8958,31 @@
    },
    "kindText": "new skill"
   },
+  "symmetry_vertical": {
+   "kind": "option",
+   "skill": "angles_lines:symmetry",
+   "skills": [
+    "angles_lines:symmetry",
+    "angles_lines:place_symmetry_lines"
+   ],
+   "option": "lines: vertical only (no diagonal or horizontal lines, no \"how many lines\")",
+   "name": "Vertical Line of Symmetry (option)",
+   "teaches": "deciding whether a vertical line splits a picture or shape into two matching halves, and drawing that one vertical line",
+   "representation": "one shape per boxed cell with a dashed vertical line to judge (tick or cross), or a shape to draw the vertical line on",
+   "family": "geometry",
+   "steps": [
+    "Y2.B3.S5"
+   ],
+   "ccss": [
+    "4.G.A.3"
+   ],
+   "why": "both skills deal diagonal lines and counts of lines (Grade 4); WRM Y2 uses a vertical mirror line only",
+   "reused": false,
+   "closes": {
+    "Y2.B3.S5": "deals diagonal and horizontal lines and counts of lines (\"a square has 4\"), 4.G.A.3; a page of vertical lines of symmetry only is not available; draws every line of symmetry, diagonals included; a vertical line only is not available"
+   },
+   "kindText": "option on angles_lines:symmetry, angles_lines:place_symmetry_lines"
+  },
   "symmetry_complete": {
    "kind": "new",
    "skill": "angles_lines:complete_symmetric_shape",
@@ -9099,6 +9005,27 @@
     "Y2.B3.S6": "completing the other half of a shape or pattern across a vertical line of symmetry on a square grid"
    },
    "kindText": "new skill"
+  },
+  "pattern_3d": {
+   "kind": "option",
+   "skill": "patterns:shape_pattern",
+   "option": "shapes: 3-D (cube, sphere, cone, cylinder pictures) as well as 2-D",
+   "name": "Patterns With 3-D Shapes (option)",
+   "teaches": "continuing and completing repeating patterns made of 3-D shapes, and of 2-D and 3-D shapes together",
+   "representation": "a row of drawn 3-D shapes in boxes with the next one or two boxes empty; answer: draw or name the shape",
+   "family": "patterns",
+   "steps": [
+    "Y2.B3.S12"
+   ],
+   "ccss": [
+    "1.G.A.1"
+   ],
+   "why": "shape_pattern draws 2-D shapes and stars only",
+   "reused": false,
+   "closes": {
+    "Y2.B3.S12": "2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt"
+   },
+   "kindText": "option on patterns:shape_pattern"
   },
   "money_notes": {
    "kind": "option",
@@ -9329,14 +9256,15 @@
    "skill": "measurement:compare_measures",
    "name": "Compare Measures",
    "options": "measure: length / mass / capacity; units: one unit (cm or m, g or kg, ml or l) / mixed units; task: compare two / order three",
-   "teaches": "comparing two lengths, masses or capacities with <, > and =, and ordering three: first in one unit (24 cm < 31 cm), then in mixed units (450 g < 1 kg; 1,200 ml > 1 l)",
+   "teaches": "comparing two lengths, masses or capacities with <, > and =, and ordering three: first in one unit (24 cm < 31 cm), then in mixed units (450 g < 1 kg; 1,200 ml > 1 l); the balance-scale form shows two objects on a pan balance (heavier, lighter, or the same mass)",
    "representation": "two measurement labels (or two drawn bars or scales) with a sign box between; the ordering cell has three labels and three answer boxes",
    "family": "measurement",
    "steps": [
     "Y2.B6.S3",
     "Y2.B6.S4",
     "Y3.B7.S5",
-    "Y3.B7.S10"
+    "Y3.B7.S10",
+    "Y2.B7.S1"
    ],
    "ccss": [
     "1.MD.A.1",
@@ -9347,7 +9275,8 @@
    "reused": false,
    "closes": {
     "Y2.B6.S3": "compares pictured objects; comparing two lengths given in the same unit (cm or m) with <, > and = is not dealt; orders pictured objects; no lengths in cm or m",
-    "Y2.B6.S4": "orders pictured objects; ordering three lengths given in the same unit (cm or m) is not dealt"
+    "Y2.B6.S4": "orders pictured objects; ordering three lengths given in the same unit (cm or m) is not dealt",
+    "Y2.B7.S1": "picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and \"equal mass / the same as\", are not dealt"
    },
    "kindText": "new skill"
   },
@@ -9549,7 +9478,8 @@
     "Y2.B8.S11",
     "Y2.B8.S12",
     "Y2.B8.S13",
-    "Y2.B8.S14"
+    "Y2.B8.S14",
+    "Y2.B8.S15"
    ],
    "ccss": [
     "1.G.A.3",
@@ -9564,7 +9494,8 @@
     "Y2.B8.S11": "denoms [2,3] also deal sixths and eighths (7/8), above Y2; deals 7/8 and 1/6",
     "Y2.B8.S12": "the halves family deals 3/4 = 12/16 and eighths too; a page of 1/2 = 2/4 only is not available",
     "Y2.B8.S13": "quarters shapes: shades 1/4, 2/4 and 3/4, not three-quarters alone; the halves family, not 3/4 alone",
-    "Y2.B8.S14": "the halves family; a page of 3/4 of a shape or amount is not available"
+    "Y2.B8.S14": "the halves family; a page of 3/4 of a shape or amount is not available",
+    "Y2.B8.S15": "(prerequisite of this step)"
    },
    "kindText": "option on fractions:shade_fraction"
   },
@@ -9998,10 +9929,34 @@
    "why": "sums pass 100 (96 + 44 = 140) and its range option is ignored: kept as related"
   },
   {
+   "key": "addition:equal_sign",
+   "step": "Y2.B2.S20",
+   "action": "remove",
+   "why": "deals plain sums (12 + 12 = ?, 16 + 20 = ?) on every item: it compares nothing"
+  },
+  {
+   "key": "angles_lines:symmetry",
+   "step": "Y2.B3.S5",
+   "action": "partial",
+   "why": "deals diagonal and horizontal lines and counts of lines (\"a square has 4\"), 4.G.A.3; a page of vertical lines of symmetry only is not available"
+  },
+  {
+   "key": "angles_lines:place_symmetry_lines",
+   "step": "Y2.B3.S5",
+   "action": "partial",
+   "why": "draws every line of symmetry, diagonals included; a vertical line only is not available"
+  },
+  {
    "key": "shapes_early:count_edges_faces_vertices",
    "step": "Y2.B3.S8",
    "action": "add",
    "why": "teaches the step with opts {\"forms\":[0]}"
+  },
+  {
+   "key": "patterns:shape_pattern",
+   "step": "Y2.B3.S12",
+   "action": "partial",
+   "why": "2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt"
   },
   {
    "key": "measurement:money_count",
@@ -10050,6 +10005,12 @@
    "step": "Y2.B6.S4",
    "action": "partial",
    "why": "orders pictured objects; ordering three lengths given in the same unit (cm or m) is not dealt"
+  },
+  {
+   "key": "measurement:heavier_lighter_visual",
+   "step": "Y2.B7.S1",
+   "action": "partial",
+   "why": "picture judgements only (which is heavier, a car or an apple); comparing on a balance scale, and \"equal mass / the same as\", are not dealt"
   },
   {
    "key": "fractions:shade_fraction",

@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 3
+# Wave 2 tagging: Year 3 (US Grade 2) — round 4
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,11 +6,49 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 134 | 56 | 48 | 30 | 11 | 42 | 46 | 66 |
+| 134 | 55 | 49 | 30 | 12 | 43 | 49 | 68 |
 
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 4 (after critic Y2–Y3 r3, 7.55 / 7.60): rule 18 content and layout of every link
+
+- **S9, year-wide link swaps** (`overrides.mjs` `linkSwap`, applied in `build.mjs` after the link opts). Rule 12 (an
+  earlier partial stays as pre) yields to rule 18 when that partial deals content above the pupil.
+  - Y2 fractions: `shade_fraction`, `identify`, `write_fraction` → `partition_shapes {parts:[0,1,2]}` (halves, thirds,
+    quarters only); `equiv_frac_*`, `select_equiv_frac`, `compose_whole`, `fraction_number_line` dropped with
+    `single_fraction` in `preBuild`; `fraction_of_set(_nv)` → `halve {band:20}`. A `frac` topic ladder refills pre.
+  - Y2: `which_sign` and `balance_addsub` dropped; `pictograph` links → `pictograph_intro`; `add_50_regroup` /
+    `sub_50_regroup` before Y2.B2.S15 → `add_10_regroup` / `sub_10_regroup {notation:['across']}`; the 2-digit column
+    steps are no longer "next step" related before S15; 1-digit facts are written across before S15
+    (`add_facts`, `sub_facts`, `add_10_mixed`, `add_20_mixed`).
+  - Y3: `fractions:compare` and `order_fractions` dropped (unlike pairs are 4.NF.A.2) with `compare_kind` in
+    `preBuild`; `missing_mult_div` (deals × 12) → `div_facts {constant:[2,3,4,5,8,10]}`; `unit_conversions` dropped;
+    3-digit column steps are no longer related before Y3.B2.S11; 1-digit facts across before S11.
+  - Both years: every `coordinates:` link dropped. Steps left without a related skill got hand entries that share the
+    idea (quarter / half past for quarter / half turns and fractions, `compose_shapes`, `between_tens`, the inverse
+    across-10 fact …); Y2.B11.S2–S4 say in `note` why none fits.
+- **`linkscan.mjs`, rewritten**: week-relative by default (a link must fit the largest number the pupil has met by that
+  school week, xlsx order, never below the previous year's range: K counts to 100, Grade 1 to 120), plus content and
+  layout checks: Y2 denominators 2/3/4 only, Y3 compares sharing a numerator or denominator, no coordinate skills (no
+  longer skipped), no × ÷ in Y2 sign/balance links, no customary units, no 2-digit column layout before Y2.B2.S15 and no
+  3-digit column layout before Y3.B2.S11. **Result: `linkscan (week mode): OK`** (0 flags; the year mode is `--year`).
+  The critic's own scripts: `fit.mjs` **0**; `relfit.mjs week` **Y3 0, Y2 6 links on Y2.B1.S1 only** (counting and
+  2-digit place value to 100 on the "Numbers to 20" step: K learning, noted on the step, which the critic allowed);
+  `sys3.py` Y3 clean, Y2 3 empty related (Y2.B11.S2–S4, noted); `swap.py` 0 / 0; `optcheck.mjs` 0. `steplink.mjs`
+  still lists `add_50_regroup` / `sub_50_regroup` as stacked on Y3.B2.S4–S10 pre: 2-digit columns the pupil met in
+  Y2.B2.S15–S18 (the skill has no `notation` option).
+- **Step fixes (Y3)**: B2.S20 → partial (2-digit rounding only) + new option `estimate_1000`, with the 0–1,000 number
+  line and 100 more/less first in pre; B6.S6 pre = number line, ruler scale, halves/thirds/quarters (+ `frac_count`
+  preBuild); B3.S2 `dot_array_mult {band:25}` (arrays to 5 × 5); B2.S16 `sub_across_zeros` moved to related (partial
+  via `exchange_count`); B7.S7 pre = jug number line, counting in 10s, Y2 ml reading (+ `nonstandard_capacity`
+  preBuild), no L ↔ mL; B7.S3 counting-in-100s pre now has 100s rows; B11.S2/S3/S7 related `reading_ruler` dropped;
+  B5.S12 `perimeter {forms:[0,1]}` (form 2 is feet-and-inch stories).
+- **Owner bug list** (generator, not tagging): `mass_volume_liquid {forms:[1]}` gives some "mass in kg" items the answer
+  0; `missing_mult_div` ignores `range` (deals "__ × 12 = 144"); `pictograph` `range` does not bound totals (105 at
+  range 50); `fraction_of_set` ignores `denoms` in missing-numerator items; `denoms` on the fraction skills picks a
+  family (denoms [2] deals eighths).
 
 ## Round 3 (after critic Y2–Y3 r2, 7.53 / 7.45) — fixed in the generator, file-wide
 
