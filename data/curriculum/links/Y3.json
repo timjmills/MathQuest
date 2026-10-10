@@ -7226,6 +7226,479 @@
    ],
    "related": [],
    "note": ""
+  },
+  "Y3.B8.S1": {
+   "title": "Add fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "lower-grade skill on 3.NF.A.2a (same domain as 4.NF.B.3)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y3.B8.S2 Subtract fractions (next step)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y3.B8.S2 Subtract fractions (next step)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (Visual)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (No Visuals)"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "why": "same cluster 4.NF.B.4c: Mixed Fraction Word Problems (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B8.S2": {
+   "title": "Subtract fractions",
+   "direct": [
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "opts": {}
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y3.B8.S1 Add fractions (step before in the block)"
+    },
+    {
+     "key": "fraction_operations:add_frac_like_nv",
+     "why": "Y3.B8.S1 Add fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (Visual)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (No Visuals)"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "why": "same cluster 4.NF.B.4c: Mixed Fraction Word Problems (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B8.S3": {
+   "title": "Partition the whole",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding the fraction that completes a whole (1 − 3/5), as a part-whole or bar model",
+   "build": [
+    "frac_whole_partition"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "Y3.B8.S2 Subtract fractions (step before in the block)"
+    },
+    {
+     "key": "fraction_operations:sub_frac_like_nv",
+     "why": "Y3.B8.S2 Subtract fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S14 Find three-quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y2.B8.S14 Find three-quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (Visual)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "same cluster 4.NF.B.4c: Fraction of a Set - Hard (No Visuals)"
+    },
+    {
+     "key": "fraction_operations:frac_word_mixed",
+     "why": "same cluster 4.NF.B.4c: Mixed Fraction Word Problems (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B8.S4": {
+   "title": "Unit fractions of a set of objects",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {
+      "note": "unit fractions"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S14 Find three-quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (next step)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "same standard 3.NF.A.1: Identify Fractions (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B8.S5": {
+   "title": "Non-unit fractions of a set of objects",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {}
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S14 Find three-quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.2)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y3.B8.S6 Reasoning with fractions of an amount (next step)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "same standard 3.NF.A.1: Identify Fractions (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B8.S6": {
+   "title": "Reasoning with fractions of an amount",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "missing": "reasoning and word problems with fractions of amounts (bar model)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reasoning and word problems with fractions of amounts (bar model)",
+   "build": [
+    "frac_amount_wp"
+   ],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "Y3.B8.S5 Non-unit fractions of a set of objects (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S14 Find three-quarters (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "lower-grade skill on 2.OA.C.3 (same domain as 3.OA.A.3)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "same standard 3.NF.A.1: Identify Fractions (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same standard 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same standard 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.3: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.3: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "same standard 3.OA.A.3: Mixed Word Problems (+−×÷) (Visual)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -7874,6 +8347,39 @@
    "ccss": [
     "3.MD.A.2",
     "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_whole_partition": {
+   "kind": "new",
+   "skill": "fractions:partition_the_whole",
+   "name": "Partition the Whole",
+   "teaches": "finding the fraction that completes a whole (1 − 3/5), as a part-whole or bar model",
+   "representation": "a bar model with one part given as a fraction; write the missing part",
+   "family": "fractions",
+   "steps": [
+    "Y3.B8.S3"
+   ],
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_amount_wp": {
+   "kind": "new",
+   "skill": "fractions:fraction_of_amount_problems",
+   "name": "Fraction of an Amount Problems",
+   "teaches": "reasoning about fractions of amounts with a bar model: find a part, find the whole, compare two fractions of amounts",
+   "representation": "a bar model split into equal parts with the whole or a part labelled; write the missing value",
+   "family": "fractions",
+   "steps": [
+    "Y3.B8.S6"
+   ],
+   "ccss": [
+    "3.NF.A.1",
+    "3.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
