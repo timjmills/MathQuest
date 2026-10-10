@@ -1746,3 +1746,17 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body .mq-scell .k2-shape-line { overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
+/* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
+   dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
+   The quotient box no longer sizes that column (`contain: inline-size` keeps it out of the grid's
+   track sizing); it spans the dividend's width or its own height (a square, >= 48 px), whichever
+   is wider, and sits centred over the bar, overhanging both ends equally when the dividend is one narrow digit.
+   Its width still follows the dividend, never the quotient (SL-2). Additive: overrides the 64 px
+   floor of `.mq-ldiv-q .mq-slot` above. */
+.mq-scell .mq-ldiv > .mq-ldiv-q { contain: inline-size; justify-content: center; }
+.mq-scell .mq-ldiv > .mq-ldiv-q .mq-slot { min-width: max(100%, 48px, var(--ws-hw, 48px)) !important; }
+/* the remainder bracket (screen-cell.js ringCellHTML, `.mq-rembrk`): its quotient box keeps its own
+   width over the dividend's column (that column no longer stretches to the box), never shrinking
+   below the touch target (critic ldiv-hug R1 D-1). */
+.mq-scell .mq-rembrk .mq-cellbox { flex: none; }
