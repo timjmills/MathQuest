@@ -34,7 +34,9 @@ for (const [id, p] of Object.entries(proposals)) {
     if (!hit) { errs.push(`proposal ${id}: reused but not in any source list`); continue; }
     // source wins; a field the source entry lacks (e.g. ccss on a WRM step proposal) keeps the audit's value
     const keep = {}; for (const k of ['ccss', 'why', 'teaches', 'representation', 'family']) if (hit[1][id][k] === undefined && p[k] !== undefined) keep[k] = p[k];
-    proposals[id] = { ...keep, ...hit[1][id], source: hit[0], map: p.map, reused: true };
+    // A reused entry widened for MAP keeps its source text and gains the extra clause as mapClause.
+    const clause = p.mapClause || (String(p.teaches || '').match(/MAP clause:\s*(.+)$/i) || [])[1];
+    proposals[id] = { ...keep, ...hit[1][id], source: hit[0], map: p.map, ...(clause ? { mapClause: clause.trim() } : {}), reused: true };
 }
 const live = k => LIVE.has(k);
 rows.forEach((r, i) => {

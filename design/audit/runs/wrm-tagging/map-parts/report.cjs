@@ -56,7 +56,7 @@ for (const [id, p] of Object.entries(P).filter(([, p]) => !p.reused)) {
         `- **Why:** ${esc(p.why)}`, '');
 }
 L.push('', '## Every proposal', '', '| Id | Kind | Skill (option) | Name | MAP strand / RIT / task type | Reused from |', '|---|---|---|---|---|---|');
-for (const [id, p] of Object.entries(P)) L.push(`| \`${id}\` | ${p.kind || ''} | \`${p.skill || ''}\`${p.option ? ' (' + esc(p.option) + ')' : ''} | ${esc(p.name)} | ${(p.map || []).map(m => `${m.strand} ${m.ritBand} — ${esc(m.taskType)}`).join('<br>')} | ${p.reused ? p.source : 'new'} |`);
+for (const [id, p] of Object.entries(P)) L.push(`| \`${id}\` | ${p.kind || ''} | \`${p.skill || ''}\`${p.option ? ' (' + esc(p.option) + ')' : ''} | ${esc(p.name)} | ${(p.map || []).map(m => `${m.strand} ${m.ritBand} — ${esc(m.taskType)}`).join('<br>')} | ${p.reused ? p.source + (p.mapClause ? ' + MAP clause: ' + esc(p.mapClause) : '') : 'new'} |`);
 L.push('', fs.readFileSync(path.join(__dirname, 'report-tail.md'), 'utf8').trim(), '');
 fs.writeFileSync(path.join(ROOT, 'design/audit/runs/wrm-tagging/MAP-report.md'), L.join('\n'));
 console.log('MAP-report.md written');

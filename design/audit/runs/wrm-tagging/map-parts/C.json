@@ -15,7 +15,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
-      }
+      },
+      "closes": "Adds the two-shape compare (count both, say which has more); live symmetry only counts one shape."
     },
     {
       "task": "Symmetry: is this proposed line correct?",
@@ -31,7 +32,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
-      }
+      },
+      "closes": "Adds judging a given line (yes/no, then fix it); live skills only have the pupil draw or click lines."
     },
     {
       "task": "Area: pick the picture with area N",
@@ -47,7 +49,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
-      }
+      },
+      "closes": "Adds picking the shape with a given area among distractors; area_unit_squares only asks the area of one shape."
     },
     {
       "task": "Nets of 3-D solids",
@@ -76,7 +79,8 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
-      }
+      },
+      "closes": "angle_rules' 'angles in a triangle (180°)' clause adds finding the missing angle; no live skill does."
     },
     {
       "task": "Volume by unit cubes",
@@ -93,7 +97,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
-      }
+      },
+      "closes": "volume_cubes adds counting unit cubes in a drawn solid; volume only multiplies edges."
     },
     {
       "task": "Perimeter",
@@ -148,7 +153,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
-      }
+      },
+      "closes": "time_convert's MAP clause adds minutes → hours as h-and-min, decimal and mixed hours."
     },
     {
       "task": "Line / dot plots",
@@ -200,7 +206,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
-      }
+      },
+      "closes": "coord_context adds points as data in a story and saying what a point means; live skills name/plot only."
     },
     {
       "task": "Match: graph ↔ sentence (data)",
@@ -217,7 +224,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
-      }
+      },
+      "closes": "Adds statements to check against a graph (select all true); live graphs ask one number."
     },
     {
       "task": "Match: shape ↔ property (geometry)",
@@ -283,7 +291,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: area figure and volume expressions items pair a picture with a number/expression"
-      }
+      },
+      "closes": "Adds ticking every area and perimeter equation for a grid rectangle; distributive_visual only splits area."
     },
     {
       "task": "Match: model ↔ number (unit cubes)",
@@ -299,7 +308,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
-      }
+      },
+      "closes": "volume_cubes adds writing the number of unit cubes for a drawn model."
     },
     {
       "task": "Compare / order objects by length (K-1)",
@@ -329,7 +339,8 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because K.MD.A.1 is in MAP's blueprint"
-      }
+      },
+      "closes": "measurable_attributes adds naming what can be measured (length, mass, capacity); none today."
     },
     {
       "task": "Measure with non-standard units",
@@ -360,7 +371,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
-      }
+      },
+      "closes": "compare_lengths adds 'how much longer' and comparing in mixed units; compare_objects only picks longer."
     },
     {
       "task": "Measure an object with a ruler (incl. not at 0)",
@@ -376,7 +388,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
-      }
+      },
+      "closes": "Adds measuring an object that does not start at 0 (distance between marks)."
     },
     {
       "task": "Two objects on a ruler: difference",
@@ -390,7 +403,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
-      }
+      },
+      "closes": "ruler_difference adds two objects on one ruler and the difference."
     },
     {
       "task": "Estimate length / choose the unit",
@@ -437,7 +451,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
-      }
+      },
+      "closes": "mass_scales adds reading scales with steps 2, 5, 10, 100 and kg scales (live kg reading has the answer-0 bug)."
     },
     {
       "task": "Mass / liquid volume word problems",
@@ -451,7 +466,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
-      }
+      },
+      "closes": "mass_ops adds +, −, ×, ÷ word problems with masses and volumes."
     },
     {
       "task": "Length word problems (add/sub lengths)",
@@ -465,7 +481,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'total length of paper Jai will use' from line plot (add lengths)"
-      }
+      },
+      "closes": "length_ops adds length word problems; none today."
     },
     {
       "task": "Convert units large → small (ft→in, kg→g, L→mL)",
@@ -498,7 +515,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
-      }
+      },
+      "closes": "conversion_table adds completing and using a two-column conversion table."
     },
     {
       "task": "Coins: identify value / count coins",
@@ -531,7 +549,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
-      }
+      },
+      "closes": "Adds building an amount by dragging coins (production); live skills count or compare sets."
     },
     {
       "task": "Money: change and comparisons",
@@ -562,7 +581,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
-      }
+      },
+      "closes": "money_2step adds buy-two-items-then-change problems."
     },
     {
       "task": "Time to the hour / half hour (K-1)",
@@ -626,7 +646,8 @@
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
-      }
+      },
+      "closes": "elapsed_stories adds the story form with a time line; elapsed_mixed is bare times."
     },
     {
       "task": "Temperature: read a thermometer",
@@ -673,7 +694,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: separate area and perimeter items in 181-210 bands"
-      }
+      },
+      "closes": "same_area adds same area / different perimeter comparisons."
     },
     {
       "task": "Rectilinear area by decomposing",
@@ -706,7 +728,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
-      }
+      },
+      "closes": "missing_lengths adds missing sides of rectilinear shapes; live covers rectangles only."
     },
     {
       "task": "Volume of a prism (l × w × h), incl. missing edge",
@@ -735,7 +758,8 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 5.NF.B.4b / 6.G.A.2 is in MAP's blueprint"
-      }
+      },
+      "closes": "volume_fractional adds 1/2- and 1/4-unit edges and packing with unit-fraction cubes."
     },
     {
       "task": "Area of a triangle / parallelogram (Gr 6 edge of MAP 2-5)",
@@ -827,7 +851,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
-      }
+      },
+      "closes": "defining_attributes adds sorting defining vs non-defining attributes."
     },
     {
       "task": "Compose shapes (pattern blocks, make a rectangle)",
@@ -860,7 +885,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
-      }
+      },
+      "closes": "Adds equal-vs-unequal, cutting shapes into halves/quarters, and choose ALL shapes showing a named fraction; partition_shapes only reads the fraction shaded."
     },
     {
       "task": "Regular and irregular polygons; name polygons by sides",
@@ -876,7 +902,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
-      }
+      },
+      "closes": "polygons adds regular vs irregular and naming polygons by sides."
     },
     {
       "task": "Points, lines, segments, rays",
@@ -890,7 +917,8 @@
       "evidence": {
         "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
         "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
-      }
+      },
+      "closes": "points_lines_rays adds naming and drawing points, lines, segments, rays."
     },
     {
       "task": "Parallel and perpendicular lines",
@@ -950,7 +978,8 @@
       "evidence": {
         "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
         "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
-      }
+      },
+      "closes": "draw_angles adds drawing an angle of a given size."
     },
     {
       "task": "Additive angles (part + part = whole)",
@@ -1029,7 +1058,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
-      }
+      },
+      "closes": "shapes_3d_props adds naming solids from faces/edges/vertices and its choose-ALL-by-property clause."
     },
     {
       "task": "Coordinates: name and plot a point (Q1)",
@@ -1077,7 +1107,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
-      }
+      },
+      "closes": "four_quadrants' 'problems' option adds missing vertices and distances across quadrants."
     },
     {
       "task": "Horizontal / vertical lines",
@@ -1091,7 +1122,8 @@
       "evidence": {
         "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
         "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
-      }
+      },
+      "closes": "hv_lines adds horizontal/vertical lines in shapes and on a grid."
     },
     {
       "task": "Reflections / translations on a grid",
@@ -1155,7 +1187,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
-      }
+      },
+      "closes": "pictogram_scale adds keys of 2, 5, 10 and half pictures to build_pictograph."
     },
     {
       "task": "Read a bar graph: how many, how many more/fewer",
@@ -1202,7 +1235,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
-      }
+      },
+      "closes": "bar_graph_scale adds scales of 2, 5, 10 to build_bar_graph."
     },
     {
       "task": "Read a tally chart",
@@ -1233,7 +1267,8 @@
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
-      }
+      },
+      "closes": "Adds making the tally from raw data; tally_chart only reads one."
     },
     {
       "task": "Read a table of data",
@@ -1247,7 +1282,8 @@
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
-      }
+      },
+      "closes": "table_data adds reading and completing data tables."
     },
     {
       "task": "Make a line plot from measurements",
@@ -1263,7 +1299,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
-      }
+      },
+      "closes": "make_line_plot adds measuring/reading data and drawing the dots; live plots are read only."
     },
     {
       "task": "Line plot with fractions: operations (total, difference)",
@@ -1294,7 +1331,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "6+ Data chart: 'graph shows change in price over time; identify intervals' (line graph, Gr5-6 edge)"
-      }
+      },
+      "closes": "line_graph adds reading and drawing line graphs."
     },
     {
       "task": "Mean / median / mode / range (upper band)",
@@ -1344,7 +1382,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' multi-select"
-      }
+      },
+      "closes": "time_convert's MAP clause adds choose ALL measurements equal to a time."
     },
     {
       "task": "Choose ALL expressions that give the volume of a prism",
@@ -1360,7 +1399,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D top band: 'Choose all the expressions that can be used to find the volume' multi-select"
-      }
+      },
+      "closes": "Adds choose ALL expressions (l×w×h, B×h, layers) for one prism."
     },
     {
       "task": "Choose ALL figures that show a line of symmetry",
@@ -1392,7 +1432,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'Move the shapes to the correct part of the chart' - line of symmetry / acute / both"
-      }
+      },
+      "closes": "Adds the two-attribute sort chart; live skills click one property."
     },
     {
       "task": "Choose ALL terms that describe a set of shapes (squares, parallelograms, quadrilaterals)",
@@ -1423,7 +1464,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
-      }
+      },
+      "closes": "shapes_3d_props' MAP clause adds choose ALL solids with six faces."
     },
     {
       "task": "Show the change from $1 (drag coins)",
@@ -1439,7 +1481,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 M&D: 'paid with one dollar. Show the change Julia should receive' (coins moved)"
-      }
+      },
+      "closes": "map_money_build's 'show the change' form adds dragging the change from $1."
     },
     {
       "task": "Read a picture graph: who has the most (key = 1)",
@@ -1471,7 +1514,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
-      }
+      },
+      "closes": "make_line_plot's MAP clause adds the total of the lengths on a fraction plot."
     },
     {
       "task": "Angle as a turn: degrees as a fraction of 360 (quarter turn = 90°)",
@@ -1485,7 +1529,8 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
-      }
+      },
+      "closes": "turns_angles' MAP clause adds degrees as a fraction of 360."
     },
     {
       "task": "Area of a rectangle with fractional side lengths",
@@ -1502,7 +1547,8 @@
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 5.NF.B.4b is in MAP's blueprint"
-      }
+      },
+      "closes": "Adds tiling with unit-fraction squares to find area; live skills only multiply."
     },
     {
       "task": "Match: measurement story ↔ operation (length / mass / money)",
@@ -1514,12 +1560,13 @@
         "measurement:money_change",
         "area_perimeter:perimeter"
       ],
-      "proposal": "length_ops",
+      "proposal": "map_measure_story_equation",
       "note": "money_change and perimeter trim stories carry an operation; no length/mass add-subtract stories (checked unit_conversion_word, capacity, mass_volume_liquid --n 12: convert/read only); story→equation building itself lives on algebra:build_expr_* (parts A/B)",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume' word problems"
-      }
+      },
+      "closes": "Adds writing the equation for length, mass, volume and money stories (build_expr pool 'measurement')."
     },
     {
       "task": "Match: coordinate grid ↔ ordered pair",
@@ -1553,7 +1600,8 @@
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"
-      }
+      },
+      "closes": "table_data's MAP clause adds completing the graph from a two-column table."
     }
   ],
   "proposals": {
@@ -1563,7 +1611,7 @@
       "option": "form \"compare\": two shapes side by side; which has more lines of symmetry (or write both counts and >, <, =)",
       "name": "Compare Lines of Symmetry (option)",
       "teaches": "counting lines of symmetry in two shapes and comparing the counts",
-      "representation": "one boxed cell, two B&W shapes (Andika labels A and B), answer slot for each count plus a sign box; screen: two number boxes and a click-to-pick sign, never MC when counts can be written",
+      "representation": "print: B&W boxed Andika cell, two outline shapes side by side labelled A and B, slots 'A: __ lines  B: __ lines' and circle the shape with more; screen: two number entries then click the shape (hot spot), not MC",
       "family": "geometry",
       "ccss": [
         "4.G.A.3"
@@ -1574,7 +1622,25 @@
         "taskType": "compare two figures; number entry / select"
       },
       "why": "MAP asks which shape has more lines of symmetry; symmetry today only asks the count of one shape or click-all-symmetric",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "count both — two shapes — write each count (print) / two number entries",
+        "compare — two shapes — circle the one with more lines (print) / click shape",
+        "same or different — two shapes — tick 'same number' or 'different' after counting (print) / click"
+      ],
+      "levels": [
+        "L1: two shapes with dashed lines already drawn; count and compare (structural: A/B labels and slots stay; hint: drawn lines)",
+        "L2: lines not drawn; pupil draws then counts (hint lines faded)",
+        "L3: regular polygons and letters, counts up to 6; compare only"
+      ],
+      "example": {
+        "item": "Shape A is a rectangle. Shape B is a square. Write how many lines of symmetry each has. Circle the shape with more.",
+        "answer": "A: 2, B: 4; circle B"
+      },
+      "misconceptions": [
+        "counts the diagonals of a rectangle as lines of symmetry",
+        "thinks a bigger shape has more lines"
+      ]
     },
     "map_symmetry_check_line": {
       "kind": "option",
@@ -1582,7 +1648,7 @@
       "option": "form \"is this a line of symmetry?\": one dashed line drawn on a shape; tick Yes or No (fold check), half the items wrong lines (diagonal of a rectangle, off-centre)",
       "name": "Is This a Line of Symmetry? (option)",
       "teaches": "judging a proposed fold line: the two halves must match exactly",
-      "representation": "boxed cell, B&W shape with one dashed line, Yes / No check boxes; screen: click Yes or No; misconception items: rectangle diagonal, parallelogram",
+      "representation": "print: B&W boxed cell, one shape with one dashed line, check boxes 'Yes, it is a line of symmetry' / 'No'; screen: click Yes/No (a judgement, so a two-choice click is the production form)",
       "family": "geometry",
       "ccss": [
         "4.G.A.3"
@@ -1593,7 +1659,25 @@
         "taskType": "true/false on a drawn line"
       },
       "why": "MAP shows one proposed line and asks if it is a line of symmetry; we only have click-all candidate lines (39/200 symmetry items), never a single yes/no judgement with the rectangle-diagonal trap",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "judge — shape with one dashed line — tick Yes or No",
+        "judge and fix — line is wrong — tick No and draw a correct line (print) / place line (place-symmetry-lines)",
+        "sort — 4 shapes with lines — tick every correct one (print) / select all"
+      ],
+      "levels": [
+        "L1: line on letters and simple shapes; fold flap picture beside (hint: fold picture fades)",
+        "L2: no fold picture; includes diagonal on a rectangle (the classic false)",
+        "L3: judge then draw a correct line where the given one is wrong"
+      ],
+      "example": {
+        "item": "A dashed line goes corner to corner across a rectangle. Is it a line of symmetry?",
+        "answer": "No"
+      },
+      "misconceptions": [
+        "accepts a diagonal of a rectangle because the halves have equal area",
+        "rejects a correct line that is not vertical"
+      ]
     },
     "map_area_pick": {
       "kind": "option",
@@ -1601,7 +1685,7 @@
       "option": "form \"pick the area\": 3–4 grid shapes, click the one with area N square units (distractor: same perimeter, different area)",
       "name": "Which Shape Has Area N? (option)",
       "teaches": "finding area by counting unit squares and matching it to a given number",
-      "representation": "boxed cell with 3 B&W grid shapes labelled A–C, check box under each; screen: click the shape (hot-spot), not a list of letters",
+      "representation": "print: B&W boxed cell, 3-4 grid shapes labelled A-D, slot 'Area __ squares' then circle the letter; screen: click the shape (hot spot); distractor shapes share the perimeter",
       "family": "measurement",
       "ccss": [
         "3.MD.C.6"
@@ -1612,7 +1696,25 @@
         "taskType": "hot spot: select the figure"
       },
       "why": "area_unit_squares only asks to count one shape; MAP asks which of several pictures has the stated area",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "pick — 'Which shape has an area of 8 squares?' — circle the letter / click shape",
+        "pick all — 'Choose ALL shapes with area 6' — tick boxes / select all",
+        "count then pick — write each area under its shape, then circle"
+      ],
+      "levels": [
+        "L1: rectangles only, whole squares, one answer (structural: grid stays)",
+        "L2: rectilinear shapes, still whole squares",
+        "L3: choose all, distractors with the same perimeter"
+      ],
+      "example": {
+        "item": "Which shape has an area of 6 square units? A: 2 by 3 rectangle, B: 1 by 5 rectangle, C: 2 by 2 square",
+        "answer": "A"
+      },
+      "misconceptions": [
+        "counts the squares round the edge (perimeter)",
+        "counts grid lines instead of squares"
+      ]
     },
     "map_money_build": {
       "kind": "option",
@@ -1620,7 +1722,7 @@
       "option": "response \"build the amount\": drag coins (or draw them on paper) to make a given total; any correct set accepted",
       "name": "Make the Amount With Coins (option)",
       "teaches": "composing a money amount from coins",
-      "representation": "boxed cell with the coin bank and an empty purse box; paper: draw/tally coins in the box; screen: drag coins, checked by total",
+      "representation": "print: B&W boxed cell, the amount in big digits and a tray of coin outlines with values; pupil draws or writes the coins used in slots '__ × 25¢ + __ × 10¢ ...'; screen: drag coins into a tray (production), any correct set accepted",
       "family": "measurement",
       "ccss": [
         "2.MD.C.8"
@@ -1631,7 +1733,26 @@
         "taskType": "drag and drop coins"
       },
       "why": "MAP drags coins to make an amount; we only count shown coins, check a set, or write fewest coins",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "make the amount — target total — drag/draw coins",
+        "show the change — 'You pay $1 for a 65¢ toy; show the change' — drag/draw coins",
+        "fewest coins — make the total with fewest coins"
+      ],
+      "levels": [
+        "L1: pennies, nickels, dimes, totals to 30¢ (structural: coin tray stays; hint: running total shown)",
+        "L2: add quarters, totals to $1; running total faded",
+        "L3: change from $1 (one new thing: subtract first)"
+      ],
+      "example": {
+        "item": "Show 41¢ with coins.",
+        "answer": "e.g. 1 quarter, 1 dime, 1 nickel, 1 penny (any set totalling 41¢)"
+      },
+      "misconceptions": [
+        "counts coins instead of their values",
+        "thinks a bigger coin is worth more (nickel vs dime)",
+        "forgets to subtract when showing change"
+      ]
     },
     "map_graph_sentence": {
       "kind": "option",
@@ -1639,7 +1760,7 @@
       "option": "form \"which sentence is true?\": a bar or picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
       "name": "Which Sentence Matches the Graph? (option)",
       "teaches": "reading a graph and checking comparison statements against it",
-      "representation": "boxed cell, B&W graph on top, statements with check boxes below; screen: select all that apply",
+      "representation": "print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply",
       "family": "data",
       "ccss": [
         "2.MD.D.10",
@@ -1651,7 +1772,25 @@
         "taskType": "multi-select statements"
       },
       "why": "MAP graph items often ask which statement the graph supports; our graph skills only ask one numeric question",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "which is true — tick the true statement(s)",
+        "true or false — one statement, tick T/F",
+        "fix — a false statement, write the right number"
+      ],
+      "levels": [
+        "L1: key 1, one true statement among 3 'most/least' sentences (structural: graph stays)",
+        "L2: 'how many more' statements",
+        "L3: scaled graph (key 2/5) and select ALL true"
+      ],
+      "example": {
+        "item": "Graph: Cats 6, Dogs 4, Fish 2. Which sentence is true? A 'Dogs got the most.' B '2 more chose cats than dogs.' C 'Fish got 4.'",
+        "answer": "B"
+      },
+      "misconceptions": [
+        "reads the bar length in squares when the scale is 2",
+        "confuses 'more than' with the total"
+      ]
     },
     "map_area_equation": {
       "kind": "option",
@@ -1659,7 +1798,7 @@
       "option": "form \"match the equation\": a grid rectangle and equations (3 × 4, 3 + 4, 3 + 4 + 3 + 4, 4 × 4); tick the one that gives the area (or the perimeter)",
       "name": "Picture to Area Equation (option)",
       "teaches": "connecting area to multiplication and perimeter to adding sides",
-      "representation": "boxed cell, B&W grid rectangle with side labels, equation bank with check boxes; screen: click the equation",
+      "representation": "print: B&W boxed cell, a grid rectangle and 3-4 equations with check boxes; screen: select all that apply",
       "family": "measurement",
       "ccss": [
         "3.MD.C.7",
@@ -1671,7 +1810,25 @@
         "taskType": "select the expression"
       },
       "why": "6.4 picture ↔ equation for area/perimeter: no skill shows a picture and asks which equation models it",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "area — tick every equation that gives the area (3 × 4, 4 + 4 + 4)",
+        "perimeter — tick every equation that gives the perimeter",
+        "write — write one area and one perimeter equation"
+      ],
+      "levels": [
+        "L1: area only, × and repeated addition (structural: grid stays)",
+        "L2: perimeter equations added",
+        "L3: mixed: tick area ones, circle perimeter ones; grid lines faded to side labels"
+      ],
+      "example": {
+        "item": "A rectangle is 3 squares tall and 4 squares wide. Tick every equation for its area: 3 × 4 = 12; 3 + 4 = 7; 4 + 4 + 4 = 12; 3 + 4 + 3 + 4 = 14",
+        "answer": "3 × 4 = 12 and 4 + 4 + 4 = 12"
+      },
+      "misconceptions": [
+        "picks the perimeter sum for area",
+        "picks 3 + 4 (adds the sides once)"
+      ]
     },
     "map_ruler_measure_object": {
       "kind": "option",
@@ -1679,7 +1836,7 @@
       "option": "task \"measure the object\": an object drawn beside the ruler, not starting at 0 on some items; write its length",
       "name": "Measure an Object Not at Zero (option)",
       "teaches": "measuring length as the distance between two marks",
-      "representation": "boxed cell, B&W ruler cell with a bar object above it, answer slot with unit; screen: number entry",
+      "representation": "print: B&W boxed cell, a line-art object above a ruler (cm or inches), slot '__ cm'; screen: number entry",
       "family": "measurement",
       "ccss": [
         "2.MD.A.1",
@@ -1691,7 +1848,25 @@
         "taskType": "number entry from a ruler picture"
       },
       "why": "reading_ruler gives an arrow on a mark; MAP shows an object (sometimes offset from 0) to measure",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "from 0 — object starts at 0 — write the length",
+        "not at 0 — object starts at 2 — write the length",
+        "two ends — 'Where does it end?' then length"
+      ],
+      "levels": [
+        "L1: start at 0, whole units (structural: ruler stays)",
+        "L2: start not at 0 (one change)",
+        "L3: inches to the half inch"
+      ],
+      "example": {
+        "item": "A pencil lies from the 3 cm mark to the 10 cm mark. How long is it?",
+        "answer": "7 cm"
+      },
+      "misconceptions": [
+        "reads the end mark as the length",
+        "counts tick marks instead of spaces"
+      ]
     },
     "map_tally_build": {
       "kind": "option",
@@ -1699,7 +1874,7 @@
       "option": "task \"make the tally\": a list or picture of items; complete the tally marks and totals",
       "name": "Complete a Tally Chart (option)",
       "teaches": "recording data with tally marks in fives",
-      "representation": "boxed cell, item list then a 2-column tally table with empty cells; screen: click to add tallies, number box for total",
+      "representation": "print: B&W boxed cell, a picture list of items, a tally table with empty tally and total columns; pupil draws tallies in fives and writes totals; screen: click to add tally marks (production) and number entry",
       "family": "data",
       "ccss": [
         "1.MD.C.4",
@@ -1711,19 +1886,38 @@
         "taskType": "complete the table"
       },
       "why": "tally_chart only reads a finished chart; MAP also asks pupils to complete one",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "make the tally — picture list — draw tallies and totals",
+        "total only — given tallies — write totals",
+        "make and ask — make the tally then answer 'how many more'"
+      ],
+      "levels": [
+        "L1: 2 categories, totals ≤ 9, cross-off picture list (hint: cross-off fades)",
+        "L2: 3-4 categories, totals to 20, fives gate",
+        "L3: add one question from the chart"
+      ],
+      "example": {
+        "item": "Fruit: apple, pear, apple, apple, banana, pear, apple, apple, apple. Make the tally.",
+        "answer": "apple 卌|| (6), pear || (2), banana | (1)"
+      },
+      "misconceptions": [
+        "draws the fifth mark as a fifth upright stroke",
+        "loses count without crossing off"
+      ]
     },
     "map_shape_partition_pick": {
       "kind": "option",
       "skill": "shapes_early:partition_shapes",
-      "option": "form \"equal or not?\": shapes cut into parts, some unequal; click the shapes showing halves/thirds/fourths",
-      "name": "Which Shows Equal Parts? (option)",
-      "teaches": "equal shares must be the same size",
-      "representation": "boxed cell, 3–4 B&W cut shapes with check boxes; screen: select all that apply",
+      "option": "forms \"equal or not?\", \"cut it\" and \"choose all that show a fraction\": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth shaded",
+      "name": "Equal Parts of Shapes (option)",
+      "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
+      "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
       "family": "geometry",
       "ccss": [
         "1.G.A.3",
-        "2.G.A.3"
+        "2.G.A.3",
+        "3.G.A.2"
       ],
       "map": {
         "strand": "Geometry",
@@ -1731,7 +1925,27 @@
         "taskType": "multi-select figures"
       },
       "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "equal or not — shapes cut into parts — tick those in equal halves/quarters / select all",
+        "cut it — a blank rectangle or circle — draw lines into halves or quarters / place cut line",
+        "choose all that show — 'Choose ALL shapes with one-third shaded' — tick / select all"
+      ],
+      "levels": [
+        "L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades)",
+        "L2: quarters (fourths)",
+        "L3: cut it yourself (halves, quarters)",
+        "L4: thirds and choose ALL showing a named fraction"
+      ],
+      "example": {
+        "item": "Tick every shape cut into equal quarters.",
+        "answer": "the square cut by two lines through its centre and the rectangle cut into 4 equal strips (not the circle cut into 4 unequal slices)"
+      },
+      "misconceptions": [
+        "counts parts and ignores size (4 unequal parts called quarters)",
+        "thinks a quarter is bigger than a half because 4 > 2",
+        "names one-third as 1/2 when one of three parts is shaded"
+      ]
     },
     "angle_rules": {
       "kind": "new",
@@ -1831,7 +2045,7 @@
       "kind": "new",
       "skill": "graphs:make_a_line_plot",
       "name": "Make a Line Plot",
-      "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+      "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it; MAP clause: answer total and difference questions (sum of the lengths) from the plot",
       "representation": "draw the × marks; write the answers — B&W boxed cell; screen keeps the production form",
       "family": "data",
       "ccss": [
@@ -2093,7 +2307,7 @@
       "kind": "new",
       "skill": "shapes_classify:3d_shape_properties",
       "name": "3-D Shapes: Names and Properties",
-      "teaches": "naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets",
+      "teaches": "naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets; MAP clause: choose ALL solids with a property (six faces, a curved face)",
       "representation": "a 3-D shape drawing with a property table; option: which net makes it",
       "family": "geometry",
       "ccss": [
@@ -2166,7 +2380,7 @@
       "kind": "new",
       "skill": "graphs:read_and_make_tables",
       "name": "Tables",
-      "teaches": "reading and completing simple tables and tally-to-number tables",
+      "teaches": "reading and completing simple tables and tally-to-number tables; MAP clause: complete a bar or picture graph from the table",
       "representation": "a two-column table with blanks; fill in the counts; answer one question",
       "family": "data",
       "ccss": [
@@ -2278,7 +2492,7 @@
       "option": "look \"bw\": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label",
       "name": "Heavier or Lighter, B&W pictures (option)",
       "teaches": "comparing the mass of two objects by experience and on a pan balance",
-      "representation": "print: one boxed cell, two B&W outline objects labelled A and B (or a tipped balance), pupil circles or writes the letter; screen: click the object (production by selection of the object itself, two choices only)",
+      "representation": "print: B&W boxed cell, two line-art objects or a pan-balance drawing, pupil writes the label from a bank ('heavier'/'lighter') or circles the object; screen: click the object (hot spot)",
       "family": "measurement",
       "ccss": [
         "K.MD.A.2"
@@ -2289,7 +2503,25 @@
         "taskType": "select an object"
       },
       "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "which is heavier — two objects — circle",
+        "balance — pan balance tipped — write heavier/lighter in the sentence",
+        "order — three objects — number 1-3 lightest to heaviest"
+      ],
+      "levels": [
+        "L1: everyday objects of very different mass (structural: picture stays)",
+        "L2: pan balance drawing (one change: read the balance)",
+        "L3: order three"
+      ],
+      "example": {
+        "item": "A pan balance has a book on the low side and a feather on the high side. The book is ____.",
+        "answer": "heavier"
+      },
+      "misconceptions": [
+        "thinks the higher side is heavier",
+        "thinks the bigger object is always heavier"
+      ]
     },
     "map_volume_expressions": {
       "kind": "option",
@@ -2297,7 +2529,7 @@
       "option": "form \"expressions\": pick every expression that gives the volume (l×w×h, B×h, layers added)",
       "name": "Volume Expressions (option)",
       "teaches": "that l×w×h, base area × height and repeated layers all give the volume",
-      "representation": "print: boxed cell with a B&W prism (edges labelled) and 4-5 expressions with check boxes, pupil ticks all that work; screen: multi-select check boxes (MAP's own form)",
+      "representation": "print: B&W boxed cell, an isometric B&W prism with edge labels and 4 expressions with check boxes; screen: select all that apply",
       "family": "measurement",
       "ccss": [
         "5.MD.C.5a",
@@ -2309,14 +2541,32 @@
         "taskType": "multi-select"
       },
       "why": "MAP's top-band volume item; volume today only computes a number",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "choose all — tick every expression for the volume",
+        "write — write two different expressions",
+        "layers — tick the sum of layers that matches"
+      ],
+      "levels": [
+        "L1: l × w × h in two orders (structural: labelled prism stays)",
+        "L2: add B × h (base area given)",
+        "L3: add layered sums (12 + 12 + 12) and distractors l + w + h"
+      ],
+      "example": {
+        "item": "A box is 4 cm long, 3 cm wide, 2 cm tall. Tick every expression for its volume: 4 × 3 × 2; 4 + 3 + 2; 12 × 2; 12 + 12",
+        "answer": "4 × 3 × 2, 12 × 2, 12 + 12"
+      },
+      "misconceptions": [
+        "adds the edges",
+        "multiplies only two edges"
+      ]
     },
     "map_shape_attribute_sort": {
       "kind": "new",
       "skill": "shapes_classify:attribute_sort_chart",
       "name": "Sort Shapes by Two Attributes",
       "teaches": "sorting figures by line of symmetry, angle type, or both",
-      "representation": "print: boxed cell, 4-6 B&W figures lettered, a 3-column chart (A only / B only / both) where pupil writes letters; screen: drag letters/figures into chart columns",
+      "representation": "print: B&W boxed cell, a 2 × 2 chart (has a line of symmetry / has an acute angle) and 6 lettered shapes; pupil writes letters in cells; screen: drag shapes into the chart (production)",
       "family": "geometry",
       "ccss": [
         "4.G.A.2",
@@ -2328,7 +2578,25 @@
         "taskType": "drag into chart"
       },
       "why": "MAP 2-5 sample item; no skill sorts by two attributes",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "sort — drag/write each shape into the chart",
+        "which cell — one shape, tick its cell",
+        "name the rule — sorted chart given, choose the headings"
+      ],
+      "levels": [
+        "L1: one attribute, two boxes (structural: chart stays)",
+        "L2: two attributes, 2 × 2 chart",
+        "L3: angle attribute with obtuse/right distractors"
+      ],
+      "example": {
+        "item": "Sort: square, scalene triangle with an obtuse angle, equilateral triangle, kite.",
+        "answer": "symmetry+acute: equilateral triangle, kite; symmetry only: square; acute only: scalene obtuse triangle (it has acute angles); neither: none"
+      },
+      "misconceptions": [
+        "thinks a right angle is acute",
+        "forgets a shape can go in 'both'"
+      ]
     },
     "time_convert": {
       "kind": "option",
@@ -2357,7 +2625,7 @@
       "option": "form \"area\": a rectangle with fractional sides (e.g. 2/3 × 3/4 unit) drawn inside a unit square tiled by unit-fraction rectangles; count the tiles, then write the area as a product",
       "name": "Area With Fractional Sides (option)",
       "teaches": "finding the area of a rectangle with fractional side lengths by tiling with unit-fraction squares and showing it equals the product of the sides",
-      "representation": "boxed cell, B&W unit square with the rectangle's tiles outlined (single grey shade), slots \"__ tiles of 1/__ = __\" and \"__ × __ = __\"; screen: fraction number entry, never multiple choice",
+      "representation": "print: B&W boxed Andika cell, a unit square divided into unit-fraction tiles with the rectangle outlined (single grey shade), slots '__ tiles of 1/__ = __' and '__ × __ = __'; screen: fraction number entry, never MC",
       "family": "fractions",
       "ccss": [
         "5.NF.B.4b"
@@ -2368,7 +2636,25 @@
         "taskType": "area with fractional sides"
       },
       "why": "frac_mult_word deals garden-area stories (55/200 dist) and mult_frac_frac an overlap model with no area framing; neither tiles with unit-fraction squares, the clause 5.NF.B.4b names",
-      "reused": false
+      "reused": false,
+      "problemTypes": [
+        "count the tiles — tiled rectangle — write the area",
+        "multiply — side labels only — write the product",
+        "match — show the tiles equal the product"
+      ],
+      "levels": [
+        "L1: unit fraction × whole (1/2 × 3) tiled (structural: grid stays)",
+        "L2: unit × unit fraction (1/2 × 1/3)",
+        "L3: non-unit (2/3 × 3/4); tile lines fade to side labels"
+      ],
+      "example": {
+        "item": "A rectangle is 2/3 unit long and 1/2 unit wide, drawn on a unit square cut into sixths. What is its area?",
+        "answer": "2/6 = 1/3 square unit"
+      },
+      "misconceptions": [
+        "adds the sides",
+        "counts tiles but uses the wrong tile size (1/3 not 1/6)"
+      ]
     },
     "turns_angles": {
       "kind": "new",
@@ -2388,6 +2674,45 @@
       },
       "why": "WRM turns_angles already planned (wrm.js); standards-audit gives 4.MD.C.5a/b a gap verdict",
       "reused": true
+    },
+    "map_measure_story_equation": {
+      "kind": "option",
+      "skill": "algebra:build_expr_addsub",
+      "option": "pool \"measurement\": length, mass, liquid-volume and money stories; build the equation only (no solving)",
+      "name": "Measurement Story to Equation (option)",
+      "teaches": "choosing the operation for a measurement story and writing the equation with units (lengths, masses, volumes, money)",
+      "representation": "print: B&W boxed Andika cell, the story with a bar model under it, slots '__ ○ __ = __' with an operation bank; screen: build-expr (drag numbers and sign), never MC",
+      "family": "measurement",
+      "ccss": [
+        "2.MD.B.5",
+        "3.MD.A.2",
+        "4.MD.A.2"
+      ],
+      "map": {
+        "strand": "Measurement",
+        "ritBand": "181-200",
+        "taskType": "choose/write the equation for a story"
+      },
+      "why": "build_expr_addsub builds equations from number stories only; MAP pairs measurement stories with their operation",
+      "reused": false,
+      "problemTypes": [
+        "build — story — write the equation",
+        "which operation — story — circle + or −",
+        "both — write the equation then the answer with its unit"
+      ],
+      "levels": [
+        "L1: length + and − within 100 (structural: bar model stays)",
+        "L2: mass and liquid volume",
+        "L3: money and two-step (bar model fades)"
+      ],
+      "example": {
+        "item": "A ribbon is 45 cm. Ana cuts off 18 cm. Write the equation for the length left.",
+        "answer": "45 − 18 = 27 (27 cm)"
+      },
+      "misconceptions": [
+        "adds whenever the story has two numbers",
+        "drops or mixes units (45 cm − 18 = 27 m)"
+      ]
     }
   }
 }

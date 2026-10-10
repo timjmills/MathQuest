@@ -32,7 +32,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_220.pdf",
     "says": "DesCartes 211-230: compares and orders decimals (not same number of digits)."
-   }
+   },
+   "closes": "Adds a mixed pool (whole numbers next to decimals, e.g. 7 among 6.85 and 7.1); order_decimals is decimal-only and order_least_to_greatest whole-only."
   },
   {
    "task": "Compare numbers: pick the lesser / greater",
@@ -49,7 +50,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_160.pdf",
     "says": "DesCartes <161-170: orders whole numbers less than 10 (number comparison, not picture groups)."
-   }
+   },
+   "closes": "Adds the pick-the-greater/lesser selection form (ring / click one of 2–4 numbers); compare only takes a symbol."
   },
   {
    "task": ">, <, =",
@@ -81,7 +83,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: understands equivalence and extends it to number sentences; calculations on both sides."
-   }
+   },
+   "closes": "compare_number_sentences adds comparing two expressions by what changed (37 + 25 vs 37 + 28) without working them out; compare_expressions always evaluates both sides."
   },
   {
    "task": "Order of operations e.g. 47 − (2 × 8)",
@@ -193,7 +196,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because K.CC.A.3 (write 0 for no objects) is in MAP's blueprint"
-   }
+   },
+   "closes": "Zero extension adds the empty set: \"how many?\" → 0 and writing 0 beside 1–5 counts; no counting skill shows an empty set."
   },
   {
    "task": "Ordinal positions (1st, 2nd, 3rd …)",
@@ -207,7 +211,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; not a CCSS standard, kept low priority for K-1 position language"
-   }
+   },
+   "closes": "ordinal_numbers adds position words (1st–10th): ring the 3rd object in a row; no skill deals ordinals."
   },
   {
    "task": "Teen numbers as ten and ones",
@@ -321,7 +326,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.NBT.1 (digit is ten times the digit to its right) is in MAP's blueprint"
-   }
+   },
+   "closes": "value_ten_times adds comparing the same digit in two places (the 7 in 700 is 10 times the 7 in 70); value names one digit only."
   },
   {
    "task": "Expanded form, standard form, unit form",
@@ -355,7 +361,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
     "says": "DesCartes 191-210: identifies numeral and written name for numbers over 100,000."
-   }
+   },
+   "closes": "Adds number names past 9,999 to millions in both directions on the live production skill number_word_form."
   },
   {
    "task": "Place value to millions (7 digits)",
@@ -371,7 +378,8 @@
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart 2-5 201-210: \"Use the numeral 612,398 … move digits to the correct place value in the boxes\"."
-   }
+   },
+   "closes": "vis_pv_bands_millions widens the place-value chart to 7 digits; pv_digit_drag stops at 5."
   },
   {
    "task": "Compare numbers with >, <, = (pictures, to 20)",
@@ -387,7 +395,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
     "says": "DesCartes 171-180: compares sets of objects (1-10): equal to, more than, less than."
-   }
+   },
+   "closes": "compare_small adds the to-10/20 band with pictures beside the numbers; compare starts at 99 and has no pictures."
   },
   {
    "task": "Order 3-4 whole numbers (drag)",
@@ -453,7 +462,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 2.MD.6 (read a whole number on a number line) is in MAP's blueprint"
-   }
+   },
+   "closes": "number_line_scales adds reading the number at an arrow on lines of any scale (whole numbers); only integer lines are read today."
   },
   {
    "task": "Integers: compare, order, place on line",
@@ -580,7 +590,8 @@
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 181-190: change-unknown story (47 then 89 points), answer by moving digit tiles."
-   }
+   },
+   "closes": "Adds join/separate stories with the change unknown (had 8, got some, now 13); unknown_start_wp is start-unknown only."
   },
   {
    "task": "Compare word problems (how many more/fewer)",
@@ -611,7 +622,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 1.OA.1 / 2.OA.1 (compare, bigger or smaller unknown) is in MAP's blueprint"
-   }
+   },
+   "closes": "Adds stories whose bigger or smaller quantity is unknown (\"6 fewer than Maya\"); comparison_word asks the difference only."
   },
   {
    "task": "Part-whole (put together / take apart, both addends unknown)",
@@ -622,12 +634,13 @@
    "skills": [
     "composing:number_bonds"
    ],
-   "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways.",
-   "proposal": "part_whole",
+   "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways. part_whole (any one part unknown) does not cover both-unknown; moved to map_another_way_to_make.",
+   "proposal": "map_another_way_to_make",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 151-160: \"Move dots to the empty domino to show a different way to make 5\"."
-   }
+   },
+   "closes": "map_another_way_to_make adds both-parts-unknown bonds and \"list all pairs\" for a number; number_bonds always gives one part."
   },
   {
    "task": "Missing addend / missing number in +/− equation",
@@ -659,7 +672,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: understands equivalence and extends the concept to number sentences."
-   }
+   },
+   "closes": "equal_sign_repair routes equal_sign to its own generator and adds true/false forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5; today it deals column addition."
   },
   {
    "task": "Balance equations (7 + 5 = __ + 3)",
@@ -703,7 +717,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
     "says": "DesCartes 191-220: demonstrates understanding of commutative, then associative property."
-   }
+   },
+   "closes": "Adds recognising and writing equivalent sums/products by commutative and associative properties (8 + 5 = 5 + 8, choose all equal); no skill deals + properties, mult_properties only fills facts."
   },
   {
    "task": "Fact families / related facts",
@@ -827,7 +842,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: translates a 2-step problem to a symbolic expression; 221-230 represents relationships as expression."
-   }
+   },
+   "closes": "write_numeric_expression adds numbers-only expressions with brackets from words (2 × (8 + 7)); write_expression deals variables only."
   },
   {
    "task": "Evaluate expressions with variables",
@@ -922,7 +938,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
     "says": "DesCartes 171-180: represents a basic-facts addition problem with a number sentence."
-   }
+   },
+   "closes": "pictures_to_sentence adds writing the number sentence for a picture; add_5_pictures gives the sentence and asks the total."
   },
   {
    "task": "Match: model <-> number (base-ten / place-value)",
@@ -939,7 +956,8 @@
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 161-170: pick the number the blocks show (1, 21, 20, 201)."
-   }
+   },
+   "closes": "Adds matching several models to several numbers (incl. zero-place distractors); live skills go one model → one number or number → build."
   },
   {
    "task": "Match: story <-> operation / equation",
@@ -957,7 +975,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
     "says": "DesCartes 171-200: determines the operation needed; writes a number sentence for a simple problem."
-   }
+   },
+   "closes": "Adds unknown-in-any-position, compare, × ÷ and fraction stories to the build-the-equation form; build_expr_* deal result-unknown +/− and ×/÷ stories only."
   },
   {
    "task": "Match: number line <-> number",
@@ -973,7 +992,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 2.MD.6 (number line ↔ whole number) is in MAP's blueprint"
-   }
+   },
+   "closes": "number_line_scales adds reading the number at a point on a whole-number line of any scale; place_on_number_line is tap-to-place only."
   },
   {
    "task": "Match: number line <-> addition/subtraction equation",
@@ -1006,7 +1026,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
     "says": "DesCartes 171-180: numeral and written name 21-999; 191-210 to over 100,000."
-   }
+   },
+   "closes": "Adds word-name ↔ numeral production past 9,999 (to millions); number_word_names is MC only and number_word_form stops at 9,999."
   },
   {
    "task": "Match: expanded form <-> standard form",
@@ -1039,7 +1060,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
     "says": "DesCartes 211-220: determines the rule given a simple real-world function table."
-   }
+   },
+   "closes": "Adds real-world function tables (word headers, find the rule and a missing row); function_table_hard uses bare In/Out tables."
   },
   {
    "task": "Show another way to make a number (move dots to an empty domino)",
@@ -1056,7 +1078,8 @@
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
-   }
+   },
+   "closes": "Adds an open \"show another way\" decomposition on an empty domino/ten frame and listing all pairs; number_bonds and make_ten ask one fixed missing part."
   },
   {
    "task": "Pick the group with the fewest / most (coatracks)",
@@ -1104,7 +1127,8 @@
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 above 191: \"6 hundreds and 5 ones. Write the number\" with digit tiles; DesCartes 171-200 place value terms."
-   }
+   },
+   "closes": "Adds unit form → number (6 hundreds 5 ones → 605), incl. zero places and out-of-order units; unit_form goes number → units only."
   },
   {
    "task": "Answer by moving digit tiles into answer boxes (number entry form)",
@@ -1138,7 +1162,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material (DesCartes OAT_210 lists rules/function tables, not multi-step); kept because 4.OA.A.3 is in MAP blueprint"
-   }
+   },
+   "closes": "multi_step_four_ops adds two-step stories with × and ÷ steps and writing the equation with a letter for the unknown; live multi-step skills are +/− only and never use a letter."
   },
   {
    "task": "Ratios from pictures",
@@ -1155,7 +1180,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: 6+ chart 201-210 asks unit price from a priced bag (rate from a quantity)"
-   }
+   },
+   "closes": "map_ratio_picture adds writing a ratio (part:part, part:whole) from a picture of objects; ratio_intro deals ratios from text only."
   },
   {
    "task": "Equal sharing from a visual (\"share N among M\")",
@@ -1172,7 +1198,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 181-190: picture of toys, \"Sonja and Kai share the toys equally\", how many each"
-   }
+   },
+   "closes": "map_share_among adds partitive sharing (deal N among M, how many in each) from a picture; share_into_groups is quotitive only."
   },
   {
    "task": "Division by making equal groups (drag)",
@@ -1189,7 +1216,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: uses manipulatives to divide a small set of objects into groups of equal size; uses sharing for division"
-   }
+   },
+   "closes": "map_share_among adds the screen drag response (counters snap into rings) for both modes; today the pupil only types a count."
   },
   {
    "task": "Picture <-> multiplication equation",
@@ -1207,7 +1235,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division using arrays; multiplication as repeated addition"
-   }
+   },
+   "closes": "map_array_to_eq adds writing the full × equation from an array/groups and the reverse (equation → shade the array)."
   },
   {
    "task": "Compare / order decimals",
@@ -1225,7 +1254,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_190: compares and orders decimals to the hundredths place, RIT 181-190"
-   }
+   },
+   "closes": "dec_compare_model adds the hundred-square model beside the comparison; the abstract compare/order forms already exist."
   },
   {
    "task": "Fraction multiplication with visual models",
@@ -1258,7 +1288,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_200: adds decimals to the hundredths place, vertical format, RIT 191-200"
-   }
+   },
+   "closes": "decimal_models adds the hundred-square model for decimal addition; column addition already exists."
   },
   {
    "task": "Equal groups total",
@@ -1276,7 +1307,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: solves word problems involving basic whole number multiplication; arrays"
-   }
+   },
+   "closes": "map_array_to_eq adds the equation-from-picture form; finding the total is dealt."
   },
   {
    "task": "Equal or unequal groups",
@@ -1305,7 +1337,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: uses manipulatives to divide a small set into equal groups; uses sharing for division"
-   }
+   },
+   "closes": "share_group adds K-2 sharing and grouping with counters on plates/rings (no ÷ sign); no live skill deals it."
   },
   {
    "task": "Repeated addition <-> multiplication",
@@ -1321,7 +1354,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: interprets multiplication as repeated addition, division as repeated subtraction"
-   }
+   },
+   "closes": "map_array_to_eq problem type 2 adds writing both the repeated addition and the × equation from groups."
   },
   {
    "task": "Multiplication facts 0-10",
@@ -1399,7 +1433,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_OAT_190/230: zero property of multiplication (181-200); understanding of multiple properties (221-230)"
-   }
+   },
+   "closes": "map_mult_prop_grouping adds the associative (three-factor grouping) form and choose ALL equal expressions; order, breaking apart, ×0, ×1 are live."
   },
   {
    "task": "Multiplication on a number line (hops)",
@@ -1464,7 +1499,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: \"Which number sentence means 3 times as many as 12?\" choose the equation"
-   }
+   },
+   "closes": "map_story_equation_match (part A) adds the \"write the equation only, no solving\" form for ×/÷ stories; build_expr_multdiv already builds and solves."
   },
   {
    "task": "Multiplicative comparison (times as many)",
@@ -1481,7 +1517,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: choose the number sentence for \"3 times as many as 12\""
-   }
+   },
+   "closes": "comparison_statements adds the comparison sentence ↔ equation form."
   },
   {
    "task": "Multiply by 10, 100, multiples of 10",
@@ -1529,7 +1566,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210/220: multiplies 3-digit by 2-digit and 3-digit by 3-digit; multiplies multiple-digit numbers, RIT 201-220"
-   }
+   },
+   "closes": "long_mult adds the standard column algorithm for multi-digit × 2-digit; live skills stop at area models."
   },
   {
    "task": "Division with remainders",
@@ -1594,7 +1632,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_OAT_220/230: complex word problems on division with remainder (2-step, 2-digit divisor), RIT 211-230"
-   }
+   },
+   "closes": "long_div_rem adds remainders to the 2-digit-divisor long division."
   },
   {
    "task": "Factors and factor pairs",
@@ -1687,7 +1726,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210: multiplies multiple 1-digit numbers, RIT 201-210"
-   }
+   },
+   "closes": "mult_three adds products of three factors (choose the easy pair first); no live skill multiplies three numbers."
   },
   {
    "task": "Estimate products and quotients",
@@ -1705,7 +1745,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_OAT_220: uses rounding to estimate answers involving multiplication and division of numbers under 100/1000, RIT 211-220"
-   }
+   },
+   "closes": "map_est_both_factors adds rounding both factors of 3-/4-digit × 2-digit products; one-factor rounding, quotients and reasonableness are live."
   },
   {
    "task": "Equal parts / halves and quarters of shapes",
@@ -1722,7 +1763,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_180: represents 1/2 with a diagram; identifies one-half from a region or set, RIT 171-180"
-   }
+   },
+   "closes": "map_shape_partition_pick (part C) adds the equal-vs-unequal parts pick; counting parts and naming the shaded fraction are live."
   },
   {
    "task": "Identify fraction of a shape (area model)",
@@ -1756,7 +1798,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_200: uses models to add and subtract fractions and connect the actions, RIT 191-200"
-   }
+   },
+   "closes": "map_frac_unit_build adds writing the unit-fraction sum from a model and shading from a sum; decompose_fractions has no model link."
   },
   {
    "task": "Fraction of a set",
@@ -1868,7 +1911,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: compares fractions greater or less than a given fraction using several representations, RIT 211-220"
-   }
+   },
+   "closes": "map_frac_compare_reason adds comparing two fractions by placing each against 1/2 or 1, with the reason; benchmark_fractions only names the nearest benchmark."
   },
   {
    "task": "Order fractions",
@@ -1900,7 +1944,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210: writes mixed numbers as improper fractions and the reverse, RIT 201-210"
-   }
+   },
+   "closes": "frac_beyond_1 adds reading and writing fractions > 1 from several whole models before the mixed/improper conversion."
   },
   {
    "task": "Mixed numbers <-> improper fractions",
@@ -2040,7 +2085,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_230: divides a mixed fraction by a fraction, RIT 221-230"
-   }
+   },
+   "closes": "div_frac_frac adds fraction ÷ fraction (models then the rule); live skills divide unit fractions and wholes only."
   },
   {
    "task": "Multiplication as scaling",
@@ -2086,7 +2132,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
-   }
+   },
+   "closes": "decimal_pv adds the value of a digit in tenths/hundredths/thousandths; placevalue skills stop at ones."
   },
   {
    "task": "Decimal on a number line (place)",
@@ -2164,7 +2211,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_200/230: multiplies a decimal by a whole number (191-200); decimal by decimal later (221-230)"
-   }
+   },
+   "closes": "mult_dec_dec adds decimal × decimal; decimal × whole is live."
   },
   {
    "task": "Divide decimals",
@@ -2196,7 +2244,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_230: multiplies/divides a decimal by 10, 100, 1000; writes numbers in exponential form, RIT 221-230"
-   }
+   },
+   "closes": "map_power10_exponent adds decimal × / ÷ 10, 100, 1000 and 10^n notation; whole numbers are live in place_value_10x."
   },
   {
    "task": "Percent from a grid",
@@ -2244,7 +2293,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 6.RP.A.3c (percent of a quantity) is in MAP's blueprint"
-   }
+   },
+   "closes": "map_percent_of_grid_bar adds the percent bar model (10%, 25%, 50% steps); the abstract percent-of is live."
   },
   {
    "task": "Unit rate",
@@ -2290,7 +2340,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: solves 1-step problems involving proportions, RIT 211-220"
-   }
+   },
+   "closes": "ratio_problems adds ratio stories solved with a bar model; no live skill deals them."
   },
   {
    "task": "Line plot with fractions",
@@ -2322,7 +2373,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division using arrays"
-   }
+   },
+   "closes": "map_array_to_eq adds both directions of picture ↔ × equation."
   },
   {
    "task": "Match: array <-> multiplication",
@@ -2339,7 +2391,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: models multiplication and division algorithms using arrays"
-   }
+   },
+   "closes": "map_array_to_eq adds array → equation and equation → shade the array."
   },
   {
    "task": "Match: story <-> operation (× / ÷)",
@@ -2357,7 +2410,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: choose the number sentence that matches a times-as-many statement"
-   }
+   },
+   "closes": "map_story_equation_match (part A) adds the operation-only equation form for ×/÷ stories."
   },
   {
    "task": "Match: number line <-> multiplication (hops)",
@@ -2374,7 +2428,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
     "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
-   }
+   },
+   "closes": "map_nl_hops_equation adds writing the × equation from drawn hops and picking the matching line."
   },
   {
    "task": "Match: model <-> number (fraction models)",
@@ -2391,7 +2446,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_200: matches numeric and visual representation of equivalent fractions, RIT 191-200"
-   }
+   },
+   "closes": "map_frac_model_match adds matching several models (area, bar, set) to a bank of fractions in both directions."
   },
   {
    "task": "Match: model <-> number (decimal grids)",
@@ -2407,7 +2463,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_190: identifies tenths from a region or set, RIT 181-190"
-   }
+   },
+   "closes": "map_decimal_grid adds reading, shading and matching tenths strips and hundred squares as decimals; percent_visual deals percent only."
   },
   {
    "task": "Match: number line <-> number (fractions)",
@@ -2439,7 +2496,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.NF.C.6 (decimal at a point on a number line) is in MAP's blueprint"
-   }
+   },
+   "closes": "map_nl_read_decimal adds reading the decimal at a marked point; placing is live."
   },
   {
    "task": "Match: story <-> operation (fractions)",
@@ -2457,7 +2515,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_220: solves 1-step real-world problems involving fractions with multiplication and division, RIT 211-220"
-   }
+   },
+   "closes": "map_story_equation_match (part A) must add a FRACTION POOL (fraction +/−/× stories → equation only); build_expr_* are whole numbers today. Part A to add the pool."
   },
   {
    "task": "Divide by a multiple of 10 (e.g. 360 ÷ 40, 3-digit ÷ tens)",
@@ -2474,7 +2533,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "NWEA DesCartes continuum M2_NO_210: divides a 3-digit number by a multiple of 10; mental computation with division, RIT 201-210"
-   }
+   },
+   "closes": "map_div_tens adds dividing by tens using the basic fact; no live skill divides by 20-90."
   },
   {
    "task": "Build fractions equal to a whole or mixed number (move digits into boxes)",
@@ -2491,7 +2551,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "NWEA RIT Reference Chart sample item: Math 2-5 NO 221-230: \"Move numbers to the boxes to show fractions that are equal to 1 ...\" (digit tiles)"
-   }
+   },
+   "closes": "map_equal_frac_build adds filling several equivalent fractions for a whole or mixed number from a digit bank."
   },
   {
    "task": "Select all the factors of a number (choose all)",
@@ -2521,7 +2582,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "DesCartes NO_220: multiplies mixed numbers by whole numbers, RIT 211-220"
-   }
+   },
+   "closes": "mult_mixed_int adds a mixed-number factor to mult_frac_whole."
   },
   {
    "task": "Move cubes to make two groups equal (equalise)",
@@ -2535,7 +2597,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 sample item: move cubes to the circles so the groups are equal"
-   }
+   },
+   "closes": "equal_groups_early's MAP clause (move objects so two groups are equal, drag on screen) closes it; no live skill moves objects."
   },
   {
    "task": "Choose ALL the shapes that show one-third shaded",
@@ -2552,7 +2615,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry sample: choose ALL the shapes that show one-third shaded"
-   }
+   },
+   "closes": "map_frac_choose_all_shaded adds the choose-ALL response with unequal-part distractors; identify picks one model."
   },
   {
    "task": "Match: picture <-> equation (fractions: model <-> 1/4 + 1/4 + 1/4 = 3/4)",
@@ -2569,7 +2633,8 @@
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
     "says": "DesCartes NO_200: uses models to represent a fraction as a sum of unit fractions, RIT 191-210"
-   }
+   },
+   "closes": "map_frac_unit_build problem types 1-2 add model → unit-fraction sum and sum → shaded model."
   },
   {
    "task": "Symmetry: compare shapes' numbers of lines",
@@ -2586,7 +2651,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
-   }
+   },
+   "closes": "Adds the two-shape compare (count both, say which has more); live symmetry only counts one shape."
   },
   {
    "task": "Symmetry: is this proposed line correct?",
@@ -2602,7 +2668,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
-   }
+   },
+   "closes": "Adds judging a given line (yes/no, then fix it); live skills only have the pupil draw or click lines."
   },
   {
    "task": "Area: pick the picture with area N",
@@ -2618,7 +2685,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
-   }
+   },
+   "closes": "Adds picking the shape with a given area among distractors; area_unit_squares only asks the area of one shape."
   },
   {
    "task": "Nets of 3-D solids",
@@ -2647,7 +2715,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
-   }
+   },
+   "closes": "angle_rules' 'angles in a triangle (180°)' clause adds finding the missing angle; no live skill does."
   },
   {
    "task": "Volume by unit cubes",
@@ -2664,7 +2733,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
-   }
+   },
+   "closes": "volume_cubes adds counting unit cubes in a drawn solid; volume only multiplies edges."
   },
   {
    "task": "Perimeter",
@@ -2719,7 +2789,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
-   }
+   },
+   "closes": "time_convert's MAP clause adds minutes → hours as h-and-min, decimal and mixed hours."
   },
   {
    "task": "Line / dot plots",
@@ -2771,7 +2842,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
-   }
+   },
+   "closes": "coord_context adds points as data in a story and saying what a point means; live skills name/plot only."
   },
   {
    "task": "Match: graph ↔ sentence (data)",
@@ -2788,7 +2860,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
-   }
+   },
+   "closes": "Adds statements to check against a graph (select all true); live graphs ask one number."
   },
   {
    "task": "Match: shape ↔ property (geometry)",
@@ -2854,7 +2927,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: area figure and volume expressions items pair a picture with a number/expression"
-   }
+   },
+   "closes": "Adds ticking every area and perimeter equation for a grid rectangle; distributive_visual only splits area."
   },
   {
    "task": "Match: model ↔ number (unit cubes)",
@@ -2870,7 +2944,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
-   }
+   },
+   "closes": "volume_cubes adds writing the number of unit cubes for a drawn model."
   },
   {
    "task": "Compare / order objects by length (K-1)",
@@ -2900,7 +2975,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because K.MD.A.1 is in MAP's blueprint"
-   }
+   },
+   "closes": "measurable_attributes adds naming what can be measured (length, mass, capacity); none today."
   },
   {
    "task": "Measure with non-standard units",
@@ -2931,7 +3007,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
-   }
+   },
+   "closes": "compare_lengths adds 'how much longer' and comparing in mixed units; compare_objects only picks longer."
   },
   {
    "task": "Measure an object with a ruler (incl. not at 0)",
@@ -2947,7 +3024,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
-   }
+   },
+   "closes": "Adds measuring an object that does not start at 0 (distance between marks)."
   },
   {
    "task": "Two objects on a ruler: difference",
@@ -2961,7 +3039,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
-   }
+   },
+   "closes": "ruler_difference adds two objects on one ruler and the difference."
   },
   {
    "task": "Estimate length / choose the unit",
@@ -3008,7 +3087,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
-   }
+   },
+   "closes": "mass_scales adds reading scales with steps 2, 5, 10, 100 and kg scales (live kg reading has the answer-0 bug)."
   },
   {
    "task": "Mass / liquid volume word problems",
@@ -3022,7 +3102,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
-   }
+   },
+   "closes": "mass_ops adds +, −, ×, ÷ word problems with masses and volumes."
   },
   {
    "task": "Length word problems (add/sub lengths)",
@@ -3036,7 +3117,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'total length of paper Jai will use' from line plot (add lengths)"
-   }
+   },
+   "closes": "length_ops adds length word problems; none today."
   },
   {
    "task": "Convert units large → small (ft→in, kg→g, L→mL)",
@@ -3069,7 +3151,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
-   }
+   },
+   "closes": "conversion_table adds completing and using a two-column conversion table."
   },
   {
    "task": "Coins: identify value / count coins",
@@ -3102,7 +3185,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
-   }
+   },
+   "closes": "Adds building an amount by dragging coins (production); live skills count or compare sets."
   },
   {
    "task": "Money: change and comparisons",
@@ -3133,7 +3217,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
-   }
+   },
+   "closes": "money_2step adds buy-two-items-then-change problems."
   },
   {
    "task": "Time to the hour / half hour (K-1)",
@@ -3197,7 +3282,8 @@
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
-   }
+   },
+   "closes": "elapsed_stories adds the story form with a time line; elapsed_mixed is bare times."
   },
   {
    "task": "Temperature: read a thermometer",
@@ -3244,7 +3330,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: separate area and perimeter items in 181-210 bands"
-   }
+   },
+   "closes": "same_area adds same area / different perimeter comparisons."
   },
   {
    "task": "Rectilinear area by decomposing",
@@ -3277,7 +3364,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
-   }
+   },
+   "closes": "missing_lengths adds missing sides of rectilinear shapes; live covers rectangles only."
   },
   {
    "task": "Volume of a prism (l × w × h), incl. missing edge",
@@ -3306,7 +3394,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 5.NF.B.4b / 6.G.A.2 is in MAP's blueprint"
-   }
+   },
+   "closes": "volume_fractional adds 1/2- and 1/4-unit edges and packing with unit-fraction cubes."
   },
   {
    "task": "Area of a triangle / parallelogram (Gr 6 edge of MAP 2-5)",
@@ -3398,7 +3487,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
-   }
+   },
+   "closes": "defining_attributes adds sorting defining vs non-defining attributes."
   },
   {
    "task": "Compose shapes (pattern blocks, make a rectangle)",
@@ -3431,7 +3521,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
-   }
+   },
+   "closes": "Adds equal-vs-unequal, cutting shapes into halves/quarters, and choose ALL shapes showing a named fraction; partition_shapes only reads the fraction shaded."
   },
   {
    "task": "Regular and irregular polygons; name polygons by sides",
@@ -3447,7 +3538,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
-   }
+   },
+   "closes": "polygons adds regular vs irregular and naming polygons by sides."
   },
   {
    "task": "Points, lines, segments, rays",
@@ -3461,7 +3553,8 @@
    "evidence": {
     "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
     "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
-   }
+   },
+   "closes": "points_lines_rays adds naming and drawing points, lines, segments, rays."
   },
   {
    "task": "Parallel and perpendicular lines",
@@ -3521,7 +3614,8 @@
    "evidence": {
     "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
     "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
-   }
+   },
+   "closes": "draw_angles adds drawing an angle of a given size."
   },
   {
    "task": "Additive angles (part + part = whole)",
@@ -3600,7 +3694,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
-   }
+   },
+   "closes": "shapes_3d_props adds naming solids from faces/edges/vertices and its choose-ALL-by-property clause."
   },
   {
    "task": "Coordinates: name and plot a point (Q1)",
@@ -3648,7 +3743,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
-   }
+   },
+   "closes": "four_quadrants' 'problems' option adds missing vertices and distances across quadrants."
   },
   {
    "task": "Horizontal / vertical lines",
@@ -3662,7 +3758,8 @@
    "evidence": {
     "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
     "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
-   }
+   },
+   "closes": "hv_lines adds horizontal/vertical lines in shapes and on a grid."
   },
   {
    "task": "Reflections / translations on a grid",
@@ -3726,7 +3823,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
-   }
+   },
+   "closes": "pictogram_scale adds keys of 2, 5, 10 and half pictures to build_pictograph."
   },
   {
    "task": "Read a bar graph: how many, how many more/fewer",
@@ -3773,7 +3871,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
-   }
+   },
+   "closes": "bar_graph_scale adds scales of 2, 5, 10 to build_bar_graph."
   },
   {
    "task": "Read a tally chart",
@@ -3804,7 +3903,8 @@
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
-   }
+   },
+   "closes": "Adds making the tally from raw data; tally_chart only reads one."
   },
   {
    "task": "Read a table of data",
@@ -3818,7 +3918,8 @@
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
-   }
+   },
+   "closes": "table_data adds reading and completing data tables."
   },
   {
    "task": "Make a line plot from measurements",
@@ -3834,7 +3935,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
-   }
+   },
+   "closes": "make_line_plot adds measuring/reading data and drawing the dots; live plots are read only."
   },
   {
    "task": "Line plot with fractions: operations (total, difference)",
@@ -3865,7 +3967,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "6+ Data chart: 'graph shows change in price over time; identify intervals' (line graph, Gr5-6 edge)"
-   }
+   },
+   "closes": "line_graph adds reading and drawing line graphs."
   },
   {
    "task": "Mean / median / mode / range (upper band)",
@@ -3915,7 +4018,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' multi-select"
-   }
+   },
+   "closes": "time_convert's MAP clause adds choose ALL measurements equal to a time."
   },
   {
    "task": "Choose ALL expressions that give the volume of a prism",
@@ -3931,7 +4035,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D top band: 'Choose all the expressions that can be used to find the volume' multi-select"
-   }
+   },
+   "closes": "Adds choose ALL expressions (l×w×h, B×h, layers) for one prism."
   },
   {
    "task": "Choose ALL figures that show a line of symmetry",
@@ -3963,7 +4068,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'Move the shapes to the correct part of the chart' - line of symmetry / acute / both"
-   }
+   },
+   "closes": "Adds the two-attribute sort chart; live skills click one property."
   },
   {
    "task": "Choose ALL terms that describe a set of shapes (squares, parallelograms, quadrilaterals)",
@@ -3994,7 +4100,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
-   }
+   },
+   "closes": "shapes_3d_props' MAP clause adds choose ALL solids with six faces."
   },
   {
    "task": "Show the change from $1 (drag coins)",
@@ -4010,7 +4117,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'paid with one dollar. Show the change Julia should receive' (coins moved)"
-   }
+   },
+   "closes": "map_money_build's 'show the change' form adds dragging the change from $1."
   },
   {
    "task": "Read a picture graph: who has the most (key = 1)",
@@ -4042,7 +4150,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
-   }
+   },
+   "closes": "make_line_plot's MAP clause adds the total of the lengths on a fraction plot."
   },
   {
    "task": "Angle as a turn: degrees as a fraction of 360 (quarter turn = 90°)",
@@ -4056,7 +4165,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
-   }
+   },
+   "closes": "turns_angles' MAP clause adds degrees as a fraction of 360."
   },
   {
    "task": "Area of a rectangle with fractional side lengths",
@@ -4073,7 +4183,8 @@
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 5.NF.B.4b is in MAP's blueprint"
-   }
+   },
+   "closes": "Adds tiling with unit-fraction squares to find area; live skills only multiply."
   },
   {
    "task": "Match: measurement story ↔ operation (length / mass / money)",
@@ -4085,12 +4196,13 @@
     "measurement:money_change",
     "area_perimeter:perimeter"
    ],
-   "proposal": "length_ops",
+   "proposal": "map_measure_story_equation",
    "note": "money_change and perimeter trim stories carry an operation; no length/mass add-subtract stories (checked unit_conversion_word, capacity, mass_volume_liquid --n 12: convert/read only); story→equation building itself lives on algebra:build_expr_* (parts A/B)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume' word problems"
-   }
+   },
+   "closes": "Adds writing the equation for length, mass, volume and money stories (build_expr pool 'measurement')."
   },
   {
    "task": "Match: coordinate grid ↔ ordered pair",
@@ -4124,7 +4236,8 @@
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"
-   }
+   },
+   "closes": "table_data's MAP clause adds completing the graph from a two-column table."
   }
  ],
  "proposals": {
@@ -4134,7 +4247,7 @@
    "option": "pool: whole numbers and decimals mixed (7, 6.85, 7.1, 0.9)",
    "name": "Order Whole Numbers and Decimals Together",
    "teaches": "Order a set that mixes whole numbers and decimals with different numbers of places",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number cards in a row with ordered answer slots and a place-value chart pane aligned on the decimal point; screen: drag the cards into order (ordering), never MC",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the numbers in a row of boxes, pupil writes them in order in an empty box row under a least → greatest arrow. Screen: drag tiles into the ordered slots (production, never MC).",
    "family": "decimals",
    "ccss": [
     "5.NBT.A.3b",
@@ -4148,7 +4261,26 @@
     }
    ],
    "why": "MAP sets mix whole numbers and decimals; the trap (6.85 > 7 because it is longer) is never dealt today",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Order 3 — three numbers, one whole (7) — write in order / drag tiles",
+    "Order 4–5 — mixed whole and 1-2 place decimals — write in order / drag tiles",
+    "Greatest or least — pick from a mixed set — ring it / click it"
+   ],
+   "levels": [
+    "L1: 3 numbers, a whole and decimals with the same whole part (7, 7.4, 6.9); place-value header over each number (structural, stays); 7 written as 7.0 in grey (hint)",
+    "L2: the 7.0 grey hint fades: 7 shown bare",
+    "L3: 4–5 numbers with different digit counts (0.9, 6.85, 7, 7.1)",
+    "L4: greatest → least direction"
+   ],
+   "example": {
+    "item": "Write in order, least to greatest: 7.1, 6.85, 7, 0.9",
+    "answer": "0.9, 6.85, 7, 7.1"
+   },
+   "misconceptions": [
+    "A whole number has no tenths so it goes first or last",
+    "Longer number is bigger (6.85 > 7.1)"
+   ]
   },
   "map_compare_pick": {
    "kind": "option",
@@ -4156,7 +4288,7 @@
    "option": "form: pick the greater / lesser (2–4 numbers; click one, or ring it on paper)",
    "name": "Which Is Greater? Which Is Less?",
    "teaches": "Choose the greatest or least of 2–4 whole numbers by comparing place by place",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 2–4 numbers in equal boxes, pupil rings one on paper; screen: click the number (MAP click/select item), with the words greater/less bolded",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 2–4 numbers each in its own box; pupil rings the greater (or lesser). Screen: click the number box (hot spot, a selection, not text MC).",
    "family": "placevalue",
    "ccss": [
     "2.NBT.A.4",
@@ -4171,7 +4303,26 @@
     }
    ],
    "why": "MAP asks 'which number is greater' as a select item; we only deal the symbol",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Pick the greater of two — two numbers — ring / click",
+    "Pick the least of 3–4 — a set — ring / click",
+    "Pick all greater than N — a set and a target — tick all / click all"
+   ],
+   "levels": [
+    "L1: two numbers to 10, tens frame under each (hint, fades)",
+    "L2: frames fade; numbers to 20",
+    "L3: 3–4 numbers to 100 with a place-value header (structural, stays)",
+    "L4: to 1,000; \"choose all greater than\""
+   ],
+   "example": {
+    "item": "Ring the lesser number: 48   84",
+    "answer": "48"
+   },
+   "misconceptions": [
+    "Reads the first digit of the shorter number as larger (9 > 12)",
+    "Swaps \"lesser\" and \"greater\""
+   ]
   },
   "compare_sentences": {
    "ccss": [
@@ -4205,7 +4356,7 @@
    "option": "pattern: add-add / add-sub / sub-add / sub-sub (default all four, equal weight)",
    "name": "Two-Step Change Stories (choose the pattern)",
    "teaches": "Two successive changes to a start amount, the teacher choosing which change patterns",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Then strip (structural) and answer box; screen: number entry",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Next–Then strip with two working lines; pupil writes each step and the answer. Screen: number entry per step, then the answer.",
    "family": "algebra",
    "ccss": [
     "2.OA.A.1",
@@ -4219,7 +4370,26 @@
     }
    ],
    "why": "Owner asked for the teacher option; re-grade with it",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "add-add story — two gains — write both steps",
+    "add-sub / sub-add story — a gain and a loss — write both steps",
+    "sub-sub story — two losses — write both steps"
+   ],
+   "levels": [
+    "L1: teacher picks one pattern (add-add); step boxes labelled 1 and 2 (structural, stays); key words underlined (hint)",
+    "L2: add-sub and sub-add mixed in",
+    "L3: sub-sub joins; underlining fades",
+    "L4: all four, step boxes unlabelled"
+   ],
+   "example": {
+    "item": "Ana had 30 stickers. She got 12 more. Then she gave away 9. How many now?",
+    "answer": "33"
+   },
+   "misconceptions": [
+    "Does only the first step",
+    "Adds every number in the story"
+   ]
   },
   "ordinal": {
    "ccss": [
@@ -4415,7 +4585,7 @@
    "option": "unknown: change (start known, result known)",
    "name": "How Many Were Added? (change unknown)",
    "teaches": "Join/separate stories where the change is unknown",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Now strip, the Then box empty; screen: number entry",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box.",
    "family": "subtraction",
    "ccss": [
     "1.OA.A.1",
@@ -4429,7 +4599,26 @@
     }
    ],
    "why": "CGI change-unknown is a MAP problem type with no skill",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "join, change unknown — had 5, got some, now 12 — write how many were added",
+    "separate, change unknown — had 15, some went, 9 left — write how many went",
+    "write the equation 5 + ☐ = 12 and solve — equation frame + number"
+   ],
+   "levels": [
+    "L1: join, within 10, counters drawn in First and Now (hint, fades); strip (structural, stays)",
+    "L2: counters fade, within 20",
+    "L3: separate stories added",
+    "L4: within 100, equation frame written by the pupil"
+   ],
+   "example": {
+    "item": "Leo had 8 cars. He got some more. Now he has 13. How many did he get?",
+    "answer": "5"
+   },
+   "misconceptions": [
+    "Adds the two numbers (8 + 13 = 21)",
+    "Writes the \"now\" number as the answer"
+   ]
   },
   "map_compare_bigger_unknown": {
    "kind": "option",
@@ -4437,7 +4626,7 @@
    "option": "unknown: bigger / smaller quantity",
    "name": "Compare Stories: Find the Bigger or Smaller Amount",
    "teaches": "'Zoe has 4 more than Owen, who has 7' — find the unknown quantity",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a two-bar comparison model (structural), answer box; screen: number entry",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar.",
    "family": "addition",
    "ccss": [
     "1.OA.A.1",
@@ -4451,35 +4640,26 @@
     }
    ],
    "why": "The hardest CGI compare forms are MAP items; not dealt",
-   "reused": false
-  },
-  "part_whole": {
-   "ccss": [
-    "K.OA.A.3",
-    "1.OA.A.1"
+   "reused": false,
+   "problemTypes": [
+    "bigger unknown — Sam has 7, Ben has 4 more — write Ben's amount",
+    "smaller unknown — Sam has 12, Ben has 5 fewer — write Ben's amount",
+    "mixed with difference-unknown — choose which bar is missing — write it"
    ],
-   "why": "Put-together/take-apart types",
-   "kind": "new",
-   "skill": "composing:part_whole_model",
-   "name": "Part-Whole Model",
-   "teaches": "parts and wholes: the cherry part-whole model, writing the four number sentences it shows, and finding a missing part",
-   "representation": "the bar/cherry part-whole diagram in B&W with one box empty; write the missing part or the number sentence",
-   "family": "operations",
-   "steps": [
-    "Y1.B2.S1"
+   "levels": [
+    "L1: bigger unknown, within 10, bars drawn to scale with the extra part shaded (hint, fades); two-bar frame (structural, stays)",
+    "L2: shading fades",
+    "L3: smaller unknown (\"fewer\")",
+    "L4: within 100, \"more/fewer\" in either sentence order"
    ],
-   "improves": [
-    "Y1.B2.S2"
-   ],
-   "source": "WRM_PROPOSALS",
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "151-180",
-     "taskType": "number entry in model"
-    }
-   ],
-   "reused": true
+   "example": {
+    "item": "Maya has 14 shells. Tom has 6 fewer shells than Maya. How many shells does Tom have?",
+    "answer": "8"
+   },
+   "misconceptions": [
+    "\"fewer\" means subtract always / \"more\" means add always (the language trap: \"Tom has 6 more than Maya\" with Tom known)",
+    "Writes the difference instead of the quantity"
+   ]
   },
   "equal_sign_repair": {
    "ccss": [
@@ -4537,7 +4717,7 @@
    "skill": "algebra:properties_of_operations",
    "name": "Same Answer? Properties of Operations",
    "teaches": "Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; one expression and a missing box in the rewritten expression (production); select-all form for 'which are equal'; screen: number entry, multi-select only for the select-all form",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; an expression and an equation frame (8 + 5 = ☐ + ☐); pupil writes the equivalent expression or ticks the equal ones. Screen: tile entry in the frame / click all equal expressions (select-all).",
    "family": "algebra",
    "ccss": [
     "1.OA.B.3",
@@ -4551,7 +4731,26 @@
     }
    ],
    "why": "MAP asks property recognition; no skill",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Write the turn-around — 8 + 5 = ☐ + ☐ — write numbers",
+    "Choose ALL equal to — 4 expressions — tick all / click all",
+    "Regroup — (2 + 3) + 7 = 2 + (☐ + ☐) — write numbers"
+   ],
+   "levels": [
+    "L1: commutative + within 20, cube trains shown (hint, fades); frame (structural, stays)",
+    "L2: trains fade",
+    "L3: associative with three addends",
+    "L4: × versions (3 × 4 = 4 × 3; (2 × 5) × 3) and choose-all"
+   ],
+   "example": {
+    "item": "(6 + 4) + 9 = 6 + (☐ + ☐)",
+    "answer": "4, 9"
+   },
+   "misconceptions": [
+    "Thinks changing the order changes the sum",
+    "Applies turn-around to subtraction (9 − 4 = 4 − 9)"
+   ]
   },
   "write_numeric_expression": {
    "ccss": [
@@ -4757,7 +4956,7 @@
    "option": "form: match 3 models to 3 numbers",
    "name": "Match the Model to the Number",
    "teaches": "Pair each base-ten model with its number, incl. near-misses (304 vs 340)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three models left, three numbers right, pupil writes the letter beside each number; screen: drag each number onto its model",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three base-ten / disk models in boxes on the left, three numbers on the right; pupil writes the letter of the model next to each number. Screen: drag each number onto its model (matching, production).",
    "family": "placevalue",
    "ccss": [
     "1.NBT.B.2",
@@ -4771,7 +4970,26 @@
     }
    ],
    "why": "6.4 match form for model↔number",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Match 3 models to 3 numbers — base-ten blocks — write letters / drag",
+    "Match with a zero place — 305 vs 350 vs 35 — write letters / drag",
+    "Which model shows N — one number, 3 models — ring / click"
+   ],
+   "levels": [
+    "L1: 2-digit, models differ in tens; place-value mat under each model (hint, fades)",
+    "L2: mat fades",
+    "L3: 3-digit with a zero place (the distractors swap places)",
+    "L4: place-value disks to 4 digits"
+   ],
+   "example": {
+    "item": "Match: A = 3 flats 5 units, B = 3 flats 5 rods, C = 3 rods 5 units → 350, 305, 35",
+    "answer": "350–B, 305–A, 35–C"
+   },
+   "misconceptions": [
+    "Counts pieces, not values (3 flats 5 units read as 35)",
+    "Ignores the empty place"
+   ]
   },
   "map_story_equation_match": {
    "kind": "option",
@@ -4779,7 +4997,7 @@
    "option": "stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv",
    "name": "Build the Equation for Any Story",
    "teaches": "Represent a story with an equation using a box for the unknown (9 + ☐ = 14, 4 × ☐ = 28, 3/8 + ☐ = 7/8), across + − × ÷ and fraction stories, without solving first",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box; pupil writes the numbers and the sign; screen: build-expr tiles (production, never MC)",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box, unknown shown as ☐; pupil writes the numbers and the sign (does not solve first). Screen: build-expr tiles (production, never MC).",
    "family": "algebra",
    "ccss": [
     "1.OA.A.1",
@@ -4787,6 +5005,7 @@
     "3.OA.A.3",
     "3.OA.D.8",
     "4.NF.B.3d",
+    "4.NF.B.4c",
     "5.NF.B.6"
    ],
    "map": [
@@ -4807,18 +5026,42 @@
     }
    ],
    "why": "One option grows the live build_expr_* production form instead of three separate story→equation proposals; it closes the 6.4 story↔equation pair for +/−, ×/÷ and fraction stories",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "+ / − story, unknown in any position — join, separate, part-whole — build e.g. 9 + ☐ = 14",
+    "compare story — more/fewer — build e.g. 14 − 6 = ☐ or 6 + ☐ = 14",
+    "× / ÷ story — equal groups, arrays, sharing, unknown factor — build e.g. 4 × ☐ = 28",
+    "fraction story — + − of like fractions, × fraction by whole — build e.g. 3/8 + ☐ = 7/8"
+   ],
+   "levels": [
+    "L1: +/− result unknown (the live skill today); frame with ☐ (structural, stays); key action word underlined (hint)",
+    "L2: change unknown and start unknown (☐ moves)",
+    "L3: compare stories (bigger, smaller, difference unknown); underlining fades",
+    "L4: × ÷ stories, incl. unknown factor and sharing",
+    "L5: fraction stories (like denominators; fraction × whole)"
+   ],
+   "example": {
+    "item": "Ravi had some stickers. He got 6 more. Now he has 15. Build the equation.",
+    "answer": "☐ + 6 = 15"
+   },
+   "misconceptions": [
+    "Writes the numbers in story order whatever the unknown (6 + 15 = ☐)",
+    "Picks + for every \"more\" (compare story with smaller unknown)",
+    "Uses × for any two numbers in a sharing story"
+   ]
   },
   "map_another_way_to_make": {
    "kind": "option",
    "skill": "composing:number_bonds",
-   "option": "response: show another way (open decomposition)",
+   "option": "response: show another way (open decomposition), both parts unknown, list all pairs",
    "name": "Another Way to Make It",
    "teaches": "Given one split of a number to 10 (domino/bond), show a different split",
-   "representation": "Print: one B&W boxed Andika cell, a drawn domino/bond with one split filled and an empty twin; the pupil draws dots or writes the two parts in boxes. Screen: tap dots into the empty domino halves (production, any valid split accepted), never MC.",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a number with a filled domino / ten-frame and an empty one beside it; pupil draws dots or writes a different pair (part + part). Screen: tap dots onto the empty domino / ten-frame, or fill a number bond (production).",
    "family": "composing",
    "ccss": [
-    "K.OA.3"
+    "K.OA.3",
+    "K.OA.A.3",
+    "1.OA.A.1"
    ],
    "map": [
     {
@@ -4828,7 +5071,26 @@
     }
    ],
    "why": "number_bonds asks for one missing part; MAP asks for an open, different decomposition with more than one right answer.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Show another way — 5 shown as 4 + 1, make it differently — draw dots / tap dots",
+    "List all ways — all pairs for 6 (both addends unknown) — write the pairs in a table",
+    "Number bond — whole given, both parts blank — write two parts"
+   ],
+   "levels": [
+    "L1: to 5, dots on a domino, the given way drawn (hint, fades); empty domino frame (structural, stays)",
+    "L2: to 10 on ten frames",
+    "L3: both parts unknown in a bond (any correct pair accepted)",
+    "L4: list all pairs for a number to 10 in an ordered table"
+   ],
+   "example": {
+    "item": "7 is 5 + 2. Show 7 another way.",
+    "answer": "any other pair, e.g. 4 + 3"
+   },
+   "misconceptions": [
+    "Repeats the given way in the other order and thinks it is new (or that it is not)",
+    "Pairs that do not total the number"
+   ]
   },
   "map_units_to_number": {
    "kind": "option",
@@ -4836,7 +5098,7 @@
    "option": "direction: units → number (incl. zero place)",
    "name": "Write the Number from Units",
    "teaches": "Read \"6 hundreds and 5 ones\" and write 605, including the zero place",
-   "representation": "Print: one B&W boxed Andika cell, the unit words in big type above a digit-box answer slot (one box per place). Screen: number entry into the same place boxes.",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; unit-form words (6 hundreds 5 ones) over a digit-box row with a place header; pupil writes the number. Screen: number entry in the digit boxes.",
    "family": "placevalue",
    "ccss": [
     "2.NBT.1",
@@ -4850,7 +5112,26 @@
     }
    ],
    "why": "unit_form goes number → units only; MAP asks the reverse with a missing place.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Units → number — 6 hundreds 5 ones — write 605",
+    "Out-of-order units — 3 ones 4 hundreds 2 tens — write 423",
+    "Regrouped units — 2 hundreds 14 tens — write 340"
+   ],
+   "levels": [
+    "L1: all places named, in order; place header over the digit boxes (structural, stays); place-value disks drawn (hint, fades)",
+    "L2: disks fade; one place missing (zero place)",
+    "L3: units out of order",
+    "L4: more than 9 of a unit (regroup)"
+   ],
+   "example": {
+    "item": "Write the number: 6 hundreds and 5 ones",
+    "answer": "605"
+   },
+   "misconceptions": [
+    "Leaves out the zero (65)",
+    "Writes digits in the order read when units are out of order"
+   ]
   },
   "map_oop_small_band": {
    "kind": "option",
@@ -4858,7 +5139,7 @@
    "option": "band: small numbers (MAP) — operands to 50, every step and the result within 100, e.g. 47 − (2 × 8)",
    "name": "Simple Parentheses: Small-Number Band",
    "teaches": "Evaluate a two-operation expression with one set of parentheses when the arithmetic is light, so the item tests structure, not computation",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step marked and a working line under it; screen: number entry (production, not MC)",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the expression with the bracketed step underlined and a working line under it; pupil writes the step then the value. Screen: number entry (production).",
    "family": "order_of_operations",
    "ccss": [
     "5.OA.A.1"
@@ -4871,7 +5152,26 @@
     }
    ],
    "why": "paren_simple sampled products to 1,400; MAP grouping-symbol items use small numbers. This is a real option (new number band), not a re-grade",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "a − (b × c) — small numbers — write value",
+    "(a + b) × c — write value",
+    "Choose ALL expressions equal to N — select-all on screen, tick on paper"
+   ],
+   "levels": [
+    "L1: brackets first, results within 50, working line labelled \"brackets\" (hint, fades); bracket underline (structural, stays)",
+    "L2: label fades; results within 100",
+    "L3: the bracket at the end of the expression (47 − (2 × 8))",
+    "L4: choose-all equal expressions"
+   ],
+   "example": {
+    "item": "40 − (3 × 6) = ☐",
+    "answer": "22"
+   },
+   "misconceptions": [
+    "Works left to right ignoring brackets (40 − 3 = 37, × 6)",
+    "Does × first but forgets the bracket rule when + is inside"
+   ]
   },
   "map_function_table_context": {
    "kind": "option",
@@ -4879,7 +5179,7 @@
    "option": "context: real-world table (headers such as Boxes / Pencils, Hours / Dollars) instead of In / Out",
    "name": "Function Tables in a Story",
    "teaches": "Find and write the rule of an input-output table whose columns are real quantities, then use it for a missing row",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two-column table with word headers, rule frame \"___ × ___\" under it; screen: rule-frame entry (operation tile + number), never MC",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two-column table with word headers (Boxes | Pencils), rule frame \"___ × ___\" and one empty row; pupil writes the rule and the missing value. Screen: rule-frame entry (operation tile + number) and number entry.",
    "family": "algebra",
    "ccss": [
     "3.OA.D.9",
@@ -4893,7 +5193,26 @@
     }
    ],
    "why": "DesCartes 211-220 \"determines the rule given a simple real-world function table\"; function_table_hard deals bare In/Out only",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Find the rule — real-world table — write the rule",
+    "Use the rule — one empty row — write the value",
+    "Which rule fits — a table and a rule to check — write yes/no on paper, toggle on screen"
+   ],
+   "levels": [
+    "L1: one-operation × rule, headers with a picture icon (hint, fades); table frame (structural, stays)",
+    "L2: + / − rules",
+    "L3: icons fade, rows out of order",
+    "L4: two-operation rule (× then +)"
+   ],
+   "example": {
+    "item": "Boxes 1, 2, 3, 5 | Pencils 6, 12, 18, ☐. Rule? Missing number?",
+    "answer": "× 6; 30"
+   },
+   "misconceptions": [
+    "Finds the rule from one row only (+5 from 1→6)",
+    "Applies the rule down the column (adds 6 each row) not across"
+   ]
   },
   "map_word_form_millions": {
    "kind": "option",
@@ -4901,7 +5220,7 @@
    "option": "band: to 999,999 and to millions (adds the thousands/millions period words), both directions via wordform",
    "name": "Number Word Form to Millions",
    "teaches": "Write the numeral for a number name to millions, and the name for a numeral, period by period",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name over a digit-box row with comma separators between periods; screen: number entry (words → numeral) or word-bank entry (numeral → words)",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name over a digit-box row with comma gaps between periods; pupil writes the numeral (or the words from a word bank). Screen: number entry / word-bank entry.",
    "family": "composing",
    "ccss": [
     "2.NBT.A.3",
@@ -4915,7 +5234,26 @@
     }
    ],
    "why": "number_word_form is the live production skill but stops at 9,999; DesCartes 191-210 asks numeral/name over 100,000",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "Words → numeral to 999,999 — write digits",
+    "Words → numeral to millions incl. zero places — write digits",
+    "Numeral → words — write words from a period word bank"
+   ],
+   "levels": [
+    "L1: to 99,999, period frame \"___ thousand ___\" (structural, stays), period words underlined (hint, fades)",
+    "L2: to 999,999",
+    "L3: zero places inside a period (four hundred five thousand, twenty)",
+    "L4: millions"
+   ],
+   "example": {
+    "item": "Write the numeral: three hundred six thousand, forty-two",
+    "answer": "306,042"
+   },
+   "misconceptions": [
+    "Writes 30642 (drops the zero place)",
+    "Writes 300,6,42 (period by period without padding)"
+   ]
   },
   "zero": {
    "ccss": [
@@ -5003,7 +5341,7 @@
    "option": "form \"from a picture\"",
    "name": "Ratios from a Picture (option)",
    "teaches": "Write the ratio of two kinds of object shown in a picture (part:part and part:whole), then an equivalent ratio from grouped pictures",
-   "representation": "B&W boxed cell: two rows of outline/solid shapes (circles, squares) counted in place, no colour coding; answer slots \"___ : ___\". Screen: two number boxes around a fixed colon (production), never MC",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two kinds of outline objects in a row; pupil writes the ratio in \"___ : ___\" slots, then one equivalent ratio. Screen: number boxes (production, never MC)",
    "family": "ratio",
    "ccss": [
     "6.RP.A.1"
@@ -5016,7 +5354,27 @@
     }
    ],
    "why": "ratio_intro and equiv_ratios are text-only; MAP shows a picture of objects and asks for the ratio",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "part:part — a row of 3 stars and 5 circles — write stars : circles / number boxes",
+    "part:whole — same picture — write stars : all objects / number boxes",
+    "equivalent — picture doubled (two rows) — write the new ratio and the simplest one / number boxes"
+   ],
+   "levels": [
+    "L1: part:part, objects grouped by kind; the two kinds labelled under the slots (label = hint, fades)",
+    "L2: part:part, objects mixed in the row; labels stay as words only",
+    "L3: part:whole from the same pictures; ratio frame \"___ : ___\" is structural and stays",
+    "L4: write an equivalent ratio from a repeated picture; no labels"
+   ],
+   "example": {
+    "item": "There are 2 squares and 6 triangles. Write the ratio of squares to triangles.",
+    "answer": "2 : 6"
+   },
+   "misconceptions": [
+    "writes the ratio in the wrong order (triangles : squares)",
+    "gives part:whole when part:part is asked",
+    "adds instead of scaling for the equivalent ratio"
+   ]
   },
   "map_share_among": {
    "kind": "option",
@@ -5024,7 +5382,7 @@
    "option": "mode \"share among M\" + response \"drag\"",
    "name": "Share Among M, and Make Groups by Dragging (option)",
    "teaches": "Partitive division (deal N counters into M circles, how many in each) beside the existing quotitive form, with an on-screen drag response for both modes",
-   "representation": "Print: B&W boxed cell, N outline counters above M (share) or ring outlines (group); pupil draws them in, writes \"___ in each\" / \"___ groups\" and the ÷ equation. Screen: counters drag into circles/rings that snap; checked when every ring holds the same count, then the pupil types the number (production, not multiple choice)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; N outline counters above M empty circles (share) or loose counters with ring outlines (group); pupil draws the counters in, writes \"___ in each\" / \"___ groups\" and the ÷ equation. Screen: drag counters into circles that snap, then type the number (production, not MC)",
    "family": "division",
    "ccss": [
     "3.OA.A.2"
@@ -5037,7 +5395,27 @@
     }
    ],
    "why": "share_into_groups deals only \"make groups of k\" with count-only entry; MAP asks \"share equally, how many each\" and lets pupils drag. Lead ruling: one option, not two.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "share — 12 counters, 3 circles — draw/drag them in, write ___ in each / drag + number box",
+    "group — 12 counters, \"make groups of 4\" — ring them, write ___ groups / drag + number box",
+    "equation — after sharing — write 12 ÷ 3 = ___ / number boxes"
+   ],
+   "levels": [
+    "L1: share among 2 with the circles drawn and one counter already placed in each (hint, fades)",
+    "L2: share among 2-5, circles drawn, no counter placed",
+    "L3: group mode (groups of k) beside share mode, one mode per page",
+    "L4: write the ÷ equation after sharing; the circles stay (structural)"
+   ],
+   "example": {
+    "item": "Share 15 apples equally between 3 baskets. How many in each basket?",
+    "answer": "5"
+   },
+   "misconceptions": [
+    "deals unequally (first circle gets the extras)",
+    "answers the number of groups instead of the number in each",
+    "confuses share-among (partitive) with groups-of (quotitive)"
+   ]
   },
   "map_array_to_eq": {
    "kind": "option",
@@ -5045,7 +5423,7 @@
    "option": "form \"write the equation\"",
    "name": "Picture to Multiplication Equation (option)",
    "teaches": "Look at an array or equal groups and write the full equation ___ × ___ = ___ (and the reverse: given an equation, choose/draw the matching array)",
-   "representation": "B&W dot array or ringed groups in the cell; three slots ___ × ___ = ___. Reverse: equation given, pupil marks rows/columns on a dot grid. Screen: three number boxes; reverse = click-to-shade grid rows",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a dot array or ringed equal groups; pupil writes ___ × ___ = ___ (and ___ + ___ + ___ = ___ for repeated addition). Reverse: equation given, pupil rings rows on a dot grid. Screen: three number boxes; reverse = click rows/columns to shade (production)",
    "family": "multiplication",
    "ccss": [
     "3.OA.A.1"
@@ -5058,7 +5436,27 @@
     }
    ],
    "why": "arrays_groups uses a sentence frame \"rows of make in all\"; MAP shows a picture and asks which/what equation, and the reverse direction is not dealt",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "picture → equation — 3 rows of 4 dots — write 3 × 4 = 12 / number boxes",
+    "groups → repeated addition and × — 4 rings of 2 — write 2 + 2 + 2 + 2 = 8 and 4 × 2 = 8 / number boxes",
+    "equation → picture — 2 × 5 given — shade 2 rows of 5 on a dot grid / click to shade"
+   ],
+   "levels": [
+    "L1: picture → equation with the frame \"___ rows of ___\" printed above the slots (hint, fades)",
+    "L2: picture → equation, × frame only (structural)",
+    "L3: groups → repeated addition and × equation together",
+    "L4: equation → picture (reverse)"
+   ],
+   "example": {
+    "item": "An array has 4 rows with 6 dots in each row. Write the multiplication equation.",
+    "answer": "4 × 6 = 24"
+   },
+   "misconceptions": [
+    "writes rows + columns (4 + 6 = 10)",
+    "counts dots on the edge only",
+    "in the reverse, shades 6 rows of 4 and thinks it is wrong (does not see commutativity)"
+   ]
   },
   "map_frac_model_match": {
    "kind": "option",
@@ -5066,7 +5464,7 @@
    "option": "form \"match model and fraction\"",
    "name": "Match Fraction Models and Numbers (option)",
    "teaches": "Match each fraction model (area, bar, set) to its fraction from a bank, both directions",
-   "representation": "B&W cell with 3-4 outline models and a bank of fractions; pupil writes the letter/fraction under each. Screen: drag fraction tiles onto models",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 3-4 fraction models (area, bar, set) on the left, a bank of fractions on the right; pupil writes the letter of the model beside each fraction. Screen: drag each fraction to its model (production pairing, not single MC)",
    "family": "fractions",
    "ccss": [
     "3.NF.A.1"
@@ -5079,14 +5477,34 @@
     }
    ],
    "why": "identify deals one model at a time (write or MC); MAP match-the-two form missing",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "model → fraction — 4 shaded models, bank of 4 fractions — write/drag the match",
+    "fraction → model — 4 fractions, 4 models with one distractor — write the letter / drag",
+    "mixed kinds — one area, one bar, one set model — match each"
+   ],
+   "levels": [
+    "L1: area models only, unit fractions, bank of 3",
+    "L2: non-unit fractions, bank of 4",
+    "L3: mixed model kinds (area, bar, set)",
+    "L4: one distractor model with unequal parts (the equal-parts rule)"
+   ],
+   "example": {
+    "item": "Match each picture to its fraction: A (2 of 3 parts shaded), B (1 of 4 parts shaded). Bank: 1/4, 2/3.",
+    "answer": "A — 2/3, B — 1/4"
+   },
+   "misconceptions": [
+    "writes unshaded/shaded (1/2 for 2/3)",
+    "counts shaded over unshaded instead of over all parts",
+    "accepts unequal parts as fractions"
+   ]
   },
   "map_decimal_grid": {
    "kind": "new",
    "skill": "decimals:decimal_grid_model",
    "name": "Decimal Grids and Numbers",
    "teaches": "Read a tenths strip or hundred square as a decimal and fraction, shade a grid for a given decimal, and match grids to decimals",
-   "representation": "B&W 10×10 outline grid with solid-black shading (single grey for partial if needed); answer slots 0.___ and ___/100. Screen: number entry; shade by clicking cells for the reverse",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a tenths strip or hundred square in a boxed cell; pupil writes the decimal and the fraction, or shades the grid for a given decimal. Screen: number boxes; shade by clicking squares (production)",
    "family": "decimals",
    "ccss": [
     "4.NF.C.6",
@@ -5100,7 +5518,27 @@
     }
    ],
    "why": "No decimal skill reads or shades a decimal grid (percent_visual does percent only)",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "grid → decimal — 37 of 100 squares shaded — write 0.37 and 37/100 / number boxes",
+    "decimal → grid — 0.6 given — shade the strip / click to shade",
+    "match — 3 grids, 3 decimals — pair them / drag"
+   ],
+   "levels": [
+    "L1: tenths strip, write the decimal; place-value header \"ones . tenths\" printed (structural, stays)",
+    "L2: hundred square, whole rows + loose squares",
+    "L3: shade for a given decimal",
+    "L4: match 3 grids to 3 decimals including 0.4 vs 0.04"
+   ],
+   "example": {
+    "item": "A hundred square has 52 squares shaded. Write the shaded part as a decimal.",
+    "answer": "0.52"
+   },
+   "misconceptions": [
+    "writes 52 instead of 0.52",
+    "reads 4 tenths as 0.04",
+    "counts rows as hundredths"
+   ]
   },
   "map_nl_read_decimal": {
    "kind": "option",
@@ -5108,7 +5546,7 @@
    "option": "task \"read the point\"",
    "name": "Read a Decimal on a Number Line (option)",
    "teaches": "Name the decimal at a marked point on a tenths/hundredths line (the reverse of placing)",
-   "representation": "B&W nl-place cell with an arrow above a tick; answer slot under the arrow. Screen: number entry",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a tenths or hundredths number line with an arrow at one tick; pupil writes the decimal in a box. Screen: number box (production, never MC)",
    "family": "decimals",
    "ccss": [
     "4.NF.C.6"
@@ -5121,7 +5559,27 @@
     }
    ],
    "why": "decimal_nl_drag only places; fractions have both directions, decimals do not",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "read tenths — 0 to 1 by tenths, arrow at 7th tick — write 0.7",
+    "read hundredths — 2.3 to 2.4 by hundredths — write 2.36",
+    "read on a line labelled only at ends — find the step first, then write"
+   ],
+   "levels": [
+    "L1: tenths, every tick labelled except the arrowed one (labels = hint, fade)",
+    "L2: tenths, ends labelled only",
+    "L3: hundredths between two tenths",
+    "L4: line starting at a non-zero whole (2.3 to 2.4)"
+   ],
+   "example": {
+    "item": "A number line goes from 4 to 5 in tenths. The arrow is on the third tick after 4. What number is it?",
+    "answer": "4.3"
+   },
+   "misconceptions": [
+    "counts ticks instead of spaces",
+    "reads hundredths as tenths (2.36 → 2.6)",
+    "forgets the whole number part"
+   ]
   },
   "map_frac_unit_build": {
    "kind": "option",
@@ -5129,7 +5587,7 @@
    "option": "form \"build from unit fractions\"",
    "name": "Build a Fraction from Unit Fractions (option)",
    "teaches": "Count unit fractions: 3/4 is 3 parts of size 1/4; write the fraction as a sum of unit fractions from a picture",
-   "representation": "B&W bar model; slots ___/___ = 1/_ + 1/_ + 1/_. Screen: number boxes",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a bar or area model cut into equal parts with some shaded; pupil writes the unit-fraction sum and the total (1/4 + 1/4 + 1/4 = 3/4). Reverse: sum given, pupil shades. Screen: number boxes for the sum; click to shade for the reverse (production)",
    "family": "fractions",
    "ccss": [
     "3.NF.A.1",
@@ -5143,14 +5601,34 @@
     }
    ],
    "why": "decompose_fractions covers 4th grade; unit-fraction counting at grade 3 MAP band not dealt from a picture",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "model → sum — 3 of 4 parts shaded — write 1/4 + 1/4 + 1/4 = 3/4",
+    "sum → model — 1/5 + 1/5 given — shade the bar / click to shade",
+    "model → count — \"how many fifths?\" — write 3 fifths = 3/5"
+   ],
+   "levels": [
+    "L1: count the shaded unit parts, \"___ quarters\" frame (hint, fades)",
+    "L2: write the unit-fraction sum, frame slots for each addend (structural)",
+    "L3: reverse: shade from the sum",
+    "L4: sums past 1 (5/4 = 1/4 × 5) with two bars"
+   ],
+   "example": {
+    "item": "A bar is cut into 6 equal parts and 4 are shaded. Write the shaded part as a sum of unit fractions.",
+    "answer": "1/6 + 1/6 + 1/6 + 1/6 = 4/6"
+   },
+   "misconceptions": [
+    "adds denominators (1/4 + 1/4 = 2/8)",
+    "writes the number of shaded parts as the denominator",
+    "counts unshaded parts"
+   ]
   },
   "map_power10_exponent": {
    "kind": "new",
    "skill": "decimals:powers_of_ten",
    "name": "Powers of Ten: Patterns and Exponents",
    "teaches": "Multiply and divide whole numbers and decimals by 10, 100, 1000 and 10^n; explain the zeros/point shift; write 10^3 = 1000",
-   "representation": "B&W place-value chart cell with arrows showing the digits move; answer number slot. Screen: number entry",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a place-value chart under the calculation with arrows showing the shift; pupil writes the product/quotient and, at L4, the exponent form. Screen: number boxes (production)",
    "family": "decimals",
    "ccss": [
     "5.NBT.A.2",
@@ -5164,7 +5642,27 @@
     }
    ],
    "why": "mult_zeros is whole-number only; dec_missing (placevalue:place_value_10x) is missing-number only; exponent notation not dealt",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "decimal × 10/100/1000 — 3.6 × 100 — write 360",
+    "decimal ÷ 10/100 — 45 ÷ 100 — write 0.45",
+    "exponent — 10³ — write 1,000 and 7 × 10³ = 7,000"
+   ],
+   "levels": [
+    "L1: whole × / ÷ 10, 100, 1000 with the pv chart (live skill level)",
+    "L2: decimal × 10, 100, 1000; pv chart stays (structural), arrow hint fades",
+    "L3: decimal ÷ 10, 100",
+    "L4: powers of ten written as 10^n"
+   ],
+   "example": {
+    "item": "Work out 2.7 × 100.",
+    "answer": "270"
+   },
+   "misconceptions": [
+    "adds zeros after the decimal (2.700)",
+    "moves the point the wrong way",
+    "reads 10³ as 30"
+   ]
   },
   "map_frac_compare_reason": {
    "kind": "option",
@@ -5172,7 +5670,7 @@
    "option": "support \"benchmark 1/2\"",
    "name": "Compare Fractions Using 1/2 (option)",
    "teaches": "Compare two fractions by placing each against 1/2 or 1 (no common denominator)",
-   "representation": "B&W cell with a 0-1/2-1 line under both fractions; answer symbol. Screen: symbol picker",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two fractions with a 0-1/2-1 strip beneath each; pupil writes >, <, = and ticks \"more than half / less than half\" for each. Screen: sign box + click the benchmark side (production)",
    "family": "fractions",
    "ccss": [
     "4.NF.A.2"
@@ -5185,7 +5683,27 @@
     }
    ],
    "why": "compare uses models of same whole only; benchmark reasoning is a MAP 201-210 task",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "compare to 1/2 — 3/8 and 4/6 — tick each side of 1/2, write the sign",
+    "compare to 1 — 7/8 and 5/4 — tick each side of 1",
+    "justify — choose the reason from a bank (\"3/8 is less than half because 3 < 4\")"
+   ],
+   "levels": [
+    "L1: one fraction at a time against 1/2 with the strip (strip = hint, fades)",
+    "L2: two fractions, strip shown",
+    "L3: two fractions, no strip, write the sign",
+    "L4: benchmark 1 and reason from a bank"
+   ],
+   "example": {
+    "item": "Compare 2/5 and 5/8. Use one half.",
+    "answer": "2/5 < 5/8"
+   },
+   "misconceptions": [
+    "bigger denominator means bigger fraction",
+    "compares numerators only",
+    "thinks half of 5 is 2"
+   ]
   },
   "map_percent_of_grid_bar": {
    "kind": "option",
@@ -5193,7 +5711,7 @@
    "option": "support \"percent bar\"",
    "name": "Percent of a Number with a Bar (option)",
    "teaches": "Find 10%, 25%, 50% of a number from a percent bar model",
-   "representation": "B&W bar split in 10 or 4 equal parts with 0%/100% labels; slot for the part. Screen: number entry",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a percent bar 0-100% above a number bar 0-N; pupil writes the value at 10%, 25%, 50%. Screen: number boxes (production)",
    "family": "conversions",
    "ccss": [
     "6.RP.A.3c"
@@ -5206,7 +5724,27 @@
     }
    ],
    "why": "percent_of_number is text-only",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "50% / 25% — bar of 80 — write 40, 20",
+    "10% — bar of 70 — write 7, then 30% = 21",
+    "percent of grid — hundred square with 30 shaded, whole = 200 — write 60"
+   ],
+   "levels": [
+    "L1: 50% with the bar halved (hint mark, fades)",
+    "L2: 25% and 75%",
+    "L3: 10% then multiples of 10%",
+    "L4: no bar, number only (live skill level)"
+   ],
+   "example": {
+    "item": "What is 25% of 60?",
+    "answer": "15"
+   },
+   "misconceptions": [
+    "divides by 25 instead of finding a quarter",
+    "writes 25 as the answer",
+    "for 30% adds 30 to 10%"
+   ]
   },
   "decimal_pv": {
    "ccss": [
@@ -5693,7 +6231,7 @@
    "option": "divisor \"multiple of 10\" (3-digit ÷ tens, basic fact × 10)",
    "name": "Divide by Multiples of Ten (option)",
    "teaches": "Dividing by 10s using the basic fact (360 ÷ 40 = 36 ÷ 4), quotient a whole number",
-   "representation": "Print: B&W boxed cell, horizontal equation with the related fact shown as a faded hint line, one answer box. Screen: same cell, number entry",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the basic fact printed above in grey support row (36 ÷ 4 = 9), then the target 360 ÷ 40 = ___ ; pupil writes the quotient. Screen: number box (production)",
    "family": "division",
    "ccss": [
     "4.NBT.B.6"
@@ -5706,7 +6244,27 @@
     }
    ],
    "why": "divide deals facts only; MAP places dividing by a multiple of 10 at 201-210",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "divide by tens — 360 ÷ 40 — write 9 (fact 36 ÷ 4)",
+    "tens ÷ ones — 360 ÷ 4 — write 90",
+    "find the fact — 2,400 ÷ 60 — write the fact and 40"
+   ],
+   "levels": [
+    "L1: dividend ÷ one-digit with tens (360 ÷ 4), fact row printed (hint, fades)",
+    "L2: tens ÷ tens (360 ÷ 40), fact row printed",
+    "L3: no fact row",
+    "L4: hundreds ÷ tens (2,400 ÷ 60)"
+   ],
+   "example": {
+    "item": "Work out 420 ÷ 70.",
+    "answer": "6"
+   },
+   "misconceptions": [
+    "keeps the zero (420 ÷ 70 = 60)",
+    "cancels unequal zeros",
+    "divides 42 by 70"
+   ]
   },
   "map_equal_frac_build": {
    "kind": "option",
@@ -5714,7 +6272,7 @@
    "option": "target \"mixed number\" + response \"digit bank\"",
    "name": "Fractions Equal to a Mixed Number (option)",
    "teaches": "Writing several fractions equal to a whole or mixed number (1 1/3 = 4/3 = 8/6) using a digit bank",
-   "representation": "Print: B&W boxed cell, target number then two or three empty fraction frames; pupil writes numerator and denominator. Screen: digit tiles drag into the fraction boxes (MAP move-numbers form), production not choice",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a whole or mixed number with 2-3 empty fraction frames and a digit bank under it; pupil writes digits into the frames. Screen: drag digit tiles into the boxes (production)",
    "family": "fractions",
    "ccss": [
     "4.NF.A.1",
@@ -5728,7 +6286,27 @@
     }
    ],
    "why": "whole_as_fraction writes only n/1 and d/d; MAP asks several equivalents of a mixed number with digit tiles",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "whole — 1 = ___/___ (3 frames) — fill from the bank",
+    "mixed — 1 1/3 = ___/3 = ___/6 — fill",
+    "improper → mixed — 7/4 = ___ ___/4"
+   ],
+   "levels": [
+    "L1: equal to 1, denominators printed (hint, fades)",
+    "L2: equal to 2 or 3 wholes",
+    "L3: mixed number to improper, denominators printed",
+    "L4: chain of equivalents, no denominators printed"
+   ],
+   "example": {
+    "item": "Fill the boxes: 2 1/2 = ___/2 = ___/4",
+    "answer": "5/2 = 10/4"
+   },
+   "misconceptions": [
+    "adds the whole to the numerator (2 1/2 = 3/2)",
+    "doubles only one part of the fraction",
+    "writes 2/2 as 2"
+   ]
   },
   "map_est_both_factors": {
    "kind": "option",
@@ -5736,7 +6314,7 @@
    "option": "factors: \"both multi-digit\" (3-/4-digit × 2-digit, round both factors), beside the existing place and task (compute / closest / reasonable) options",
    "name": "Estimate Products: Round Both Factors (option)",
    "teaches": "Round both factors of a 3- or 4-digit × 2-digit product to estimate it and judge whether an answer is reasonable",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; print: \"412 × 38 ≈ ___ × ___ = ___\" slots; screen: the same inline number boxes (production, never MC except the existing \"closest\" task)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; \"412 × 38 ≈ ___ × ___ = ___\" slots with the rounded factors written first. Screen: the same inline number boxes; the reasonable task is a yes/no tick plus the estimate (production)",
    "family": "number sense",
    "ccss": [
     "4.NBT.B.5",
@@ -5751,7 +6329,27 @@
     }
    ],
    "why": "estimate_products rounds only the bigger factor of 2-4-digit × 1-digit; MAP 211-220 estimates multi-digit × multi-digit. Option on the live skill, not a new skill.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "round both — 412 × 38 — write 400 × 40 = 16,000",
+    "reasonable? — \"Sam says 297 × 21 = 2,237\" — write the estimate, tick yes/no",
+    "closest — choose the estimate nearest to 58 × 69 (live task, larger factors)"
+   ],
+   "levels": [
+    "L1: 2-digit × 2-digit, round both to tens; \"round to\" labels printed (hint, fades)",
+    "L2: 3-digit × 2-digit, round to hundreds and tens",
+    "L3: 4-digit × 2-digit",
+    "L4: \"is the answer reasonable?\" with the estimate"
+   ],
+   "example": {
+    "item": "Estimate 61 × 29 by rounding both numbers.",
+    "answer": "60 × 30 = 1,800"
+   },
+   "misconceptions": [
+    "rounds only one factor",
+    "rounds to the wrong place",
+    "miscounts zeros in the estimate (60 × 30 = 180)"
+   ]
   },
   "map_mult_prop_grouping": {
    "kind": "option",
@@ -5759,7 +6357,7 @@
    "option": "forms: add \"Grouping (2 × 3 × 4 = 2 × 12)\" and a \"choose ALL equal products\" response",
    "name": "Multiplication Properties: Grouping and Choose All (option)",
    "teaches": "Associative property with three factors, and recognising every expression equal to a product (commutative/associative/distributive)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; print: three factors with a bracket slot \"(2 × 3) × 4 = 2 × (___ × 4)\" or a list of expressions to tick; screen: number boxes / click ALL equal expressions (multi-select, production of the set)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three factors with bracket slots, or a list of 4-5 expressions; pupil writes the missing number or ticks every expression equal to the product. Screen: number boxes; click ALL equal expressions (multi-select)",
    "family": "multiplication",
    "ccss": [
     "3.OA.B.5"
@@ -5772,7 +6370,27 @@
     }
    ],
    "why": "mult_properties forms cover order, breaking apart, ×1, ×0 only; MAP asks associative and \"which are equal\". Real residual, not a re-grade.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "grouping — (2 × 3) × 4 = 2 × (___ × 4) — write 3",
+    "choose all — \"Tick every expression equal to 6 × 8\" (8 × 6, 6 × 4 + 6 × 4, 3 × 2 × 8, 6 + 8) — tick",
+    "easy pair — 5 × 7 × 2 = 7 × ___ — write 10"
+   ],
+   "levels": [
+    "L1: grouping with a bracket drawn round the first pair (hint, fades)",
+    "L2: grouping, no bracket hint",
+    "L3: make a ten (5 × 2) first",
+    "L4: choose ALL equal expressions mixing order, grouping, breaking apart"
+   ],
+   "example": {
+    "item": "Fill the box: (4 × 5) × 3 = 4 × (___ × 3)",
+    "answer": "5"
+   },
+   "misconceptions": [
+    "adds inside the brackets",
+    "thinks changing grouping changes the product",
+    "ticks 6 + 8 as equal to 6 × 8"
+   ]
   },
   "map_nl_hops_equation": {
    "kind": "option",
@@ -5780,7 +6398,7 @@
    "option": "task: \"write the equation the hops show\" (hops drawn, no equation printed)",
    "name": "Number Line Hops to Equation (option)",
    "teaches": "Read equal hops on a number line and write ___ × ___ = ___",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; print: the hop line with the hops drawn and three slots ___ × ___ = ___; screen: three number boxes (never MC)",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; the hop line with equal hops drawn and no equation; pupil writes ___ × ___ = ___. Screen: three number boxes (never MC)",
    "family": "multiplication",
    "ccss": [
     "3.OA.A.1",
@@ -5794,7 +6412,27 @@
     }
    ],
    "why": "nl_mult always prints the equation and asks the product; MAP shows the hops and asks the equation.",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "hops → × — 4 hops of 5 from 0 — write 4 × 5 = 20",
+    "hops → repeated addition — write 5 + 5 + 5 + 5 = 20",
+    "which hops — two lines drawn, write the letter of the one showing 3 × 6 and its product"
+   ],
+   "levels": [
+    "L1: every hop end labelled (hint, fades)",
+    "L2: only 0 and the end labelled",
+    "L3: the repeated addition and the × equation",
+    "L4: pick the matching line of two"
+   ],
+   "example": {
+    "item": "The number line shows 6 hops of 3 from 0. Write the multiplication equation.",
+    "answer": "6 × 3 = 18"
+   },
+   "misconceptions": [
+    "counts tick marks instead of hops",
+    "writes hop size first and number of hops second and thinks order matters",
+    "reads the end point as the number of hops"
+   ]
   },
   "map_frac_choose_all_shaded": {
    "kind": "option",
@@ -5802,7 +6440,7 @@
    "option": "response: \"choose ALL the models that show a/b\" (4-6 models, distractors with unequal parts or wrong count)",
    "name": "Choose All Models That Show a Fraction (option)",
    "teaches": "Recognise a unit or non-unit fraction only when the whole is cut into equal parts, across shapes",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; print: 4-6 small B&W shape models in the cell, pupil ticks every match; screen: click ALL (multi-select-check), production of the set, not single MC",
+   "representation": "Print: one boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 4-6 small outline shapes in the cell, some cut equally, some unequally; pupil ticks every shape showing a/b. Screen: click ALL (multi-select-check)",
    "family": "fractions",
    "ccss": [
     "3.NF.A.1",
@@ -5816,7 +6454,27 @@
     }
    ],
    "why": "identify asks \"which model shows 1/3\" with one answer; MAP asks choose ALL, with unequal-part distractors (the equal-parts misconception).",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "unit fraction — \"Tick ALL the shapes with one-third shaded\" — tick",
+    "non-unit — \"Tick ALL showing 2/4\" — tick",
+    "different shapes — circles, bars, rectangles mixed — tick"
+   ],
+   "levels": [
+    "L1: same shape, only part-count distractors",
+    "L2: unequal-part distractors added",
+    "L3: mixed shapes",
+    "L4: non-unit fractions"
+   ],
+   "example": {
+    "item": "Tick ALL the shapes that show one-quarter shaded.",
+    "answer": "every shape cut into 4 equal parts with 1 part shaded"
+   },
+   "misconceptions": [
+    "ticks a shape cut into 3 unequal parts with 1 shaded",
+    "ticks 1 of 4 parts unshaded",
+    "misses a different-shaped model"
+   ]
   },
   "equal_groups_early": {
    "ccss": [
@@ -5841,6 +6499,7 @@
      "taskType": "drag objects to make groups equal"
     }
    ],
+   "mapClause": "move objects so two groups are equal",
    "reused": true
   },
   "map_symmetry_compare": {
@@ -5849,7 +6508,7 @@
    "option": "form \"compare\": two shapes side by side; which has more lines of symmetry (or write both counts and >, <, =)",
    "name": "Compare Lines of Symmetry (option)",
    "teaches": "counting lines of symmetry in two shapes and comparing the counts",
-   "representation": "one boxed cell, two B&W shapes (Andika labels A and B), answer slot for each count plus a sign box; screen: two number boxes and a click-to-pick sign, never MC when counts can be written",
+   "representation": "print: B&W boxed Andika cell, two outline shapes side by side labelled A and B, slots 'A: __ lines  B: __ lines' and circle the shape with more; screen: two number entries then click the shape (hot spot), not MC",
    "family": "geometry",
    "ccss": [
     "4.G.A.3"
@@ -5862,7 +6521,25 @@
     }
    ],
    "why": "MAP asks which shape has more lines of symmetry; symmetry today only asks the count of one shape or click-all-symmetric",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "count both — two shapes — write each count (print) / two number entries",
+    "compare — two shapes — circle the one with more lines (print) / click shape",
+    "same or different — two shapes — tick 'same number' or 'different' after counting (print) / click"
+   ],
+   "levels": [
+    "L1: two shapes with dashed lines already drawn; count and compare (structural: A/B labels and slots stay; hint: drawn lines)",
+    "L2: lines not drawn; pupil draws then counts (hint lines faded)",
+    "L3: regular polygons and letters, counts up to 6; compare only"
+   ],
+   "example": {
+    "item": "Shape A is a rectangle. Shape B is a square. Write how many lines of symmetry each has. Circle the shape with more.",
+    "answer": "A: 2, B: 4; circle B"
+   },
+   "misconceptions": [
+    "counts the diagonals of a rectangle as lines of symmetry",
+    "thinks a bigger shape has more lines"
+   ]
   },
   "map_symmetry_check_line": {
    "kind": "option",
@@ -5870,7 +6547,7 @@
    "option": "form \"is this a line of symmetry?\": one dashed line drawn on a shape; tick Yes or No (fold check), half the items wrong lines (diagonal of a rectangle, off-centre)",
    "name": "Is This a Line of Symmetry? (option)",
    "teaches": "judging a proposed fold line: the two halves must match exactly",
-   "representation": "boxed cell, B&W shape with one dashed line, Yes / No check boxes; screen: click Yes or No; misconception items: rectangle diagonal, parallelogram",
+   "representation": "print: B&W boxed cell, one shape with one dashed line, check boxes 'Yes, it is a line of symmetry' / 'No'; screen: click Yes/No (a judgement, so a two-choice click is the production form)",
    "family": "geometry",
    "ccss": [
     "4.G.A.3"
@@ -5883,7 +6560,25 @@
     }
    ],
    "why": "MAP shows one proposed line and asks if it is a line of symmetry; we only have click-all candidate lines (39/200 symmetry items), never a single yes/no judgement with the rectangle-diagonal trap",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "judge — shape with one dashed line — tick Yes or No",
+    "judge and fix — line is wrong — tick No and draw a correct line (print) / place line (place-symmetry-lines)",
+    "sort — 4 shapes with lines — tick every correct one (print) / select all"
+   ],
+   "levels": [
+    "L1: line on letters and simple shapes; fold flap picture beside (hint: fold picture fades)",
+    "L2: no fold picture; includes diagonal on a rectangle (the classic false)",
+    "L3: judge then draw a correct line where the given one is wrong"
+   ],
+   "example": {
+    "item": "A dashed line goes corner to corner across a rectangle. Is it a line of symmetry?",
+    "answer": "No"
+   },
+   "misconceptions": [
+    "accepts a diagonal of a rectangle because the halves have equal area",
+    "rejects a correct line that is not vertical"
+   ]
   },
   "map_area_pick": {
    "kind": "option",
@@ -5891,7 +6586,7 @@
    "option": "form \"pick the area\": 3–4 grid shapes, click the one with area N square units (distractor: same perimeter, different area)",
    "name": "Which Shape Has Area N? (option)",
    "teaches": "finding area by counting unit squares and matching it to a given number",
-   "representation": "boxed cell with 3 B&W grid shapes labelled A–C, check box under each; screen: click the shape (hot-spot), not a list of letters",
+   "representation": "print: B&W boxed cell, 3-4 grid shapes labelled A-D, slot 'Area __ squares' then circle the letter; screen: click the shape (hot spot); distractor shapes share the perimeter",
    "family": "measurement",
    "ccss": [
     "3.MD.C.6"
@@ -5904,7 +6599,25 @@
     }
    ],
    "why": "area_unit_squares only asks to count one shape; MAP asks which of several pictures has the stated area",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "pick — 'Which shape has an area of 8 squares?' — circle the letter / click shape",
+    "pick all — 'Choose ALL shapes with area 6' — tick boxes / select all",
+    "count then pick — write each area under its shape, then circle"
+   ],
+   "levels": [
+    "L1: rectangles only, whole squares, one answer (structural: grid stays)",
+    "L2: rectilinear shapes, still whole squares",
+    "L3: choose all, distractors with the same perimeter"
+   ],
+   "example": {
+    "item": "Which shape has an area of 6 square units? A: 2 by 3 rectangle, B: 1 by 5 rectangle, C: 2 by 2 square",
+    "answer": "A"
+   },
+   "misconceptions": [
+    "counts the squares round the edge (perimeter)",
+    "counts grid lines instead of squares"
+   ]
   },
   "map_money_build": {
    "kind": "option",
@@ -5912,7 +6625,7 @@
    "option": "response \"build the amount\": drag coins (or draw them on paper) to make a given total; any correct set accepted",
    "name": "Make the Amount With Coins (option)",
    "teaches": "composing a money amount from coins",
-   "representation": "boxed cell with the coin bank and an empty purse box; paper: draw/tally coins in the box; screen: drag coins, checked by total",
+   "representation": "print: B&W boxed cell, the amount in big digits and a tray of coin outlines with values; pupil draws or writes the coins used in slots '__ × 25¢ + __ × 10¢ ...'; screen: drag coins into a tray (production), any correct set accepted",
    "family": "measurement",
    "ccss": [
     "2.MD.C.8"
@@ -5925,7 +6638,26 @@
     }
    ],
    "why": "MAP drags coins to make an amount; we only count shown coins, check a set, or write fewest coins",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "make the amount — target total — drag/draw coins",
+    "show the change — 'You pay $1 for a 65¢ toy; show the change' — drag/draw coins",
+    "fewest coins — make the total with fewest coins"
+   ],
+   "levels": [
+    "L1: pennies, nickels, dimes, totals to 30¢ (structural: coin tray stays; hint: running total shown)",
+    "L2: add quarters, totals to $1; running total faded",
+    "L3: change from $1 (one new thing: subtract first)"
+   ],
+   "example": {
+    "item": "Show 41¢ with coins.",
+    "answer": "e.g. 1 quarter, 1 dime, 1 nickel, 1 penny (any set totalling 41¢)"
+   },
+   "misconceptions": [
+    "counts coins instead of their values",
+    "thinks a bigger coin is worth more (nickel vs dime)",
+    "forgets to subtract when showing change"
+   ]
   },
   "map_graph_sentence": {
    "kind": "option",
@@ -5933,7 +6665,7 @@
    "option": "form \"which sentence is true?\": a bar or picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
    "name": "Which Sentence Matches the Graph? (option)",
    "teaches": "reading a graph and checking comparison statements against it",
-   "representation": "boxed cell, B&W graph on top, statements with check boxes below; screen: select all that apply",
+   "representation": "print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply",
    "family": "data",
    "ccss": [
     "2.MD.D.10",
@@ -5947,7 +6679,25 @@
     }
    ],
    "why": "MAP graph items often ask which statement the graph supports; our graph skills only ask one numeric question",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "which is true — tick the true statement(s)",
+    "true or false — one statement, tick T/F",
+    "fix — a false statement, write the right number"
+   ],
+   "levels": [
+    "L1: key 1, one true statement among 3 'most/least' sentences (structural: graph stays)",
+    "L2: 'how many more' statements",
+    "L3: scaled graph (key 2/5) and select ALL true"
+   ],
+   "example": {
+    "item": "Graph: Cats 6, Dogs 4, Fish 2. Which sentence is true? A 'Dogs got the most.' B '2 more chose cats than dogs.' C 'Fish got 4.'",
+    "answer": "B"
+   },
+   "misconceptions": [
+    "reads the bar length in squares when the scale is 2",
+    "confuses 'more than' with the total"
+   ]
   },
   "map_area_equation": {
    "kind": "option",
@@ -5955,7 +6705,7 @@
    "option": "form \"match the equation\": a grid rectangle and equations (3 × 4, 3 + 4, 3 + 4 + 3 + 4, 4 × 4); tick the one that gives the area (or the perimeter)",
    "name": "Picture to Area Equation (option)",
    "teaches": "connecting area to multiplication and perimeter to adding sides",
-   "representation": "boxed cell, B&W grid rectangle with side labels, equation bank with check boxes; screen: click the equation",
+   "representation": "print: B&W boxed cell, a grid rectangle and 3-4 equations with check boxes; screen: select all that apply",
    "family": "measurement",
    "ccss": [
     "3.MD.C.7",
@@ -5969,7 +6719,25 @@
     }
    ],
    "why": "6.4 picture ↔ equation for area/perimeter: no skill shows a picture and asks which equation models it",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "area — tick every equation that gives the area (3 × 4, 4 + 4 + 4)",
+    "perimeter — tick every equation that gives the perimeter",
+    "write — write one area and one perimeter equation"
+   ],
+   "levels": [
+    "L1: area only, × and repeated addition (structural: grid stays)",
+    "L2: perimeter equations added",
+    "L3: mixed: tick area ones, circle perimeter ones; grid lines faded to side labels"
+   ],
+   "example": {
+    "item": "A rectangle is 3 squares tall and 4 squares wide. Tick every equation for its area: 3 × 4 = 12; 3 + 4 = 7; 4 + 4 + 4 = 12; 3 + 4 + 3 + 4 = 14",
+    "answer": "3 × 4 = 12 and 4 + 4 + 4 = 12"
+   },
+   "misconceptions": [
+    "picks the perimeter sum for area",
+    "picks 3 + 4 (adds the sides once)"
+   ]
   },
   "map_ruler_measure_object": {
    "kind": "option",
@@ -5977,7 +6745,7 @@
    "option": "task \"measure the object\": an object drawn beside the ruler, not starting at 0 on some items; write its length",
    "name": "Measure an Object Not at Zero (option)",
    "teaches": "measuring length as the distance between two marks",
-   "representation": "boxed cell, B&W ruler cell with a bar object above it, answer slot with unit; screen: number entry",
+   "representation": "print: B&W boxed cell, a line-art object above a ruler (cm or inches), slot '__ cm'; screen: number entry",
    "family": "measurement",
    "ccss": [
     "2.MD.A.1",
@@ -5991,7 +6759,25 @@
     }
    ],
    "why": "reading_ruler gives an arrow on a mark; MAP shows an object (sometimes offset from 0) to measure",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "from 0 — object starts at 0 — write the length",
+    "not at 0 — object starts at 2 — write the length",
+    "two ends — 'Where does it end?' then length"
+   ],
+   "levels": [
+    "L1: start at 0, whole units (structural: ruler stays)",
+    "L2: start not at 0 (one change)",
+    "L3: inches to the half inch"
+   ],
+   "example": {
+    "item": "A pencil lies from the 3 cm mark to the 10 cm mark. How long is it?",
+    "answer": "7 cm"
+   },
+   "misconceptions": [
+    "reads the end mark as the length",
+    "counts tick marks instead of spaces"
+   ]
   },
   "map_tally_build": {
    "kind": "option",
@@ -5999,7 +6785,7 @@
    "option": "task \"make the tally\": a list or picture of items; complete the tally marks and totals",
    "name": "Complete a Tally Chart (option)",
    "teaches": "recording data with tally marks in fives",
-   "representation": "boxed cell, item list then a 2-column tally table with empty cells; screen: click to add tallies, number box for total",
+   "representation": "print: B&W boxed cell, a picture list of items, a tally table with empty tally and total columns; pupil draws tallies in fives and writes totals; screen: click to add tally marks (production) and number entry",
    "family": "data",
    "ccss": [
     "1.MD.C.4",
@@ -6013,19 +6799,38 @@
     }
    ],
    "why": "tally_chart only reads a finished chart; MAP also asks pupils to complete one",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "make the tally — picture list — draw tallies and totals",
+    "total only — given tallies — write totals",
+    "make and ask — make the tally then answer 'how many more'"
+   ],
+   "levels": [
+    "L1: 2 categories, totals ≤ 9, cross-off picture list (hint: cross-off fades)",
+    "L2: 3-4 categories, totals to 20, fives gate",
+    "L3: add one question from the chart"
+   ],
+   "example": {
+    "item": "Fruit: apple, pear, apple, apple, banana, pear, apple, apple, apple. Make the tally.",
+    "answer": "apple 卌|| (6), pear || (2), banana | (1)"
+   },
+   "misconceptions": [
+    "draws the fifth mark as a fifth upright stroke",
+    "loses count without crossing off"
+   ]
   },
   "map_shape_partition_pick": {
    "kind": "option",
    "skill": "shapes_early:partition_shapes",
-   "option": "form \"equal or not?\": shapes cut into parts, some unequal; click the shapes showing halves/thirds/fourths",
-   "name": "Which Shows Equal Parts? (option)",
-   "teaches": "equal shares must be the same size",
-   "representation": "boxed cell, 3–4 B&W cut shapes with check boxes; screen: select all that apply",
+   "option": "forms \"equal or not?\", \"cut it\" and \"choose all that show a fraction\": tell equal from unequal parts; draw lines to cut a shape into halves/quarters (thirds at Gr 2); choose ALL shapes showing one-half / one-third / one-fourth shaded",
+   "name": "Equal Parts of Shapes (option)",
+   "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
+   "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
    "family": "geometry",
    "ccss": [
     "1.G.A.3",
-    "2.G.A.3"
+    "2.G.A.3",
+    "3.G.A.2"
    ],
    "map": [
     {
@@ -6035,7 +6840,27 @@
     }
    ],
    "why": "partition_shapes asks fraction shaded / count parts only; MAP asks which picture shows equal shares",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "equal or not — shapes cut into parts — tick those in equal halves/quarters / select all",
+    "cut it — a blank rectangle or circle — draw lines into halves or quarters / place cut line",
+    "choose all that show — 'Choose ALL shapes with one-third shaded' — tick / select all"
+   ],
+   "levels": [
+    "L1: halves only, equal vs clearly unequal (structural: outline shapes stay; hint: 'same size?' cue fades)",
+    "L2: quarters (fourths)",
+    "L3: cut it yourself (halves, quarters)",
+    "L4: thirds and choose ALL showing a named fraction"
+   ],
+   "example": {
+    "item": "Tick every shape cut into equal quarters.",
+    "answer": "the square cut by two lines through its centre and the rectangle cut into 4 equal strips (not the circle cut into 4 unequal slices)"
+   },
+   "misconceptions": [
+    "counts parts and ignores size (4 unequal parts called quarters)",
+    "thinks a quarter is bigger than a half because 4 > 2",
+    "names one-third as 1/2 when one of three parts is shaded"
+   ]
   },
   "angle_rules": {
    "ccss": [
@@ -6309,6 +7134,7 @@
      "taskType": "build a line plot from data (drag Xs)"
     }
    ],
+   "mapClause": "answer total and difference questions (sum of the lengths) from the plot",
    "reused": true
   },
   "bar_graph_scale": {
@@ -6811,6 +7637,7 @@
      "taskType": "3-D shape properties"
     }
    ],
+   "mapClause": "choose ALL solids with a property (six faces, a curved face)",
    "reused": true
   },
   "polygons": {
@@ -6914,6 +7741,7 @@
      "taskType": "read a table"
     }
    ],
+   "mapClause": "complete a bar or picture graph from the table",
    "reused": true
   },
   "four_quadrants": {
@@ -7098,7 +7926,7 @@
    "option": "look \"bw\": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label",
    "name": "Heavier or Lighter, B&W pictures (option)",
    "teaches": "comparing the mass of two objects by experience and on a pan balance",
-   "representation": "print: one boxed cell, two B&W outline objects labelled A and B (or a tipped balance), pupil circles or writes the letter; screen: click the object (production by selection of the object itself, two choices only)",
+   "representation": "print: B&W boxed cell, two line-art objects or a pan-balance drawing, pupil writes the label from a bank ('heavier'/'lighter') or circles the object; screen: click the object (hot spot)",
    "family": "measurement",
    "ccss": [
     "K.MD.A.2"
@@ -7111,7 +7939,25 @@
     }
    ],
    "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "which is heavier — two objects — circle",
+    "balance — pan balance tipped — write heavier/lighter in the sentence",
+    "order — three objects — number 1-3 lightest to heaviest"
+   ],
+   "levels": [
+    "L1: everyday objects of very different mass (structural: picture stays)",
+    "L2: pan balance drawing (one change: read the balance)",
+    "L3: order three"
+   ],
+   "example": {
+    "item": "A pan balance has a book on the low side and a feather on the high side. The book is ____.",
+    "answer": "heavier"
+   },
+   "misconceptions": [
+    "thinks the higher side is heavier",
+    "thinks the bigger object is always heavier"
+   ]
   },
   "map_volume_expressions": {
    "kind": "option",
@@ -7119,7 +7965,7 @@
    "option": "form \"expressions\": pick every expression that gives the volume (l×w×h, B×h, layers added)",
    "name": "Volume Expressions (option)",
    "teaches": "that l×w×h, base area × height and repeated layers all give the volume",
-   "representation": "print: boxed cell with a B&W prism (edges labelled) and 4-5 expressions with check boxes, pupil ticks all that work; screen: multi-select check boxes (MAP's own form)",
+   "representation": "print: B&W boxed cell, an isometric B&W prism with edge labels and 4 expressions with check boxes; screen: select all that apply",
    "family": "measurement",
    "ccss": [
     "5.MD.C.5a",
@@ -7133,14 +7979,32 @@
     }
    ],
    "why": "MAP's top-band volume item; volume today only computes a number",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "choose all — tick every expression for the volume",
+    "write — write two different expressions",
+    "layers — tick the sum of layers that matches"
+   ],
+   "levels": [
+    "L1: l × w × h in two orders (structural: labelled prism stays)",
+    "L2: add B × h (base area given)",
+    "L3: add layered sums (12 + 12 + 12) and distractors l + w + h"
+   ],
+   "example": {
+    "item": "A box is 4 cm long, 3 cm wide, 2 cm tall. Tick every expression for its volume: 4 × 3 × 2; 4 + 3 + 2; 12 × 2; 12 + 12",
+    "answer": "4 × 3 × 2, 12 × 2, 12 + 12"
+   },
+   "misconceptions": [
+    "adds the edges",
+    "multiplies only two edges"
+   ]
   },
   "map_shape_attribute_sort": {
    "kind": "new",
    "skill": "shapes_classify:attribute_sort_chart",
    "name": "Sort Shapes by Two Attributes",
    "teaches": "sorting figures by line of symmetry, angle type, or both",
-   "representation": "print: boxed cell, 4-6 B&W figures lettered, a 3-column chart (A only / B only / both) where pupil writes letters; screen: drag letters/figures into chart columns",
+   "representation": "print: B&W boxed cell, a 2 × 2 chart (has a line of symmetry / has an acute angle) and 6 lettered shapes; pupil writes letters in cells; screen: drag shapes into the chart (production)",
    "family": "geometry",
    "ccss": [
     "4.G.A.2",
@@ -7154,7 +8018,25 @@
     }
    ],
    "why": "MAP 2-5 sample item; no skill sorts by two attributes",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "sort — drag/write each shape into the chart",
+    "which cell — one shape, tick its cell",
+    "name the rule — sorted chart given, choose the headings"
+   ],
+   "levels": [
+    "L1: one attribute, two boxes (structural: chart stays)",
+    "L2: two attributes, 2 × 2 chart",
+    "L3: angle attribute with obtuse/right distractors"
+   ],
+   "example": {
+    "item": "Sort: square, scalene triangle with an obtuse angle, equilateral triangle, kite.",
+    "answer": "symmetry+acute: equilateral triangle, kite; symmetry only: square; acute only: scalene obtuse triangle (it has acute angles); neither: none"
+   },
+   "misconceptions": [
+    "thinks a right angle is acute",
+    "forgets a shape can go in 'both'"
+   ]
   },
   "time_convert": {
    "ccss": [
@@ -7181,6 +8063,7 @@
      "taskType": "number entry; select all equivalent"
     }
    ],
+   "mapClause": "small → large as h-and-min, decimal and mixed hours (90 min = 1 h 30 min = 1.5 h = 1 ½ h), and choose ALL measurements equal to a time",
    "reused": true
   },
   "map_frac_side_area": {
@@ -7189,7 +8072,7 @@
    "option": "form \"area\": a rectangle with fractional sides (e.g. 2/3 × 3/4 unit) drawn inside a unit square tiled by unit-fraction rectangles; count the tiles, then write the area as a product",
    "name": "Area With Fractional Sides (option)",
    "teaches": "finding the area of a rectangle with fractional side lengths by tiling with unit-fraction squares and showing it equals the product of the sides",
-   "representation": "boxed cell, B&W unit square with the rectangle's tiles outlined (single grey shade), slots \"__ tiles of 1/__ = __\" and \"__ × __ = __\"; screen: fraction number entry, never multiple choice",
+   "representation": "print: B&W boxed Andika cell, a unit square divided into unit-fraction tiles with the rectangle outlined (single grey shade), slots '__ tiles of 1/__ = __' and '__ × __ = __'; screen: fraction number entry, never MC",
    "family": "fractions",
    "ccss": [
     "5.NF.B.4b"
@@ -7202,7 +8085,25 @@
     }
    ],
    "why": "frac_mult_word deals garden-area stories (55/200 dist) and mult_frac_frac an overlap model with no area framing; neither tiles with unit-fraction squares, the clause 5.NF.B.4b names",
-   "reused": false
+   "reused": false,
+   "problemTypes": [
+    "count the tiles — tiled rectangle — write the area",
+    "multiply — side labels only — write the product",
+    "match — show the tiles equal the product"
+   ],
+   "levels": [
+    "L1: unit fraction × whole (1/2 × 3) tiled (structural: grid stays)",
+    "L2: unit × unit fraction (1/2 × 1/3)",
+    "L3: non-unit (2/3 × 3/4); tile lines fade to side labels"
+   ],
+   "example": {
+    "item": "A rectangle is 2/3 unit long and 1/2 unit wide, drawn on a unit square cut into sixths. What is its area?",
+    "answer": "2/6 = 1/3 square unit"
+   },
+   "misconceptions": [
+    "adds the sides",
+    "counts tiles but uses the wrong tile size (1/3 not 1/6)"
+   ]
   },
   "turns_angles": {
    "ccss": [
@@ -7231,7 +8132,49 @@
      "taskType": "angle as a turn of a circle"
     }
    ],
+   "mapClause": "degrees as a fraction of 360 (a quarter turn = 90°, 1/360 of a turn = 1°)",
    "reused": true
+  },
+  "map_measure_story_equation": {
+   "kind": "option",
+   "skill": "algebra:build_expr_addsub",
+   "option": "pool \"measurement\": length, mass, liquid-volume and money stories; build the equation only (no solving)",
+   "name": "Measurement Story to Equation (option)",
+   "teaches": "choosing the operation for a measurement story and writing the equation with units (lengths, masses, volumes, money)",
+   "representation": "print: B&W boxed Andika cell, the story with a bar model under it, slots '__ ○ __ = __' with an operation bank; screen: build-expr (drag numbers and sign), never MC",
+   "family": "measurement",
+   "ccss": [
+    "2.MD.B.5",
+    "3.MD.A.2",
+    "4.MD.A.2"
+   ],
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "181-200",
+     "taskType": "choose/write the equation for a story"
+    }
+   ],
+   "why": "build_expr_addsub builds equations from number stories only; MAP pairs measurement stories with their operation",
+   "reused": false,
+   "problemTypes": [
+    "build — story — write the equation",
+    "which operation — story — circle + or −",
+    "both — write the equation then the answer with its unit"
+   ],
+   "levels": [
+    "L1: length + and − within 100 (structural: bar model stays)",
+    "L2: mass and liquid volume",
+    "L3: money and two-step (bar model fades)"
+   ],
+   "example": {
+    "item": "A ribbon is 45 cm. Ana cuts off 18 cm. Write the equation for the length left.",
+    "answer": "45 − 18 = 27 (27 cm)"
+   },
+   "misconceptions": [
+    "adds whenever the story has two numbers",
+    "drops or mixes units (45 cm − 18 = 27 m)"
+   ]
   }
  },
  "regrades": {
