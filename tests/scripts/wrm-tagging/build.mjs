@@ -104,9 +104,13 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // ---- pre-skills ----
   const allDirect=new Set([...direct,...partial].map(d=>d.key));
   const pre=[],preBuild=[];
-  const addPre=(k,why)=>{k=resolve(k);if(!k||(OV.exclude||[]).includes(k)||allDirect.has(k)||pre.find(p=>p.key===k)||pre.length>=8)return;pre.push({key:k,why});};
+  // hand-chosen related keys win over AUTOMATIC pre entries (rule 10: a key is never in both)
+  const handRel=new Set([...(o.related||[]),...(OV.extraRelated?.[s.id]||[])].map(r=>resolve(r.key)));
+  let autoPre=false;
+  const addPre=(k,why)=>{k=resolve(k);if(!k||(OV.exclude||[]).includes(k)||allDirect.has(k)||pre.find(p=>p.key===k)||pre.length>=8)return;if(autoPre&&handRel.has(k))return;pre.push({key:k,why});};
   const addPB=pid=>{if(build.includes(pid)||preBuild.includes(pid)||preBuild.length>=3)return;preBuild.push(pid);usedProps.add(pid);};
   for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])addPre(p.key,p.why);
+  autoPre=true;
   if(!o.preOnly){
    const wk=lessonWeek[s.id];const ps=wk?priorSteps(wk):[];
    const kept=ps.filter(x=>stepById[x.id]&&feeds(s,stepById[x.id])&&order.indexOf(x.id)<order.indexOf(s.id))
@@ -115,7 +119,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    const prev=b.steps[i-1];
    if(prev&&topic(prev)===topic(s))for(const k of directOf(prev.id).slice(0,2))addPre(k,`${prev.id} ${prev.title} (step before in the block)`);
    for(const x of kept){const st=stepById[x.id];const ks=directOf(x.id);
-     if(!ks.length){for(const pid of propsOf[x.id]||[])addPB(pid);continue;}
+     if(!ks.length){if(topic(st)===topic(s))for(const pid of propsOf[x.id]||[])addPB(pid);continue;}
      for(const k of ks.slice(0,2))addPre(k,`${x.id} ${st.title} (prior learning wk ${wk})`);}
    // fallbacks: earlier steps in the block on the same topic, then the previous year's steps on the same topic
    for(let j=i-2;j>=0&&pre.length<3;j--){const st=b.steps[j];if(topic(st)!==topic(s))continue;for(const k of directOf(st.id).slice(0,1))addPre(k,`${st.id} ${st.title} (earlier in the block)`);}

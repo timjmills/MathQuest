@@ -333,10 +333,6 @@
      "why": "Y2.B1.S5 Partition numbers to 100 (step before in the block)"
     },
     {
-     "key": "placevalue:unit_form",
-     "why": "Y2.B1.S5 Partition numbers to 100 (step before in the block)"
-    },
-    {
      "key": "composing:base10_build",
      "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W02)"
     },
@@ -363,6 +359,10 @@
    ],
    "preBuild": [],
    "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "the same number said as tens and ones before it is written in words"
+    },
     {
      "key": "placevalue:identify",
      "why": "Y2.B1.S4 Use a place value chart (neighbouring step on the same topic: the idea one step before or after)"
@@ -591,10 +591,6 @@
    ],
    "pre": [
     {
-     "key": "placevalue:compare",
-     "why": "Y1.B12.S7 Compare any two numbers (prior learning wk W03)"
-    },
-    {
      "key": "composing:base10_build",
      "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W03)"
     },
@@ -612,6 +608,10 @@
     {
      "key": "measurement:estimate_length",
      "why": "estimating a length, the same judging-by-eye"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "deciding which number is nearer, the same reasoning as an estimate"
     }
    ],
    "note": ""
@@ -2480,14 +2480,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
     }
    ],
    "preBuild": [
@@ -2502,6 +2494,14 @@
     {
      "key": "shapes_early:shape_attributes",
      "why": "describing shapes by their properties"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "matching 3-D shapes to names by their faces"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "naming the shape whose faces are counted"
     }
    ],
    "note": "forms [0] = faces only: the shape_faces proposal is already built (retire it). Owner question: the skill says a cylinder has 3 faces; WRM Y2 says 2 flat faces and 1 curved surface."
@@ -2534,14 +2534,6 @@
     {
      "key": "shapes_early:shape_name_match_2d",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)"
     }
    ],
    "preBuild": [
@@ -2552,6 +2544,14 @@
     {
      "key": "shapes_early:shape_attributes",
      "why": "describing shapes by their properties"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "matching 3-D shapes to names by their properties"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "naming the shape whose edges are counted"
     }
    ],
    "note": ""
@@ -3249,20 +3249,12 @@
    "build": [],
    "pre": [
     {
-     "key": "division:share_into_groups",
-     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W27)"
-    },
-    {
      "key": "patterns:double",
      "why": "Y1.B9.S7 Make doubles (prior learning wk W27)"
     },
     {
      "key": "number_sense:doubles_near_doubles",
      "why": "Y1.B9.S7 Make doubles (prior learning wk W27)"
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y1.B9.S6 Make arrays (prior learning wk W27)"
     },
     {
      "key": "multiplication:dot_array_mult",
@@ -3279,6 +3271,14 @@
     {
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W27)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W27)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W27)"
     }
    ],
    "preBuild": [
@@ -3288,6 +3288,14 @@
     {
      "key": "multiplication:mult_word_problems",
      "why": "equal groups in stories"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "making equal groups from a total, the inverse view"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "equal groups written as \"groups of\" sentences, the next idea"
     }
    ],
    "note": ""
@@ -3323,16 +3331,16 @@
      "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
     },
     {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "Y1.B9.S5 Add equal groups (prior learning wk W28)"
-    },
-    {
      "key": "patterns:seq_5",
      "why": "Y1.B9.S3 Count in 5s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
     }
    ],
    "preBuild": [
@@ -3342,6 +3350,14 @@
     {
      "key": "multiplication:mult_word_problems",
      "why": "equal groups in stories"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "equal groups set out in rows as an array"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "adding the equal groups made"
     }
    ],
    "note": ""
@@ -3427,10 +3443,6 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S3 Add equal groups (step before in the block)"
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W28)"
     },
@@ -3457,6 +3469,10 @@
     {
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
     }
    ],
    "preBuild": [
@@ -3466,6 +3482,10 @@
     {
      "key": "multiplication:mult_facts",
      "why": "the × facts the symbol is used for"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "the × sentence read from a picture of groups"
     }
    ],
    "note": ""
@@ -3500,10 +3520,6 @@
      "why": "Y1.B9.S7 Make doubles (prior learning wk W28)"
     },
     {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y1.B9.S6 Make arrays (prior learning wk W28)"
-    },
-    {
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W28)"
     },
@@ -3514,6 +3530,10 @@
     {
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W28)"
     }
    ],
    "preBuild": [
@@ -3523,6 +3543,10 @@
     {
      "key": "multiplication:mult_word_problems",
      "why": "multiplication sentences in stories"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "the same sentence read from an array"
     }
    ],
    "note": ""
@@ -3563,10 +3587,6 @@
      "why": "Y1.B9.S7 Make doubles (prior learning wk W29)"
     },
     {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "Y1.B9.S5 Add equal groups (prior learning wk W29)"
-    },
-    {
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W29)"
     },
@@ -3590,6 +3610,10 @@
     {
      "key": "multiplication:mult_facts",
      "why": "the facts an array shows"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "an array row by row is a repeated addition"
     }
    ],
    "note": ""
@@ -4095,9 +4119,7 @@
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
     }
    ],
-   "preBuild": [
-    "part_whole"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "composing:odd_even",
@@ -4136,10 +4158,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S14 Divide by 10 (step before in the block)"
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W26)"
     },
@@ -4166,6 +4184,10 @@
     {
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W26)"
     }
    ],
    "preBuild": [],
@@ -4173,6 +4195,10 @@
     {
      "key": "measurement:time_fives_ring",
      "why": "counting in 5s round a clock face"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "the inverse: dividing by 5 (Y2.B5.S16)"
     }
    ],
    "note": ""
@@ -4227,9 +4253,7 @@
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
     }
    ],
-   "preBuild": [
-    "part_whole"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "multiplication:mult_chart_easy",
@@ -4266,10 +4290,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S16 Divide by 5 (step before in the block)"
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W26)"
     },
@@ -4296,6 +4316,10 @@
     {
      "key": "patterns:seq_10",
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W26)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W26)"
     }
    ],
    "preBuild": [],
@@ -4303,6 +4327,10 @@
     {
      "key": "measurement:money_count",
      "why": "counting 5-cent and 10-cent coins"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "the inverse: dividing by 5 and 10"
     }
    ],
    "note": ""
@@ -4355,10 +4383,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 Measure in centimetres (step before in the block)"
-    },
-    {
      "key": "shapes_early:measure_nonstandard",
      "why": "Y1.B7.S2 Measure length using objects (prior learning wk W21)"
     },
@@ -4376,6 +4400,10 @@
     {
      "key": "measurement:estimate_length",
      "why": "choosing cm or m for an object"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "measuring on a scale (the ruler)"
     }
    ],
    "note": ""
@@ -4575,8 +4603,8 @@
    ],
    "related": [
     {
-     "key": "measurement:unit_conversions",
-     "why": "grams and kilograms as units of the same mass (later: 1 kg = 1,000 g)"
+     "key": "number_sense:place_on_number_line",
+     "why": "a scale is a number line: find the value at the pointer"
     }
    ],
    "note": ""
@@ -4611,8 +4639,8 @@
    ],
    "related": [
     {
-     "key": "measurement:unit_conversions",
-     "why": "kilograms and grams as units of the same mass"
+     "key": "number_sense:place_on_number_line",
+     "why": "a scale is a number line: find the value at the pointer"
     }
    ],
    "note": ""
@@ -4994,10 +5022,6 @@
    "build": [],
    "pre": [
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S3 Recognise a half (step before in the block)"
-    },
-    {
      "key": "fractions:fraction_of_set",
      "why": "Y1.B10.S7 Recognise a quarter of a quantity (prior learning wk W17)"
     },
@@ -5016,6 +5040,10 @@
    ],
    "preBuild": [],
    "related": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 recognising a half of a shape"
+    },
     {
      "key": "patterns:double",
      "why": "doubling is the inverse of halving"
@@ -6192,9 +6220,7 @@
      "why": "Y2.B10.S1 Make tally charts (earlier in the block)"
     }
    ],
-   "preBuild": [
-    "part_whole"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "graphs:bar_graph",
@@ -6487,7 +6513,8 @@
    "family": "operations",
    "steps": [
     "Y2.B2.S5",
-    "Y2.B2.S12"
+    "Y2.B2.S12",
+    "Y3.B2.S2"
    ],
    "ccss": [
     "1.NBT.C.4",
@@ -6529,7 +6556,8 @@
    "family": "operations",
    "steps": [
     "Y1.B12.S3",
-    "Y2.B2.S14"
+    "Y2.B2.S14",
+    "Y3.B2.S3"
    ],
    "ccss": [
     "1.NBT.C.4",
@@ -6677,7 +6705,7 @@
    "family": "measurement",
    "steps": [
     "Y2.B4.S7",
-    "Y3.B9.S5"
+    "Y3.B9.S4"
    ],
    "ccss": [
     "2.MD.C.8"
@@ -6767,22 +6795,6 @@
    ],
    "ccss": [
     "3.OA.A.1"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "part_whole": {
-   "kind": "new",
-   "skill": "composing:part_whole_model",
-   "name": "Part-Whole Model",
-   "teaches": "parts and wholes: the cherry part-whole model, writing the four number sentences it shows, and finding a missing part",
-   "representation": "the bar/cherry part-whole diagram in B&W with one box empty; write the missing part or the number sentence",
-   "family": "operations",
-   "steps": [
-    "Y1.B2.S1"
-   ],
-   "ccss": [
-    "K.OA.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
@@ -6993,7 +7005,8 @@
     "Y2.B8.S8",
     "Y2.B8.S12",
     "Y2.B8.S13",
-    "Y2.B8.S14"
+    "Y2.B8.S14",
+    "Y3.B8.S4"
    ],
    "ccss": [
     "1.G.A.3",
@@ -7442,6 +7455,13 @@
   }
  ],
  "retireBuilt": [
+  {
+   "id": "count_50s",
+   "by": "multiplication:count_by_tables {rows:[{step:50,start:\"zero\"}]} closes Y3.B1.S14; still open for Y3.B1.S4 (100s run past 1,000) and Y4",
+   "steps": [
+    "Y3.B1.S14"
+   ]
+  },
   {
    "id": "count_3s",
    "by": "multiplication:count_by_tables {rows:[{step:3,start:\"zero\"}]}",
