@@ -213,9 +213,18 @@
   },
   "Y4.B1.S4": {
    "title": "Thousands",
-   "direct": [
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:place_value_disks",
+     "missing": "reads 4-digit numbers from counters; never shows 1,000 as 10 hundreds or counts in 1,000s",
+     "opts": {
+      "band": 9999
+     }
+    },
     {
      "key": "patterns:count_by_powers_of_10",
+     "missing": "generated items count in 10,000s-1,000,000s, not 1,000s within 10,000",
      "opts": {
       "step": [
        2
@@ -223,17 +232,8 @@
      }
     }
    ],
-   "partial": [
-    {
-     "key": "placevalue:place_value_disks",
-     "missing": "1,000 shown as 10 hundreds (the exchange) and thousands counted in base-10 cubes",
-     "opts": {
-      "band": 9999
-     }
-    }
-   ],
    "verdict": "partial",
-   "missing": "1,000 = 10 hundreds = 100 tens as an exchange; counting in 1,000s from any multiple of 1,000 with base-10 cubes",
+   "missing": "1,000 = 10 hundreds as an exchange; counting in 1,000s within 10,000",
    "build": [
     "regroup_thousands",
     "count_50s"
@@ -278,7 +278,7 @@
      "why": "a digit moving into the thousands place"
     }
    ],
-   "note": "School teaches this step in W33 (enrichment after MAP)."
+   "note": "Generated: count_by_powers_of_10 {step:[2]} gave \"Count down by 100,000s\", \"Count up by 1,000,000s\"; no 1,000s within 10,000."
   },
   "Y4.B1.S5": {
    "title": "Represent numbers to 10,000",
@@ -307,15 +307,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "Y4.B1.S4 Thousands (step before in the block)",
-     "opts": {
-      "step": [
-       2
-      ]
-     }
-    },
     {
      "key": "placevalue:compare",
      "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W33)",
@@ -484,9 +475,7 @@
      }
     }
    ],
-   "preBuild": [
-    "flex_partition"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:combine",
@@ -571,10 +560,6 @@
      "why": "adding and subtracting 100s is the same move"
     },
     {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "counting on in 10s, 100s and 1,000s"
-    },
-    {
      "key": "placevalue:value",
      "why": "which digit changes and why",
      "opts": {
@@ -624,10 +609,6 @@
      "opts": {
       "band": 999
      }
-    },
-    {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "Y4.B1.S4 Thousands (lower grade, same CCSS cluster)"
     }
    ],
    "preBuild": [],
@@ -953,7 +934,7 @@
      }
     }
    ],
-   "note": ""
+   "note": "Generated: rounding_visual {place:10, band:1000} rounds 3-digit numbers (272 → 270); nearest_10 deals 2-digit numbers, the review form."
   },
   "Y4.B1.S15": {
    "title": "Round to the nearest 100",
@@ -1131,10 +1112,6 @@
       "span": 100,
       "band": 1000
      }
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W13)"
     }
    ],
    "preBuild": [],
@@ -1176,8 +1153,7 @@
    "verdict": "partial",
    "missing": "adding and subtracting multiples of 1, 10, 100 and 1,000 to and from 4-digit numbers, including crossing a boundary",
    "build": [
-    "add_sub_place_units",
-    "add_sub_patterns"
+    "add_sub_place_units"
    ],
    "pre": [
     {
@@ -1223,10 +1199,6 @@
      "opts": {
       "band": 9999
      }
-    },
-    {
-     "key": "patterns:count_by_powers_of_10",
-     "why": "counting on in 10s, 100s, 1,000s"
     }
    ],
    "note": ""
@@ -1293,7 +1265,7 @@
    "partial": [
     {
      "key": "addition:add_10k_regroup",
-     "missing": "items cannot be held to exactly ONE exchange; the skill deals any number of exchanges"
+     "missing": "generated items mix one and several exchanges and include 3-digit + 3-digit (868 + 697)"
     }
    ],
    "verdict": "partial",
@@ -1349,7 +1321,7 @@
    "partial": [
     {
      "key": "addition:add_10k_regroup",
-     "missing": "items cannot be held to MORE THAN ONE exchange; many items have only one"
+     "missing": "generated items mix one and several exchanges (8,357 + 484 has two, 1,678 + 235 has two, 4,678 + 4,813 three)"
     }
    ],
    "verdict": "partial",
@@ -1680,7 +1652,7 @@
    "partial": [
     {
      "key": "subtraction:sub_check_by_adding",
-     "missing": "2-digit items only; no checking an addition by subtracting, no 4-digit numbers, no checking by estimating"
+     "missing": "generated: 3-digit subtractions only (525 − 457 = 68); no checking an addition by subtracting, no 4-digit numbers, no checking by estimating"
     }
    ],
    "verdict": "partial",
@@ -1774,10 +1746,6 @@
     {
      "key": "counting:count_objects",
      "why": "Y1.B4.S1 Count within 20 (prior learning wk W18)"
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
     }
    ],
    "preBuild": [],
@@ -1825,10 +1793,6 @@
      "why": "Y1.B4.S1 Count within 20 (prior learning wk W18)"
     },
     {
-     "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)"
-    },
-    {
      "key": "shapes_early:partition_shapes",
      "why": "Y2.B8.S3 Recognise a half (lower grade, same CCSS cluster)"
     }
@@ -1856,7 +1820,7 @@
    "partial": [
     {
      "key": "shapes_early:compose_rect_from_squares",
-     "missing": "fills a given rectangle; does not ask for different shapes with the same area"
+     "missing": "generated: every item is the same 2 × 3 rectangle to fill; never different shapes with the same area"
     }
    ],
    "verdict": "partial",
@@ -1945,15 +1909,6 @@
     {
      "key": "area_perimeter:perimeter_grid",
      "why": "compare perimeters on the same shapes"
-    },
-    {
-     "key": "graphs:bar_graph",
-     "why": "\"how many more\" comparison in another form",
-     "opts": {
-      "forms": [
-       2
-      ]
-     }
     }
    ],
    "note": ""
@@ -1968,10 +1923,6 @@
        3
       ]
      }
-    },
-    {
-     "key": "number_theory:multiples",
-     "opts": {}
     },
     {
      "key": "multiplication:mult_chart",
@@ -2040,19 +1991,15 @@
      }
     },
     {
+     "key": "number_theory:multiples",
+     "why": "multiples of other numbers (no table option: it mixes 6, 7, 8 …)"
+    },
+    {
      "key": "patterns:skip_count_line",
      "why": "counting in 3s on a line"
-    },
-    {
-     "key": "number_theory:divisibility_sort",
-     "why": "is it a multiple of 3?"
-    },
-    {
-     "key": "multiplication:nl_mult",
-     "why": "jumps of 3"
     }
    ],
-   "note": "number_theory:multiples has no table option; its items mix tables. Pair it with count_by_tables/mult_chart held to 3."
+   "note": "Generated: number_theory:multiples has no table option and dealt multiples of 8, 6, 10, 7, 9 — moved to related."
   },
   "Y4.B4.S2": {
    "title": "Multiply and divide by 6",
@@ -3026,10 +2973,6 @@
     {
      "key": "multiplication:mult_chart",
      "why": "the 0 and 1 rows"
-    },
-    {
-     "key": "algebra:solve_unknown",
-     "why": "__ × 7 = 0"
     }
    ],
    "note": ""
@@ -3085,10 +3028,6 @@
        5
       ]
      }
-    },
-    {
-     "key": "composing:odd_even",
-     "why": "Y2.B5.S12 Odd and even numbers (prior learning wk W04)"
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3149,10 +3088,6 @@
     {
      "key": "multiplication:mult_zeros",
      "why": "making 10 first (2 × 5)"
-    },
-    {
-     "key": "order_of_operations:two_ops_no_paren",
-     "why": "two operations in one expression"
     },
     {
      "key": "number_theory:factor_links_easy",
@@ -3242,7 +3177,7 @@
    "verdict": "partial",
    "missing": "using a factor pair to multiply mentally (14 × 5 = 7 × 2 × 5 = 7 × 10)",
    "build": [
-    "mult_three"
+    "factor_pair_strategy"
    ],
    "pre": [
     {
@@ -3267,9 +3202,7 @@
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "number_theory:factors_identify",
@@ -3629,7 +3562,7 @@
    "verdict": "partial",
    "missing": "writing the related multiplication and division facts from one known fact scaled by 10 (3 × 4 = 12 so 30 × 4 = 120, 120 ÷ 4 = 30, 120 ÷ 30 = 4)",
    "build": [
-    "tables_links"
+    "scaled_fact_family"
    ],
    "pre": [
     {
@@ -3892,7 +3825,14 @@
    "title": "Divide a 2-digit number by a 1-digit number (1)",
    "direct": [
     {
+     "key": "division:area_model_div_2by1",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
      "key": "division:divide",
+     "missing": "generated items mix no-exchange (88 ÷ 2) with exchange (76 ÷ 4, 96 ÷ 4)",
      "opts": {
       "tiles": 21,
       "regroup": "none"
@@ -3900,17 +3840,14 @@
     },
     {
      "key": "division:box_division_easy",
-     "opts": {}
-    },
-    {
-     "key": "division:area_model_div_2by1",
-     "opts": {}
+     "missing": "generated items mix no-exchange (86 ÷ 2) and exchange (72 ÷ 4)"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page held to no exchange (84 ÷ 4, 69 ÷ 3)",
+   "build": [
+    "div_exchange"
+   ],
    "pre": [
     {
      "key": "division:share_into_groups",
@@ -3954,40 +3891,32 @@
      "why": "division on a number line"
     }
    ],
-   "note": ""
+   "note": "area_model_div_2by1 is the WRM partition picture; it is direct for the method but the page cannot be held to no exchange either."
   },
   "Y4.B5.S12": {
    "title": "Divide a 2-digit number by a 1-digit number (2)",
    "direct": [
     {
-     "key": "division:divide",
-     "opts": {
-      "tiles": 21,
-      "regroup": "always"
-     }
-    },
-    {
      "key": "division:area_model_div_2by1",
      "opts": {}
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
-   "pre": [
+   "partial": [
     {
      "key": "division:divide",
-     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (step before in the block)",
+     "missing": "exchange items appear (76 ÷ 4) but mixed with no-exchange items",
      "opts": {
       "tiles": 21,
       "regroup": "none"
      }
-    },
-    {
-     "key": "division:box_division_easy",
-     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (prior learning wk W06)"
-    },
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page held to an exchange of a ten with no remainder (52 ÷ 4, 72 ÷ 3)",
+   "build": [
+    "div_exchange"
+   ],
+   "pre": [
     {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
@@ -4002,25 +3931,29 @@
     },
     {
      "key": "composing:base10_regroup",
-     "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
+     "why": "trading 1 ten for 10 ones (the exchange inside the division)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "division:remainder_interpret",
-     "why": "what a remainder means when the exchange leaves one"
+     "key": "division:divide",
+     "why": "the same layout with a remainder every item (generated: 78 ÷ 4 = 19 R 2)",
+     "opts": {
+      "tiles": 21,
+      "regroup": "always"
+     }
     },
     {
      "key": "division:div_check_by_multiplying",
-     "why": "check"
+     "why": "check by multiplying"
     },
     {
      "key": "division:remainder_too_big",
      "why": "is the remainder finished?"
     }
    ],
-   "note": "Step (2) is the exchange of a ten into ones (52 ÷ 4). box_division_easy deals exact no-exchange quotients, so it belongs to S11; divide with regroup \"always\" gives the exchange. Remainders stay a pre-skill (Y3.B4.S9)."
+   "note": "Generated: divide {regroup:\"always\"} gives a remainder on every item, so \"regroup\" is the remainder option, not the exchange."
   },
   "Y4.B5.S13": {
    "title": "Divide a 3-digit number by a 1-digit number",
@@ -4143,7 +4076,8 @@
    "verdict": "partial",
    "missing": "choosing an efficient strategy for a given multiplication: doubling, near multiples (9 × 7 = 10 × 7 − 7), factor pairs, partitioning",
    "build": [
-    "tables_links"
+    "tables_links",
+    "factor_pair_strategy"
    ],
    "pre": [
     {
@@ -4166,9 +4100,7 @@
      "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (prior learning wk W06)"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "multiplication:area_model_mult",
@@ -4191,7 +4123,7 @@
    "partial": [
     {
      "key": "measurement:length_metric",
-     "missing": "converts whole km to m only; no sense of 1 km, no mixed measures (2 km 300 m), no choosing km or m",
+     "missing": "generated: only \"How many m are in 7 km?\"; no sense of 1 km, no mixed km and m",
      "opts": {
       "forms": [
        3
@@ -4353,10 +4285,6 @@
     {
      "key": "counting:count_objects",
      "why": "Y1.B4.S1 Count within 20 (prior learning wk W19)"
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W19)"
     }
    ],
    "preBuild": [],
@@ -4548,10 +4476,6 @@
     {
      "key": "subtraction:sub_100_mixed",
      "why": "the subtraction used"
-    },
-    {
-     "key": "coordinates:coord_distance_q1",
-     "why": "side lengths read from coordinates"
     }
    ],
    "note": "composite_shapes asks only for the perimeter; it never asks for the missing side by itself."
@@ -4598,9 +4522,7 @@
      "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "missing_lengths"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "area_perimeter:area_polygon_decompose",
@@ -4651,9 +4573,7 @@
      "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "polygons"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "shapes_classify:classify_triangles",
@@ -4799,9 +4719,7 @@
      "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W07)"
     }
    ],
-   "preBuild": [
-    "frac_count"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "fractions:mixed_nl_drag",
@@ -5663,7 +5581,9 @@
    "direct": [
     {
      "key": "decimals:decimal_nl_drag",
-     "opts": {}
+     "opts": {
+      "ticks": "one"
+     }
     }
    ],
    "partial": [],
@@ -5705,13 +5625,15 @@
      "why": "position shows which is greater"
     }
    ],
-   "note": "decimal_nl_drag samples are tenths on 0-1; numbers past 1 should be checked by the critic."
+   "note": "Generated: tenths on a 0-1 line (0.2, 0.4, 0.8). WRM also goes past 1; the 0-1 line is the core of the step."
   },
   "Y4.B8.S5": {
    "title": "Divide a 1-digit number by 10",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "placevalue:place_value_10x",
+     "missing": "generated items divide 3-digit numbers (274 ÷ 10); the step needs only 1-digit numbers ÷ 10 (7 ÷ 10 = 0.7)",
      "opts": {
       "op": "/",
       "power": [
@@ -5721,10 +5643,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "only 1-digit numbers ÷ 10 (7 ÷ 10 = 0.7)",
+   "build": [
+    "div10_small_numbers"
+   ],
    "pre": [
     {
      "key": "placevalue:place_value_10x",
@@ -5781,9 +5704,11 @@
   },
   "Y4.B8.S6": {
    "title": "Divide a 2-digit number by 10",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "placevalue:place_value_10x",
+     "missing": "generated items divide 3-digit numbers (274 ÷ 10); the step needs only 2-digit numbers ÷ 10 (34 ÷ 10 = 3.4)",
      "opts": {
       "op": "/",
       "power": [
@@ -5793,10 +5718,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "only 2-digit numbers ÷ 10 (34 ÷ 10 = 3.4)",
+   "build": [
+    "div10_small_numbers"
+   ],
    "pre": [
     {
      "key": "placevalue:place_value_10x",
@@ -6016,9 +5942,7 @@
      "why": "trading 1 ten for 10 ones with base-10 blocks (Grade 1-2 regrouping, the model of an exchange)"
     }
    ],
-   "preBuild": [
-    "decimal_pv"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:expand",
@@ -6037,9 +5961,11 @@
   },
   "Y4.B8.S10": {
    "title": "Divide a 1- or 2-digit number by 100",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "placevalue:place_value_10x",
+     "missing": "generated items divide 3-digit numbers (274 ÷ 100); the step needs 1- and 2-digit numbers ÷ 100 (7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34)",
      "opts": {
       "op": "/",
       "power": [
@@ -6049,10 +5975,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "1- and 2-digit numbers ÷ 100 (7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34)",
+   "build": [
+    "div10_small_numbers"
+   ],
    "pre": [
     {
      "key": "placevalue:place_value_10x",
@@ -6190,9 +6117,7 @@
      "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "decimal_whole"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:money_change",
@@ -6235,9 +6160,7 @@
      "why": "Y3.B1.S6 Partition numbers to 1,000 (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "decimal_pv"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "decimals:compare_decimal",
@@ -6285,7 +6208,6 @@
     }
    ],
    "preBuild": [
-    "decimal_pv",
     "flex_partition"
    ],
    "related": [
@@ -6524,7 +6446,9 @@
    "direct": [
     {
      "key": "measurement:money_notation",
-     "opts": {}
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "partial": [],
@@ -6574,7 +6498,10 @@
    "partial": [
     {
      "key": "measurement:money_notation",
-     "missing": "writes the amount shown; never converts 345¢ ↔ $3.45"
+     "missing": "writes the amount shown in coins; never converts 345¢ ↔ $3.45",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "verdict": "partial",
@@ -6630,7 +6557,10 @@
    "partial": [
     {
      "key": "measurement:money_compare",
-     "missing": "compares two sets of coins; not written amounts ($2.35 vs 189¢) or ordering three amounts"
+     "missing": "coin sets only, and no US currency option (plain or riyal); not written amounts or ordering",
+     "opts": {
+      "response": "sign"
+     }
     }
    ],
    "verdict": "partial",
@@ -6639,6 +6569,10 @@
     "money_compare_written"
    ],
    "pre": [
+    {
+     "key": "measurement:money_compare",
+     "why": "Y2.B4.S6"
+    },
     {
      "key": "measurement:money_notation",
      "why": "Y3.B9.S1 Pounds and pence (prior learning wk W22)"
@@ -6676,7 +6610,7 @@
      "why": "ordering"
     }
    ],
-   "note": ""
+   "note": "money_compare has no usd value: the money_compare_written option should add it."
   },
   "Y4.B10.S4": {
    "title": "Estimate with money",
@@ -6732,11 +6666,21 @@
    "direct": [
     {
      "key": "measurement:money",
-     "opts": {}
+     "opts": {
+      "currency": "usd",
+      "step": 5,
+      "band": 2000,
+      "regroup": "mixed"
+     }
     },
     {
      "key": "measurement:money_change",
-     "opts": {}
+     "opts": {
+      "currency": "usd",
+      "step": 5,
+      "band": 2000,
+      "paid": "note"
+     }
     }
    ],
    "partial": [],
@@ -6745,16 +6689,20 @@
    "build": [],
    "pre": [
     {
+     "key": "measurement:money",
+     "why": "Y3.B9.S3"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "Y3.B9.S5"
+    },
+    {
      "key": "measurement:enough_money",
      "why": "Y2.B4.S7 Calculate with money (prior learning wk W07)"
     },
     {
      "key": "addition:add_1k_regroup",
      "why": "Y3.B2.S13 Add two numbers (across a 10) (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "fractions:identify",
-     "why": "Y2.B8.S10 Unit fractions (prior learning wk W07)"
     }
    ],
    "preBuild": [],
@@ -6772,7 +6720,7 @@
      "why": "multiple items at one price"
     }
    ],
-   "note": ""
+   "note": "Generated with defaults the money skill added whole dollars only (16, 8); with step 5 and USD it deals dollars and cents."
   },
   "Y4.B10.S6": {
    "title": "Solve problems with money",
@@ -6780,11 +6728,19 @@
    "partial": [
     {
      "key": "measurement:money",
-     "missing": "one-step totals only"
+     "missing": "one-step totals only",
+     "opts": {
+      "currency": "usd",
+      "step": 5
+     }
     },
     {
      "key": "measurement:money_change",
-     "missing": "one-step change only"
+     "missing": "one-step change only",
+     "opts": {
+      "currency": "usd",
+      "step": 5
+     }
     }
    ],
    "verdict": "partial",
@@ -6853,8 +6809,7 @@
     }
    ],
    "preBuild": [
-    "day_order",
-    "time_calendar"
+    "day_order"
    ],
    "related": [
     {
@@ -6864,10 +6819,6 @@
     {
      "key": "measurement:unit_conversions",
      "why": "conversion tables"
-    },
-    {
-     "key": "measurement:elapsed_mixed",
-     "why": "time intervals"
     }
    ],
    "note": "The xlsx prior list (Days of the week, Months of the year, Y3 Years, months and days) maps to no live skill."
@@ -6929,11 +6880,17 @@
    "direct": [
     {
      "key": "measurement:time_analog_digital",
-     "opts": {}
+     "opts": {
+      "dir": "to-digital",
+      "precision": 1
+     }
     },
     {
-     "key": "measurement:time_match_clock",
-     "opts": {}
+     "key": "measurement:time_analog_digital",
+     "opts": {
+      "dir": "to-analog",
+      "precision": 1
+     }
     }
    ],
    "partial": [],
@@ -7166,9 +7123,7 @@
      "why": "Y3.B11.S8 Draw polygons (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "turns_angles"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "angles_lines:measure_angles",
@@ -7215,9 +7170,7 @@
      "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W28)"
     }
    ],
-   "preBuild": [
-    "polygons"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "shapes_classify:classify_quads",
@@ -7273,10 +7226,6 @@
     {
      "key": "shapes_early:shape_attributes",
      "why": "attributes of shapes"
-    },
-    {
-     "key": "area_perimeter:perimeter",
-     "why": "rectangle perimeter"
     },
     {
      "key": "shapes_classify:mixed_shapes",
@@ -7402,9 +7351,7 @@
      "why": "Y4.B6.S3 Perimeter on a grid (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "symmetry_complete"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "coordinates:geo_reflect",
@@ -7619,9 +7566,7 @@
      "why": "Y4.B14.S2 Plot coordinates (lower grade, same CCSS cluster)"
     }
    ],
-   "preBuild": [
-    "line_graph"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "graphs:build_bar_graph",
@@ -7740,10 +7685,6 @@
     {
      "key": "shapes_early:shape_positions",
      "why": "Y2.B11.S1 Language of position (prior learning wk W29)"
-    },
-    {
-     "key": "fractions:identify",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W29)"
     }
    ],
    "preBuild": [
@@ -7800,10 +7741,6 @@
     {
      "key": "coordinates:geo_rotate",
      "why": "rotation"
-    },
-    {
-     "key": "addition:add_facts",
-     "why": "adding to the x and y coordinates"
     }
    ],
    "note": ""
@@ -7836,9 +7773,7 @@
      "why": "subtracting within 20 fluently (Grade 1-2 fact fluency)"
     }
    ],
-   "preBuild": [
-    "translate_grid"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "coordinates:geo_reflect",
@@ -7998,22 +7933,6 @@
     "Y4.B2.S2"
    ],
    "reused": false
-  },
-  "add_sub_patterns": {
-   "kind": "new",
-   "skill": "addition:add_sub_patterns",
-   "name": "Spot the Pattern (+/−)",
-   "teaches": "using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same",
-   "representation": "a three-row fact ladder with the first row done; complete the others",
-   "family": "operations",
-   "steps": [
-    "Y4.B2.S1",
-    "Y3.B2.S10",
-    "Y3.B2.S2",
-    "Y3.B2.S5"
-   ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
   },
   "exchange_count_add": {
    "kind": "option",
@@ -8183,15 +8102,50 @@
    "family": "operations",
    "steps": [
     "Y4.B4.S12",
-    "Y4.B4.S13",
-    "Y4.B5.S2",
-    "Y4.B5.S15"
+    "Y4.B4.S13"
    ],
    "improves": [
     "Y4.B5.S2"
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "factor_pair_strategy": {
+   "kind": "option",
+   "skill": "multiplication:mult_properties",
+   "option": "form \"split a factor into a factor pair\"",
+   "name": "Use Factor Pairs to Multiply (option)",
+   "teaches": "replacing a factor by a factor pair to make the product easy: 14 × 5 = 7 × 2 × 5 = 7 × 10; 12 × 4 = 12 × 2 × 2",
+   "representation": "equation chain cell: 14 × 5 = □ × □ × 5 = □ × 10 = □, boxes in a row; the factor pair drawn as two branches under the split factor (hint, fades)",
+   "family": "multiplication",
+   "ccss": [
+    "3.OA.B.5",
+    "4.OA.B.4"
+   ],
+   "why": "mult_properties breaks apart by addition only; mult_three multiplies three given numbers and never splits one",
+   "steps": [
+    "Y4.B5.S2",
+    "Y4.B5.S15"
+   ],
+   "reused": false
+  },
+  "scaled_fact_family": {
+   "kind": "option",
+   "skill": "multiplication:mult_zeros",
+   "option": "form \"related facts ×10\" (both operations)",
+   "name": "Related Facts Times Ten (option)",
+   "teaches": "from a known fact write the scaled facts: 3 × 4 = 12 so 30 × 4 = 120, 120 ÷ 4 = 30, 120 ÷ 30 = 4",
+   "representation": "a known-fact box at the top of the cell, then three equations with one answer box each; place-value counters beside the first (hint, fades)",
+   "family": "multiplication",
+   "ccss": [
+    "3.NBT.A.3",
+    "3.OA.B.6"
+   ],
+   "why": "mult_zeros {forms:[2]} deals only the multiplication (generated: 70 × 4, 8 × 30); tables_links is about doubling tables, not ×10",
+   "steps": [
+    "Y4.B5.S7"
+   ],
+   "reused": false
   },
   "informal_mult": {
    "kind": "new",
@@ -8235,6 +8189,25 @@
    ],
    "reused": true,
    "source": "VISUAL_BUILDS"
+  },
+  "div_exchange": {
+   "kind": "option",
+   "skill": "division:divide",
+   "option": "exchange \"none\" / \"in the tens\" (tiles 21, 31)",
+   "name": "Division With or Without an Exchange (option)",
+   "teaches": "2- and 3-digit ÷ 1-digit held to no exchange (84 ÷ 4) or to an exchange of a ten (52 ÷ 4), with no remainder",
+   "representation": "the existing bus-stop/bracket cell with the exchange box; only the dealing changes",
+   "family": "division",
+   "ccss": [
+    "3.OA.B.5",
+    "4.NBT.B.6"
+   ],
+   "why": "generated: divide {regroup:\"none\"} mixes 76 ÷ 4 (exchange) with 88 ÷ 2 (none); regroup \"always\" means a remainder, not an exchange",
+   "steps": [
+    "Y4.B5.S11",
+    "Y4.B5.S12"
+   ],
+   "reused": false
   },
   "correspondence": {
    "kind": "new",
@@ -8331,7 +8304,6 @@
    "family": "geometry",
    "steps": [
     "Y4.B6.S8",
-    "Y4.B12.S4",
     "Y4.B12.S6",
     "Y5.B10.S9"
    ],
@@ -8540,6 +8512,26 @@
    ],
    "reused": true,
    "source": "VISUAL_BUILDS"
+  },
+  "div10_small_numbers": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "band \"1-digit\" and \"2-digit\" when decimals are on",
+   "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+   "teaches": "7 ÷ 10 = 0.7, 34 ÷ 10 = 3.4, 7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34 on a place-value chart with the digits sliding right",
+   "representation": "the existing shift-chart cell (O . t h columns, arrows under the digits), one decimal answer box with a fixed point",
+   "family": "placevalue",
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.2"
+   ],
+   "why": "generated: place_value_10x {op:\"/\", decimals:true} dealt 274 ÷ 10, 866 ÷ 100; the smallest band is 1,000",
+   "steps": [
+    "Y4.B8.S5",
+    "Y4.B8.S6",
+    "Y4.B8.S10"
+   ],
+   "reused": false
   },
   "vis_hundred_square": {
    "lane": "fractions",
@@ -9064,12 +9056,6 @@
    "why": "missing tag: draw counters for a 3-digit number"
   },
   {
-   "key": "patterns:count_by_powers_of_10",
-   "step": "Y4.B1.S4",
-   "action": "add",
-   "why": "missing tag: counting in 1,000s (opts step [2])"
-  },
-  {
    "key": "placevalue:place_value_disks",
    "step": "Y4.B1.S1",
    "action": "add",
@@ -9127,7 +9113,7 @@
    "key": "subtraction:sub_check_by_adding",
    "step": "Y4.B2.S10",
    "action": "partial",
-   "why": "2-digit subtraction only; the step checks 4-digit sums and differences both ways"
+   "why": "3-digit subtraction only (generated); the step checks 4-digit sums and differences both ways"
   },
   {
    "key": "addition:add_sub_100s",
@@ -9224,12 +9210,6 @@
    "step": "Y4.B5.S2",
    "action": "partial",
    "why": "kept partial (breaking apart by addition, not a factor pair)"
-  },
-  {
-   "key": "division:box_division_easy",
-   "step": "Y4.B5.S12",
-   "action": "remove",
-   "why": "deals exact quotients with no exchange-plus-remainder; it is the S11 skill"
   },
   {
    "key": "multiplication:multiply",
@@ -9358,12 +9338,6 @@
    "why": "mixes fifths"
   },
   {
-   "key": "placevalue:place_value_10x",
-   "step": "Y4.B8.S5",
-   "action": "add",
-   "why": "re-tag as FULL with op ÷, power [10], decimals on (S6 same; S10 power [100])"
-  },
-  {
    "key": "decimals:compare_decimal",
    "step": "Y4.B9.S5",
    "action": "partial",
@@ -9428,6 +9402,54 @@
    "step": "Y4.B14.S5",
    "action": "partial",
    "why": "multiple choice of the image; does not describe a translation"
+  },
+  {
+   "key": "patterns:count_by_powers_of_10",
+   "step": "Y4.B1.S4",
+   "action": "partial",
+   "why": "generated items count in 10,000s and up, not 1,000s"
+  },
+  {
+   "key": "number_theory:multiples",
+   "step": "Y4.B4.S1",
+   "action": "remove",
+   "why": "no table option; generated items are multiples of 6, 7, 8, 9, 10"
+  },
+  {
+   "key": "division:box_division_easy",
+   "step": "Y4.B5.S11",
+   "action": "partial",
+   "why": "mixes exchange and no-exchange items"
+  },
+  {
+   "key": "division:box_division_easy",
+   "step": "Y4.B5.S12",
+   "action": "remove",
+   "why": "not an exchange-only page; S11 skill"
+  },
+  {
+   "key": "division:area_model_div_2by1",
+   "step": "Y4.B5.S11",
+   "action": "add",
+   "why": "direct method; page not held to no exchange"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B8.S5",
+   "action": "partial",
+   "why": "generated 3-digit ÷ 10; step is 1-digit (S6 2-digit, S10 ÷100 likewise)"
+  },
+  {
+   "key": "measurement:money_notation",
+   "step": "Y4.B10.S1",
+   "action": "add",
+   "why": "full with opts currency usd"
+  },
+  {
+   "key": "measurement:money_change",
+   "step": "Y4.B10.S5",
+   "action": "add",
+   "why": "full with opts currency usd, step 5"
   }
  ]
 }
