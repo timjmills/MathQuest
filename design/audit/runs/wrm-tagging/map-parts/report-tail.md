@@ -5,7 +5,7 @@
 - `measurement:heavier_lighter_visual` answers with emoji (200/200), which breaks black-and-white print (`map_heavier_lighter_bw`).
 - `order_of_operations:paren_simple` deals products near 1,400, far above MAP's small-number order-of-operations items.
 - `angles_lines:additive_angles` deals reflex parts such as 292° of 360°, beyond MAP grades 2–5.
-- `area_perimeter:volume_composite` ("composite" volume) deals single prisms only: 0 composite solids in 200 items (`map_volume_two_prisms`).
+- `area_perimeter:volume_composite` ("composite" volume) deals single prisms only: 0 composite solids in 200 items (`volume_composite_repair`, reused).
 - `graphs:line_plot` labels unsimplified fractions ("4/8 inches"); `measurement:mass_volume_liquid` answers 0 on half of its "read the scale" items.
 
 ## Owner questions (with suggested answers)
