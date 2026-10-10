@@ -4316,6 +4316,580 @@
    ],
    "note": "The week's prior-learning slot is the Base Ten test, so pre-skills come from the block."
   },
+  "Y6.B9.S1": {
+   "title": "Decimal and fraction equivalents",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:f_to_d",
+     "missing": "denominators 2, 4, 5, 10 and 100 only; never 20, 25, 50 or a thousandths denominator (7/20 = 35/100 = 0.35; 3/8 = 375/1000)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "missing": "decimals to 2 dp back to fractions; no thousandths"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "converting fractions with denominators that are factors of 10, 100 or 1,000 (20, 25, 50, 125, 8) to decimals by making an equivalent fraction, and thousandths both ways",
+   "build": [
+    "f_to_d_factors"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W20)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y4.B9.S8 Halves and quarters as decimals / Y5.B7.S4 (prior learning wk W20)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "why": "Y5.B7.S4 Equivalent fractions and decimals (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (prior learning wk W20/W37)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y5.B4.S2 equivalent fractions with pictures (prior learning wk W20)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups, sharing (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_as_division",
+     "why": "the next step: a fraction is a division"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "fraction to percent uses the same /100 step"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "fractions and decimals on one line"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "comparing across forms"
+    }
+   ],
+   "note": "The Y5 tags on f_to_d/d_to_f fit Y5 (halves, quarters, fifths, tenths); Y6 adds the factor denominators and thousandths, so they are partial here."
+  },
+  "Y6.B9.S2": {
+   "title": "Fractions as division",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:frac_as_division",
+     "missing": "reads a ÷ b as a/b and shares wholes, but never carries the division on to a decimal (3/8 = 3 ÷ 8 = 0.375 by short division)"
+    },
+    {
+     "key": "fraction_operations:frac_as_div_nv",
+     "missing": "same, without pictures"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "using short division to write a fraction as a decimal (3 ÷ 8 = 0.375), the WRM end-point of the step",
+   "build": [
+    "f_to_d_division"
+   ],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups, sharing (prior learning wk W20)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "Y6.B9.S1 Decimal and fraction equivalents (previous step)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "short division, carried past the decimal point"
+    },
+    {
+     "key": "decimals:div_decimal",
+     "why": "decimal ÷ integer (Y6.B8.S8)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (prior learning wk W20/W37)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_as_div_word",
+     "why": "fraction as division in stories (5.NF.B.3)"
+    },
+    {
+     "key": "fractions:improper_mixed",
+     "why": "7 ÷ 2 = 7/2 = 3½"
+    },
+    {
+     "key": "division:remainder_interpret",
+     "why": "a remainder as a fraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B9.S3": {
+   "title": "Understand percentages",
+   "direct": [
+    {
+     "key": "conversions:percent_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (prior learning wk W36)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S11 Find a part (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W36/W37)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "conversions:p_to_f",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning)"
+    },
+    {
+     "key": "conversions:percent_of_number",
+     "why": "percent of an amount"
+    },
+    {
+     "key": "fraction_operations:frac_10_100_nv",
+     "why": "hundredths without pictures"
+    }
+   ],
+   "note": "Full: the hundred-square cell asks what percent and what fraction is shaded and how many squares make 80%, including the parts not shaded (complement to 100%)."
+  },
+  "Y6.B9.S4": {
+   "title": "Fractions to percentages",
+   "direct": [
+    {
+     "key": "conversions:f_to_p",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y6.B9.S3 Understand percentages (previous step)"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (prior learning wk W20/W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S13 Recognise three quarters (prior learning wk W37)"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts (prior learning wk W37)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:p_to_f",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning)"
+    },
+    {
+     "key": "conversions:d_to_p",
+     "why": "Y5.B7.S14 Percentages as decimals (prior learning wk W20)"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "fraction to decimal"
+    },
+    {
+     "key": "conversions:order_fdp",
+     "why": "Y5.B7.S15 Equivalent fractions, decimals and percentages (prior learning wk W20)"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B9.S5": {
+   "title": "Equivalent fractions, decimals and percentages",
+   "direct": [
+    {
+     "key": "conversions:f_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:p_to_f",
+     "opts": {}
+    },
+    {
+     "key": "conversions:d_to_p",
+     "opts": {}
+    },
+    {
+     "key": "conversions:p_to_d",
+     "opts": {}
+    },
+    {
+     "key": "conversions:f_to_d",
+     "opts": {}
+    },
+    {
+     "key": "conversions:d_to_f",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y6.B9.S4 Fractions to percentages (previous step)"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (prior learning wk W20/W37)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups, sharing (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [
+    "f_to_d_factors"
+   ],
+   "related": [
+    {
+     "key": "conversions:order_fdp",
+     "why": "Y5.B7.S15 Equivalent fractions, decimals and percentages (prior learning wk W20)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "placing all three forms on a line"
+    },
+    {
+     "key": "conversions:mixed_conversions",
+     "why": "mixed practice"
+    },
+    {
+     "key": "fraction_operations:frac_as_division",
+     "why": "3/8 as a division"
+    }
+   ],
+   "note": "Full as a set: the six one-way converters together cover every direction among F, D and P with the common denominators. The f_to_d gap at Y6.B9.S1 (20ths, 25ths, eighths) also thins this step."
+  },
+  "Y6.B9.S6": {
+   "title": "Order fractions, decimals and percentages",
+   "direct": [
+    {
+     "key": "conversions:order_fdp",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y6.B9.S5 Equivalent FDP (previous step)"
+    },
+    {
+     "key": "conversions:d_to_p",
+     "why": "Y6.B9.S5 (previous step)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W20)"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W20)"
+    },
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "4.NF.A.2 comparing fractions (same CCSS)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (prior learning wk W20/W37)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:order_fractions",
+     "why": "ordering fractions alone"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "benchmark ½"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "a number line to order"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B9.S7": {
+   "title": "Percentage of an amount – one step",
+   "direct": [
+    {
+     "key": "conversions:percent_of_number",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W36/W37)"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y5.B6.S5 Fraction of an amount (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): 50%"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (prior learning wk W36)"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "Y4.B8.S7 Hundredths as fractions (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:find_whole_from_pct",
+     "why": "the inverse"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "fraction of an amount, no pictures"
+    },
+    {
+     "key": "conversions:double_num_line",
+     "why": "percent on a double number line"
+    }
+   ],
+   "note": "percent_of_number deals one-step percentages of an amount (20% of 60); with the \"What is\" form it is the WRM step. Teach 50%, 25%, 10%, 1% first by setting the max to 100."
+  },
+  "Y6.B9.S8": {
+   "title": "Percentage of an amount – multi-step",
+   "direct": [],
+   "partial": [
+    {
+     "key": "conversions:percent_of_number",
+     "missing": "gives any percent as one calculation; never builds 35% from 10% and 5%, and no increase or decrease (a 20% discount)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding a percentage in several steps from known ones (35% = 3 × 10% + 5%) and adding or subtracting it (increase, discount)",
+   "build": [
+    "percent_multi"
+   ],
+   "pre": [
+    {
+     "key": "conversions:percent_of_number",
+     "why": "Y6.B9.S7 Percentage of an amount, one step (previous step)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): 50%"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard",
+     "why": "Y5.B6.S5 Fraction of an amount (prior learning wk W36)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step stories"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S11 Find a part (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:find_whole_from_pct",
+     "why": "percent missing values (next step)"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "percent as a decimal multiplier"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "discount and change"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B9.S9": {
+   "title": "Percentages – missing values",
+   "direct": [
+    {
+     "key": "conversions:find_whole_from_pct",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "conversions:percent_of_number",
+     "missing": "finds the part; never the percentage itself (12 is what percent of 40?)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding the missing percentage (12 out of 40 is __%)",
+   "build": [
+    "percent_multi"
+   ],
+   "pre": [
+    {
+     "key": "conversions:percent_of_number",
+     "why": "Y6.B9.S7-S8 Percentage of an amount"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "Y5.B6.S6 Find the whole (prior learning wk W37)"
+    },
+    {
+     "key": "conversions:f_to_p",
+     "why": "Y5.B7.S13 Percentages as fractions (prior learning wk W20/W36/W37)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 equivalent fractions (prior learning wk W37): 12/40 = 30/100"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (prior learning wk W20/W36/W37)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "conversions:double_num_line",
+     "why": "a double number line of amount | percent"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "percent as a ratio to 100"
+    },
+    {
+     "key": "fractions:fraction_of_set_hard_nv",
+     "why": "find the whole from a fraction"
+    }
+   ],
+   "note": ""
+  },
   "Y6.B10.S1": {
    "title": "Shapes - same area",
    "direct": [],
@@ -6074,6 +6648,43 @@
    "reused": false,
    "option": "form \"two operations\" (machine, bar model, words) and notation \"algebraic convention\""
   },
+  "f_to_d_division": {
+   "kind": "option",
+   "skill": "conversions:f_to_d",
+   "name": "Fraction to Decimal by Division (option)",
+   "teaches": "writing a fraction as a decimal by dividing the numerator by the denominator with short division (3/8 = 3 ÷ 8 = 0.375; 1/3 ≈ 0.333)",
+   "representation": "a boxed cell holding a short-division bus stop for 3 ÷ 8 with the decimal point and placeholder zeros drawn (3.000), digit boxes for the quotient; the equation 3/8 = [ ] below",
+   "family": "fractions",
+   "steps": [
+    "Y6.B9.S2"
+   ],
+   "ccss": [
+    "5.NF.B.3"
+   ],
+   "why": "frac_as_division stops at a ÷ b = a/b; no skill carries the division to a decimal",
+   "reused": false,
+   "option": "method \"by short division\" (eighths, and thirds rounded to 3 dp)"
+  },
+  "f_to_d_factors": {
+   "kind": "option",
+   "skill": "conversions:f_to_d",
+   "name": "Fraction to Decimal: Any Factor Denominator (option)",
+   "teaches": "converting fractions whose denominators are factors of 10, 100 or 1,000 (2, 4, 5, 20, 25, 50, 8, 125) to decimals by making an equivalent tenths, hundredths or thousandths fraction, and thousandths both ways",
+   "representation": "a boxed cell: 7/20 = [ ]/100 = [ ] with an arrow labelled × 5 over and under the fraction (the structural scaffold stays), the decimal slot after it; fades to \"7/20 = [ ]\"",
+   "family": "fractions",
+   "steps": [
+    "Y6.B9.S1",
+    "Y6.B9.S5"
+   ],
+   "ccss": [
+    "4.NF.C.6",
+    "5.NF.B.3",
+    "5.NBT.A.3"
+   ],
+   "why": "f_to_d deals only 2, 4, 5, 10 and 100; Y6 asks 20ths, 25ths, 50ths and thousandths",
+   "reused": false,
+   "option": "denominators \"factors of 10, 100 and 1,000\" (20, 25, 50, 8, 125); also on d_to_f to 3 dp"
+  },
   "formulae": {
    "kind": "new",
    "skill": "algebra:use_formulae",
@@ -6512,6 +7123,24 @@
     "6.G.A.1"
    ],
    "why": "No live skill deals the area of a parallelogram.",
+   "reused": true
+  },
+  "percent_multi": {
+   "kind": "option",
+   "skill": "conversions:percent_of_number",
+   "name": "Percentages: Multi-Step and Missing Values (option)",
+   "teaches": "percentage of an amount in two steps (increase/decrease), and missing values (what percent is 12 of 40?)",
+   "representation": "task options on percent_of_number",
+   "family": "decimals",
+   "option": "multi-step",
+   "steps": [
+    "Y6.B9.S8",
+    "Y6.B9.S9"
+   ],
+   "ccss": [
+    "6.RP.A.3"
+   ],
+   "why": "no skill builds a percent from 10%/5%/1%, does increase/decrease, or finds the missing percentage",
    "reused": true
   },
   "pie": {
@@ -7300,6 +7929,54 @@
    "step": "Y6.B8.S9",
    "action": "add",
    "why": "partial cover: no context"
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y6.B9.S1",
+   "action": "partial",
+   "why": "denominators 2, 4, 5, 10, 100 only"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y6.B9.S1",
+   "action": "partial",
+   "why": "no thousandths"
+  },
+  {
+   "key": "fraction_operations:frac_as_division",
+   "step": "Y6.B9.S2",
+   "action": "partial",
+   "why": "stops at a ÷ b = a/b; no decimal by division"
+  },
+  {
+   "key": "fraction_operations:frac_as_div_nv",
+   "step": "Y6.B9.S2",
+   "action": "partial",
+   "why": "same as frac_as_division"
+  },
+  {
+   "key": "conversions:p_to_d",
+   "step": "Y6.B9.S5",
+   "action": "add",
+   "why": "direction percent → decimal"
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y6.B9.S5",
+   "action": "add",
+   "why": "direction fraction → decimal"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y6.B9.S5",
+   "action": "add",
+   "why": "direction decimal → fraction"
+  },
+  {
+   "key": "conversions:percent_of_number",
+   "step": "Y6.B9.S8",
+   "action": "add",
+   "why": "partial cover: one-step only"
   }
  ]
 }
