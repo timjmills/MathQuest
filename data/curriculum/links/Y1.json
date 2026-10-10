@@ -1,0 +1,1078 @@
+{
+ "year": "Y1",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "Y1.B1.S1": {
+   "title": "Sort objects",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:classify_count",
+     "opts": {
+      "band": 6
+     },
+     "missing": "sorting every object into groups by a rule; the skill counts one kind"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sorting all objects into groups and naming the rule",
+   "build": [
+    "sort_groups"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "next step: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same block: Y1.B1.S5 Recognise numbers as words"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S2": {
+   "title": "Count objects",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (prior learning wk W01)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (the step before in this block)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "zero",
+    "sort_groups"
+   ],
+   "related": [
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same block: Y1.B1.S5 Recognise numbers as words"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S3": {
+   "title": "Count objects from a larger group",
+   "direct": [],
+   "partial": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10
+     },
+     "missing": "counting out a given number from a larger group"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting out (take 6 from a pile of 10)",
+   "build": [
+    "ten_count_out"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (prior learning wk W01)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (the step before in this block)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S3 Build numbers beyond 10 (14-20) (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "zero",
+    "sort_groups"
+   ],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: Y1.B1.S4 Represent objects"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same block: Y1.B1.S5 Recognise numbers as words"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B1.S6 Count on from any number"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S4": {
+   "title": "Represent objects",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B3.S1 Find 1, 2 and 3 (prior learning wk W01)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W01)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S4 Continue patterns beyond 10 (14-20) (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero",
+    "subitise",
+    "ten_count_out"
+   ],
+   "related": [
+    {
+     "key": "composing:number_word_form",
+     "why": "next step: Y1.B1.S5 Recognise numbers as words"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in Y1.B1.S7 1 more"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "same CCSS K.CC.B.4 in Y1.B1.S7 1 more"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S5": {
+   "title": "Recognise numbers as words",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:number_word_form",
+     "opts": {},
+     "missing": "number words 0 to 9 (the skill starts at 10)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading and matching the words zero to ten",
+   "build": [
+    "words_0_10"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (prior learning wk W02)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W02)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W02)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W02)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S3 Count objects from a larger group (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "zero",
+    "consolidate",
+    "ten_count_out"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: Y1.B1.S6 Count on from any number"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "next step: Y1.B1.S6 Count on from any number"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S6": {
+   "title": "Count on from any number",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W02)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (prior learning wk W02)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y1.B1.S5 Recognise numbers as words (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "zero",
+    "consolidate",
+    "words_0_10"
+   ],
+   "related": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "next step: Y1.B1.S7 1 more"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S7": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "opts": {
+      "step": 1,
+      "dir": "more",
+      "band": 20
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W02)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (prior learning wk W02)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W02)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y1.B1.S5 Recognise numbers as words (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero",
+    "words_0_10"
+   ],
+   "related": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "next step: Y1.B1.S8 Count backwards within 10"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S8": {
+   "title": "Count backwards within 10",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B1.S7 1 more (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "zero"
+   ],
+   "related": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "next step: Y1.B1.S9 1 less"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S9": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "opts": {
+      "step": 1,
+      "dir": "less",
+      "band": 20
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W03)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "next step: Y1.B1.S10 Compare groups by matching"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S10": {
+   "title": "Compare groups by matching",
+   "direct": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 10,
+      "level": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W03)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W03)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B1.S9 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_small"
+   ],
+   "related": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "same CCSS K.CC.C.6 in Y1.B1.S14 Order objects and numbers"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S11": {
+   "title": "Fewer, more, same",
+   "direct": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 10,
+      "dir": "mixed"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W03)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W03)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B1.S9 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_small"
+   ],
+   "related": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "same CCSS K.CC.C.6 in Y1.B1.S14 Order objects and numbers"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S12": {
+   "title": "Less than, greater than, equal to",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "level": [
+       2
+      ]
+     },
+     "missing": "the symbols <, > and = and the words greater than / less than"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the symbols <, >, = and the words greater than, less than, equal to within 10",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W04)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W04)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:compare",
+     "why": "next step: Y1.B1.S13 Compare numbers"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "same CCSS K.CC.C.6, K.CC.C.7 in Y1.B1.S14 Order objects and numbers"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S13": {
+   "title": "Compare numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:compare",
+     "opts": {},
+     "missing": "numbers within 10 (the lowest band is 99)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two numbers within 10",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W04)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W04)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "next step: Y1.B1.S14 Order objects and numbers"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S14": {
+   "title": "Order objects and numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {},
+     "missing": "ordering objects and numbers within 10 (the lowest band is 99)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering groups and numbers within 10",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W04)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W04)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "the reverse order"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B1.S4 Represent objects"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B1.S15": {
+   "title": "The number line",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "the 0-10 number line: reading, counting along and placing numbers",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W05)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W05)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W05)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W05)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W05)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (the step before in this block)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y1.B1.S13 Compare numbers (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_small"
+   ],
+   "related": [
+    {
+     "key": "addition:number_line_add",
+     "why": "jumps on a line"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "next number"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: Y1.B1.S1 Sort objects"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B1.S2 Count objects"
+    }
+   ],
+   "note": ""
+  }
+ },
+ "proposals": {
+  "sort_groups": {
+   "kind": "new",
+   "skill": "comparing:sort_into_groups",
+   "name": "Sort into Groups",
+   "teaches": "sorting objects by one attribute (kind, colour, size, shape) into labelled groups, then saying the sorting rule",
+   "representation": "picture tiles and two or three labelled sorting rings; write the letter of each tile in its ring; option: rule given or rule found",
+   "family": "counting",
+   "steps": [
+    "Y1.B1.S1"
+   ],
+   "ccss": [
+    "K.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "subitise": {
+   "kind": "new",
+   "skill": "counting:subitise",
+   "name": "Say How Many Without Counting",
+   "teaches": "perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5)",
+   "representation": "standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts",
+   "family": "counting",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "zero": {
+   "kind": "new",
+   "skill": "counting:zero_none",
+   "name": "Zero Means None",
+   "teaches": "zero as the count of an empty set, and writing 0",
+   "representation": "pictures of plates/boxes with some or no objects; write how many, including 0",
+   "family": "counting",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "ten_count_out": {
+   "kind": "new",
+   "skill": "counting:count_out",
+   "name": "Count Out a Number",
+   "teaches": "counting out a given number of objects from a larger group (give me 7)",
+   "representation": "a drawn group of 10-20 objects; circle exactly the number asked",
+   "family": "counting",
+   "steps": [
+    "Y1.B1.S3"
+   ],
+   "ccss": [
+    "K.CC.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "words_0_10": {
+   "kind": "option",
+   "skill": "composing:number_word_form",
+   "option": "words 0-10",
+   "name": "Number Words 0 to 10 (option)",
+   "teaches": "reading and writing the number words zero to ten (the skill starts at 10)",
+   "representation": "a band option \"0 to 10\" on the existing skill: numeral to word and word to numeral",
+   "family": "counting",
+   "steps": [
+    "Y1.B1.S5"
+   ],
+   "ccss": [
+    "2.NBT.A.3",
+    "K.CC.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "consolidate": {
+   "kind": "new",
+   "skill": "counting:number_sense_review",
+   "name": "Number Sense Review",
+   "teaches": "consolidating counting, cardinality, composition and patterns to 10 (Reception year review)",
+   "representation": "a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content)",
+   "family": "counting",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "compare_small": {
+   "kind": "option",
+   "skill": "placevalue:compare",
+   "option": "band 10/20 and pictures",
+   "name": "Compare Numbers to 10 and 20 (option)",
+   "teaches": "comparing and ordering numbers and groups of objects within 10 and 20 (and tens-and-ones pictures to 100) with <, >, = and the words greater than / less than / equal to (the lowest band today is 99)",
+   "representation": "band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level",
+   "family": "placevalue",
+   "steps": [
+    "Y1.B1.S12",
+    "Y1.B1.S13",
+    "Y1.B1.S14"
+   ],
+   "ccss": [
+    "K.CC.C.6",
+    "K.CC.C.7"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "nl_20": {
+   "kind": "new",
+   "skill": "number_sense:number_line_scales",
+   "name": "Numbers on a Number Line (any scale)",
+   "teaches": "the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled",
+   "representation": "a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked",
+   "family": "placevalue",
+   "steps": [
+    "Y1.B1.S15"
+   ],
+   "ccss": [
+    "K.CC.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  }
+ },
+ "tagFixes": []
+}
