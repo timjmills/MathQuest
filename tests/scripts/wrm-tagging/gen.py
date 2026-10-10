@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW
+from spec import S, NEW, FORMS, RM
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -48,6 +48,42 @@ def prior_r_steps(step):
         out.append(best[-1])
     return wk, out
 
+READS = json.load(open(f'{HERE}/reads_range.json'))   # skill -> True when its items change with Max Number
+
+SUBS = [  # (family, sub, regex on the step title) — first match wins; order matters
+    ('money', 'money', r'coin|note|money|unitis'),
+    ('time', 'time', r'\btime\b|\bdays?\b|month|hours|before and after'),
+    ('fraction', 'fraction', r'half|quarter'),
+    ('count', 'oral', r'verbal|patterns beyond'), ('pattern', 'pattern', r'pattern'),
+    ('measure', 'mass', r'mass|balance|heavier'), ('measure', 'capacity', r'capacity|volume|full'),
+    ('measure', 'length', r'length|height|size'),
+    ('position', 'position', r'\bpositions?\b|map|turn|scene|visualis|instructions|ordinal'),
+    ('shape', 'shape3d', r'3-d'), ('shape', 'shape2d', r'shape|circle|triangle|2-d|sides'),
+    ('groups', 'skip', r'count in \d'), ('groups', 'oddeven', r'odd|even|pairs'),
+    ('groups', 'share', r'shar|equal groups|grouping|array'),
+    ('count', 'tens', r'tens and ones|groups of tens|tens to'),
+    ('calc', 'double', r'double'), ('calc', 'fact', r'fact|sentence|missing|related'),
+    ('calc', 'bond', r'compos|bond|part|arrangements'),
+    ('calc', 'add', r'\badd|combine|how many did i add'), ('calc', 'sub', r'subtract|take away|difference|how many did i take'),
+    ('sort', 'sort', r'sort|match objects|match pictures|identify a set'),
+    ('count', 'more1', r'\b1 more|\b1 less'), ('count', 'nline', r'number line'),
+    ('count', 'compare', r'compare|fewer|less than|order (objects and )?numbers|matching'),
+    ('count', 'tens', r'tens|beyond 10|understand 1|understand 20|within 20|count from|20, 30')]
+def topic2(step):
+    t = info[step]['title'].lower()
+    for fam, sub, rx in SUBS:
+        if re.search(rx, t): return fam, sub
+    return 'count', 'count'
+def topic(step): return topic2(step)[1]
+def dom(c): return c.split('.')[1] if '.' in c else c
+def related_topic(a, b):
+    (fa, sa), (fb, sb) = topic2(a), topic2(b)
+    if sa == sb: return 2
+    if fa == fb: return 1
+    if {fa, fb} <= {'count', 'calc'} and {dom(c) for c in info[a]['ccss']} & {dom(c) for c in info[b]['ccss']}: return 1
+    return 0
+
+def dentries(step): return [(d[0], d[1]) for d in S[step]['d']]
 def dkeys(step): return [d[0] for d in S[step]['d']]
 def fmt_step(s): return f"{s} {info[s]['title']}"
 
@@ -55,6 +91,7 @@ def build(step):
     sp = S[step]; s = info[step]; direct = []; partial = []
     for k, o, miss in sp['d']:
         assert live(k), (step, k)
+        if READS.get(k): assert 'range' in o, f'{step} {k}: reads Max Number, record range'
         if miss: partial.append({'key': k, 'opts': o, 'missing': miss})
         else: direct.append({'key': k, 'opts': o})
     v = sp['v']
@@ -62,68 +99,70 @@ def build(step):
     if v == 'gap': assert not direct and not partial, step
     if v == 'partial': assert partial or direct, step
     if v != 'full': assert sp['b'], step
-    own = set(dkeys(step)); pre = []; seen = set(own); pb = []
-    def addp(k, why):
-        if k in seen or not live(k) or len(pre) >= 8: return
-        seen.add(k); pre.append({'key': k, 'why': why})
-    for k, why in sp['p']: addp(k, why)
-    wk, rsteps = (None, [])
-    if s['year'] == 'Y1': wk, rsteps = prior_r_steps(step)
-    cc0 = set(s['ccss']); cl0 = {c.rsplit('.', 1)[0] for c in cc0}
-    rsteps = sorted(rsteps, key=lambda r: (0 if cc0 & set(info[r]['ccss']) else 1 if cl0 & {c.rsplit('.', 1)[0] for c in info[r]['ccss']} else 2))
-    for rs in rsteps:
-        if len(pre) >= 5: break
-        for k in dkeys(rs): addp(k, f"{fmt_step(rs)} (prior learning wk {wk})")
-        if S[rs]['v'] == 'gap':
-            for b in S[rs]['b']:
-                if b not in pb: pb.append(b)
-    # previous step in block
-    prev = [x for x in order if info[x]['block'] == s['block'] and idx[x] < idx[step]]
-    for x in reversed(prev[-2:]):
-        for k in dkeys(x): addp(k, f"{fmt_step(x)} (the step before in this block)")
-    # earlier steps on the same CCSS, nearest first
-    cc = set(s['ccss'])
-    for x in reversed(order[:idx[step]]):
-        if cc & set(info[x]['ccss']):
-            for k in dkeys(x): addp(k, f"{fmt_step(x)} (same CCSS {', '.join(sorted(cc & set(info[x]['ccss'])))}, earlier)")
-    # nothing yet (first steps with no CCSS): earlier steps in the same block family
-    if not pre and prev:
-        for x in reversed(prev):
-            for k in dkeys(x): addp(k, f"{fmt_step(x)} (earlier in this block)")
-    if s['year'] == 'Y1' and not pre:
-        pass
-    pb = []
-    cand = [r for r in rsteps if cl0 & {c.rsplit('.', 1)[0] for c in info[r]['ccss']}] + list(reversed(prev[-2:])) + [x for x in reversed(prev) if cc & set(info[x]['ccss'])]
-    for x in cand:
+    own = set(dkeys(step)); pre = []; pb = []
+    sig = lambda k, o: k + json.dumps(o or {}, sort_keys=True)
+    seen = {sig(k, o) for k, o in dentries(step)}; seen_keys = set()
+    def addp(k, why, o=None):
+        # a pre may be the step's own skill on an earlier rung (other opts); never the same skill+opts as a direct
+        if sig(k, o) in seen or not live(k) or len(pre) >= 8: return
+        if o is None and k in own: return
+        if k in seen_keys and k not in own: return
+        seen.add(sig(k, o)); seen_keys.add(k); e = {'key': k, 'why': why}
+        if o: e['opts'] = o
+        pre.append(e)
+    def take_builds(x):
         if S[x]['v'] != 'full':
             for b in S[x]['b']:
                 if b not in pb and b not in sp['b']: pb.append(b)
+    for k, why in sp['p']: addp(k, why)
+    wk = None
+    if s['year'] == 'Y1':
+        # rule 3/12: the xlsx week's prior R steps, kept only when they share the step's idea; partial-only steps count
+        wk, rsteps = prior_r_steps(step)
+        for rs in rsteps:
+            if not (related_topic(step, rs) == 2 or (related_topic(step, rs) and len(pre) < 2)): continue
+            for k, o in dentries(rs): addp(k, f"{fmt_step(rs)} (school prior learning, week {wk})", o)
+            if S[rs]['v'] == 'gap': take_builds(rs)
+    # earlier steps on the same idea: same sub-topic first, then the same family, nearest first (rule 11)
+    cands = [x for x in reversed(order[:idx[step]]) if related_topic(step, x) and (info[x]['year'] == s['year'] or s['year'] == 'Y1')]
+    cands.sort(key=lambda x: -related_topic(step, x))   # stable: nearest first inside each rank
+    for x in cands:
+        if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 2): break
+        for k, o in dentries(x): addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
+    for x in [c for c in cands if related_topic(step, c) == 2][:3]:
+        if S[x]['v'] == 'gap': take_builds(x)   # a needed earlier step with no live skill: its build is a pre-build
     pb = pb[:3]
-    if not pre and not pb and prev and S[prev[-1]]['v'] == 'gap':
-        pb = S[prev[-1]]['b'][:2]
-    rel = []; rseen = set(own)
+    rel = []; rseen = set(own) | {p['key'] for p in pre}
     def addr(k, why):
-        if k in rseen or not live(k) or len(rel) >= 8: return
+        if k in rseen or not live(k) or len(rel) >= 6: return
         rseen.add(k); rel.append({'key': k, 'why': why})
     for k, why in sp['r']: addr(k, why)
-    nxt = [x for x in order if info[x]['block'] == s['block'] and idx[x] > idx[step]]
-    if nxt:
-        for k in dkeys(nxt[0]): addr(k, f"next step: {fmt_step(nxt[0])}")
-    for x in order:
-        if x != step and cc & set(info[x]['ccss']) and idx[x] > idx[step] and info[x]['year'] == s['year'] and abs(int(info[x]['block'].split('B')[1]) - int(s['block'].split('B')[1])) <= 2:
-            for k in dkeys(x):
-                if len(rel) < 6: addr(k, f"same CCSS {', '.join(sorted(cc & set(info[x]['ccss'])))} in {fmt_step(x)}")
-    if len(rel) < 3:
-        for x in [y for y in order if info[y]['block'] == s['block'] and y != step]:
-            for k in dkeys(x): addr(k, f"same block: {fmt_step(x)}")
-            if len(rel) >= 4: break
+    for k in dkeys(step):
+        for k2, why in FORMS.get(k, []): addr(k2, why)
+    # the next step's skill when it carries the same idea forward (rule 4/10: a reason beyond "same block")
+    later = [x for x in order[idx[step] + 1:] if info[x]['year'] == s['year'] and related_topic(step, x) == 2]
+    for x in later[:2]:
+        for k in dkeys(x): addr(k, f"the next step on this idea: {fmt_step(x)}")
+    note = sp['n']
+    def add_note(t):
+        nonlocal note
+        note = (note + ' ' if note else '') + t
+    if not pre:
+        same = [x for x in cands if related_topic(step, x) == 2]
+        live_same = [x for x in same if S[x]['d']]
+        if live_same: add_note(f"Pre: the earlier steps on this idea ({', '.join(live_same[:3])}) use this same skill and options.")
+        elif same: add_note(f"Pre: the earlier steps on this idea ({', '.join(same[:3])}) have no live skill yet; see preBuild.")
+        else: add_note('Pre: none; this is the first step on this idea.')
+    if not rel:
+        add_note('Related: no live skill shows this idea yet (see build).' if v == 'gap' else 'Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills.')
     return {'title': s['title'], 'direct': direct, 'partial': partial, 'verdict': v,
-            'missing': '' if v == 'full' else sp['m'], 'build': sp['b'], 'pre': pre, 'preBuild': [b for b in pb if b not in sp['b']],
-            'related': rel, 'note': sp['n']}
+            'missing': '' if v == 'full' else sp['m'], 'build': sp['b'], 'pre': pre, 'preBuild': pb,
+            'related': rel, 'note': note}
 
+def closes(steps): return '; '.join(f"{x}: {S[x]['m']}" for x in steps)
 def proposal(pid, steps):
     if pid in NEW:
-        p = dict(NEW[pid]); p['steps'] = steps; p['reused'] = False; return p
+        p = dict(NEW[pid]); p['steps'] = steps; p['closes'] = closes(steps); p['reused'] = False; return p
     src = WP.get(pid) or bl.get(pid)
     assert src, pid
     p = {k: src[k] for k in ('kind', 'skill', 'option', 'name', 'teaches', 'representation', 'family') if k in src}
@@ -132,6 +171,7 @@ def proposal(pid, steps):
     cc = src.get('ccss') or src.get('standards') or sorted({c for st in steps for c in info[st]['ccss']})
     p['ccss'] = cc
     p['why'] = src.get('why') or f"existing {'WRM_PROPOSALS' if pid in WP else bl[pid]['_src']} entry; covers these steps"
+    p['closes'] = closes(steps)
     p['reused'] = True
     return p
 
@@ -141,7 +181,7 @@ def tagfixes(step, out):
     new = {d['key']: None for d in out['direct']}; new.update({d['key']: d['missing'] for d in out['partial']})
     for k, t in old.items():
         if k not in new:
-            fixes.append({'key': k, 'step': step, 'action': 'remove', 'why': 'does not teach this step: ' + (t.get('partial') or 'tagged full but no item matches the step')})
+            fixes.append({'key': k, 'step': step, 'action': 'remove', 'why': RM.get((step, k)) or ('does not teach this step: ' + (t.get('partial') or 'tagged full but no generated item matches the step'))})
         elif (t.get('partial') is None) != (new[k] is None):
             if new[k]: fixes.append({'key': k, 'step': step, 'action': 'partial', 'why': new[k]})
             else: fixes.append({'key': k, 'step': step, 'action': 'add', 'why': 'teaches the whole step with the options given; drop the partial flag'})
