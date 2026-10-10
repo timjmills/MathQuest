@@ -7699,6 +7699,314 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B9.S1": {
+   "title": "Pounds and pence",
+   "direct": [
+    {
+     "key": "measurement:money_count",
+     "opts": {}
+    },
+    {
+     "key": "measurement:money_notation",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_change",
+     "why": "Y2.B4.S9 Find change (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B9.S2": {
+   "title": "Convert pounds and pence",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting between cents and dollars-and-cents (345 cents = $3.45) and recording money",
+   "build": [
+    "money_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "why": "Y3.B9.S1 Pounds and pence (step before in the block)"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "Y3.B9.S1 Pounds and pence (step before in the block)"
+    },
+    {
+     "key": "measurement:money_change",
+     "why": "Y2.B4.S9 Find change (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B9.S3": {
+   "title": "Add money",
+   "direct": [
+    {
+     "key": "measurement:money",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_change",
+     "why": "Y2.B4.S9 Find change (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S3 Count money - pounds and pence (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B9.S4": {
+   "title": "Subtract money",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_change",
+     "missing": "subtracting two prices that are not change from a payment"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "subtracting two prices that are not change from a payment",
+   "build": [
+    "money_2step"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money",
+     "why": "Y3.B9.S3 Add money (step before in the block)"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S3 Count money - pounds and pence (prior learning wk W19)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B9.S5": {
+   "title": "Find change",
+   "direct": [
+    {
+     "key": "measurement:money_change",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:enough_money",
+     "why": "Y2.B4.S7 Calculate with money (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y2.B9.S1 O'clock and half past (prior learning wk W20)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y2.B9.S1 O'clock and half past (prior learning wk W20)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W20)"
+    }
+   ],
+   "preBuild": [
+    "time_talk"
+   ],
+   "related": [
+    {
+     "key": "measurement:money_count",
+     "why": "same standard 2.MD.C.8: Count Coins and Notes"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "same standard 2.MD.C.8: Do the Coins Make the Amount?"
+    },
+    {
+     "key": "measurement:make_change_least_coins",
+     "why": "same standard 2.MD.C.8: Make an Amount With the Fewest Coins"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "same standard 2.MD.C.8: Coins and Notes by Value"
+    },
+    {
+     "key": "measurement:money_notation",
+     "why": "same standard 2.MD.C.8: Write an Amount of Money"
+    },
+    {
+     "key": "measurement:money_compare",
+     "why": "same standard 2.MD.C.8: Which Has More Money?"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -8381,6 +8689,78 @@
     "3.NF.A.1",
     "3.OA.A.3"
    ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_notes": {
+   "kind": "option",
+   "skill": "measurement:coin_value",
+   "option": "notes",
+   "name": "Recognise Notes (option)",
+   "teaches": "recognising banknotes and their values alongside coins (the school teaches US dollars)",
+   "representation": "add notes to the coin-value picture bank",
+   "family": "measurement",
+   "steps": [
+    "Y1.B13.S3"
+   ],
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_convert": {
+   "kind": "option",
+   "skill": "measurement:money_notation",
+   "option": "convert",
+   "name": "Dollars and Cents (option)",
+   "teaches": "converting between cents and dollars-and-cents (345 cents = $3.45) and recording money",
+   "representation": "option: cents to dollars and back",
+   "family": "measurement",
+   "steps": [
+    "Y3.B9.S2",
+    "Y4.B10.S2"
+   ],
+   "ccss": [
+    "2.MD.C.8",
+    "4.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_2step": {
+   "kind": "new",
+   "skill": "measurement:money_two_step",
+   "name": "Two-Step Money Problems",
+   "teaches": "two-step money word problems (buy two items, then find the change)",
+   "representation": "a price list drawn as tags plus a short story; bar model support level",
+   "family": "measurement",
+   "steps": [
+    "Y2.B4.S10",
+    "Y3.B9.S4",
+    "Y4.B10.S6"
+   ],
+   "ccss": [
+    "2.MD.C.8",
+    "2.OA.A.1",
+    "4.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "time_talk": {
+   "kind": "new",
+   "skill": "measurement:time_words",
+   "name": "Time Words",
+   "teaches": "the language of time (today, yesterday, tomorrow, days of the week, months, seasons, before, after)",
+   "representation": "calendar strip or picture timeline; circle or write the word from a bank",
+   "family": "measurement",
+   "steps": [
+    "R.B10.S5",
+    "Y1.B14.S2",
+    "Y1.B14.S3"
+   ],
+   "ccss": [],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
   }
