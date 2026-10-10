@@ -206,3 +206,17 @@ This blocks the three steps. It is not a small follow-up.
 5. Remove pre/related duplicates and same-block padding (rule 4).
 6. Split `pictures_change_unknown`.
 7. Add the `band_3` and multiples-only proposals.
+
+## Owner ruling 2026-10-10: keep every WRM step (checked)
+
+The ruling: every White Rose step stays, even beyond CCSS. That covers oral steps, days and months, UK money changed to US, and above-grade steps. Each one is covered or has a build proposal; none is dropped or called "not needed".
+
+- **All 235 steps meet the ruling.** Every R and Y1 step that is not `full` has at least one `build` entry: 0 steps are uncovered. No note or `missing` text drops a step.
+- The above-grade Y1 blocks are tagged as WRM teaches them.
+- These steps all keep a proposal:
+  - the oral steps (R.B13.S5, R.B10.S5)
+  - days and months (Y1.B14.S2/S3, `time_talk`)
+  - notes (Y1.B13.S3, `money_notes`, USD default)
+- **One conflict: owner question 4 in the R report.** Its suggested answer, to make R.B18 a page role and drop the `consolidate` proposal, would leave R.B18.S1/S2 with no build. Under the ruling, reject that answer: R.B18.S1/S2 keep `consolidate` (or a named review skill) as their build.
+- Y1 report question 1 (the xlsx-only "Build and draw shapes" and "Compose shapes") is not a WRM step and is unaffected.
+- Y1 report question 2 (US bills) agrees with the ruling.
