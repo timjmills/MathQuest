@@ -2733,6 +2733,14 @@
     {
      "key": "conversions:p_to_d",
      "why": "Y5.B7.S14 Percentages as decimals (previous step)"
+    },
+    {
+     "key": "conversions:p_to_f",
+     "why": "Y5.B7.S13 Percentages as fractions (earlier step)"
+    },
+    {
+     "key": "conversions:percent_visual",
+     "why": "Y5.B7.S12 Understand percentages (earlier step)"
     }
    ],
    "preBuild": [],
@@ -4243,6 +4251,14 @@
     {
      "key": "decimals:add_decimal",
      "why": "Y5.B12.S4 Add decimals with the same number of decimal places (previous step)"
+    },
+    {
+     "key": "decimals:compare_decimal",
+     "why": "Y4.B9.S5 Compare decimals (lower grade, same cluster CCSS 4.NF.C.7)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3 column methods (lower grade, same cluster CCSS 3.NBT.A.2)"
     }
    ],
    "preBuild": [],
@@ -4284,6 +4300,10 @@
     {
      "key": "decimals:sub_decimal",
      "why": "Y5.B12.S5 Subtract decimals with the same number of decimal places (previous step)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (place-holder zero)"
     }
    ],
    "preBuild": [],
@@ -4325,6 +4345,10 @@
     {
      "key": "decimals:add_decimal",
      "why": "Y5.B12.S6 Add decimals with different numbers of decimal places (previous step)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 Order and compare any decimals with up to 3 decimal places (place-holder zero)"
     }
    ],
    "preBuild": [],
@@ -4361,6 +4385,10 @@
     {
      "key": "decimals:sub_decimal",
      "why": "Y5.B12.S7 Subtract decimals with different numbers of decimal places (previous step)"
+    },
+    {
+     "key": "decimals:round_decimals",
+     "why": "Y5.B7.S11 Round to 1 decimal place (rounding to adjust)"
     }
    ],
    "preBuild": [],
@@ -4393,7 +4421,24 @@
    "build": [
     "dec_sequence"
    ],
-   "pre": [],
+   "pre": [
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y4 count in steps (lower grade, same cluster CCSS 4.OA.C.5)"
+    },
+    {
+     "key": "patterns:count_by_step_down",
+     "why": "Y4 count back in steps (lower grade, same cluster CCSS 4.OA.C.5)"
+    },
+    {
+     "key": "patterns:number_pattern",
+     "why": "find the rule of a sequence (lower grade, same cluster CCSS 4.OA.C.5)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same cluster CCSS 4.NF.C.6)"
+    }
+   ],
    "preBuild": [],
    "related": [
     {
@@ -5642,7 +5687,8 @@
     "4.NBT.B.4",
     "5.NBT.B.7"
    ],
-   "why": "closes the listed Y5 steps"
+   "why": "closes the listed Y5 steps",
+   "representation": "add with hundred squares, then the column; subtract with an exchange of a tenth; multiply a decimal by a whole with an area model; which model matches the column?"
   },
   "dec_dp_match": {
    "kind": "option",
@@ -5910,6 +5956,7 @@
    "ccss": [
     "4.MD.C.6"
    ],
+   "representation": "read the angle on the protractor; which scale starts at 0?; is it acute or obtuse? (check the reading); measure two angles and compare",
    "why": "closes Y5.B10.S4 Measure angles up to 180° (existing std_props entry, reused)"
   },
   "draw_angles": {
@@ -5939,7 +5986,8 @@
    "family": "measurement",
    "steps": [],
    "reused": true,
-   "ccss": []
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B10.S5, Y5.B14.S2 (existing entry, reused)"
   },
   "angles_point": {
    "kind": "option",
@@ -6071,7 +6119,8 @@
    "family": "geometry",
    "steps": [],
    "reused": true,
-   "ccss": []
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B11.S6 (existing entry, reused)"
   },
   "negative_count": {
    "kind": "new",
@@ -6244,7 +6293,8 @@
    "family": "measurement",
    "steps": [],
    "reused": true,
-   "ccss": []
+   "ccss": [],
+   "why": "needed as a pre-skill for Y5.B14.S1, Y5.B14.S2, Y5.B15.S4 (existing entry, reused)"
   }
  },
  "tagFixes": [
