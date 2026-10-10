@@ -5,9 +5,11 @@ R = '/home/user/MathQuest/.claude/worktrees/agent-aa09d8d25584eba48/'
 ns = {}
 import glob
 for f in sorted(glob.glob(os.path.join(H, 'spec*.py'))): exec(open(f).read(), ns)
-K = json.load(open(os.path.join(H, 'keys.json')))
+# keys.json / prior.json are generated (keys.mjs / prior.mjs) into DATA, a scratch folder outside the repo
+DATA = os.environ.get('WRM_TAG_DATA', '/tmp/claude-0/-home-user-MathQuest/766f9569-7b1f-5e16-90cf-84166df13b4d/scratchpad/wrm-tag-Y4')
+K = json.load(open(os.path.join(DATA, 'keys.json')))
 keys, props = K['keys'], K['props']
-prior = json.load(open(os.path.join(H, 'prior.json')))
+prior = json.load(open(os.path.join(DATA, 'prior.json')))
 wrm = json.load(open(R + 'data/curriculum/wrm-steps.json'))
 steps = {}
 order = []
