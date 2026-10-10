@@ -58,3 +58,21 @@ Commit + push often to your branch (given in your prompt) with trailers:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01M5EMD5ufNjURHDiNDLJjwD
 Scratch files only under a scratch folder outside the repo.
+
+## MANDATORY after critic Y2–Y3 r1 (FAIL, means 6.65 / 6.73) — every year must meet these
+1. GENERATE, don't infer: for every direct/partial skill, generate ≥ 6 real items WITH the opts you list
+   (node + generateQuestionFor) and judge the verdict from those items. Never inherit a verdict from an old SKILL_WRM tag
+   without generating. Record the opts you generated with.
+2. OPTIONS ARE VALUES, NOT NOTES: when a step needs an option ("8 times-table", "m and cm", "L and mL", "to words",
+   US money), put the real option values in `opts` (read the skill's schema in js/modules/skill-options.js:
+   e.g. {constant:[8]}, {forms:[1]}, {units:[1]}, {wordform:['to_words']}, {currency:'usd'}, {kind:'both'}). A step is
+   `full` only if those opts make the generator deal exactly the step. A note is never a substitute.
+3. FILTER PRE-SKILLS: the xlsx week list mixes blocks. Keep only entries that share the step's CCSS domain/cluster or are
+   a genuine building block of it (state why). No pre from an unrelated domain. A Test row is not a lesson — fall back.
+   Never put a step's own `build` proposal in its `preBuild`.
+4. RELATED must share the IDEA (same concept in another form, inverse, next step) — not merely the same cluster; fewer,
+   better entries beat padding. Every step should have some, or say why not.
+5. Before reusing a proposal, check it is not ALREADY BUILT (the option may exist now — then the step is full with opts)
+   and that it really closes THIS step; otherwise write a new option proposal.
+6. Self-check before you report: a random 10 of your steps re-judged by generating items; fix and repeat until you'd
+   score them ≥ 8.
