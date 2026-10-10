@@ -7242,22 +7242,70 @@
    "why": "Partitioning numbers to 1,000,000 at band 999,999 is part of this step."
   },
   {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y6.B1.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing numbers with a millions digit (band stops at 999,999)"
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y6.B1.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing 7-digit numbers partitioned (band stops at 999,999)"
+  },
+  {
+   "key": "placevalue:number_word_names",
+   "step": "Y6.B1.S3",
+   "action": "partial",
+   "why": "add as a partial cover: missing 7-digit numbers and the word \"million\" (band stops at 999,999)"
+  },
+  {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y6.B1.S3",
+   "action": "partial",
+   "why": "add as a partial cover: missing the words source for 7-digit numbers"
+  },
+  {
    "key": "placevalue:place_value_10x",
    "step": "Y6.B1.S4",
    "action": "partial",
-   "why": "Teaches x/÷ by 10/100/1,000, not the x10 relationship between places to 1,000,000."
+   "why": "the x10 relationship between neighbouring places and 10/100/.../1,000,000 named as powers of ten (it multiplies and divides numbers by 10, 100, 1,000)"
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y6.B1.S5",
+   "action": "partial",
+   "why": "add as a partial cover: missing lines between hundred-thousands and millions (spans stop at 1,000, numbers at 10,000)"
+  },
+  {
+   "key": "number_sense:round_nl_hundred_thousands",
+   "step": "Y6.B1.S5",
+   "action": "partial",
+   "why": "add as a partial cover: missing reading/placing a number on a line to 10,000,000 (it only rounds 6-digit numbers on a line)"
   },
   {
    "key": "placevalue:compare",
    "step": "Y6.B1.S6",
    "action": "partial",
-   "why": "Band stops at 999,999; \"any integers\" reaches 10,000,000."
+   "why": "7-digit numbers (band stops at 999,999)"
   },
   {
    "key": "placevalue:order_least_to_greatest",
    "step": "Y6.B1.S6",
    "action": "partial",
-   "why": "Band stops at 999,999."
+   "why": "7-digit numbers (band stops at 999,999)"
+  },
+  {
+   "key": "integers:compare_int",
+   "step": "Y6.B1.S6",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "placevalue:order_greatest_to_least",
+   "step": "Y6.B1.S6",
+   "action": "partial",
+   "why": "add as a partial cover: missing 7-digit numbers"
   },
   {
    "key": "number_sense:nearest_10000",
@@ -7275,13 +7323,13 @@
    "key": "integers:compare_int",
    "step": "Y6.B1.S8",
    "action": "partial",
-   "why": "No interval across zero in context."
+   "why": "context and intervals across zero"
   },
   {
    "key": "integers:order_negatives",
    "step": "Y6.B1.S8",
    "action": "remove",
-   "why": "Ordering integers is Y6.B1.S6; it is not the S8 interval lesson (kept there as pre/related)."
+   "why": "Ordering integers is Y6.B1.S6; it is not the S8 interval lesson (kept there as pre/related).; kept as a pre-skill"
   },
   {
    "key": "integers:integer_nl_drag",
@@ -7290,34 +7338,10 @@
    "why": "Places integers on a number line through zero."
   },
   {
-   "key": "shapes_classify:net_identify",
-   "step": "Y6.B12.S11",
+   "key": "integers:sub_int",
+   "step": "Y6.B1.S8",
    "action": "partial",
-   "why": "multiple-choice identification only; the step also draws and checks nets"
-  },
-  {
-   "key": "angles_lines:measure_angles",
-   "step": "Y6.B12.S1",
-   "action": "partial",
-   "why": "multiple choice among multiples of 30/45 degrees; no protractor to the nearest degree"
-  },
-  {
-   "key": "coordinates:geo_translate",
-   "step": "Y6.B13.S4",
-   "action": "partial",
-   "why": "MC only; drawing and describing the translation are missing"
-  },
-  {
-   "key": "coordinates:geo_reflect",
-   "step": "Y6.B13.S5",
-   "action": "partial",
-   "why": "MC only; drawing the reflection and writing coordinates are missing"
-  },
-  {
-   "key": "coordinates:coordinate_all",
-   "step": "Y6.B13.S3",
-   "action": "partial",
-   "why": "reads/plots points but no coordinate problems"
+   "why": "add as a partial cover: missing the difference across zero in context (temperature); it is abstract integer subtraction"
   },
   {
    "key": "addition:add_wp_1m",
@@ -7332,40 +7356,40 @@
    "why": "Column subtraction in context to 1,000,000."
   },
   {
+   "key": "number_theory:gcf_easy",
+   "step": "Y6.B2.S2",
+   "action": "add",
+   "why": "upgrade partial to full: with the options given in direct, the skill teaches every clause of the step"
+  },
+  {
    "key": "number_theory:gcf_hard",
    "step": "Y6.B2.S2",
    "action": "add",
    "why": "\"Click every common factor\" form for larger pairs."
   },
   {
-   "key": "number_theory:divisibility_sort",
-   "step": "Y6.B2.S4",
-   "action": "partial",
-   "why": "Sorts by trial; never states a rule."
+   "key": "number_theory:lcm",
+   "step": "Y6.B2.S3",
+   "action": "add",
+   "why": "upgrade partial to full: with the options given in direct, the skill teaches every clause of the step"
   },
   {
    "key": "order_of_operations:exponents_simple",
    "step": "Y6.B2.S6",
-   "action": "add",
-   "why": "Partial: square and cube notation only."
+   "action": "partial",
+   "why": "add as a partial cover: missing square numbers as square arrays and cube numbers as cubes; recognising whether a number is square or cube (it only evaluates 5² and 5³)"
   },
   {
    "key": "multiplication:area_model_mult_hard",
    "step": "Y6.B2.S7",
    "action": "partial",
-   "why": "Grids stop at 2x3 digits."
-  },
-  {
-   "key": "multiplication:mult_placeholder_zero",
-   "step": "Y6.B2.S7",
-   "action": "partial",
-   "why": "Top number stops at 3 digits."
+   "why": "4-digit x 2-digit (grids are 2x2 and 2x3)"
   },
   {
    "key": "number_ops_mixed:word_problems_mixed",
    "step": "Y6.B2.S8",
    "action": "partial",
-   "why": "Fact-sized numbers, one step."
+   "why": "multiplication with multi-digit numbers and two-step stories"
   },
   {
    "key": "algebra:multi_step_word",
@@ -7374,52 +7398,64 @@
    "why": "+ and - within 100 only: not multiplication."
   },
   {
+   "key": "multiplication:mult_word_problems",
+   "step": "Y6.B2.S8",
+   "action": "partial",
+   "why": "add as a partial cover: missing multi-digit numbers (stories use fact-sized numbers)"
+  },
+  {
+   "key": "multiplication:mult_comparison",
+   "step": "Y6.B2.S8",
+   "action": "partial",
+   "why": "add as a partial cover: missing multi-digit numbers"
+  },
+  {
    "key": "division:box_division_hard",
    "step": "Y6.B2.S9",
    "action": "partial",
-   "why": "3-digit / 1-digit in a box grid, not the bus stop."
+   "why": "4-digit dividends, the bus-stop layout and dividing by a 2-digit number (it is 3-digit / 1-digit in a box grid)"
   },
   {
    "key": "division:div_zero_in_quotient",
    "step": "Y6.B2.S9",
    "action": "partial",
-   "why": "Only zero-in-quotient items."
-  },
-  {
-   "key": "division:long_div_2digit",
-   "step": "Y6.B2.S12",
-   "action": "partial",
-   "why": "Exact quotients only."
+   "why": "general 4-digit / 1-digit (only zero-in-quotient items)"
   },
   {
    "key": "division:remainder_interpret",
    "step": "Y6.B2.S13",
    "action": "partial",
-   "why": "Divisor <= 20, dividend <= 10 x divisor."
+   "why": "multi-digit numbers and 2-digit divisors (divisor <= 20, dividend <= 10 x divisor)"
   },
   {
    "key": "division:remainder_contexts",
    "step": "Y6.B2.S13",
    "action": "partial",
-   "why": "Fact-sized numbers."
+   "why": "multi-digit numbers"
+  },
+  {
+   "key": "division:div_word_problems",
+   "step": "Y6.B2.S13",
+   "action": "partial",
+   "why": "add as a partial cover: missing multi-digit numbers"
   },
   {
    "key": "number_ops_mixed:word_problems_mixed",
    "step": "Y6.B2.S14",
    "action": "partial",
-   "why": "One-step stories."
+   "why": "two or more steps (one-step stories)"
   },
   {
    "key": "algebra:multi_step_word",
    "step": "Y6.B2.S14",
    "action": "partial",
-   "why": "+ and - within 100 only."
+   "why": "x and / steps and large numbers (+ and - within 100 only)"
   },
   {
    "key": "algebra:multi_step_word_plain",
    "step": "Y6.B2.S14",
    "action": "partial",
-   "why": "+ and - within 100 only."
+   "why": "x and / steps and large numbers"
   },
   {
    "key": "order_of_operations:three_ops_no_paren",
@@ -7428,10 +7464,16 @@
    "why": "Three operations without brackets is part of the 5.OA.A.1 step."
   },
   {
-   "key": "number_sense:estimate_products",
+   "key": "number_sense:estimate_sums_diffs",
    "step": "Y6.B2.S16",
    "action": "partial",
-   "why": "Rounds and multiplies; no reasonableness check across four operations."
+   "why": "add as a partial cover: missing checking a given answer is reasonable and choosing a mental method"
+  },
+  {
+   "key": "number_sense:estimate_quotient",
+   "step": "Y6.B2.S16",
+   "action": "partial",
+   "why": "add as a partial cover: missing checking a given answer is reasonable"
   },
   {
    "key": "fractions:equiv_frac_visual",
@@ -7440,10 +7482,28 @@
    "why": "Equivalent fractions with bars."
   },
   {
-   "key": "fraction_operations:frac_word_problems",
+   "key": "fractions:graph_fractions",
+   "step": "Y6.B3.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing equivalent fractions as the same point on two lines"
+  },
+  {
+   "key": "fractions:order_frac_numline",
+   "step": "Y6.B3.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing equivalence on stacked lines"
+  },
+  {
+   "key": "fractions:compare",
+   "step": "Y6.B3.S4",
+   "action": "partial",
+   "why": "add as a partial cover: missing comparing by the same numerator (3/5 > 3/7) and by making numerators common"
+  },
+  {
+   "key": "fraction_operations:frac_word_mixed",
    "step": "Y6.B3.S9",
    "action": "partial",
-   "why": "One-step stories only."
+   "why": "add as a partial cover: missing two-step stories"
   },
   {
    "key": "fraction_operations:mult_frac_whole",
@@ -7458,52 +7518,28 @@
    "why": "No mixed number x integer."
   },
   {
+   "key": "fraction_operations:div_unit_frac_nv",
+   "step": "Y6.B4.S3",
+   "action": "partial",
+   "why": "Unit fractions only."
+  },
+  {
    "key": "fraction_operations:div_unit_fraction",
    "step": "Y6.B4.S3",
    "action": "partial",
    "why": "Unit fractions only."
   },
   {
-   "key": "fraction_operations:div_unit_frac_nv",
-   "step": "Y6.B4.S3",
-   "action": "partial",
-   "why": "Unit fractions only."
-  },
-  {
-   "key": "fraction_operations:div_unit_frac_nv",
-   "step": "Y6.B4.S4",
-   "action": "partial",
-   "why": "Unit fractions only; no renaming."
-  },
-  {
    "key": "fraction_operations:mixed_fraction_ops",
    "step": "Y6.B4.S5",
    "action": "partial",
-   "why": "Random pool; no operation choice page."
+   "why": "add as a partial cover: missing a page that asks the pupil to choose among +, -, x and / by an integer (it is a random pool that also deals /10-/100 and fraction-as-division items)"
   },
   {
-   "key": "fractions:fraction_of_set_hard_nv",
-   "step": "Y6.B4.S7",
+   "key": "fraction_operations:frac_word_mixed",
+   "step": "Y6.B4.S5",
    "action": "partial",
-   "why": "Find-the-whole form has no bar model."
-  },
-  {
-   "key": "measurement:capacity",
-   "step": "Y6.B5.S2",
-   "action": "partial",
-   "why": "whole metric amounts only; Y6 converts decimals both ways"
-  },
-  {
-   "key": "measurement:length_metric",
-   "step": "Y6.B5.S2",
-   "action": "partial",
-   "why": "larger → smaller unit, whole counts only"
-  },
-  {
-   "key": "measurement:unit_conversions",
-   "step": "Y6.B5.S2",
-   "action": "add",
-   "why": "partial cover: metric conversions both ways but whole numbers only"
+   "why": "add as a partial cover: missing calculation items; it is stories only"
   },
   {
    "key": "measurement:capacity",
@@ -7518,22 +7554,64 @@
    "why": "choosing g/kg/ml/l and reading metric scales"
   },
   {
+   "key": "measurement:estimate_length",
+   "step": "Y6.B5.S1",
+   "action": "add",
+   "why": "teaches the step"
+  },
+  {
+   "key": "measurement:capacity",
+   "step": "Y6.B5.S2",
+   "action": "partial",
+   "why": "metric l ↔ ml with whole amounts only"
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y6.B5.S2",
+   "action": "partial",
+   "why": "only larger → smaller unit with a whole-number count (How many mm are in 7 cm?); no decimals, no converting back"
+  },
+  {
+   "key": "measurement:unit_conversions",
+   "step": "Y6.B5.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing amounts with decimals and conversions to the larger unit with a non-whole answer (2.5 kg = 2,500 g; 750 ml = 0.75 l); the generator deals whole-number amounts only"
+  },
+  {
    "key": "measurement:unit_conversion_word",
    "step": "Y6.B5.S3",
-   "action": "add",
-   "why": "partial cover: converts in a story but never calculates with two measures"
+   "action": "partial",
+   "why": "add as a partial cover: missing only converts one amount in a story; never adds, subtracts, multiplies or compares two measures in mixed units"
   },
   {
    "key": "measurement:unit_conversions",
    "step": "Y6.B5.S5",
    "action": "partial",
-   "why": "customary within-system only; no imperial ↔ metric approximations"
+   "why": "customary units only, exact facts; no stone, and no approximate imperial ↔ metric (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb, 1 pint ≈ 570 ml)"
   },
   {
    "key": "measurement:length_customary",
    "step": "Y6.B5.S5",
    "action": "partial",
-   "why": "within-system imperial length only"
+   "why": "imperial length within the system only (in, ft, yd, mi)"
+  },
+  {
+   "key": "measurement:capacity",
+   "step": "Y6.B5.S5",
+   "action": "partial",
+   "why": "add as a partial cover: missing customary capacity within the system only (cups, pints, quarts, gallons)"
+  },
+  {
+   "key": "multiplication:mult_comparison",
+   "step": "Y6.B6.S1",
+   "action": "partial",
+   "why": "add as a partial cover: missing multiplicative relationships only (\"3 times as many\"); never contrasts them with an additive one (\"3 more than\") or asks the pupil to decide which"
+  },
+  {
+   "key": "conversions:ratio_intro",
+   "step": "Y6.B6.S2",
+   "action": "partial",
+   "why": "writes ratios with the colon from two counts in a sentence, with no picture and no \"for every … there are …\" sentence; this step teaches the language before the symbol"
   },
   {
    "key": "conversions:equiv_ratios",
@@ -7545,43 +7623,31 @@
    "key": "conversions:equiv_ratios",
    "step": "Y6.B6.S8",
    "action": "partial",
-   "why": "bare missing-value ratios only; no story, no sharing a total"
+   "why": "\"find the missing value\" (5 : 9 = __ : 54) covers one-part-known problems as bare ratios; no story and no sharing a total in a ratio"
   },
   {
    "key": "conversions:ratio_tables",
    "step": "Y6.B6.S8",
    "action": "partial",
-   "why": "missing value in a table only"
-  },
-  {
-   "key": "conversions:ratio_intro",
-   "step": "Y6.B6.S2",
-   "action": "partial",
-   "why": "colon form only; the step is ratio language from a picture"
+   "why": "missing value in a ratio table only"
   },
   {
    "key": "conversions:unit_rate_intro",
    "step": "Y6.B6.S9",
    "action": "partial",
-   "why": "finds one; never scales on to the asked amount"
+   "why": "finds the value of one only; does not go on to scale to a new amount"
   },
   {
    "key": "conversions:double_num_line",
    "step": "Y6.B6.S9",
    "action": "partial",
-   "why": "proportion from a given drawing only"
+   "why": "solves a proportion from a drawn double number line, never from a story alone"
   },
   {
-   "key": "multiplication:mult_comparison",
-   "step": "Y6.B6.S1",
-   "action": "add",
-   "why": "partial cover: multiplicative side only"
-  },
-  {
-   "key": "algebra:function_table_hard",
-   "step": "Y6.B7.S2",
-   "action": "add",
-   "why": "now full (was partial): ftRules two-step and ftTask \"Find the missing In numbers\" cover both clauses"
+   "key": "conversions:ratio_tables",
+   "step": "Y6.B6.S9",
+   "action": "partial",
+   "why": "add as a partial cover: missing missing value in a given table"
   },
   {
    "key": "algebra:function_table_hard",
@@ -7590,88 +7656,100 @@
    "why": "one-step rules with ftTask \"inputs\" give the backwards machine"
   },
   {
+   "key": "algebra:function_table_hard",
+   "step": "Y6.B7.S2",
+   "action": "add",
+   "why": "upgrade partial to full: now full (was partial): ftRules two-step and ftTask \"Find the missing In numbers\" cover both clauses"
+  },
+  {
    "key": "algebra:write_expression",
    "step": "Y6.B7.S3",
    "action": "partial",
-   "why": "one operation from words only"
+   "why": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, no algebraic convention (3n for 3 × n)"
   },
   {
    "key": "algebra:evaluate_expression_hard",
    "step": "Y6.B7.S5",
-   "action": "add",
-   "why": "partial cover: substitution without a real formula"
+   "action": "partial",
+   "why": "add as a partial cover: missing substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3)"
   },
   {
    "key": "number_theory:factor_tchart_medium",
    "step": "Y6.B7.S9",
-   "action": "add",
-   "why": "partial cover: pairs that multiply to n"
+   "action": "partial",
+   "why": "add as a partial cover: missing lists the factor pairs of a number (a × b = 24) systematically; never pairs for a + b = n or 2a + b = n written with letters"
+  },
+  {
+   "key": "decimals:compare_thousandths",
+   "step": "Y6.B8.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing compares numbers with integer and decimal parts but never asks the value of a digit or partitions the number"
+  },
+  {
+   "key": "decimals:order_decimals",
+   "step": "Y6.B8.S2",
+   "action": "partial",
+   "why": "add as a partial cover: missing orders decimals; no digit value"
   },
   {
    "key": "decimals:round_decimals",
    "step": "Y6.B8.S3",
    "action": "partial",
-   "why": "no nearest whole number"
+   "why": "rounds to the nearest tenth or hundredth with a number line; no rounding to the nearest whole number"
   },
   {
    "key": "decimals:round_thousandths",
    "step": "Y6.B8.S3",
    "action": "partial",
-   "why": "numbers within 1, tenth or hundredth only"
+   "why": "numbers within 1 to the nearest tenth or hundredth only"
   },
   {
    "key": "decimals:add_decimal",
    "step": "Y6.B8.S4",
    "action": "partial",
-   "why": "equal numbers of decimal places only"
+   "why": "both addends always have the same number of decimal places (3.42 + 5.17); never 3.4 + 2.15 or 7 + 2.36"
   },
   {
    "key": "decimals:sub_decimal",
    "step": "Y6.B8.S4",
    "action": "partial",
-   "why": "equal numbers of decimal places only"
-  },
-  {
-   "key": "decimals:compare_thousandths",
-   "step": "Y6.B8.S2",
-   "action": "add",
-   "why": "partial cover, as on Y6.B8.S1"
+   "why": "same number of places in both numbers; never 5 − 2.36 or 4.2 − 1.75 where a zero must be written"
   },
   {
    "key": "decimals:mult_decimal",
    "step": "Y6.B8.S9",
-   "action": "add",
-   "why": "partial cover: no context"
+   "action": "partial",
+   "why": "add as a partial cover: missing bare calculations only, no context"
   },
   {
    "key": "decimals:div_decimal",
    "step": "Y6.B8.S9",
-   "action": "add",
-   "why": "partial cover: no context"
+   "action": "partial",
+   "why": "add as a partial cover: missing bare calculations only, no context"
   },
   {
    "key": "conversions:f_to_d",
    "step": "Y6.B9.S1",
    "action": "partial",
-   "why": "denominators 2, 4, 5, 10, 100 only"
+   "why": "denominators 2, 4, 5, 10 and 100 only; never 20, 25, 50 or a thousandths denominator (7/20 = 35/100 = 0.35; 3/8 = 375/1000)"
   },
   {
    "key": "conversions:d_to_f",
    "step": "Y6.B9.S1",
    "action": "partial",
-   "why": "no thousandths"
-  },
-  {
-   "key": "fraction_operations:frac_as_division",
-   "step": "Y6.B9.S2",
-   "action": "partial",
-   "why": "stops at a ÷ b = a/b; no decimal by division"
+   "why": "decimals to 2 dp back to fractions; no thousandths"
   },
   {
    "key": "fraction_operations:frac_as_div_nv",
    "step": "Y6.B9.S2",
    "action": "partial",
-   "why": "same as frac_as_division"
+   "why": "same, without pictures"
+  },
+  {
+   "key": "fraction_operations:frac_as_division",
+   "step": "Y6.B9.S2",
+   "action": "partial",
+   "why": "reads a ÷ b as a/b and shares wholes, but never carries the division on to a decimal (3/8 = 3 ÷ 8 = 0.375 by short division)"
   },
   {
    "key": "conversions:p_to_d",
@@ -7694,8 +7772,74 @@
   {
    "key": "conversions:percent_of_number",
    "step": "Y6.B9.S8",
+   "action": "partial",
+   "why": "add as a partial cover: missing gives any percent as one calculation; never builds 35% from 10% and 5%, and no increase or decrease (a 20% discount)"
+  },
+  {
+   "key": "area_perimeter:area_perimeter",
+   "step": "Y6.B10.S1",
+   "action": "partial",
+   "why": "add as a partial cover: missing finds area and perimeter of one rectangle only; never sets shapes of the same area side by side to compare perimeters, or rectilinear shapes on squared paper"
+  },
+  {
+   "key": "area_perimeter:composite_shapes",
+   "step": "Y6.B10.S2",
    "action": "add",
-   "why": "partial cover: one-step only"
+   "why": "teaches the step with options {\"forms\": [1]}"
+  },
+  {
+   "key": "area_perimeter:area_triangle",
+   "step": "Y6.B10.S4",
+   "action": "partial",
+   "why": "deals right-angled triangles by (b x h) / 2 with the formula given; never shows the triangle as half of its surrounding rectangle on a grid"
+  },
+  {
+   "key": "area_perimeter:area_triangle",
+   "step": "Y6.B10.S5",
+   "action": "partial",
+   "why": "right-angled triangles only; no acute or obtuse triangles with a dashed perpendicular height, and no choosing the right height"
+  },
+  {
+   "key": "graphs:pie_chart",
+   "step": "Y6.B11.S4",
+   "action": "partial",
+   "why": "add as a partial cover: missing reads a labelled percent and adds two sectors; never finds the amount from a percent and a total (25% of 80 people)"
+  },
+  {
+   "key": "angles_lines:measure_angles",
+   "step": "Y6.B12.S1",
+   "action": "partial",
+   "why": "multiple choice among multiples of 30 and 45 degrees; no reading a protractor to the nearest degree"
+  },
+  {
+   "key": "shapes_classify:classify_triangles",
+   "step": "Y6.B12.S5",
+   "action": "partial",
+   "why": "add as a partial cover: missing names isosceles/equilateral/right triangles but never uses their equal angles or the right angle to find a missing angle"
+  },
+  {
+   "key": "shapes_classify:net_identify",
+   "step": "Y6.B12.S11",
+   "action": "partial",
+   "why": "matches a net to its solid by multiple choice; never draws, completes or checks a net"
+  },
+  {
+   "key": "coordinates:coordinate_all",
+   "step": "Y6.B13.S3",
+   "action": "partial",
+   "why": "add as a partial cover: missing reads and plots single points; no problems (missing vertex, same x/y, distance across an axis)"
+  },
+  {
+   "key": "coordinates:geo_translate",
+   "step": "Y6.B13.S4",
+   "action": "partial",
+   "why": "multiple choice: pick the translated image; no drawing the image, no describing the translation, no new coordinates"
+  },
+  {
+   "key": "coordinates:geo_reflect",
+   "step": "Y6.B13.S5",
+   "action": "partial",
+   "why": "multiple choice over the x- or y-axis; no drawing the reflection or writing its coordinates"
   }
  ]
 }
