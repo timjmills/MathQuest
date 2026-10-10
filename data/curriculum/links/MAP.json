@@ -2752,7 +2752,7 @@
     "area_perimeter:area_unit_squares"
    ],
    "proposal": "map_area_pick",
-   "note": "area_unit_squares: \"Count the unit squares. What is the area?\" number entry on one shape only",
+   "note": "area_unit_squares: \"Count the unit squares. What is the area?\" number entry on one shape only; drawing checked: one grid rectangle/L per item",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
@@ -2929,10 +2929,13 @@
    "proposal": "map_graph_sentence",
    "note": "graph skills ask one numeric/text question; no statement-matching form; re-check --n 12, checked: bar_graph (how many / how many more / in all), tally_chart, pictograph — one numeric/name question, no statements",
    "evidence": {
-    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-    "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 2.MD.D.10 / 3.MD.B.3 (statements about a graph) is in MAP's blueprint"
    },
-   "closes": "Adds statements to check against a graph (select all true); live graphs ask one number."
+   "closes": "Adds statements to check against a graph (select all true); live graphs ask one number.",
+   "also": [
+    "map_graph_sentence_picto"
+   ]
   },
   {
    "task": "Match: shape ↔ property (geometry)",
@@ -2994,10 +2997,10 @@
     "area_perimeter:area_distributive_visual"
    ],
    "proposal": "map_area_equation",
-   "note": "distributive model computes a total; nothing asks which equation models the picture",
+   "note": "distributive model computes a total; nothing asks which equation models the picture; drawing checked (gen-geometry.js): split rectangle with side labels, no equations shown",
    "evidence": {
-    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
-    "says": "2-5 M&D: area figure and volume expressions items pair a picture with a number/expression"
+    "url": null,
+    "says": "not found in public NWEA material; kept because 3.MD.C.7b / 3.MD.D.8 is in MAP's blueprint"
    },
    "closes": "Adds ticking every area and perimeter equation for a grid rectangle; distributive_visual only splits area."
   },
@@ -3138,7 +3141,7 @@
     "measurement:mass_volume_liquid"
    ],
    "proposal": "mass_scales",
-   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading); options checked: mass_volume_liquid forms 0/1/2 (cylinder, scale, sort)",
+   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell; re-sampled --n 12: 6/12 'Read the scale. mass in kg' return ans=0 (BUG: kg scale reading); options checked: mass_volume_liquid forms 0/1/2 (cylinder, scale, sort); drawing checked: scale and cylinder drawn; kg reading answer 0 bug",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 3.MD.A.2 is in MAP's blueprint"
@@ -3235,13 +3238,13 @@
     "measurement:equiv_coin_sets",
     "measurement:make_change_least_coins"
    ],
-   "proposal": "map_money_build",
+   "proposal": "money_uk",
    "note": "check a given set or write fewest coins; no free build; options checked: money_count kind/values/order, equiv_coin_sets, make_change_least_coins — count or least coins, no free build",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
    },
-   "closes": "Adds building an amount by dragging coins (production); live skills count or compare sets."
+   "closes": "money_uk adds choosing coins to make an amount (and two ways); live skills count or find fewest coins (make_change_least_coins)."
   },
   {
    "task": "Money: change and comparisons",
@@ -3574,12 +3577,16 @@
     "shapes_early:partition_shapes"
    ],
    "proposal": "map_shape_partition_pick",
-   "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares; options checked: partition_shapes forms 0/1, parts halves/thirds/fourths — no choose-all, no eighths",
+   "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares; options checked: partition_shapes forms 0/1, parts halves/thirds/fourths — no choose-all, no eighths; drawing checked: one shape per item, shaded parts, no set of shapes",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
    },
-   "closes": "Adds equal-vs-unequal, cutting shapes into halves/quarters, and choose ALL shapes showing a named fraction; partition_shapes only reads the fraction shaded."
+   "closes": "map_shape_partition_pick adds choose ALL shapes in equal shares / with a named unit fraction shaded; also partition_draw (draw the cuts) and WRM fraction_parts (equal or not, part B) close the cutting and equal-vs-unequal clauses.",
+   "also": [
+    "partition_draw",
+    "fraction_parts"
+   ]
   },
   {
    "task": "Regular and irregular polygons; name polygons by sides",
@@ -3955,13 +3962,13 @@
    "skills": [
     "graphs:tally_chart"
    ],
-   "proposal": "map_tally_build",
+   "proposal": "collect_data",
    "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build; options checked: tally_chart forms 0-3 all read a finished chart",
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary; page returned 503)"
    },
-   "closes": "Adds making the tally from raw data; tally_chart only reads one."
+   "closes": "collect_data adds tallying a raw data list (its mapClause: tally-only K-2 band); tally_chart only reads a finished chart."
   },
   {
    "task": "Read a table of data",
@@ -4071,13 +4078,13 @@
    "skills": [
     "measurement:unit_conversions"
    ],
-   "proposal": "time_convert",
-   "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only); options checked: unit_conversions forms 1 (click every equal) with units metric/customary — no time units",
+   "proposal": "map_conv_time_choose_all",
+   "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only); options checked: unit_conversions forms 1 (click every equal) with units metric/customary — no time units; drawing checked (gen-measurement.js): conversion arrow card with a 'Remember' strip; form 1 multi-select has no time",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' multi-select"
    },
-   "closes": "time_convert's MAP clause adds choose ALL measurements equal to a time."
+   "closes": "map_conv_time_choose_all adds time units to unit_conversions so its live click-every-equal form asks 'equal to 5 hours'."
   },
   {
    "task": "Choose ALL expressions that give the volume of a prism",
@@ -4156,7 +4163,7 @@
     "shapes_early:count_edges_faces_vertices"
    ],
    "proposal": "shapes_3d_props",
-   "note": "count_edges_faces asks one solid's count; no select-all-with-property item; re-check --n 12, checked: count_edges_faces_vertices (one solid count), cross_section_3d — no select-all-by-property",
+   "note": "count_edges_faces asks one solid's count; no select-all-with-property item; re-check --n 12, checked: count_edges_faces_vertices (one solid count), cross_section_3d — no select-all-by-property; drawing checked: one solid per item",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
@@ -4178,7 +4185,7 @@
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 M&D: 'paid with one dollar. Show the change Julia should receive' (coins moved)"
    },
-   "closes": "map_money_build's 'show the change' form adds dragging the change from $1."
+   "closes": "map_money_build adds showing the change with coins; money_change gives it as a number."
   },
   {
    "task": "Total from a fraction line plot (sum of lengths)",
@@ -4311,7 +4318,7 @@
     "measurement:reading_ruler"
    ],
    "proposal": "measure_two_units",
-   "note": "measure_nonstandard --n 8: one unit per item (crayons, clips or cubes); reading_ruler: inches only (options parts 0/1/2 all inches) — no item measures one object twice; options checked: reading_ruler parts, labels",
+   "note": "measure_nonstandard --n 8: one unit per item (crayons, clips or cubes); reading_ruler: inches only (options parts 0/1/2 all inches) — no item measures one object twice; options checked: reading_ruler parts, labels; drawing checked: one unit row under one object",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 2.MD.A.2 is in MAP's blueprint"
@@ -4328,7 +4335,7 @@
     "shapes_early:compose_shapes"
    ],
    "proposal": "map_compose_solids",
-   "note": "compose_shapes --n 8: 8/8 two flat shapes ('What shape do you make when you put these two shapes together?'); compose_hexagon, compose_rect_from_squares flat too; no options on compose_shapes",
+   "note": "compose_shapes --n 8: 8/8 two flat shapes ('What shape do you make when you put these two shapes together?'); compose_hexagon, compose_rect_from_squares flat too; compose_shapes option shapes (triangle / square or rectangle / hexagon made) — all flat; drawing checked: two flat shapes",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 1.G.A.2 is in MAP's blueprint"
@@ -6874,11 +6881,11 @@
   },
   "map_money_build": {
    "kind": "option",
-   "skill": "measurement:money_count",
-   "option": "response \"build the amount\": drag coins (or draw them on paper) to make a given total; any correct set accepted",
-   "name": "Make the Amount With Coins (option)",
-   "teaches": "composing a money amount from coins",
-   "representation": "print: B&W boxed cell, the amount in big digits and a tray of coin outlines with values; pupil draws or writes the coins used in slots '__ × 25¢ + __ × 10¢ ...'; screen: drag coins into a tray (production), any correct set accepted",
+   "skill": "measurement:money_change",
+   "option": "response \"show the change\": drag (or draw) the coins of the change from $1",
+   "name": "Show the Change with Coins (option)",
+   "teaches": "making the change from $1 with coins (counting up from the price)",
+   "representation": "print: B&W boxed Andika cell, price tag and a coin tray of outlines; pupil draws/writes the coins; screen: drag coins (production)",
    "family": "measurement",
    "ccss": [
     "2.MD.C.8"
@@ -6890,32 +6897,30 @@
      "taskType": "drag and drop coins"
     }
    ],
-   "why": "MAP drags coins to make an amount; we only count shown coins, check a set, or write fewest coins",
+   "why": "money_change ('Find the Change') asks the change as a number; MAP shows it with coins. Making an amount is WRM money_uk (choosing coins) and fewest coins is live make_change_least_coins, so neither is repeated here",
    "reused": false,
    "problemTypes": [
-    "make the amount — target total — drag/draw coins",
-    "show the change — 'You pay $1 for a 65¢ toy; show the change' — drag/draw coins",
-    "fewest coins — make the total with fewest coins"
+    "show the change — 'You pay $1 for a 65¢ toy' — drag/draw coins",
+    "count up — price then coins added to reach $1 — write the running totals"
    ],
    "levels": [
-    "L1: pennies, nickels, dimes, totals to 30¢ (structural: coin tray stays; hint: running total shown)",
-    "L2: add quarters, totals to $1; running total faded",
-    "L3: change from $1 (one new thing: subtract first)"
+    "L1: prices ending in 5 or 0, change ≤ 35¢, running total shown (structural: coin tray; hint: running total fades)",
+    "L2: any price to 99¢",
+    "L3: no running total"
    ],
    "example": {
-    "item": "Show 41¢ with coins.",
-    "answer": "e.g. 1 quarter, 1 dime, 1 nickel, 1 penny (any set totalling 41¢)"
+    "item": "You pay $1 for a 79¢ robot. Show the change with coins.",
+    "answer": "21¢, e.g. 2 dimes and 1 penny"
    },
    "misconceptions": [
-    "counts coins instead of their values",
-    "thinks a bigger coin is worth more (nickel vs dime)",
-    "forgets to subtract when showing change"
+    "writes the price instead of the change",
+    "counts coins not values"
    ]
   },
   "map_graph_sentence": {
    "kind": "option",
    "skill": "graphs:bar_graph",
-   "option": "form \"which sentence is true?\": a bar or picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
+   "option": "form \"which sentence is true?\": a bar graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
    "name": "Which Sentence Matches the Graph? (option)",
    "teaches": "reading a graph and checking comparison statements against it",
    "representation": "print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply",
@@ -7032,59 +7037,17 @@
     "counts tick marks instead of spaces"
    ]
   },
-  "map_tally_build": {
-   "kind": "option",
-   "skill": "graphs:tally_chart",
-   "option": "task \"make the tally\": a list or picture of items; complete the tally marks and totals",
-   "name": "Complete a Tally Chart (option)",
-   "teaches": "recording data with tally marks in fives",
-   "representation": "print: B&W boxed cell, a picture list of items, a tally table with empty tally and total columns; pupil draws tallies in fives and writes totals; screen: click to add tally marks (production) and number entry",
-   "family": "data",
-   "ccss": [
-    "1.MD.C.4",
-    "2.MD.D.10"
-   ],
-   "map": [
-    {
-     "strand": "Data & graphing",
-     "ritBand": "161-180",
-     "taskType": "complete the table"
-    }
-   ],
-   "why": "tally_chart only reads a finished chart; MAP also asks pupils to complete one",
-   "reused": false,
-   "problemTypes": [
-    "make the tally — picture list — draw tallies and totals",
-    "total only — given tallies — write totals",
-    "make and ask — make the tally then answer 'how many more'"
-   ],
-   "levels": [
-    "L1: 2 categories, totals ≤ 9, cross-off picture list (hint: cross-off fades)",
-    "L2: 3-4 categories, totals to 20, fives gate",
-    "L3: add one question from the chart"
-   ],
-   "example": {
-    "item": "Fruit: apple, pear, apple, apple, banana, pear, apple, apple, apple. Make the tally.",
-    "answer": "apple 卌|| (6), pear || (2), banana | (1)"
-   },
-   "misconceptions": [
-    "draws the fifth mark as a fifth upright stroke",
-    "loses count without crossing off"
-   ]
-  },
   "map_shape_partition_pick": {
    "kind": "option",
    "skill": "shapes_early:partition_shapes",
-   "option": "form \"choose ALL\": 4-6 shapes, some cut unequally; choose ALL in equal halves/thirds/fourths/eighths, or ALL showing a named unit fraction shaded",
+   "option": "form \"choose ALL\": 4-6 shapes, some cut unequally; choose ALL in equal halves/thirds/fourths, or ALL showing a named unit fraction shaded",
    "name": "Equal Parts of Shapes (option)",
    "teaches": "equal shares must be the same size; halves, thirds and quarters (fourths) of circles and rectangles; naming the shaded share",
    "representation": "print: B&W boxed Andika cell, 3-4 outline shapes with check boxes (choose forms) or one blank shape the pupil cuts with a pencil line (cut form), shaded part in the single grey; screen: select all that apply / draw a cut line (production), never MC for the cut form",
    "family": "geometry",
    "ccss": [
     "1.G.A.3",
-    "2.G.A.3",
-    "3.G.A.2",
-    "3.NF.A.1"
+    "2.G.A.3"
    ],
    "map": [
     {
@@ -7093,7 +7056,7 @@
      "taskType": "multi-select figures"
     }
    ],
-   "why": "partition_shapes asks fraction shaded / count parts only; MAP asks choose ALL shapes in equal shares and choose ALL shapes showing a named unit fraction. This option owns that choose-ALL form for 1/2, 1/3, 1/4 and 1/8 (no other proposal has it). Companions, not duplicated here: WRM fraction_parts (tick equal / not equal on one shape) and STANDARD partition_draw (draw the cuts).",
+   "why": "partition_shapes asks fraction shaded / count parts only; MAP asks choose ALL shapes in equal shares and choose ALL shapes showing a named unit fraction. This option owns that choose-ALL form for 1/2, 1/3 and 1/4 (eighths dropped: the host is 'Halves/Thirds/Fourths') (no other proposal has it). Companions, not duplicated here: WRM fraction_parts (tick equal / not equal on one shape) and STANDARD partition_draw (draw the cuts).",
    "reused": false,
    "problemTypes": [
     "choose all equal — 'Choose ALL shapes cut into equal fourths' — tick / select all",
@@ -7104,8 +7067,7 @@
     "L1: halves only, 4 shapes, unequal ones clearly unequal (structural: outline shapes and check boxes stay; hint: 'same size?' cue fades)",
     "L2: fourths",
     "L3: thirds",
-    "L4: choose ALL showing a named unit fraction shaded",
-    "L5: eighths"
+    "L4: choose ALL showing a named unit fraction shaded"
    ],
    "example": {
     "item": "Tick every shape cut into equal quarters.",
@@ -8193,16 +8155,15 @@
      "taskType": "select an object"
     }
    ],
-   "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw",
+   "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw; the pan-balance form is WRM balance ('Balanced or Not?'), not repeated here",
    "reused": false,
    "problemTypes": [
     "which is heavier — two objects — circle",
-    "balance — pan balance tipped — write heavier/lighter in the sentence",
     "order — three objects — number 1-3 lightest to heaviest"
    ],
    "levels": [
     "L1: everyday objects of very different mass (structural: picture stays)",
-    "L2: pan balance drawing (one change: read the balance)",
+    "L2: closer masses",
     "L3: order three"
    ],
    "example": {
@@ -8272,7 +8233,7 @@
      "taskType": "drag into chart"
     }
    ],
-   "why": "MAP 2-5 sample item; no skill sorts by two attributes; reuse sweep: VISUAL_BUILDS vis_sort_diagrams supplies the Carroll 2 × 2 pane this skill draws with, but it hosts no shape-attribute skill, so the skill stays new",
+   "why": "MAP 2-5 sample item; no skill sorts by two attributes; reuse sweep: VISUAL_BUILDS vis_sort_diagrams supplies the Carroll 2 × 2 pane this skill draws with, but it hosts no shape-attribute skill, so the skill stays new; picture search: WRM shape_sort (one property, rings, K-1) is the early form; this is the Grade 4 two-attribute chart",
    "reused": false,
    "problemTypes": [
     "sort — drag/write each shape into the chart",
@@ -8315,10 +8276,10 @@
     {
      "strand": "Measurement",
      "ritBand": "201-220",
-     "taskType": "number entry; select all equivalent"
+     "taskType": "number entry"
     }
    ],
-   "mapClause": "small → large as h-and-min, decimal and mixed hours (90 min = 1 h 30 min = 1.5 h = 1 ½ h), and choose ALL measurements equal to a time",
+   "mapClause": "small → large as h-and-min, decimal and mixed hours (90 min = 1 h 30 min = 1.5 h = 1 ½ h)",
    "reused": true
   },
   "map_frac_side_area": {
@@ -8556,6 +8517,190 @@
    "misconceptions": [
     "names the flat face (circle) instead of the solid (cylinder)",
     "counts a hidden cube twice or misses it"
+   ]
+  },
+  "collect_data": {
+   "ccss": [
+    "2.MD.D.10",
+    "3.MD.B.3"
+   ],
+   "why": "WRM collect_data (wrm.js) already makes the pupil tally raw data; MAP's K-2 item stops at the tally, so the only extra is a tally-only band",
+   "kind": "new",
+   "skill": "graphs:collect_and_represent",
+   "name": "Collect and Represent Data",
+   "teaches": "collecting data into a tally, then choosing a table, pictogram or bar chart to show it",
+   "representation": "a list of raw data; tally it, then draw the chart on a grid",
+   "family": "data",
+   "steps": [
+    "Y3.B12.S5"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Data & graphing",
+     "ritBand": "161-190",
+     "taskType": "complete a tally chart from data"
+    }
+   ],
+   "mapClause": "K-2 band: tally only (2-4 categories, totals to 20, no chart step), screen: click to add tally marks",
+   "reused": true
+  },
+  "map_conv_time_choose_all": {
+   "kind": "option",
+   "skill": "measurement:unit_conversions",
+   "option": "units \"time\" (h, min, s) for both forms, so form 1 'Click every equal measurement' can ask 'Choose ALL measurements equal to 5 hours'",
+   "name": "Time in Measurement Conversions (option)",
+   "teaches": "choosing every measurement equal to a time (5 h = 300 min = 18,000 s) and converting h ↔ min ↔ s",
+   "representation": "print: B&W boxed Andika cell, the time in big digits and 4-5 measurements with check boxes, a 'Remember: 1 h = 60 min' strip; screen: select all that apply (form 1, live multi-select) and number entry (form 0)",
+   "family": "measurement",
+   "ccss": [
+    "4.MD.A.1",
+    "5.MD.A.1"
+   ],
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "211-220",
+     "taskType": "select all equivalent"
+    }
+   ],
+   "why": "unit_conversions ('Measurement Conversions') already has the click-every-equal form, but its units option is metric/customary only; time is a measurement conversion, so the name covers it",
+   "reused": false,
+   "problemTypes": [
+    "choose all — 'Choose ALL measurements equal to 3 hours' — tick / select all",
+    "convert — '2 h = __ min' — write / number entry",
+    "which is not — one distractor among equals — cross it out / click"
+   ],
+   "levels": [
+    "L1: h → min, whole hours (structural: check boxes; hint: 'Remember: 1 h = 60 min' strip, fades by L3)",
+    "L2: min → s",
+    "L3: h → s (two steps) and choose all with distractors that use ×100"
+   ],
+   "example": {
+    "item": "Choose ALL measurements equal to 2 hours: 120 minutes, 200 minutes, 7,200 seconds, 1 hour 60 minutes",
+    "answer": "120 minutes, 7,200 seconds, 1 hour 60 minutes"
+   },
+   "misconceptions": [
+    "uses 100 minutes in an hour",
+    "multiplies by 60 only once for hours → seconds"
+   ]
+  },
+  "partition_draw": {
+   "ccss": [
+    "3.G.A.2"
+   ],
+   "why": "STANDARD_PROPOSALS partition_draw (build-list.js)",
+   "representation": "legacy → draw the cuts on a blank shape; write the unit fraction",
+   "kind": "option",
+   "skill": "shapes_early:partition_shapes",
+   "option": "task \"draw the cuts\": partition a shape into n equal-area parts and write the unit fraction of each part",
+   "name": "Cut Into Equal Areas (option)",
+   "grade": "3",
+   "family": "geometry",
+   "standards": [
+    "3.G.A.2"
+   ],
+   "ee": [
+    "M.EE.3.G.2"
+   ],
+   "teaches": "partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole",
+   "problemTypes": [
+    "draw lines to make 4 equal parts; each is __ of the shape",
+    "are these parts equal in area?",
+    "two different ways to cut into quarters",
+    "name one part"
+   ],
+   "templates": [
+    "frac-model"
+   ],
+   "newTemplates": [
+    "shape-grid"
+   ],
+   "answer": "draw the cut lines; write the unit fraction",
+   "ladder": "O2 halves/quarters → thirds/sixths → eighths · O3 grid under the shape → dots → none · O6 rectangles / circles / hexagons",
+   "misconceptions": [
+    "equal parts must be the same shape",
+    "counts parts that are not equal"
+   ],
+   "wrmSteps": [
+    "Y3.B6.S1"
+   ],
+   "after": [],
+   "source": "STANDARD_PROPOSALS",
+   "map": [
+    {
+     "strand": "Geometry",
+     "ritBand": "181-200",
+     "taskType": "partition a shape"
+    }
+   ],
+   "reused": true
+  },
+  "money_uk": {
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "why": "WRM money_uk (wrm.js) already teaches choosing coins to make an amount",
+   "kind": "option",
+   "skill": "measurement:money_count",
+   "option": "notes and cents",
+   "name": "Count Money (option)",
+   "teaches": "counting notes and coins together and in dollars and cents, choosing coins to make an amount, making the same amount two ways",
+   "representation": "options on money_count / equiv_coin_sets: notes, dollars-and-cents mode, \"make it two ways\"",
+   "family": "measurement",
+   "steps": [
+    "Y2.B4.S2",
+    "Y2.B4.S3",
+    "Y2.B4.S8"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "171-190",
+     "taskType": "make an amount with coins"
+    }
+   ],
+   "reused": true
+  },
+  "map_graph_sentence_picto": {
+   "kind": "option",
+   "skill": "graphs:pictograph",
+   "option": "form \"which sentence is true?\": a picture graph and 3 statements (\"5 more chose cats than dogs\"); tick the true one(s)",
+   "name": "Which Sentence Matches the Picture Graph? (option)",
+   "teaches": "reading a graph and checking comparison statements against it",
+   "representation": "print: B&W boxed cell, the bar or picture graph on top (single grey bars), 3 statements below with check boxes; screen: select all that apply",
+   "family": "data",
+   "ccss": [
+    "2.MD.D.10",
+    "3.MD.B.3"
+   ],
+   "map": [
+    {
+     "strand": "Data & graphing",
+     "ritBand": "181-200",
+     "taskType": "multi-select statements"
+    }
+   ],
+   "why": "same option as map_graph_sentence, declared on Pictographs so each host's name covers its graph",
+   "reused": false,
+   "problemTypes": [
+    "which is true — tick the true statement(s)",
+    "true or false — one statement, tick T/F",
+    "fix — a false statement, write the right number"
+   ],
+   "levels": [
+    "L1: key 1, one true statement among 3 'most/least' sentences (structural: graph stays)",
+    "L2: 'how many more' statements",
+    "L3: scaled graph (key 2/5) and select ALL true"
+   ],
+   "example": {
+    "item": "Graph: Cats 6, Dogs 4, Fish 2. Which sentence is true? A 'Dogs got the most.' B '2 more chose cats than dogs.' C 'Fish got 4.'",
+    "answer": "B"
+   },
+   "misconceptions": [
+    "reads the bar length in squares when the scale is 2",
+    "confuses 'more than' with the total"
    ]
   }
  },

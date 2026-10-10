@@ -2327,7 +2327,8 @@
     "ritBand": "181-190",
     "taskType": "picture ↔ equation"
    },
-   "reused": true
+   "reused": true,
+   "option": "split, hidden, finish-the-array, counter one|ten|hundred, array-groups (three factors), expression matching"
   },
   "vis_double_scale": {
    "kind": "template",
