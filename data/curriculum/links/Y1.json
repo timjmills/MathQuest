@@ -2526,6 +2526,812 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B4.S1": {
+   "title": "Count within 20",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 20
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W05)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W05)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W05)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W05)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: Y1.B4.S7 1 more and 1 less"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "same block: Y1.B4.S7 1 more and 1 less"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S2": {
+   "title": "Understand 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     },
+     "missing": "10 as one ten (a full frame is one ten)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "10 as one ten",
+   "build": [
+    "teen_structure"
+   ],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W21)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W21)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W21)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:teen_compose",
+     "why": "next step: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "next step: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S3 Count by making groups of tens"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S5 Partition into tens and ones"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S3": {
+   "title": "Understand 11, 12 and 13",
+   "direct": [
+    {
+     "key": "composing:teen_compose",
+     "opts": {
+      "band": 15
+     }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {
+      "band": 15
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W21)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S3 Count by making groups of tens"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S5 Partition into tens and ones"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S4": {
+   "title": "Understand 14, 15 and 16",
+   "direct": [
+    {
+     "key": "composing:teen_compose",
+     "opts": {
+      "band": 19
+     }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {
+      "band": 19
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W21)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S3 Count by making groups of tens"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S5 Partition into tens and ones"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S5": {
+   "title": "Understand 17, 18 and 19",
+   "direct": [
+    {
+     "key": "composing:teen_compose",
+     "opts": {
+      "band": 19
+     }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {
+      "band": 19
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W21)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W21)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W21)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S3 Count by making groups of tens"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S4 Groups of tens and ones"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S5 Partition into tens and ones"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S6": {
+   "title": "Understand 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:ten_frame_build_teen",
+     "opts": {},
+     "missing": "20 as two full tens"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "20 as two tens",
+   "build": [
+    "teen_structure"
+   ],
+   "pre": [
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W22)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W22)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W22)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S4 Grouping (prior learning wk W22)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y1.B1.S5 Recognise numbers as words (same CCSS K.CC.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "consolidate"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: Y1.B4.S7 1 more and 1 less"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "next step: Y1.B4.S7 1 more and 1 less"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same CCSS K.CC.A.3 in Y1.B4.S9 Use a number line to 20"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.CC.A.3 in Y1.B4.S9 Use a number line to 20"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S3 Count by making groups of tens"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same CCSS K.NBT.A.1 in Y1.B6.S4 Groups of tens and ones"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S7": {
+   "title": "1 more and 1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "opts": {
+      "step": 1,
+      "band": 20
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B11.S1 Find 9 and 10 (prior learning wk W05)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W05)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S3 Represent 9 and 10 (prior learning wk W05)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W05)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S8": {
+   "title": "The number line to 20",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "the 0-20 number line: reading and labelling ticks",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W06)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B4.S7 1 more and 1 less (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "Y1.B4.S6 Understand 20 (the step before in this block)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y1.B1.S5 Recognise numbers as words (same CCSS K.CC.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "addition:number_line_add",
+     "why": "jumps on a line to 20"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "next step: Y1.B4.S9 Use a number line to 20"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S9": {
+   "title": "Use a number line to 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:number_line_add",
+     "opts": {},
+     "missing": "using the line to count on and back (the skill is addition only)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "opts": {},
+     "missing": "counting back on the line"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding and placing numbers on a 0-20 line",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W06)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B4.S7 1 more and 1 less (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "Y1.B4.S6 Understand 20 (same CCSS K.CC.A.3, earlier)"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "Y1.B1.S5 Recognise numbers as words (same CCSS K.CC.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S10": {
+   "title": "Estimate on a number line to 20",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "estimating where a number lies on a 0-20 line with only the ends marked",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W06)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B4.S9 Use a number line to 20 (the step before in this block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B4.S9 Use a number line to 20 (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "Y1.B4.S6 Understand 20 (same CCSS K.CC.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "teen_structure"
+   ],
+   "related": [
+    {
+     "key": "placevalue:compare",
+     "why": "next step: Y1.B4.S11 Compare numbers to 20"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S11": {
+   "title": "Compare numbers to 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:compare",
+     "opts": {},
+     "missing": "numbers within 20 (the lowest band is 99)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing numbers within 20",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W07)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W07)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W07)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B4.S9 Use a number line to 20 (the step before in this block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B4.S9 Use a number line to 20 (the step before in this block)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (same CCSS K.CC.C.7, earlier)"
+    }
+   ],
+   "preBuild": [
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "next step: Y1.B4.S12 Order numbers to 20"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B4.S12": {
+   "title": "Order numbers to 20",
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {},
+     "missing": "numbers within 20"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering numbers within 20",
+   "build": [
+    "compare_small"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W07)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B11.S5 1 more (prior learning wk W07)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "reverse order"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same block: Y1.B4.S1 Count within 20"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: Y1.B4.S2 Understand 10"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "same block: Y1.B4.S3 Understand 11, 12 and 13"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -2626,9 +3432,12 @@
    "steps": [
     "Y1.B1.S12",
     "Y1.B1.S13",
-    "Y1.B1.S14"
+    "Y1.B1.S14",
+    "Y1.B4.S11",
+    "Y1.B4.S12"
    ],
    "ccss": [
+    "1.NBT.B.3",
     "K.CC.C.6",
     "K.CC.C.7"
    ],
@@ -2643,10 +3452,14 @@
    "representation": "a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked",
    "family": "placevalue",
    "steps": [
-    "Y1.B1.S15"
+    "Y1.B1.S15",
+    "Y1.B4.S8",
+    "Y1.B4.S9",
+    "Y1.B4.S10"
    ],
    "ccss": [
-    "K.CC.A.2"
+    "K.CC.A.2",
+    "K.CC.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
@@ -2803,6 +3616,25 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "teen_structure": {
+   "kind": "option",
+   "skill": "composing:teen_compose",
+   "option": "10 and 20",
+   "name": "Understand 10 and 20 (option)",
+   "teaches": "10 as one ten and 20 as two tens (the skill covers 11-19)",
+   "representation": "band values \"exactly 10\" and \"20\" on teen_compose with one and two full ten frames",
+   "family": "counting",
+   "steps": [
+    "Y1.B4.S2",
+    "Y1.B4.S6"
+   ],
+   "ccss": [
+    "K.CC.A.3",
+    "K.NBT.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -2829,6 +3661,12 @@
    "step": "Y1.B3.S5",
    "action": "partial",
    "why": "patterns of 3-D shapes (the skill draws 2-D shapes only)"
+  },
+  {
+   "key": "subtraction:number_line_sub",
+   "step": "Y1.B4.S9",
+   "action": "partial",
+   "why": "counting back on the line"
   }
  ]
 }
