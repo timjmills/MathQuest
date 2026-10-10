@@ -639,6 +639,145 @@
     }
    ],
    "note": "Wholes up to 5; 3 = 2 + 1 lies inside the band."
+  },
+  "R.B4.S1": {
+   "title": "Identify and name circles and triangles",
+   "direct": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "match the word to the shape"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "count corners: a circle has none"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "next step: R.B4.S2 Compare circles and triangles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B4.S2": {
+   "title": "Compare circles and triangles",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "opts": {},
+     "missing": "comparing two shapes side by side: curved / straight sides, corners"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing a circle and a triangle (same / different, curved / straight)",
+   "build": [
+    "compare_shapes"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B4.S1 Identify and name circles and triangles"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B4.S4 Describe position"
+    }
+   ],
+   "note": ""
+  },
+  "R.B4.S3": {
+   "title": "Shapes in the environment",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding circles and triangles in real objects",
+   "build": [
+    "shapes_world"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_shapes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "naming the shapes first"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "next step: R.B4.S4 Describe position"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B4.S2 Compare circles and triangles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B4.S4": {
+   "title": "Describe position",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {},
+     "missing": "in front of, behind, next to, on top of, under (the skill does above / below / beside)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the full early position vocabulary (in front, behind, on top, under, between)",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "shapes_world",
+    "compare_shapes"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B4.S1 Identify and name circles and triangles"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same block: R.B4.S2 Compare circles and triangles"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -751,7 +890,62 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "compare_shapes": {
+   "kind": "new",
+   "skill": "shapes_early:compare_two_shapes",
+   "name": "Same and Different Shapes",
+   "teaches": "comparing two shapes by sides, corners and straight or curved edges",
+   "representation": "two shapes side by side with a same/different checklist (sides, corners, curved)",
+   "family": "geometry",
+   "steps": [
+    "R.B4.S2"
+   ],
+   "ccss": [
+    "K.G.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "shapes_world": {
+   "kind": "new",
+   "skill": "shapes_early:shapes_around_us",
+   "name": "Shapes Around Us",
+   "teaches": "recognising 2-D and 3-D shapes in everyday objects (a clock is a circle, a tin is a cylinder)",
+   "representation": "line drawings of everyday objects; circle or write the matching shape name from a word bank",
+   "family": "geometry",
+   "steps": [
+    "R.B4.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "position_map": {
+   "kind": "new",
+   "skill": "shapes_early:position_and_maps",
+   "name": "Where Is It? Positions and Maps",
+   "teaches": "position and direction language (on, under, next to, behind, in front, left, right, forwards, backwards), following and giving simple directions on a grid map",
+   "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
+   "family": "geometry",
+   "steps": [
+    "R.B4.S4"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
- "tagFixes": []
+ "tagFixes": [
+  {
+   "key": "shapes_early:shape_positions",
+   "step": "R.B4.S4",
+   "action": "partial",
+   "why": "in front of, behind, next to, on top of, under (the skill does above / below / beside)"
+  }
+ ]
 }
