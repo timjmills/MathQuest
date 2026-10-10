@@ -251,7 +251,9 @@ function linesGeom(p, ctx, c) {
     let gap = Math.max(minGap, Math.min(LINE_GAP_MAX, gapFor(perRow, w, perRow < n)));
     if (twin && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     const rows = Math.ceil(n / perRow);
-    const h = S(ctx).writeMm + (p.compact ? 2 : 1);
+    // critic r3 N9: where the role sizes the cell to the row (opener), a Lines row spends 3 mm more on writing height above
+    // its line instead of leaving it as empty band round a short row
+    const h = S(ctx).writeMm + (p.compact ? 2 : 1) + (ctx && ctx.tightRows ? 3 : 0);
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (w + gap - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblH = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : 0;
     return { size, n, look: 'arcs', shape: 'box', w, h, pitch: w + gap, gap, tab, tabBody, perRow, rows, arcH: 0, pt, tabPt: basePt, hasLbl, lblH, lblPt, compact: !!p.compact, lines: true };
