@@ -5195,6 +5195,735 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B5.S1": {
+   "title": "Measure in metres and centimetres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:length_metric",
+     "missing": "measuring in m and cm with a mixed answer (1 m 25 cm)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring in m and cm with a mixed answer (1 m 25 cm)",
+   "build": [
+    "mm_cm_m"
+   ],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W13)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W13)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W13)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S2": {
+   "title": "Measure in millimetres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:reading_ruler",
+     "missing": "a ruler in millimetres"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a ruler in millimetres",
+   "build": [
+    "ruler_cm"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S1 Measure in metres and centimetres (step before in the block)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "tens_ones_group"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B5.S3": {
+   "title": "Measure in centimetres and millimetres",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm)",
+   "build": [
+    "mm_cm_m"
+   ],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B5.S2 Measure in millimetres (step before in the block)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S4 Metres, centimetres and millimetres (next step)"
+    },
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S4": {
+   "title": "Metres, centimetres and millimetres",
+   "direct": [
+    {
+     "key": "measurement:length_metric",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S5": {
+   "title": "Equivalent lengths (metres and centimetres)",
+   "direct": [
+    {
+     "key": "measurement:length_metric",
+     "opts": {
+      "note": "m and cm"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S6": {
+   "title": "Equivalent lengths (centimetres and millimetres)",
+   "direct": [
+    {
+     "key": "measurement:length_metric",
+     "opts": {
+      "note": "cm and mm"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W14)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W14)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W14)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "tens_ones_group"
+   ],
+   "related": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S7": {
+   "title": "Compare lengths",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm); measuring two objects with a standard unit and finding how much longer one is",
+   "build": [
+    "compare_lengths",
+    "ruler_difference"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (step before in the block)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y2.B6.S3 Compare lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "length_ops"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B5.S8": {
+   "title": "Add lengths",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding and subtracting lengths in the same and mixed units, including bar-model \"longer by\" / \"shorter by\" problems",
+   "build": [
+    "add_sub_lengths"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [
+    "length_ops",
+    "metres"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y3.B5.S9": {
+   "title": "Subtract lengths",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding and subtracting lengths in the same and mixed units, including bar-model \"longer by\" / \"shorter by\" problems",
+   "build": [
+    "add_sub_lengths"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (prior learning wk W15)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W15)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W15)"
+    }
+   ],
+   "preBuild": [
+    "length_ops",
+    "metres"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3.B5.S10 What is perimeter (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S10": {
+   "title": "What is perimeter",
+   "direct": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "length_ops",
+    "shape_draw"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3.B5.S11 Measure perimeter (next step)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "same standard 3.MD.D.8: Perimeter Only"
+    },
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "same standard 3.MD.D.8: Area AND Perimeter"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S11": {
+   "title": "Measure perimeter",
+   "direct": [
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3.B5.S10 What is perimeter (step before in the block)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "length_ops",
+    "shape_draw"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y3.B5.S12 Calculate perimeter (next step)"
+    },
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "same standard 3.MD.D.8: Area AND Perimeter"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B5.S12": {
+   "title": "Calculate perimeter",
+   "direct": [
+    {
+     "key": "area_perimeter:perimeter",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3.B5.S11 Measure perimeter (step before in the block)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "length_ops",
+    "metres",
+    "shape_draw"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "same standard 3.MD.D.8: Perimeter Intro - Sum the Sides (Visual)"
+    },
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "same standard 3.MD.D.8: Area AND Perimeter"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5579,6 +6308,135 @@
    ],
    "ccss": [
     "3.OA.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "mm_cm_m": {
+   "kind": "option",
+   "skill": "measurement:length_metric",
+   "option": "mm and cm",
+   "name": "Metres, Centimetres, Millimetres (option)",
+   "teaches": "measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm)",
+   "representation": "ruler pictures in mm; mixed-unit answers (_ m _ cm)",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S1",
+    "Y3.B5.S3"
+   ],
+   "ccss": [
+    "2.MD.A.1",
+    "2.MD.A.2",
+    "4.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "ruler_cm": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "centimetres and millimetres",
+   "name": "Read a Centimetre Ruler (option)",
+   "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
+   "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture",
+   "family": "measurement",
+   "steps": [
+    "Y1.B7.S3",
+    "Y2.B6.S1",
+    "Y3.B5.S2"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "2.MD.A.1",
+    "1.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "length_ops": {
+   "kind": "new",
+   "skill": "measurement:length_word_problems",
+   "name": "Length Word Problems",
+   "teaches": "adding, subtracting, multiplying and dividing lengths and heights in context (same units)",
+   "representation": "a drawn ruler or bar model with the lengths labelled; write the answer with its unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S5"
+   ],
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "compare_lengths": {
+   "kind": "new",
+   "skill": "measurement:compare_lengths",
+   "name": "Compare Lengths",
+   "teaches": "comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm)",
+   "representation": "two labelled bars; write <, > or = after converting",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S7",
+    "Y2.B6.S3",
+    "Y2.B6.S4"
+   ],
+   "ccss": [
+    "2.MD.A.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "ruler_difference": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "task \"how much longer?\": two objects on one ruler; cm and inches",
+   "name": "How Much Longer? (option)",
+   "teaches": "measuring two objects with a standard unit and finding how much longer one is",
+   "representation": "legacy; write both lengths and the difference with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S4",
+    "Y3.B5.S7"
+   ],
+   "ccss": [
+    "2.MD.A.4"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "add_sub_lengths": {
+   "kind": "new",
+   "skill": "measurement:add_subtract_lengths",
+   "name": "Add and Subtract Lengths",
+   "teaches": "adding and subtracting lengths in the same and mixed units, including bar-model \"longer by\" / \"shorter by\" problems",
+   "representation": "a bar model with two lengths; write the total or the difference with the unit",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S8",
+    "Y3.B5.S9"
+   ],
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "shape_draw": {
+   "kind": "new",
+   "skill": "shapes_early:draw_2d_shapes",
+   "name": "Draw 2-D Shapes",
+   "teaches": "drawing 2-D shapes on a dot grid from a name or a description (4 sides, 2 long and 2 short)",
+   "representation": "a square dot grid; draw the shape; the key shows one correct drawing",
+   "family": "geometry",
+   "steps": [
+    "Y2.B3.S4",
+    "Y3.B11.S8"
+   ],
+   "ccss": [
+    "1.G.A.1",
+    "2.G.A.1",
+    "K.G.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
