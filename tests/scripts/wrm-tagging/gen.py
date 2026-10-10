@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -87,34 +87,80 @@ def dentries(step): return [(d[0], d[1]) for d in S[step]['d']]
 def dkeys(step): return [d[0] for d in S[step]['d']]
 def fmt_step(s): return f"{s} {info[s]['title']}"
 
+import subprocess
+MD_PATH = f'{HERE}/maxdealt.json'
+MD = json.load(open(MD_PATH)) if os.path.exists(MD_PATH) else {}
+MISSING = set()
+FIXED = re.compile(r'^measurement:(time_|clock_)')   # a clock face: its numerals are the domain, not a number range
+def dsig(k, o): return k + ' ' + json.dumps(o or {}, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
+def dealt(k, o):
+    """The largest number the skill+opts deals (8 generated items, maxdealt.mjs); 0 for a clock face."""
+    if FIXED.match(k): return 0
+    s = dsig(k, o)
+    if s not in MD: MISSING.add(s); return 0
+    return MD[s]
+def ceiling(step):
+    """Rule 18, judged per step: the step's own top = its block number range, what its own skills deal, the title's numbers."""
+    c = hi(step)
+    for k, o, miss in S[step]['d']:
+        if miss is None: c = max(c, dealt(k, o))   # a full direct skill only: a partial may deal past the step
+    for m in re.findall(r'\d+', info[step]['title']): c = max(c, int(m))
+    return c
+def lcap(step):
+    c = ceiling(step); return max(c * 1.5, c + 2)
+def fits(k, o, step):
+    if k in FIT and not FIT[k]: return False
+    return dealt(k, o) <= lcap(step)
+def fit(k, step):
+    """The opts a pre / related link uses for this step: the largest FIT row whose items stay under the step's cap; None if none."""
+    if k not in FIT: return {} if fits(k, {}, step) else None
+    ok = [o for c, o in FIT[k] if fits(k, o, step)]
+    return dict(ok[-1]) if ok else None
+def split(e):
+    return (e[0], e[1], e[2] if len(e) > 2 else None)
+TAUGHT = {}   # key -> [(step, opts)] in curriculum order
+for x in order:
+    for k, o in dentries(x): TAUGHT.setdefault(k, []).append((x, o))
+
 def build(step):
     sp = S[step]; s = info[step]; direct = []; partial = []
     for k, o, miss in sp['d']:
         assert live(k), (step, k)
-        if READS.get(k): assert 'range' in o, f'{step} {k}: reads Max Number, record range'
+        if READS.get(k): assert 'range' in o or 'band' in o, f'{step} {k}: reads Max Number, record range (or the band that overrides it)'
         if miss: partial.append({'key': k, 'opts': o, 'missing': miss})
         else: direct.append({'key': k, 'opts': o})
     v = sp['v']
-    if v == 'full': assert direct and not sp['b'], step
+    if v == 'full': assert direct and not sp['b'] and not partial, step
     if v == 'gap': assert not direct and not partial, step
     if v == 'partial': assert partial or direct, step
     if v != 'full': assert sp['b'], step
     own = set(dkeys(step)); pre = []; pb = []
     sig = lambda k, o: k + json.dumps(o or {}, sort_keys=True)
     seen = {sig(k, o) for k, o in dentries(step)}; seen_keys = set()
-    def addp(k, why, o=None):
+    xp = set(sp['xp']); xr = set(sp['xr'])
+    def addp(k, why, o=None, explicit=False):
         # a pre may be the step's own skill on an earlier rung (other opts); never the same skill+opts as a direct
-        if sig(k, o) in seen or not live(k) or len(pre) >= 8: return
-        if o is None and k in own: return
-        if k in seen_keys and k not in own: return
+        if k in xp or not live(k) or len(pre) >= 8: return False
+        if o is None:
+            if k in own: return False
+            o = fit(k, step)
+            if o is None: return False
+        elif not fits(k, o, step):
+            o = fit(k, step) if k not in own else None
+            if o is None: return False
+        if sig(k, o) in seen: return False
+        if k in seen_keys and k not in own: return False
         seen.add(sig(k, o)); seen_keys.add(k); e = {'key': k, 'why': why}
         if o: e['opts'] = o
-        pre.append(e)
+        pre.append(e); return True
     def take_builds(x):
         if S[x]['v'] != 'full':
             for b in S[x]['b']:
-                if b not in pb and b not in sp['b']: pb.append(b)
-    for k, why in sp['p']: addp(k, why)
+                if b not in pb and b not in sp['b'] and b not in sp['xpb']: pb.append(b)
+    for b in sp['pb']:
+        if b not in pb and b not in sp['b']: pb.append(b)
+    for e in sp['p']:
+        k, why, o = split(e); addp(k, why, o, explicit=o is not None)
     wk = None
     if s['year'] == 'Y1':
         # rule 3/12: the xlsx week's prior R steps, kept only when they share the step's idea; partial-only steps count
@@ -123,38 +169,75 @@ def build(step):
             if not (related_topic(step, rs) == 2 or (related_topic(step, rs) and len(pre) < 2)): continue
             for k, o in dentries(rs): addp(k, f"{fmt_step(rs)} (school prior learning, week {wk})", o)
             if S[rs]['v'] == 'gap': take_builds(rs)
-    # earlier steps on the same idea: same sub-topic first, then the same family, nearest first (rule 11)
+    # earlier steps on the same idea: same sub-topic first, then the same family, nearest first (rule 11);
+    # rule 15: keep going through the family until 3 pre-skills are found
     cands = [x for x in reversed(order[:idx[step]]) if related_topic(step, x) and (info[x]['year'] == s['year'] or s['year'] == 'Y1')]
     cands.sort(key=lambda x: -related_topic(step, x))   # stable: nearest first inside each rank
     for x in cands:
-        if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 2): break
+        if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 3): break
         for k, o in dentries(x): addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
     for x in [c for c in cands if related_topic(step, c) == 2][:3]:
         if S[x]['v'] == 'gap': take_builds(x)   # a needed earlier step with no live skill: its build is a pre-build
     pb = pb[:3]
-    rel = []; rseen = set(own) | {p['key'] for p in pre}
-    def addr(k, why):
+    rel = []; rseen = set(own) | {p['key'] for p in pre} | xr
+    def earlier(k):   # rule 14: the latest earlier step that teaches k
+        ts = [(x, o) for x, o in TAUGHT.get(k, []) if idx[x] < idx[step]]
+        return ts[-1] if ts else None
+    promoted = []
+    def addr(k, why, o=None):
         if k in rseen or not live(k) or len(rel) >= 6: return
-        rseen.add(k); rel.append({'key': k, 'why': why})
-    for k, why in sp['r']: addr(k, why)
+        ex = earlier(k)
+        if ex:   # an earlier step's skill is a building block: pre, never only related (rule 14)
+            rseen.add(k)
+            x, eo = ex
+            if related_topic(step, x) or any(k == e[0] for e in sp['r']):
+                use = eo if fits(k, eo, step) else fit(k, step)
+                if use is not None and addp(k, f"{fmt_step(x)} (earlier step; {why})", use): promoted.append(k)
+            return
+        if o is None:
+            o = fit(k, step)
+            if o is None: return
+        elif not fits(k, o, step): return
+        rseen.add(k); e = {'key': k, 'why': why}
+        if o: e['opts'] = o
+        rel.append(e)
+    for e in sp['r']:
+        k, why, o = split(e); addr(k, why, o)
     for k in dkeys(step):
-        for k2, why in FORMS.get(k, []): addr(k2, why)
-    # the next step's skill when it carries the same idea forward (rule 4/10: a reason beyond "same block")
-    later = [x for x in order[idx[step] + 1:] if info[x]['year'] == s['year'] and related_topic(step, x) == 2]
-    for x in later[:2]:
-        for k in dkeys(x): addr(k, f"the next step on this idea: {fmt_step(x)}")
+        for e in FORMS.get(k, []):
+            k2, why, o = split(e); addr(k2, why, o)
+    # the next steps' skills when they carry the same idea forward (rule 4/10: a reason beyond "same block")
+    later = [x for x in order[idx[step] + 1:] if related_topic(step, x) == 2]
+    for x in later[:3]:
+        for k, o in dentries(x): addr(k, f"the next step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
+    if len(rel) < 2:   # a later step on the same idea whose skill is new (not taught yet): the next form a pupil meets
+        for x in [x for x in order[idx[step] + 1:] if related_topic(step, x)]:
+            if len(rel) >= 2: break
+            for k, o in dentries(x):
+                if not earlier(k): addr(k, f"a later step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
     note = sp['n']
     def add_note(t):
         nonlocal note
         note = (note + ' ' if note else '') + t
-    if not pre:
-        same = [x for x in cands if related_topic(step, x) == 2]
-        live_same = [x for x in same if S[x]['d']]
-        if live_same: add_note(f"Pre: the earlier steps on this idea ({', '.join(live_same[:3])}) use this same skill and options.")
-        elif same: add_note(f"Pre: the earlier steps on this idea ({', '.join(same[:3])}) have no live skill yet; see preBuild.")
-        else: add_note('Pre: none; this is the first step on this idea.')
+    if len(pre) < 3:   # rule 15: say exactly why there are fewer than 3
+        if not cands:
+            add_note(f"Pre: {len(pre)} only; this is the first step on this idea ({topic(step)}) in the curriculum" + (", so its pre-skills are building blocks from other ideas." if pre else "."))
+        else:
+            why = {'own': set(), 'past': set(), 'gap': []}
+            dsigs = {sig(k, o) for k, o in dentries(step)}
+            for x in cands:
+                if not S[x]['d']: why['gap'].append(x); continue
+                for k, o in dentries(x):
+                    if k in {p['key'] for p in pre}: continue
+                    if sig(k, o) in dsigs or k in own: why['own'].add(k.split(':')[1])
+                    elif not fits(k, o, step) and fit(k, step) is None: why['past'].add(k.split(':')[1])
+            parts = []
+            if why['own']: parts.append('the earlier steps on this idea use this step\'s own skill (' + ', '.join(sorted(why['own'])) + ')')
+            if why['past']: parts.append('the other earlier skills on this idea deal numbers past this step (' + ', '.join(sorted(why['past'])) + '; rule 18)')
+            if why['gap']: parts.append('the earlier steps ' + ', '.join(why['gap'][:3]) + ' have no live skill yet (see preBuild)')
+            add_note(f"Pre: {len(pre)} only; " + ('; '.join(parts) if parts else 'no other live skill teaches an earlier step on this idea') + '.')
     if not rel:
-        add_note('Related: no live skill shows this idea yet (see build).' if v == 'gap' else 'Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills.')
+        add_note('Related: no live skill shows this idea in another form yet (see build).' if v == 'gap' else 'Related: none; every other live form of this idea is already a pre-skill or a direct skill.')
     return {'title': s['title'], 'direct': direct, 'partial': partial, 'verdict': v,
             'missing': '' if v == 'full' else sp['m'], 'build': sp['b'], 'pre': pre, 'preBuild': pb,
             'related': rel, 'note': note}
@@ -198,11 +281,21 @@ def run(year):
         o = build(i); steps[i] = o; fixes += tagfixes(i, o)
         for b in o['build']: uses.setdefault(b, []).append(i)
         for b in o['preBuild']: uses.setdefault(b, [])
+    for pid, st in uses.items():
+        if not st: uses[pid] = [x for x in order if pid in S[x]['b']]
     props = {pid: proposal(pid, st) for pid, st in uses.items()}
-    for pid, p in props.items():
-        if not p['steps']: p['steps'] = []
     return {'year': year, 'generatedBy': 'wave2-tagging', 'steps': steps, 'proposals': props, 'tagFixes': fixes}
 
+# pass 1 finds every link signature whose dealt maximum is unknown; maxdealt.mjs generates them; pass 2 is the real run
+for y in ('R', 'Y1'): run(y)
+for _ in range(3):
+    if not MISSING: break
+    sigs = [[s.split(' ', 1)[0], json.loads(s.split(' ', 1)[1])] for s in sorted(MISSING)]
+    res = subprocess.run(['node', f'{HERE}/maxdealt.mjs'], input=json.dumps(sigs), capture_output=True, text=True, check=True)
+    MD.update(json.loads(res.stdout.strip().splitlines()[-1])); json.dump(MD, open(MD_PATH, 'w'))
+    MISSING.clear()
+    for y in ('R', 'Y1'): run(y)
+assert not MISSING, MISSING
 os.makedirs(f'{ROOT}/data/curriculum/links', exist_ok=True)
 for y in ('R', 'Y1'):
     if LIMIT and LIMIT.startswith('R') and y == 'Y1': continue

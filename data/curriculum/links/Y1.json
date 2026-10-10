@@ -37,13 +37,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "comparing:compare_groups",
-     "why": "the same idea in another form: compare the groups"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Pre: 2 only; the earlier steps R.B1.S6, R.B1.S3, R.B1.S2 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B1.S2": {
    "title": "Count objects",
@@ -98,8 +93,25 @@
    ],
    "related": [
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind inside a mixed set"
+     "key": "composing:number_word_form",
+     "why": "the next step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -152,6 +164,21 @@
       "band": 10,
       "objects": "frame"
      }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S4 Continue patterns beyond 10 (14-20) (earlier step; the next step on this idea: Y1.B1.S6 Count on from any number)",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (earlier step; the next step on this idea: Y1.B1.S6 Count on from any number)",
+     "opts": {
+      "step": 1,
+      "range": 10
+     }
     }
    ],
    "preBuild": [
@@ -160,12 +187,25 @@
    ],
    "related": [
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind inside a mixed set"
+     "key": "composing:number_word_form",
+     "why": "the next step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "composing:number_word_form",
-     "why": "the next step on this idea: Y1.B1.S5 Recognise numbers as words"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -199,6 +239,21 @@
      "opts": {
       "band": 5
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (earlier, same idea: oral)",
+     "opts": {
+      "step": 1,
+      "range": 10
+     }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S4 Continue patterns beyond 10 (14-20) (earlier step; the next step on this idea: Y1.B1.S6 Count on from any number)",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "preBuild": [
@@ -207,15 +262,24 @@
    "related": [
     {
      "key": "composing:number_word_form",
-     "why": "the next step on this idea: Y1.B1.S5 Recognise numbers as words"
+     "why": "the next step on this idea: Y1.B1.S5 Recognise numbers as words",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "the next step on this idea: Y1.B1.S6 Count on from any number"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "the next step on this idea: Y1.B1.S6 Count on from any number"
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -227,16 +291,13 @@
     {
      "key": "composing:number_word_form",
      "opts": {
-      "wordform": [
-       "to_number"
-      ],
       "range": 10
      },
-     "missing": "number words 0 to 9 (the skill deals \"ten\" only at Max 10)"
+     "missing": "the words zero to nine: at Max Number 10 the skill deals only \"ten\" (20 of 20 seeds; a generator bug), and at 20 it deals the teens"
     }
    ],
    "verdict": "partial",
-   "missing": "reading and matching the words zero to ten",
+   "missing": "reading the number words zero to ten and matching each to its numeral (the live skill deals only \"ten\" at Max Number 10)",
    "build": [
     "words_0_10"
    ],
@@ -262,6 +323,14 @@
      "opts": {
       "band": 10
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (earlier step; the next step on this idea: Y1.B1.S6 Count on from any number)",
+     "opts": {
+      "step": 1,
+      "range": 10
+     }
     }
    ],
    "preBuild": [
@@ -269,8 +338,18 @@
    ],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "the next step on this idea: Y1.B1.S6 Count on from any number"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -307,29 +386,9 @@
      }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (school prior learning, week W02)",
-     "opts": {
-      "band": 20,
-      "dir": "forward"
-     }
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (school prior learning, week W02)",
-     "opts": {
-      "step": 1,
-      "dir": "forward",
-      "range": 20
-     }
-    },
-    {
      "key": "composing:number_word_form",
      "why": "Y1.B1.S5 Recognise numbers as words (earlier, same idea: count)",
      "opts": {
-      "wordform": [
-       "to_number"
-      ],
       "range": 10
      }
     },
@@ -346,12 +405,25 @@
    ],
    "related": [
     {
-     "key": "placevalue:more_less_10",
-     "why": "the same idea in another form: \"1 more than\" sentences"
+     "key": "composing:hundreds_chart_fill",
+     "why": "the same idea in another form: the hundred square",
+     "opts": {
+      "band": 10
+     }
     },
     {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: the hundred square"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -380,20 +452,11 @@
      }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (school prior learning, week W02)",
-     "opts": {
-      "band": 20,
-      "dir": "forward"
-     }
-    },
-    {
      "key": "counting:number_seq_fill",
      "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (school prior learning, week W02)",
      "opts": {
       "step": 1,
-      "dir": "forward",
-      "range": 20
+      "range": 10
      }
     },
     {
@@ -410,8 +473,18 @@
    ],
    "related": [
     {
-     "key": "placevalue:more_less_10",
-     "why": "the same idea in another form: \"1 more than\" sentences"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": "\"What comes after n\" within 10; more_less_10 starts at band 20, beyond this block."
@@ -471,9 +544,6 @@
      "key": "composing:number_word_form",
      "why": "Y1.B1.S5 Recognise numbers as words (earlier, same idea: count)",
      "opts": {
-      "wordform": [
-       "to_number"
-      ],
       "range": 10
      }
     },
@@ -497,12 +567,25 @@
    ],
    "related": [
     {
-     "key": "placevalue:more_less_10",
-     "why": "the same idea in another form: \"1 more than\" sentences"
+     "key": "composing:hundreds_chart_fill",
+     "why": "the same idea in another form: the hundred square",
+     "opts": {
+      "band": 10
+     }
     },
     {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: the hundred square"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -540,17 +623,32 @@
       "band": 10,
       "dir": "forward"
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier, same idea: count)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "the same idea in another form: the number track"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "placevalue:more_less_10",
-     "why": "the same idea in another form: \"1 more than\" sentences"
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -592,18 +690,30 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W03)",
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier, same idea: count)",
      "opts": {
-      "band": 99
+      "step": 1,
+      "dir": "back",
+      "range": 10
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind of a sort"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -651,20 +761,23 @@
        1
       ]
      }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W03)",
-     "opts": {
-      "band": 99
-     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind of a sort"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -716,13 +829,6 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W04)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "comparing:compare_groups",
      "why": "Y1.B1.S11 Fewer, more, same (earlier, same idea: compare)",
      "opts": {
@@ -734,12 +840,18 @@
    "preBuild": [],
    "related": [
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind of a sort"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "the next step on this idea: Y1.B1.S14 Order objects and numbers"
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -764,12 +876,9 @@
    "pre": [
     {
      "key": "comparing:compare_groups",
-     "why": "R.B1.S7 Compare amounts (school prior learning, week W04)",
+     "why": "Y1.B1.S11 / S12 compare two groups within 10: more, fewer, same",
      "opts": {
-      "band": 5,
-      "level": [
-       1
-      ]
+      "band": 10
      }
     },
     {
@@ -779,13 +888,32 @@
       "band": 10,
       "dir": "forward"
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier, same idea: count)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "the same idea in another form: order three numbers"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -796,7 +924,9 @@
    "partial": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "opts": {},
+     "opts": {
+      "band": 99
+     },
      "missing": "ordering objects and numbers within 10 (the lowest band is 99)"
     }
    ],
@@ -825,18 +955,30 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W04)",
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier, same idea: count)",
      "opts": {
-      "band": 99
+      "step": 1,
+      "dir": "back",
+      "range": 10
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "placevalue:order_greatest_to_least",
-     "why": "the reverse order"
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -866,17 +1008,30 @@
       "band": 10,
       "objects": "frame"
      }
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 Less than, greater than, equal to (earlier, same idea: compare)",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "addition:number_line_add",
-     "why": "jumps on a line, next block"
+     "why": "jumps on a line, next block",
+     "opts": {
+      "range": 10
+     }
     },
     {
      "key": "subtraction:number_line_sub",
-     "why": "the next step on this idea: Y1.B4.S9 Use a number line to 20"
+     "why": "the next step on this idea: Y1.B4.S9 Use a number line to 20",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -900,14 +1055,6 @@
    ],
    "pre": [
     {
-     "key": "composing:number_bonds",
-     "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W11)",
-     "opts": {
-      "band": 5,
-      "unknown": "mixed"
-     }
-    },
-    {
      "key": "addition:add_5_pictures",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)"
     },
@@ -915,7 +1062,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -923,71 +1070,6 @@
      "why": "R.B11.S7 Composition to 10 (school prior learning, week W11)",
      "opts": {
       "band": 10
-     }
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W11)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
-     "key": "addition:add_three",
-     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
-     "opts": {
-      "band": 10,
-      "notation": [
-       "across"
-      ]
-     }
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "addition:number_families_add",
-     "why": "the same idea in another form: the number family"
-    }
-   ],
-   "note": ""
-  },
-  "Y1.B2.S2": {
-   "title": "Part-whole model",
-   "direct": [
-    {
-     "key": "composing:number_bonds",
-     "opts": {
-      "band": 10
-     }
-    }
-   ],
-   "partial": [
-    {
-     "key": "addition:number_families_add",
-     "opts": {
-      "band": 10
-     },
-     "missing": "the part-whole diagram itself"
-    }
-   ],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
-   "pre": [
-    {
-     "key": "composing:number_bonds",
-     "why": "R.B3.S6 Composition of 1, 2 and 3 (school prior learning, week W11)",
-     "opts": {
-      "band": 5
-     }
-    },
-    {
-     "key": "composing:number_bonds",
-     "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W11)",
-     "opts": {
-      "band": 5,
-      "unknown": "mixed"
      }
     },
     {
@@ -1018,8 +1100,95 @@
    "preBuild": [],
    "related": [
     {
+     "key": "addition:number_families_add",
+     "why": "the same idea in another form: the number family",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
      "key": "addition:add_sub_fact_family",
-     "why": "the same idea in another form: the fact family"
+     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
+     "opts": {
+      "range": 10
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S2": {
+   "title": "Part-whole model",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B3.S6 Composition of 1, 2 and 3 (school prior learning, week W11)",
+     "opts": {
+      "band": 5
+     }
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)",
+     "opts": {
+      "band": 7
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (school prior learning, week W11)",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
+     "opts": {
+      "band": 10,
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (earlier, same idea: bond)",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:number_families_add",
+     "why": "the part-whole numbers written as the four sentences of a family",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "a later step on this idea: Y1.B2.S4 Fact families - addition facts",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1056,51 +1225,57 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W11)",
      "opts": {
-      "band": 10
+      "band": 7
      }
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (earlier, same idea: sub)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "the same idea in another form: the same take-away as a story"
-    },
-    {
      "key": "addition:add_sub_fact_family",
-     "why": "the next step on this idea: Y1.B2.S4 Fact families - addition facts"
-    },
-    {
-     "key": "addition:number_families_add",
-     "why": "the next step on this idea: Y1.B2.S4 Fact families - addition facts"
-    },
-    {
-     "key": "addition:fact_family_sort",
-     "why": "the next step on this idea: Y1.B2.S13 Fact families - the eight facts"
-    }
-   ],
-   "note": ""
-  },
-  "Y1.B2.S4": {
-   "title": "Fact families - addition facts",
-   "direct": [
-    {
-     "key": "addition:add_sub_fact_family",
+     "why": "the next step on this idea: Y1.B2.S4 Fact families - addition facts",
      "opts": {
       "range": 10
      }
     },
     {
      "key": "addition:number_families_add",
+     "why": "the next step on this idea: Y1.B2.S4 Fact families - addition facts",
      "opts": {
       "band": 10
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "note": ""
+  },
+  "Y1.B2.S4": {
+   "title": "Fact families - addition facts",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "opts": {
+      "range": 10
+     },
+     "missing": "it deals the subtraction facts too (8 − 6 = 2), which are S13, and never writes the = on the left"
+    },
+    {
+     "key": "addition:number_families_add",
+     "opts": {
+      "band": 10
+     },
+     "missing": "the family includes the subtraction facts"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the addition facts of a family only: both orders and the = on either side (8 = 6 + 2); both live skills also deal the subtraction facts",
+   "build": [
+    "family_add_only"
+   ],
    "pre": [
     {
      "key": "composing:number_bonds",
@@ -1117,7 +1292,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W12)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -1129,10 +1304,27 @@
    "related": [
     {
      "key": "addition:fact_family_sort",
-     "why": "the same idea in another form: is it a fact family?"
+     "why": "the same idea in another form: is it a fact family?",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "the next step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "the next step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 10
+     }
     }
    ],
-   "note": "Addition facts of a family (both orders) within 10."
+   "note": ""
   },
   "Y1.B2.S5": {
    "title": "Number bonds within 10",
@@ -1157,11 +1349,14 @@
      }
     },
     {
-     "key": "composing:number_bonds",
-     "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W13)",
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W13)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W13)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 7
      }
     },
     {
@@ -1179,13 +1374,6 @@
      }
     },
     {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "addition:add_three",
      "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
@@ -1194,11 +1382,33 @@
        "across"
       ]
      }
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S4 Fact families - addition facts (earlier step; the same idea in another form: the number family)",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B2.S9 Addition - add more",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:add_wp_10_plain",
+     "why": "a later step on this idea: Y1.B2.S10 Addition problems",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B2.S6": {
    "title": "Systematic number bonds within 10",
@@ -1225,7 +1435,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W13)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -1243,16 +1453,34 @@
      }
     },
     {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
-      "band": 10
+      "band": 10,
+      "notation": [
+       "across"
+      ]
      }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "the next step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B2.S9 Addition - add more",
+     "opts": {
+      "range": 10
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B2.S7": {
    "title": "Number bonds to 10",
@@ -1264,16 +1492,7 @@
      }
     }
    ],
-   "partial": [
-    {
-     "key": "composing:number_bonds",
-     "opts": {
-      "band": 10,
-      "unknown": "second"
-     },
-     "missing": "wholes other than 10 (only 10 is the step)"
-    }
-   ],
+   "partial": [],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -1282,8 +1501,7 @@
      "key": "composing:number_bonds",
      "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W14)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 5
      }
     },
     {
@@ -1294,14 +1512,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W14)",
      "opts": {
-      "band": 10
-     }
-    },
-    {
-     "key": "composing:number_bonds",
-     "why": "R.B11.S7 Composition to 10 (school prior learning, week W14)",
-     "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -1312,10 +1523,13 @@
      }
     },
     {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
-      "band": 10
+      "band": 10,
+      "notation": [
+       "across"
+      ]
      }
     }
    ],
@@ -1325,7 +1539,17 @@
    "related": [
     {
      "key": "subtraction:missing_add_sub",
-     "why": "the next step on this idea: Y1.B2.S12 Subtraction - find a part"
+     "why": "the next step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "a later step on this idea: Y1.B2.S9 Addition - add more",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1350,35 +1574,52 @@
      "key": "composing:number_bonds",
      "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W14)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 5
      }
     },
     {
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W14)",
      "opts": {
+      "band": 7
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B2.S7 Number bonds to 10 (earlier, same idea: bond)",
+     "opts": {
       "band": 10
      }
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (earlier step; the inverse: take away with pictures)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "addition:add_10_mixed",
-     "why": "the same facts as numbers (across)"
-    },
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "the inverse: take away with pictures"
+     "why": "the same facts as numbers (across)",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "addition:number_line_add",
-     "why": "the next step on this idea: Y1.B2.S9 Addition - add more"
+     "why": "the next step on this idea: Y1.B2.S9 Addition - add more",
+     "opts": {
+      "range": 10
+     }
     },
     {
      "key": "addition:add_wp_10_plain",
-     "why": "the next step on this idea: Y1.B2.S10 Addition problems"
+     "why": "the next step on this idea: Y1.B2.S10 Addition problems",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "note": ""
@@ -1408,32 +1649,49 @@
      "key": "composing:number_bonds",
      "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W14)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 5
      }
     },
     {
      "key": "addition:add_5_pictures",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W14)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W14)",
+     "opts": {
+      "band": 7
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (earlier step; the inverse: take-away stories)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "the inverse: take-away stories"
-    },
-    {
      "key": "subtraction:number_line_sub",
-     "why": "the inverse: subtract on the line"
+     "why": "the inverse: subtract on the line",
+     "opts": {
+      "range": 10
+     }
     },
     {
      "key": "addition:add_wp_10_plain",
-     "why": "the next step on this idea: Y1.B2.S10 Addition problems"
+     "why": "the next step on this idea: Y1.B2.S10 Addition problems",
+     "opts": {
+      "band": 10
+     }
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "the next step on this idea: Y1.B2.S17 Add or subtract 1 or 2"
+     "why": "the next step on this idea: Y1.B2.S17 Add or subtract 1 or 2",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "note": ""
@@ -1471,26 +1729,41 @@
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W15)"
     },
     {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W15)",
+     "opts": {
+      "band": 7
+     }
+    },
+    {
      "key": "addition:number_line_add",
      "why": "Y1.B2.S9 Addition - add more (earlier, same idea: add)",
      "opts": {
       "range": 10
      }
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (earlier step; the inverse: take-away stories)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "subtraction:sub_wp_10",
-     "why": "the inverse: take-away stories"
-    },
-    {
      "key": "addition:add_10_mixed",
-     "why": "the next step on this idea: Y1.B2.S17 Add or subtract 1 or 2"
+     "why": "the next step on this idea: Y1.B2.S17 Add or subtract 1 or 2",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
-     "key": "addition:add_20_no_regroup",
-     "why": "the next step on this idea: Y1.B5.S1 Add by counting on within 20"
+     "key": "subtraction:missing_add_sub",
+     "why": "a later step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1519,11 +1792,14 @@
      }
     },
     {
-     "key": "composing:number_bonds",
-     "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W12)",
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W12)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W12)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 7
      }
     },
     {
@@ -1541,16 +1817,18 @@
      }
     },
     {
-     "key": "composing:number_bonds",
-     "why": "Y1.B2.S7 Number bonds to 10 (earlier, same idea: bond)",
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
       "band": 10,
-      "unknown": "second"
+      "notation": [
+       "across"
+      ]
      }
     },
     {
      "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
+     "why": "Y1.B2.S4 Fact families - addition facts (earlier step; the same idea in another form: the number family)",
      "opts": {
       "band": 10
      }
@@ -1562,11 +1840,24 @@
    "related": [
     {
      "key": "subtraction:missing_add_sub",
-     "why": "the next step on this idea: Y1.B2.S12 Subtraction - find a part"
+     "why": "the next step on this idea: Y1.B2.S12 Subtraction - find a part",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "addition:add_20_no_regroup",
-     "why": "the next step on this idea: Y1.B5.S2 Add ones using number bonds"
+     "key": "subtraction:nl_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1601,11 +1892,14 @@
      }
     },
     {
-     "key": "composing:number_bonds",
-     "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W12)",
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W12)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W12)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 7
      }
     },
     {
@@ -1632,7 +1926,7 @@
     },
     {
      "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
+     "why": "Y1.B2.S4 Fact families - addition facts (earlier step; the same idea in another form: the number family)",
      "opts": {
       "band": 10
      }
@@ -1644,11 +1938,24 @@
    "related": [
     {
      "key": "addition:cloze_addition",
-     "why": "the same idea in another form: pick numbers to make a total"
+     "why": "the same idea in another form: pick numbers to make a total",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "addition:add_20_no_regroup",
-     "why": "the next step on this idea: Y1.B5.S2 Add ones using number bonds"
+     "key": "subtraction:nl_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "a later step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1666,12 +1973,6 @@
      "key": "addition:number_families_add",
      "opts": {
       "band": 10
-     }
-    },
-    {
-     "key": "addition:fact_family_sort",
-     "opts": {
-      "range": 10
      }
     }
    ],
@@ -1695,23 +1996,36 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W15)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
      "key": "subtraction:sub_5_pictures",
      "why": "Y1.B2.S3 Write number sentences (earlier, same idea: fact)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B2.S12 Subtraction - find a part (earlier step; the next step on this idea: Y1.B5.S10 Missing number problems)",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:cloze_addition",
-     "why": "the next step on this idea: Y1.B5.S10 Missing number problems"
+     "key": "addition:fact_family_sort",
+     "why": "is it a fact family? A typed yes / no answer (rule 8), so related, not direct",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "subtraction:missing_add_sub",
-     "why": "the next step on this idea: Y1.B5.S10 Missing number problems"
+     "key": "addition:cloze_addition",
+     "why": "the next step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1736,8 +2050,7 @@
      "key": "composing:number_bonds",
      "why": "R.B5.S7 Composition of 1 - 5 (school prior learning, week W14)",
      "opts": {
-      "band": 5,
-      "unknown": "mixed"
+      "band": 5
      }
     },
     {
@@ -1748,7 +2061,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W14)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -1760,11 +2073,17 @@
    "related": [
     {
      "key": "subtraction:nl_sub",
-     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line"
+     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
     },
     {
      "key": "subtraction:number_line_sub",
-     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line"
+     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1805,7 +2124,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W15)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     }
    ],
@@ -1813,15 +2132,33 @@
    "related": [
     {
      "key": "subtraction:sub_10_mixed",
-     "why": "the same facts as numbers"
+     "why": "the same facts as numbers",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
      "key": "subtraction:nl_sub",
-     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line"
+     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
     },
     {
      "key": "subtraction:number_line_sub",
-     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line"
+     "why": "the next step on this idea: Y1.B2.S16 Subtraction on a number line",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -1868,17 +2205,32 @@
     {
      "key": "subtraction:sub_wp_10",
      "why": "R.B14.S3 Take away (school prior learning, week W16)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B2.S9 Addition - add more (earlier step; the inverse: add on the line)",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:number_line_add",
-     "why": "the inverse: add on the line"
+     "key": "addition:comparison_word",
+     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "addition:comparison_word",
-     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference"
+     "key": "addition:add_10_mixed",
+     "why": "a later step on this idea: Y1.B2.S17 Add or subtract 1 or 2",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "note": ""
@@ -1947,11 +2299,19 @@
    "related": [
     {
      "key": "subtraction:sub_10_mixed",
-     "why": "the inverse: subtract within 10"
+     "why": "the inverse: subtract within 10",
+     "opts": {
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
-     "key": "addition:add_20_no_regroup",
-     "why": "the next step on this idea: Y1.B5.S1 Add by counting on within 20"
+     "key": "addition:comparison_word",
+     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -2004,8 +2364,13 @@
     "shape_3d_tasks",
     "shapes_world"
    ],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
+    }
+   ],
+   "note": ""
   },
   "Y1.B3.S2": {
    "title": "Sort 3-D shapes",
@@ -2045,15 +2410,20 @@
     },
     {
      "key": "shapes_early:shape_name_match_3d",
-     "why": "R.B12.S1 Recognise and name 3-D shapes (school prior learning, week W31)"
+     "why": "Y1.B3.S1 Recognise and name 3-D shapes (earlier, same idea: shape3d)"
     }
    ],
    "preBuild": [
     "shape_3d_tasks",
     "shapes_world"
    ],
-   "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "related": [
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "a later step on this idea: Y1.B3.S3 Recognise and name 2-D shapes"
+    }
+   ],
+   "note": ""
   },
   "Y1.B3.S3": {
    "title": "Recognise and name 2-D shapes",
@@ -2245,13 +2615,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "naming the shapes in the pattern"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B4.S1": {
    "title": "Count within 20",
@@ -2297,17 +2662,31 @@
      "opts": {
       "band": 15
      }
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (earlier step; the same idea in another form: build the count on a ten frame)",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "composing:ten_frame_build",
-     "why": "the same idea in another form: build the count on a ten frame"
+     "key": "placevalue:more_less_10",
+     "why": "a later step on this idea: Y1.B4.S7 1 more and 1 less",
+     "opts": {
+      "step": 1,
+      "band": 20
+     }
     },
     {
-     "key": "comparing:classify_count",
-     "why": "the same idea in another form: count one kind inside a mixed set"
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
     }
    ],
    "note": ""
@@ -2356,8 +2735,24 @@
    "preBuild": [
     "subitise"
    ],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "a later step on this idea: Y1.B4.S7 1 more and 1 less",
+     "opts": {
+      "step": 1,
+      "band": 20
+     }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B4.S3": {
    "title": "Understand 11, 12 and 13",
@@ -2418,7 +2813,18 @@
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the same idea in another form: base-10 blocks"
+     "why": "the same idea in another form: base-10 blocks",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "a later step on this idea: Y1.B4.S7 1 more and 1 less",
+     "opts": {
+      "step": 1,
+      "band": 20
+     }
     }
    ],
    "note": ""
@@ -2476,13 +2882,32 @@
      "opts": {
       "band": 15
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier step; the next step on this idea: Y1.B6.S1 Count from 20 to 50)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the same idea in another form: base-10 blocks"
+     "why": "the same idea in another form: base-10 blocks",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
     }
    ],
    "note": ""
@@ -2540,21 +2965,39 @@
      "opts": {
       "band": 15
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier step; the next step on this idea: Y1.B6.S1 Count from 20 to 50)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the same idea in another form: base-10 blocks"
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50"
+     "why": "the same idea in another form: base-10 blocks",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50"
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -2604,21 +3047,32 @@
      "opts": {
       "band": 20
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier step; the next step on this idea: Y1.B6.S1 Count from 20 to 50)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50"
-    },
-    {
      "key": "composing:hundreds_chart_fill",
-     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50"
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
     },
     {
      "key": "composing:tens_foundation_visual",
-     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50"
+     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -2660,17 +3114,39 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "Y1.B4.S6 Understand 20 (earlier, same idea: tens)",
+     "opts": {
+      "band": 19
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S8 Count backwards within 10 (earlier step; the same idea in another form: the number track)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "the same idea in another form: the number track"
+     "key": "composing:hundreds_chart_fill",
+     "why": "the same idea in another form: the hundred square",
+     "opts": {
+      "band": 30
+     }
     },
     {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: the hundred square"
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -2686,68 +3162,67 @@
    ],
    "pre": [
     {
+     "key": "addition:number_line_add",
+     "why": "Y1.B2.S9 jump along a 0-10 line: the line is the building block",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 jump back on a 0-10 line",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
      "key": "counting:count_sequence",
-     "why": "R.B11.S5 1 more (school prior learning, week W06)",
+     "why": "Y1.B4.S7 the order of the numbers to 20",
      "opts": {
-      "band": 10,
+      "band": 20,
       "dir": "forward"
-     }
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W06)",
-     "opts": {
-      "band": 10,
-      "level": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W06)",
-     "opts": {
-      "band": 99
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:number_line_add",
-     "why": "jumps on a line"
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
     },
     {
-     "key": "subtraction:number_line_sub",
-     "why": "the next step on this idea: Y1.B4.S9 Use a number line to 20"
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
   },
   "Y1.B4.S9": {
    "title": "Use a number line to 20",
-   "direct": [],
-   "partial": [
+   "direct": [
     {
      "key": "addition:number_line_add",
      "opts": {
-      "range": 10
-     },
-     "missing": "using the line to find and place numbers (the skill is addition on a 0-10 line)"
+      "range": 20
+     }
     },
     {
      "key": "subtraction:number_line_sub",
      "opts": {
-      "range": 10
-     },
-     "missing": "counting back on the line"
+      "range": 20
+     }
     }
    ],
-   "verdict": "partial",
-   "missing": "finding and placing numbers on a 0-20 line",
-   "build": [
-    "nl_20"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "counting:count_sequence",
@@ -2768,21 +3243,34 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W06)",
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B4.S7 1 more and 1 less (earlier, same idea: more1)",
      "opts": {
-      "band": 99
+      "step": 1,
+      "band": 20
      }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "nl_20"
+   ],
    "related": [
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "the next step on this idea: Y1.B6.S6 The number line to 50"
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
-   "note": ""
+   "note": "At Max Number 20 both skills draw a 0-20 line (13 + 2, 16 − 7): count on and back along it."
   },
   "Y1.B4.S10": {
    "title": "Estimate on a number line to 20",
@@ -2813,32 +3301,35 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W06)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "addition:number_line_add",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     },
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "the next step on this idea: Y1.B6.S6 The number line to 50"
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -2880,13 +3371,38 @@
      }
     },
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y1.B1.S14 Order objects and numbers (earlier, same idea: compare)"
+     "key": "addition:number_line_add",
+     "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
+     "opts": {
+      "range": 20
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B4.S12": {
    "title": "Order numbers to 20",
@@ -2894,8 +3410,10 @@
    "partial": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "opts": {},
-     "missing": "numbers within 20"
+     "opts": {
+      "band": 99
+     },
+     "missing": "numbers within 20 (the lowest band is 99)"
     }
    ],
    "verdict": "partial",
@@ -2923,18 +3441,35 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W07)",
+     "key": "addition:number_line_add",
+     "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "band": 99
+      "range": 20
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
+     "opts": {
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "placevalue:order_greatest_to_least",
-     "why": "reverse order"
+     "key": "composing:hundreds_chart_fill",
+     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "a later step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -2950,17 +3485,15 @@
        "across"
       ]
      }
-    }
-   ],
-   "partial": [
+    },
     {
      "key": "addition:number_line_add",
      "opts": {
-      "range": 10
-     },
-     "missing": "a 0-20 line (the line stops at 10)"
+      "range": 20
+     }
     }
    ],
+   "partial": [],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -3011,14 +3544,23 @@
    "related": [
     {
      "key": "subtraction:sub_20_no_regroup",
-     "why": "the inverse: subtract ones"
+     "why": "the inverse: subtract ones",
+     "opts": {
+      "band": 20,
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
-     "key": "subtraction:number_line_sub",
-     "why": "the inverse: subtract on the line"
+     "key": "addition:comparison_word",
+     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     }
    ],
-   "note": "Counting on within 20, no bridging."
+   "note": "Counting on within 20, no bridging; number_line_add at Max Number 20 draws the 0-20 line (14 + 4)."
   },
   "Y1.B5.S2": {
    "title": "Add ones using number bonds",
@@ -3070,13 +3612,6 @@
      }
     },
     {
-     "key": "addition:number_families_add",
-     "why": "Y1.B2.S2 Part-whole model (earlier, same idea: bond)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "addition:add_three",
      "why": "R.B11.S10 Bonds to 10 (3 parts) (earlier, same idea: bond)",
      "opts": {
@@ -3085,17 +3620,33 @@
        "across"
       ]
      }
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B5.S1 Add by counting on within 20 (earlier step; the same idea in another form: count on along a line)",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "subtraction:sub_20_no_regroup",
-     "why": "the inverse: subtract ones"
+     "why": "the inverse: subtract ones",
+     "opts": {
+      "band": 20,
+      "notation": [
+       "across"
+      ]
+     }
     },
     {
-     "key": "addition:number_line_add",
-     "why": "the same idea in another form: count on along a line"
+     "key": "addition:comparison_word",
+     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -3120,11 +3671,17 @@
    "pre": [
     {
      "key": "composing:number_bonds",
-     "why": "Y1.B2.S5 bonds within 10"
+     "why": "Y1.B2.S5 bonds within 10",
+     "opts": {
+      "band": 10
+     }
     },
     {
      "key": "composing:ten_frame_build_teen",
-     "why": "Y1.B4 teen numbers on two frames"
+     "why": "Y1.B4 teen numbers on two frames",
+     "opts": {
+      "band": 19
+     }
     },
     {
      "key": "composing:make_ten",
@@ -3162,7 +3719,20 @@
    "related": [
     {
      "key": "subtraction:sub_20_no_regroup",
-     "why": "the next step on this idea: Y1.B5.S6 Subtract ones using number bonds"
+     "why": "the next step on this idea: Y1.B5.S6 Subtract ones using number bonds",
+     "opts": {
+      "band": 20,
+      "notation": [
+       "across"
+      ]
+     }
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -3188,8 +3758,7 @@
      "key": "patterns:double",
      "why": "R.B9.S8 Double to 8 (make a double) (school prior learning, week W17)",
      "opts": {
-      "band": 20,
-      "range": 10
+      "band": 20
      }
     },
     {
@@ -3198,13 +3767,33 @@
      "opts": {
       "band": 10
      }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (earlier, same idea: bond)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "patterns:halve",
-     "why": "the inverse: halve"
+     "why": "the inverse: halve",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "subtraction:sub_20_no_regroup",
+     "why": "a later step on this idea: Y1.B5.S6 Subtract ones using number bonds",
+     "opts": {
+      "band": 20,
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "note": "Doubles 1 + 1 to 10 + 10."
@@ -3240,8 +3829,14 @@
      "key": "patterns:double",
      "why": "R.B9.S8 Double to 8 (make a double) (school prior learning, week W17)",
      "opts": {
-      "band": 20,
-      "range": 10
+      "band": 20
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (earlier, same idea: bond)",
+     "opts": {
+      "band": 20
      }
     }
    ],
@@ -3249,7 +3844,20 @@
    "related": [
     {
      "key": "patterns:halve",
-     "why": "the inverse: halve"
+     "why": "the inverse: halve",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "subtraction:sub_20_no_regroup",
+     "why": "a later step on this idea: Y1.B5.S6 Subtract ones using number bonds",
+     "opts": {
+      "band": 20,
+      "notation": [
+       "across"
+      ]
+     }
     }
    ],
    "note": "Doubles plus one and minus one."
@@ -3283,7 +3891,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W18)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -3319,43 +3927,65 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "addition:comparison_word",
+     "why": "a later step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 20
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B5.S7": {
    "title": "Subtraction - counting back",
-   "direct": [],
-   "partial": [
+   "direct": [
     {
      "key": "subtraction:nl_sub",
      "opts": {
-      "range": 10
-     },
-     "missing": "counting back on a 0-20 line (the line stops at 10)"
+      "range": 20
+     }
     },
     {
      "key": "subtraction:number_line_sub",
      "opts": {
-      "range": 10
-     },
-     "missing": "a 0-20 line"
+      "range": 20
+     }
     }
    ],
-   "verdict": "partial",
-   "missing": "counting back within 20 on a line",
-   "build": [
-    "nl_20"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
-     "key": "addition:add_5_pictures",
-     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W18)"
+     "key": "counting:count_sequence",
+     "why": "Y1.B1.S8 / Y1.B4.S7 count back: the main building block",
+     "opts": {
+      "band": 20,
+      "dir": "back"
+     }
     },
     {
-     "key": "addition:add_wp_10",
-     "why": "R.B9.S9 Combine 2 groups (school prior learning, week W18)",
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B2.S16 subtract on a 0-10 line",
      "opts": {
-      "band": 10
+      "range": 10
+     }
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 count back on a 0-10 line",
+     "opts": {
+      "range": 10
      }
     },
     {
@@ -3365,20 +3995,33 @@
     {
      "key": "subtraction:sub_wp_10",
      "why": "R.B14.S3 Take away (school prior learning, week W18)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B5.S1 Add by counting on within 20 (earlier step; the inverse: add on the line)",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "addition:number_line_add",
-     "why": "the inverse: add on the line"
+     "key": "addition:comparison_word",
+     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference",
+     "opts": {
+      "range": 10
+     }
     },
     {
-     "key": "addition:comparison_word",
-     "why": "the next step on this idea: Y1.B5.S8 Subtraction - finding the difference"
+     "key": "addition:cloze_addition",
+     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 20
+     }
     }
    ],
-   "note": ""
+   "note": "At Max Number 20 both draw a 0-20 line (15 − 3, 16 − 6, 17 − 6): count back along it."
   },
   "Y1.B5.S8": {
    "title": "Subtraction - finding the difference",
@@ -3406,7 +4049,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W18)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -3421,22 +4064,25 @@
      "key": "subtraction:nl_sub",
      "why": "Y1.B5.S7 Subtraction - counting back (earlier, same idea: sub)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     },
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B5.S7 Subtraction - counting back (earlier, same idea: sub)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "comparing:compare_groups",
-     "why": "the same idea in another form: compare two groups"
+     "key": "addition:cloze_addition",
+     "why": "a later step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "note": ""
@@ -3464,7 +4110,7 @@
      "key": "addition:add_wp_10",
      "why": "R.B9.S9 Combine 2 groups (school prior learning, week W18)",
      "opts": {
-      "band": 10
+      "band": 7
      }
     },
     {
@@ -3482,54 +4128,49 @@
      }
     },
     {
-     "key": "addition:fact_family_sort",
-     "why": "Y1.B2.S13 Fact families - the eight facts (earlier, same idea: fact)",
+     "key": "subtraction:sub_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (earlier, same idea: fact)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B2.S12 Subtraction - find a part (earlier step; the next step on this idea: Y1.B5.S10 Missing number problems)",
      "opts": {
       "range": 10
      }
-    },
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "Y1.B2.S3 Write number sentences (earlier, same idea: fact)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "addition:cloze_addition",
-     "why": "the next step on this idea: Y1.B5.S10 Missing number problems"
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "the next step on this idea: Y1.B5.S10 Missing number problems"
+     "why": "the next step on this idea: Y1.B5.S10 Missing number problems",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "note": ""
   },
   "Y1.B5.S10": {
    "title": "Missing number problems",
-   "direct": [],
-   "partial": [
+   "direct": [
     {
      "key": "addition:cloze_addition",
      "opts": {
-      "range": 10
-     },
-     "missing": "within 20 (deals within 10)"
+      "range": 20
+     }
     },
     {
      "key": "subtraction:missing_add_sub",
      "opts": {
-      "range": 10
-     },
-     "missing": "within 20 (Max Number 10 or 100 only)"
+      "range": 20
+     }
     }
    ],
-   "verdict": "partial",
-   "missing": "missing-number sentences within 20",
-   "build": [
-    "missing_20"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "composing:number_bonds",
@@ -3560,13 +4201,6 @@
      }
     },
     {
-     "key": "addition:fact_family_sort",
-     "why": "Y1.B2.S13 Fact families - the eight facts (earlier, same idea: fact)",
-     "opts": {
-      "range": 10
-     }
-    },
-    {
      "key": "addition:add_5_pictures",
      "why": "Y1.B2.S3 Write number sentences (earlier, same idea: fact)"
     },
@@ -3577,29 +4211,33 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Max Number 20: missing_add_sub deals 12 − __ = 7 and 7 + 9; cloze_addition deals \"make 16\". Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B6.S1": {
    "title": "Count from 20 to 50",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "counting:number_seq_fill",
      "opts": {
       "step": 1,
       "range": 50
-     }
+     },
+     "missing": "counting from 20 to 50: range 50 deals tracks from 1 (5 of 8 below 20)"
     },
     {
      "key": "composing:hundreds_chart_fill",
      "opts": {
       "band": 50
-     }
+     },
+     "missing": "rows 20-50: band 50 also shows rows below 20"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counting on from 20 to 50 only (the tracks and the chart start below 20)",
+   "build": [
+    "count_start_at"
+   ],
    "pre": [
     {
      "key": "counting:count_sequence",
@@ -3642,25 +4280,38 @@
    "related": [
     {
      "key": "composing:tens_foundation_visual",
-     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50"
+     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "the next step on this idea: Y1.B6.S4 Groups of tens and ones",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
   },
   "Y1.B6.S2": {
    "title": "20, 30, 40 and 50",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "composing:tens_foundation_visual",
      "opts": {
       "band": 50
-     }
+     },
+     "missing": "naming the multiple of ten: the skill asks \"how many tens?\" (1-5), never 20, 30, 40, 50"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "saying and writing 20, 30, 40 and 50 for 2-5 tens (the skill answers only how many tens)",
+   "build": [
+    "tens_name_100"
+   ],
    "pre": [
     {
      "key": "counting:count_sequence",
@@ -3711,10 +4362,13 @@
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the same idea in another form: build with rods and cubes"
+     "why": "the same idea in another form: build with rods and cubes",
+     "opts": {
+      "band": 50
+     }
     }
    ],
-   "note": "Tens rods 10-50: how many tens."
+   "note": ""
   },
   "Y1.B6.S3": {
    "title": "Count by making groups of tens",
@@ -3782,7 +4436,10 @@
    "related": [
     {
      "key": "composing:base10_build",
-     "why": "the same idea in another form: build with rods and cubes"
+     "why": "the same idea in another form: build with rods and cubes",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "note": ""
@@ -3847,13 +4504,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "placevalue:unit_form",
-     "why": "the same idea in another form: write tens and ones"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B6.S5": {
    "title": "Partition into tens and ones",
@@ -3915,13 +4567,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "placevalue:unit_form",
-     "why": "the same partition written in words (to 99)"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B6.S6": {
    "title": "The number line to 50",
@@ -3961,20 +4608,20 @@
      "key": "addition:number_line_add",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     },
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B6.S7": {
    "title": "Estimate on a number line to 50",
@@ -4014,30 +4661,23 @@
      }
     },
     {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W09)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "addition:number_line_add",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     },
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B6.S8": {
    "title": "1 more, 1 less",
@@ -4056,28 +4696,19 @@
    "build": [],
    "pre": [
     {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B6.S1 count to 50 in ones: the next and the previous number",
+     "opts": {
+      "step": 1,
+      "range": 50
+     }
+    },
+    {
      "key": "counting:count_sequence",
      "why": "R.B11.S5 1 more (school prior learning, week W09)",
      "opts": {
       "band": 10,
       "dir": "forward"
-     }
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W09)",
-     "opts": {
-      "band": 10,
-      "level": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "R.B11.S2 Compare numbers to 10 (school prior learning, week W09)",
-     "opts": {
-      "band": 99
      }
     },
     {
@@ -4087,16 +4718,18 @@
       "step": 1,
       "band": 20
      }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y1.B6.S1 Count from 20 to 50 (earlier step; the same idea in another form: the hundred square)",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: the hundred square"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B7.S1": {
    "title": "Compare lengths and heights",
@@ -4128,14 +4761,14 @@
      "opts": {
       "task": "length"
      }
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (earlier, same idea: mass)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "measurement:heavier_lighter_visual",
-     "why": "the same idea in another form: compare mass"
-    },
     {
      "key": "shapes_early:measure_nonstandard",
      "why": "the same idea in another form: measure with units"
@@ -4170,6 +4803,10 @@
     {
      "key": "shapes_early:order_objects_length",
      "why": "Y1.B7.S1 Compare lengths and heights (earlier, same idea: length)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (earlier, same idea: mass)"
     }
    ],
    "preBuild": [],
@@ -4219,7 +4856,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B8.S1": {
    "title": "Heavier and lighter",
@@ -4244,11 +4881,15 @@
     {
      "key": "measurement:reading_ruler",
      "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (earlier, same idea: length)"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B8.S2": {
    "title": "Measure mass",
@@ -4261,24 +4902,24 @@
    ],
    "pre": [
     {
-     "key": "measurement:heavier_lighter_visual",
-     "why": "R.B8.S1 Compare mass (school prior learning, week W26)"
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 measure length with cubes: the same measuring with units"
     },
     {
-     "key": "comparing:compare_objects",
-     "why": "R.B2.S1 Compare size (school prior learning, week W26)"
-    }
-   ],
-   "preBuild": [
-    "capacity_early"
-   ],
-   "related": [
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 count the cubes, to 20",
+     "opts": {
+      "band": 20
+     }
+    },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "the same idea for length"
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S1 heavier and lighter on a balance"
     }
    ],
-   "note": ""
+   "preBuild": [],
+   "related": [],
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S3": {
    "title": "Compare mass",
@@ -4303,13 +4944,17 @@
     {
      "key": "measurement:reading_ruler",
      "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (earlier, same idea: length)"
     }
    ],
    "preBuild": [
     "capacity_early"
    ],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B8.S4": {
    "title": "Full and empty",
@@ -4328,11 +4973,15 @@
     {
      "key": "comparing:compare_objects",
      "why": "R.B2.S1 Compare size (school prior learning, week W26)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S5": {
    "title": "Compare volume",
@@ -4351,11 +5000,15 @@
     {
      "key": "measurement:heavier_lighter_visual",
      "why": "Y1.B8.S3 Compare mass (earlier, same idea: mass)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S6": {
    "title": "Measure capacity",
@@ -4374,13 +5027,17 @@
     {
      "key": "measurement:heavier_lighter_visual",
      "why": "Y1.B8.S3 Compare mass (earlier, same idea: mass)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
     }
    ],
    "preBuild": [
     "capacity_early"
    ],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B8.S7": {
    "title": "Compare capacity",
@@ -4399,13 +5056,17 @@
     {
      "key": "measurement:heavier_lighter_visual",
      "why": "Y1.B8.S3 Compare mass (earlier, same idea: mass)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (earlier, same idea: length)"
     }
    ],
    "preBuild": [
     "capacity_early"
    ],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B9.S1": {
    "title": "Count in 2s",
@@ -4417,8 +5078,7 @@
       "step": [
        0
       ],
-      "band": 50,
-      "range": 50
+      "band": 50
      },
      "missing": "2s alone on a page; 2s, 5s and 10s come mixed, and no pictured pairs"
     }
@@ -4430,19 +5090,56 @@
    ],
    "pre": [
     {
+     "key": "patterns:double",
+     "why": "R.B9.S8 / Y1.B5.S4 doubles: two equal groups of 2",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "composing:odd_even",
-     "why": "R.B9.S6 / R.B11.S13 pairs: odd and even"
+     "why": "R.B9.S6 / R.B11.S13 pairs: odd and even",
+     "opts": {
+      "forms": [
+       2
+      ],
+      "range": 10
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B6.S1 count to 50 in ones",
+     "opts": {
+      "step": 1,
+      "range": 50
+     }
     },
     {
      "key": "counting:count_objects",
-     "why": "Y1.B4.S1 count objects to 20 one by one"
+     "why": "Y1.B4.S1 count objects to 20 one by one",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "the same idea in another form: tens as rods"
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "a later step on this idea: Y1.B9.S4 Recognise equal groups",
+     "opts": {
+      "step": 6
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "a later step on this idea: Y1.B9.S5 Add equal groups",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -4457,8 +5154,7 @@
       "step": [
        0
       ],
-      "band": 50,
-      "range": 50
+      "band": 50
      },
      "missing": "10s alone on a page; mixed with 2s and 5s, no ten frames"
     }
@@ -4471,16 +5167,56 @@
    "pre": [
     {
      "key": "composing:tens_foundation_visual",
-     "why": "Y1.B6.S2 / Y1.B12.S2 20, 30, 40 ... as tens"
+     "why": "Y1.B6.S2 20, 30, 40 … as tens",
+     "opts": {
+      "band": 90
+     }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "the tens column of the hundred square",
+     "opts": {
+      "band": 100,
+      "gaps": "column"
+     }
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 count to 100 in ones"
+     "why": "count on in ones to 50 (Y1.B6.S1)",
+     "opts": {
+      "step": 1,
+      "range": 50
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 count objects to 20",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "related": [
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "a later step on this idea: Y1.B9.S4 Recognise equal groups",
+     "opts": {
+      "step": 6
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "a later step on this idea: Y1.B9.S5 Add equal groups",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "range": 10
+     }
+    }
+   ],
+   "note": ""
   },
   "Y1.B9.S3": {
    "title": "Count in 5s",
@@ -4492,8 +5228,7 @@
       "step": [
        0
       ],
-      "band": 50,
-      "range": 50
+      "band": 50
      },
      "missing": "5s alone on a page; mixed with 2s and 10s, no hands"
     }
@@ -4505,22 +5240,56 @@
    ],
    "pre": [
     {
-     "key": "counting:count_objects",
-     "why": "Y1.B4.S1 count objects to 20"
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B9.S2 counting in 10s first: two 5s make each ten",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S1 counting in equal steps: doubles",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B12.S1 count to 100 in ones"
+     "why": "Y1.B6.S1 count to 50 in ones",
+     "opts": {
+      "step": 1,
+      "range": 50
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 count objects to 20",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "the same idea in another form: tens as rods"
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "a later step on this idea: Y1.B9.S4 Recognise equal groups",
+     "opts": {
+      "step": 6
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "a later step on this idea: Y1.B9.S5 Add equal groups",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "range": 10
+     }
     }
    ],
-   "note": ""
+   "note": "The count-in-2s and count-in-10s steps (Y1.B9.S1, S2) use this same skill and options (skip_count_line has no single-count value), so their building blocks are listed instead."
   },
   "Y1.B9.S4": {
    "title": "Recognise equal groups",
@@ -4556,13 +5325,26 @@
      "opts": {
       "band": 12
      }
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S3 Count in 5s (earlier, same idea: skip)",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "multiplication:arrays_groups",
-     "why": "the same idea in another form: groups of ... make ..."
+     "why": "the same idea in another form: groups of ... make ...",
+     "opts": {
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -4611,13 +5393,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "the same sum written with ×, later"
-    }
-   ],
-   "note": "\"___ groups of ___ make ___ in all\" with rings of dots."
+   "related": [],
+   "note": "\"___ groups of ___ make ___ in all\" with rings of dots. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B9.S6": {
    "title": "Make arrays",
@@ -4675,17 +5452,8 @@
    "preBuild": [
     "share_group"
    ],
-   "related": [
-    {
-     "key": "multiplication:dot_array_mult",
-     "why": "count a bigger array"
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "the same idea in another form: repeated addition, later"
-    }
-   ],
-   "note": "Rows of dots: \"___ rows of ___ make ___\"."
+   "related": [],
+   "note": "Rows of dots: \"___ rows of ___ make ___\". Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B9.S7": {
    "title": "Make doubles",
@@ -4701,8 +5469,7 @@
     {
      "key": "patterns:double",
      "opts": {
-      "band": 20,
-      "range": 20
+      "band": 20
      }
     }
    ],
@@ -4712,14 +5479,6 @@
    "build": [],
    "pre": [
     {
-     "key": "patterns:double",
-     "why": "R.B9.S8 Double to 8 (make a double) (school prior learning, week W20)",
-     "opts": {
-      "band": 20,
-      "range": 10
-     }
-    },
-    {
      "key": "number_sense:doubles_near_doubles",
      "why": "Y1.B5.S5 Near doubles (earlier, same idea: double)",
      "opts": {
@@ -4728,13 +5487,30 @@
        2
       ]
      }
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (earlier, same idea: fact)",
+     "opts": {
+      "range": 20
+     }
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B5.S10 Missing number problems (earlier, same idea: fact)",
+     "opts": {
+      "range": 20
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "patterns:halve",
-     "why": "the inverse: halve"
+     "why": "the inverse: halve",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "note": ""
@@ -4786,7 +5562,7 @@
     "share_group"
    ],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B9.S9": {
    "title": "Make equal groups - sharing",
@@ -4836,7 +5612,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B10.S1": {
    "title": "Recognise a half of an object or a shape",
@@ -4857,18 +5633,53 @@
    "pre": [
     {
      "key": "division:share_into_groups",
-     "why": "R.B16 grouping into equal groups: equal parts"
+     "why": "R.B16 grouping into equal groups: equal parts",
+     "opts": {
+      "band": 12
+     }
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 name the shape being halved",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 / S6 two shapes make one shape"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "fractions:shade_fraction",
-     "why": "the same idea in another form: shade the part"
+     "why": "the same idea in another form: shade the part",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
     },
     {
      "key": "fractions:fraction_of_set",
-     "why": "the next step on this idea: Y1.B10.S3 Recognise a half of a quantity"
+     "why": "the next step on this idea: Y1.B10.S3 Recognise a half of a quantity",
+     "opts": {
+      "denoms": [
+       2
+      ],
+      "range": 10
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "the next step on this idea: Y1.B10.S4 Find a half of a quantity",
+     "opts": {
+      "band": 10,
+      "range": 10
+     }
     }
    ],
    "note": "Halves only (parts 0)."
@@ -4894,8 +5705,21 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 name the shape being halved",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 / S6 two shapes make one shape"
+    },
+    {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (earlier, same idea: fraction)",
+     "why": "Y1.B10.S1 recognise a half of a shape",
      "opts": {
       "parts": [
        0
@@ -4907,11 +5731,21 @@
    "related": [
     {
      "key": "fractions:fraction_of_set",
-     "why": "the same idea in another form: a fraction of a set"
+     "why": "the same idea in another form: a fraction of a set",
+     "opts": {
+      "denoms": [
+       2
+      ],
+      "range": 10
+     }
     },
     {
      "key": "patterns:halve",
-     "why": "the next step on this idea: Y1.B10.S4 Find a half of a quantity"
+     "why": "the next step on this idea: Y1.B10.S4 Find a half of a quantity",
+     "opts": {
+      "band": 10,
+      "range": 10
+     }
     }
    ],
    "note": ""
@@ -4928,15 +5762,31 @@
       ],
       "range": 10
      },
-     "missing": "recognising whether a set is split into two equal groups"
+     "missing": "recognising whether a set is split into two equal groups; and with denoms [2] its missing-numerator form still deals ?/3, ?/5 and ?/6 (4 of 12 items: the option leaks, a generator bug)"
     }
    ],
    "verdict": "partial",
-   "missing": "is this set in halves? (equal / not equal)",
+   "missing": "is this set in halves? (two equal groups or not); the live option leaks thirds, fifths and sixths",
    "build": [
     "half_quarter"
    ],
    "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 a half of a shape: two equal parts",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 make equal groups",
+     "opts": {
+      "band": 12
+     }
+    },
     {
      "key": "fractions:shade_fraction",
      "why": "Y1.B10.S2 Find a half of an object or a shape (earlier, same idea: fraction)",
@@ -4945,22 +5795,16 @@
        2
       ]
      }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (earlier, same idea: fraction)",
-     "opts": {
-      "parts": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "patterns:halve",
-     "why": "the same idea in another form: half of a number"
+     "why": "half of a number, next step",
+     "opts": {
+      "band": 10
+     }
     }
    ],
    "note": ""
@@ -4976,78 +5820,28 @@
      }
     }
    ],
-   "partial": [
-    {
-     "key": "fractions:fraction_of_set",
-     "opts": {
-      "denoms": [
-       2
-      ],
-      "range": 10
-     },
-     "missing": "halves only (family 2 deals quarters too)"
-    }
-   ],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
-   "pre": [
-    {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S2 Find a half of an object or a shape (earlier, same idea: fraction)",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 Recognise a half of an object or a shape (earlier, same idea: fraction)",
-     "opts": {
-      "parts": [
-       0
-      ]
-     }
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "patterns:double",
-     "why": "the inverse: double"
-    }
-   ],
-   "note": "halve: \"Half of 8\" within 10."
-  },
-  "Y1.B10.S5": {
-   "title": "Recognise a quarter of an object or a shape",
-   "direct": [
-    {
-     "key": "shapes_early:partition_shapes",
-     "opts": {
-      "parts": [
-       2
-      ]
-     }
-    }
-   ],
    "partial": [],
    "verdict": "full",
    "missing": "",
    "build": [],
    "pre": [
     {
-     "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fraction)",
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 doubles: halving undoes a double",
      "opts": {
-      "band": 10,
-      "range": 10
+      "band": 20
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 share into 2 equal groups",
+     "opts": {
+      "band": 12
      }
     },
     {
      "key": "fractions:fraction_of_set",
-     "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fraction)",
+     "why": "Y1.B10.S3 Recognise a half of a quantity (earlier, same idea: fraction)",
      "opts": {
       "denoms": [
        2
@@ -5076,7 +5870,65 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Fourths only (parts 2). Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "halve: \"Half of 8\" within 10. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+  },
+  "Y1.B10.S5": {
+   "title": "Recognise a quarter of an object or a shape",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {
+      "parts": [
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fraction)",
+     "opts": {
+      "band": 10,
+      "range": 10
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S3 Recognise a half of a quantity (earlier, same idea: fraction)",
+     "opts": {
+      "denoms": [
+       2
+      ],
+      "range": 10
+     }
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (earlier, same idea: fraction)",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (earlier, same idea: fraction)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Fourths only (parts 2). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B10.S6": {
    "title": "Find a quarter of an object or a shape",
@@ -5117,7 +5969,7 @@
     },
     {
      "key": "fractions:fraction_of_set",
-     "why": "Y1.B10.S4 Find a half of a quantity (earlier, same idea: fraction)",
+     "why": "Y1.B10.S3 Recognise a half of a quantity (earlier, same idea: fraction)",
      "opts": {
       "denoms": [
        2
@@ -5128,7 +5980,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B10.S7": {
    "title": "Recognise a quarter of a quantity",
@@ -5142,29 +5994,36 @@
       ],
       "range": 10
      },
-     "missing": "recognising a set split into four equal groups"
+     "missing": "recognising a set split into four equal groups; with denoms [2] the missing-numerator form leaks ?/3, ?/5 and ?/6 (a generator bug)"
     }
    ],
    "verdict": "partial",
-   "missing": "is this set in quarters?",
+   "missing": "is this set in quarters? (four equal groups or not); the live option leaks thirds, fifths and sixths",
    "build": [
     "half_quarter"
    ],
    "pre": [
     {
-     "key": "fractions:shade_fraction",
-     "why": "Y1.B10.S6 Find a quarter of an object or a shape (earlier, same idea: fraction)",
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 a quarter of a shape: four equal parts",
      "opts": {
-      "denoms": [
+      "parts": [
        2
       ]
      }
     },
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (earlier, same idea: fraction)",
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 make equal groups",
      "opts": {
-      "parts": [
+      "band": 12
+     }
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (earlier, same idea: fraction)",
+     "opts": {
+      "denoms": [
        2
       ]
      }
@@ -5180,7 +6039,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B10.S8": {
    "title": "Find a quarter of a quantity",
@@ -5194,11 +6053,11 @@
       ],
       "range": 10
      },
-     "missing": "a quarter only (family 2 deals 1/2 and 2/4 too)"
+     "missing": "a quarter only: family 2 deals 1/2 and 2/4 too, and the missing-numerator form leaks ?/3, ?/5, ?/6 (a generator bug)"
     }
    ],
    "verdict": "partial",
-   "missing": "finding a quarter of a quantity only",
+   "missing": "finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths)",
    "build": [
     "halves_quarters_only"
    ],
@@ -5232,7 +6091,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B11.S1": {
    "title": "Describe turns",
@@ -5245,8 +6104,30 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 / S5 a half and a quarter of a shape: a half turn, a quarter turn",
+     "opts": {
+      "parts": [
+       0,
+       2
+      ]
+     }
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "the clock hand turns round the face",
+     "opts": {
+      "task": "hands"
+     }
+    },
+    {
      "key": "shapes_early:shape_positions",
-     "why": "R.B17.S7 Give instructions to build (earlier, same idea: position)"
+     "why": "R.B17.S6 position words",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -5254,7 +6135,7 @@
     "position_map"
    ],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B11.S2": {
    "title": "Describe position - left and right",
@@ -5271,18 +6152,33 @@
    "build": [
     "position_map"
    ],
-   "pre": [],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 / R.B17.S6 the position words above, below, beside first",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name the shapes being placed",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
    "preBuild": [
     "scenes",
     "turns"
    ],
-   "related": [
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "naming the shapes being placed"
-    }
-   ],
-   "note": "Pre: the earlier steps on this idea (R.B17.S7, R.B17.S6, R.B4.S4) use this same skill and options."
+   "related": [],
+   "note": "Pre: 2 only; the earlier steps Y1.B11.S1, R.B17.S11, R.B17.S10 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B11.S3": {
    "title": "Describe position - forwards and backwards",
@@ -5296,7 +6192,29 @@
    "pre": [
     {
      "key": "shapes_early:shape_positions",
-     "why": "R.B4.S4 Describe position (school prior learning, week W30)"
+     "why": "R.B17.S6 / Y1.B11.S2 position words",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B1.S6 / S8 count forwards and backwards",
+     "opts": {
+      "band": 10,
+      "dir": "mixed"
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S6 steps along a number track",
+     "opts": {
+      "step": 1,
+      "range": 10
+     }
     }
    ],
    "preBuild": [
@@ -5304,7 +6222,7 @@
     "turns"
    ],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B11.S4": {
    "title": "Describe position - above and below",
@@ -5325,6 +6243,24 @@
    "pre": [
     {
      "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 above, below, beside",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "name the shapes being placed",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:shape_positions",
      "why": "R.B4.S4 Describe position (school prior learning, week W30)"
     }
    ],
@@ -5333,13 +6269,8 @@
     "position_map",
     "turns"
    ],
-   "related": [
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "naming the shapes being placed"
-    }
-   ],
-   "note": "Above and below only (forms 0)."
+   "related": [],
+   "note": "Above and below only (forms 0). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B11.S5": {
    "title": "Ordinal numbers",
@@ -5351,6 +6282,29 @@
     "ordinal"
    ],
    "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B1.S6 the counting order: first, next",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 count a row of objects",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S6 the order of the numbers on a track",
+     "opts": {
+      "step": 1,
+      "range": 10
+     }
+    },
     {
      "key": "shapes_early:shape_positions",
      "why": "Y1.B11.S4 Describe position - above and below (earlier, same idea: position)",
@@ -5365,29 +6319,33 @@
     "position_map"
    ],
    "related": [],
-   "note": "Related: no live skill shows this idea yet (see build)."
+   "note": "Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B12.S1": {
    "title": "Count from 50 to 100",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "counting:number_seq_fill",
      "opts": {
       "step": 1,
       "range": 100
-     }
+     },
+     "missing": "counting from 50 to 100: range 100 deals tracks from 1 (6 of 8 below 50)"
     },
     {
      "key": "composing:hundreds_chart_fill",
      "opts": {
       "band": 100
-     }
+     },
+     "missing": "rows 50-100: band 100 deals 5 of 8 below 50"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counting on from 50 to 100 only (the tracks and the chart deal mostly below 50)",
+   "build": [
+    "count_start_at"
+   ],
    "pre": [
     {
      "key": "counting:count_sequence",
@@ -5437,25 +6395,31 @@
    "related": [
     {
      "key": "placevalue:unit_form",
-     "why": "the next step on this idea: Y1.B12.S3 Partition into tens and ones"
+     "why": "the next step on this idea: Y1.B12.S3 Partition into tens and ones",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "note": ""
   },
   "Y1.B12.S2": {
    "title": "Tens to 100",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "composing:tens_foundation_visual",
      "opts": {
       "band": 90
-     }
+     },
+     "missing": "100 as ten tens never appears: band 90 deals 1-9 tens, and asks only how many tens"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counting the tens to 100, with 100 as ten tens (band 90 stops at 9 tens) and naming each multiple of ten",
+   "build": [
+    "tens_name_100"
+   ],
    "pre": [
     {
      "key": "counting:count_sequence",
@@ -5500,20 +6464,26 @@
      "opts": {
       "band": 100
      }
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B6.S5 Partition into tens and ones (earlier step; the same idea in another form: build with rods and cubes)",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "composing:base10_build",
-     "why": "the same idea in another form: build with rods and cubes"
-    },
-    {
      "key": "placevalue:unit_form",
-     "why": "the next step on this idea: Y1.B12.S3 Partition into tens and ones"
+     "why": "the next step on this idea: Y1.B12.S3 Partition into tens and ones",
+     "opts": {
+      "band": 99
+     }
     }
    ],
-   "note": "Tens rods 10-90; 100 as ten tens is said aloud."
+   "note": ""
   },
   "Y1.B12.S3": {
    "title": "Partition into tens and ones",
@@ -5582,7 +6552,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B12.S4": {
    "title": "The number line to 100",
@@ -5622,20 +6592,20 @@
      "key": "addition:number_line_add",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     },
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B4.S9 Use a number line to 20 (earlier, same idea: nline)",
      "opts": {
-      "range": 10
+      "range": 20
      }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B12.S5": {
    "title": "1 more, 1 less",
@@ -5693,16 +6663,18 @@
       "step": 1,
       "band": 20
      }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "Y1.B12.S1 Count from 50 to 100 (earlier step; the same idea in another form: the hundred square)",
+     "opts": {
+      "band": 100
+     }
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:hundreds_chart_fill",
-     "why": "the same idea in another form: the hundred square"
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B12.S6": {
    "title": "Compare numbers with the same number of tens",
@@ -5748,14 +6720,17 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y1.B4.S12 Order numbers to 20 (earlier, same idea: compare)"
+     "why": "Y1.B4.S12 Order numbers to 20 (earlier, same idea: compare)",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "preBuild": [
     "subitise"
    ],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B12.S7": {
    "title": "Compare any two numbers",
@@ -5798,14 +6773,17 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y1.B4.S12 Order numbers to 20 (earlier, same idea: compare)"
+     "why": "Y1.B4.S12 Order numbers to 20 (earlier, same idea: compare)",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "preBuild": [
     "subitise"
    ],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B13.S1": {
    "title": "Unitising",
@@ -5833,19 +6811,45 @@
    ],
    "pre": [
     {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S2 / S3 count in 5s and 10s: a nickel is five ones",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     }
+    },
+    {
      "key": "counting:count_objects",
-     "why": "Y1.B1.S2 count ones"
+     "why": "Y1.B1.S2 count ones",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "composing:base10_build",
-     "why": "Y1.B6.S4 a ten as one rod"
+     "why": "Y1.B6.S4 a ten as one rod",
+     "opts": {
+      "band": 50
+     }
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "measurement:money_count",
-     "why": "the same idea in another form: count the coins"
+     "why": "the same idea in another form: count the coins",
+     "opts": {
+      "currency": "usd",
+      "kind": "like",
+      "band": 50,
+      "values": [
+       1,
+       5,
+       10
+      ]
+     }
     }
    ],
    "note": ""
@@ -5866,21 +6870,38 @@
    "build": [],
    "pre": [
     {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B13.S1 Unitising (earlier, same idea: money)",
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 count the coins one by one",
      "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S2 / S3 count in 5s and 10s: nickels and dimes",
+     "opts": {
+      "step": [
+       0
+      ],
       "band": 50
+     }
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "count 1-cent coins one by one",
+     "opts": {
+      "currency": "usd",
+      "kind": "like",
+      "values": [
+       1
+      ],
+      "band": 20
      }
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "measurement:money_count",
-     "why": "the same idea in another form: count the coins"
-    }
-   ],
-   "note": "US coins: circle every coin worth n."
+   "related": [],
+   "note": "US coins: circle every coin worth n. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B13.S3": {
    "title": "Recognise notes",
@@ -5911,23 +6932,33 @@
    ],
    "pre": [
     {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S2 / S3 count in 5s and 10s: 5- and 10-dollar bills",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 count the bills one by one",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
      "key": "measurement:coin_value",
      "why": "Y1.B13.S2 Recognise coins (earlier, same idea: money)",
      "opts": {
       "currency": "usd"
      }
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B13.S1 Unitising (earlier, same idea: money)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B13.S4": {
    "title": "Count in coins",
@@ -5952,20 +6983,20 @@
    "build": [],
    "pre": [
     {
-     "key": "measurement:coin_value",
-     "why": "Y1.B13.S3 Recognise notes (earlier, same idea: money)",
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S2 / S3 count in 5s and 10s: the main building block",
      "opts": {
-      "currency": "usd",
-      "task": "order"
+      "step": [
+       0
+      ],
+      "band": 50
      }
     },
     {
-     "key": "measurement:money_count",
+     "key": "measurement:coin_value",
      "why": "Y1.B13.S3 Recognise notes (earlier, same idea: money)",
      "opts": {
-      "currency": "usd",
-      "kind": "note",
-      "band": 100
+      "currency": "usd"
      }
     },
     {
@@ -5978,7 +7009,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Count like coins (1, 5, 10 cents) to 50. Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Count like coins (1, 5, 10 cents) to 50. Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "Y1.B14.S1": {
    "title": "Before and after",
@@ -5993,8 +7024,17 @@
    "preBuild": [
     "time_talk"
    ],
-   "related": [],
-   "note": "Pre: the earlier steps on this idea (R.B10.S6, R.B10.S5, R.B6.S4) have no live skill yet; see preBuild. Related: no live skill shows this idea yet (see build)."
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "a later step on this idea: Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "a later step on this idea: Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": "Pre: 0 only; the earlier steps R.B10.S6, R.B10.S5, R.B6.S4 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S2": {
    "title": "Days of the week",
@@ -6009,8 +7049,17 @@
    "preBuild": [
     "day_order"
    ],
-   "related": [],
-   "note": "Pre: the earlier steps on this idea (Y1.B14.S1, R.B10.S6, R.B10.S5) have no live skill yet; see preBuild. Related: no live skill shows this idea yet (see build)."
+   "related": [
+    {
+     "key": "measurement:time_hour",
+     "why": "the next step on this idea: Y1.B14.S5 Tell the time to the hour"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "a later step on this idea: Y1.B14.S6 Tell the time to the half hour"
+    }
+   ],
+   "note": "Pre: 0 only; the earlier steps Y1.B14.S1, R.B10.S6, R.B10.S5 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S3": {
    "title": "Months of the year",
@@ -6025,13 +7074,8 @@
    "preBuild": [
     "day_order"
    ],
-   "related": [
-    {
-     "key": "measurement:time_hour",
-     "why": "the next step on this idea: Y1.B14.S5 Tell the time to the hour"
-    }
-   ],
-   "note": "Pre: the earlier steps on this idea (Y1.B14.S2, Y1.B14.S1, R.B10.S6) have no live skill yet; see preBuild."
+   "related": [],
+   "note": "Related: no live skill orders the months; the days-of-the-week build (time_talk) is the same idea. Pre: 0 only; the earlier steps Y1.B14.S2, Y1.B14.S1, R.B10.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "Y1.B14.S4": {
    "title": "Hours, minutes and seconds",
@@ -6061,7 +7105,7 @@
      "why": "the next step on this idea: Y1.B14.S6 Tell the time to the half hour"
     }
    ],
-   "note": "Pre: the earlier steps on this idea (Y1.B14.S3, Y1.B14.S2, Y1.B14.S1) have no live skill yet; see preBuild."
+   "note": "Pre: 0 only; the earlier steps Y1.B14.S3, Y1.B14.S2, Y1.B14.S1 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S5": {
    "title": "Tell the time to the hour",
@@ -6079,6 +7123,14 @@
     {
      "key": "measurement:clock_parts",
      "why": "the hands and numbers of a clock"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 the order of the numbers 1 to 12",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     }
     }
    ],
    "preBuild": [
@@ -6092,7 +7144,7 @@
      "why": "the same idea in another form: the half hour next"
     }
    ],
-   "note": ""
+   "note": "Pre: 2 only; the earlier steps Y1.B14.S4, Y1.B14.S3, Y1.B14.S2 have no live skill yet (see preBuild)."
   },
   "Y1.B14.S6": {
    "title": "Tell the time to the half hour",
@@ -6109,7 +7161,23 @@
    "pre": [
     {
      "key": "measurement:time_hour",
-     "why": "Y1.B14.S5 Tell the time to the hour (earlier, same idea: time)"
+     "why": "Y1.B14.S5 the time to the hour first"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 a half of a shape: half past is half way round",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "the hands of the clock",
+     "opts": {
+      "task": "hands"
+     }
     }
    ],
    "preBuild": [
@@ -6118,7 +7186,7 @@
     "time_units"
    ],
    "related": [],
-   "note": "Related: none beyond the pre-skills; the other forms of this idea are already listed as pre-skills or direct skills."
+   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   }
  },
  "proposals": {
@@ -6146,10 +7214,13 @@
    "teaches": "consolidating counting, cardinality, composition and patterns to 10 (Reception year review)",
    "representation": "a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content)",
    "family": "counting",
-   "steps": [],
+   "steps": [
+    "R.B18.S1",
+    "R.B18.S2"
+   ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B18.S1: a consolidation review across the Reception year; R.B18.S2: number relationships (1 more, doubles, bonds) reviewed together",
    "reused": true
   },
   "subitise": {
@@ -6159,10 +7230,21 @@
    "teaches": "perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5)",
    "representation": "standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts",
    "family": "counting",
-   "steps": [],
-   "ccss": [],
+   "steps": [
+    "R.B3.S2",
+    "R.B5.S2",
+    "R.B7.S3",
+    "R.B7.S8",
+    "R.B9.S10",
+    "R.B11.S4",
+    "R.B11.S9"
+   ],
+   "ccss": [
+    "K.CC.B.5",
+    "K.OA.A.3"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B3.S2: perceptual subitising of 1, 2 and 3 (seen, not counted); R.B5.S2: perceptual subitising of 4 and 5; R.B7.S3: subitising 0 to 5; R.B7.S8: conceptual subitising to 5: seeing 3 and 2 and knowing 5; R.B9.S10: conceptual subitising to 8 (see 5 and 3); R.B11.S4: conceptual subitising to 10 on frames and dice; R.B11.S9: seeing different arrangements of 10 as the same amount",
    "reused": true
   },
   "ten_count_out": {
@@ -6198,7 +7280,7 @@
     "K.CC.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "Y1.B1.S5: reading and matching the words zero to ten",
+   "closes": "Y1.B1.S5: reading the number words zero to ten and matching each to its numeral (the live skill deals only \"ten\" at Max Number 10)",
    "reused": true
   },
   "zero": {
@@ -6208,10 +7290,20 @@
    "teaches": "zero as the count of an empty set, and writing 0",
    "representation": "pictures of plates/boxes with some or no objects; write how many, including 0",
    "family": "counting",
-   "steps": [],
-   "ccss": [],
+   "steps": [
+    "R.B7.S1",
+    "R.B7.S2",
+    "R.B7.S4",
+    "R.B7.S7"
+   ],
+   "ccss": [
+    "K.CC.A.3",
+    "K.CC.B.4",
+    "K.CC.B.5",
+    "K.OA.A.3"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B7.S1: zero as none: an empty set and the numeral 0; R.B7.S2: finding a group of zero; R.B7.S4: representing 0 (an empty frame); R.B7.S7: composition of 0 to 5: the wholes 1 and 2 and a zero part (5 = 5 + 0) never appear",
    "reused": true
   },
   "compare_small": {
@@ -6250,22 +7342,18 @@
    "steps": [
     "Y1.B1.S15",
     "Y1.B4.S8",
-    "Y1.B4.S9",
     "Y1.B4.S10",
-    "Y1.B5.S7",
     "Y1.B6.S6",
     "Y1.B6.S7",
     "Y1.B12.S4"
    ],
    "ccss": [
     "1.NBT.A.1",
-    "1.OA.C.5",
     "K.CC.A.2",
-    "K.CC.A.3",
-    "K.OA.A.1"
+    "K.CC.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "Y1.B1.S15: the 0-10 number line: reading, counting along and placing numbers; Y1.B4.S8: the 0-20 number line: reading and labelling ticks; Y1.B4.S9: finding and placing numbers on a 0-20 line; Y1.B4.S10: estimating where a number lies on a 0-20 line with only the ends marked; Y1.B5.S7: counting back within 20 on a line; Y1.B6.S6: the 0-50 line; Y1.B6.S7: estimating on a 0-50 line; Y1.B12.S4: the 0-100 line",
+   "closes": "Y1.B1.S15: the 0-10 number line: reading, counting along and placing numbers; Y1.B4.S8: the 0-20 number line: reading and labelling ticks; Y1.B4.S10: estimating where a number lies on a 0-20 line with only the ends marked; Y1.B6.S6: the 0-50 line; Y1.B6.S7: estimating on a 0-50 line; Y1.B12.S4: the 0-100 line",
    "reused": true
   },
   "part_whole": {
@@ -6303,6 +7391,25 @@
    "closes": "Y1.B2.S3: writing the + / − sentence that matches a picture (the skills give the sentence)",
    "reused": true
   },
+  "family_add_only": {
+   "kind": "option",
+   "skill": "addition:add_sub_fact_family",
+   "option": "facts: addition only (both orders, = on either side); the same on number_families_add",
+   "name": "Addition Facts of a Family (option)",
+   "teaches": "write the two addition facts of a family (6 + 2 = 8, 2 + 6 = 8) and the same facts with = on the left (8 = 6 + 2)",
+   "representation": "the skill's own part-whole and four-sentence cell with only the addition rows",
+   "family": "operations",
+   "ccss": [
+    "K.OA.A.3",
+    "1.OA.B.3"
+   ],
+   "why": "both live skills deal the subtraction facts too, which are the next step (Y1.B2.S13)",
+   "steps": [
+    "Y1.B2.S4"
+   ],
+   "closes": "Y1.B2.S4: the addition facts of a family only: both orders and the = on either side (8 = 6 + 2); both live skills also deal the subtraction facts",
+   "reused": false
+  },
   "systematic_bonds": {
    "kind": "new",
    "skill": "composing:bonds_in_order",
@@ -6324,14 +7431,14 @@
    "kind": "new",
    "skill": "addition:add_10_pictures",
    "name": "Add Within 10 with Pictures",
-   "teaches": "count two pictured groups and write how many in all, totals 6 to 10",
+   "teaches": "count two pictured groups (combine) or a group and the ones that join it (add more) and write how many in all; totals to 8 for Reception growing 6-8, to 10 after",
    "representation": "two groups of counters (or a ten frame split in two) in one cell; one answer box",
    "family": "operations",
    "ccss": [
     "K.OA.A.1",
     "K.OA.A.2"
    ],
-   "why": "add_5_pictures stops at 5 by name; add_10_mixed is abstract",
+   "why": "add_5_pictures stops at 5 by name; add_10_mixed is abstract; add_wp_10 is a word-work cell with an operation bank",
    "steps": [
     "Y1.B2.S8"
    ],
@@ -6381,10 +7488,18 @@
    "teaches": "properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes",
    "representation": "line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape",
    "family": "geometry",
-   "steps": [],
-   "ccss": [],
+   "steps": [
+    "R.B12.S2",
+    "R.B12.S3",
+    "R.B15.S1",
+    "R.B15.S8"
+   ],
+   "ccss": [
+    "K.G.A.3",
+    "K.G.B.4"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B12.S2: finding the flat (2-D) faces on 3-D shapes; R.B12.S3: choosing a 3-D shape for a job (it rolls, it stacks); R.B15.S1: selecting a shape for a purpose; R.B15.S8: finding 2-D faces within 3-D shapes",
    "reused": true
   },
   "shapes_world": {
@@ -6394,10 +7509,16 @@
    "teaches": "recognising 2-D and 3-D shapes in everyday objects (a clock is a circle, a tin is a cylinder)",
    "representation": "line drawings of everyday objects; circle or write the matching shape name from a word bank",
    "family": "geometry",
-   "steps": [],
-   "ccss": [],
+   "steps": [
+    "R.B4.S3",
+    "R.B6.S3",
+    "R.B12.S4"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B4.S3: finding circles and triangles in real objects; R.B6.S3: finding 4-sided shapes in the environment; R.B12.S4: finding 3-D shapes in the environment",
    "reused": true
   },
   "shape_sort": {
@@ -6426,10 +7547,18 @@
    "teaches": "copying a picture or construction made of shapes, visualising from another viewpoint, replicating a scene",
    "representation": "a model picture made of shapes beside an empty frame; draw or choose the matching copy",
    "family": "geometry",
-   "steps": [],
-   "ccss": [],
+   "steps": [
+    "R.B15.S4",
+    "R.B15.S7",
+    "R.B17.S4",
+    "R.B17.S5"
+   ],
+   "ccss": [
+    "K.G.B.5",
+    "K.G.B.6"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "",
+   "closes": "R.B15.S4: describing how shapes are arranged; R.B15.S7: copying a picture made of 2-D shapes; R.B17.S4: replicating a scene or construction from a model; R.B17.S5: visualising objects from different positions",
    "reused": true
   },
   "pattern_make": {
@@ -6546,22 +7675,44 @@
    "closes": "Y1.B5.S8: difference as comparison (bars, line)",
    "reused": true
   },
-  "missing_20": {
+  "count_start_at": {
    "kind": "option",
-   "skill": "subtraction:missing_add_sub",
-   "option": "range 20 (also cloze_addition)",
-   "name": "Missing Numbers Within 20 (option)",
-   "teaches": "find the missing number in + and − sentences within 20",
-   "representation": "the skill's own sentence cell with numbers to 20",
-   "family": "operations",
+   "skill": "counting:number_seq_fill",
+   "option": "start: 20 / 50 (tracks inside 20-50 or 50-100); the same on hundreds_chart_fill (the rows shown start at 20 or 50)",
+   "name": "Count From 20 or 50 (option)",
+   "teaches": "continue a number track (or fill a hundred-square window) that stays inside 20-50, or inside 50-100",
+   "representation": "the skill's own track or chart window, numbers held to the step's span",
+   "family": "counting",
    "ccss": [
-    "1.OA.D.8"
+    "K.CC.A.1",
+    "1.NBT.A.1"
    ],
-   "why": "the range is 10 or 100 only",
+   "why": "range 50 / 100 and band 50 / 100 are caps: most tracks and windows start below 20 or 50",
    "steps": [
-    "Y1.B5.S10"
+    "Y1.B6.S1",
+    "Y1.B12.S1"
    ],
-   "closes": "Y1.B5.S10: missing-number sentences within 20",
+   "closes": "Y1.B6.S1: counting on from 20 to 50 only (the tracks and the chart start below 20); Y1.B12.S1: counting on from 50 to 100 only (the tracks and the chart deal mostly below 50)",
+   "reused": false
+  },
+  "tens_name_100": {
+   "kind": "option",
+   "skill": "composing:tens_foundation_visual",
+   "option": "band: 100 (up to ten tens = 100); ask: the number (2 tens = 20) as well as how many tens",
+   "name": "Name the Tens to 100 (option)",
+   "teaches": "count the ten rods and write the number they make (20, 30 … 100), up to ten tens",
+   "representation": "the skill's own row of ten rods; one answer box for the number",
+   "family": "counting",
+   "ccss": [
+    "1.NBT.B.2",
+    "K.CC.A.1"
+   ],
+   "why": "band 90 stops at 9 tens and the skill only asks \"how many tens?\"",
+   "steps": [
+    "Y1.B6.S2",
+    "Y1.B12.S2"
+   ],
+   "closes": "Y1.B6.S2: saying and writing 20, 30, 40 and 50 for 2-5 tens (the skill answers only how many tens); Y1.B12.S2: counting the tens to 100, with 100 as ten tens (band 90 stops at 9 tens) and naming each multiple of ten",
    "reused": false
   },
   "tens_ones_group": {
@@ -6661,7 +7812,7 @@
   "multiples_from_0": {
    "kind": "option",
    "skill": "patterns:seq_2",
-   "option": "start at 0 (multiples only), band 20 / 50 / 100; the same on seq_5 and seq_10",
+   "option": "start at 0 (multiples only), band 20 / 50 / 100; the same on seq_5 and seq_10 (seq_10 gets band 100: it has only 50 and 1000)",
    "name": "Count in 2s, 5s, 10s from Zero (option)",
    "teaches": "count in 2s (or 5s, 10s) from 0 on true multiples and fill the next number, one count per page",
    "representation": "a number track of multiples with a picture strip (pairs of socks, hands, ten frames) above it",
@@ -6732,7 +7883,7 @@
     "Y1.B10.S6",
     "Y1.B10.S8"
    ],
-   "closes": "Y1.B10.S2: finding (shading) a half of a shape only; Y1.B10.S6: finding (shading) a quarter of a shape only; Y1.B10.S8: finding a quarter of a quantity only",
+   "closes": "Y1.B10.S2: finding (shading) a half of a shape only; Y1.B10.S6: finding (shading) a quarter of a shape only; Y1.B10.S8: finding a quarter of a quantity only (the live option also deals halves and leaks thirds, fifths and sixths)",
    "reused": false
   },
   "half_quarter": {
@@ -6750,7 +7901,7 @@
     "1.G.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
-   "closes": "Y1.B10.S3: is this set in halves? (equal / not equal); Y1.B10.S7: is this set in quarters?",
+   "closes": "Y1.B10.S3: is this set in halves? (two equal groups or not); the live option leaks thirds, fifths and sixths; Y1.B10.S7: is this set in quarters? (four equal groups or not); the live option leaks thirds, fifths and sixths",
    "reused": true
   },
   "turns": {
@@ -6910,6 +8061,12 @@
    "why": "parts and wholes of real objects and groups, named in words (not yet a bond)"
   },
   {
+   "key": "addition:number_families_add",
+   "step": "Y1.B2.S2",
+   "action": "remove",
+   "why": "does not teach this step: the part-whole diagram itself"
+  },
+  {
    "key": "addition:add_5_pictures",
    "step": "Y1.B2.S3",
    "action": "partial",
@@ -6922,10 +8079,22 @@
    "why": "writing the number sentence for a picture"
   },
   {
+   "key": "addition:add_sub_fact_family",
+   "step": "Y1.B2.S4",
+   "action": "partial",
+   "why": "it deals the subtraction facts too (8 − 6 = 2), which are S13, and never writes the = on the left"
+  },
+  {
+   "key": "addition:number_families_add",
+   "step": "Y1.B2.S4",
+   "action": "partial",
+   "why": "the family includes the subtraction facts"
+  },
+  {
    "key": "composing:number_bonds",
    "step": "Y1.B2.S7",
-   "action": "partial",
-   "why": "wholes other than 10 (only 10 is the step)"
+   "action": "remove",
+   "why": "does not teach this step: tagged full but no generated item matches the step"
   },
   {
    "key": "addition:add_5_pictures",
@@ -6938,6 +8107,12 @@
    "step": "Y1.B2.S8",
    "action": "remove",
    "why": "add_10_mixed is a column / abstract layout, not a pictured part-whole for Kindergarten"
+  },
+  {
+   "key": "addition:fact_family_sort",
+   "step": "Y1.B2.S13",
+   "action": "remove",
+   "why": "does not teach this step: tagged full but no generated item matches the step"
   },
   {
    "key": "subtraction:sub_5_pictures",
@@ -7018,22 +8193,22 @@
    "why": "17-19 only"
   },
   {
+   "key": "addition:number_line_add",
+   "step": "Y1.B4.S9",
+   "action": "add",
+   "why": "teaches the whole step with the options given; drop the partial flag"
+  },
+  {
    "key": "subtraction:number_line_sub",
    "step": "Y1.B4.S9",
-   "action": "partial",
-   "why": "counting back on the line"
+   "action": "add",
+   "why": "teaches this step"
   },
   {
    "key": "addition:add_20_mixed",
    "step": "Y1.B5.S1",
    "action": "remove",
    "why": "add_20_mixed regroups (bridges 10) in some items; counting on is add_20_no_regroup"
-  },
-  {
-   "key": "addition:number_line_add",
-   "step": "Y1.B5.S1",
-   "action": "partial",
-   "why": "a 0-20 line (the line stops at 10)"
   },
   {
    "key": "addition:add_20_no_regroup",
@@ -7078,34 +8253,28 @@
    "why": "using the bond 7 − 3 to do 17 − 3 (a ten and ones picture); the skill is abstract"
   },
   {
-   "key": "subtraction:nl_sub",
-   "step": "Y1.B5.S7",
-   "action": "partial",
-   "why": "counting back on a 0-20 line (the line stops at 10)"
-  },
-  {
-   "key": "subtraction:number_line_sub",
-   "step": "Y1.B5.S7",
-   "action": "partial",
-   "why": "a 0-20 line"
-  },
-  {
    "key": "addition:add_sub_fact_family",
    "step": "Y1.B5.S9",
    "action": "remove",
    "why": "add_sub_fact_family reads Max Number 10 or 100: below or far past \"within 20\"; number_families_add {band:20} fits"
   },
   {
-   "key": "addition:cloze_addition",
-   "step": "Y1.B5.S10",
+   "key": "counting:number_seq_fill",
+   "step": "Y1.B6.S1",
    "action": "partial",
-   "why": "within 20 (deals within 10)"
+   "why": "counting from 20 to 50: range 50 deals tracks from 1 (5 of 8 below 20)"
   },
   {
-   "key": "subtraction:missing_add_sub",
-   "step": "Y1.B5.S10",
+   "key": "composing:hundreds_chart_fill",
+   "step": "Y1.B6.S1",
    "action": "partial",
-   "why": "within 20 (Max Number 10 or 100 only)"
+   "why": "rows 20-50: band 50 also shows rows below 20"
+  },
+  {
+   "key": "composing:tens_foundation_visual",
+   "step": "Y1.B6.S2",
+   "action": "partial",
+   "why": "naming the multiple of ten: the skill asks \"how many tens?\" (1-5), never 20, 30, 40, 50"
   },
   {
    "key": "patterns:seq_10",
@@ -7182,8 +8351,8 @@
   {
    "key": "fractions:fraction_of_set",
    "step": "Y1.B10.S4",
-   "action": "partial",
-   "why": "halves only (family 2 deals quarters too)"
+   "action": "remove",
+   "why": "does not teach this step: tagged full but no generated item matches the step"
   },
   {
    "key": "fractions:shade_fraction",
@@ -7195,13 +8364,31 @@
    "key": "fractions:fraction_of_set",
    "step": "Y1.B10.S8",
    "action": "partial",
-   "why": "a quarter only (family 2 deals 1/2 and 2/4 too)"
+   "why": "a quarter only: family 2 deals 1/2 and 2/4 too, and the missing-numerator form leaks ?/3, ?/5, ?/6 (a generator bug)"
   },
   {
    "key": "shapes_early:shape_positions",
    "step": "Y1.B11.S2",
    "action": "partial",
    "why": "left and right (the skill does above / below / beside)"
+  },
+  {
+   "key": "counting:number_seq_fill",
+   "step": "Y1.B12.S1",
+   "action": "partial",
+   "why": "counting from 50 to 100: range 100 deals tracks from 1 (6 of 8 below 50)"
+  },
+  {
+   "key": "composing:hundreds_chart_fill",
+   "step": "Y1.B12.S1",
+   "action": "partial",
+   "why": "rows 50-100: band 100 deals 5 of 8 below 50"
+  },
+  {
+   "key": "composing:tens_foundation_visual",
+   "step": "Y1.B12.S2",
+   "action": "partial",
+   "why": "100 as ten tens never appears: band 90 deals 1-9 tens, and asks only how many tens"
   },
   {
    "key": "patterns:seq_10",
