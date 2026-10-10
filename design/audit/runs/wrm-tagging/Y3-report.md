@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 7
+# Wave 2 tagging: Year 3 (US Grade 2) — round 8
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -11,6 +11,38 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 8 (after critic Y2–Y3 r7, 7.88 / 7.74): related by school week, whys keep their reasons, ladders
+
+- **A1 (S13)**: related "next step" links now come from the steps taught AFTER this one by school week (block first,
+  then the year, same topic), worded "(next step, W18: …)"; a block step taught earlier is a pre candidate
+  "(taught earlier, W18)", whatever its WRM position. Critic `nextscan` **0**.
+- **A2 (S12)**: the why check reads count payloads (a number track [10,12,14,16] is counting in 2s) and treats units,
+  money and fraction words as content only on measurement / fraction / graph / shape skills (on a number skill they are
+  the analogy that explains the link). A rebuilt why describes the skill in words (`whyText` for every rebuilt key, no
+  catalogue labels: `labwhy` 0 / 0), keeps the old why's reason after its colon when that reason is true of the items
+  and opts, cites the owner step, and says "taught the same week (Wn)" or "taught later (Wn)" instead of "earlier
+  learning" ("— earlier learning" 0 / 0). The r6 analogy whys are back (unit_form exchanges, expand "dollars and cents
+  as two parts", the 4s doubled, the coin context on Y2.B4.S1, "100 is two 50s", the 100 g scale).
+- **A3**: the "earlier step this builds on" suffix and every cited step name the step that owns the link's key with the
+  closest opts (exact, then a superset of its rows / tables / parts).
+- **A4**: `relOnly` with its own related list (even `[]`) replaces extraRelated and relR3 (Y2.B8.S13 has its note).
+- **A5**: a hand `core` pre that the week or content checks would drop is a build error (`COREDROP`, exit 1); the two it
+  found were fixed (Y2.B4.S9 money, Y3.B4.S2 tables).
+- **A6**: a link is excluded as "the step's own skill" only when key AND opts match (or are empty): Y3.B3.S14/S15 lead
+  with `mult_facts {constant:[4]}` ("double each fact for the 8s") beside the direct `mult_facts {constant:[8]}`.
+- **B. steps**: all of the critic's list (Y2.B5.S12 number track in 2s; Y2.B8.S13 note; Y2.B4.S8 change from a dollar
+  as pre, enough_money related; Y2.B4.S4/S5 money_compare pre; Y2.B2.S2/S3/S16, B3.S1 earlier steps as pre; Y2.B1.S7
+  partition first; Y3.B3.S14/S15, S9, S3 ladders; Y3.B4.S2 known fact; Y3.B5.S1/S3/S5/S10 and B11.S4 measuring
+  ladders; Y3.B6.S2–S6 fractions on a number line (W18) as pre; Y3.B11.S6; Y3.B1.S3/S10/S11, B2.S1; Y3.B3.S4 coins;
+  Y3.B1.S14; Y3.B7.S3). 23 steps whose only related skills were taught earlier now say so in `note`.
+- **Scans**: critic r7 `nextscan` 0, `labwhy` 0, `vscan` 0 links, `prewk` 0, `optcheck` 0; `whyscan` A 0, B 100 (all
+  related links to steps taught LATER, i.e. correct "next step" links; 0 pre), C 86 = its own false positives: count
+  whys on number tracks / count rows it cannot read in the payload, "quarter past" whys on `time_quarter` (clock
+  times, not fractions), "number line" on the number-line skills, and the analogy whys r7 asked to restore; `scan9`
+  links: `share_into_groups` (r6: clean) and ×8 facts inside the 2, 3, 4, 5 and 10 tables (r4 false positive); r3
+  `swap.py` (WRM order) lists 16 related links whose step is earlier in WRM order but taught LATER by school week —
+  correct under rule 19. `linkscan (week mode)` OK; both files rebuild byte-identical.
 
 ## Round 7 (after critic Y2–Y3 r6, 7.73 / 7.53): inch ruler, skip counts, ÷ payloads, hand-written whys
 
