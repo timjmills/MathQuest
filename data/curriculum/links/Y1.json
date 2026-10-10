@@ -948,6 +948,1273 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B2.S1": {
+   "title": "Introduce parts and wholes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 5
+     },
+     "missing": "parts and wholes of real objects and groups, named in words (not yet a bond)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "identifying the parts and the whole of a group in words",
+   "build": [
+    "part_whole"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W11)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W11)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W11)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S4 How many did I take away (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:number_families_add",
+     "why": "next step: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S4 Fact families - addition facts"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S2": {
+   "title": "Part-whole model",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "addition:number_families_add",
+     "opts": {},
+     "missing": "the part-whole diagram itself"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W11)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W11)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (same CCSS K.OA.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "next step: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "next step: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.3 in Y1.B2.S4 Fact families - addition facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S3": {
+   "title": "Write number sentences",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_5_pictures",
+     "opts": {},
+     "missing": "writing the number sentence for a picture"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "opts": {},
+     "missing": "writing the number sentence for a picture"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "writing the + / − sentence that matches a picture (the skills give the sentence)",
+   "build": [
+    "pictures_to_sentence"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B3.S6 Composition of 1, 2 and 3 (prior learning wk W11)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W11)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W11)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W11)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (the step before in this block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "next step: Y1.B2.S4 Fact families - addition facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "next step: Y1.B2.S4 Fact families - addition facts"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S13 Fact families - the eight facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S4": {
+   "title": "Fact families - addition facts",
+   "direct": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_families_add",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S6 Composition of 4 and 5 (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "pictures_to_sentence",
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: Y1.B2.S5 Number bonds within 10"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "same CCSS 1.OA.B.3, K.OA.A.1 in Y1.B2.S13 Fact families - the eight facts"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S14 Subtraction - take away cross out (How many left )"
+    }
+   ],
+   "note": "Addition facts of a family (two orders)."
+  },
+  "Y1.B2.S5": {
+   "title": "Number bonds within 10",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (the step before in this block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S4 Fact families - addition facts (the step before in this block)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "pictures_to_sentence"
+   ],
+   "related": [
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same block: Y1.B2.S4 Fact families - addition facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S6": {
+   "title": "Systematic number bonds within 10",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "listing bonds of a number in order (0 + 5, 1 + 4 ...) and seeing the pattern",
+   "build": [
+    "systematic_bonds"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S6 Composition of 4 and 5 (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W13)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (the step before in this block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S4 Fact families - addition facts (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "single bonds"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "next step: Y1.B2.S7 Number bonds to 10"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S7": {
+   "title": "Number bonds to 10",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10,
+      "unknown": "second"
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "pictures_change_unknown",
+    "systematic_bonds"
+   ],
+   "related": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "next step: Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "next step: Y1.B2.S8 Addition - add together"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S8": {
+   "title": "Addition - add together",
+   "direct": [
+    {
+     "key": "addition:add_5_pictures",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S7 Composition of 1 - 5 (prior learning wk W14)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S4 Fact families - addition facts (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "subitise",
+    "systematic_bonds"
+   ],
+   "related": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "next step: Y1.B2.S9 Addition - add more"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "next step: Y1.B2.S9 Addition - add more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S13 Fact families - the eight facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S13 Fact families - the eight facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S9": {
+   "title": "Addition - add more",
+   "direct": [
+    {
+     "key": "addition:add_wp_10",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "addition:number_line_add",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S7 Composition of 1 - 5 (prior learning wk W14)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "addition:add_wp_10_plain",
+     "why": "next step: Y1.B2.S10 Addition problems"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "same CCSS K.OA.A.2 in Y1.B2.S15 Subtraction - take away (How many left )"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "same CCSS K.OA.A.2 in Y1.B2.S15 Subtraction - take away (How many left )"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S10": {
+   "title": "Addition problems",
+   "direct": [
+    {
+     "key": "addition:add_wp_10",
+     "opts": {
+      "band": 10
+     }
+    },
+    {
+     "key": "addition:add_wp_10_plain",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W15)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S6 Composition of 4 and 5 (prior learning wk W15)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B2.S9 Addition - add more (the step before in this block)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: Y1.B2.S11 Find a part"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "same CCSS K.OA.A.2 in Y1.B2.S15 Subtraction - take away (How many left )"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "same CCSS K.OA.A.2 in Y1.B2.S15 Subtraction - take away (How many left )"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S11": {
+   "title": "Find a part",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10,
+      "unknown": "first"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_wp_10_plain",
+     "why": "Y1.B2.S10 Addition problems (the step before in this block)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B2.S9 Addition - add more (the step before in this block)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (same CCSS K.OA.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "systematic_bonds"
+   ],
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "next step: Y1.B2.S12 Subtraction - find a part"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S12": {
+   "title": "Subtraction - find a part",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10,
+      "unknown": "second"
+     }
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W12)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W12)"
+    },
+    {
+     "key": "addition:add_wp_10_plain",
+     "why": "Y1.B2.S10 Addition problems (the step before in this block)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "pictures_to_sentence",
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "next step: Y1.B2.S13 Fact families - the eight facts"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "next step: Y1.B2.S13 Fact families - the eight facts"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "next step: Y1.B2.S13 Fact families - the eight facts"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S14 Subtraction - take away cross out (How many left )"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S13": {
+   "title": "Fact families - the eight facts",
+   "direct": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_families_add",
+     "opts": {}
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W15)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S6 Composition of 4 and 5 (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B2.S12 Subtraction - find a part (the step before in this block)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S8 Addition - add together (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "pictures_to_sentence",
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "next step: Y1.B2.S14 Subtraction - take away cross out (How many left )"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S14": {
+   "title": "Subtraction - take away cross out (How many left )",
+   "direct": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "crossing out to take away from amounts 6 to 10 (the pictures skill stops at 5)",
+   "build": [
+    "pictures_change_unknown"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W14)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W14)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S7 Composition of 1 - 5 (prior learning wk W14)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W14)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "pictures_to_sentence",
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "take-away stories with a picture row"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "next step: Y1.B2.S15 Subtraction - take away (How many left )"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same CCSS K.OA.A.1 in Y1.B2.S16 Subtraction on a number line"
+    }
+   ],
+   "note": "Proposal pictures_change_unknown also lifts the pictures band to 10."
+  },
+  "Y1.B2.S15": {
+   "title": "Subtraction - take away (How many left )",
+   "direct": [
+    {
+     "key": "subtraction:sub_10_mixed",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W15)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W15)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B5.S6 Composition of 4 and 5 (prior learning wk W15)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W15)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y1.B2.S13 Fact families - the eight facts (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "subtraction:nl_sub",
+     "why": "next step: Y1.B2.S16 Subtraction on a number line"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "next step: Y1.B2.S16 Subtraction on a number line"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: Y1.B2.S1 Introduce parts and wholes"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S16": {
+   "title": "Subtraction on a number line",
+   "direct": [
+    {
+     "key": "subtraction:nl_sub",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "Y1.B2.S15 Subtraction - take away (How many left ) (the step before in this block)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown",
+    "subitise",
+    "pictures_to_sentence"
+   ],
+   "related": [
+    {
+     "key": "addition:add_10_mixed",
+     "why": "next step: Y1.B2.S17 Add or subtract 1 or 2"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: Y1.B2.S1 Introduce parts and wholes"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B2.S17": {
+   "title": "Add or subtract 1 or 2",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_10_mixed",
+     "opts": {},
+     "missing": "adding or subtracting only 1 or 2 (counting on or back by 1 or 2)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "+1, +2, −1, −2 as a fluency set",
+   "build": [
+    "add_sub_1_2"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W16)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W16)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S1 Add more (prior learning wk W16)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (the step before in this block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (the step before in this block)"
+    },
+    {
+     "key": "subtraction:sub_10_mixed",
+     "why": "Y1.B2.S15 Subtraction - take away (How many left ) (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise",
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: Y1.B2.S1 Introduce parts and wholes"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "same block: Y1.B2.S2 Part-whole model"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same block: Y1.B2.S3 Write number sentences"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1072,7 +2339,109 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "part_whole": {
+   "kind": "new",
+   "skill": "composing:part_whole_model",
+   "name": "Part-Whole Model",
+   "teaches": "parts and wholes: the cherry part-whole model, writing the four number sentences it shows, and finding a missing part",
+   "representation": "the bar/cherry part-whole diagram in B&W with one box empty; write the missing part or the number sentence",
+   "family": "operations",
+   "steps": [
+    "Y1.B2.S1"
+   ],
+   "ccss": [
+    "K.OA.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "pictures_to_sentence": {
+   "kind": "option",
+   "skill": "addition:add_5_pictures",
+   "option": "response \"write the number sentence\" (the pupil writes 3 + 2 = 5 for the picture)",
+   "name": "Write the Number Sentence for the Picture (option)",
+   "teaches": "representing addition and subtraction: the pupil writes the equation a picture shows, and draws a picture for an equation",
+   "family": "operations",
+   "representation": "write the + sentence for two groups; write the − sentence for a take-away picture; draw dots for 4 + 1; which sentence matches the picture?",
+   "steps": [
+    "Y1.B2.S3"
+   ],
+   "ccss": [
+    "K.OA.A.1"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "pictures_change_unknown": {
+   "kind": "option",
+   "skill": "addition:add_5_pictures",
+   "option": "unknown: change; band to 10",
+   "name": "How Many Were Added / Taken Away? (option)",
+   "teaches": "change-unknown stories with pictures: how many were added or taken away, totals to 10; also lifts the pictures band to 10",
+   "representation": "a before box and an after box of counters in one cell; write how many were added (or crossed out); applies to subtraction:sub_5_pictures too",
+   "family": "operations",
+   "ccss": [
+    "K.OA.A.2",
+    "K.OA.A.1"
+   ],
+   "why": "the picture skills ask only for the result and stop at 5",
+   "steps": [
+    "Y1.B2.S14"
+   ],
+   "reused": false
+  },
+  "systematic_bonds": {
+   "kind": "new",
+   "skill": "composing:bonds_in_order",
+   "name": "Number Bonds in Order",
+   "teaches": "listing all the bonds of a number systematically (0+5, 1+4, 2+3 ...) and seeing the pattern",
+   "representation": "a two-column table with the first rows filled; complete it; option: ten frame beside each row",
+   "family": "operations",
+   "steps": [
+    "Y1.B2.S6"
+   ],
+   "ccss": [
+    "K.OA.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "add_sub_1_2": {
+   "kind": "new",
+   "skill": "addition:add_sub_1_or_2",
+   "name": "Add or Subtract 1 or 2",
+   "teaches": "adding or subtracting 1 or 2 by counting on or back, linked to 1 more / 1 less",
+   "representation": "a number track with the start circled; write the answer; mixed + and - on one page",
+   "family": "operations",
+   "steps": [
+    "Y1.B2.S17"
+   ],
+   "ccss": [
+    "K.OA.A.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
- "tagFixes": []
+ "tagFixes": [
+  {
+   "key": "composing:number_bonds",
+   "step": "Y1.B2.S1",
+   "action": "partial",
+   "why": "parts and wholes of real objects and groups, named in words (not yet a bond)"
+  },
+  {
+   "key": "addition:add_5_pictures",
+   "step": "Y1.B2.S3",
+   "action": "partial",
+   "why": "writing the number sentence for a picture"
+  },
+  {
+   "key": "subtraction:sub_5_pictures",
+   "step": "Y1.B2.S3",
+   "action": "partial",
+   "why": "writing the number sentence for a picture"
+  }
+ ]
 }
