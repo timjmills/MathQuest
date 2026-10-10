@@ -224,7 +224,19 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
 - 2026-10-09 Wave 1 lane "Touch numerals" round 5: builder escalated to Opus medium (the ceiling) - the screen hosts failed critic rounds 1 to 4 (teacher dots dropped on a wrong answer, stack Start again covered, column wording, quiz count-all line).
+- 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
+
+### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
+
+- **N-6 (open, pre-existing)**: the Scripted Model key page is a plain copy of the pupil page: "Name" in the header,
+  no "Answer Key" marker, no "Key" in the footer. Nothing to colour, but it can be handed out by mistake. Give it the
+  key header and footer like every other key.
+- **N-7 (open, legacy)**: on legacy word problems the copy key stamps the answer as small "Answer: 4" text under the
+  line instead of on it; on the Opener `area` Model the traced "20" is replaced by the stamp. Colours are right; size
+  and placement belong to the legacy-migration work.
+- **N-5 (for the lessons wave, Wave 8/9)**: the `nl_add` Lesson anchor chart number line runs past the cell and its
+  labels overlap ("110121132143154"); the Say frame reads "10 plus 10 equals 10." while the steps say "You land on 20".
 
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 

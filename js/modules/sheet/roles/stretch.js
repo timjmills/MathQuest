@@ -122,7 +122,7 @@ export function openTask(it, size = 'L') {
             columns: ['First number', 'Second number', check],
             example: [ops[0], ops[1], N],
             keyRows: pairs.slice(0, rowsN).map((p) => [p.a, p.b, N]),
-            rule: `${glyph} = ${N}`,
+            rule: `${glyph} = ${N}`, glyph,
             // How many answers there are in all (ordered pairs), so the key knows whether "I found
             // them all" is the true box: a + b = N has N + 1; a x b = N one per divisor.
             total: op === 'add' ? N + 1 : op === 'multiply' ? Array.from({ length: N }, (_, i) => i + 1).filter((d) => N % d === 0).length : Infinity,
@@ -153,6 +153,12 @@ export function prepare(it, info = {}) {
     slots['st-more'] = task.keyRows.length && !all ? '✓' : '';
     slots['st-all'] = all ? '✓' : '';
     const key = slotKey(slots, task.keyRows.length ? `${Math.min(nRows, task.keyRows.length) + 1} answers shown` : 'Answers vary');
+    // the short key's line (critic r1, B2): the pairs the copy key writes, the count, the box
+    if (task.keyRows.length) {
+        const glyph = task.glyph || '';
+        const rows = task.keyRows.slice(0, nRows).map((r) => (glyph && r.length === 3 ? `${r[0]} ${glyph} ${r[1]} = ${r[2]}` : `(${r.join(', ')})`));
+        key.short = `${rows.join('; ')}. I found ${found}. ${all ? 'I found them all.' : 'There are more.'}`;
+    } else key.short = 'Answers vary';
     const render = (c) => {
         const head = `<tr>${task.columns.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>`;
         const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${esc(String(v))}</span></td>`).join('')}</tr>`;
