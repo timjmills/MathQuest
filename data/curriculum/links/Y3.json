@@ -178,6 +178,27 @@
    ],
    "pre": [
     {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 comparing 2-digit numbers: the greater one sits further along the line",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y2.B1.S14 ordering 2-digit numbers: the order the line shows",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y2.B1.S15 counting in 10s: the tens marked on the line",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
      "key": "multiplication:count_by_tables",
      "why": "Y3.B1.S14 Count in 50s (taught before this step in the block)",
      "opts": {
@@ -189,32 +210,11 @@
        }
       ]
      }
-    },
-    {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y3.B1.S13 Order numbers to 1,000",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y3.B1.S12 Compare numbers to 1,000 (taught earlier, W2)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
-     "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (taught earlier, W2)",
-     "opts": {
-      "step": 0
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: every later-taught step of the block uses skills already linked here"
   },
   "Y3.B1.S4": {
    "title": "Hundreds",
@@ -312,6 +312,13 @@
      "opts": {
       "band": 999
      }
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (a later step, W2: the same idea one step further)",
+     "opts": {
+      "step": 0
+     }
     }
    ],
    "note": ""
@@ -399,9 +406,16 @@
    "related": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (a later step, W2: the same idea one step further)",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (next step, W2: the same idea one step further)",
      "opts": {
       "step": 0
+     }
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (a later step, W2: the same idea one step further)",
+     "opts": {
+      "band": 999
      }
     }
    ],
@@ -489,9 +503,23 @@
    "related": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (a later step, W2: the same idea one step further)",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (next step, W2: the same idea one step further)",
      "opts": {
       "step": 0
+     }
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
+     "opts": {
+      "band": 999
      }
     }
    ],
@@ -568,21 +596,21 @@
    "related": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (a later step, W2: the same idea one step further)",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (next step, W2: the same idea one step further)",
      "opts": {
       "step": 0
      }
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "putting numbers in order, greatest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
@@ -671,14 +699,14 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "putting numbers in order, greatest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (a later step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
@@ -767,14 +795,14 @@
    "related": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "putting numbers in order, greatest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
@@ -816,7 +844,7 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y3.B1.S13 Order numbers to 1,000",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (taught earlier, W3)",
      "opts": {
       "band": 999
      }
@@ -831,7 +859,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: every later-taught step of the block uses skills already linked here"
   },
   "Y3.B1.S11": {
    "title": "Estimate on a number line to 1,000",
@@ -867,7 +895,7 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y3.B1.S13 Order numbers to 1,000",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (taught earlier, W3)",
      "opts": {
       "band": 999
      }
@@ -887,7 +915,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
   },
   "Y3.B1.S12": {
    "title": "Compare numbers to 1,000",
@@ -967,14 +995,14 @@
    "related": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "putting numbers in order, smallest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "putting numbers in order, greatest first — Y2.B1.S14 Order objects and numbers",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step, W3: the same idea one step further)",
      "opts": {
       "band": 999
      }
@@ -1056,8 +1084,17 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: the number line to 1,000 (the other way to see the order) is earlier learning listed as pre; ordering other kinds of numbers is above Grade 2"
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 number line to 1,000 (a later step, W13): the order seen on a line",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "note": ""
   },
   "Y3.B1.S14": {
    "title": "Count in 50s",
@@ -1103,8 +1140,17 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "count_by_tables with a row {step 50, from 0} deals 0, 50 ... 550: count_50s is built for this step (still open for Y3.B1.S4). no related skill: the number-line skip count deals 6s and 25s, never 50s; counting in 10s and 100s is pre"
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 counting along a 0-1,000 number line (a later step, W13)",
+     "opts": {
+      "span": 100,
+      "band": 1000
+     }
+    }
+   ],
+   "note": "count_by_tables with a row {step 50, from 0} deals 0, 50 ... 550: count_50s is built for this step (still open for Y3.B1.S4)"
   },
   "Y3.B2.S1": {
    "title": "Apply number bonds within 10",
@@ -1137,18 +1183,18 @@
     },
     {
      "key": "addition:add_facts",
-     "why": "addition facts within 20",
+     "why": "the facts being applied: add within 20",
      "opts": {}
     },
     {
      "key": "subtraction:sub_facts",
-     "why": "subtraction facts within 20",
+     "why": "the facts being applied: subtract within 20",
      "opts": {}
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
   },
   "Y3.B2.S2": {
    "title": "Add and subtract 1s",
@@ -1322,9 +1368,11 @@
      "opts": {}
     },
     {
-     "key": "number_sense:make_a_ten",
-     "why": "Y3.B2.S6 Add 1s across a 10 (a later step, W4: the same idea one step further)",
-     "opts": {}
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B2.S4 Add and subtract 100s (next step, W4: the same idea one step further)",
+     "opts": {
+      "step": 100
+     }
     }
    ],
    "note": ""
@@ -1406,7 +1454,12 @@
    "related": [
     {
      "key": "subtraction:sub_50_regroup",
-     "why": "Y3.B2.S8 Subtract 1s across a 10 (a later step, W5: the same idea one step further)",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (next step, W5: the same idea one step further)",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y3.B2.S10 Make connections (a later step, W5: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -1477,7 +1530,12 @@
    "related": [
     {
      "key": "subtraction:sub_50_regroup",
-     "why": "Y3.B2.S8 Subtract 1s across a 10 (a later step, W5: the same idea one step further)",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (next step, W5: the same idea one step further)",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y3.B2.S10 Make connections (a later step, W5: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -1551,7 +1609,7 @@
    "related": [
     {
      "key": "subtraction:sub_50_regroup",
-     "why": "Y3.B2.S8 Subtract 1s across a 10 (a later step, W5: the same idea one step further)",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (next step, W5: the same idea one step further)",
      "opts": {}
     },
     {
@@ -1628,7 +1686,7 @@
    "related": [
     {
      "key": "number_sense:compensation",
-     "why": "Y3.B2.S10 Make connections (a later step, W5: the same idea one step further)",
+     "why": "Y3.B2.S10 Make connections (next step, W5: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -1700,7 +1758,7 @@
    "related": [
     {
      "key": "number_sense:compensation",
-     "why": "Y3.B2.S10 Make connections (a later step, W5: the same idea one step further)",
+     "why": "Y3.B2.S10 Make connections (next step, W5: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -2054,7 +2112,7 @@
    "related": [
     {
      "key": "subtraction:sub_1k_regroup",
-     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (a later step, W7: the same idea one step further)",
+     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (next step, W7: the same idea one step further)",
      "opts": {}
     },
     {
@@ -2198,7 +2256,7 @@
    "related": [
     {
      "key": "addition:add_1k_mixed",
-     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (a later step, W7: the same idea one step further)",
+     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (next step, W7: the same idea one step further)",
      "opts": {}
     },
     {
@@ -2410,14 +2468,14 @@
    "related": [
     {
      "key": "number_sense:estimate_sum",
-     "why": "Y3.B2.S20 Estimate answers (a later step, W8: the same idea one step further)",
+     "why": "Y3.B2.S20 Estimate answers (next step, W8: the same idea one step further)",
      "opts": {
       "place": 10
      }
     },
     {
      "key": "number_sense:estimate_sums_diffs",
-     "why": "Y3.B2.S20 Estimate answers (a later step, W8: the same idea one step further)",
+     "why": "Y3.B2.S20 Estimate answers (next step, W8: the same idea one step further)",
      "opts": {
       "place": 10
      }
@@ -2615,7 +2673,7 @@
     "add_next_10"
    ],
    "related": [],
-   "note": "no related skill beyond the pre list: fact families and missing numbers (the same inverse idea) are earlier learning listed as pre"
+   "note": "no related skill: the later-taught steps of the block are Y3.B2.S22 Make decisions (W8) has no skill yet | Y3.B2.S1 (W9): add_sub_10s is already taught in Y3.B2.S3 (W3), before this step: earlier learning, not a next step; add_sub_100s is already taught in Y3.B2.S4 (W4), before this step: earlier learning, not a next step"
   },
   "Y3.B2.S22": {
    "title": "Make decisions",
@@ -2707,14 +2765,35 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 Multiples of 10 (taught before this step)",
+     "why": "Y2.B1.S15 counting in equal steps",
      "opts": {
       "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
        {
         "step": 10,
         "start": "zero",
         "dir": "up"
        }
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5 the 2, 5 and 10 times-tables",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
       ]
      }
     },
@@ -2728,26 +2807,6 @@
     {
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "addition:cloze_addition",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)",
      "opts": {}
     }
    ],
@@ -2766,11 +2825,11 @@
      }
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S6 Multiply by 3 (a later step, W11: the same idea one step further)",
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (next step, W10: the same idea one step further)",
      "opts": {
-      "constant": [
-       3
+      "forms": [
+       0
       ]
      }
     }
@@ -2801,6 +2860,40 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S15 counting in equal steps",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5 the 2, 5 and 10 times-tables",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
+    },
+    {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y3.B3.S1 Multiplication - equal groups (taught before this step in the block)",
      "opts": {
@@ -2810,26 +2903,6 @@
     {
      "key": "multiplication:equal_or_unequal_groups",
      "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "addition:cloze_addition",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)",
      "opts": {}
     }
    ],
@@ -2849,7 +2922,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S6 Multiply by 3 (a later step, W11: the same idea one step further)",
+     "why": "Y3.B3.S6 Multiply by 3 (next step, W11: the same idea one step further)",
      "opts": {
       "constant": [
        3
@@ -2931,6 +3004,15 @@
      "key": "composing:odd_even",
      "why": "multiples of 2 are the even numbers",
      "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S6 Multiply by 3 (next step, W11: the same idea one step further)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
     }
    ],
    "note": ""
@@ -2980,7 +3062,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
      "opts": {
       "constant": [
        2,
@@ -3135,6 +3217,19 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S16 counting in 3s: the 3s facts in order",
+     "opts": {
+      "rows": [
+       {
+        "step": 3,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
@@ -3146,19 +3241,6 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W11)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
      }
     },
     {
@@ -3184,8 +3266,31 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S9 Multiply by 4 (next step, W11: the same idea one step further)",
+     "opts": {
+      "constant": [
+       4
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y3.B3.S11 The 4 times-table (a later step, W11: the same idea one step further)",
+     "opts": {
+      "rows": [
+       {
+        "step": 4,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y3.B3.S7": {
    "title": "Divide by 3",
@@ -3205,11 +3310,24 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (taught before this step)",
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 the 3 times-table (W11)",
      "opts": {
-      "forms": [
-       0
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S16 counting in 3s",
+     "opts": {
+      "rows": [
+       {
+        "step": 3,
+        "start": "zero",
+        "dir": "up"
+       }
       ]
      }
     },
@@ -3218,35 +3336,6 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
-     "opts": {
-      "constant": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
-     "opts": {
-      "rows": [
-       {
-        "step": 2,
-        "start": "zero",
-        "dir": "up"
-       }
-      ]
      }
     },
     {
@@ -3269,6 +3358,13 @@
      "opts": {
       "band": 25
      }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)",
+     "opts": {
+      "band": 25
+     }
     }
    ],
    "preBuild": [],
@@ -3285,7 +3381,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10): division as a missing factor — Y2.B5.S16 Divide by 5",
+     "why": "Y3.B3.S10/S13 dividing by 4 and by 8 (the same week, W31): ÷3 mixed with the other tables",
      "opts": {
       "constant": [
        2,
@@ -3370,7 +3466,7 @@
    "related": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
      "opts": {
       "constant": [
        2,
@@ -3501,6 +3597,15 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S11 the 4 times-table (W11)",
+     "opts": {
+      "constant": [
+       4
+      ]
+     }
+    },
+    {
      "key": "multiplication:count_by_tables",
      "why": "counting in 4s from 0 finds the multiples used (earlier step this builds on: Y3.B3.S11 The 4 times-table)",
      "opts": {
@@ -3525,15 +3630,6 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W31)",
-     "opts": {
-      "constant": [
-       2
-      ]
      }
     },
     {
@@ -3579,7 +3675,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10): division as a missing factor — Y3.B3.S7 Divide by 3 (the same week, W31)",
+     "why": "Y3.B3.S7/S13 dividing by 3 and by 8 (the same week, W31): ÷4 mixed with the other tables",
      "opts": {
       "constant": [
        2,
@@ -3664,7 +3760,7 @@
    "related": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
      "opts": {
       "constant": [
        2,
@@ -3686,7 +3782,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "multiplication facts (tables: 2, 3, 4, 5, 10): the fact family — Y3.B3.S9 Multiply by 4 (the same week, W11)",
+     "why": "times-table facts (tables: 2, 3, 4, 5, 10) — Y3.B3.S9 Multiply by 4 (the same week, W11)",
      "opts": {
       "constant": [
        2,
@@ -3720,7 +3816,7 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S10 Divide by 4 (the same week, W31)",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S10 Divide by 4 (the same week, W31)",
      "opts": {
       "constant": [
        2,
@@ -3827,17 +3923,8 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S12 Multiply by 8 (taught before this step in the block)",
-     "opts": {
-      "constant": [
-       8
-      ]
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 8s from 0 (earlier step this builds on: Y3.B3.S11 The 4 times-table)",
+     "why": "counting in 8s from 0 (taught the same week, W31, with the 8 times-table)",
      "opts": {
       "rows": [
        {
@@ -3845,6 +3932,15 @@
         "start": "zero",
         "dir": "up"
        }
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S12 Multiply by 8 (taught before this step in the block)",
+     "opts": {
+      "constant": [
+       8
       ]
      }
     },
@@ -3898,19 +3994,14 @@
      "why": "dividing by 8 as jumps on a number line",
      "opts": {
       "constant": [
-       2,
-       3,
-       4,
-       5,
-       8,
-       10
+       8
       ],
       "band": 100
      }
     },
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10): division as a missing factor — Y3.B3.S10 Divide by 4 (the same week, W31)",
+     "why": "Y3.B3.S7/S10 dividing by 3 and by 4 (the same week, W31): ÷8 mixed with the other tables",
      "opts": {
       "constant": [
        2,
@@ -3966,7 +4057,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "doubling a 4s fact gives the 8s fact",
+     "why": "twice a 4s fact is the 8s fact",
      "opts": {
       "band": 50
      }
@@ -4069,7 +4160,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "doubling links the 2, 4 and 8 tables",
+     "why": "twice a 2s fact is a 4s fact, twice a 4s fact an 8s fact",
      "opts": {
       "band": 50
      }
@@ -4140,20 +4231,6 @@
        10
       ],
       "band": 100
-     }
-    },
-    {
-     "key": "division:box_division_easy",
-     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (next step, W32: the same idea one step further)",
-     "opts": {
-      "regroup": "none",
-      "constant": [
-       2,
-       3,
-       4,
-       5,
-       8
-      ]
      }
     }
    ],
@@ -4389,7 +4466,7 @@
    "related": [
     {
      "key": "patterns:double",
-     "why": "doubling: the 4 times-table is double the 2 times-table",
+     "why": "twice each 2s fact: the 4 times-table is double the 2 times-table",
      "opts": {
       "band": 20
      }
@@ -4495,7 +4572,7 @@
    "related": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
      "opts": {
       "constant": [
        2,
@@ -4609,7 +4686,7 @@
    "related": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
      "opts": {
       "constant": [
        2,
@@ -4732,7 +4809,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y3.B4.S10 (W33): mult_comparison deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S11 How many ways (W34) has no skill yet"
   },
   "Y3.B4.S7": {
    "title": "Divide a 2-digit number by a 1-digit number - no exchange",
@@ -4848,7 +4925,7 @@
     },
     {
      "key": "division:div_remainders",
-     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (a later step, W32: the same idea one step further)",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (next step, W32: the same idea one step further)",
      "opts": {
       "constant": [
        2,
@@ -5086,7 +5163,7 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "division facts (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
+     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
      "opts": {
       "constant": [
        2,
@@ -5101,7 +5178,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "multiplication facts (tables: 2, 3, 4, 5, 8, 10) — Y3.B3.S15 The 2, 4 and 8 times-tables",
+     "why": "times-table facts (tables: 2, 3, 4, 5, 8, 10) — Y3.B3.S15 The 2, 4 and 8 times-tables",
      "opts": {
       "constant": [
        2,
@@ -5411,6 +5488,15 @@
        0
       ]
      }
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (next step, W14: the same idea one step further)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": ""
@@ -5526,6 +5612,15 @@
        0
       ]
      }
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (next step, W14: the same idea one step further)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "note": ""
@@ -5573,7 +5668,12 @@
    "related": [
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S10 What is perimeter (a later step, W16: the same idea one step further)",
+     "why": "Y3.B5.S10 What is perimeter (next step, W16: the same idea one step further)",
+     "opts": {}
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3.B5.S11 Measure perimeter (a later step, W16: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -5634,7 +5734,7 @@
    "related": [
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S10 What is perimeter (a later step, W16: the same idea one step further)",
+     "why": "Y3.B5.S10 What is perimeter (next step, W16: the same idea one step further)",
      "opts": {}
     },
     {
@@ -5700,7 +5800,7 @@
    "related": [
     {
      "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S10 What is perimeter (a later step, W16: the same idea one step further)",
+     "why": "Y3.B5.S10 What is perimeter (next step, W16: the same idea one step further)",
      "opts": {}
     },
     {
@@ -6085,7 +6185,7 @@
    "related": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (a later step, W37: the same idea one step further)",
+     "why": "Y3.B6.S9 equivalent fractions (a later step, W37)",
      "opts": {
       "denoms": [
        2
@@ -6233,7 +6333,7 @@
     "fraction_parts"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y3.B6.S6 Fractions and scales (W27) has no skill yet | Y3.B6.S2 (W36): compare deals fracCompare content first taught W36 (rule 19); order_fractions deals fracCompare content first taught W36 (rule 19) | Y3.B6.S5 (W36): compare deals fracCompare content first taught W36 (rule 19); order_fractions deals fracCompare content first taught W36 (rule 19) | Y3.B6.S8 Count in fractions on a number line (W37) has no skill yet | Y3.B6.S9 (W37): equiv_frac_visual deals equivFrac content first taught W37 (rule 19)"
   },
   "Y3.B6.S5": {
    "title": "Compare and order non-unit fractions",
@@ -6317,7 +6417,7 @@
    "related": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (a later step, W37: the same idea one step further)",
+     "why": "Y3.B6.S9 equivalent fractions (a later step, W37)",
      "opts": {
       "denoms": [
        2
@@ -6326,7 +6426,7 @@
     },
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y3.B8.S1 Add fractions (a later step, W37: the same idea one step further)",
+     "why": "Y3.B8.S1 Add fractions (next step, W37: the same idea one step further)",
      "opts": {
       "denoms": [
        2,
@@ -6388,7 +6488,7 @@
     "ruler_cm"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y3.B6.S2 (W36): compare deals fracCompare content first taught W36 (rule 19); order_fractions deals fracCompare content first taught W36 (rule 19) | Y3.B6.S5 (W36): compare deals fracCompare content first taught W36 (rule 19); order_fractions deals fracCompare content first taught W36 (rule 19) | Y3.B6.S8 Count in fractions on a number line (W37) has no skill yet | Y3.B6.S9 (W37): equiv_frac_visual deals equivFrac content first taught W37 (rule 19)"
   },
   "Y3.B6.S7": {
    "title": "Fractions on a number line",
@@ -6576,12 +6676,12 @@
    "related": [
     {
      "key": "fractions:select_equiv_frac",
-     "why": "circle the equivalent fractions",
+     "why": "picking the fractions that name the same amount",
      "opts": {}
     },
     {
      "key": "fractions:equiv_frac_nv",
-     "why": "equivalent fractions without a picture, the next idea",
+     "why": "the same amount as two fractions without a picture, the next idea",
      "opts": {
       "denoms": [
        2
@@ -6648,7 +6748,7 @@
    "related": [
     {
      "key": "fractions:equiv_frac_nv",
-     "why": "equivalent fractions without a picture (the next idea)",
+     "why": "the same amount as two fractions without a picture (the next idea)",
      "opts": {
       "denoms": [
        2
@@ -7494,7 +7594,7 @@
    "related": [
     {
      "key": "fractions:fraction_of_set",
-     "why": "Y3.B8.S4 Unit fractions of a set of objects (a later step, W38: the same idea one step further)",
+     "why": "Y3.B8.S4 Unit fractions of a set of objects (next step, W38: the same idea one step further)",
      "opts": {
       "denoms": [
        2,
@@ -7977,7 +8077,7 @@
    "related": [
     {
      "key": "measurement:enough_money",
-     "why": "is there enough money: reading the amount first",
+     "why": "checking an amount against a price: reading the amount first",
      "opts": {
       "currency": "usd"
      }
@@ -8330,7 +8430,7 @@
    "related": [
     {
      "key": "measurement:time_1min",
-     "why": "Y3.B10.S3 Tell the time to the minute (a later step, W20: the same idea one step further)",
+     "why": "Y3.B10.S3 Tell the time to the minute (next step, W20: the same idea one step further)",
      "opts": {}
     },
     {
@@ -8545,12 +8645,12 @@
    "related": [
     {
      "key": "measurement:elapsed_mixed",
-     "why": "Y3.B10.S8 Hours and minutes - use start and end times (a later step, W22: the same idea one step further)",
+     "why": "Y3.B10.S8 Hours and minutes - use start and end times (next step, W22: the same idea one step further)",
      "opts": {}
     },
     {
      "key": "measurement:elapsed_find_duration",
-     "why": "Y3.B10.S8 Hours and minutes - use start and end times (a later step, W22: the same idea one step further)",
+     "why": "Y3.B10.S8 Hours and minutes - use start and end times (next step, W22: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -8603,12 +8703,12 @@
    "related": [
     {
      "key": "measurement:elapsed_mixed",
-     "why": "Y3.B10.S8 Hours and minutes - use start and end times (a later step, W22: the same idea one step further)",
+     "why": "Y3.B10.S8 Hours and minutes - use start and end times (next step, W22: the same idea one step further)",
      "opts": {}
     },
     {
      "key": "measurement:elapsed_find_duration",
-     "why": "Y3.B10.S8 Hours and minutes - use start and end times (a later step, W22: the same idea one step further)",
+     "why": "Y3.B10.S8 Hours and minutes - use start and end times (next step, W22: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -9011,6 +9111,11 @@
      "key": "angles_lines:identify_angles",
      "why": "Y3.B11.S2 Right angles (next step, W28: the same idea one step further)",
      "opts": {}
+    },
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 Parallel and perpendicular (a later step, W29: the same idea one step further)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -9065,8 +9170,14 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 perpendicular lines meet at a right angle (next step, W29)",
+     "opts": {}
+    }
+   ],
+   "note": ""
   },
   "Y3.B11.S3": {
    "title": "Compare angles",
@@ -9110,7 +9221,7 @@
    "related": [
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (a later step, W29: the same idea one step further)",
+     "why": "Y3.B11.S6 Parallel and perpendicular (next step, W29: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -9244,6 +9355,15 @@
    "build": [],
    "pre": [
     {
+     "key": "angles_lines:identify_angles",
+     "why": "Y3.B11.S3 right angles (W28): perpendicular lines meet at one",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y3.B11.S7 recognising and describing 2-D shapes (taught earlier, W27)",
      "opts": {}
@@ -9279,15 +9399,6 @@
      "opts": {
       "forms": [
        1
-      ]
-     }
-    },
-    {
-     "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S3 Compare angles (taught earlier, W29)",
-     "opts": {
-      "forms": [
-       0
       ]
      }
     }
@@ -9416,7 +9527,7 @@
     "ruler_cm"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
   },
   "Y3.B11.S9": {
    "title": "Recognise and describe 3-D shapes",
@@ -9471,7 +9582,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (a later step, W29: the same idea one step further)",
+     "why": "Y3.B11.S6 Parallel and perpendicular (next step, W29: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -9533,7 +9644,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (a later step, W29: the same idea one step further)",
+     "why": "Y3.B11.S6 Parallel and perpendicular (next step, W29: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -9601,12 +9712,12 @@
    "related": [
     {
      "key": "measurement:bar_graph_intro",
-     "why": "Y3.B12.S3 Interpret bar charts (a later step, W24: the same idea one step further)",
+     "why": "Y3.B12.S3 Interpret bar charts (next step, W24: the same idea one step further)",
      "opts": {}
     },
     {
      "key": "graphs:bar_graph",
-     "why": "Y3.B12.S3 Interpret bar charts (a later step, W24: the same idea one step further)",
+     "why": "Y3.B12.S3 Interpret bar charts (next step, W24: the same idea one step further)",
      "opts": {}
     }
    ],

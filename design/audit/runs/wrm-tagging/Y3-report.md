@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 8
+# Wave 2 tagging: Year 3 (US Grade 2) — round 9
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -11,6 +11,45 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 9 (after critic Y2–Y3 r8, 7.79 / 7.81): per-step notes, why ownership, building blocks
+
+- **N1 (notes)**: the shared "no later step" sentence is gone. `build.mjs` writes each empty-related note from the
+  step's own later-taught block steps, one reason per skill: already linked here; a content marker first taught Wn
+  (rule 19); a swap that keeps content above the grade (rule 18); already taught in an earlier step; another topic; or
+  "has no skill yet". A later skill with none of these reasons is a `NOTECHECK` build error, so a note can no longer be
+  pasted unchecked (0 at build). Hand notes on Y3.B3.S6, B6.S4, B6.S6 and B1.S13 were removed (now school-week reasons
+  or a related link).
+- **N2 (whys)**: a marker or year swap that changes the key rebuilds the why from the new key only (no kept reason);
+  a why that already names its week ("next step / a later step / taught earlier / the same week, Wn") is never re-cited
+  to another step; `whyText` for `compare_groups`, `hundreds_chart_fill`, `time_half_hour` ("half past: the minute hand
+  makes a half turn"), `div_facts`, `mult_facts`, `equiv_frac_visual`, `double`; the why check reads an ordering answer
+  "236,511,961" as a list, not one number (it had rewritten the Y3.B1.S13 next-step whys).
+- **N4a / pre and related by key + opts**: a pre whose `parts` / `constant` / `denoms` are a superset of a direct's is
+  excluded. A key may sit in both pre and related only when their table / part / form lists are disjoint
+  (`mult_facts {constant:[5,10]}` pre beside `{constant:[2]}` related on Y2.B5.S4/S5); a hand related link is promoted
+  to pre only when an earlier-taught step owns those opts.
+- **linkscan**: the 2-digit / 3-digit column-layout check is gated by school week with the markers' 2-week tolerance,
+  not by WRM order (Y2.B2.S4, W5, takes Y2.B2.S15, W6, as its next step).
+- **Steps (Y3)**: Y3.B11.S2 related `identify_lines` (S6, W29); Y3.B1.S13 related `place_on_number_line {span:100,
+  band:1000}` (S10, W13) and no false note; Y3.B3.S7 leads with `mult_facts {constant:[3]}` and counting in 3s (no
+  `mult_zeros`, no halving); Y3.B3.S10 leads with `mult_facts {constant:[4]}`; Y3.B3.S6 leads with counting in 3s;
+  Y3.B11.S6 ranks `identify_angles {forms:[0]}` first; Y3.B3.S1/S2 drop the ± padding (`cloze_addition`,
+  `missing_add_sub`, `add/sub_wp_100`) for counting in 2s/5s/10s and the 2, 5 and 10 tables; Y3.B1.S3 keeps only 2-digit
+  pres (compare and order to 99, counting in 10s); Y3.B6.S2/S5 cite Y3.B6.S9 (W37) for `equiv_frac_visual`;
+  Y3.B3.S13 cites counting in 8s by its own week; the W31 division steps divide on the number line by their own table
+  (S13 by 8) and say why the mixed facts are related ("dividing by 4 and by 8, the same week"); Y3.B5.S4 no longer lists
+  its own `length_metric` form 0 as related.
+- **Scans** (critic r8 scripts on the rebuilt files): `notecheck` 0, `nextscan2` 0, `labwhy2` 0 / 0, `nextscan` 0,
+  `labwhy` 0, `prewk` 0, `optcheck` 0, `whyscan` A 0; `dirlink` has no superset pre left: what remains is a related
+  next step with its own opts (`arrays_groups {forms:[0]}`, the next table, `length_metric {forms:[0]}`), the A6
+  ladders (`mult_facts {constant:[2]}` on ×4, `{constant:[4]}` on ×8 / 2-4-8), the halves and quarters pres on the
+  quarter and third steps, and the mixed-facts related the critic accepted. `steprange` NEW = exactly the requested
+  links (Y2.B5.S4/S5 `mult_facts {5,10}`, Y3.B3.S1/S2 counting in 2s/5s/10s and the 2, 5 and 10 tables); every r8 NEW
+  on Y2.B2.S2/S12 and Y3.B1.S3 is gone; BOTH lines are unchanged since r7. `whyscan` B 125 are related links to steps
+  taught later (correct next-step links), C 94 its known false positives (count rows it cannot read in payloads,
+  digit-joined order lists, analogy whys). `range` adds only the joined-digit artifact on `order_*` (909596).
+  `linkscan` week mode OK. Both files rebuild byte-identical.
 
 ## Round 8 (after critic Y2–Y3 r7, 7.88 / 7.74): related by school week, whys keep their reasons, ladders
 

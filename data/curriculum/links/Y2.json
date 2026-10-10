@@ -50,7 +50,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Hundreds Chart - Find the Missing Number — Y1.B12.S1 Count from 50 to 100",
+     "why": "the counting order to 100 on a hundred square — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -81,15 +81,8 @@
      }
     },
     {
-     "key": "placevalue:identify",
-     "why": "Y2.B1.S4 Use a place value chart (a later step, W1: the same idea one step further)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
-     "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (a later step, W1: the same idea one step further)",
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S2 Count objects to 100 by making 10s (next step, W1: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -153,7 +146,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Hundreds Chart - Find the Missing Number — Y1.B12.S1 Count from 50 to 100",
+     "why": "the counting order to 100 on a hundred square — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -168,14 +161,14 @@
    "related": [
     {
      "key": "placevalue:identify",
-     "why": "Y2.B1.S4 Use a place value chart (a later step, W1: the same idea one step further)",
+     "why": "Y2.B1.S4 Use a place value chart (next step, W1: the same idea one step further)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (a later step, W1: the same idea one step further)",
+     "why": "Y2.B1.S4 Use a place value chart (next step, W1: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -227,7 +220,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Hundreds Chart - Find the Missing Number — Y1.B12.S1 Count from 50 to 100",
+     "why": "the counting order to 100 on a hundred square — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -330,7 +323,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Hundreds Chart - Find the Missing Number — Y1.B12.S1 Count from 50 to 100",
+     "why": "the counting order to 100 on a hundred square — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -448,7 +441,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 10s on the number line to 100 (a later step, W3: the same idea one step further)",
+     "why": "Y2.B1.S9 10s on the number line to 100 (next step, W3: the same idea one step further)",
      "opts": {
       "span": 10,
       "band": 100
@@ -529,7 +522,7 @@
    "related": [
     {
      "key": "placevalue:combine",
-     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (a later step, W2: the same idea one step further)",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (next step, W2: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -871,14 +864,14 @@
    "related": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -955,14 +948,14 @@
    "related": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -1026,14 +1019,14 @@
    "related": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "Y2.B1.S14 Order objects and numbers (a later step, W4: the same idea one step further)",
+     "why": "Y2.B1.S14 Order objects and numbers (next step, W4: the same idea one step further)",
      "opts": {
       "band": 99
      }
@@ -1461,16 +1454,6 @@
      "key": "composing:number_bonds",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W09)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (taught earlier, W8)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S14 Add and subtract 10s (taught earlier, W7)",
-     "opts": {}
     }
    ],
    "preBuild": [],
@@ -1557,7 +1540,7 @@
    "related": [
     {
      "key": "addition:add_three",
-     "why": "Y2.B2.S7 Add three 1-digit numbers (a later step, W10: the same idea one step further)",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (next step, W10: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -1616,8 +1599,21 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 adding two 2-digit numbers with no new ten (next step, W6): bonds of tens used inside a sum",
+     "opts": {}
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (a later step, W7): one ten on or off",
+     "opts": {
+      "step": 10
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B2.S5": {
    "title": "Add and subtract 1s",
@@ -1694,7 +1690,7 @@
    "related": [
     {
      "key": "addition:add_three",
-     "why": "Y2.B2.S7 Add three 1-digit numbers (a later step, W10: the same idea one step further)",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (next step, W10: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -2016,15 +2012,6 @@
      "opts": {}
     },
     {
-     "key": "addition:add_10_regroup",
-     "why": "the inverse: adding across 10 (earlier step this builds on: Y2.B2.S6 Add by making 10)",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)",
      "opts": {}
@@ -2051,6 +2038,11 @@
     },
     {
      "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_families_add",
      "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)",
      "opts": {}
     }
@@ -2095,15 +2087,6 @@
      }
     },
     {
-     "key": "addition:add_10_regroup",
-     "why": "the inverse: adding across 10 (earlier step this builds on: Y2.B2.S6 Add by making 10)",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)",
      "opts": {}
@@ -2121,6 +2104,11 @@
     {
      "key": "subtraction:number_line_sub",
      "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)",
      "opts": {}
     }
    ],
@@ -2194,11 +2182,6 @@
      "key": "composing:make_ten",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W09)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (taught earlier, W8)",
-     "opts": {}
     }
    ],
    "preBuild": [],
@@ -2211,11 +2194,6 @@
     {
      "key": "number_sense:between_tens",
      "why": "which two tens a number sits between",
-     "opts": {}
-    },
-    {
-     "key": "addition:fact_family_sort",
-     "why": "Y2.B2.S3 Related facts (next step, W10: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -2942,7 +2920,7 @@
     "shape_sort"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y2.B3.S6 Use lines of symmetry to complete shapes (W16) has no skill yet"
   },
   "Y2.B3.S2": {
    "title": "Count sides on 2-D shapes",
@@ -2985,14 +2963,13 @@
      "opts": {}
     },
     {
-     "key": "angles_lines:symmetry",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (a later step, W13: the same idea one step further)",
-     "opts": {}
-    },
-    {
-     "key": "angles_lines:place_symmetry_lines",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (a later step, W13: the same idea one step further)",
-     "opts": {}
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (next step, W13: the same idea one step further)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "note": ""
@@ -3038,12 +3015,12 @@
    "related": [
     {
      "key": "angles_lines:symmetry",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (a later step, W13: the same idea one step further)",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (next step, W13: the same idea one step further)",
      "opts": {}
     },
     {
      "key": "angles_lines:place_symmetry_lines",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (a later step, W13: the same idea one step further)",
+     "why": "Y2.B3.S5 Lines of symmetry on shapes (next step, W13: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -3181,7 +3158,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
   },
   "Y2.B3.S7": {
    "title": "Sort 2-D shapes",
@@ -3243,6 +3220,11 @@
        0
       ]
      }
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (a later step, W14: the same idea one step further)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -3309,9 +3291,13 @@
    ],
    "related": [
     {
-     "key": "patterns:shape_pattern",
-     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (a later step, W14: the same idea one step further)",
-     "opts": {}
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S9 Count edges on 3-D shapes (next step, W14: the same idea one step further)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "note": "forms [0] = faces only: the shape_faces proposal is already built (retire it). Owner question: the skill says a cylinder has 3 faces; WRM Y2 says 2 flat faces and 1 curved surface."
@@ -3369,9 +3355,13 @@
    ],
    "related": [
     {
-     "key": "patterns:shape_pattern",
-     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (a later step, W14: the same idea one step further)",
-     "opts": {}
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "Y2.B3.S10 Count vertices on 3-D shapes (next step, W14: the same idea one step further)",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
     }
    ],
    "note": ""
@@ -3425,7 +3415,7 @@
    "related": [
     {
      "key": "patterns:shape_pattern",
-     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (a later step, W14: the same idea one step further)",
+     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (next step, W14: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -3608,15 +3598,16 @@
    "preBuild": [],
    "related": [
     {
-     "key": "measurement:equiv_coin_sets",
-     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S2 Count money - pounds (notes and coins) (next step, W32: the same idea one step further)",
      "opts": {
-      "currency": "usd"
+      "currency": "usd",
+      "kind": "note"
      }
     },
     {
-     "key": "measurement:make_change_least_coins",
-     "why": "Y2.B4.S4 Choose notes and coins (a later step, W33: the same idea one step further)",
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
      "opts": {
       "currency": "usd"
      }
@@ -3696,15 +3687,16 @@
    ],
    "related": [
     {
-     "key": "measurement:equiv_coin_sets",
-     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
+     "key": "measurement:money_count",
+     "why": "Y2.B4.S3 Count money - pounds and pence (next step, W32: the same idea one step further)",
      "opts": {
-      "currency": "usd"
+      "currency": "usd",
+      "kind": "both"
      }
     },
     {
-     "key": "measurement:make_change_least_coins",
-     "why": "Y2.B4.S4 Choose notes and coins (a later step, W33: the same idea one step further)",
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
      "opts": {
       "currency": "usd"
      }
@@ -3943,9 +3935,17 @@
    "related": [
     {
      "key": "measurement:money",
-     "why": "Y2.B4.S7 Calculate with money (a later step, W33: the same idea one step further)",
+     "why": "Y2.B4.S7 Calculate with money (next step, W33: the same idea one step further)",
      "opts": {
       "currency": "usd"
+     }
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S8 Make a pound (a later step, W34: the same idea one step further)",
+     "opts": {
+      "currency": "usd",
+      "band": 100
      }
     }
    ],
@@ -4011,6 +4011,13 @@
       "step": 100,
       "paid": "note",
       "band": 2000
+     }
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (a later step, W32: the same idea one step further)",
+     "opts": {
+      "currency": "usd"
      }
     }
    ],
@@ -4118,7 +4125,7 @@
    "pre": [
     {
      "key": "measurement:money_change",
-     "why": "Y2.B4.S9 Find change (W12): change from a dollar",
+     "why": "Y2.B4.S9 Find change (W12): subtracting a price from the bill paid",
      "opts": {
       "currency": "usd",
       "step": 100,
@@ -4293,7 +4300,7 @@
     },
     {
      "key": "measurement:enough_money",
-     "why": "is there enough money: the check after a two-step total",
+     "why": "checking the total against the money you have: the check after a two-step total",
      "opts": {
       "currency": "usd"
      }
@@ -4374,8 +4381,31 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill beyond the pre list: in school order the 5 and 10 times-tables (W26) come before this step (W27), so they are pre; sharing and grouping are pre"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B5.S2": {
    "title": "Make equal groups",
@@ -4439,8 +4469,18 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 the 2 times-table (next step, W29): equal groups of 2 written with ×",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B5.S3": {
    "title": "Add equal groups",
@@ -4519,8 +4559,27 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 the 2 times-table (next step, W29): equal groups of 2 written with ×",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (next step, W29: the same idea one step further)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B5.S4": {
    "title": "Introduce the multiplication symbol",
@@ -4535,6 +4594,16 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13/S15 the 10 and 5 times-tables (taught earlier, W26): the × sentences already met",
+     "opts": {
+      "constant": [
+       5,
+       10
+      ]
+     }
+    },
     {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S3 Add equal groups (taught before this step in the block)",
@@ -4581,18 +4650,30 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 the 2 times-table (next step, W29): equal groups of 2 written with ×",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (next step, W29: the same idea one step further)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B5.S5": {
    "title": "Multiplication sentences",
@@ -4607,6 +4688,16 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13/S15 the 10 and 5 times-tables (taught earlier, W26): the × sentences already met",
+     "opts": {
+      "constant": [
+       5,
+       10
+      ]
+     }
+    },
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (taught before this step in the block)",
@@ -4651,18 +4742,21 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W28)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 the 2 times-table (next step, W29): equal groups of 2 written with ×",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B5.S6": {
    "title": "Use arrays",
@@ -4729,11 +4823,24 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (a later step, W30: the same idea one step further)",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
      "opts": {
       "constant": [
        2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
       ]
      }
     }
@@ -4804,8 +4911,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (a later step, W30: the same idea one step further)",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
      "opts": {
       "constant": [
        2
@@ -4813,10 +4920,16 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (a later step, W30: the same idea one step further)",
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
      "opts": {
-      "band": 20
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     }
    ],
@@ -4884,8 +4997,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (a later step, W30: the same idea one step further)",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
      "opts": {
       "constant": [
        2
@@ -4893,10 +5006,16 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (a later step, W30: the same idea one step further)",
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (next step, W29: the same idea one step further)",
      "opts": {
-      "band": 20
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     }
    ],
@@ -5349,14 +5468,25 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:mult_chart_easy",
-     "why": "filling the missing products in a times-table chart (tables: 5, 10) — taught the same week (W26): Y2.B5.S17 The 5 and 10 times-tables",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 The 5 times-table (next step, W26: the same idea one step further)",
      "opts": {
       "constant": [
-       5,
-       10
-      ],
-      "band": 100
+       5
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S15 The 5 times-table (next step, W26: the same idea one step further)",
+     "opts": {
+      "rows": [
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
      }
     }
    ],
@@ -5379,6 +5509,15 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 the 10 times-table (W26): 30 ÷ 10 = 3 because 3 × 10 = 30",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
     {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
@@ -5423,20 +5562,21 @@
      "opts": {
       "band": 20
      }
-    },
+    }
+   ],
+   "preBuild": [],
+   "related": [
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S9 The 2 times-table (taught earlier, W29)",
+     "key": "division:div_facts",
+     "why": "Y2.B5.S16 Divide by 5 (next step, W31: the same idea one step further)",
      "opts": {
       "constant": [
-       2
+       5
       ]
      }
     }
    ],
-   "preBuild": [],
-   "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": ""
   },
   "Y2.B5.S15": {
    "title": "The 5 times-table",
@@ -5519,17 +5659,6 @@
      "key": "measurement:time_fives_ring",
      "why": "counting in 5s round a clock face",
      "opts": {}
-    },
-    {
-     "key": "multiplication:mult_chart_easy",
-     "why": "filling the missing products in a times-table chart (tables: 5, 10) — taught the same week (W26): Y2.B5.S17 The 5 and 10 times-tables",
-     "opts": {
-      "constant": [
-       5,
-       10
-      ],
-      "band": 100
-     }
     }
    ],
    "note": ""
@@ -5551,6 +5680,15 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 the 5 times-table (W26): the facts dividing by 5 undoes",
+     "opts": {
+      "constant": [
+       5
+      ]
+     }
+    },
     {
      "key": "division:share_into_groups",
      "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)",
@@ -5599,7 +5737,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: no step of the block is taught after this one, and the skills that share the idea are taught earlier (pre)"
   },
   "Y2.B5.S17": {
    "title": "The 5 and 10 times-tables",
@@ -6104,7 +6242,7 @@
     "nonstandard_mass"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y2.B7.S4 Four operations with mass (W35) has no skill yet | Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
   },
   "Y2.B7.S3": {
    "title": "Measure in kilograms",
@@ -6167,7 +6305,7 @@
     "nonstandard_mass"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y2.B7.S4 Four operations with mass (W35) has no skill yet | Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
   },
   "Y2.B7.S4": {
    "title": "Four operations with mass",
@@ -6325,7 +6463,7 @@
     "capacity_early"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
   },
   "Y2.B7.S7": {
    "title": "Measure in litres",
@@ -6386,7 +6524,7 @@
     "capacity_early"
    ],
    "related": [],
-   "note": "no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill"
+   "note": "no related skill: the later-taught steps of the block are Y2.B7.S8 Four operations with volume and capacity (W36) has no skill yet"
   },
   "Y2.B7.S8": {
    "title": "Four operations with volume and capacity",
@@ -6520,7 +6658,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     },
     {
@@ -6568,7 +6706,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     },
     {
@@ -6607,16 +6745,6 @@
    "build": [],
    "pre": [
     {
-     "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y1.B10.S5 Recognise a quarter of an object or a shape",
-     "opts": {
-      "parts": [
-       0,
-       2
-      ]
-     }
-    },
-    {
      "key": "patterns:halve",
      "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)",
      "opts": {
@@ -6632,7 +6760,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -6645,7 +6773,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "doubling undoes halving",
+     "why": "twice the half gives the whole: doubling undoes halving",
      "opts": {
       "band": 20
      }
@@ -6686,7 +6814,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -6694,7 +6822,7 @@
    "related": [
     {
      "key": "patterns:double",
-     "why": "doubling is the inverse of halving",
+     "why": "twice the half gives the whole: the inverse of halving",
      "opts": {
       "band": 20
      }
@@ -6726,11 +6854,10 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "Y2.B8.S3 a half (W17)",
      "opts": {
       "parts": [
-       0,
-       2
+       0
       ]
      }
     },
@@ -6753,11 +6880,6 @@
     "single_fraction"
    ],
    "related": [
-    {
-     "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
-     "opts": {}
-    },
     {
      "key": "shapes_early:compose_shapes",
      "why": "two or more equal parts put back together make the whole shape",
@@ -6813,11 +6935,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
-     "opts": {}
-    },
-    {
      "key": "shapes_early:compose_shapes",
      "why": "two or more equal parts put back together make the whole shape",
      "opts": {}
@@ -6844,11 +6961,10 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "Y2.B8.S3/S5 halves and quarters (W17-18)",
      "opts": {
       "parts": [
        0,
-       1,
        2
       ]
      }
@@ -6862,7 +6978,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -6914,7 +7030,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7047,7 +7163,7 @@
     },
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
+     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
      "opts": {}
     }
    ],
@@ -7165,7 +7281,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7173,7 +7289,7 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
+     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
      "opts": {}
     }
    ],
@@ -7210,11 +7326,10 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S3 Recognise a half (the same week, W17)",
+     "why": "Y2.B8.S3 a half (W17)",
      "opts": {
       "parts": [
-       0,
-       2
+       0
       ]
      }
     },
@@ -7234,7 +7349,7 @@
     },
     {
      "key": "comparing:compare_groups",
-     "why": "More/Fewer/Same Groups — Y2.B1.S12 Compare objects",
+     "why": "equal or not equal: do the groups have the same number? — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7523,7 +7638,7 @@
     },
     {
      "key": "measurement:time_fives_ring",
-     "why": "Y2.B9.S5 Tell the time to 5 minutes (a later step, W37: the same idea one step further)",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (next step, W37: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -7794,7 +7909,7 @@
    "related": [
     {
      "key": "measurement:bar_graph_intro",
-     "why": "Y2.B10.S3 Block diagrams (a later step, W25: the same idea one step further)",
+     "why": "Y2.B10.S3 Block diagrams (next step, W25: the same idea one step further)",
      "opts": {}
     }
    ],
@@ -8164,14 +8279,6 @@
      "opts": {}
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "moving right and left along a line by a number of steps (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
-     "opts": {
-      "span": 10,
-      "band": 20
-     }
-    },
-    {
      "key": "shapes_early:partition_shapes",
      "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
      "opts": {
@@ -8180,6 +8287,11 @@
        2
       ]
      }
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 naming the shapes that are moved and turned (topic ladder)",
+     "opts": {}
     }
    ],
    "preBuild": [
@@ -8187,8 +8299,17 @@
     "position_map",
     "turns"
    ],
-   "related": [],
-   "note": "no related skill a Grade 1 pupil has met by this school week (W19-W20): quarter past and quarter to come in W36 and grid or coordinate skills are Grade 5+ (rule 19); position words and halves and quarters of a shape (K learning) are pre"
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "moving right and left along a line by a number of steps",
+     "opts": {
+      "span": 10,
+      "band": 20
+     }
+    }
+   ],
+   "note": ""
   },
   "Y2.B11.S3": {
    "title": "Describe turns",
@@ -8207,7 +8328,7 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape): a half turn and a quarter turn — Y2.B8.S13 Recognise three-quarters",
+     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
      "opts": {
       "parts": [
        0,
@@ -8225,7 +8346,7 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
+     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
      "opts": {}
     }
    ],
@@ -8242,14 +8363,6 @@
    ],
    "pre": [
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "moving along a line by a number of steps (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
-     "opts": {
-      "span": 10,
-      "band": 20
-     }
-    },
-    {
      "key": "shapes_early:shape_positions",
      "why": "Y1.B11.S4 Describe position - above and below (prior learning wk W19)",
      "opts": {}
@@ -8263,6 +8376,11 @@
        2
       ]
      }
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 naming the shapes that are moved and turned (topic ladder)",
+     "opts": {}
     }
    ],
    "preBuild": [
@@ -8273,8 +8391,16 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn of the clock: a quarter of a turn of the clock — Y1.B14.S6 Tell the time to the half hour",
+     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
      "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "moving along a line by a number of steps",
+     "opts": {
+      "span": 10,
+      "band": 20
+     }
     }
    ],
    "note": ""

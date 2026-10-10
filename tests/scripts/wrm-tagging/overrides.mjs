@@ -154,7 +154,7 @@ export const steps = {
   // ================= Y3 B2 addition and subtraction =================
   'Y3.B2.S1': { partials: [P('addition:add_sub_10s', 'a decade ± 10 only; 30 + 40 from 3 + 4 is not dealt'), P('addition:add_sub_100s', 'a hundred ± 100 only; 300 + 400 from 3 + 4 is not dealt')],
     why: { 'addition:add_facts': 'within-20 facts: the bonds themselves, not applied to tens and hundreds (kept as pre)', 'subtraction:sub_facts': 'within-20 facts (kept as pre)' },
-    build: ['add_sub_patterns'], preOnly: true, pre: [R('composing:number_bonds', 'Y2.B2.S1 bonds within 10: the facts being applied'), R('composing:make_ten', 'bonds to 10'), R('addition:add_facts', 'addition facts within 20'), R('subtraction:sub_facts', 'subtraction facts within 20'), R('addition:add_sub_10s', 'Y2.B2.S14 adding and subtracting 10s')] },
+    build: ['add_sub_patterns'], preOnly: true, pre: [R('composing:number_bonds', 'Y2.B2.S1 bonds within 10: the facts being applied'), R('composing:make_ten', 'bonds to 10'), R('addition:add_facts', 'the facts being applied: add within 20'), R('subtraction:sub_facts', 'the facts being applied: subtract within 20'), R('addition:add_sub_10s', 'Y2.B2.S14 adding and subtracting 10s')] },
   'Y3.B2.S2': { reviewed: true, build: ['add_sub_patterns', 'one_digit_addend'] },
   'Y3.B2.S3': { partials: [P('addition:add_sub_10s', 'a decade ± 10 only; adding and subtracting 10s to a 2- or 3-digit number (234 + 30) is not dealt'), P('placevalue:more_less_100', '10 more / 10 less only, not several tens', { step: 10 })], build: ['tens_any'] },
   'Y3.B2.S4': { partials: [P('addition:add_sub_100s', 'a hundred ± 100 only; adding hundreds to a 3-digit number (234 + 200) is not dealt'), P('placevalue:more_less_100', '100 more / 100 less only', { step: 100 })], build: ['hundreds_any'] },
@@ -347,7 +347,7 @@ export const extraRelated = {
   'Y3.B3.S12': [R('patterns:double', 'double the 4 times-table to get the 8 times-table')],
   'Y3.B3.S13': [R('multiplication:count_by_tables', 'counting in 8s from 0')],
   'Y3.B3.S14': [R('division:div_facts', 'the inverse: dividing by 8')],
-  'Y3.B3.S15': [R('patterns:double', 'doubling links the 2, 4 and 8 tables')],
+  'Y3.B3.S15': [R('patterns:double', 'twice a 2s fact is a 4s fact, twice a 4s fact an 8s fact')],
   'Y3.B5.S1': [R('measurement:estimate_length', 'choosing m or cm for an object')],
   'Y3.B5.S2': [R('measurement:length_metric', 'mm and cm as units of the same length (10 mm = 1 cm)')],
   'Y3.B5.S4': [R('measurement:estimate_length', 'choosing a sensible unit')],
@@ -355,7 +355,7 @@ export const extraRelated = {
   'Y3.B5.S6': [R('measurement:reading_ruler', 'measuring on a ruler marked in cm and mm')],
   'Y3.B5.S7': [R('placevalue:compare', 'comparing the numbers once the units match')],
   'Y3.B6.S8': [R('composing:fraction_number_line', 'reading a fraction at a point on the line')],
-  'Y3.B6.S10': [R('fractions:equiv_frac_nv', 'equivalent fractions without a picture (the next idea)')],
+  'Y3.B6.S10': [R('fractions:equiv_frac_nv', 'the same amount as two fractions without a picture (the next idea)')],
   'Y3.B7.S1': [R('number_sense:place_on_number_line', 'a scale is a number line with intervals')],
   'Y3.B7.S2': [R('number_sense:place_on_number_line', 'a scale is a number line')],
   'Y3.B7.S3': [R('number_sense:place_on_number_line', 'a scale is a number line')],
@@ -411,7 +411,7 @@ export const extraRelated = {
   'Y2.B7.S9': [R('comparing:compare_objects', 'warmer and colder as comparison language, like longer and shorter')],
   'Y2.B8.S1': [R('fractions:identify', 'naming a part of a whole as a fraction, where parts and wholes lead')],
   'Y2.B8.S3': [R('fractions:identify', 'name the fraction shaded: 1/2 among others')],
-  'Y2.B8.S4': [R('patterns:double', 'doubling is the inverse of halving')],
+  'Y2.B8.S4': [R('patterns:double', 'twice the half gives the whole: the inverse of halving')],
   'Y2.B8.S5': [R('fractions:identify', 'name the fraction shaded, quarters among others')],
   'Y2.B8.S6': [R('fractions:identify', 'name the fraction shaded: 1/4 among others')],
   'Y2.B8.S7': [R('fractions:identify', 'name the fraction shaded, thirds among others')],
@@ -564,7 +564,7 @@ export const relR3 = {
   'Y2.B2.S21': [R('algebra:balance_addsub', 'a missing number that makes both sides equal'), R('algebra:tape_diagram', 'a bar model shows the missing part')],
   'Y2.B3.S12': [R('patterns:number_pattern', 'a repeating pattern of numbers: the same rule-spotting')],
   'Y2.B4.S9': [R('addition:comparison_word', 'how many more: the difference behind change'), R('algebra:tape_diagram', 'a bar model: the amount paid split into the price and the change')],
-  'Y2.B4.S10': [R('algebra:multi_step_word', 'two-step stories in other contexts'), R('measurement:enough_money', 'is there enough money: the check after a two-step total')],
+  'Y2.B4.S10': [R('algebra:multi_step_word', 'two-step stories in other contexts'), R('measurement:enough_money', 'checking the total against the money you have: the check after a two-step total')],
   'Y2.B5.S12': [R('patterns:skip_count_grid', 'counting in 2s on a grid marks the even numbers')],
   'Y2.B5.S17': [R('patterns:skip_count_line', 'the 5s and 10s as jumps on a number line'), R('measurement:time_fives_ring', 'counting in 5s round a clock face'), R('multiplication:mult_word_problems', 'the 5 and 10 times-tables in stories')],
   'Y2.B6.S3': [R('measurement:estimate_length', 'estimating lengths in cm or m before comparing'), R('measurement:heavier_lighter_visual', 'comparing masses (Y2.B7.S1): the same compare language')],
@@ -592,7 +592,7 @@ export const relR3 = {
   'Y3.B4.S11': [R('multiplication:mult_chart_easy', 'a times-table chart is a table of combinations: rows × columns')],
   'Y3.B5.S2': [R('measurement:estimate_length', 'choosing mm or cm for an object'), R('measurement:reading_ruler_hard', 'a ruler in cm and mm with harder readings')],
   'Y3.B6.S8': [R('fractions:order_frac_numline', 'placing and ordering fractions on a line'), R('fractions:fraction_nl_drag', 'placing a fraction on the line')],
-  'Y3.B6.S9': [R('fractions:select_equiv_frac', 'circle the equivalent fractions'), R('fractions:equiv_frac_nv', 'equivalent fractions without a picture, the next idea')],
+  'Y3.B6.S9': [R('fractions:select_equiv_frac', 'picking the fractions that name the same amount'), R('fractions:equiv_frac_nv', 'the same amount as two fractions without a picture, the next idea')],
   'Y3.B7.S1': [R('measurement:temperature', 'a thermometer: the same scale reading'), R('measurement:reading_ruler_hard', 'a ruler: another scale with intervals')],
   'Y3.B7.S2': [R('measurement:temperature', 'a thermometer: the same scale reading')],
   'Y3.B7.S3': [R('measurement:temperature', 'a thermometer: the same scale reading'), R('measurement:length_metric', 'm and cm: mixed units like kg and g')],
@@ -604,7 +604,7 @@ export const relR3 = {
   'Y3.B7.S10': [R('measurement:money_compare', 'comparing two amounts of money: the same <, > and = with units')],
   'Y3.B7.S11': [R('measurement:money', 'adding amounts of money: the same calculation with units'), R('algebra:tape_diagram', 'a bar model of two capacities and their total')],
   'Y3.B8.S6': [R('fractions:fraction_of_set_hard_nv', 'fractions of amounts without pictures, harder'), R('fraction_operations:mult_frac_whole', 'a fraction of an amount as fraction × whole number (Grade 4)')],
-  'Y3.B9.S1': [R('measurement:enough_money', 'is there enough money: reading the amount first'), R('measurement:money_compare', 'comparing two amounts')],
+  'Y3.B9.S1': [R('measurement:enough_money', 'checking an amount against a price: reading the amount first'), R('measurement:money_compare', 'comparing two amounts')],
   'Y3.B9.S2': [R('measurement:money_compare', 'comparing two amounts once they are in the same form'), R('measurement:unit_conversions', 'converting a bigger unit into smaller ones (feet to inches): the same idea as dollars to cents')],
   'Y3.B9.S3': [R('measurement:enough_money', 'is there enough: the total compared with what you have'), R('algebra:tape_diagram', 'a bar model of two prices and the total')],
   'Y3.B9.S4': [R('measurement:enough_money', 'is there enough: the difference between what you have and a price'), R('addition:comparison_word', 'how many more: a difference')],
@@ -774,7 +774,7 @@ Object.assign(relR3, {
   'Y2.B3.S6': [CS],
   'Y2.B8.S1': [CS, R('composing:number_bonds', 'part-part-whole with numbers: the same idea with a quantity')],
   'Y2.B8.S2': [CS, R('multiplication:equal_or_unequal_groups', 'equal and unequal groups of objects: the same idea with a set')],
-  'Y2.B8.S3': [TH, R('patterns:double', 'doubling undoes halving', { band: 20 })], 'Y2.B8.S4': [TH, R('patterns:double', 'doubling undoes halving', { band: 20 })],
+  'Y2.B8.S3': [TH, R('patterns:double', 'twice the half gives the whole: doubling undoes halving', { band: 20 })], 'Y2.B8.S4': [TH, R('patterns:double', 'twice the half gives the whole: doubling undoes halving', { band: 20 })],
   'Y2.B8.S5': [TQ, CS], 'Y2.B8.S6': [TQ, CS], 'Y2.B8.S7': [CS], 'Y2.B8.S8': [CS],
   'Y2.B8.S9': [R('patterns:double', 'the whole is double the half', { band: 20 }), CS],
   'Y2.B8.S10': [CS, TQ], 'Y2.B8.S11': [CS, TQ], 'Y2.B8.S12': [TQ, TH], 'Y2.B8.S13': [TQ], 'Y2.B8.S14': [TQ], 'Y2.B8.S15': [TQ, TH],
@@ -864,7 +864,7 @@ Object.assign(r3, {
   'Y2.B9.S6': { ...(r3['Y2.B9.S6'] || {}), relNote: 'no related skill met by W23: quarter past/to (W36), 5-minute times (W37) and durations come later (rule 19); o\'clock and half past are pre' },
   'Y3.B4.S3': { partials: [P('multiplication:mult_properties', '×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available')], verdict: 'partial', build: ['props_tables'],
     core: [C('multiplication:arrays_groups', 'Y3.B3.S2 arrays: turning an array gives the same product', { forms: [0] }), C('multiplication:repeated_add_to_mult', 'Y2.B5.S3 adding equal groups', { band: 25 })],
-    related: [R('patterns:double', 'doubling: the 4 times-table is double the 2 times-table', { band: 20 })] },
+    related: [R('patterns:double', 'twice each 2s fact: the 4 times-table is double the 2 times-table', { band: 20 })] },
   'Y3.B4.S4': { partials: [P('multiplication:multiply', '2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture, exchanges mixed, and ×6, ×7, ×9 items', { tiles: 21 })], build: ['exchange_count'] },
   'Y3.B4.S5': { ...r3['Y3.B4.S5'], partials: [P('multiplication:multiply', 'mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear', { tiles: 21 })], build: ['exchange_count'] },
   'Y3.B4.S7': { ...(r3['Y3.B4.S7'] || {}), partials: [P('division:box_division_easy', 'regroup "none" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)', { regroup: 'none', constant: [2, 3, 4, 5, 8] })], build: ['exchange_count'] },
@@ -1056,8 +1056,8 @@ Object.assign(r3, {
   'Y2.B4.S4': { ...r3['Y2.B4.S4'], core: [...r3['Y2.B4.S4'].core, C('measurement:money_compare', 'Y2.B4.S6 comparing two amounts of money (W8)')] },
   'Y2.B4.S5': { ...(r3['Y2.B4.S5'] || {}), core: [C('measurement:money_compare', 'Y2.B4.S6 comparing two amounts of money (W8)')] },
   'Y2.B1.S7': { ...(r3['Y2.B1.S7'] || {}), core: [C('placevalue:expand', 'Y2.B1.S5 partitioning a number into tens and ones', { band: 99 }), C('placevalue:unit_form', 'Y2.B1.S5 the same number as tens and ones', { band: 99 }), C('composing:base10_build', 'Y2.B1.S3 tens and ones with base-10 blocks', { band: 99 })], dropPre: ['composing:number_word_form'] },
-  'Y3.B3.S14': { ...(r3['Y3.B3.S14'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11): double each fact for the 8s', { constant: [4] }), C('patterns:double', 'doubling a 4s fact gives the 8s fact', { band: 50 })] },
-  'Y3.B3.S15': { ...(r3['Y3.B3.S15'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11): double each fact for the 8s', { constant: [4] }), C('patterns:double', 'doubling links the 2, 4 and 8 tables', { band: 50 })] },
+  'Y3.B3.S14': { ...(r3['Y3.B3.S14'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11): double each fact for the 8s', { constant: [4] }), C('patterns:double', 'twice a 4s fact is the 8s fact', { band: 50 })] },
+  'Y3.B3.S15': { ...(r3['Y3.B3.S15'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11): double each fact for the 8s', { constant: [4] }), C('patterns:double', 'twice a 2s fact is a 4s fact, twice a 4s fact an 8s fact', { band: 50 })] },
   'Y3.B3.S9': { ...(r3['Y3.B3.S9'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S9 the 2 times-table: × 4 is double × 2', { constant: [2] }), C(CBT, 'Y2.B1.S15 counting in 2s from 0', ZR(2))] },
   'Y3.B3.S3': { ...(r3['Y3.B3.S3'] || {}), core: [C(CBT, 'Y2.B1.S15 counting in 2s from 0: the multiples of 2', ZR(2)), C('multiplication:mult_facts', 'Y2.B5.S9 the 2 times-table', { constant: [2] })], dropPre: ['addition:add_wp_100', 'subtraction:sub_wp_100', 'addition:cloze_addition', 'subtraction:missing_add_sub'] },
   'Y3.B5.S1': { ...(r3['Y3.B5.S1'] || {}), core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), C(CBT, 'Y2.B1.S15 counting in 10s: 100 cm make 1 m', ZR(10))] },
@@ -1084,3 +1084,72 @@ r3['Y3.B3.S4'] = { ...r3['Y3.B3.S4'], core: [C(CBT, 'Y2.B1.S15 and Y2.B5.S17 cou
 Object.assign(whyText, { 'subtraction:sub_10_regroup': 'subtracting ones across 10 (within 20)', 'addition:add_10_regroup': 'adding ones across 10 (within 20)',
   'multiplication:mult_zeros': 'multiplying by 10 and by multiples of 10', 'measurement:estimate_length': 'estimating a length' });
 r3['Y3.B11.S6'] = { ...r3['Y3.B11.S6'], core: [C('shapes_early:name_2d_shapes', 'Y3.B11.S7 recognising and describing 2-D shapes (taught earlier, W27)'), C('shapes_early:name_3d_shapes', 'Y3.B11.S9 recognising 3-D shapes (taught earlier, W28)'), C('shapes_early:count_edges_faces_vertices', 'Y3.B11.S9 faces, edges and vertices of 3-D shapes (taught earlier, W28)')] };
+
+// ======================= round 9 (critic Y2-Y3 r8: per-step notes, why ownership, building blocks) =======================
+// N1: the shared "no later step" sentence is gone; build.mjs computes each empty-related note from the step's own facts
+for (const id of Object.keys(r3)) if (r3[id] && r3[id].relNote === LATER) delete r3[id].relNote;
+for (const id of ['Y3.B3.S6', 'Y3.B6.S4', 'Y3.B6.S6', 'Y3.B1.S13']) if (r3[id]) delete r3[id].relNote;
+Object.assign(whyText, { 'comparing:compare_groups': 'equal or not equal: do the groups have the same number?', 'composing:hundreds_chart_fill': 'the counting order to 100 on a hundred square',
+  'measurement:time_half_hour': 'half past: the minute hand makes a half turn' });
+const M2 = R('multiplication:mult_facts', 'Y2.B5.S9 the 2 times-table (next step, W29): equal groups of 2 written with ×', { constant: [2] });
+Object.assign(relR3, { 'Y2.B5.S2': [M2], 'Y2.B5.S3': [M2], 'Y2.B5.S4': [M2], 'Y2.B5.S5': [M2],
+  'Y2.B2.S4': [R('addition:add_100_no_regroup', 'Y2.B2.S15 adding two 2-digit numbers with no new ten (next step, W6): bonds of tens used inside a sum'), R('placevalue:more_less_10', 'Y2.B2.S13 10 more, 10 less (a later step, W7): one ten on or off', { step: 10 })],
+  'Y3.B11.S2': [R('angles_lines:identify_lines', 'Y3.B11.S6 perpendicular lines meet at a right angle (next step, W29)')],
+  'Y3.B6.S2': [R('fractions:equiv_frac_visual', 'Y3.B6.S9 equivalent fractions (a later step, W37)', { denoms: [2] })],
+  'Y3.B6.S5': [R('fractions:equiv_frac_visual', 'Y3.B6.S9 equivalent fractions (a later step, W37)', { denoms: [2] })],
+});
+r3['Y3.B1.S13'] = { ...r3['Y3.B1.S13'], relOnly: true, related: [R('number_sense:place_on_number_line', 'Y3.B1.S10 number line to 1,000 (a later step, W13): the order seen on a line', { span: 100, band: 1000 })] };
+for (const id of ['Y2.B5.S2', 'Y2.B5.S3', 'Y2.B5.S4', 'Y2.B5.S5', 'Y2.B2.S4', 'Y3.B11.S2']) if (r3[id]) { delete r3[id].relNote; if (r3[id].relOnly && r3[id].related && !r3[id].related.length) { delete r3[id].relOnly; delete r3[id].related; } }
+const MF510 = C('multiplication:mult_facts', 'Y2.B5.S13/S15 the 10 and 5 times-tables (taught earlier, W26): the × sentences already met', { constant: [5, 10] });
+Object.assign(r3, {
+  'Y2.B5.S4': { ...(r3['Y2.B5.S4'] || {}), core: [MF510] }, 'Y2.B5.S5': { ...(r3['Y2.B5.S5'] || {}), core: [MF510] },
+  'Y2.B5.S14': { ...(r3['Y2.B5.S14'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S13 the 10 times-table (W26): 30 ÷ 10 = 3 because 3 × 10 = 30', { constant: [10] })] },
+  'Y2.B5.S16': { ...(r3['Y2.B5.S16'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S15 the 5 times-table (W26): the facts dividing by 5 undoes', { constant: [5] })] },
+  'Y3.B3.S7': { ...(r3['Y3.B3.S7'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S8 the 3 times-table (W11)', { constant: [3] }), C(CBT, 'Y2.B1.S16 counting in 3s', ZR(3))], dropPre: ['multiplication:mult_zeros', 'patterns:halve'] },
+  'Y3.B3.S10': { ...(r3['Y3.B3.S10'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11)', { constant: [4] })] },
+  'Y3.B3.S6': { ...(r3['Y3.B3.S6'] || {}), core: [C(CBT, 'Y2.B1.S16 counting in 3s: the 3s facts in order', ZR(3))] },
+  'Y3.B11.S6': { ...r3['Y3.B11.S6'], core: [C('angles_lines:identify_angles', 'Y3.B11.S2 right angles (W28): perpendicular lines meet at one', { forms: [0] }), ...r3['Y3.B11.S6'].core] },
+  'Y3.B3.S1': { ...(r3['Y3.B3.S1'] || {}), core: [C(CBT, 'Y2.B1.S15 counting in equal steps', ZR(2, 5, 10)), C('multiplication:mult_facts', 'Y2.B5 the 2, 5 and 10 times-tables', { constant: [2, 5, 10] })], dropPre: ['addition:cloze_addition', 'subtraction:missing_add_sub', 'subtraction:sub_wp_100', 'addition:add_wp_100'] },
+  'Y3.B3.S2': { ...(r3['Y3.B3.S2'] || {}), core: [C(CBT, 'Y2.B1.S15 counting in equal steps', ZR(2, 5, 10)), C('multiplication:mult_facts', 'Y2.B5 the 2, 5 and 10 times-tables', { constant: [2, 5, 10] })], dropPre: ['addition:cloze_addition', 'subtraction:missing_add_sub', 'subtraction:sub_wp_100', 'addition:add_wp_100'] },
+  'Y2.B2.S2': { ...(r3['Y2.B2.S2'] || {}), dropPre: ['addition:add_wp_100', 'addition:add_sub_10s'] },
+  'Y2.B2.S12': { ...(r3['Y2.B2.S12'] || {}), dropPre: ['addition:add_wp_100'] },
+  'Y3.B1.S3': { ...(r3['Y3.B1.S3'] || {}), dropPre: ['placevalue:compare', 'placevalue:more_less_100'] },
+  'Y2.B4.S8': { ...r3['Y2.B4.S8'], core: [C('measurement:money_change', 'Y2.B4.S9 Find change (W12): subtracting a price from the bill paid', { currency: 'usd', step: 100, paid: 'note', band: 2000 })] },
+  'Y3.B3.S13': { ...(r3['Y3.B3.S13'] || {}), core: [C(CBT, 'counting in 8s from 0 (the same week, W31: Y3.B3.S14)', ZR(8))] },
+  'Y2.B8.S5': { ...(r3['Y2.B8.S5'] || {}), core: [C('shapes_early:partition_shapes', 'Y2.B8.S3 a half (W17)', { parts: [0] })] },
+  'Y2.B8.S7': { ...(r3['Y2.B8.S7'] || {}), core: [C('shapes_early:partition_shapes', 'Y2.B8.S3/S5 halves and quarters (W17-18)', { parts: [0, 2] })] },
+  'Y2.B8.S13': { ...r3['Y2.B8.S13'], core: [C('shapes_early:partition_shapes', 'Y2.B8.S3 a half (W17)', { parts: [0] })] },
+});
+// quarter steps: half past does not carry the quarter idea; quarter past/to is W36
+for (const id of ['Y2.B8.S5', 'Y2.B8.S6']) linkFix[id] = { ...(linkFix[id] || {}), 'measurement:time_half_hour': null };
+r3['Y3.B3.S13'] = { ...r3['Y3.B3.S13'], core: [C(CBT, 'counting in 8s from 0 (taught the same week, W31, with the 8 times-table)', ZR(8))] };
+r3['Y3.B1.S14'] = { ...r3['Y3.B1.S14'], related: [R('number_sense:place_on_number_line', 'Y3.B1.S10 counting along a 0-1,000 number line (a later step, W13)', { span: 100, band: 1000 })] };
+r3['Y3.B2.S21'] = { ...(r3['Y3.B2.S21'] || {}), related: [R('addition:add_sub_10s', 'Y3.B2.S1 known facts applied to tens and hundreds, checked by the inverse (a later step, W9)')] };
+delete r3['Y3.B2.S21'].relNote;
+r3['Y3.B2.S21'] = { ...r3['Y3.B2.S21'], related: [R('addition:add_sub_100s', 'Y3.B2.S1 known facts applied to hundreds (a later step, W9)')] };
+linkFix['Y2.B8.S3'] = { ...(linkFix['Y2.B8.S3'] || {}), 'shapes_early:partition_shapes': null };
+// labwhy2: whys that open with the skill's catalogue name say what the pupil does instead
+Object.assign(whyText, { 'division:div_facts': 'sharing a number into equal groups using the tables', 'multiplication:mult_facts': 'times-table facts',
+  'fractions:equiv_frac_visual': 'the same amount shown as two fractions on a picture', 'patterns:double': 'twice a number' });
+delete r3['Y3.B2.S21'].related;
+for (const id of ['Y2.B8.S5', 'Y2.B8.S6']) linkFix[id] = { ...(linkFix[id] || {}), 'measurement:time_quarter': null };
+// r9 (critic r8 N1): Y2.B2.S4 (W5) takes Y2.B2.S15 (W6, the next week) as related; the column layout is met one week later
+linkSwap.Y2['addition:add_100_no_regroup'] = { ...linkSwap.Y2['addition:add_100_no_regroup'], not: /^Y2\.B2\.S4$/ };
+// r9: Y3.B3.S13 number-line division divides by 8 (its own table), like S7 (by 3) and S10 (by 4)
+linkFix['Y3.B3.S13'] = { ...(linkFix['Y3.B3.S13'] || {}), 'division:nl_div': { constant: [8], band: 100 } };
+// r9: the mixed division facts on the W31 division steps say why: the other tables divided the same week
+{ const DM = { constant: [2, 3, 4, 5, 8, 10], band: 100 };
+  relR3['Y3.B3.S7'] = [...(relR3['Y3.B3.S7'] || []), R('division:div_facts', 'Y3.B3.S10/S13 dividing by 4 and by 8 (the same week, W31): ÷3 mixed with the other tables', DM)];
+  relR3['Y3.B3.S10'] = [...(relR3['Y3.B3.S10'] || []), R('division:div_facts', 'Y3.B3.S7/S13 dividing by 3 and by 8 (the same week, W31): ÷4 mixed with the other tables', DM)];
+  relR3['Y3.B3.S13'] = [...(relR3['Y3.B3.S13'] || []), R('division:div_facts', 'Y3.B3.S7/S10 dividing by 3 and by 4 (the same week, W31): ÷8 mixed with the other tables', DM)]; }
+// the missing-factor link is swapped year-wide to div_facts; here the step already holds its own mixed div_facts link
+for (const id of ['Y3.B3.S7', 'Y3.B3.S10', 'Y3.B3.S13']) linkFix[id] = { ...(linkFix[id] || {}), 'division:missing_mult_div': null };
+// r9: Y3.B5.S4 deals length_metric forms 0-2 itself, so the next step's form 0 is the step's own content, not a related idea
+linkFix['Y3.B5.S4'] = { ...(linkFix['Y3.B5.S4'] || {}), 'measurement:length_metric': null };
+// r9 (critic r8 N4c): Y3.B1.S3 Number line to 100 keeps only 2-digit building blocks (no 3-digit compare, order or more/less)
+r3['Y3.B1.S3'] = { ...(r3['Y3.B1.S3'] || {}), dropPre: ['placevalue:more_less_100', 'placevalue:order_greatest_to_least'],
+  core: [C('placevalue:compare', 'Y2.B1.S13 comparing 2-digit numbers: the greater one sits further along the line', { band: 99 }),
+    C('placevalue:order_least_to_greatest', 'Y2.B1.S14 ordering 2-digit numbers: the order the line shows', { band: 99 }),
+    C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the tens marked on the line', { band: 50 })] };
+// r9: Y2.B5.S12 Odd and even keeps its own related list; dividing by 10 (Y2.B5.S14) is not the odd/even idea (÷2 is pre)
+r3['Y2.B5.S12'] = { ...(r3['Y2.B5.S12'] || {}), relOnly: true, related: [...((r3['Y2.B5.S12'] || {}).related || []), ...(relR3['Y2.B5.S12'] || [])] };

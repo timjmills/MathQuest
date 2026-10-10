@@ -70,8 +70,10 @@ for(const Y of years){const L=JSON.parse(fs.readFileSync(root+`data/curriculum/l
         if(Y==='Y3'&&r.unlike&&/:(compare|order_fractions|order_frac|compare_frac|benchmark)/.test(e.key))flag('UNLIKE');}
       if(Y==='Y2'&&r.muldiv&&/^(number_ops_mixed|algebra):/.test(e.key))flag('MULDIV');
       if(r.cust)flag('CUSTOMARY');
-      if(Y==='Y2'&&r.col2&&order.indexOf(id)<order.indexOf(FIRSTCOL.Y2))flag('COLUMN');
-      if(Y==='Y3'&&r.col3&&order.indexOf(id)<order.indexOf(FIRSTCOL.Y3))flag('COLUMN');}}}
+      // r9: the column layout is gated by SCHOOL week like every content marker (rule 19, TOL 2), not by WRM order
+      const colLate=f=>(SWK[id]??999)+2<(SWK[FIRSTCOL[Y]]??999)||((SWK[id]??999)===999&&order.indexOf(id)<order.indexOf(FIRSTCOL[Y]));
+      if(Y==='Y2'&&r.col2&&colLate())flag('COLUMN');
+      if(Y==='Y3'&&r.col3&&colLate())flag('COLUMN');}}}
 console.log(rows.join('\n'));
 console.log(`linkscan (${YEARMODE?'year':'week'} mode): `+(bad?bad+' links flagged':'OK'));
 process.exitCode=bad?1:0;
