@@ -20,7 +20,7 @@ for (const s of STRANDS) { const rs = rows.filter(r => r.strand === s); L.push(`
 L.push(`| **All** | ${rows.length} | ${cnt(rows).join(' | ')} |`, '');
 L.push('| Source | rows | exists-ok | exists-regrade | partial | missing |', '|---|---|---|---|---|---|');
 for (const s of ['6.2', 'strand-walk', '6.4']) { const rs = rows.filter(r => r.source === s); L.push(`| ${s} | ${rs.length} | ${cnt(rs).join(' | ')} |`); }
-L.push('', 'Proposals by kind: ' + ['new', 'option'].map(k => `${k} ${pr.filter(p => p.kind === k).length}`).join(', ') + '.', '');
+L.push('', 'Proposals by kind: ' + Object.entries(pr.reduce((a, p) => (a[p.kind || '(none)'] = (a[p.kind || '(none)'] || 0) + 1, a), {})).map(([k, v]) => `${k} ${v}`).join(', ') + ` (= ${pr.length}).`, '');
 L.push('## The Wave 6.2 table, re-verified against the code today', '', '| MAP task | Plan said | Today | Skills | Proposal | What was sampled |', '|---|---|---|---|---|---|');
 const PLAN = fs.readFileSync(path.join(ROOT, 'design/MASTER_PLAN.md'), 'utf8');
 for (const r of rows.filter(r => r.source === '6.2')) {

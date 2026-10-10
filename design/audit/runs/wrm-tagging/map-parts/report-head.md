@@ -16,6 +16,8 @@ still has to pass the 8/10 re-grade, or the answer form is weaker than MAP's; th
 **Evidence.** Each row's `evidence` cites public NWEA material: the MAP Growth RIT Reference Charts (sample items by RIT band,
 both the NWEA CDN copy and a district copy), the NWEA DesCartes learning-continuum statements by band (2014 files M2_NO,
 M2_OAT, M6_OAT … served by Bismarck Public Schools), and the NWEA item-pool blog on technology-enhanced items. NWEA's own
-concept PDFs on teach.mapnwea.org returned 503 during the audit, so they are not cited. Nothing was copied into the repo.
+concept PDFs on teach.mapnwea.org returned 503 during the audit; where a row cites one, it says "(search summary; page
+returned 503)". An evidence entry must show the row's own task; where no public item does, `url` is null and the note
+names the CCSS code that keeps the row in MAP's blueprint. Nothing was copied into the repo.
 RIT bands are those the evidence gives where it gives one; otherwise the band of the skill's RIT list in `data.js`, or an
 estimate (flagged in the note).
