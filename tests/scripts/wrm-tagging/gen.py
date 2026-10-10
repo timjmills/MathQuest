@@ -474,12 +474,17 @@ def proposal(pid, steps):
 def tagfixes(step, out):
     fixes = []
     old = {t['key']: t for t in TAGS.get(step, [])}
-    new = {d['key']: None for d in out['direct']}; new.update({d['key']: d['missing'] for d in out['partial']})
+    # one tag per key: a direct skill is full; a key that is only partial carries its clauses joined by '; ' (mergecheck.mjs)
+    new = {}
+    for d in out['partial']:
+        if d['key'] not in new: new[d['key']] = d['missing']
+        elif d['missing'] not in new[d['key']]: new[d['key']] += '; ' + d['missing']
+    new.update({d['key']: None for d in out['direct']})
     for k, t in old.items():
         if k not in new:
             fixes.append({'key': k, 'step': step, 'action': 'remove', 'why': RM.get((step, k)) or ('does not teach this step: ' + (t.get('partial') or 'tagged full but no generated item matches the step'))})
-        elif (t.get('partial') is None) != (new[k] is None):
-            if new[k]: fixes.append({'key': k, 'step': step, 'action': 'partial', 'why': new[k]})
+        elif (t.get('partial') is None) != (new[k] is None) or (new[k] is not None and t.get('partial') != new[k]):
+            if new[k]: fixes.append({'key': k, 'step': step, 'action': 'partial', 'why': new[k]})   # a changed clause is re-sent too
             else: fixes.append({'key': k, 'step': step, 'action': 'add', 'why': 'teaches the whole step with the options given; drop the partial flag'})
     for k, miss in new.items():
         if k not in old:
@@ -509,12 +514,35 @@ for _ in range(3):
     MISSING.clear()
     for y in ('R', 'Y1'): run(y)
 assert not MISSING, MISSING
+# Critic r11 D20: a full verdict must ask about both ends of its range, not only print the top. Over 96 items
+# (maxdealt amin / amax; the top also by the largest number printed, a minuend), the full directs together must reach N - 1 (N = the title's or block's "to / within N"),
+# and a counting-sequence step ("1 more", "1 less", "count on / back") must ask down to N / 20 (at least 1).
+# A step that misses an end says so in its note ("not dealt").
+SEQ_STEP = re.compile(r'^1 (more|less)\b|^count backwards|^count on from', re.I)   # not "add by counting on": a sum's bottom is not a sequence end
+def ends_miss(x, doc):
+    s = doc['steps'][x]
+    if s['verdict'] != 'full': return None
+    n = [int(m) for m in re.findall(r'(?:within|to) (\d+)', info[x]['title'])] or [int(m) for m in re.findall(r'within (\d+)', info[x]['blockName'])]
+    rows = [md(d['key'], d.get('opts')) for d in s['direct'] if NUMCAT.match(d['key'])]
+    hi = [r['amax'] for r in rows if r.get('amax') is not None]; lo = [r['amin'] for r in rows if r.get('amin') is not None]
+    if not n or not hi: return None
+    N = max(n); miss = []
+    top = max(max(hi), max(r['max'] for r in rows))   # a subtraction's top is its minuend, printed, not its answer
+    if top < N - 1: miss.append(f'top: reaches {top} of {N}')
+    if SEQ_STEP.search(info[x]['title']) and min(lo) > max(1, N // 20): miss.append(f'bottom: asks down to {min(lo)} only')
+    return miss or None
 os.makedirs(f'{ROOT}/data/curriculum/links', exist_ok=True)
 for y in ('R', 'Y1'):
     if LIMIT and LIMIT.startswith('R') and y == 'Y1': continue
     doc = run(y)
     if not doc['steps']: continue
     json.dump(doc, open(f'{ROOT}/data/curriculum/links/{y}.json', 'w'), indent=1, ensure_ascii=False)
+    for x, st_ in doc['steps'].items():   # the verdict follows from the tags the lead merges (mergecheck.mjs): full = a direct skill
+        assert st_['verdict'] == ('full' if st_['direct'] else 'partial' if st_['partial'] else 'gap'), (x, st_['verdict'])
+    for x in doc['steps']:
+        m = ends_miss(x, doc)
+        assert not m or 'not dealt' in doc['steps'][x]['note'], (x, m)   # a full step that misses an end names it
+        if m: print('range ends (named in the note):', x, '; '.join(m))
     c = {v: sum(1 for s in doc['steps'].values() if s['verdict'] == v) for v in ('full', 'partial', 'gap')}
     nr = sum(1 for p in doc['proposals'].values() if p['reused']); nn = len(doc['proposals']) - nr
     print(y, len(doc['steps']), c, 'proposals new', nn, 'reused', nr, 'tagFixes', len(doc['tagFixes']))

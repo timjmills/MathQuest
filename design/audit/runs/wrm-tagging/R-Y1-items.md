@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 11)
+# R and Y1: generated items per step (wave 2 tagging, round 12)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -16,16 +16,16 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
 - no live skill; build: odd_one_out
 
 ### R.B1.S4 Sort objects to a type — **partial** (missing: putting every object into a group by type (the skill only counts one kind))
-- partial `comparing:classify_count` opts `{"band":3,"tiles":2}` (6 generated; Max Number not read)
-  - Count only the stars. / A=3 / number / {kind:sort,bag:[star,star,circle,star],asked:star,ans:3}
-  - Count only the squares. / A=2 / number / {kind:sort,bag:[circle,square,square],asked:square,ans:2}
-  - Count only the squares. / A=1 / number / {kind:sort,bag:[square,triangle],asked:square,ans:1}
+- partial `comparing:classify_count` opts `{"band":3,"tiles":2,"objects":"pictures"}` (6 generated; Max Number not read)
+  - Count only the flowers. / A=3 / number / {kind:sort,bag:[flower,flower,ball,flower],asked:flower,ans:3}
+  - Count only the apples. / A=2 / number / {kind:sort,bag:[ball,apple,apple],asked:apple,ans:2}
+  - Count only the apples. / A=1 / number / {kind:sort,bag:[apple,fish],asked:apple,ans:1}
 
 ### R.B1.S5 Explore sorting techniques — **partial** (missing: sorting the same objects by different attributes)
-- partial `comparing:classify_count` opts `{"band":3}` (6 generated; Max Number not read)
-  - Count only the stars. / A=3 / number / {kind:sort,bag:[circle,star,circle,star,star,circle],asked:star,ans:3}
-  - Count only the squares. / A=2 / number / {kind:sort,bag:[square,star,square,circle],asked:square,ans:2}
-  - Count only the squares. / A=1 / number / {kind:sort,bag:[square,triangle],asked:square,ans:1}
+- partial `comparing:classify_count` opts `{"band":3,"objects":"pictures"}` (6 generated; Max Number not read)
+  - Count only the flowers. / A=3 / number / {kind:sort,bag:[ball,flower,ball,flower,flower,ball],asked:flower,ans:3}
+  - Count only the apples. / A=2 / number / {kind:sort,bag:[apple,flower,apple,ball],asked:apple,ans:2}
+  - Count only the apples. / A=1 / number / {kind:sort,bag:[apple,fish],asked:apple,ans:1}
 
 ### R.B1.S6 Create sorting rules — **gap** (missing: creating and saying a sorting rule)
 - no live skill; build: sort_groups
@@ -717,6 +717,10 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - What number comes before 4? / A=3 / number
   - What number comes before 6? / A=5 / number
   - What number comes before 2? / A=1 / number
+- full `counting:number_seq_fill` opts `{"step":1,"dir":"back","range":10}` (6 generated; Max Number 10)
+  - Write the missing number in the number track. / A=4 / number / {values:[7,6,5,4,3],blanks:[3],shape:mixed}
+  - Write the missing numbers in the number track. / A="7, 5" / text / {values:[9,8,7,6,5],blanks:[2,4],shape:mixed}
+  - Write the missing number in the number track. / A=2 / number / {values:[5,4,3,2,1],blanks:[3],shape:mixed}
 
 ### Y1.B1.S10 Compare groups by matching — **full**
 - full `comparing:compare_groups` opts `{"band":10,"level":[1]}` (6 generated; Max Number not read)
@@ -799,14 +803,14 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - How many in all? 1 + 1 = ? / A=2 / number / {kind:join,n:1,m:1,shape:square,ans:2}
 
 ### Y1.B2.S9 Addition - add more — **partial** (missing: add-more stories as a Kindergarten response: a pictured story read aloud and one answer box (the word-work cell adds columns, a sign row and a label bank))
-- full `addition:number_line_add` opts `{"range":10}` (6 generated; Max Number 10)
-  - Use the number line: 4 + 5 = ? / A=9 / number / {min:0,max:10,start:4,add:5,op:+,unknown:result}
-  - Use the number line: 6 + 3 = ? / A=9 / number / {min:0,max:10,start:6,add:3,op:+,unknown:result}
-  - Use the number line: 2 + 1 = ? / A=3 / number / {min:0,max:10,start:2,add:1,op:+,unknown:result}
 - partial `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)
   - I have 2 apples. I get 2 more apples. How many apples do I have now? / A=4 / number / {lines:[I have 2 apples.,I get 2 more apples.,How many apples do I have now?],steps:[{a:2,b:2,op:+,ans:4,top:2
   - There are 5 fish in a pond. 3 more fish swim in. How many fish are there now? / A=8 / number / {lines:[There are 5 fish in a pond.,3 more fish swim in.,How many fish are there now?],steps:[{a:5,b:3,op:+,an
   - 2 stars are on a card. 4 stars are on a page. How many stars are there in all? / A=6 / number / {lines:[2 stars are on a card.,4 stars are on a page.,How many stars are there in all?],steps:[{a:2,b:4,op:+,a
+- partial `addition:number_line_add` opts `{"range":10}` (6 generated; Max Number 10)
+  - Use the number line: 4 + 5 = ? / A=9 / number / {min:0,max:10,start:4,add:5,op:+,unknown:result}
+  - Use the number line: 6 + 3 = ? / A=9 / number / {min:0,max:10,start:6,add:3,op:+,unknown:result}
+  - Use the number line: 2 + 1 = ? / A=3 / number / {min:0,max:10,start:2,add:1,op:+,unknown:result}
 
 ### Y1.B2.S10 Addition problems — **partial** (missing: addition stories within 10 as a Kindergarten response: a pictured story and one answer box (the word-work cell adds columns, a sign row and a label bank))
 - partial `addition:add_wp_10` opts `{"band":10}` (6 generated; Max Number not read)

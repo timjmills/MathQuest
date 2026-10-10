@@ -25,14 +25,16 @@
      "why": "R.B1.S4 Sort objects to a type (school prior learning, week W23)",
      "opts": {
       "band": 3,
-      "tiles": 2
+      "tiles": 2,
+      "objects": "pictures"
      }
     },
     {
      "key": "comparing:classify_count",
      "why": "R.B1.S5 Explore sorting techniques (school prior learning, week W23)",
      "opts": {
-      "band": 3
+      "band": 3,
+      "objects": "pictures"
      }
     }
    ],
@@ -100,11 +102,13 @@
      }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "R.B11.S6 1 less (count back: a building block)",
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (compare two groups: more, fewer, same: a building block)",
      "opts": {
       "band": 10,
-      "dir": "back"
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -162,11 +166,13 @@
      }
     },
     {
-     "key": "counting:count_sequence",
-     "why": "R.B11.S6 1 less (count back: a building block)",
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (compare two groups: more, fewer, same: a building block)",
      "opts": {
       "band": 10,
-      "dir": "back"
+      "level": [
+       1
+      ]
      }
     }
    ],
@@ -390,7 +396,7 @@
     "zero"
    ],
    "related": [],
-   "note": "\"What comes after n\" within 10; more_less_10 starts at band 20, beyond this block. Related: none; the candidate links are number_seq_fill (a pre-skill here); more_less_10 (it deals numbers to 20, past this step (10)); count_sequence (a direct skill here)."
+   "note": "\"What comes after n\" within 10; more_less_10 starts at band 20, beyond this block. count_sequence forward asks 1 more than 3 to 9 only (five-box window): 1 more than 0, 1 and 2 are not dealt, and Reception covers them (R.B5.S4, R.B11.S5). Related: none; the candidate links are number_seq_fill (a pre-skill here); more_less_10 (it deals numbers to 20, past this step (10)); count_sequence (a direct skill here)."
   },
   "Y1.B1.S8": {
    "title": "Count backwards within 10",
@@ -472,6 +478,14 @@
       "band": 10,
       "dir": "back"
      }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
+     }
     }
    ],
    "partial": [],
@@ -498,18 +512,24 @@
      }
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B1.S4 Represent objects (show the amount on a frame: a building block)",
      "opts": {
-      "step": 1,
-      "dir": "back",
-      "range": 10
+      "band": 10
      }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Related: none; the candidate links are number_seq_fill (a pre-skill here); more_less_10 (it deals numbers to 20, past this step (10)); count_sequence (a direct skill here)."
+   "related": [
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "the same idea in another form: the hundred square",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "note": "count_sequence back asks 1 less than 1 to 7 only (five-box window); the backward number track (number_seq_fill, Y1.B1.S8's own skill) asks 1 less than every number 1 to 10, 8, 9 and 10 included (3 seeds x 64 items)."
   },
   "Y1.B1.S10": {
    "title": "Compare groups by matching",
@@ -614,12 +634,10 @@
      }
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S3 Count objects from a larger group (count a group: a building block)",
      "opts": {
-      "step": 1,
-      "dir": "back",
-      "range": 10
+      "band": 10
      }
     }
    ],
@@ -693,7 +711,7 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "why": "Y1.B1.S9 1 less (the number track: a building block)",
      "opts": {
       "step": 1,
       "dir": "back",
@@ -742,7 +760,7 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "why": "Y1.B1.S9 1 less (the number track: a building block)",
      "opts": {
       "step": 1,
       "dir": "back",
@@ -794,7 +812,7 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (the number track: a building block)",
+     "why": "Y1.B1.S9 1 less (the number track: a building block)",
      "opts": {
       "step": 1,
       "dir": "back",
@@ -1368,14 +1386,7 @@
   },
   "Y1.B2.S9": {
    "title": "Addition - add more",
-   "direct": [
-    {
-     "key": "addition:number_line_add",
-     "opts": {
-      "range": 10
-     }
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "addition:add_wp_10",
@@ -1383,6 +1394,13 @@
       "band": 10
      },
      "missing": "a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank"
+    },
+    {
+     "key": "addition:number_line_add",
+     "opts": {
+      "range": 10
+     },
+     "missing": "the add-more story: the skill is a bare 0-10 number-line sum (start, jump on), no story or picture"
     }
    ],
    "verdict": "partial",
@@ -2129,16 +2147,6 @@
     {
      "key": "shapes_early:name_3d_shapes",
      "why": "Y1.B3.S1 Recognise and name 3-D shapes (name the solids: a building block)"
-    },
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B15.S6 Decompose shapes (two shapes make a new shape: a building block)",
-     "opts": {
-      "shapes": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "preBuild": [
@@ -2681,26 +2689,19 @@
      }
     },
     {
-     "key": "counting:count_objects",
-     "why": "Y1.B4.S1 Count within 20 (count a group: a building block)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S12 Less than, greater than, equal to (compare two groups: more, fewer, same: a building block)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B1.S8 Count backwards within 10 (an earlier step; the number track: a building block)",
+     "why": "Y1.B1.S9 1 less (earlier, same idea: more1)",
      "opts": {
       "step": 1,
       "dir": "back",
       "range": 10
+     }
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B4.S1 Count within 20 (count a group: a building block)",
+     "opts": {
+      "band": 20
      }
     }
    ],
@@ -4927,7 +4928,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "R.B16 grouping into equal groups: equal parts",
+     "why": "R.B16.S4 / Y1.B9.S8 make equal groups (how many groups of n): equal parts",
      "opts": {
       "band": 12
      }
@@ -5074,7 +5075,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "R.B16 grouping into equal groups: equal parts",
+     "why": "R.B16.S4 / Y1.B9.S8 make equal groups (how many groups of n): equal parts",
      "opts": {
       "band": 12
      }
@@ -5120,7 +5121,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "R.B16 grouping into equal groups: equal parts",
+     "why": "R.B16.S4 / Y1.B9.S8 make equal groups (how many groups of n): equal parts",
      "opts": {
       "band": 12
      }
@@ -5133,6 +5134,14 @@
        0,
        1
       ]
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 half of a quantity; a quarter is half of a half",
+     "opts": {
+      "band": 10,
+      "range": 10
      }
     }
    ],
@@ -5170,7 +5179,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)",
+     "why": "Y1.B9.S7 doubles: two equal groups; halving undoes a double",
      "opts": {
       "band": 20
      }
@@ -5218,7 +5227,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)",
+     "why": "Y1.B9.S7 doubles: two equal groups; halving undoes a double",
      "opts": {
       "band": 20
      }
@@ -5766,6 +5775,15 @@
      "opts": {
       "step": 1,
       "band": 20
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B1.S9 1 less (earlier, same idea: more1)",
+     "opts": {
+      "step": 1,
+      "dir": "back",
+      "range": 10
      }
     }
    ],
@@ -6327,7 +6345,7 @@
     },
     {
      "key": "counting:count_sequence",
-     "why": "Y1.B4.S7 the order of the numbers 1 to 12 round the clock",
+     "why": "Y1.B4.S7 the order of the numbers to 20 (1 to 12 on the clock)",
      "opts": {
       "band": 20,
       "dir": "forward"
@@ -7245,6 +7263,12 @@
  },
  "tagFixes": [
   {
+   "key": "composing:number_word_form",
+   "step": "Y1.B1.S5",
+   "action": "partial",
+   "why": "the words zero to nine: at Max Number 10 the skill deals only \"ten\" (20 of 20 seeds; a generator bug), and at 20 it deals the teens"
+  },
+  {
    "key": "placevalue:more_less_10",
    "step": "Y1.B1.S7",
    "action": "remove",
@@ -7255,6 +7279,12 @@
    "step": "Y1.B1.S9",
    "action": "remove",
    "why": "more_less_10 starts at band 20; the step is within 10"
+  },
+  {
+   "key": "counting:number_seq_fill",
+   "step": "Y1.B1.S9",
+   "action": "add",
+   "why": "teaches this step"
   },
   {
    "key": "placevalue:compare",
@@ -7327,6 +7357,12 @@
    "step": "Y1.B2.S9",
    "action": "partial",
    "why": "a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank"
+  },
+  {
+   "key": "addition:number_line_add",
+   "step": "Y1.B2.S9",
+   "action": "partial",
+   "why": "the add-more story: the skill is a bare 0-10 number-line sum (start, jump on), no story or picture"
   },
   {
    "key": "addition:add_wp_10",
@@ -7431,6 +7467,12 @@
    "why": "17-19 only"
   },
   {
+   "key": "addition:number_line_add",
+   "step": "Y1.B4.S9",
+   "action": "partial",
+   "why": "moving along the line without a sentence: it deals addition sentences (7 + 6), which the school teaches from week 14"
+  },
+  {
    "key": "subtraction:number_line_sub",
    "step": "Y1.B4.S9",
    "action": "partial",
@@ -7533,6 +7575,12 @@
    "why": "unit_form {band:99} deals numbers to 99, past \"within 50\"; kept as related"
   },
   {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y1.B6.S6",
+   "action": "partial",
+   "why": "a whole 0-50 line counted in tens then ones; the skill shows one ten to the next, and its lowest band (100) deals 51-100 (84, 95), taught from week 10"
+  },
+  {
    "key": "patterns:seq_2",
    "step": "Y1.B9.S1",
    "action": "remove",
@@ -7600,6 +7648,12 @@
   },
   {
    "key": "fractions:fraction_of_set",
+   "step": "Y1.B10.S3",
+   "action": "partial",
+   "why": "recognising whether a set is split into two equal groups; and with denoms [2] its missing-numerator form still deals ?/3, ?/5 and ?/6 (4 of 12 items: the option leaks, a generator bug)"
+  },
+  {
+   "key": "fractions:fraction_of_set",
    "step": "Y1.B10.S4",
    "action": "remove",
    "why": "does not teach this step: tagged full but no generated item matches the step"
@@ -7615,6 +7669,12 @@
    "step": "Y1.B10.S6",
    "action": "partial",
    "why": "quarters only (family 2 also deals halves and eighths)"
+  },
+  {
+   "key": "fractions:fraction_of_set",
+   "step": "Y1.B10.S7",
+   "action": "partial",
+   "why": "recognising a set split into four equal groups; with denoms [2] the missing-numerator form leaks ?/3, ?/5 and ?/6 (a generator bug)"
   },
   {
    "key": "fractions:fraction_of_set",
@@ -7645,6 +7705,12 @@
    "step": "Y1.B12.S2",
    "action": "remove",
    "why": "seq_10 deals 73, 83, 93, 103: not tens"
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y1.B12.S4",
+   "action": "partial",
+   "why": "a whole 0-100 line counted in tens then ones"
   },
   {
    "key": "placevalue:compare",

@@ -50,9 +50,9 @@ st('R.B1.S1', v='gap', m='matching an object to an identical object (same / diff
    r=[(CG,'matching one to one is the next use of "same"')], n='Pre-number step; no existing skill matches pictures.')
 st('R.B1.S2', v='gap', m='matching a picture to its object and objects to pictures', b=['match_same'])
 st('R.B1.S3', v='gap', m='deciding which objects belong to a set and which does not', b=['odd_one_out'], r=[(CC,'counting one kind inside a mixed set')])
-st('R.B1.S4', d=[P(CC,'the sort itself: putting every object into its group by type; the skill counts one kind', band=3, tiles=2)],
+st('R.B1.S4', d=[P(CC,'the sort itself: putting every object into its group by type; the skill counts one kind', band=3, tiles=2, objects='pictures')],
    v='partial', m='putting every object into a group by type (the skill only counts one kind)', b=['sort_groups'])
-st('R.B1.S5', d=[P(CC,'sorting the same set in different ways (colour, size, kind)', band=3)], v='partial',
+st('R.B1.S5', d=[P(CC,'sorting the same set in different ways (colour, size, kind)', band=3, objects='pictures')], v='partial',
    m='sorting the same objects by different attributes', b=['sort_groups'])
 st('R.B1.S6', v='gap', m='creating and saying a sorting rule', b=['sort_groups'])
 st('R.B1.S7', d=[F(CG, band=5, level=[1])], r=[(COB,'compare by an attribute, not an amount')],
@@ -261,9 +261,10 @@ st('Y1.B1.S4', d=[F(TFB, band=10)], r=[('counting:write_numbers_0_20','proposal:
 st('Y1.B1.S5', d=[P(NWF,'the words zero to nine: at Max Number 10 the skill deals only "ten" (20 of 20 seeds; a generator bug), and at 20 it deals the teens', range=10)], v='partial',
    m='reading the number words zero to ten and matching each to its numeral (the live skill deals only "ten" at Max Number 10)', b=['words_0_10'])
 st('Y1.B1.S6', d=[F(CS, band=10, dir='forward'), F(NSF, step=1, dir='forward', range=10)])
-st('Y1.B1.S7', d=[F(CS, band=10, dir='forward')], n='"What comes after n" within 10; more_less_10 starts at band 20, beyond this block.')
+st('Y1.B1.S7', d=[F(CS, band=10, dir='forward')], n='"What comes after n" within 10; more_less_10 starts at band 20, beyond this block. count_sequence forward asks 1 more than 3 to 9 only (five-box window): 1 more than 0, 1 and 2 are not dealt, and Reception covers them (R.B5.S4, R.B11.S5).')
 st('Y1.B1.S8', d=[F(CS, band=10, dir='back'), F(NSF, step=1, dir='back', range=10)])
-st('Y1.B1.S9', d=[F(CS, band=10, dir='back')])
+st('Y1.B1.S9', d=[F(CS, band=10, dir='back'), F(NSF, step=1, dir='back', range=10)],
+   n='count_sequence back asks 1 less than 1 to 7 only (five-box window); the backward number track (number_seq_fill, Y1.B1.S8\'s own skill) asks 1 less than every number 1 to 10, 8, 9 and 10 included (3 seeds x 64 items).')
 st('Y1.B1.S10', d=[F(CG, band=10, level=[1])])
 st('Y1.B1.S11', d=[F(CG, band=10, dir='mixed')])
 st('Y1.B1.S12', d=[P(CG,'the symbols <, > and = and the words greater than / less than', band=10)], v='partial',
@@ -287,7 +288,7 @@ st('Y1.B2.S6', v='gap', m='listing bonds of a number in order (0 + 5, 1 + 4 ...)
 st('Y1.B2.S7', d=[F(MT, band=10)], r=[(NB,'bonds of other wholes: 10 is the special case',{'band':10,'unknown':'second'})])
 st('Y1.B2.S8', d=[P(A5,'pictured parts with totals 6-10 (the skill stops at 5)')], v='partial', m='adding two pictured groups with totals to 10',
    b=['add_10_pictures'], r=[(A10,'the same facts as numbers (across)')])
-st('Y1.B2.S9', d=[P(AWP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank', band=10), F(NLA, range=10)], v='partial',
+st('Y1.B2.S9', d=[P(AWP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank', band=10), P(NLA, 'the add-more story: the skill is a bare 0-10 number-line sum (start, jump on), no story or picture', range=10)], v='partial',
    m='add-more stories as a Kindergarten response: a pictured story read aloud and one answer box (the word-work cell adds columns, a sign row and a label bank)', b=['k_story'],
    p=[(CS,'Y1.B1.S6 count on from any number: the main building block of add more',{'band':10,'dir':'forward'})])
 st('Y1.B2.S10', d=[P(AWP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank', band=10), P(AWPP,'a Kindergarten response: the word-work cell prints a column digit-box stack, a + − × ÷ sign row and a unit-word bank; the picture row is off', band=10)], v='partial',
@@ -473,7 +474,7 @@ NEW = {
  'band_3': dict(kind='option', skill='counting:count_objects', option='band: 3, added to the existing band option of count_objects, ten_frame_build and number_bonds (number_bonds band 3: wholes 1, 2 and 3 with an optional zero part, 3 = 3 + 0); band: 5 added to count_sequence',
    name='Numbers to 3 (band value on each skill)', teaches='count, build and split groups of 1, 2 and 3 only, including a zero part; ask one more / one less within 5',
    representation='the skill\'s own cell with at most 3 objects (5 on the more / less track)', family='counting', ccss=['K.CC.B.4', 'K.CC.B.5', 'K.OA.A.3'],
-   why='the smallest live band is 5 (10 for count_sequence) and number_bonds never deals a whole below 3 or a zero part; a value on each skill\'s own band option, not a new shared option'),
+   why='the smallest live band is 5 (10 for count_sequence) and number_bonds never deals whole 1 or a zero part (band 5 deals wholes 2-5); a value on each skill\'s own band option, not a new shared option'),
  'number_focus': dict(kind='option', skill='counting:count_objects', option='focus: 4-5 / 6-8 / 9-10 (a window, not a cap; the same option on ten_frame_build, number_bonds and count_sequence)',
    name='Number Focus Window (option)', teaches='deal only the numbers the step introduces (4 and 5, 6 to 8, or 9 and 10), with a smaller number as at most one review item',
    representation='the skill\'s own cell; amounts and wholes held to the window', family='counting', ccss=['K.CC.B.4', 'K.CC.B.5', 'K.OA.A.3'],
@@ -562,7 +563,7 @@ FORMS = {
 
 # Why an old SKILL_WRM tag is removed (judged from generated items)
 RM = {
- ('R.B11.S8', NB): 'number_bonds {band:10} deals wholes 4-10; bonds to 10 are make_ten',
+ ('R.B11.S8', NB): 'number_bonds {band:10} deals wholes 2-10; bonds to 10 are make_ten',
  ('R.B13.S6', SEQ10): 'seq_10 deals 1, 11, 21, 31 and 87, 97, 107: not Reception counting patterns',
  ('R.B14.S2', AWP): 'add_wp_10 asks for the total, never how many were added',
  ('R.B14.S4', SWP): 'sub_wp_10 asks how many are left, never how many were taken away',
@@ -865,6 +866,7 @@ FORM_LABEL.update({MAS: 'missing numbers in + and − sentences', HCF: 'the hund
 BLOCKS[CO] = BLOCKS[CO] | {'bond', 'share'}; BLOCKS[CG] = BLOCKS[CG] | {'share'}
 BLOCKS[CS + '{"band": 10, "dir": "forward"}'] = {'tens'}
 BLOCK_EXCEPT |= {(CS, 'Y1.B1.S4'), (CMP, 'Y1.B3.S4'), (NSF, 'Y1.B1.S10')}
+BLOCK_EXCEPT |= {(CS, 'Y1.B1.S2'), (CS, 'Y1.B1.S3'), (NSF, 'Y1.B1.S11'), (CMP, 'Y1.B3.S3')}   # r12 N7r: judged-false blocks (r8 N7a, r9)
 for _s, _sub in (('R.B3.S3', 'R.B3.S2 Subitise 1, 2 and 3'), ('R.B5.S3', 'R.B5.S2 Subitise 4 and 5'), ('R.B7.S4', 'R.B7.S3 Subitise 0 to 5')):
     S[_s]['p'] += [(CO, _sub + ': see the amount, then build it', {'band': 5, 'objects': 'dice'})]
 prepre('R.B11.S9', (CO, 'R.B11.S1 count that each arrangement is still 10', {'band': 10, 'objects': 'frame'}))
@@ -895,10 +897,10 @@ for _s in ('Y1.B9.S5', 'Y1.B9.S8', 'Y1.B9.S9'):
 # sib.py review (critic r10): every same-sub-idea pre a block sibling carries and a short-pre step lacks, decided one by one
 S['R.B17.S4']['p'] += [(N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the scene', {'forms': [1], 'shapes': [0, 1, 2]}), (N3D, 'R.B12.S1 name the solids in the construction', {'forms': [1]})]
 S['R.B17.S7']['p'] += [(N3D, 'R.B12.S1 name the solids being built with', {'forms': [1]}), (CMP, 'R.B15.S5 two shapes put together make a new shape', {'shapes': [0, 1]})]
-for _s in ('Y1.B10.S2', 'Y1.B10.S5', 'Y1.B10.S6'): S[_s]['p'] += [(SHG, 'R.B16 grouping into equal groups: equal parts', {'band': 12})]
+for _s in ('Y1.B10.S2', 'Y1.B10.S5', 'Y1.B10.S6'): S[_s]['p'] += [(SHG, 'R.B16.S4 / Y1.B9.S8 make equal groups (how many groups of n): equal parts', {'band': 12})]
 S['Y1.B10.S6']['p'] += [(CMP, 'R.B15.S5 / S6 two shapes make one shape', {'shapes': [0, 1]})]
-for _s in ('Y1.B10.S7', 'Y1.B10.S8'): S[_s]['p'] += [(DBL, 'Y1.B9.S7 doubles: two equal groups (a quarter is half of a half)', {'band': 20})]
-S['Y1.B14.S6']['p'] += [(CS, 'Y1.B4.S7 the order of the numbers 1 to 12 round the clock', {'band': 20, 'dir': 'forward'})]
+for _s in ('Y1.B10.S7', 'Y1.B10.S8'): S[_s]['p'] += [(DBL, 'Y1.B9.S7 doubles: two equal groups; halving undoes a double', {'band': 20})]
+S['Y1.B14.S6']['p'] += [(CS, 'Y1.B4.S7 the order of the numbers to 20 (1 to 12 on the clock)', {'band': 20, 'dir': 'forward'})]
 SIB_REJECT = {
  'R.B1.S1': 'classify_count (its sort comes later, at R.B1.S4)', 'R.B1.S2': 'classify_count (its sort comes later, at R.B1.S4)',
  'R.B1.S3': 'classify_count (its sort comes later, at R.B1.S4)',
@@ -922,3 +924,5 @@ SIB_REJECT = {
 }
 for _s, _r in SIB_REJECT.items():
     S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + 'Left out from the block\'s other steps: ' + _r + '.'
+# r12 M13: halve (Y1.B10.S4, W38) restored on Y1.B10.S6; the shape blocks above had pushed it out of the block tier
+S['Y1.B10.S6']['p'] += [(HALF, 'Y1.B10.S4 half of a quantity; a quarter is half of a half', {'band': 10, 'range': 10})]

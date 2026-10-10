@@ -3,6 +3,7 @@
 // flags: content a PK / K link must not carry (the critic's r3 regexes): x / ÷, parallel / right angles, vertices,
 // polygons past 4 sides, columns / regrouping, standard units, fractions, coordinates, typed words, drag.
 // c19: the rule-19 content classes (lt = a < > sign or "is greater / less than", never "1 less than 9"); distinct: how many different items 24 samples give (a link needs at least 3).
+// amin / amax (96 more items, seeds 9100 + 17i): the smallest and largest number answer asked (a number, or a list of numbers "3, 2"); null when the answer is not a number.
 // `range` in opts is Max Number (default 10). Read by gen.py (rule 18).
 import fs from 'fs';
 const _m=new Map();globalThis.localStorage={getItem:k=>_m.get(k)??null,setItem:(k,v)=>_m.set(k,String(v)),removeItem:k=>_m.delete(k)};
@@ -19,7 +20,7 @@ const FLAGS={times:/×|÷|multipl|divid/i,parallel:/parallel|perpendicular|right
 const C19={skip25:/by 2s|by 5s|count-by-2s|count-by-5s|in 2s|in 5s/i,nline:/number.?line|numberLine|"nl/i,money:/¢|cent|penny|nickel|dime|dollar|\$/i,clock:/o'clock|half past|clock/i,
  frac:/\bhalf\b|\bhalves\b|quarter|\d\/\d/i,units:/\b(cm|inch|inches|centimet)/i,lt:/[<>]|\bis (greater|less) than\b/i,quad:/square|rectangle/i,minus:/−|-\s*\d|subtract|take away/i,array:/\barray|rows of/i,diff:/how many (more|fewer)\b[^?]*\bthan\b|how many less/i};
 const out={};
-for(const [key,opts] of JSON.parse(fs.readFileSync(0,'utf8'))){const [c,k]=key.split(':');const o={...opts};const range=o.range??10;delete o.range;let max=0;const flags={};const c19={};const seen=new Set();
+for(const [key,opts] of JSON.parse(fs.readFileSync(0,'utf8'))){const [c,k]=key.split(':');const o={...opts};const range=o.range??10;delete o.range;let max=0;const flags={};const c19={};const seen=new Set();let amin=null,amax=null;
   for(let i=0;i<24;i++){let q;try{q=g.generateQuestionFor({category:c,skill:k,opts:o,range,seed:4400+i*13,itemIndex:i,itemCount:24});}catch(e){continue;}
     if(!q)continue;const t=strip(q.text)+' '+JSON.stringify(q.ans??'');for(const m of t.matchAll(/\d+/g))max=Math.max(max,+m[0]);
     const walk=(v,kk)=>{if(v==null||SKIPK.has(kk))return;if(typeof v==='number'&&Number.isFinite(v))max=Math.max(max,v);else if(Array.isArray(v))v.forEach(x=>walk(x,kk));else if(typeof v==='object')for(const[a,b]of Object.entries(v))walk(b,a);};
@@ -31,5 +32,8 @@ for(const [key,opts] of JSON.parse(fs.readFileSync(0,'utf8'))){const [c,k]=key.s
     const t19=t+' '+(q.cell?JSON.stringify(q.cell):'')+' '+strip(q.visual||'').slice(0,600);
     for(const[n,r]of Object.entries(C19))if(r.test(t19))c19[n]=(c19[n]||0)+1;
     seen.add(strip(q.text)+'|'+JSON.stringify(q.ans??'')+'|'+JSON.stringify(q.cell?.payload??'')+'|'+String(q.visual??''));   /* the picture counts too (critic r6) */}
-  out[key+' '+JSON.stringify(opts,Object.keys(opts).sort())]={max,flags,c19,distinct:seen.size};}
+  for(let i=0;i<96;i++){let q;try{q=g.generateQuestionFor({category:c,skill:k,opts:o,range,seed:9100+i*17,itemIndex:i%24,itemCount:24});}catch(e){continue;}   /* the numbers it asks for, both ends (critic r11 D20): 96 items */
+    if(!q)continue;const as=typeof q.ans==='number'?[q.ans]:(typeof q.ans==='string'&&/^\s*-?\d+(\s*,\s*-?\d+)*\s*$/.test(q.ans)?q.ans.split(',').map(Number):[]);
+    for(const v of as){amin=amin==null?v:Math.min(amin,v);amax=amax==null?v:Math.max(amax,v);}}
+  out[key+' '+JSON.stringify(opts,Object.keys(opts).sort())]={max,flags,c19,distinct:seen.size,amin,amax};}
 console.log=_l;console.log(JSON.stringify(out));

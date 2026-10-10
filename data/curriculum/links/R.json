@@ -54,7 +54,8 @@
      "key": "comparing:classify_count",
      "opts": {
       "band": 3,
-      "tiles": 2
+      "tiles": 2,
+      "objects": "pictures"
      },
      "missing": "the sort itself: putting every object into its group by type; the skill counts one kind"
     }
@@ -96,7 +97,8 @@
     {
      "key": "comparing:classify_count",
      "opts": {
-      "band": 3
+      "band": 3,
+      "objects": "pictures"
      },
      "missing": "sorting the same set in different ways (colour, size, kind)"
     }
@@ -106,7 +108,17 @@
    "build": [
     "sort_groups"
    ],
-   "pre": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (earlier, same idea: sort)",
+     "opts": {
+      "band": 3,
+      "tiles": 2,
+      "objects": "pictures"
+     }
+    }
+   ],
    "preBuild": [
     "odd_one_out",
     "match_same"
@@ -129,7 +141,7 @@
      }
     }
    ],
-   "note": "Pre: 0 only; the other earlier skills on this idea do not fit this step (classify_count {\"band\": 3, \"tiles\": 2}: it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
+   "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
   },
   "R.B1.S6": {
    "title": "Create sorting rules",
@@ -858,7 +870,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); count_objects (a direct skill here)."
+   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
   "R.B5.S2": {
    "title": "Subitise 4 and 5",
@@ -907,7 +919,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but it shows squares and rectangles, which Reception meets later (block 6, shapes with 4 sides)); count_objects (a direct skill here)."
+   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
   },
   "R.B5.S3": {
    "title": "Represent 4 and 5",
@@ -5271,7 +5283,7 @@
     "K.CC.B.5",
     "K.OA.A.3"
    ],
-   "why": "the smallest live band is 5 (10 for count_sequence) and number_bonds never deals a whole below 3 or a zero part; a value on each skill's own band option, not a new shared option",
+   "why": "the smallest live band is 5 (10 for count_sequence) and number_bonds never deals whole 1 or a zero part (band 5 deals wholes 2-5); a value on each skill's own band option, not a new shared option",
    "steps": [
     "R.B3.S1",
     "R.B3.S2",
@@ -5809,6 +5821,30 @@
  },
  "tagFixes": [
   {
+   "key": "comparing:classify_count",
+   "step": "R.B1.S4",
+   "action": "partial",
+   "why": "the sort itself: putting every object into its group by type; the skill counts one kind"
+  },
+  {
+   "key": "comparing:classify_count",
+   "step": "R.B1.S5",
+   "action": "partial",
+   "why": "sorting the same set in different ways (colour, size, kind)"
+  },
+  {
+   "key": "comparing:compare_objects",
+   "step": "R.B2.S1",
+   "action": "partial",
+   "why": "overall size (big / small); the skill compares length, height and thickness only"
+  },
+  {
+   "key": "patterns:shape_pattern",
+   "step": "R.B2.S4",
+   "action": "partial",
+   "why": "talking about what repeats in a pattern (finding the unit); the skill only fills missing shapes by typing names"
+  },
+  {
    "key": "patterns:shape_pattern",
    "step": "R.B2.S5",
    "action": "partial",
@@ -5819,6 +5855,12 @@
    "step": "R.B3.S1",
    "action": "partial",
    "why": "groups of 1-3 only (band 5 deals 4 and 5 in most items)"
+  },
+  {
+   "key": "counting:count_objects",
+   "step": "R.B3.S2",
+   "action": "partial",
+   "why": "recognising 1-3 at a glance; band 5 also deals 4 and 5"
   },
   {
    "key": "composing:ten_frame_build",
@@ -5845,6 +5887,12 @@
    "why": "wholes of 2 and 3 only (band 5 deals wholes 4 and 5)"
   },
   {
+   "key": "shapes_early:shape_attributes",
+   "step": "R.B4.S2",
+   "action": "partial",
+   "why": "comparing two shapes side by side (curved / straight, corners); the skill asks how many sides or vertices one shape has"
+  },
+  {
    "key": "shapes_early:shape_positions",
    "step": "R.B4.S4",
    "action": "partial",
@@ -5855,6 +5903,12 @@
    "step": "R.B5.S1",
    "action": "partial",
    "why": "groups of exactly 4 and 5: band 5 deals 1-3 in 5 of 8 items"
+  },
+  {
+   "key": "counting:count_objects",
+   "step": "R.B5.S2",
+   "action": "partial",
+   "why": "recognising 4 and 5 at a glance"
   },
   {
    "key": "composing:ten_frame_build",
@@ -5891,6 +5945,12 @@
    "step": "R.B7.S2",
    "action": "partial",
    "why": "a group of zero (the skill always draws at least one)"
+  },
+  {
+   "key": "counting:count_objects",
+   "step": "R.B7.S3",
+   "action": "partial",
+   "why": "recognising 0-5 at a glance, including an empty frame"
   },
   {
    "key": "composing:ten_frame_build",
@@ -5953,6 +6013,12 @@
    "why": "finding a double in a picture to 8 (the skill is abstract doubles to 10 + 10)"
   },
   {
+   "key": "patterns:double",
+   "step": "R.B9.S8",
+   "action": "partial",
+   "why": "building a double with objects to 8; the skill is abstract \"Double 7\""
+  },
+  {
    "key": "addition:add_5_pictures",
    "step": "R.B9.S9",
    "action": "partial",
@@ -6004,7 +6070,13 @@
    "key": "composing:number_bonds",
    "step": "R.B11.S8",
    "action": "remove",
-   "why": "number_bonds {band:10} deals wholes 4-10; bonds to 10 are make_ten"
+   "why": "number_bonds {band:10} deals wholes 2-10; bonds to 10 are make_ten"
+  },
+  {
+   "key": "addition:add_three",
+   "step": "R.B11.S10",
+   "action": "partial",
+   "why": "three parts that make 10, shown as a part-whole picture"
   },
   {
    "key": "number_sense:doubles_near_doubles",
@@ -6029,6 +6101,12 @@
    "step": "R.B12.S6",
    "action": "partial",
    "why": "copying; choosing or drawing the shape instead of typing its name"
+  },
+  {
+   "key": "patterns:shape_pattern",
+   "step": "R.B12.S7",
+   "action": "partial",
+   "why": "patterns in real objects and scenes; and its response is typed shape names, not a Reception response"
   },
   {
    "key": "composing:teen_compose",
@@ -6145,10 +6223,28 @@
    "why": "shape_attributes asks for sides / vertices; 0 of 40 items choose a shape for a purpose"
   },
   {
+   "key": "shapes_early:name_2d_shapes",
+   "step": "R.B15.S2",
+   "action": "partial",
+   "why": "recognising a shape when it is turned; the skill taps shapes by name (circles, triangles, squares and rectangles here)"
+  },
+  {
    "key": "shapes_early:compose_shapes",
    "step": "R.B15.S3",
    "action": "partial",
    "why": "turning or flipping a shape so it fits a space; the skill only puts two shapes together"
+  },
+  {
+   "key": "shapes_early:compose_shapes",
+   "step": "R.B15.S6",
+   "action": "partial",
+   "why": "decomposing: finding the shapes inside a shape (the skill only composes)"
+  },
+  {
+   "key": "division:share_into_groups",
+   "step": "R.B16.S2",
+   "action": "partial",
+   "why": "sharing one at a time (how many each); the skill makes groups of a size"
   },
   {
    "key": "division:share_into_groups",
@@ -6163,10 +6259,22 @@
    "why": "building doubles with objects; the skill is abstract and deals doubles to 20 (9 + 9, 10 + 10)"
   },
   {
+   "key": "patterns:shape_pattern",
+   "step": "R.B17.S1",
+   "action": "partial",
+   "why": "circling the unit that repeats; and its response is typed shape names, not a Reception response"
+  },
+  {
    "key": "shapes_early:shape_positions",
    "step": "R.B17.S6",
    "action": "partial",
    "why": "in front, behind, next to, on top of"
+  },
+  {
+   "key": "patterns:shape_pattern",
+   "step": "R.B18.S2",
+   "action": "partial",
+   "why": "relationships between numbers (1 more, doubles, bonds); and its response is typed shape names, not a Reception response"
   }
  ]
 }
