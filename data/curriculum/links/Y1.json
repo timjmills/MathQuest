@@ -5739,6 +5739,496 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B10.S1": {
+   "title": "Recognise a half of an object or a shape",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "next step: Y1.B10.S2 Find a half of an object or a shape"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S3 Recognise a half of a quantity"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S4 Find a half of a quantity"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B10.S2": {
+   "title": "Find a half of an object or a shape",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W37)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W37)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "next step: Y1.B10.S3 Recognise a half of a quantity"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S4 Find a half of a quantity"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S5 Recognise a quarter of an object or a shape"
+    }
+   ],
+   "note": "Denominator 2."
+  },
+  "Y1.B10.S3": {
+   "title": "Recognise a half of a quantity",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {},
+     "missing": "recognising whether a set is split into two equal groups"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "is this set in halves? (equal / not equal)",
+   "build": [
+    "half_quarter"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W37)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W37)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:halve",
+     "why": "next step: Y1.B10.S4 Find a half of a quantity"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S5 Recognise a quarter of an object or a shape"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S6 Find a quarter of an object or a shape"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B10.S4": {
+   "title": "Find a half of a quantity",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (same CCSS 1.G.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "half_quarter"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "next step: Y1.B10.S5 Recognise a quarter of an object or a shape"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S6 Find a quarter of an object or a shape"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B10.S5": {
+   "title": "Recognise a quarter of an object or a shape",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W37)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W37)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S4 Find a half of a quantity (the step before in this block)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "half_quarter"
+   ],
+   "related": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "next step: Y1.B10.S6 Find a quarter of an object or a shape"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same CCSS 1.G.A.3 in Y1.B10.S7 Recognise a quarter of a quantity"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same block: Y1.B10.S4 Find a half of a quantity"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B10.S6": {
+   "title": "Find a quarter of an object or a shape",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (the step before in this block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S4 Find a half of a quantity (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "half_quarter"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "next step: Y1.B10.S7 Recognise a quarter of a quantity"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same block: Y1.B10.S1 Recognise a half of an object or a shape"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same block: Y1.B10.S4 Find a half of a quantity"
+    }
+   ],
+   "note": "Denominator 4."
+  },
+  "Y1.B10.S7": {
+   "title": "Recognise a quarter of a quantity",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {},
+     "missing": "recognising a set split into four equal groups"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "is this set in quarters?",
+   "build": [
+    "half_quarter"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same block: Y1.B10.S1 Recognise a half of an object or a shape"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "same block: Y1.B10.S2 Find a half of an object or a shape"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same block: Y1.B10.S4 Find a half of a quantity"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B10.S8": {
+   "title": "Find a quarter of a quantity",
+   "direct": [
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W38)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B11.S13 Explore even and odd (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B16.S6 Play with and build doubles (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W38)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (same CCSS 1.G.A.3, earlier)"
+    }
+   ],
+   "preBuild": [
+    "half_quarter"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "same block: Y1.B10.S1 Recognise a half of an object or a shape"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "same block: Y1.B10.S2 Find a half of an object or a shape"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "same block: Y1.B10.S4 Find a half of a quantity"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -6220,6 +6710,23 @@
    ],
    "ccss": [
     "3.OA.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "half_quarter": {
+   "kind": "new",
+   "skill": "fractions:halves_and_quarters",
+   "name": "Halves and Quarters",
+   "teaches": "finding and recognising a half and a quarter of a shape, an object and a small quantity (equal parts, 2 or 4)",
+   "representation": "shapes and small sets of objects; shade or circle a half/quarter; tick if the parts are equal",
+   "family": "fractions",
+   "steps": [
+    "Y1.B10.S3",
+    "Y1.B10.S7"
+   ],
+   "ccss": [
+    "1.G.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
