@@ -5443,7 +5443,9 @@
    "reused": true
   },
   "hv_lines": {
-   "ccss": [],
+   "ccss": [
+    "K.G.A.1"
+   ],
    "why": "none",
    "kind": "new",
    "skill": "angles_lines:horizontal_vertical",
@@ -5519,7 +5521,9 @@
    "reused": true
   },
   "four_quadrants": {
-   "ccss": [],
+   "ccss": [
+    "6.NS.C.8"
+   ],
    "why": "coordinate_all covers naming only",
    "kind": "option",
    "skill": "coordinates:coordinate_all",
