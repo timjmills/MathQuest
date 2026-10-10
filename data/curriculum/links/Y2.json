@@ -43,14 +43,14 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Number Sequence: Fill Missing (Grid) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "range": 100
      }
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Hundreds Chart - Find the Missing Number (Visual) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -146,14 +146,14 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Number Sequence: Fill Missing (Grid) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "range": 100
      }
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Hundreds Chart - Find the Missing Number (Visual) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -220,14 +220,14 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Number Sequence: Fill Missing (Grid) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "range": 100
      }
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Hundreds Chart - Find the Missing Number (Visual) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -323,14 +323,14 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Number Sequence: Fill Missing (Grid) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "range": 100
      }
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B6.S1 Count from 20 to 50 (prior learning wk W01)",
+     "why": "Hundreds Chart - Find the Missing Number (Visual) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "band": 100
      }
@@ -908,6 +908,20 @@
    ],
    "pre": [
     {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 counting in 10s: the tens on the line",
+     "opts": {
+      "band": 50
+     }
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B12.S1 counting to 100 in order",
+     "opts": {
+      "range": 100
+     }
+    },
+    {
      "key": "placevalue:compare",
      "why": "Y1.B12.S7 Compare any two numbers (prior learning wk W03)",
      "opts": {
@@ -936,17 +950,6 @@
      "why": "Y2.B1.S8 Write numbers to 100 in expanded form (earlier in the block)",
      "opts": {
       "band": 99
-     }
-    },
-    {
-     "key": "composing:number_word_form",
-     "why": "Y2.B1.S6 Write numbers to 100 in words (earlier in the block)",
-     "opts": {
-      "wordform": [
-       "to_words",
-       "to_number"
-      ],
-      "range": 100
      }
     }
    ],
@@ -1079,7 +1082,7 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y1.B4.S12 Order numbers to 20 (prior learning wk W04)",
+     "why": "Order: Least to Greatest — Y1.B4.S12 Order numbers to 20",
      "opts": {
       "band": 99
      }
@@ -1248,8 +1251,11 @@
     },
     {
      "key": "patterns:skip_count_line",
-     "why": "the same count as jumps on a number line",
+     "why": "counting in equal jumps along a line — Y1.B9.S1 Count in 2s",
      "opts": {
+      "step": [
+       0
+      ],
       "band": 50
      }
     }
@@ -1333,16 +1339,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "patterns:skip_count_line",
-     "why": "counting in 3s as jumps on a number line",
-     "opts": {
-      "band": 50
-     }
-    }
-   ],
-   "note": "count_by_tables with a row {step 3, from 0} deals 0, 3, 6 ... 33: the count_3s proposal is already built (retire it)"
+   "related": [],
+   "note": "count_by_tables with a row {step 3, from 0} deals 0, 3, 6 ... 33: the count_3s proposal is already built (retire it). no related skill: the only number-line skip count deals 4s and 6s with the 3s (beyond Grade 1); counting in 2s, 5s and 10s is pre"
   },
   "Y2.B2.S1": {
    "title": "Bonds to 10",
@@ -2225,7 +2223,7 @@
    "related": [
     {
      "key": "subtraction:nl_sub",
-     "why": "counting back across a ten on a number line",
+     "why": "counting back in jumps along a line — Y1.B5.S7 Subtraction - counting back",
      "opts": {}
     },
     {
@@ -2287,6 +2285,19 @@
      "opts": {}
     },
     {
+     "key": "multiplication:count_by_tables",
+     "why": "counting in 10s from 0: the same jump of 10 (earlier step this builds on: Y2.B1.S16 Count in 3s)",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "composing:make_ten",
      "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)",
      "opts": {}
@@ -2295,22 +2306,10 @@
      "key": "composing:number_bonds",
      "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W07)",
      "opts": {}
-    },
-    {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S4 Bonds to 100 (tens) (earlier in the block)",
-     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "patterns:skip_count_line",
-     "why": "counting in 10s as jumps on a number line",
-     "opts": {
-      "band": 50
-     }
-    },
     {
      "key": "composing:hundreds_chart_fill",
      "why": "one row down a hundred square is 10 more",
@@ -2349,6 +2348,19 @@
      }
     },
     {
+     "key": "multiplication:count_by_tables",
+     "why": "counting in 10s from 0: adding a 10 is the next count (earlier step this builds on: Y2.B1.S16 Count in 3s)",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     }
+    },
+    {
      "key": "composing:make_ten",
      "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)",
      "opts": {}
@@ -2383,22 +2395,10 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)",
-     "opts": {}
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "patterns:skip_count_line",
-     "why": "counting in 10s as jumps on a number line",
-     "opts": {
-      "band": 50
-     }
-    },
     {
      "key": "composing:hundreds_chart_fill",
      "why": "one row down a hundred square is 10 more",
@@ -3232,6 +3232,25 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 counting the sides of 2-D shapes",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 counting corners",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 naming 2-D shapes",
+     "opts": {}
+    },
+    {
      "key": "angles_lines:symmetry",
      "why": "Y2.B3.S5 Lines of symmetry on shapes (taught before this step in the block)",
      "opts": {}
@@ -3242,38 +3261,9 @@
      "opts": {}
     },
     {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)",
-     "opts": {}
-    },
-    {
      "key": "shapes_early:shape_name_match_2d",
      "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W14)",
      "opts": {}
-    },
-    {
-     "key": "shapes_early:name_3d_shapes",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W14)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:shape_corners_count",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (earlier in the block)",
-     "opts": {}
-    },
-    {
-     "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S2 Count sides on 2-D shapes (earlier in the block)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -3607,7 +3597,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0: counting 5-cent and 10-cent coins",
+     "why": "Count by 1–12 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
@@ -3630,19 +3620,19 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "counting a set one by one, for 1-cent coins",
+     "why": "Count Objects (1-20) (Visual) — Y1.B4.S1 Count within 20",
      "opts": {}
     },
     {
      "key": "patterns:seq_5",
-     "why": "Y1.B9.S3 counting in 5s: counting 5-cent coins",
+     "why": "Count by 5s — Y1.B9.S3 Count in 5s",
      "opts": {
       "band": 50
      }
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 counting in 10s: counting 10-cent coins",
+     "why": "Count by 10s — Y1.B12.S2 Tens to 100",
      "opts": {
       "band": 50
      }
@@ -4366,7 +4356,7 @@
     },
     {
      "key": "multiplication:mult_chart_easy",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (taught before this step in the block)",
+     "why": "filling the missing products in a times-table chart (tables: 5, 10) — Y2.B5.S17 The 5 and 10 times-tables",
      "opts": {
       "constant": [
        5,
@@ -4826,13 +4816,6 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -4924,13 +4907,6 @@
      "opts": {
       "band": 50
      }
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
-     "opts": {
-      "band": 50
-     }
     }
    ],
    "preBuild": [],
@@ -5013,13 +4989,6 @@
     },
     {
      "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:skip_count_line",
      "why": "Y1.B9.S1 Count in 2s (prior learning wk W29)",
      "opts": {
       "band": 50
@@ -5225,10 +5194,12 @@
      }
     },
     {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (earlier in the block)",
      "opts": {
-      "band": 50
+      "forms": [
+       0
+      ]
      }
     }
    ],
@@ -5303,13 +5274,6 @@
     },
     {
      "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
-     "key": "patterns:skip_count_line",
      "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
      "opts": {
       "band": 50
@@ -5396,15 +5360,17 @@
      }
     },
     {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W30)",
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (earlier in the block)",
      "opts": {
-      "band": 50
+      "constant": [
+       2
+      ]
      }
     },
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (earlier in the block)",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (earlier in the block)",
      "opts": {
       "constant": [
        2
@@ -5416,7 +5382,7 @@
    "related": [
     {
      "key": "counting:number_seq_fill",
-     "why": "counting in 2s fills in the even numbers",
+     "why": "Number Sequence: Fill Missing (Grid) — Y1.B12.S1 Count from 50 to 100",
      "opts": {
       "step": 2,
       "range": 20
@@ -5504,7 +5470,7 @@
    "related": [
     {
      "key": "multiplication:mult_chart_easy",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (a later step of the block: the same idea one step further)",
+     "why": "filling the missing products in a times-table chart (tables: 5, 10) — earlier learning",
      "opts": {
       "constant": [
        5,
@@ -5592,7 +5558,7 @@
    "related": [
     {
      "key": "multiplication:mult_chart_easy",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (a later step of the block: the same idea one step further)",
+     "why": "filling the missing products in a times-table chart (tables: 5, 10) — Y2.B5.S17 The 5 and 10 times-tables",
      "opts": {
       "constant": [
        5,
@@ -5687,7 +5653,7 @@
     },
     {
      "key": "multiplication:mult_chart_easy",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (a later step of the block: the same idea one step further)",
+     "why": "filling the missing products in a times-table chart (tables: 5, 10) — earlier learning",
      "opts": {
       "constant": [
        5,
@@ -5768,7 +5734,7 @@
    "related": [
     {
      "key": "multiplication:mult_chart_easy",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (next step: the same idea one step further)",
+     "why": "filling the missing products in a times-table chart (tables: 5, 10) — Y2.B5.S17 The 5 and 10 times-tables",
      "opts": {
       "constant": [
        5,
@@ -5876,15 +5842,13 @@
     },
     {
      "key": "patterns:skip_count_line",
-     "why": "the 5s and 10s as jumps on a number line",
+     "why": "counting in equal jumps along a line — Y1.B9.S1 Count in 2s",
      "opts": {
+      "step": [
+       0
+      ],
       "band": 50
      }
-    },
-    {
-     "key": "measurement:time_fives_ring",
-     "why": "counting in 5s round a clock face",
-     "opts": {}
     }
    ],
    "note": ""
@@ -5916,7 +5880,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line (topic ladder)",
+     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps (topic ladder)",
      "opts": {
       "span": 10,
       "band": 100
@@ -5948,14 +5912,17 @@
    ],
    "pre": [
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 Measure in centimetres (taught before this step in the block)",
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 measuring with cubes and paper clips",
      "opts": {}
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W21)",
-     "opts": {}
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
     },
     {
      "key": "comparing:compare_objects",
@@ -5968,7 +5935,9 @@
      "opts": {}
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "ruler_cm"
+   ],
    "related": [
     {
      "key": "measurement:estimate_length",
@@ -6002,21 +5971,24 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 measuring with cubes and paper clips",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
+    },
+    {
      "key": "placevalue:compare",
      "why": "comparing the numbers of the measurements with <, >, = (earlier step this builds on: Y2.B1.S13 Compare numbers)",
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)",
-     "opts": {}
-    },
-    {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 Measure in centimetres (earlier in the block)",
-     "opts": {}
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -6031,7 +6003,9 @@
      "opts": {}
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "ruler_cm"
+   ],
    "related": [
     {
      "key": "measurement:estimate_length",
@@ -6066,6 +6040,19 @@
    ],
    "pre": [
     {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 measuring with cubes and paper clips",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
+    },
+    {
      "key": "comparing:compare_objects",
      "why": "Y2.B6.S3 Compare lengths and heights (taught before this step in the block)",
      "opts": {}
@@ -6076,19 +6063,11 @@
      "opts": {
       "band": 99
      }
-    },
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W22)",
-     "opts": {}
-    },
-    {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 Measure in centimetres (earlier in the block)",
-     "opts": {}
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "ruler_cm"
+   ],
    "related": [
     {
      "key": "measurement:estimate_length",
@@ -6112,11 +6091,6 @@
     "length_ops"
    ],
    "pre": [
-    {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 measuring a length",
-     "opts": {}
-    },
     {
      "key": "addition:add_wp_100",
      "why": "addition stories within 100",
@@ -6145,9 +6119,24 @@
      "opts": {
       "band": 20
      }
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 measuring with cubes and paper clips",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
     }
    ],
-   "preBuild": [],
+   "preBuild": [
+    "ruler_cm"
+   ],
    "related": [
     {
      "key": "measurement:estimate_length",
@@ -6714,8 +6703,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     },
     {
@@ -6762,8 +6751,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     },
     {
@@ -6816,8 +6805,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -6870,8 +6859,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -6924,8 +6913,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 equal and unequal groups (K) (topic ladder)",
+     "key": "comparing:compare_groups",
+     "why": "Y1.B1.S12 more, fewer, the same: comparing groups (K) (topic ladder)",
      "opts": {}
     }
    ],
@@ -7035,8 +7024,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7094,8 +7083,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7343,8 +7332,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7402,8 +7391,8 @@
      }
     },
     {
-     "key": "multiplication:equal_or_unequal_groups",
-     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)",
+     "key": "comparing:compare_groups",
+     "why": "More/Fewer/Same Groups (Visual) — Y2.B1.S12 Compare objects",
      "opts": {}
     }
    ],
@@ -7772,7 +7761,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 5s from 0: the minutes round the clock",
+     "why": "Y2.B5.S15 counting in 5s from 0: the minutes round the clock",
      "opts": {
       "rows": [
        {
@@ -8032,7 +8021,7 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S5 Interpret pictograms (1-1) (a later step of the block: the same idea one step further)",
+     "why": "Picture Graph Intro (Visual) — earlier learning",
      "opts": {}
     }
    ],
@@ -8091,7 +8080,7 @@
    "related": [
     {
      "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S5 Interpret pictograms (1-1) (next step: the same idea one step further)",
+     "why": "Picture Graph Intro (Visual) — earlier learning",
      "opts": {}
     }
    ],
@@ -8201,7 +8190,7 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S5 Interpret pictograms (1-1) (taught before this step in the block)",
+     "why": "Picture Graph Intro (Visual) — Y2.B10.S5 Interpret pictograms (1-1)",
      "opts": {}
     },
     {
@@ -8262,7 +8251,7 @@
     },
     {
      "key": "measurement:pictograph_intro",
-     "why": "Y2.B10.S5 Interpret pictograms (1-1) (earlier in the block)",
+     "why": "Picture Graph Intro (Visual) — Y2.B10.S5 Interpret pictograms (1-1)",
      "opts": {}
     },
     {
@@ -9108,7 +9097,11 @@
    "steps": [
     "Y1.B7.S3",
     "Y2.B6.S1",
-    "Y3.B5.S2"
+    "Y3.B5.S2",
+    "Y2.B6.S2",
+    "Y2.B6.S3",
+    "Y2.B6.S4",
+    "Y2.B6.S5"
    ],
    "ccss": [
     "K.MD.A.1",
@@ -9118,7 +9111,11 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y2.B6.S1": "a centimetre ruler (the skill reads inches only)"
+    "Y2.B6.S1": "a centimetre ruler (the skill reads inches only)",
+    "Y2.B6.S2": "(prerequisite of this step)",
+    "Y2.B6.S3": "(prerequisite of this step)",
+    "Y2.B6.S4": "(prerequisite of this step)",
+    "Y2.B6.S5": "(prerequisite of this step)"
    },
    "kindText": "option on measurement:reading_ruler"
   },
@@ -9359,7 +9356,7 @@
   "single_fraction": {
    "kind": "option",
    "skill": "fractions:shade_fraction",
-   "option": "fraction: one chosen fraction (1/2, 1/4, 3/4, 1/3, 2/4) instead of a denominator family; also on identify, write_fraction, equiv_frac_visual, fraction_of_set",
+   "option": "fraction: one chosen fraction (1/2, 1/4, 3/4, 1/3, 2/4) instead of a denominator family; also on identify, write_fraction, equiv_frac_visual, fraction_of_set; unit_only: unit fractions only (1/2, 1/3, 1/4, 1/5, 1/8)",
    "name": "One Fraction per Page (option)",
    "teaches": "a page about ONE fraction (find a quarter, find a third, three-quarters) of a shape and of an amount, as WRM Y2 teaches them one at a time",
    "representation": "the existing fraction cells (area, bar, circle, set of objects) with the one fraction; answer: shade or write the number",
@@ -9372,6 +9369,7 @@
     "Y2.B8.S12",
     "Y2.B8.S13",
     "Y2.B8.S14",
+    "Y3.B6.S1",
     "Y2.B8.S15"
    ],
    "ccss": [

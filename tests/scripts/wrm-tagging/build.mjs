@@ -110,9 +110,9 @@ const markerHits=MK.makeMarkerCheck(generateQuestionFor,YEAR,SWK,2);
 // r6 (S11): a why written from the skill and opts actually linked. Used after any swap, and whenever the hand why
 // names a table, a count step or a unit the opts do not deal (whyMismatch).
 const PARTS=['halves','thirds','quarters'];
-function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividing by ':'the ')+o.constant.join(', ')+(/div/.test(k)?'':' times-table'+(o.constant.length>1?'s':'')));
+function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividing by ':'tables: ')+o.constant.join(', '));
   if(o.rows)t.push('counting in '+o.rows.map(r=>r.step+'s').join(', ')+' from 0');if(o.parts)t.push(o.parts.map(i=>PARTS[i]).join(' and ')+' of a shape');
-  if(o.band&&!o.constant)t.push('within '+o.band);if(o.range)t.push('within '+o.range);if(o.notation&&o.notation.includes('across'))t.push('written across');
+  if(o.notation&&o.notation.includes('across'))t.push('written across');
   if(k==='measurement:length_metric'&&o.forms)t.push(o.forms.map(f=>['cm ↔ mm','m ↔ cm','m ↔ mm','km ↔ m'][f]).join(', '));
   if(k==='measurement:estimate_length'&&o.forms)t.push('about how long is it? a sensible length in metric units');return t.join('; ');}
 function taughtAt(k,sid,o){if(o&&Object.keys(o).length){let b2=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(JSON.stringify(stepOptsFor(id,k))===JSON.stringify(o))b2=id;}if(b2)return b2;}
@@ -129,7 +129,15 @@ function whyMismatch(e){const w=String(e.why).split('(')[0];const o=e.opts||{};c
   if(/:mult_zeros$/.test(e.key)&&/2-digit number by a 1-digit/.test(w))return true;
   if(/:div_facts$/.test(e.key)&&/mult_facts \{constant/.test(e.why))return true;
   if(/counting in 5s and 10s|counting in 2s, 5s and 10s/.test(w)&&o.rows&&!o.rows.some(r=>r.step===5))return true;
-  return false;}
+  return whyContentBad(e).length>0;}
+// r7 (critic r6 A4): every why, hand-written or not, must name only what the link's generated items deal (units, count
+// steps, tables, "within N", time words, fraction words). The same test as the critic's whyscan C.
+const UNITS=[[/\bmillilit|\bmL\b|\bml\b/i,/mL|ml\b|millil/i],[/\bkilogram|\bkg\b/i,/kg|kilogram/i],[/\bgrams?\b/i,/\bg\b|gram/i],[/\bmm\b|millimet/i,/mm\b|millimet/i],[/\bcm\b|centimet/i,/cm\b|centimet/i],[/\bmetres?\b|\bm and cm/i,/\d\s?m\b|metre|meter/i],[/\blitres?\b/i,/\bL\b|litre|liter/i],[/quarter past|quarter to/i,/:15|:45|quarter/i],[/\bthirds?\b/i,/\/3\b|third|"d":3/],[/\bquarters?\b/i,/\/4\b|quarter|"d":4/],[/\bpictogra/i,/pictogra|picto/i],[/\btally/i,/tally/i],[/\bnumber line/i,/number line|"ticks"|numberline|nl/i],[/\bdollars?|\$|cents?\b|¢/i,/\$|¢|cent|dollar/i]];
+function whyContentBad(e){const head=String(e.why).split('—')[0].split(/\(Y\d|\(prior|\(earlier|\(taught/)[0];const its=markerHits.items(e.key,e.opts||{}).slice(0,60);if(!its.length)return [];
+  const txt=its.map(q=>q.to+' '+q.a+' '+q.p+' '+(q.v||'')).join(' \n ');const mx=Math.max(...its.map(q=>Math.max(0,...[...(q.t+' '+q.a).replace(/\d{1,2}:\d\d/g,'').replace(/(\d),(\d{3})(?!\d)/g,'$1$2').matchAll(/\d+/g)].map(m=>+m[0]))));const bad=[];const isTime=/^measurement:(time|elapsed|clock)/.test(e.key);
+  for(const m of head.matchAll(/(?:within|to|up to) (\d[\d,]*)/gi)){const n=+m[1].replace(/,/g,'');if(mx>n*1.05&&n>=10)bad.push(m[0]);}
+  for(const m of head.matchAll(/(\d+)s?(?: and (\d+))? times-tables?|counting in (\d+)s|dividing by (\d+)/g)){const n=+(m[1]||m[3]||m[4]);if(!new RegExp(`(\\b${n}\\s*[×x÷]|[×x÷]\\s*${n}\\b|"step":${n}\\b|\\b${n}, ?${2*n}, ?${3*n}|by ${n}\\b|in ${n}s\\b|\\b${n}s\\b)`,'i').test(txt))bad.push(n+'s');}
+  for(const [re,u] of UNITS){if(isTime&&/third|quarter/.test(re.source)&&!/past|to/.test(re.source))continue;if(re.test(head)&&!new RegExp(u.source,'i').test(txt))bad.push(re.source.slice(0,12));}return bad;}
 const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
 const usedProps=new Set();const missingReview=[];
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
@@ -242,7 +250,11 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
   for(const e of pre){for(const x of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0]))if(x.startsWith(YEAR+'.')&&!taughtBefore(x,s.id)){const q=x.replace(/\./g,'\\.');e.why=e.why.replace(new RegExp('\\s*/\\s*'+q),'').replace(new RegExp(q+'\\s*/\\s*'),'');}}
   for(const e of [...pre,...related]){if(e.swapped&&e.why.includes('[rule'))e.why=descWhy(e.key,e.opts,s.id);delete e.swapped;
-    e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');if(whyMismatch(e))e.why=descWhy(e.key,e.opts,s.id);}
+    e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');
+    // r7: a cited step whose own opts for this key differ from the link's: cite the step that uses these opts instead
+    if(e.opts&&Object.keys(e.opts).length)for(const c of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0])){const so=stepOptsFor(c,e.key);if(so&&JSON.stringify(so)!==JSON.stringify(e.opts)){const t=taughtAt(e.key,s.id,e.opts);if(t&&t!==c&&JSON.stringify(stepOptsFor(t,e.key))===JSON.stringify(e.opts))e.why=e.why.replace(c,t).replace(stepById[c].title,stepById[t].title);}}
+    if(whyMismatch(e))e.why=descWhy(e.key,e.opts,s.id);
+    if(whyContentBad(e).length)console.error('WHYBAD',s.id,e.key,JSON.stringify(e.opts),whyContentBad(e).join(','),'|',e.why.slice(0,80));}
   pre.splice(8);related.splice(6);
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
   for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))

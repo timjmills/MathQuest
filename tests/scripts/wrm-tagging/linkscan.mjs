@@ -5,8 +5,8 @@
 // --year falls back to the old year-wide ceiling (Y2 120, Y3 1,000).
 // CONTENT and LAYOUT checks (always on): Y2 fraction denominators only 2, 3, 4; Y3 fraction compares must share a numerator
 // or a denominator; no coordinate-plane / transformation skill; no × or ÷ in a Y2 sign or balance link; no customary units
-// (ft, yd, in, mi, oz, lb, cup, pt, qt, gal) on a Y2/Y3 link (the school measures in metric; reading_ruler's inch ruler is
-// the only allowed case: it reads whole units on a ruler); no 2-digit column (stack) layout before Y2.B2.S15 and no
+// (ft, yd, in, mi, oz, lb, cup, pt, qt, gal) on a Y2/Y3 link (the school measures in metric; no skill is exempted by name: reading_ruler's
+// inch ruler counts); no 2-digit column (stack) layout before Y2.B2.S15 and no
 // 3-digit column layout before Y3.B2.S11. Clock, angle and shape skills are not number-range checked (fixed domains);
 // money payloads are cents. RULE 19 (WEEK): markers.mjs content markers (thirds, quarter past, 5-minute times, ÷, ×8,
 // ÷3/4/8, fractions beyond quarters, equivalence, angles and lines, L ↔ mL, decimals, 2-digit × ÷ 1-digit, rounding,
@@ -69,7 +69,7 @@ for(const Y of years){const L=JSON.parse(fs.readFileSync(root+`data/curriculum/l
         if(Y==='Y2'){const b=[...r.dens].filter(x=>![1,2,3,4].includes(x));if(b.length)flag('DENOM '+b.join(','));}
         if(Y==='Y3'&&r.unlike&&/:(compare|order_fractions|order_frac|compare_frac|benchmark)/.test(e.key))flag('UNLIKE');}
       if(Y==='Y2'&&r.muldiv&&/^(number_ops_mixed|algebra):/.test(e.key))flag('MULDIV');
-      if(r.cust&&e.key!=='measurement:reading_ruler')flag('CUSTOMARY');
+      if(r.cust)flag('CUSTOMARY');
       if(Y==='Y2'&&r.col2&&order.indexOf(id)<order.indexOf(FIRSTCOL.Y2))flag('COLUMN');
       if(Y==='Y3'&&r.col3&&order.indexOf(id)<order.indexOf(FIRSTCOL.Y3))flag('COLUMN');}}}
 console.log(rows.join('\n'));

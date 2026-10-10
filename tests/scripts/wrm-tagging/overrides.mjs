@@ -960,3 +960,77 @@ linkFix['Y3.B2.S19'] = { 'measurement:money_change': null };
 r3['Y3.B3.S12'] = { ...(r3['Y3.B3.S12'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S9 multiplying by 4: double the 4 times-table to get the 8s', { constant: [4] })] };
 r3['Y3.B3.S12'] = { ...(r3['Y3.B3.S12'] || {}), core: [C(CBT, 'Y3.B3.S11 counting in 4s from 0: double each multiple of 4 to count in 8s', ZR(4))] };
 linkFix['Y3.B11.S1'] = { 'measurement:reading_ruler': null };
+
+// ======================= round 7 (critic Y2-Y3 r6: inch ruler, skip counts, ÷ payloads, hand whys) =======================
+// B. links. reading_ruler draws an INCH ruler (80/80 items): never a pre for a metric step; the cm ruler is ruler_cm (to build)
+for (const Y of ['Y2', 'Y3']) {
+  linkSwap[Y]['measurement:reading_ruler'] = { to: null, preBuild: 'ruler_cm' };
+  linkSwap[Y]['measurement:reading_ruler_hard'] = { to: null };
+}
+linkSwap.Y3['fraction_operations:mult_frac_whole'] = { to: null };
+linkSwap.Y3['division:div_word_problems'] = { to: null }; // its payloads deal 42 ÷ 6, 49 ÷ 7 (never at Grade 2) and ÷3/4/8 at W9
+linkSwap.Y2['patterns:skip_count_line'] = { to: 'patterns:skip_count_line', opts: { step: [0], band: 50 } }; // 2s and 5s only
+linkSwap.Y3['patterns:skip_count_line'] = { to: null };
+// Y2 B8 (W16-W18): equal_or_unequal_groups answers "multiply / add" ten weeks before × (W26): compare groups instead
+linkSwap.Y2['multiplication:equal_or_unequal_groups'] = { to: 'comparing:compare_groups', opts: {}, only: /^Y2\.B8\./ };
+ladders.length = [C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('comparing:compare_objects', 'Y1.B7.S1 comparing lengths and heights'),
+  C('number_sense:place_on_number_line', 'Y2.B1.S9 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), C('measurement:length_metric', 'Y3.B5.S5 m and cm: 1 m = 100 cm', { forms: [1] }), C('measurement:length_metric', 'Y3.B5.S6 cm and mm: 1 cm = 10 mm', { forms: [0] })];
+ladders.frac = ladders.frac.map((l) => l.key === 'multiplication:equal_or_unequal_groups' ? C('comparing:compare_groups', 'Y1.B1.S12 more, fewer, the same: comparing groups (K)') : l);
+Object.assign(linkFix, {
+  'Y2.B5.S6': { 'patterns:skip_count_line': null }, 'Y2.B5.S7': { 'patterns:skip_count_line': null }, 'Y2.B5.S8': { 'patterns:skip_count_line': null },
+  'Y2.B5.S10': { 'patterns:skip_count_line': null }, 'Y2.B5.S11': { 'patterns:skip_count_line': null }, 'Y2.B5.S12': { ...(linkFix['Y2.B5.S12'] || {}), 'patterns:skip_count_line': null },
+  'Y2.B1.S16': { 'patterns:skip_count_line': null },
+  'Y2.B1.S11': { ...linkFix['Y2.B1.S11'], 'composing:number_word_form': null },
+  'Y3.B5.S2': { 'measurement:reading_ruler_hard': null },
+});
+// the B6.S2-S5 / B5 measuring steps: refill pre from metric skills (ladder) after the inch ruler leaves
+for (const id of ['Y2.B6.S2', 'Y2.B6.S3', 'Y2.B6.S4', 'Y2.B6.S5']) r3[id] = { ...(r3[id] || {}), core: [C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a ruler is a number line marked in equal steps', { span: 10, band: 100 })] };
+relR3['Y2.B2.S13'] = [R(CBT, 'counting in 10s from 0: the same jump of 10', ZR(10)), HCF, BT];
+relR3['Y2.B2.S14'] = [R(CBT, 'counting in 10s from 0: adding a 10 is the next count', ZR(10)), HCF, BT];
+relR3['Y2.B1.S15'] = [R('patterns:seq_10', 'counting on in 10s from any number, the next idea', { band: 100 }), R('patterns:skip_count_line', 'counting in 2s and 5s as jumps on a number line', { step: [0], band: 50 })];
+relR3['Y2.B5.S17'] = [R('patterns:skip_count_line', 'counting in 5s as jumps on a number line', { step: [0], band: 50 }), R('measurement:money_count', 'counting 5-cent and 10-cent coins', { currency: 'usd' })];
+// C. verdicts and clauses
+Object.assign(r3, {
+  'Y3.B3.S5': { direct: [D('division:share_into_groups')], partials: [P('division:div_word_problems', 'sharing and grouping stories, but ÷6 and ÷7 facts beyond the Grade 2 tables appear (42 ÷ 6, 36 ÷ 6, 49 ÷ 7)')], verdict: 'partial', build: ['muldiv_tables'], neverNamed: ['division:div_word_problems'] },
+  'Y3.B5.S2': { partials: [P('measurement:reading_ruler', 'reads an INCH ruler (whole inches); a ruler marked in cm and mm, and measuring in millimetres, are not dealt')], build: ['ruler_cm'], neverNamed: ['measurement:reading_ruler'],
+    related: [R('measurement:estimate_length', 'about how long is it? estimating a length in metric units', { forms: [0] })] },
+  'Y3.B11.S4': { ...(r3['Y3.B11.S4'] || {}), partials: [P('measurement:reading_ruler', 'reads an INCH ruler; drawing a line of a given length and measuring in mm are not dealt')], build: ['draw_measure'], neverNamed: ['measurement:reading_ruler'] },
+  'Y2.B6.S1': { ...(r3['Y2.B6.S1'] || {}), neverNamed: ['measurement:reading_ruler'] },
+  'Y3.B6.S1': { ...(r3['Y3.B6.S1'] || {}), direct: [], partials: [P('fractions:identify', 'names fractions of shapes, but most items are non-unit fractions or ask for the numerator ("the numerator of 5/9"), which is Y3.B6.S3; a page of unit fractions (1/2, 1/3, 1/4, 1/5) is not available'), P('fractions:write_fraction', 'writes the fraction shaded, but non-unit fractions (3/5, 2/3) are most of the items; unit fractions only are not available')], verdict: 'partial', build: ['single_fraction'] },
+  // D. pre rank
+  'Y3.B4.S4': { ...r3['Y3.B4.S4'], core: [...r3['Y3.B4.S4'].core, C('multiplication:mult_facts', 'Y3.B3.S8 / S11 / S12 the 3, 4 and 8 times-tables', { constant: [3, 4, 8] })], dropPre: ['division:div_remainders', 'division:div_facts', 'patterns:halve'] },
+  'Y3.B4.S5': { ...r3['Y3.B4.S5'], core: [...(r3['Y3.B4.S5'].core || []), C('multiplication:mult_facts', 'Y3.B3.S8 / S11 / S12 the 3, 4 and 8 times-tables', { constant: [3, 4, 8] })], dropPre: ['division:div_facts', 'patterns:halve'] },
+  'Y3.B4.S6': { ...r3['Y3.B4.S6'], core: [C('multiplication:mult_facts', 'Y3.B3.S15 the 2, 3, 4, 5, 8 and 10 times-tables', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 2, 3, 4, 5, 8 and 10', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('division:share_into_groups', 'Y3.B3.S5 sharing and grouping')], dropPre: ['patterns:double', 'patterns:halve'] },
+  'Y3.B4.S8': { ...r3['Y3.B4.S8'], core: [C('division:box_division_easy', 'Y3.B4.S7 dividing a 2-digit number with no exchange', { regroup: 'none', constant: [2, 3, 4, 5, 8] }), C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 3, 4 and 8', { constant: [3, 4, 8] })] },
+  'Y3.B4.S2': { ...r3['Y3.B4.S2'], core: [C('multiplication:mult_facts', 'Y3.B3.S15 the 2, 3, 4, 5, 8 and 10 times-tables: the known fact', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('placevalue:unit_form', 'Y3.B1.S8 hundreds, tens and ones: 12 tens = 120', { band: 999 })] },
+  'Y2.B3.S7': { ...r3['Y2.B3.S7'], core: [C('shapes_early:count_sides_vertices_2d', 'Y2.B3.S2 counting the sides of 2-D shapes', { forms: [0] }), C('shapes_early:shape_corners_count', 'Y2.B3.S3 counting corners'), C('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming 2-D shapes')], dropPre: ['shapes_early:name_3d_shapes', 'shapes_early:shape_name_match_3d'] },
+  'Y2.B1.S11': { ...(r3['Y2.B1.S11'] || {}), core: [C('patterns:seq_10', 'Y1.B12.S2 / Y2.B1.S15 counting in 10s: the tens on the line', { band: 100 }), C('counting:number_seq_fill', 'Y1.B12.S1 counting to 100 in order', { range: 100 })], dropPre: ['composing:number_word_form'] },
+  // E. small fixes
+  'Y2.B8.S13': { ...r3['Y2.B8.S13'], relOnly: true, related: [], relNote: 'no related skill met by W17: three-quarters of a turn on the clock (quarter to) comes in W36 (rule 19)' },
+  'Y2.B1.S16': { ...(r3['Y2.B1.S16'] || {}), relOnly: true, related: [], relNote: 'no related skill: the only number-line skip count deals 4s and 6s with the 3s (beyond Grade 1); counting in 2s, 5s and 10s is pre' },
+  'Y3.B1.S14': { ...(r3['Y3.B1.S14'] || {}), relOnly: true, related: [], relNote: 'no related skill: the number-line skip count deals 6s and 25s, never 50s; counting in 10s and 100s is pre' },
+});
+// muldiv_tables now also closes Y3.B3.S5 (div_word_problems); single_fraction gets a unit-fractions page for Y3.B6.S1
+proposals.muldiv_tables.skills.push('division:div_word_problems'); proposals.muldiv_tables.steps.push('Y3.B3.S5');
+proposals.muldiv_tables.teaches += '; sharing and grouping stories use the same tables';
+proposals.single_fraction.option += '; unit_only: unit fractions only (1/2, 1/3, 1/4, 1/5, 1/8)';
+proposals.single_fraction.steps.push('Y3.B6.S1');
+whyText['measurement:mass_volume_liquid'] = 'reading a scale in mL';
+Object.assign(linkFix, { 'Y2.B2.S13': { 'multiplication:count_by_tables': ZR(10) }, 'Y2.B2.S14': { 'multiplication:count_by_tables': ZR(10) } });
+Object.assign(whyText, {
+  'patterns:skip_count_line': 'counting in equal jumps along a line', 'subtraction:nl_sub': 'counting back in jumps along a line', 'division:nl_div': 'dividing as equal jumps back along a line',
+  'multiplication:mult_chart_easy': 'filling the missing products in a times-table chart', 'measurement:length_metric': 'converting metric lengths', 'graphs:pictograph': 'reading a picture graph with a key',
+});
+r3['Y3.B12.S1'] = { ...(r3['Y3.B12.S1'] || {}), direct: [D('graphs:pictograph', { scale: [0, 1, 2] })], note: 'scale [0,1,2]: keys of 2, 5 and 10 (scale 3 is a key of 25)' };
+r3['Y3.B4.S1'] = { ...r3['Y3.B4.S1'], core: [...r3['Y3.B4.S1'].core, C(CBT, 'Y2.B1.S15 counting in 10s from 0', ZR(10))] };
+Object.assign(relR3, {
+  'Y3.B3.S1': [R('multiplication:mult_word_problems', 'x', {})].slice(0, 0).concat([R('multiplication:nl_mult', 'equal groups as equal jumps along a line', { constant: [2, 5, 10], band: 50 })]),
+  'Y3.B3.S2': [R('multiplication:nl_mult', 'the same product as equal jumps along a line', { constant: [2, 5, 10], band: 50 })],
+  'Y3.B3.S4': [R('measurement:money_count', 'counting nickels and dimes: multiples of 5 and 10', { currency: 'usd', kind: 'like' })],
+});
+r3['Y3.B3.S3'] = { ...(r3['Y3.B3.S3'] || {}), partials: [P('number_theory:multiples', 'lists multiples, but of any number to 12 (multiples of 6, 7, 9: "7, 14, 21 …", beyond the Grade 2 tables); multiples of 2 as the even numbers to 100 are not a page of their own')], neverNamed: ['number_theory:multiples'] };
+r3['Y3.B3.S4'] = { ...(r3['Y3.B3.S4'] || {}), partials: [P('number_theory:multiples', 'lists multiples, but of any number to 12 (multiples of 6, 7, 9: "7, 14, 21 …", beyond the Grade 2 tables); a page of multiples of 5 and 10 only is not available')], neverNamed: ['number_theory:multiples'] };
+Object.assign(linkFix, { 'Y3.B3.S7': { ...linkFix['Y3.B3.S7'], 'division:nl_div': { constant: [3], band: 50 } }, 'Y3.B3.S10': { ...linkFix['Y3.B3.S10'], 'division:nl_div': { constant: [4], band: 50 } } });
+r3['Y3.B4.S1'] = { ...r3['Y3.B4.S1'], core: [...r3['Y3.B4.S1'].core, C('placevalue:more_less_10', 'Y2.B2.S13 10 more, 10 less', { step: 10 })] };
+// seq_10 {band:100} deals 99, 109, 119, 129 (past 100 at W03): band 50 keeps it inside what the pupil has met
+r3['Y2.B1.S11'].core = [C('patterns:seq_10', 'Y1.B12.S2 / Y2.B1.S15 counting in 10s: the tens on the line', { band: 50 }), C('counting:number_seq_fill', 'Y1.B12.S1 counting to 100 in order', { range: 100 })];

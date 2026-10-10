@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 6
+# Wave 2 tagging: Year 2 (US Grade 1) — round 7
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -9,6 +9,44 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 | 124 | 63 | 36 | 25 | 10 | 37 | 52 | 75 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 7 (after critic Y2–Y3 r6, 7.73 / 7.53): inch ruler, skip counts, ÷ payloads, hand-written whys
+
+- **A. `markers.mjs` / `linkscan.mjs`**: no skill is exempted by name any more (the `reading_ruler` customary exemption
+  is gone: it is an INCH ruler); the never-in-grade markers read the drawn cell, `screenInstr`, the hint and payload
+  options as well as the text; `beyond()` and `div348` read division payloads (`"a":42,"b":6,"op":"/"` = 6 × 7) and, at
+  Grade 2, sharing payloads (`"n":24,"size":4`); new `skipBeyond` marker (count steps: Y2 {1,2,3,5,10}; Y3
+  {1,2,3,4,5,8,10,50,100}, 4s from Y3.B3.S9 and 8s from Y3.B3.S12; clock / time-line payloads are not count steps),
+  also on direct skills. `build.mjs` now tests EVERY why (hand-written ones too) against the link's 60 generated items
+  (units, count steps, tables, time and fraction words) and rewrites a why that names content the items lack; the
+  rebuilt why describes the skill in words (`whyText`), not with the skill's catalogue label.
+- **B. links**: `reading_ruler` dropped from every pre (Y2.B6.S2–S5; Y3.B5, B6.S6/S7, B11.S6–S10) with `ruler_cm` in
+  `preBuild`, refilled from `measure_nonstandard`, `place_on_number_line {span:10, band:100}` and `length_metric`
+  (new length ladder); `reading_ruler_hard` dropped; `skip_count_line` → `{step:[0], band:50}` (2s and 5s) at Grade 1,
+  dropped on Y2.B5.S6–S12, B1.S16 (note) and Y3.B1.S14 (note); Y2.B2.S13/S14 count in 10s (`count_by_tables` 10s
+  rows); `div_word_problems` dropped from Y3 links; `mult_frac_whole` dropped; Y2 B8 `equal_or_unequal_groups` →
+  `compare_groups` (no "multiply" answer before W26).
+- **C. verdicts**: Y3.B3.S5 → partial (÷6, ÷7 word problems) with `muldiv_tables` (now also on `div_word_problems`);
+  Y3.B5.S2 and B11.S4 clauses name the inch ruler; Y3.B6.S1 → partial (non-unit items) with `single_fraction`
+  (`unit_only`); Y3.B3.S3/S4 `multiples` clauses name multiples of 6, 7, 9; Y3.B12.S1 `pictograph {scale:[0,1,2]}`.
+- **D. pre rank**: Y3.B4.S4/S5 add `mult_facts {constant:[3,4,8]}`; B4.S6 leads with `mult_facts` / `div_facts`
+  `{constant:[2,3,4,5,8,10]}` and sharing; B4.S8 adds `div_facts {constant:[3,4,8]}`; B4.S2 leads with the known fact and
+  unit form; Y2.B3.S7 leads with sides, corners and 2-D names; Y2.B1.S11 adds counting in 10s (`seq_10 {band:50}`:
+  band 100 deals 109-129 at W03) and `number_seq_fill {range:100}`, `number_word_form` dropped.
+- **E.** Y2.B8.S13 note (quarter to is W36); Y3.B7.S4 `length_metric {forms:[1]}` cites Y3.B5.S5; Y3.B7.S9/S11
+  `mass_volume_liquid` why "reading a scale in mL"; Y3.B3.S7/S10 `nl_div {constant:[3]}` / `[4]`.
+- **Scans (critic r6 scripts)**: `vscan` 0 links (the 3 direct inch-ruler lines are partials whose clauses name the
+  inch ruler); `scan9` links: only (i) Y2 `share_into_groups {band:12}` flagged by its `dividewp` marker — the r6 report
+  itself lists this as clean (grouping counters, K content) — and (ii) `mult_facts {constant:[5]}` / `[5,10]` / `[4]`
+  hits for "5 × 8", "10 × 8", "4 × 8": facts of the 5, 10 and 4 tables, the "×8 inside a ×5 or ×10 table" false positive
+  the r4 critic removed; `stepscan` 26 lines, all `elapsed_*` time-line payloads (`"step":15` / `30` minutes between
+  ticks, not skip counts); `whyscan` A 1 (`add_sub_fact_family` cites Y2.B2.S3 "Related facts" — the step the xlsx
+  names, tagged to the next key in SKILL_WRM), B 89 — all related "next step" links (0 pre), which the r6 report lists
+  as clean — and C 65, all two scanner false positives: `count_by_tables` items are "Count by N. Write the missing
+  numbers" with values 0, N, 2N … (no "×" and not "N, 2N, 3N" with spaces), and `time_quarter` whys say "quarter past"
+  while items are "3:15" (the fraction-word "quarter" rule fires on a clock). r5 `whyfit` 0, `scan8`/`sys5` unchanged
+  (6 = injected lines), `prewk` 0, `fit` 0, `optcheck` 0, `swap` 0, `linkscan (week mode)` OK; the files rebuild
+  byte-identical.
 
 ## Round 6 (after critic Y2–Y3 r5, 7.70 / 7.44): marker blind spots, S11 whys, never-in-grade directs
 
