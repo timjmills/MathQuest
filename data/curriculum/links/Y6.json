@@ -497,6 +497,974 @@
    ],
    "note": "The school week W32 prior list is 3D-shape lessons (data mismatch); pre-skills come from the Y5 negative-number block instead."
   },
+  "Y6.B2.S1": {
+   "title": "Add and subtract integers",
+   "direct": [
+    {
+     "key": "addition:add_1m_mixed",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_wp_1m",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_wp_1m",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_100k_mixed",
+     "why": "Y5.B2.S2 Add whole numbers with more than 4 digits (prior learning wk W02)"
+    },
+    {
+     "key": "subtraction:sub_100k_mixed",
+     "why": "Y5.B2.S3 Subtract whole numbers with more than 4 digits (prior learning wk W02)"
+    },
+    {
+     "key": "addition:add_1m_regroup",
+     "why": "column addition with exchanges"
+    },
+    {
+     "key": "subtraction:sub_1m_regroup",
+     "why": "column subtraction with exchanges"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y5.B2.S4 Round to check answers"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "inverse to check"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "estimate to check"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step + and - stories"
+    },
+    {
+     "key": "addition:add_wp_1m_plain",
+     "why": "same stories without pictures"
+    }
+   ],
+   "note": "Full on the column method (4.NBT.B.4) to 1,000,000; 7-digit operands are not dealt, but the WRM lesson is the method, not the size."
+  },
+  "Y6.B2.S2": {
+   "title": "Common factors",
+   "direct": [
+    {
+     "key": "number_theory:gcf_easy",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "number_theory:gcf_hard",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y5.B3.S3 Factors (find every factor pair)"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors"
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "factor pairs as a rainbow"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "Y5.B3.S5 Prime numbers"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:lcm",
+     "why": "common multiples (next step)"
+    },
+    {
+     "key": "fractions:simplify",
+     "why": "common factors used to simplify (Y6.B3.S1)"
+    },
+    {
+     "key": "number_theory:factor_tchart_hard",
+     "why": "factors of larger numbers"
+    }
+   ],
+   "note": "Full with the \"Click every common factor\" form; the Venn-diagram look of common_mf would add a picture, not a missing clause. The school prior list for W09 is a test week."
+  },
+  "Y6.B2.S3": {
+   "title": "Common multiples",
+   "direct": [
+    {
+     "key": "number_theory:lcm",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "skip counting gives the multiples"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "times-table recall"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "Y6.B2.S2 Common factors (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "common multiple as common denominator"
+    },
+    {
+     "key": "fraction_operations:add_frac_unlike",
+     "why": "common denominators (Y6.B3)"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "common factors"
+    }
+   ],
+   "note": "lcm forms [1] lists every common multiple below a cap, which is the WRM lesson; forms [0] (the least only) is the extension."
+  },
+  "Y6.B2.S4": {
+   "title": "Rules of divisibility",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_theory:divisibility_sort",
+     "missing": "stating and applying the divisibility rules (it sorts by trying the division)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the rules for 2, 3, 4, 5, 6, 8, 9, 10 and 25 stated and applied",
+   "build": [
+    "divisibility_rules"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S2 Common multiples (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y5.B3.S3 Factors (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "Y5.B3.S5 Prime numbers (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "times-table recall"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:prime_composite",
+     "why": "primes have no divisor but 1 and themselves"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "a divisor is a factor"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "division facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B2.S5": {
+   "title": "Primes to 100",
+   "direct": [
+    {
+     "key": "number_theory:prime_composite",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_theory:prime_composite",
+     "why": "Y5.B3.S5 Prime numbers (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y5.B3.S3 Factors (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors (prior learning wk W10)"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "Y6.B2.S4 Rules of divisibility (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "factor pairs show a number is composite"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "test for divisors"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "common factors"
+    }
+   ],
+   "note": "Natural band is 100, which is exactly \"primes to 100\"; all four forms (decide, which is composite, click primes, sort) fit."
+  },
+  "Y6.B2.S6": {
+   "title": "Square and cube numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "missing": "square numbers as square arrays and cube numbers as cubes; recognising whether a number is square or cube (it only evaluates 5² and 5³)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "square and cube numbers as pictures (arrays, cubes) and recognising them; only the notation is taught",
+   "build": [
+    "square_cube"
+   ],
+   "pre": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "why": "Y5.B3.S6 Square numbers (notation)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "arrays before square arrays"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "n x n facts"
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "a square number has a repeated factor pair"
+    }
+   ],
+   "preBuild": [
+    "square_cube"
+   ],
+   "related": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "square dot arrays"
+    },
+    {
+     "key": "order_of_operations:oop_hard",
+     "why": "powers inside order of operations"
+    },
+    {
+     "key": "algebra:evaluate_expression_hard",
+     "why": "powers in expressions"
+    }
+   ],
+   "note": "School prior for W33 is negative numbers, so it is not used; Y5 square/cube steps are the true pre-learning."
+  },
+  "Y6.B2.S7": {
+   "title": "Multiply up to a 4-digit number by a 2-digit number",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "missing": "4-digit x 2-digit (top number is at most 3 digits)"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "missing": "4-digit x 2-digit (grids are 2x2 and 2x3)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "long multiplication of a 4-digit number by a 2-digit number",
+   "build": [
+    "long_mult"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "Y5.B5.S5 Multiply a 4-digit number by a 2-digit number (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "2-digit x 3-digit grid"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "column multiplication by 1 digit"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "x 10 and multiples of ten for the second row"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "times-table recall"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "reasoning inside the column method"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate first"
+    },
+    {
+     "key": "division:long_div_2digit",
+     "why": "inverse: long division"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "problems with multiplication (next step)"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B2.S8": {
+   "title": "Solve problems with multiplication",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "missing": "multi-digit numbers (stories use fact-sized numbers)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "missing": "multiplication with multi-digit numbers and two-step stories"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "missing": "multi-digit numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "word problems that need multi-digit (up to 4-digit x 2-digit) multiplication",
+   "build": [
+    "wp_multidigit",
+    "long_mult"
+   ],
+   "pre": [
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "Y5.B5.S6 Solve problems with multiplication (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "Y5.B5.S5 Multiply a 4-digit number by a 2-digit number (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y5.B5.S11 times-as-many stories"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "Y6.B2.S7 previous step"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "the same stories without pictures"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "inverse: division stories"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate the answer"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step stories"
+    }
+   ],
+   "note": "Tag fix: algebra:multi_step_word is + and - within 100 only; it is not a multiplication skill."
+  },
+  "Y6.B2.S9": {
+   "title": "Short division",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:box_division_hard",
+     "missing": "4-digit dividends, the bus-stop layout and dividing by a 2-digit number (it is 3-digit / 1-digit in a box grid)"
+    },
+    {
+     "key": "division:div_zero_in_quotient",
+     "missing": "general 4-digit / 1-digit (only zero-in-quotient items)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "short division set out as the bus stop, 4-digit / 1-digit and 4-digit / 2-digit",
+   "build": [
+    "long_mult",
+    "vis_division_layouts"
+   ],
+   "pre": [
+    {
+     "key": "division:box_division_hard",
+     "why": "Y5.B5.S7 Short division (prior learning wk W03)"
+    },
+    {
+     "key": "division:div_zero_in_quotient",
+     "why": "Y5.B5.S7 Short division (prior learning wk W03)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y5.B5.S9 Divide with remainders"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "partition the dividend"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "division facts"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:long_div_2digit",
+     "why": "long division (Y6.B2.S11)"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "inverse check"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "is the remainder finished?"
+    }
+   ],
+   "note": "box_division_hard is a box grid, not the bus stop; the layout itself is the lesson for SPED pupils."
+  },
+  "Y6.B2.S10": {
+   "title": "Division using factors",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "dividing by a 2-digit number by dividing by its factors in turn (420 / 12 = 420 / 2 / 6)",
+   "build": [
+    "div_factors"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y5.B3.S3 Factors (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "3.OA.B.5 associative property (breaking apart)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "Y5.B5.S7 Short division (prior learning wk W03)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "division facts"
+    },
+    {
+     "key": "division:mixed_mult_div",
+     "why": "relating x and /"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:long_div_2digit",
+     "why": "the same divisions by long division"
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "choosing a factor pair"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check by multiplying"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B2.S11": {
+   "title": "Introduction to long division",
+   "direct": [
+    {
+     "key": "division:long_div_2digit",
+     "opts": {}
+    },
+    {
+     "key": "division:div_fix_estimate",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:box_division_hard",
+     "why": "Y5.B5.S7 Short division (prior learning wk W04)"
+    },
+    {
+     "key": "division:div_zero_in_quotient",
+     "why": "Y5.B5.S8 Divide a 4-digit number by a 1-digit number (prior learning wk W04)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (list multiples of the divisor) (prior learning wk W04)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y5.B5.S1 Multiply by a 1-digit number (prior learning wk W04)"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate the quotient"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y5.B5.S9 Divide with remainders (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check by multiplying"
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "inverse: long multiplication"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "is the remainder finished?"
+    }
+   ],
+   "note": "long_div_2digit draws a genuine long-division bracket with divide-multiply-subtract-bring-down work rows, 3-4 digit dividends, 2-digit divisors."
+  },
+  "Y6.B2.S12": {
+   "title": "Long division with remainders",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:long_div_2digit",
+     "missing": "remainders (it deals exact quotients only) and writing them as r, a fraction or a decimal"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "long division by a 2-digit number with remainders, written as r, a fraction or a decimal",
+   "build": [
+    "long_div_rem"
+   ],
+   "pre": [
+    {
+     "key": "division:long_div_2digit",
+     "why": "Y6.B2.S11 Introduction to long division (previous step)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y5.B5.S9 Divide with remainders (prior learning wk W04)"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "Y5.B5.S9 Divide with remainders (prior learning wk W04)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "short division with remainders (Remainders: every item)"
+    },
+    {
+     "key": "fraction_operations:frac_as_division",
+     "why": "a remainder as a fraction"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:remainder_interpret",
+     "why": "what the remainder means (next step)"
+    },
+    {
+     "key": "division:div_fix_estimate",
+     "why": "fix the trial quotient"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check: q x d + r"
+    }
+   ],
+   "note": "Tag fix: long_div_2digit becomes partial here."
+  },
+  "Y6.B2.S13": {
+   "title": "Solve problems with division",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:remainder_interpret",
+     "missing": "multi-digit numbers and 2-digit divisors (divisor <= 20, dividend <= 10 x divisor)"
+    },
+    {
+     "key": "division:remainder_contexts",
+     "missing": "multi-digit numbers"
+    },
+    {
+     "key": "division:div_word_problems",
+     "missing": "multi-digit numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "division word problems that need long or short division of 3-4 digit numbers, with the remainder interpreted",
+   "build": [
+    "wp_multidigit"
+   ],
+   "pre": [
+    {
+     "key": "division:remainder_interpret",
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning wk W05)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "Y5.B5.S11 (prior learning wk W05)"
+    },
+    {
+     "key": "division:long_div_2digit",
+     "why": "Y6.B2.S11 long division"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "Y5.B5.S10 Efficient division (prior learning wk W05)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "short division"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "the same stories without pictures"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "inverse: multiplication stories"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate the answer"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B2.S14": {
+   "title": "Solve multi-step problems",
+   "direct": [],
+   "partial": [
+    {
+     "key": "algebra:multi_step_word",
+     "missing": "x and / steps and large numbers (+ and - within 100 only)"
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "missing": "x and / steps and large numbers"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "missing": "two or more steps (one-step stories)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "multi-step problems mixing all four operations with Y6-sized numbers",
+   "build": [
+    "multi_step_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W11)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning wk W11)"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y5.B2.S4 Round to check answers (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:algebra_word_mixed",
+     "why": "stories written as equations"
+    },
+    {
+     "key": "order_of_operations:paren_simple",
+     "why": "write the steps as one expression (next step)"
+    },
+    {
+     "key": "division:remainder_interpret",
+     "why": "interpret a remainder step"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B2.S15": {
+   "title": "Order of operations",
+   "direct": [
+    {
+     "key": "order_of_operations:two_ops_no_paren",
+     "opts": {}
+    },
+    {
+     "key": "order_of_operations:three_ops_no_paren",
+     "opts": {}
+    },
+    {
+     "key": "order_of_operations:paren_simple",
+     "opts": {}
+    },
+    {
+     "key": "order_of_operations:oop_medium",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts (prior learning wk W11)"
+    },
+    {
+     "key": "order_of_operations:oop_easy",
+     "why": "two operations, no brackets"
+    },
+    {
+     "key": "number_ops_mixed:mixed",
+     "why": "all four operations"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step problems (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "order_of_operations:paren_multi",
+     "why": "several operations with brackets"
+    },
+    {
+     "key": "order_of_operations:compare_expressions",
+     "why": "compare two expressions"
+    },
+    {
+     "key": "algebra:write_expression",
+     "why": "record a calculation as an expression"
+    },
+    {
+     "key": "order_of_operations:exponents_simple",
+     "why": "powers (KS3 extension)"
+    }
+   ],
+   "note": "Y6 = 5.OA.A.1 brackets and the x/ before +- rule; nested brackets and exponents are left as related."
+  },
+  "Y6.B2.S16": {
+   "title": "Mental calculations and estimation",
+   "direct": [
+    {
+     "key": "number_sense:estimate_products",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "missing": "checking a given answer is reasonable and choosing a mental method"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "missing": "checking a given answer is reasonable"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "judging whether an answer is reasonable by estimating, and choosing mental methods across the four operations",
+   "build": [
+    "mental_estimate"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y5.B2.S4 Round to check answers"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y6.B1.S7 Round any integer"
+    },
+    {
+     "key": "number_sense:nearest_100000",
+     "why": "Y6.B1.S7 Round any integer"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "multiply by multiples of ten mentally"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:mixed_number_sense",
+     "why": "mixed rounding and estimation"
+    },
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "estimate sums"
+    },
+    {
+     "key": "algebra:build_expr_multdiv",
+     "why": "5.OA.A.2 expressions"
+    }
+   ],
+   "note": "The school W09 prior entry is a test; pre-skills come from Y5.B2 and Y6.B1."
+  },
+  "Y6.B2.S17": {
+   "title": "Reason from known facts",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "deriving new facts from a known one (24 x 15 = 360, so 24 x 16 = 384 and 2.4 x 15 = 36)",
+   "build": [
+    "known_facts"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts (3 x 4 = 12 so 30 x 4 = 120)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "3.OA.B.5 breaking apart and order"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y6.B1.S4 x and / by 10, 100, 1,000"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "related x and / facts"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "Y5.B5.S10 Efficient division (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "partial products"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "reasonableness"
+    },
+    {
+     "key": "order_of_operations:compare_expressions",
+     "why": "compare without calculating"
+    }
+   ],
+   "note": "mult_zeros and mult_properties only teach the Y3/Y4 roots of this; the Y6 reasoning (adjust by one group, scale by 10) is not dealt."
+  },
   "Y6.B5.S1": {
    "title": "Metric measures",
    "direct": [
@@ -2927,6 +3895,40 @@
    "why": "No live skill names radius, diameter or circumference.",
    "reused": true
   },
+  "div_factors": {
+   "kind": "new",
+   "skill": "division:divide_using_factors",
+   "name": "Division Using Factors",
+   "teaches": "dividing by a 2-digit number by dividing by its factors in turn (420 ÷ 12 = 420 ÷ 2 ÷ 6)",
+   "representation": "a two-step arrow diagram with the factor pair chosen",
+   "family": "operations",
+   "steps": [
+    "Y6.B2.S10"
+   ],
+   "ccss": [
+    "5.NBT.B.6",
+    "3.OA.B.5"
+   ],
+   "why": "No skill divides by a 2-digit number through its factors in turn.",
+   "reused": true
+  },
+  "divisibility_rules": {
+   "kind": "option",
+   "skill": "number_theory:divisibility_sort",
+   "option": "rules",
+   "name": "Rules of Divisibility (option)",
+   "teaches": "the divisibility rules for 2, 3, 4, 5, 6, 8, 9, 10, 25 stated and applied",
+   "representation": "a rule card beside each sort; option: \"which rule tells you?\"",
+   "family": "number_theory",
+   "steps": [
+    "Y6.B2.S4"
+   ],
+   "ccss": [
+    "4.OA.B.4"
+   ],
+   "why": "divisibility_sort sorts by trying the division; it never states or applies the rule (digit sum for 3 and 9, last two digits for 4).",
+   "reused": true
+  },
   "draw_accurately": {
    "kind": "new",
    "skill": "angles_lines:draw_shapes_accurately",
@@ -2997,6 +3999,23 @@
    "why": "coord_polygon works in the first quadrant on side lengths only; missing vertices and coordinate problems across four quadrants are not dealt.",
    "reused": true
   },
+  "known_facts": {
+   "kind": "new",
+   "skill": "multiplication:reason_from_known_facts",
+   "name": "Reason from Known Facts",
+   "teaches": "deriving new facts from a known one (24 × 15 = 360 so 24 × 16 = 384, 2.4 × 15 = 36)",
+   "representation": "a given fact and a list of related calculations to answer without recalculating",
+   "family": "operations",
+   "steps": [
+    "Y6.B2.S17"
+   ],
+   "ccss": [
+    "5.NBT.B.5",
+    "3.OA.B.5"
+   ],
+   "why": "No skill derives a new fact from a given one.",
+   "reused": true
+  },
   "line_graph": {
    "kind": "new",
    "skill": "graphs:line_graphs",
@@ -3012,6 +4031,42 @@
     "4.MD.B.4"
    ],
    "why": "No live line graph skill; coordinate_graph plots points but never reads a joined line of data.",
+   "reused": true
+  },
+  "long_div_rem": {
+   "kind": "option",
+   "skill": "division:long_div_2digit",
+   "option": "remainders",
+   "name": "Long Division with Remainders (option)",
+   "teaches": "long division by a 2-digit number with remainders written as r, a fraction or a decimal",
+   "representation": "a remainder-form option on long_div_2digit",
+   "family": "operations",
+   "steps": [
+    "Y6.B2.S12"
+   ],
+   "ccss": [
+    "5.NBT.B.6"
+   ],
+   "why": "long_div_2digit deals exact quotients only.",
+   "reused": true
+  },
+  "long_mult": {
+   "kind": "new",
+   "skill": "multiplication:long_multiplication_4x2",
+   "name": "Long Multiplication and Division (4-digit)",
+   "teaches": "long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method",
+   "representation": "a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes",
+   "family": "operations",
+   "steps": [
+    "Y6.B2.S7",
+    "Y6.B2.S8",
+    "Y6.B2.S9"
+   ],
+   "ccss": [
+    "5.NBT.B.5",
+    "5.NBT.B.6"
+   ],
+   "why": "The longest written multiplication is 3-digit x 2-digit; 4-digit x 2-digit long multiplication and 4-digit short division are missing.",
    "reused": true
   },
   "mean_missing": {
@@ -3031,6 +4086,23 @@
    ],
    "reused": false,
    "option": "mean only asks for the mean of a list; the WRM step also finds a missing value from a given mean."
+  },
+  "mental_estimate": {
+   "kind": "new",
+   "skill": "number_sense:estimate_and_check",
+   "name": "Mental Calculation and Estimation",
+   "teaches": "estimating to check answers to calculations with all four operations and choosing mental methods",
+   "representation": "a calculation with a proposed answer; round, estimate and tick reasonable or not",
+   "family": "operations",
+   "steps": [
+    "Y6.B2.S16"
+   ],
+   "ccss": [
+    "5.OA.A.2",
+    "4.NBT.A.3"
+   ],
+   "why": "The estimation skills round and compute one operation; none asks whether a given answer is reasonable or which mental method fits.",
+   "reused": true
   },
   "metric_calc": {
    "kind": "new",
@@ -3098,6 +4170,23 @@
     "5.MD.A.1"
    ],
    "why": "no skill uses 5 miles ≈ 8 km",
+   "reused": true
+  },
+  "multi_step_four_ops": {
+   "kind": "option",
+   "skill": "algebra:multi_step_word",
+   "option": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate",
+   "name": "Two-Step Problems With All Four Operations (option)",
+   "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+   "family": "algebra",
+   "representation": "write each step answer; write the equation",
+   "steps": [
+    "Y6.B2.S14"
+   ],
+   "ccss": [
+    "4.OA.A.3"
+   ],
+   "why": "multi_step_word is + and - within 100 only; Y6 multi-step problems mix all four operations with large numbers.",
    "reused": true
   },
   "negative_count": {
@@ -3347,6 +4436,24 @@
    "why": "no skill enlarges a shape, reads a scale drawing or compares similar shapes",
    "reused": true
   },
+  "square_cube": {
+   "kind": "new",
+   "skill": "number_theory:square_and_cube_numbers",
+   "name": "Square and Cube Numbers",
+   "teaches": "square numbers as square arrays and cube numbers as cubes, with the notation 5² and 2³",
+   "representation": "dot arrays and cube drawings; write the number and the notation; option: is it square?",
+   "family": "number_theory",
+   "steps": [
+    "Y6.B2.S6",
+    "Y6.B2.S6"
+   ],
+   "ccss": [
+    "6.EE.A.1",
+    "4.OA.B.4"
+   ],
+   "why": "exponents_simple evaluates 5² but never shows squares as arrays or cubes as cubes, nor asks \"is it a square number?\".",
+   "reused": true
+  },
   "translate_grid": {
    "kind": "new",
    "skill": "coordinates:translate_on_grid",
@@ -3379,6 +4486,23 @@
     "5.NBT.A.1"
    ],
    "why": "Y6 Powers of 10 is the x10 relationship between neighbouring places, which no skill asks directly.",
+   "reused": true
+  },
+  "vis_division_layouts": {
+   "kind": "option",
+   "name": "Division Layouts: Bus Stop, Notes, Missing Digits",
+   "representation": "the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path",
+   "skill": "division:long_div_2digit",
+   "teaches": "the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path",
+   "family": "operations",
+   "option": "Division Layouts: Bus Stop, Notes, Missing Digits",
+   "steps": [
+    "Y6.B2.S9"
+   ],
+   "ccss": [
+    "5.NBT.B.6"
+   ],
+   "why": "The division template has no bus-stop (short division) layout with exchange-digit slots.",
    "reused": true
   },
   "vis_mean_levelling": {
@@ -3450,6 +4574,26 @@
    ],
    "why": "No live skill counts unit cubes in a drawn solid; volume starts at l x w x h.",
    "reused": true
+  },
+  "wp_multidigit": {
+   "kind": "option",
+   "skill": "multiplication:mult_word_problems",
+   "option": "multi-digit numbers: up to 4-digit x 2-digit, and (on division:div_word_problems) up to 4-digit / 2-digit with remainders interpreted",
+   "name": "Multi-Digit Word Problems (option)",
+   "teaches": "one- and two-step stories that need a written method: 1,250 seats x 24 rows, 1,575 people / 25 per bus (round up)",
+   "representation": "word-work cell: the story in Andika, a bar model frame below (structural, stays), a working box with the column/long-division grid, one answer slot with a unit label; no pictures in the plain variant",
+   "family": "operations",
+   "ccss": [
+    "5.NBT.B.5",
+    "5.NBT.B.6",
+    "4.OA.A.3"
+   ],
+   "why": "Every multiplication and division word problem uses fact-sized numbers (divisor <= 20, dividend <= 10 x divisor); Y6 problems need long multiplication and long division.",
+   "steps": [
+    "Y6.B2.S8",
+    "Y6.B2.S13"
+   ],
+   "reused": false
   }
  },
  "tagFixes": [
@@ -3536,6 +4680,120 @@
    "step": "Y6.B13.S3",
    "action": "partial",
    "why": "reads/plots points but no coordinate problems"
+  },
+  {
+   "key": "addition:add_wp_1m",
+   "step": "Y6.B2.S1",
+   "action": "add",
+   "why": "Column addition in context to 1,000,000."
+  },
+  {
+   "key": "subtraction:sub_wp_1m",
+   "step": "Y6.B2.S1",
+   "action": "add",
+   "why": "Column subtraction in context to 1,000,000."
+  },
+  {
+   "key": "number_theory:gcf_hard",
+   "step": "Y6.B2.S2",
+   "action": "add",
+   "why": "\"Click every common factor\" form for larger pairs."
+  },
+  {
+   "key": "number_theory:divisibility_sort",
+   "step": "Y6.B2.S4",
+   "action": "partial",
+   "why": "Sorts by trial; never states a rule."
+  },
+  {
+   "key": "order_of_operations:exponents_simple",
+   "step": "Y6.B2.S6",
+   "action": "add",
+   "why": "Partial: square and cube notation only."
+  },
+  {
+   "key": "multiplication:area_model_mult_hard",
+   "step": "Y6.B2.S7",
+   "action": "partial",
+   "why": "Grids stop at 2x3 digits."
+  },
+  {
+   "key": "multiplication:mult_placeholder_zero",
+   "step": "Y6.B2.S7",
+   "action": "partial",
+   "why": "Top number stops at 3 digits."
+  },
+  {
+   "key": "number_ops_mixed:word_problems_mixed",
+   "step": "Y6.B2.S8",
+   "action": "partial",
+   "why": "Fact-sized numbers, one step."
+  },
+  {
+   "key": "algebra:multi_step_word",
+   "step": "Y6.B2.S8",
+   "action": "remove",
+   "why": "+ and - within 100 only: not multiplication."
+  },
+  {
+   "key": "division:box_division_hard",
+   "step": "Y6.B2.S9",
+   "action": "partial",
+   "why": "3-digit / 1-digit in a box grid, not the bus stop."
+  },
+  {
+   "key": "division:div_zero_in_quotient",
+   "step": "Y6.B2.S9",
+   "action": "partial",
+   "why": "Only zero-in-quotient items."
+  },
+  {
+   "key": "division:long_div_2digit",
+   "step": "Y6.B2.S12",
+   "action": "partial",
+   "why": "Exact quotients only."
+  },
+  {
+   "key": "division:remainder_interpret",
+   "step": "Y6.B2.S13",
+   "action": "partial",
+   "why": "Divisor <= 20, dividend <= 10 x divisor."
+  },
+  {
+   "key": "division:remainder_contexts",
+   "step": "Y6.B2.S13",
+   "action": "partial",
+   "why": "Fact-sized numbers."
+  },
+  {
+   "key": "number_ops_mixed:word_problems_mixed",
+   "step": "Y6.B2.S14",
+   "action": "partial",
+   "why": "One-step stories."
+  },
+  {
+   "key": "algebra:multi_step_word",
+   "step": "Y6.B2.S14",
+   "action": "partial",
+   "why": "+ and - within 100 only."
+  },
+  {
+   "key": "algebra:multi_step_word_plain",
+   "step": "Y6.B2.S14",
+   "action": "partial",
+   "why": "+ and - within 100 only."
+  },
+  {
+   "key": "order_of_operations:three_ops_no_paren",
+   "step": "Y6.B2.S15",
+   "action": "add",
+   "why": "Three operations without brackets is part of the 5.OA.A.1 step."
+  },
+  {
+   "key": "number_sense:estimate_products",
+   "step": "Y6.B2.S16",
+   "action": "partial",
+   "why": "Rounds and multiplies; no reasonableness check across four operations."
   },
   {
    "key": "measurement:capacity",
