@@ -175,7 +175,7 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18; tagged there by a hand tagFix, critic Y4 r11)",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18; tagged there as a partial cover by a hand tagFix)",
      "opts": {
       "step": [
        0
@@ -189,7 +189,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (lower grade, same idea)"
+     "why": "filling the gaps on a 1-100 hundred chart (Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100)"
     }
    ],
    "preBuild": [],
@@ -493,7 +493,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 999,
       "rename": "more"
@@ -598,9 +598,9 @@
     },
     {
      "key": "placevalue:value",
-     "why": "the value of each digit up to the thousands (Y3.B1.S8 extended by Y4.B1.S5-S6, wk W11): the digit that 1,000 more changes",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same CCSS cluster)",
      "opts": {
-      "band": 9999
+      "band": 999
      }
     },
     {
@@ -1673,7 +1673,7 @@
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16; counting on in 10s from any number)",
      "maxNumber": 100
     },
     {
@@ -1717,25 +1717,29 @@
   },
   "Y4.B2.S9": {
    "title": "Estimate answers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "number_sense:estimate_sums_diffs",
+     "missing": "with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers",
      "opts": {
-      "place": 1000,
-      "task": "reasonable"
+      "place": 100
      }
     },
     {
      "key": "number_sense:estimate_sums_diffs",
+     "missing": "4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
      "opts": {
-      "place": 100
+      "place": 1000,
+      "task": "reasonable"
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "estimating 4-digit sums and differences, and judging answers, within 10,000",
+   "build": [
+    "estimate_within_10k"
+   ],
    "pre": [
     {
      "key": "number_sense:rounding_table",
@@ -1773,7 +1777,17 @@
      "why": "the next step: checking"
     }
    ],
-   "note": "Existing partial tag becomes full with place 1,000 and task \"Is the answer reasonable?\"."
+   "note": "Both option sets are partial covers: {place:100} rounds 3-digit numbers only (sums to 2,000); {place:1000, task:\"reasonable\"} deals 4-digit numbers but its sums pass 10,000. The build list holds both within 10,000.",
+   "envision": [
+    {
+     "proposal": "estimate_within_10k",
+     "name": "Estimate Within 10,000 (option)",
+     "kind": "option on number_sense:estimate_sums_diffs",
+     "teaches": "estimate 4-digit sums and differences and judge answers, every number within 10,000",
+     "closes": "sums, differences and shown answers held within 10,000",
+     "representation": "equation cell 4,267 + 3,527 = 7,794 with \"Reasonable / Not reasonable\" check boxes and a rounding line beneath (hint, fades)"
+    }
+   ]
   },
   "Y4.B2.S10": {
    "title": "Checking strategies",
@@ -1939,7 +1953,13 @@
    "related": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "why": "counting edges on the same grid"
+     "why": "counting edges on the same grid",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     },
     {
      "key": "multiplication:dot_array_mult",
@@ -3380,16 +3400,6 @@
      "why": "Y4.B5.S1 Factor pairs (taught the same school week, W05)"
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S11 Multiply by 1 and 0 (taught earlier this year, wk W03)",
-     "opts": {
-      "constant": [
-       10
-      ],
-      "band": 100
-     }
-    },
-    {
      "key": "multiplication:mult_zeros",
      "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W05)",
      "opts": {
@@ -3406,6 +3416,16 @@
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)",
      "maxNumber": 100
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (lower grade, same CCSS cluster)",
+     "opts": {
+      "constant": [
+       10
+      ],
+      "band": 100
+     }
     }
    ],
    "preBuild": [],
@@ -3470,7 +3490,7 @@
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16; counting on in 10s from any number)",
      "maxNumber": 1000
     },
     {
@@ -3534,7 +3554,7 @@
     },
     {
      "key": "patterns:seq_10",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W17)",
+     "why": "Y1.B9.S2 Count in 10s (lower grade, same idea; counting on in 10s from any number)",
      "maxNumber": 1000
     },
     {
@@ -4352,7 +4372,7 @@
      "opts": {
       "op": "x",
       "power": [
-       1000
+       100
       ],
       "band": 10000
      }
@@ -4487,10 +4507,6 @@
     {
      "key": "area_perimeter:area_unit_squares",
      "why": "Y4.B3.S2 Count squares (taught earlier this year, wk W18)"
-    },
-    {
-     "key": "area_perimeter:perimeter_grid",
-     "why": "Y3.B5.S11 Measure perimeter (lower grade, same idea)"
     },
     {
      "key": "counting:count_objects",
@@ -5907,7 +5923,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "mixes fifths and hundredths with tenths; no tenths model",
+     "missing": "mixes fifths and hundredths with tenths; no tenths model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
      "opts": {
       "denoms": [
        5
@@ -5927,7 +5943,8 @@
    "verdict": "partial",
    "missing": "tenths only, both ways (3/10 = 0.3), with a tenths strip, including numbers past 1 (1.3)",
    "build": [
-    "dec_fraction_basics"
+    "dec_fraction_basics",
+    "f_to_d_one_item"
    ],
    "pre": [
     {
@@ -5991,6 +6008,14 @@
      "teaches": "write tenths as decimals and back (3/10 = 0.3, 1.3 = 13/10) with a tenths strip",
      "closes": "tenths only, both ways (3/10 = 0.3), with a tenths strip, including numbers past 1 (1.3)",
      "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    },
+    {
+     "proposal": "f_to_d_one_item",
+     "name": "Fraction to Decimal: One Item (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "convert one tenth per cell (7/10 = 0.7), with no percent bin sort on the page",
+     "closes": "the bin-sort items (percent tiles and quarters as decimals) are off the page",
+     "representation": "equation cell 7/10 = □ with one decimal box and a fixed decimal point"
     }
    ]
   },
@@ -6303,7 +6328,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "Y1.B12.S1 Count from 50 to 100 (lower grade, same idea)"
+     "why": "filling the gaps on a 1-100 hundred chart (Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100)"
     }
    ],
    "preBuild": [],
@@ -6342,7 +6367,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "hundredths mixed with fifths and tenths; no hundred-square model",
+     "missing": "hundredths mixed with fifths and tenths; no hundred-square model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
      "opts": {
       "denoms": [
        5
@@ -6363,7 +6388,8 @@
    "missing": "hundredths both ways (37/100 = 0.37, 0.07 = 7/100) with a hundred square, held to hundredths",
    "build": [
     "dec_fraction_basics",
-    "vis_hundred_square"
+    "vis_hundred_square",
+    "f_to_d_one_item"
    ],
    "pre": [
     {
@@ -6417,6 +6443,14 @@
      "teaches": "shade or read the hundred square that shows it",
      "closes": "the hundred-square model",
      "representation": "a 10 × 10 hundred square as one whole, shade or read"
+    },
+    {
+     "proposal": "f_to_d_one_item",
+     "name": "Fraction to Decimal: One Item (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "convert one hundredth per cell (37/100 = 0.37), with no percent bin sort on the page",
+     "closes": "the bin-sort items (percent tiles and quarters as decimals) are off the page",
+     "representation": "equation cell 7/10 = □ with one decimal box and a fixed decimal point"
     }
    ]
   },
@@ -6773,7 +6807,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (lower grade, same idea)",
      "opts": {
       "band": 999,
       "rename": "more"
@@ -7026,7 +7060,7 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "halves and quarters mixed with eighths; no hundred-square model",
+     "missing": "halves and quarters mixed with eighths; no hundred-square model; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
      "opts": {
       "denoms": [
        2
@@ -7037,7 +7071,8 @@
    "verdict": "partial",
    "missing": "1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75 (and 0.5 = 5/10 = 50/100) with a hundred square",
    "build": [
-    "dec_fraction_basics"
+    "dec_fraction_basics",
+    "f_to_d_one_item"
    ],
    "pre": [
     {
@@ -7086,6 +7121,14 @@
      "teaches": "write 1/2, 1/4 and 3/4 as 0.5, 0.25 and 0.75 (and back) from a hundred square",
      "closes": "1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75 (and 0.5 = 5/10 = 50/100) with a hundred square",
      "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    },
+    {
+     "proposal": "f_to_d_one_item",
+     "name": "Fraction to Decimal: One Item (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "convert one half or quarter per cell (3/4 = 0.75), with no percent tiles or twelfths",
+     "closes": "the bin-sort items (percent tiles and quarters as decimals) are off the page",
+     "representation": "equation cell 7/10 = □ with one decimal box and a fixed decimal point"
     }
    ]
   },
@@ -7531,7 +7574,7 @@
     },
     {
      "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)",
+     "why": "Y1.B9.S3 Count in 5s (lower grade, same idea; counting on in 5s from any number)",
      "maxNumber": 100
     }
    ],
@@ -8113,7 +8156,7 @@
     },
     {
      "key": "patterns:seq_5",
-     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W25)",
+     "why": "Y1.B9.S3 Count in 5s (lower grade, same idea; counting on in 5s from any number)",
      "maxNumber": 100
     }
    ],
@@ -8499,7 +8542,13 @@
    "related": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "why": "shapes drawn on the same squared grid, counted square by square"
+     "why": "shapes drawn on the same squared grid, counted square by square",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "note": "",
@@ -8794,6 +8843,24 @@
    ],
    "reused": true,
    "source": "VISUAL_BUILDS"
+  },
+  "estimate_within_10k": {
+   "kind": "option",
+   "skill": "number_sense:estimate_sums_diffs",
+   "option": "limit \"within 9,999\": operands, the true sum and every shown answer held to 9,999",
+   "name": "Estimate Within 10,000 (option)",
+   "teaches": "round two 4-digit numbers to the nearest 1,000 or 100 and judge an answer, with every number on the page within 10,000",
+   "representation": "equation cell 4,267 + 3,527 = 7,794 with \"Reasonable / Not reasonable\" check boxes and a rounding line beneath (hint, fades)",
+   "family": "number_sense",
+   "ccss": [
+    "4.NBT.A.3",
+    "3.NBT.A.1"
+   ],
+   "why": "place 1,000 with task reasonable deals sums to 19,191 and decoys to 174,380; Y4 add/sub is held within 10,000",
+   "steps": [
+    "Y4.B2.S9"
+   ],
+   "reused": false
   },
   "inverse_check": {
    "kind": "option",
@@ -9346,6 +9413,25 @@
    ],
    "reused": false
   },
+  "f_to_d_one_item": {
+   "kind": "option",
+   "skill": "conversions:f_to_d",
+   "option": "form \"convert one fraction\" / \"drag-bin sort\" (the _dragOrNot option d_to_f, f_to_p and p_to_f already have)",
+   "name": "Fraction to Decimal: One Item (option)",
+   "teaches": "convert one fraction to a decimal per cell (7/10 = 0.7); no percent or bin-sort items on the page",
+   "representation": "equation cell 7/10 = □ with one decimal box and a fixed decimal point; the bin sort stays available as its own form",
+   "family": "conversions",
+   "ccss": [
+    "4.NF.C.6"
+   ],
+   "why": "f_to_d mixes a drag-bin sort of 50% / 75% / 0.25 tiles into every denominator set; d_to_f can switch it off, f_to_d cannot",
+   "steps": [
+    "Y4.B8.S2",
+    "Y4.B8.S8",
+    "Y4.B9.S8"
+   ],
+   "reused": false
+  },
   "decimal_pv": {
    "kind": "new",
    "skill": "decimals:decimal_place_value",
@@ -9894,8 +9980,8 @@
   {
    "key": "placevalue:place_value_disks",
    "step": "Y4.B1.S1",
-   "action": "full",
-   "why": "re-tag as FULL with band 999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 999",
    "opts": {
     "band": 999
    }
@@ -9921,8 +10007,8 @@
   {
    "key": "placevalue:expand",
    "step": "Y4.B1.S2",
-   "action": "full",
-   "why": "re-tag as FULL with band 999 (standard partition is all the step asks)",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 999 (standard partition is all the step asks)",
    "opts": {
     "band": 999
    }
@@ -9930,8 +10016,8 @@
   {
    "key": "placevalue:unit_form",
    "step": "Y4.B1.S2",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "band": 999
    }
@@ -9939,8 +10025,9 @@
   {
    "key": "number_sense:place_on_number_line",
    "step": "Y4.B1.S3",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "reading an unlabelled point and lines counting in 2s, 5s, 50s, 100s; estimating where a number goes on 0-1,000",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "span": 100,
     "band": 1000
@@ -9961,8 +10048,9 @@
   {
    "key": "placevalue:place_value_disks",
    "step": "Y4.B1.S4",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "reads 4-digit numbers from counters; never shows 1,000 as 10 hundreds or counts in 1,000s",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "band": 9999
    }
@@ -9970,8 +10058,8 @@
   {
    "key": "placevalue:place_value_disks",
    "step": "Y4.B1.S5",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -9979,8 +10067,8 @@
   {
    "key": "placevalue:pv_digit_drag",
    "step": "Y4.B1.S5",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -9997,8 +10085,8 @@
   {
    "key": "placevalue:combine",
    "step": "Y4.B1.S6",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -10006,8 +10094,8 @@
   {
    "key": "placevalue:expand",
    "step": "Y4.B1.S6",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -10045,8 +10133,9 @@
   {
    "key": "placevalue:more_less_100",
    "step": "Y4.B1.S8",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "only 1,000 more or less (4,890 + 1,000); never 1 or 10, never the four steps mixed; 100 more or less on 3-digit numbers only (489 + 100); the skill has no 4-digit band",
+   "why": "tagged full (note '1, 10, 100 and 1,000'); generated items teach only part of the step",
    "opts": [
     {
      "step": 1000
@@ -10059,8 +10148,9 @@
   {
    "key": "number_sense:place_on_number_line",
    "step": "Y4.B1.S9",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "reading the number at a point and lines in 100s/1,000s with only some ticks labelled",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "span": 1000,
     "band": 10000
@@ -10080,8 +10170,8 @@
   {
    "key": "placevalue:compare",
    "step": "Y4.B1.S11",
-   "action": "full",
-   "why": "re-tag as FULL (drop the partial flag) with opts band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -10089,8 +10179,8 @@
   {
    "key": "placevalue:order_greatest_to_least",
    "step": "Y4.B1.S12",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -10098,8 +10188,8 @@
   {
    "key": "placevalue:order_least_to_greatest",
    "step": "Y4.B1.S12",
-   "action": "full",
-   "why": "re-tag as FULL with band 9,999",
+   "action": "opts",
+   "why": "tagged full already; record the options: band 9,999",
    "opts": {
     "band": 9999
    }
@@ -10155,6 +10245,13 @@
      ]
     }
    ]
+  },
+  {
+   "key": "addition:add_sub_100s",
+   "step": "Y4.B2.S1",
+   "action": "partial",
+   "partial": "adding/subtracting 1s, 10s and 1,000s, and any of them to a 4-digit number (3,452 + 300); it deals only 100s to about 1,000",
+   "why": "kept partial; missing clause now names 1s, 10s, 1,000s on 4-digit numbers"
   },
   {
    "key": "placevalue:more_less_100",
@@ -10214,15 +10311,16 @@
   {
    "key": "number_sense:estimate_sums_diffs",
    "step": "Y4.B2.S9",
-   "action": "full",
-   "why": "re-tag as FULL with place 1,000 and task reasonable",
+   "action": "partial",
+   "partial": "with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers; 4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000",
+   "why": "tagged full (note 'nearest 100 or 1,000'); generated items teach only part of the step",
    "opts": [
+    {
+     "place": 100
+    },
     {
      "place": 1000,
      "task": "reasonable"
-    },
-    {
-     "place": 100
     }
    ]
   },
@@ -10260,10 +10358,17 @@
    "why": "no half squares"
   },
   {
+   "key": "shapes_early:compose_rect_from_squares",
+   "step": "Y4.B3.S3",
+   "action": "partial",
+   "partial": "generated: every item is the same 2 × 3 rectangle to fill; never different shapes with the same area",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
+  },
+  {
    "key": "multiplication:count_by_tables",
    "step": "Y4.B4.S1",
-   "action": "full",
-   "why": "re-tag as FULL with constant [3]",
+   "action": "opts",
+   "why": "tagged full already; record the options: constant [3]",
    "opts": {
     "constant": [
      3
@@ -10285,8 +10390,8 @@
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S2",
-   "action": "full",
-   "why": "re-tag as FULL with opts constant [6] (likewise S4, S7, S9, S10)",
+   "action": "opts",
+   "why": "tagged full already; record the options: constant [6] (likewise S4, S7, S9, S10)",
    "opts": {
     "constant": [
      6
@@ -10307,8 +10412,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S2",
-   "action": "full",
-   "why": "re-tag as FULL with opts constant [6] (likewise S4 with [9], S7 [7], S9 [11], S10 [12])",
+   "action": "opts",
+   "why": "tagged full already; record the options: constant [6] (likewise S4 with [9], S7 [7], S9 [11], S10 [12])",
    "opts": {
     "constant": [
      6
@@ -10335,8 +10440,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S3",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      6
@@ -10346,8 +10451,8 @@
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S4",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      9
@@ -10368,8 +10473,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S4",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      9
@@ -10396,8 +10501,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S5",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      9
@@ -10407,8 +10512,9 @@
   {
    "key": "multiplication:mult_chart",
    "step": "Y4.B4.S6",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "shows the 3, 6, 9 rows but does not ask the link (6 × 4 = double 3 × 4; 9 × 4 = 3 × 3 × 4)",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "task": "pattern",
     "constant": [
@@ -10421,8 +10527,8 @@
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S7",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      7
@@ -10443,8 +10549,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S7",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      7
@@ -10471,8 +10577,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S8",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      7
@@ -10482,8 +10588,8 @@
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S9",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      11
@@ -10504,8 +10610,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S9",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      11
@@ -10515,8 +10621,8 @@
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S10",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      12
@@ -10537,8 +10643,8 @@
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S10",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "constant": [
      12
@@ -10584,8 +10690,9 @@
   {
    "key": "multiplication:mult_properties",
    "step": "Y4.B4.S12",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "times 1 only; never n ÷ n = 1 or n ÷ 1 = n as a pair",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "forms": [
      2
@@ -10595,7 +10702,8 @@
   {
    "key": "multiplication:mult_properties",
    "step": "Y4.B5.S2",
-   "action": "opts",
+   "action": "partial",
+   "partial": "breaking apart by addition only; never replacing a factor by a factor pair (12 × 5 = 6 × 2 × 5)",
    "why": "kept partial (breaking apart by addition, not a factor pair)",
    "opts": {
     "forms": [
@@ -10613,8 +10721,8 @@
   {
    "key": "multiplication:mult_zeros",
    "step": "Y4.B5.S3",
-   "action": "full",
-   "why": "re-tag as FULL with forms [0] (S4: forms [1])",
+   "action": "opts",
+   "why": "tagged full already; record the options: forms [0] (S4: forms [1])",
    "opts": {
     "forms": [
      0
@@ -10624,8 +10732,8 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B5.S3",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "op": "x",
     "power": [
@@ -10637,8 +10745,8 @@
   {
    "key": "multiplication:mult_zeros",
    "step": "Y4.B5.S4",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "forms": [
      1
@@ -10648,8 +10756,8 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B5.S4",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "op": "x",
     "power": [
@@ -10661,8 +10769,8 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B5.S5",
-   "action": "full",
-   "why": "re-tag as FULL with op ÷, power [10] (S6: power [100])",
+   "action": "opts",
+   "why": "tagged full already; record the options: op ÷, power [10] (S6: power [100])",
    "opts": {
     "op": "/",
     "power": [
@@ -10674,8 +10782,8 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B5.S6",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "op": "/",
     "power": [
@@ -10687,8 +10795,9 @@
   {
    "key": "multiplication:mult_zeros",
    "step": "Y4.B5.S7",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "multiplication only; not the matching division (120 ÷ 4 = 30) or the fact family of 3 × 4 = 12",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "forms": [
      2
@@ -10708,7 +10817,8 @@
   {
    "key": "multiplication:multiply",
    "step": "Y4.B5.S8",
-   "action": "opts",
+   "action": "partial",
+   "partial": "goes straight to the column method",
    "why": "kept partial: the column method is not the informal layout",
    "opts": {
     "tiles": 21
@@ -10726,8 +10836,8 @@
   {
    "key": "multiplication:multiply",
    "step": "Y4.B5.S9",
-   "action": "full",
-   "why": "re-tag as FULL with tiles 21 (S10: tiles 31)",
+   "action": "opts",
+   "why": "tagged full already; record the options: tiles 21 (S10: tiles 31)",
    "opts": {
     "tiles": 21
    }
@@ -10744,8 +10854,8 @@
   {
    "key": "multiplication:multiply",
    "step": "Y4.B5.S10",
-   "action": "full",
-   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
    "opts": {
     "tiles": 31
    }
@@ -10812,10 +10922,18 @@
    }
   },
   {
+   "key": "multiplication:mult_properties",
+   "step": "Y4.B5.S15",
+   "action": "partial",
+   "partial": "order and breaking apart, but not choosing a method (doubling, near multiples, factor pairs) for a calculation",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
+  },
+  {
    "key": "measurement:length_metric",
    "step": "Y4.B6.S1",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "generated: only \"How many m are in 7 km?\"; no sense of 1 km, no mixed km and m",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
    "opts": {
     "forms": [
      3
@@ -10825,7 +10943,8 @@
   {
    "key": "measurement:length_metric",
    "step": "Y4.B6.S2",
-   "action": "opts",
+   "action": "partial",
+   "partial": "km to m in whole kilometres only; not m to km, half kilometres (1,500 m = 1 1/2 km) or mixed units",
    "why": "km → m whole numbers only",
    "opts": {
     "forms": [
@@ -10848,8 +10967,8 @@
   {
    "key": "area_perimeter:perimeter",
    "step": "Y4.B6.S4",
-   "action": "full",
-   "why": "re-tag as FULL with forms [0, 1]",
+   "action": "opts",
+   "why": "tagged full already; record the options: forms [0, 1]",
    "opts": {
     "forms": [
      0,
@@ -10872,8 +10991,9 @@
   {
    "key": "area_perimeter:perimeter_grid",
    "step": "Y4.B6.S5",
-   "action": "opts",
-   "why": "re-tag as FULL (L-shapes on a grid)",
+   "action": "partial",
+   "partial": "L-shapes only (six sides), counted on a grid or with written whole-number sides; no T- or U-shapes",
+   "why": "tagged full (note 'L-shapes'); the generated items teach only the six-sided shapes",
    "opts": {
     "forms": [
      1,
@@ -10892,6 +11012,13 @@
      0
     ]
    }
+  },
+  {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y4.B6.S7",
+   "action": "partial",
+   "partial": "every side length is given (counted on a grid, or written on rectangles and L-shapes); no side has to be found first",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
   },
   {
    "key": "area_perimeter:perimeter_intro",
@@ -10957,6 +11084,13 @@
    "why": "generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)"
   },
   {
+   "key": "fractions:equiv_frac_visual",
+   "step": "Y4.B7.S9",
+   "action": "partial",
+   "partial": "bar and area models only; no stacked number lines",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
+  },
+  {
    "key": "fractions:select_equiv_frac",
    "step": "Y4.B7.S10",
    "action": "add",
@@ -10968,6 +11102,13 @@
    "action": "add",
    "partial": "two addends only (10/11 + 3/11, 7/8 + 5/8); never three or more",
    "why": "missing tag (two-addend part)"
+  },
+  {
+   "key": "fraction_operations:add_fractions_like",
+   "step": "Y4.B7.S11",
+   "action": "partial",
+   "partial": "two addends only; no three or more addends",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
   },
   {
    "key": "fraction_operations:add_mixed_like",
@@ -11014,8 +11155,9 @@
   {
    "key": "fractions:write_fraction",
    "step": "Y4.B8.S1",
-   "action": "opts",
-   "why": "kept partial with denoms [5]",
+   "action": "partial",
+   "partial": "tenths are mixed with fifths and hundredths; no tenths-only page and no counting in tenths past 1",
+   "why": "tagged full (note 'tenths'); with denoms [5] the items mix fifths and hundredths with tenths",
    "opts": {
     "denoms": [
      5
@@ -11037,8 +11179,9 @@
   {
    "key": "conversions:f_to_d",
    "step": "Y4.B8.S2",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "mixes fifths and hundredths with tenths; no tenths model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+   "why": "tagged full (note 'tenths'); generated items teach only part of the step",
    "opts": {
     "denoms": [
      5
@@ -11058,7 +11201,8 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B8.S5",
-   "action": "opts",
+   "action": "partial",
+   "partial": "generated items divide 3-digit numbers (274 ÷ 10); the step needs only 1-digit numbers ÷ 10 (7 ÷ 10 = 0.7)",
    "why": "generated 3-digit ÷ 10; step is 1-digit (S6 2-digit, S10 ÷100 likewise)",
    "opts": {
     "op": "/",
@@ -11071,8 +11215,9 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B8.S6",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "generated items divide 3-digit numbers (274 ÷ 10); the step needs only 2-digit numbers ÷ 10 (34 ÷ 10 = 3.4)",
+   "why": "tagged full (note '÷ 10, decimals on'); generated items teach only part of the step",
    "opts": {
     "op": "/",
     "power": [
@@ -11103,8 +11248,9 @@
   {
    "key": "conversions:f_to_d",
    "step": "Y4.B8.S8",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "hundredths mixed with fifths and tenths; no hundred-square model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)",
+   "why": "tagged full (note 'hundredths'); generated items teach only part of the step",
    "opts": {
     "denoms": [
      5
@@ -11114,8 +11260,9 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B8.S10",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "generated items divide 3-digit numbers (274 ÷ 100); the step needs 1- and 2-digit numbers ÷ 100 (7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34)",
+   "why": "tagged full (note '÷ 100, decimals on'); generated items teach only part of the step",
    "opts": {
     "op": "/",
     "power": [
@@ -11159,8 +11306,9 @@
   {
    "key": "conversions:f_to_d",
    "step": "Y4.B9.S8",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "halves and quarters mixed with eighths; no hundred-square model; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths",
+   "why": "tagged full (note 'halves and quarters'); generated items teach only part of the step",
    "opts": {
     "denoms": [
      2
@@ -11271,6 +11419,13 @@
    ]
   },
   {
+   "key": "angles_lines:identify_angles",
+   "step": "Y4.B12.S3",
+   "action": "partial",
+   "partial": "names acute/right/obtuse; never compares two angles or orders three by size",
+   "why": "kept partial: names angles, no compare/order"
+  },
+  {
    "key": "shapes_early:count_sides_vertices_2d",
    "step": "Y4.B12.S6",
    "action": "add",
@@ -11345,6 +11500,20 @@
     ]
    },
    "maxNumber": 10
+  },
+  {
+   "key": "coordinates:coord_polygon",
+   "step": "Y4.B14.S3",
+   "action": "partial",
+   "partial": "gives the vertices and asks side lengths/perimeter; never asks to plot and join, or to find the missing vertex",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
+  },
+  {
+   "key": "coordinates:geo_translate",
+   "step": "Y4.B14.S4",
+   "action": "partial",
+   "partial": "multiple choice in four quadrants; the pupil never draws the translated shape on a first-quadrant grid",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out"
   },
   {
    "key": "coordinates:geo_translate",
@@ -11428,7 +11597,8 @@
      0
     ]
    },
-   "why": "its step [0] counts in 2s, 5s and 10s: exactly Y2.B1.S15 (critic Y4 r11)"
+   "why": "its step [0] counts in 2s, 5s and 10s, but from any number and past 100: a partial cover of Y2.B1.S15 (critic Y4 r12)",
+   "partial": "counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)"
   }
  ]
 }

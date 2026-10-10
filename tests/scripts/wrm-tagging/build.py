@@ -188,7 +188,7 @@ for sid_, st_ in out_steps.items():
         if cands:
             ref_ = m_.group(1)
             # the same grade as the cited step first, then the nearest step to it in WRM order
-            best = min(cands, key=lambda t_: (t_.split('.')[0] != ref_.split('.')[0], abs(allorder.index(t_) - allorder.index(ref_)) if ref_ in allorder else 0))
+            best = min(sorted(cands), key=lambda t_: (t_.split('.')[0] != ref_.split('.')[0], abs(allorder.index(t_) - allorder.index(ref_)) if ref_ in allorder else 0))
             e_['why'] = why_for(sid_, best, 'X'); recited += 1
         else:
             e_['why'] = e_['why'].rstrip(')') + f"; nearest live practice: {e_['key'].split(':')[1]} is not tagged to {m_.group(1)})"
@@ -223,11 +223,12 @@ for sid, st in out_steps.items():
 # action: add (no tag yet; `partial` carries the missing clause when it is a partial cover), full (an existing partial
 # tag becomes full), partial (an existing full tag becomes partial), opts (tag unchanged, record the option values),
 # remove (tagged now, not a direct or partial skill here). The hand-written why is kept where one exists.
-cur = {}
+cur, notes = {}, {}
 for k, v in K['tags'].items():
     for e in v:
         sid_ = e if isinstance(e, str) else e['step']
-        if sid_ in out_steps: cur[(k, sid_)] = None if isinstance(e, str) else e.get('partial', '')
+        if sid_ in out_steps: cur[(k, sid_)] = None if isinstance(e, str) or 'partial' not in e else e['partial']   # {step, note} is a FULL tag in wrm.js
+        if sid_ in out_steps and isinstance(e, dict) and e.get('note'): notes[(k, sid_)] = e['note']
 hand = {(t['key'], t['step']): t for t in ns['TAGFIXES']}
 want = {}
 for sid, st in out_steps.items():
@@ -238,23 +239,35 @@ for sid, st in out_steps.items():
         w = want.setdefault((pz['key'], sid), {'status': 'partial', 'opts': [], 'missing': pz['missing']})
         w['opts'].append(pz.get('opts', {}))
         if pz.get('maxNumber'): w['maxNumber'] = pz['maxNumber']
-        if w['status'] == 'partial': w['missing'] = pz['missing']
+        if w['status'] == 'partial' and pz['missing'] not in w['missing']: w['missing'] = w['missing'] + '; ' + pz['missing']   # two option sets of one skill: both clauses
 tagfixes = []
-def why_of(key, sid, dflt):
-    h = hand.get((key, sid)); return h['why'] if h else dflt
+def why_of(key, sid, dflt, action=None):
+    # The hand why is kept unless it contradicts the derived action (the hand list predates reading {step, note} as FULL).
+    h = hand.get((key, sid))
+    if not h: return dflt
+    w = h['why']
+    if re.match(r'^re-tag as FULL', w) and action == 'opts':
+        rest = re.sub(r'^re-tag as FULL(?: \(drop the partial flag\))?(?: with)?(?: opts)? ?', '', w).strip()
+        return 'tagged full already; record the options' + (': ' + (rest[1:-1] if rest.startswith('(') and rest.endswith(')') else rest) if rest else '')
+    if re.search(r'FULL', w) and action in ('partial', 'remove'): return dflt
+    if re.match(r'^kept partial', w) and action == 'partial' and cur.get((key, sid), '') is None: return dflt + ' (' + w[len('kept partial'):].strip() + ')'
+    return w
 for (key, sid), w in sorted(want.items(), key=lambda x: (order.index(x[0][1]), x[0][0])):
     opts = [o for o in w['opts'] if o]
     t = {'key': key, 'step': sid}
     if (key, sid) not in cur:
         t['action'] = 'add'
         if w['status'] == 'partial': t['partial'] = w['missing']
-        t['why'] = why_of(key, sid, 'not tagged yet; generated items teach this step' + (' in part' if w['status'] == 'partial' else ''))
+        t['why'] = why_of(key, sid, 'not tagged yet; generated items teach this step' + (' in part' if w['status'] == 'partial' else ''), 'add')
     elif cur[(key, sid)] is not None and w['status'] == 'full':
-        t['action'] = 'full'; t['why'] = why_of(key, sid, 'tagged partial; with these option values the generated items teach the whole step')
+        t['action'] = 'full'; t['why'] = why_of(key, sid, 'tagged partial; with these option values the generated items teach the whole step', 'full')
     elif cur[(key, sid)] is None and w['status'] == 'partial':
-        t['action'] = 'partial'; t['partial'] = w['missing']; t['why'] = why_of(key, sid, 'tagged full; generated items teach only part of the step')
+        t['action'] = 'partial'; t['partial'] = w['missing']; t['why'] = why_of(key, sid, 'tagged full' + (f" (note '{notes[(key, sid)]}')" if (key, sid) in notes else '') + '; generated items teach only part of the step', 'partial')
+    elif w['status'] == 'partial' and cur[(key, sid)] != w['missing']:
+        # partial -> partial with a new clause: the clause in SKILL_WRM is replaced by this file's
+        t['action'] = 'partial'; t['partial'] = w['missing']; t['why'] = why_of(key, sid, 'tagged partial; the clause is replaced by what the generated items leave out', 'partial')
     elif opts:
-        t['action'] = 'opts'; t['why'] = why_of(key, sid, 'tag unchanged; record the option values that make the generated items fit the step')
+        t['action'] = 'opts'; t['why'] = why_of(key, sid, 'tag unchanged; record the option values that make the generated items fit the step', 'opts')
     else:
         continue
     if opts: t['opts'] = opts if len(opts) > 1 else opts[0]
@@ -265,10 +278,29 @@ for (key, sid), pz in sorted(cur.items(), key=lambda x: (order.index(x[0][1]), x
     st = out_steps[sid]
     where = 'related' if any(r['key'] == key for r in st['related']) else ('pre' if any(p['key'] == key for p in st['pre']) else '')
     tagfixes.append({'key': key, 'step': sid, 'action': 'remove',
-                     'why': why_of(key, sid, 'generated items do not teach this step' + (f'; kept as a {where} skill' if where else ''))})
+                     'why': why_of(key, sid, 'generated items do not teach this step' + (f'; kept as a {where} skill' if where else ''), 'remove')})
 # hand fixes on steps outside this year (another grade's tag a Y4 link relies on) are kept as written
 tagfixes += [dict(t) for t in ns['TAGFIXES'] if t['step'] not in out_steps]
 stale = [k for k in hand if k not in {(t['key'], t['step']) for t in tagfixes}]
+# Critic r12 N: simulate the lead's merge of these tagFixes into SKILL_WRM; every Y4 direct must come out full, every partial
+# partial with this file's clause, and nothing else tagged to a Y4 step.
+merged = {k_: ('full' if c_ is None else ('partial', c_)) for k_, c_ in cur.items()}
+for t_ in tagfixes:
+    k_ = (t_['key'], t_['step'])
+    if t_['step'] not in out_steps: continue
+    if t_['action'] == 'remove': merged.pop(k_, None)
+    elif t_['action'] == 'full' or (t_['action'] == 'add' and 'partial' not in t_): merged[k_] = 'full'
+    elif t_['action'] in ('partial', 'add'): merged[k_] = ('partial', t_['partial'])
+    elif t_['action'] == 'opts' and k_ not in merged: errs.append(f'merge: opts on an untagged {k_}')
+for k_, w_ in want.items():
+    got_ = merged.get(k_)
+    exp_ = 'full' if w_['status'] == 'full' else ('partial', w_['missing'])
+    if got_ != exp_: errs.append(f'merge: {k_[1]} {k_[0]} is {got_} after the merge, Y4.json says {exp_}')
+for k_ in merged:
+    if k_ not in want: errs.append(f'merge: {k_[1]} {k_[0]} stays tagged after the merge but is not a direct or partial skill')
+for t_ in tagfixes:
+    if t_['action'] == 'full' and re.search(r'^tagged partial', t_['why']) and cur.get((t_['key'], t_['step'])) is None: errs.append(f"merge: {t_['step']} {t_['key']} why says tagged partial but it is tagged full")
+print('merge check: SKILL_WRM + tagFixes reproduces every Y4 verdict' if not any(e_.startswith('merge:') for e_ in errs) else 'merge check: FAIL')
 
 missing_steps = [s for s in order if s not in out_steps]
 doc = {'year': 'Y4', 'generatedBy': 'wave2-tagging', 'steps': {s: out_steps[s] for s in order if s in out_steps},

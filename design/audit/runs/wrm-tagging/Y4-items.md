@@ -2071,3 +2071,110 @@ Pre and related links new or changed since round 11 (4 items each):
 3. Count the outside edges. What is the perimeter? → 10
 4. Count the outside edges. What is the perimeter? → 24
 
+
+# Round 13
+
+Steps whose direct or partial changed (B2.S9, B8.S2, B8.S8, B9.S8):
+
+## Y4.B2.S9 Estimate answers — partial
+
+**partial** `number_sense:estimate_sums_diffs` opts `{"place":100}` Max Number 10000 — missing: with place 100: 3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers
+
+1. Round each number to the nearest 100. 538 + 775 ≈ ___ + ___ = ___ → 1300 [pv]
+2. Round each number to the nearest 100. 728 − 250 ≈ ___ − ___ = ___ → 400 [pv]
+3. Round each number to the nearest 100. 309 + 186 ≈ ___ + ___ = ___ → 500 [pv]
+4. Round each number to the nearest 100. 631 − 304 ≈ ___ − ___ = ___ → 300 [pv]
+5. Round each number to the nearest 100. 972 + 305 ≈ ___ + ___ = ___ → 1300 [pv]
+6. Round each number to the nearest 100. 854 − 756 ≈ ___ − ___ = ___ → 100 [pv]
+
+**partial** `number_sense:estimate_sums_diffs` opts `{"place":1000,"task":"reasonable"}` Max Number 10000 — missing: 4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000
+
+1. Is this answer reasonable? 5,376 + 7,757 = 13,133 → Reasonable [pv]
+2. Is this answer reasonable? 7,285 − 2,500 = 4,785 → Reasonable [pv]
+3. Is this answer reasonable? 3,090 + 1,859 = 49,490 → Not reasonable [pv]
+4. Is this answer reasonable? 6,307 − 3,041 = 32,660 → Not reasonable [pv]
+5. Is this answer reasonable? 9,886 + 1,656 = 11,542 → Reasonable [pv]
+6. Is this answer reasonable? 8,543 − 7,558 = 985 → Reasonable [pv]
+
+## Y4.B8.S2 Tenths as decimals — partial
+
+**partial** `conversions:f_to_d` opts `{"denoms":[5]}` Max Number 10000 — missing: mixes fifths and hundredths with tenths; no tenths model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)
+
+1. Convert to decimal: 1/100 → 0.01
+2. Convert to decimal: 9/10 → 0.9
+3. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binThreeQ","t2":"binHalf","t3":"binH
+4. Drag each value into the bin for the equivalent fraction. → {"t0":"binQuarter","t1":"binHalf","t2":"binThreeQ","t3":"bin
+5. Convert to decimal: 25/100 → 0.25
+6. Convert to decimal: 7/100 → 0.07
+
+**partial** `conversions:d_to_f` opts `{"forms":[0]}` Max Number 10000 — missing: mixes fifths (0.6 = 3/5); no tenths-only page
+
+1. Convert 0.3 to a fraction. → 3/10
+2. Convert 0.1 to a fraction. → 1/10
+3. Convert 0.8 to a fraction. → 4/5
+4. Convert 0.5 to a fraction. → 1/2
+5. Convert 0.5 to a fraction. → 1/2
+6. Convert 0.7 to a fraction. → 7/10
+
+## Y4.B8.S8 Hundredths as decimals — partial
+
+**partial** `conversions:f_to_d` opts `{"denoms":[5]}` Max Number 10000 — missing: hundredths mixed with fifths and tenths; no hundred-square model; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)
+
+1. Convert to decimal: 1/100 → 0.01
+2. Convert to decimal: 9/10 → 0.9
+3. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binThreeQ","t2":"binHalf","t3":"binH
+4. Drag each value into the bin for the equivalent fraction. → {"t0":"binQuarter","t1":"binHalf","t2":"binThreeQ","t3":"bin
+5. Convert to decimal: 25/100 → 0.25
+6. Convert to decimal: 7/100 → 0.07
+
+**partial** `conversions:d_to_f` opts `{"forms":[0]}` Max Number 10000 — missing: mixes fifths; no hundredths-only page
+
+1. Convert 0.3 to a fraction. → 3/10
+2. Convert 0.1 to a fraction. → 1/10
+3. Convert 0.8 to a fraction. → 4/5
+4. Convert 0.5 to a fraction. → 1/2
+5. Convert 0.5 to a fraction. → 1/2
+6. Convert 0.7 to a fraction. → 7/10
+
+## Y4.B9.S8 Halves and quarters as decimals — partial
+
+**partial** `conversions:f_to_d` opts `{"denoms":[2]}` Max Number 10000 — missing: halves and quarters mixed with eighths; no hundred-square model; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths
+
+1. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binQuarter","t2":"binQuarter","t3":"
+2. Drag each value into the bin for the equivalent fraction. → {"t0":"binHalf","t1":"binThreeQ","t2":"binHalf","t3":"binThr
+3. Drag each value into the bin for the equivalent fraction. → {"t0":"binThreeQ","t1":"binThreeQ","t2":"binHalf","t3":"binH
+4. Drag each value into the bin for the equivalent fraction. → {"t0":"binQuarter","t1":"binHalf","t2":"binThreeQ","t3":"bin
+5. Convert to decimal: 1/4 → 0.25
+6. Drag each value into the bin for the equivalent fraction. → {"t0":"binHalf","t1":"binThreeQ","t2":"binQuarter","t3":"bin
+
+
+Pre and related links whose key or options changed since round 12 (4 items each):
+
+**Y4.B1.S8 pre** `placevalue:value` opts `{"band":999}` Max Number 10000 — Y3.B1.S8 Hundreds, tens and ones (lower grade, same CCSS cluster)
+
+1. What is the underlined digit worth? → 8
+2. What is the underlined digit worth? → 30
+3. What is the underlined digit worth? → 4
+4. What is the underlined digit worth? → 300
+
+**Y4.B3.S2 related** `area_perimeter:perimeter_grid` opts `{"forms":[0,1]}` Max Number 10000 — counting edges on the same grid
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Count the outside edges. What is the perimeter? → 20
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+
+**Y4.B6.S1 pre** `placevalue:place_value_10x` opts `{"op":"x","power":[100],"band":10000}` Max Number 10000 — Y4.B5.S4 Multiply by 100 (taught earlier this year, wk W17)
+
+1. 5 × 100 = ? → 500
+2. 76 × 100 = ? → 7600
+3. 31 × 100 = ? → 3100
+4. 3 × 100 = ? → 300
+
+**Y4.B14.S4 related** `area_perimeter:perimeter_grid` opts `{"forms":[0,1]}` Max Number 10000 — shapes drawn on the same squared grid, counted square by square
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Count the outside edges. What is the perimeter? → 20
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+

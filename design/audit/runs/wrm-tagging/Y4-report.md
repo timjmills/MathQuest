@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 12
+# Wave 2 tagging: Y4 (Grade 3) report, round 13
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -11,13 +11,13 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | | Round 2 | Round 3 | Round 4 |
 |---|---|---|---|
 | Steps | 129 | 129 | 129 (14 blocks, none skipped) |
-| Full | 56 | 48 | **44** (round 12; 45 in round 4) |
-| Partial | 50 | 60 | **64** (round 12; 63 in round 4) |
+| Full | 56 | 48 | **43** (round 13: B2.S9 became partial; 45 in round 4) |
+| Partial | 50 | 60 | **65** (round 13; 63 in round 4) |
 | Gap | 23 | 21 | **21** |
-| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **72 (24 new, 48 reused)** (round 12) |
-| Tag fixes | 76 (hand list) | 151, derived | **157, derived** (round 12: add 46, full 35, opts 33, partial 32, remove 11; one hand fix tags a Y2 step) |
-| Pre / related entries | 528 / — | 570 / 319 | **533 / 215** (round 12). Every step has at least 3 pre and at least 1 related. 0 keys in both |
-| Option checks | — | — | Round 12: 396 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 748 links misfit** (`linkfit.mjs`, 180 items a link; per-step result in `Y4-linkfit.txt`) |
+| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **74 (26 new, 48 reused)** (round 13) |
+| Tag fixes | 76 (hand list) | 151, derived | **166, derived** (round 13: add 46, full 1, opts 47, partial 61, remove 11; one hand fix tags a Y2 step as partial). A simulated merge into the live `SKILL_WRM` reproduces every Y4 verdict and clause (`mergecheck.mjs`) |
+| Pre / related entries | 528 / — | 570 / 319 | **532 / 215** (round 13). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 13: 398 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 747 links misfit** (`linkfit.mjs`, 180 items a link; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,94 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 13 (after critic r12: tagFix derivation, f_to_d bin branch, B2.S9, 4 isolated cites)
+
+**N. The tagFix derivation in `build.py`** (the lead's merge depends on it).
+
+What changed:
+- **`{step, note}` is now read as a FULL tag**, as wrm.js defines it. The code is `cur = None if isinstance(e, str) or 'partial' not in e else e['partial']`.
+- **The 10 partial covers that stayed full now emit `action:'partial'`** with the step's clause:
+  - B1.S8 `more_less_100`;
+  - B6.S2 `length_metric`;
+  - B6.S5 `perimeter_grid`;
+  - B8.S1 `write_fraction`;
+  - B8.S2, B8.S8 and B9.S8 `f_to_d`;
+  - B8.S5, B8.S6 and B8.S10 `place_value_10x`.
+- **The 34 no-op `full` actions are now `opts`.** Their "tagged partial" whys are gone. A hand "re-tag as FULL with band 9,999" becomes "tagged full already; record the options: band 9,999".
+- **The derived why names the old note.** For example: "tagged full (note 'L-shapes'); generated items teach only part of the step".
+- **A partial → partial clause change is now emitted** as `action:'partial'` whenever the `SKILL_WRM` clause differs from this file's. There are 18. B6.S7 `perimeter_grid` now carries the r12 clause.
+- **Two option sets of one skill on a step** (only B2.S9 now) join their clauses with "; ".
+- **A hand why that contradicts the derived action is not used.** "re-tag as FULL" is dropped on a partial or remove action. "kept partial" on a full tag becomes the derived why.
+  - B6.S5's hand fix is now `partial`: "tagged full (note 'L-shapes'); the generated items teach only the six-sided shapes".
+  - B8.S1's why names the note.
+
+**New merge check.**
+- `build.py` simulates the merge of `SKILL_WRM` plus the tagFixes and fails the build unless:
+  - every direct comes out full;
+  - every partial comes out partial with this file's clause;
+  - nothing else stays tagged to a Y4 step.
+- `tests/scripts/wrm-tagging/mergecheck.mjs` does the same against the **live** `js/modules/wrm.js`. It also flags:
+  - `full` on a full tag;
+  - "tagged partial" whys on full tags;
+  - "re-tag as FULL" on a non-full action;
+  - `add` on an existing tag;
+  - `opts` or `remove` on an untagged one.
+- Result: **mergecheck: OK, 175 Y4 direct/partial tags, 166 tagFixes, 0 problems.**
+- The critic's own scripts also pass: `tfcheck` 0 problems; `tf3` 0 stale clauses.
+
+**B. The `f_to_d` drag-bin branch.**
+
+| Step | Skill / opts | Clause now ends |
+|---|---|---|
+| B8.S2, B8.S8 | `f_to_d {denoms:[5]}` | "; 49 of 150 items are a drag-bin sort of halves and quarters shown as 50% / 75%, 0.25 / 0.75 and eighths or twelfths (percent is later-grade; quarters as decimals are W33)" |
+| B9.S8 | `f_to_d {denoms:[2]}` | "; most items (85-101 of 150) are that drag-bin sort, with percent tiles (25%, 50%, 75%) and twelfths" |
+
+There is a new proposal, **`f_to_d_one_item`**: an option on `conversions:f_to_d` with the form "convert one fraction" or "drag-bin sort". This is the `_dragOrNot` option that `d_to_f`, `f_to_p` and `p_to_f` already have.
+- It is in the build lists of all three steps.
+- Each step has its own envisioned `teaches`, for example "convert one tenth per cell (7/10 = 0.7), with no percent bin sort on the page".
+- Its `closes` is "the bin-sort items (percent tiles and quarters as decimals) are off the page".
+
+**R. B2.S9 is now partial.**
+- Both option sets of `estimate_sums_diffs` are partial covers:
+  - `{place:1000, task:'reasonable'}`: "4-digit sums pass 10,000 in 56 of 150 items (9,884 + 7,610 = 17,494) and the 'not reasonable' answers reach 174,380; the step stays within 10,000".
+  - `{place:100}`: "3-digit numbers rounded to the nearest 100 (427 + 753, sums to 2,000); no 4-digit numbers".
+- `build.py` refuses a partial step that lists a direct skill. The critic's other choice, keeping `{place:100}` direct, would have left the step full.
+- Missing: "estimating 4-digit sums and differences, and judging answers, within 10,000".
+- New proposal **`estimate_within_10k`**: an option on `estimate_sums_diffs` that holds operands, the true sum and every shown answer to 9,999. It has a rule-13 short spec.
+
+**Isolated.**
+
+| # | Step | Link | Now |
+|---|---|---|---|
+| 1 | Y2.B1.S15 hand tagFix | `count_by_step_up {step:[0]}` | `action:'add'` with `partial`: "counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)". The B1.S3 label says "tagged there as a partial cover" |
+| 2 | B1.S8 | pre `value` | `{band:999}`, "Y3.B1.S8 Hundreds, tens and ones (lower grade, same CCSS cluster)" |
+| 3 | B5.S2 | pre `mult_facts {constant:[10], band:100}` | "Y2.B5.S13 The 10 times-table (lower grade, same CCSS cluster)" |
+| 4 | B6.S1 | pre `place_value_10x` | `{op:'x', power:[100], band:10000}`, "Y4.B5.S4 Multiply by 100 (taught earlier this year, wk W17)" |
+
+**Minor.**
+- **`build.py` is reproducible.** The re-cite tie-break is `min(sorted(cands), …)`. Builds under `PYTHONHASHSEED` 0, 1, 4 and 7 give byte-identical Y4.json (md5 ed8096d5…).
+- **B6.S3:** the pre `perimeter_grid {}` is dropped. It still has 3 pre.
+- **B3.S2 and B14.S4:** the related `perimeter_grid` is now `{forms:[0,1]}`, every item counted on a grid, so "counting edges" / "counted square by square" are true.
+- **`hundreds_chart_fill`** (B1.S3, B8.S7) now reads "filling the gaps on a 1-100 hundred chart (Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100)".
+- **`seq_10` and `seq_5` cite their single count:**
+  - B2.S8, B5.S3 and B5.S4 cite "Y1.B9.S2 Count in 10s (…; counting on in 10s from any number)";
+  - B11.S2 and B13.S1 cite "Y1.B9.S3 Count in 5s (…; counting on in 5s from any number)".
+  - Both are tagged there.
+
+**Scan results.**
+- `linkfit.mjs`: 0 of 747 links misfit.
+- `optcheck`: 398 entries, 0 problems.
+- `optchange`: 0.
+- `build.py`: OK; merge check OK; 30 labels re-cited.
+- `mergecheck.mjs`: OK.
+- own12 (critic seeds): 0, apart from known false positives:
+  - the ruled ÷10 / ÷100 hits (100 + 1);
+  - the old own11 "cited count" regex on the five `seq_10` / `seq_5` links. These are ruled honest in r12 §3, and own12's widened 90% read finds 0;
+  - the three related links that name the next Y4 step, as rule 5 allows.
+- own12's "on multiples" lines are info. The labels now say "from any number".
+
+Items: `Y4-items.md` "# Round 13" has B2.S9, B8.S2, B8.S8 and B9.S8 (6 each), plus the 4 links whose key or options changed.
 
 ## Changes in round 12 (after critic r11: re-cites that ignored options, perimeter_grid, whys)
 
