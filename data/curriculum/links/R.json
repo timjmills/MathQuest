@@ -2120,6 +2120,152 @@
     }
    ],
    "note": ""
+  },
+  "R.B10.S1": {
+   "title": "Explore length",
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "length"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [],
+   "related": [],
+   "note": ""
+  },
+  "R.B10.S2": {
+   "title": "Compare length",
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "length"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "order three by length"
+    }
+   ],
+   "note": ""
+  },
+  "R.B10.S3": {
+   "title": "Explore height",
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "height"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [],
+   "related": [],
+   "note": ""
+  },
+  "R.B10.S4": {
+   "title": "Compare height",
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "height"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "order by length or height"
+    }
+   ],
+   "note": ""
+  },
+  "R.B10.S5": {
+   "title": "Talk about time",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "time language: now, before, after, morning, night, yesterday, tomorrow",
+   "build": [
+    "time_talk"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S4 Compare height (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B10.S1 Explore length"
+    }
+   ],
+   "note": ""
+  },
+  "R.B10.S6": {
+   "title": "Order and sequence time",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "ordering events in time (first, next, then)",
+   "build": [
+    "day_order"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S4 Compare height (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "time_talk"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: R.B10.S1 Explore length"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -2298,7 +2444,8 @@
    "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
    "family": "measurement",
    "steps": [
-    "R.B6.S4"
+    "R.B6.S4",
+    "R.B10.S6"
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -2371,6 +2518,20 @@
     "R.B9.S8"
    ],
    "reused": false
+  },
+  "time_talk": {
+   "kind": "new",
+   "skill": "measurement:time_words",
+   "name": "Time Words",
+   "teaches": "the language of time (today, yesterday, tomorrow, days of the week, months, seasons, before, after)",
+   "representation": "calendar strip or picture timeline; circle or write the word from a bank",
+   "family": "measurement",
+   "steps": [
+    "R.B10.S5"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
