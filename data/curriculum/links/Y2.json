@@ -6363,6 +6363,1051 @@
    "preBuild": [],
    "related": [],
    "note": ""
+  },
+  "Y2.B8.S1": {
+   "title": "Introduction to parts and whole",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "build": [
+    "fraction_parts"
+   ],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W16)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W16)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 1.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S2": {
+   "title": "Equal and unequal parts",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "build": [
+    "fraction_parts"
+   ],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S1 Recognise a half of an object or a shape (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B15.S6 Decompose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "R.B15.S5 Compose shapes (prior learning wk W16)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W16)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W16)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W16)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W16)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 1.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S3": {
+   "title": "Recognise a half",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {
+      "note": "halves"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S7 Recognise a quarter of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S4": {
+   "title": "Find a half",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {
+      "note": "1/2"
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {
+      "note": "1/2"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S3 Recognise a half (step before in the block)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S5": {
+   "title": "Recognise a quarter",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {
+      "note": "fourths"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S4 Find a half (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y2.B8.S4 Find a half (step before in the block)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S6": {
+   "title": "Find a quarter",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {
+      "note": "1/4"
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {
+      "note": "1/4"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S5 Recognise a quarter (step before in the block)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S7": {
+   "title": "Recognise a third",
+   "direct": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "opts": {
+      "note": "thirds"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S6 Find a quarter (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y2.B8.S6 Find a quarter (step before in the block)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same cluster 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 2.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S8": {
+   "title": "Find a third",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {
+      "note": "1/3"
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {
+      "note": "1/3"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S7 Recognise a third (step before in the block)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W31)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W31)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W31)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S2 20, 30, 40 and 50 (prior learning wk W31)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same cluster 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 2.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S9": {
+   "title": "Find the whole",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "build": [
+    "fraction_parts"
+   ],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S8 Find a third (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y2.B8.S8 Find a third (step before in the block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W18)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (next step)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S10 Unit fractions (next step)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S10": {
+   "title": "Unit fractions",
+   "direct": [
+    {
+     "key": "fractions:identify",
+     "opts": {}
+    },
+    {
+     "key": "fractions:write_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S8 Find a quarter of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W18)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W18)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W18)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W18)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S11": {
+   "title": "Non-unit fractions",
+   "direct": [
+    {
+     "key": "fractions:write_fraction",
+     "opts": {}
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S8 Find a quarter of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (next step)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S12": {
+   "title": "Recognise the equivalence of a half and two quarters",
+   "direct": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "opts": {
+      "note": "halves and quarters"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S7 Recognise a quarter of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W17)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S13 Recognise three-quarters (next step)"
+    },
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "same standard 3.NF.A.3b: Equivalent Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "same standard 3.NF.A.3b: Circle the Equivalent Fractions (MAP)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S13": {
+   "title": "Recognise three-quarters",
+   "direct": [
+    {
+     "key": "fractions:identify",
+     "opts": {
+      "note": "3/4"
+     }
+    },
+    {
+     "key": "fractions:write_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y1.B10.S7 Recognise a quarter of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W17)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W17)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W17)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B16.S5 Even and odd sharing (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same cluster 1.G.A.2: Combine Shapes (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "same cluster 1.G.A.2: Compose a Hexagon from Pattern Blocks"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "same cluster 1.G.A.1: Shapes by Attributes (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S14": {
+   "title": "Find three-quarters",
+   "direct": [
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {
+      "note": "3/4"
+     }
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "opts": {
+      "note": "3/4"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "same standard 3.NF.A.1: Identify Fractions (Visual)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "same standard 3.NF.A.1: Write the Fraction Shown"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B8.S15": {
+   "title": "Count in fractions up to a whole",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4)",
+   "build": [
+    "frac_count"
+   ],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S14 Find three-quarters (step before in the block)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y2.B8.S14 Find three-quarters (step before in the block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W38)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S9 Make equal groups - sharing (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W38)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W38)"
+    }
+   ],
+   "preBuild": [
+    "part_whole"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "same standard 3.NF.A.1: Identify Fractions (Visual)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "same standard 3.NF.A.1: Write the Fraction Shown"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "same standard 3.NF.A.3c: Whole Numbers as Fractions (Visual)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -7053,6 +8098,46 @@
    ],
    "ccss": [
     "1.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "fraction_parts": {
+   "kind": "new",
+   "skill": "fractions:equal_parts",
+   "name": "Equal and Unequal Parts",
+   "teaches": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "representation": "shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter",
+   "family": "fractions",
+   "steps": [
+    "Y2.B8.S1",
+    "Y2.B8.S2",
+    "Y2.B8.S9"
+   ],
+   "ccss": [
+    "1.G.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_count": {
+   "kind": "new",
+   "skill": "fractions:count_in_fractions",
+   "name": "Count in Fractions",
+   "teaches": "counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4)",
+   "representation": "a number line with fraction ticks; fill the missing counts",
+   "family": "fractions",
+   "steps": [
+    "Y2.B8.S15",
+    "Y3.B6.S8",
+    "Y3.B6.S9",
+    "Y4.B7.S9"
+   ],
+   "ccss": [
+    "3.NF.A.1",
+    "3.NF.A.3c",
+    "3.NF.A.2",
+    "3.NF.A.3a"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
