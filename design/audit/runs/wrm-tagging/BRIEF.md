@@ -94,3 +94,7 @@ Every White Rose small step is covered or gets a build proposal, even when it go
 11. Reception (no xlsx sheet): pre-skills from earlier R steps on the SAME topic (counting, shape, measure, pattern …), not
     simply the step before in the block.
 12. Partial-only prior steps still count as pre-skills (use their partial skill) — don't drop the xlsx's listed prior steps.
+Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals all the way to large numbers (one
+`roman_numerals` skill, bands to 12 / 100 / 1,000 / 3,999, read and write); times-tables up to 15 (`tables_to_15`);
+`improper_mixed` one-direction option; one-exchange / two-or-more-exchanges option on every regroup band. Reception
+"Make connections" (R.B18) keeps a build (mixed review) — never left without one.
