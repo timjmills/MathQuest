@@ -32,14 +32,29 @@ L.push('', '## New gaps found beyond the 6.2 table (strand walk)', '');
 for (const s of STRANDS) {
     const rs = rows.filter(r => r.strand === s && r.source === 'strand-walk' && r.status !== 'exists-ok');
     if (!rs.length) continue;
-    L.push(`### ${s}`, '', '| Task | RIT | Status | Proposal |', '|---|---|---|---|');
-    for (const r of rs) L.push(`| ${esc(r.task)} | ${esc(r.ritBand)} | ${r.status} | ${pn(r.proposal)} |`);
+    L.push(`### ${s}`, '', '| Task | RIT | Status | Skill to make | What it adds |', '|---|---|---|---|---|');
+    for (const r of rs) L.push(`| ${esc(r.task)} | ${esc(r.ritBand)} | ${r.status} | ${pn(r.proposal)} | ${esc(r.closes)} |`);
     L.push('');
 }
-L.push('## The 6.4 "match the two" audit', '', '| Pair | Strand | Status | Skills | Proposal |', '|---|---|---|---|---|');
-for (const r of rows.filter(r => r.source === '6.4')) L.push(`| ${esc(r.task)} | ${r.strand} | ${r.status} | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal)} |`);
+L.push('## The 6.4 "match the two" audit', '', '| Pair | Strand | Status | Skills | Skill to make | What it adds |', '|---|---|---|---|---|---|');
+for (const r of rows.filter(r => r.source === '6.4')) L.push(`| ${esc(r.task)} | ${r.strand} | ${r.status} | ${r.skills.map(k => '`' + k + '`').join(', ')} | ${pn(r.proposal)} | ${esc(r.closes)} |`);
 L.push('', '## Re-grades (not builds)', '', 'Skills that already deal a MAP task but must pass the 8/10 re-grade (Wave 5 lanes). These are in `MAP.json` `regrades`, not in `proposals`.', '', '| Skill | MAP tasks it serves |', '|---|---|');
 for (const [k, ts] of Object.entries(d.regrades || {})) L.push(`| \`${k}\` | ${ts.map(esc).join('; ')} |`);
+L.push('', '## Skills yet to be made (every new proposal, in full)', '');
+for (const [id, p] of Object.entries(P).filter(([, p]) => !p.reused)) {
+    const gaps = rows.filter(r => r.proposal === id);
+    L.push(`### \`${id}\` — ${esc(p.name)}`, '',
+        `- **Builds:** ${p.kind === 'option' ? `option on \`${p.skill}\`: ${esc(p.option)}` : `new skill \`${p.skill}\``} (family ${p.family}; CCSS ${(p.ccss || []).join(', ')})`,
+        `- **Teaches:** ${esc(p.teaches)}`,
+        `- **Looks like:** ${esc(p.representation)}`,
+        `- **Problem types:** ${(p.problemTypes || []).map(esc).join('; ')}`,
+        `- **Levels:** ${(p.levels || []).map(esc).join(' → ')}`,
+        `- **Example:** ${esc(p.example && p.example.item)} → **${esc(p.example && p.example.answer)}**`,
+        `- **Misconceptions:** ${(p.misconceptions || []).map(esc).join('; ')}`,
+        `- **MAP:** ${(p.map || []).map(m => `${m.strand} ${m.ritBand} (${esc(m.taskType)})`).join('; ')}`,
+        `- **Fills:** ${gaps.map(r => esc(r.task)).join('; ')}`,
+        `- **Why:** ${esc(p.why)}`, '');
+}
 L.push('', '## Every proposal', '', '| Id | Kind | Skill (option) | Name | MAP strand / RIT / task type | Reused from |', '|---|---|---|---|---|---|');
 for (const [id, p] of Object.entries(P)) L.push(`| \`${id}\` | ${p.kind || ''} | \`${p.skill || ''}\`${p.option ? ' (' + esc(p.option) + ')' : ''} | ${esc(p.name)} | ${(p.map || []).map(m => `${m.strand} ${m.ritBand} — ${esc(m.taskType)}`).join('<br>')} | ${p.reused ? p.source : 'new'} |`);
 L.push('', fs.readFileSync(path.join(__dirname, 'report-tail.md'), 'utf8').trim(), '');
