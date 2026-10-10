@@ -16,6 +16,8 @@ the owner's — keep. Follow-up for the first two goes with the skip_count grid/
 
 **Owner answers 2026-10-10:** (1) Lane D More Practice DN-2 lint compares item counts within one letter only (each letter is its own sheet); (2) number_families_mult gains a "6 × 6" band choice, default unchanged (share codes stable); (3) touch column stacks keep the greys of earlier columns; (4) "Touched N" stays on × stacks; (5) a search with no hits says "No skill teaches this yet".
 
+**Owner request 2026-10-10 (regroup boxes, build NEXT SESSION with Lane B):** on screen the needed regroup / carry boxes are required and marked; a right subtraction regroup number crosses out the old top digit live (78 − 29: 7 → 6, 8 → 18); addition carries a 1, no crossing; paper unchanged; per-skill option marked (default) / unmarked / optional. Spec: `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`.
+
 **Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
 passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
 
