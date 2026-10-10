@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 11
+# Wave 2 tagging: Y4 (Grade 3) report, round 12
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -11,13 +11,13 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | | Round 2 | Round 3 | Round 4 |
 |---|---|---|---|
 | Steps | 129 | 129 | 129 (14 blocks, none skipped) |
-| Full | 56 | 48 | **44** (round 11; 45 in round 4) |
-| Partial | 50 | 60 | **64** (round 11; 63 in round 4) |
+| Full | 56 | 48 | **44** (round 12; 45 in round 4) |
+| Partial | 50 | 60 | **64** (round 12; 63 in round 4) |
 | Gap | 23 | 21 | **21** |
-| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **72 (24 new, 48 reused)** (round 11) |
-| Tag fixes | 76 (hand list) | 151, derived | **154, derived** (round 11: add 45, full 35, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **532 / 215** (round 11). Every step has at least 3 pre and at least 1 related. 0 keys in both |
-| Option checks | — | — | Round 11: 394 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 747 links misfit** (`linkfit.mjs`, 180 items a link; per-step result in `Y4-linkfit.txt`) |
+| Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **72 (24 new, 48 reused)** (round 12) |
+| Tag fixes | 76 (hand list) | 151, derived | **157, derived** (round 12: add 46, full 35, opts 33, partial 32, remove 11; one hand fix tags a Y2 step) |
+| Pre / related entries | 528 / — | 570 / 319 | **533 / 215** (round 12). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 12: 396 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 748 links misfit** (`linkfit.mjs`, 180 items a link; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,74 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 12 (after critic r11: re-cites that ignored options, perimeter_grid, whys)
+
+**C′. The G18 re-cite now checks the link's options (G19).**
+
+| Step | Link | Label now |
+|---|---|---|
+| B1.S3 | `count_by_step_up {step:[0]}` | "Y2.B1.S15 Count in 2s, 5s and 10s". A hand tagFix now tags `count_by_step_up {step:[0]}` to Y2.B1.S15 (its step 0 is exactly 2s, 5s and 10s). |
+| B2.S4 | `add_10k_regroup {band:1000}` | "Y3.B2.S14 Add two numbers (across a 100)", naming the gap: the skill is not tagged to that step. |
+| B2.S7 | `sub_10k_regroup {band:1000}` | "Y3.B2.S16 Subtract two numbers (across a 100)", naming the gap in the same way. |
+| B5.S12 | `unit_form {band:99, rename:'more'}` | "Y2.B1.S5 Partition numbers to 100". |
+
+To make the B1.S3 fix hold, three things changed in the tooling:
+- `build.py` keeps hand tagFixes on steps outside Y4.
+- The G18 re-cite counts a hand tagFix (add, full or partial) as a tag.
+- `linkfit.mjs` G18 reads `tagFixes` the same way.
+
+**G19, in both `build.py` and `linkfit.mjs`.**
+- In `build.py`, a re-cite candidate must fit the link's options:
+  - "Count in Ns" must name only steps the link's `step` or `constant` option deals;
+  - "N-digit" must match the band's digit count;
+  - "Hundreds" needs a band of at least 999;
+  - "number line to N" must lie within half to twice the band.
+  If no tagged step fits, the label names the gap.
+- `linkfit.mjs` reads every cited title (not "nearest live practice", "has no live skill" or "this step's build") against 180 items:
+  - "Count in Ns": at least a third of the items must count in those steps. The step is read from "count by N", from `"step":N`, or from the gap between neighbours in "Complete: 205, 215, ___, 235".
+  - "N-digit" and "Hundreds": at least a third of the items must show such a number in the text or the cell payload.
+  - "number line to N": the lines must reach N/10 to 1.5N.
+- A regex fix in both: "Count in 2s, 5s and 10s" now reads as {2, 5, 10}. Before, it read as {2} only.
+
+**P. `perimeter_grid {}` deals written side lengths (form 2) on 61 of 150 items.**
+
+| Step | Before | Now |
+|---|---|---|
+| B6.S3 | direct `perimeter_grid {}` | direct `perimeter_grid {forms:[0,1]}`, counted on a grid only. Stays full. |
+| B6.S5 | full | Partial, through `perimeter_grid {forms:[1,3]}`: "L-shapes only (six sides), counted on a grid or with written whole-number sides; no T- or U-shapes". |
+| B6.S7 | — | `perimeter_grid` gets the clause "every side length is given (counted on a grid, or written on rectangles and L-shapes); no side has to be found first". |
+
+More detail on the two partial steps:
+- **B6.S5.** Missing: "perimeter of rectilinear shapes with more than six sides (T- and U-shapes) from written whole-number side lengths". `composite_whole_sides` now teaches T- and U-shapes only, and its envisioned spec says so.
+- **B6.S7.** `composite_whole_sides` closes the step's own clause: "the composite shapes must have whole-number sides (no 2.5 / 3.5 before W29)". Its envisioned `teaches` drops "so the missing side is a whole number".
+
+**Whys.**
+- B5.S8 related `repeated_add_to_mult`: "equal groups as repeated addition (3 + 3 + 3 + 3 = 4 × 3): the idea the partitioned method shortens".
+- B1.S4 pre `count_by_step_up {step:[0]}`: "counting on in 2s, 5s and 10s to 1,000 (… count_50s is this step's build)".
+
+**Optional items, all applied.**
+- B7.S4 is re-cited to Y1.B12.S4.
+- B8.S3 and B8.S9 `place_value_disks {band:99}` end "(lower grade, same idea; tens and ones)".
+- B4.S2 `count_by_tables {constant:[3]}` is re-cited to Y3.B3.S8.
+
+**Fixes from the own11 scan.**
+- **"why example".** Seven `mult_facts` whys said "to 10 × 10" or "to 12 × 12", which the scan reads as a 2-digit factor example.
+  - The band-100 whys now read "the times-table facts with products to 100 (Y3 and Y4 block 4)".
+  - B5.S9's why now reads "the times-table facts through the 12s table (Y4 block 4) …".
+  - B5.S15's related `mult_zeros` why now reads "nine 7s is ten 7s take away one 7".
+- **"cited hundreds".** B1.S8's `value {band:9999}` deals thousands, so "Hundreds, tens and ones" was not its title. The why is now free text: "the value of each digit up to the thousands (Y3.B1.S8 extended by Y4.B1.S5-S6, wk W11): the digit that 1,000 more changes".
+
+**Scan results.**
+- `linkfit.mjs`: 0 of 748 links misfit (`Y4-linkfit.txt`).
+- `optcheck`: 396 entries, 0 problems.
+- `optchange`: 0 entries whose non-default values change nothing.
+- `build.py`: OK, 32 labels re-cited.
+- own11 (critic seeds, 150 items a link): 0, except these known false positives:
+  - **r10 "3-digit ÷ before W36" (100 hits)** and **"divisor ≥ 13" (1 hit).** These are the accepted ÷10 and ÷100 pres on B5.S6 and B6.S2.
+  - **r11 "cited count not dealt" (2 hits).** B2.S8 `seq_10@100` and B5.S3 `seq_10@1000` are cited to "Y1.B9.S2 Count in 10s". Their items are sequences like "Complete: 27, ___, 47, 57", and the rest are drag-in-order. With the critic's seeds, 112 of 150 items (Max Number 100) and 104 of 150 (Max Number 1,000) step by 10, counting the 20 across the blank. The scan's regex looks only for the words "by 10" or `"step":10`, which this skill never prints.
+
+Items: `Y4-items.md` "# Round 12" has B6.S3, B6.S5, B6.S7 (6 each) and the one link whose key or options changed (B6.S3's pre `perimeter_grid {}`).
 
 ## Changes in round 11 (after critic r10: 3 classes and 3 isolated misfits)
 All changes are in `spec_zzzz_r11.py`. One verdict changed: B6.S5 goes from full to partial, as the coordinator allowed.

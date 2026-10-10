@@ -1,3 +1,4 @@
+Built 608 skill codes
 Y4.B1.S1 [W11] own ceiling 1000: ok
 Y4.B1.S2 [W11] own ceiling 1000: ok
 Y4.B1.S3 [W18] own ceiling 1000: ok
@@ -59,7 +60,7 @@ Y4.B5.S14 [W06] own ceiling 0: ok
 Y4.B5.S15 [W06] own ceiling 72: ok
 Y4.B6.S1 [W36] own ceiling 12000: ok
 Y4.B6.S2 [W36] own ceiling 12000: ok
-Y4.B6.S3 [W19] own ceiling 40: ok
+Y4.B6.S3 [W19] own ceiling 26: ok
 Y4.B6.S4 [W20] own ceiling 200: ok
 Y4.B6.S5 [W20] own ceiling 44: ok
 Y4.B6.S6 [W20] own ceiling 0: ok
@@ -127,4 +128,4 @@ Y4.B14.S2 [W38] own ceiling 10: ok
 Y4.B14.S3 [W29] own ceiling 38: ok
 Y4.B14.S4 [W38] own ceiling 3: ok
 Y4.B14.S5 [W38] own ceiling 3: ok
-linkfit: 747 links in 129 steps; 0 misfits (0 size, 0 content/layout)
+linkfit: 748 links in 129 steps; 0 misfits (0 size, 0 content/layout)

@@ -2005,3 +2005,69 @@ B6.S5 and B6.S7 (clauses changed), then every new or changed pre / related link 
 3. Drag the decimals from least to greatest. → ["t2","t0","t3","t1"]
 4. Drag the decimals from least to greatest. → ["t4","t3","t2","t0","t1"]
 
+
+# Round 12
+
+Steps whose direct or partial changed (B6.S3, B6.S5, B6.S7):
+
+## Y4.B6.S3 Perimeter on a grid — full
+
+**direct** `area_perimeter:perimeter_grid` opts `{"forms":[0,1]}` Max Number 10000
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Count the outside edges. What is the perimeter? → 20
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+5. Count the outside edges of this L-shape. What is the perimeter? → 16
+6. Count the outside edges. What is the perimeter? → 20
+
+## Y4.B6.S5 Perimeter of rectilinear shapes — partial
+
+**partial** `area_perimeter:perimeter_grid` opts `{"forms":[1,3]}` Max Number 10000 — missing: L-shapes only (six sides), counted on a grid or with written whole-number sides; no T- or U-shapes
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this composite shape. → 34
+3. Count the outside edges of this L-shape. What is the perimeter? → 16
+4. Find the perimeter of this composite shape. → 32
+5. Count the outside edges of this L-shape. What is the perimeter? → 16
+6. Count the outside edges of this L-shape. What is the perimeter? → 22
+
+**partial** `area_perimeter:composite_shapes` opts `{"forms":[0]}` Max Number 10000 — missing: perimeter of L-, T- and U-shapes with the lengths given, but some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)
+
+1. Find the perimeter of this composite shape. → 34
+2. Find the perimeter of this composite shape. → 32
+3. Find the perimeter of this composite shape. → 20
+4. Find the perimeter of this composite shape. → 32
+5. Find the perimeter of this composite shape. → 28
+6. Find the perimeter of this composite shape. → 38
+
+## Y4.B6.S7 Calculate the perimeter of rectilinear shapes — partial
+
+**partial** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — missing: every side length is given (counted on a grid, or written on rectangles and L-shapes); no side has to be found first
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+5. Count the outside edges of this L-shape. What is the perimeter? → 16
+6. Find the perimeter of this rectangle. → 36
+
+**partial** `area_perimeter:composite_shapes` opts `{"forms":[0]}` Max Number 10000 — missing: perimeter of a composite shape; generated items label the sides, so no missing length has to be found first; some T-shapes label sides 2.5 / 3.5 (decimal side lengths before W29)
+
+1. Find the perimeter of this composite shape. → 34
+2. Find the perimeter of this composite shape. → 32
+3. Find the perimeter of this composite shape. → 20
+4. Find the perimeter of this composite shape. → 32
+5. Find the perimeter of this composite shape. → 28
+6. Find the perimeter of this composite shape. → 38
+
+
+Pre and related links new or changed since round 11 (4 items each):
+
+**Y4.B6.S3 pre** `area_perimeter:perimeter_grid` opts `{}` Max Number 10000 — Y3.B5.S11 Measure perimeter (lower grade, same idea)
+
+1. Count the outside edges of this L-shape. What is the perimeter? → 26
+2. Find the perimeter of this rectangle. → 14
+3. Count the outside edges. What is the perimeter? → 10
+4. Count the outside edges. What is the perimeter? → 24
+

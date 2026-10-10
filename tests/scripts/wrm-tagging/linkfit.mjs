@@ -195,6 +195,25 @@ function whyCheck(e, r) {
   const w = (w0.match(/^(?:R|Y\d)\.B\d+\.S\d+\s+(.*?)(?:\(|$)/) || [])[1] ?? w0;
   const out = [], texts = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''}` + (/^\s*\d{1,2}\s*$/.test(i.a || '') && /equal parts/i.test(i.text || '') ? ` 1/${(i.a || '').trim()}` : ''));   // a count-parts answer of n is nths (4 = fourths)
   if (/common multiples/i.test(w) && !texts.some(t => /common multiple|in both/i.test(t))) out.push('why claims common multiples; no item asks for one');
+  const cited = w !== w0;
+  // G19: a cited title stays true for the link's items ("Count in Ns", "N-digit", "Hundreds", "number line to N")
+  if (cited && !/nearest live practice|has no live skill|this step's build/i.test(w0)) {
+    const N = texts.length;
+    const cm = w.match(/Count in ((?:\d+s(?:,\s*|\s+and\s+)?)+)/i);
+    if (cm) { const want = new Set([...cm[1].matchAll(/\d+/g)].map(x => +x[0]));
+      const hit = r.items.filter(i => { const k = [...`${i.text || ''} ${i.pay || ''}`.matchAll(/count (?:up |down )?by (\d+)|"step":(\d+)/gi)].map(x => +(x[1] || x[2]));
+        const seq = ((i.text || '').match(/(?:\d[\d,]*\s*,\s*(?:_+\s*,\s*)?){2,}\d[\d,]*|(?:\d[\d,]*\s*,\s*){1,}_+/) || [''])[0].split(',').map(x => x.trim()).map(x => /^\d/.test(x) ? +x : null);   // "Complete: 205, 215, ___, 235": the step is the gap between neighbours
+        for (let j = 1; j < seq.length; j++) if (seq[j] != null && seq[j - 1] != null) k.push(Math.abs(seq[j] - seq[j - 1]));
+        return k.some(x => want.has(x)); }).length;
+      if (hit < N / 3) out.push(`cited "${cm[0]}" but only ${hit} of ${N} items count in those steps`); }
+    const dm = w.match(/(\d)-digit/);
+    if (dm) { const D = +dm[1]; const hit = texts.filter((t, k) => [...(t + ' ' + (r.items[k].pay || '')).matchAll(/\b\d{1,3}(?:,\d{3})+\b|\b\d+\b/g)].some(x => x[0].replace(/,/g, '').length === D)).length;
+      if (hit < N / 3) out.push(`cited "${D}-digit" but only ${hit} of ${N} items have ${D}-digit numbers`); }
+    if (/\bHundreds\b/.test(w)) { const hit = texts.filter((t, k) => /\b\d{3,}\b/.test(t + ' ' + (r.items[k].pay || ''))).length; if (hit < N / 3) out.push(`cited "Hundreds" but only ${hit} of ${N} items have 3-digit numbers`); }
+    const lm = w.match(/number line to ([\d,]+)/i);
+    if (lm) { const L = +lm[1].replace(/,/g, ''); const his = r.items.map(i => +(((i.pay || '').match(/"hi":(\d+)/) || [])[1] || 0)).filter(Boolean);
+      const hi = his.length ? Math.max(...his) : r.max; if (hi > L * 1.5 || hi < L / 10) out.push(`cited "number line to ${L}" but the lines reach ${hi}`); }
+  }
   const tm = w.match(/\b(\d+)s? times-tables?|multiply and divide by (\d+)|\bdivide by (\d+)\b|\bthe (\d+) row|\bwith (\d+) in a group|\bdividing by (\d+)|counting in (\d+)s\b|\b(?:jumps|hops) of (\d+)|\bmultiples of (\d+)/i);
   if (tm) { const n = tm.slice(1).find(Boolean);
     const grid = r.items.filter(i => i.tpl === 'mult-grid');
@@ -202,7 +221,6 @@ function whyCheck(e, r) {
     const hit = hitGrid + texts.filter((t, k) => r.items[k].tpl !== 'mult-grid' && (new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b|in ${n}s|of ${n}\\b`).test(t) || new RegExp(`"step":${n}\\b`).test(r.items[k].pay || ''))).length;
     if (hit < texts.length / 2) out.push(`why names ${n} but only ${hit} of ${texts.length} items use it`); }
   const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(w));
-  const cited = w !== w0;
   if (fams.length && !/to\s+(eighths|twelfths|tenths)|halves to/i.test(w)) {
     const ok = new Set(fams.flatMap(f => FAM[f]).concat([1]));
     const per = texts.map(t => new Set([...t.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1])));
@@ -224,6 +242,7 @@ const TAGS = JSON.parse(fs.readFileSync(DATA + '/keys.json', 'utf8')).tags;
 const taughtAt = {};
 for (const [k, v] of Object.entries(TAGS)) for (const t of v) (taughtAt[k] ??= new Set()).add(typeof t === 'string' ? t : t.step);
 for (const [sid, s] of Object.entries(d.steps)) for (const e of [...s.direct, ...s.partial]) (taughtAt[e.key] ??= new Set()).add(sid);
+for (const t of d.tagFixes || []) if (!d.steps[t.step] && ['add', 'full', 'partial'].includes(t.action)) (taughtAt[t.key] ??= new Set()).add(t.step);   // a tagFix on another grade's step tags it there
 function citeCheck(e, role) {
   if (role !== 'pre') return [];
   const m = String(e.why).match(/^((?:R|Y\d)\.B\d+\.S\d+)/); if (!m) return [];

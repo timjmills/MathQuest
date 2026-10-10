@@ -175,7 +175,7 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18; tagged there by a hand tagFix, critic Y4 r11)",
      "opts": {
       "step": [
        0
@@ -268,7 +268,7 @@
     },
     {
      "key": "patterns:count_by_step_up",
-     "why": "counting on in 10s along a line to 1,000 (Y3.B1.S14 counts in 50s, which no live skill deals: count_50s is this step's build)",
+     "why": "counting on in 2s, 5s and 10s to 1,000 (Y3.B1.S14 counts in 50s, which no live skill deals: count_50s is this step's build)",
      "opts": {
       "step": [
        0
@@ -598,7 +598,7 @@
     },
     {
      "key": "placevalue:value",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
+     "why": "the value of each digit up to the thousands (Y3.B1.S8 extended by Y4.B1.S5-S6, wk W11): the digit that 1,000 more changes",
      "opts": {
       "band": 9999
      }
@@ -1413,7 +1413,7 @@
    "pre": [
     {
      "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (step before in the block, wk W14)",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (prior learning wk W15; nearest live practice: add_10k_regroup at band 1,000 deals 3-digit sums and is not tagged to it)",
      "opts": {
       "band": 1000
      }
@@ -1584,7 +1584,7 @@
    "pre": [
     {
      "key": "subtraction:sub_10k_regroup",
-     "why": "Y4.B2.S6 Subtract two 4-digit numbers - one exchange (step before in the block, wk W15)",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (prior learning wk W16; nearest live practice: sub_10k_regroup at band 1,000 deals 3-digit differences and is not tagged to it)",
      "opts": {
       "band": 1000
      }
@@ -2205,7 +2205,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01; nearest live practice: count_by_tables is not tagged to it)",
+     "why": "Y3.B3.S8 The 3 times-table (lower grade, same idea)",
      "opts": {
       "constant": [
        3
@@ -3254,7 +3254,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -3328,7 +3328,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -3825,7 +3825,7 @@
    "related": [
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "23 × 4 as 23 + 23 + 23 + 23: the repeated addition partitioning shortens"
+     "why": "equal groups as repeated addition (3 + 3 + 3 + 3 = 4 × 3): the idea the partitioned method shortens"
     }
    ],
    "note": "",
@@ -3880,7 +3880,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 12 × 12 (Y4 block 4), used in every column of the multiplication"
+     "why": "the times-table facts through the 12s table (Y4 block 4), used in every column of the multiplication"
     },
     {
      "key": "placevalue:expand",
@@ -4089,7 +4089,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)",
+     "why": "Y2.B1.S5 Partition numbers to 100 (lower grade, same idea)",
      "opts": {
       "band": 99,
       "rename": "more"
@@ -4207,7 +4207,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -4280,7 +4280,7 @@
    "related": [
     {
      "key": "multiplication:mult_zeros",
-     "why": "× 10 is the anchor of near multiples (9 × 7 = 10 × 7 − 7)",
+     "why": "× 10 is the anchor of near multiples (nine 7s is ten 7s take away one 7)",
      "opts": {
       "forms": [
        0
@@ -4467,7 +4467,12 @@
    "direct": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
    "partial": [],
@@ -4482,6 +4487,10 @@
     {
      "key": "area_perimeter:area_unit_squares",
      "why": "Y4.B3.S2 Count squares (taught earlier this year, wk W18)"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "why": "Y3.B5.S11 Measure perimeter (lower grade, same idea)"
     },
     {
      "key": "counting:count_objects",
@@ -4571,7 +4580,13 @@
    "partial": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "missing": "counts the edges of rectilinear shapes on a grid; never a shape with its side lengths written"
+     "missing": "L-shapes only (six sides), counted on a grid or with written whole-number sides; no T- or U-shapes",
+     "opts": {
+      "forms": [
+       1,
+       3
+      ]
+     }
     },
     {
      "key": "area_perimeter:composite_shapes",
@@ -4584,7 +4599,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "perimeter of rectilinear shapes from written whole-number side lengths (no decimal side lengths before W29)",
+   "missing": "perimeter of rectilinear shapes with more than six sides (T- and U-shapes) from written whole-number side lengths",
    "build": [
     "composite_whole_sides"
    ],
@@ -4636,8 +4651,8 @@
      "proposal": "composite_whole_sides",
      "name": "Composite Shapes With Whole-Number Sides (option)",
      "kind": "option on area_perimeter:composite_shapes",
-     "teaches": "add the written whole-number sides of an L-, T- or U-shape to find its perimeter",
-     "closes": "perimeter of rectilinear shapes from written whole-number side lengths (no decimal side lengths before W29)",
+     "teaches": "add the written whole-number sides of a T- or U-shape to find its perimeter",
+     "closes": "perimeter of rectilinear shapes with more than six sides (T- and U-shapes) from written whole-number side lengths",
      "representation": "the existing composite-shape cell"
     }
    ]
@@ -4709,7 +4724,7 @@
    "partial": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "missing": "on a grid only (lengths counted, not calculated)"
+     "missing": "every side length is given (counted on a grid, or written on rectangles and L-shapes); no side has to be found first"
     },
     {
      "key": "area_perimeter:composite_shapes",
@@ -4770,8 +4785,8 @@
      "proposal": "composite_whole_sides",
      "name": "Composite Shapes With Whole-Number Sides (option)",
      "kind": "option on area_perimeter:composite_shapes",
-     "teaches": "the same shapes with whole-number sides only, so the missing side is a whole number",
-     "closes": "decimal side lengths before W29",
+     "teaches": "the same shapes with whole-number sides only",
+     "closes": "the composite shapes must have whole-number sides (no 2.5 / 3.5 before W29)",
      "representation": "the existing composite-shape cell"
     }
    ]
@@ -4807,7 +4822,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -5159,7 +5174,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y1.B6.S6 The number line to 50 (lower grade, same idea)"
+     "why": "Y1.B12.S4 The number line to 100 (lower grade, same idea)"
     }
    ],
    "preBuild": [
@@ -5320,7 +5335,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -5495,7 +5510,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "the times-table facts to 10 × 10 (Y3 and Y4 block 4)",
+     "why": "the times-table facts with products to 100 (Y3 and Y4 block 4)",
      "opts": {
       "band": 100
      }
@@ -5996,7 +6011,7 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea; tens and ones)",
      "opts": {
       "band": 99
      }
@@ -6427,7 +6442,7 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea)",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (lower grade, same idea; tens and ones)",
      "opts": {
       "band": 99
      }
@@ -9045,7 +9060,7 @@
    "skill": "area_perimeter:composite_shapes",
    "option": "sides \"whole numbers only\" (a T-shape's shoulders split evenly)",
    "name": "Composite Shapes With Whole-Number Sides (option)",
-   "teaches": "find the perimeter of an L-, T- or U-shape whose side lengths are all whole numbers",
+   "teaches": "find the perimeter of a T- or U-shape whose side lengths are all whole numbers",
    "representation": "the existing composite-shape cell; only the dealing changes",
    "family": "measurement",
    "ccss": [
@@ -10819,6 +10834,18 @@
    }
   },
   {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y4.B6.S3",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     0,
+     1
+    ]
+   }
+  },
+  {
    "key": "area_perimeter:perimeter",
    "step": "Y4.B6.S4",
    "action": "full",
@@ -10839,6 +10866,18 @@
    "opts": {
     "forms": [
      0
+    ]
+   }
+  },
+  {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y4.B6.S5",
+   "action": "opts",
+   "why": "re-tag as FULL (L-shapes on a grid)",
+   "opts": {
+    "forms": [
+     1,
+     3
     ]
    }
   },
@@ -11379,6 +11418,17 @@
    "step": "Y4.B8.S1",
    "action": "remove",
    "why": "tenths as hundredths is Y4.B8.S7, not tenths as fractions"
+  },
+  {
+   "key": "patterns:count_by_step_up",
+   "step": "Y2.B1.S15",
+   "action": "add",
+   "opts": {
+    "step": [
+     0
+    ]
+   },
+   "why": "its step [0] counts in 2s, 5s and 10s: exactly Y2.B1.S15 (critic Y4 r11)"
   }
  ]
 }

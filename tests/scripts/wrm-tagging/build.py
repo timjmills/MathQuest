@@ -154,6 +154,8 @@ for k_, v_ in K['tags'].items():
     for t_ in v_: taught_at.setdefault(k_, set()).add(t_ if isinstance(t_, str) else t_['step'])
 for sid_, st_ in out_steps.items():
     for e_ in st_['direct'] + st_['partial']: taught_at.setdefault(e_['key'], set()).add(sid_)
+for t_ in ns['TAGFIXES']:   # a hand tagFix that tags a skill to another grade's step counts as tagged there
+    if t_['step'] not in out_steps and t_.get('action') in ('add', 'full', 'partial'): taught_at.setdefault(t_['key'], set()).add(t_['step'])
 allorder = [s_['id'] for y_ in wrm['years'] for b_ in y_['blocks'] for s_ in b_['steps']]
 def _wk(x): return ns.get('WK_OVERRIDE', {}).get(x) or prior.get(x, {}).get('wk') or ''
 recited = 0
@@ -165,6 +167,24 @@ for sid_, st_ in out_steps.items():
         _yr = lambda x: ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].index(x.split('.')[0])
         cands = [t_ for t_ in taught_at.get(e_['key'], set()) if t_ in allorder and t_ != sid_ and
                  (_yr(t_) < 4 or (_yr(t_) == 4 and _wk(t_) and _wk(sid_) and _wk(t_) <= _wk(sid_)))]   # met by this week: earlier grade or taught already
+        # G19: the cited title must stay true for the link's options ("Count in Ns", "N-digit", "Hundreds", "number line to N")
+        def title_fits(key, opts, title):
+            o = opts or {}
+            m = re.search(r'Count in ((?:\d+s(?:,\s*|\s+and\s+)?)+)', title)
+            if m:
+                want = {int(x) for x in re.findall(r'(\d+)', m.group(1))}
+                if key == 'patterns:count_by_step_up':
+                    have = set().union(*[{0: {2, 5, 10}, 1: {3, 4}}[v] for v in o.get('step', [0, 1])])
+                    if not want <= have: return False
+                if key == 'multiplication:count_by_tables' and o.get('constant') and not want <= set(o['constant']): return False
+            band = o.get('band') or o.get('range')
+            dm = re.findall(r'(\d)-digit', title)
+            if dm and band and int(max(dm)) != len(str(int(band) - 1 if str(band).endswith('0') else band)): return False
+            if re.search(r'\bHundreds\b', title) and band and int(band) < 999: return False
+            lm = re.search(r'number line to ([\d,]+)', title, re.I)
+            if lm and band and not (int(band) / 2 <= int(lm.group(1).replace(',', '')) <= int(band) * 2): return False
+            return True
+        cands = [t_ for t_ in cands if title_fits(e_['key'], e_.get('opts'), steps[t_]['title'])]
         if cands:
             ref_ = m_.group(1)
             # the same grade as the cited step first, then the nearest step to it in WRM order
@@ -246,6 +266,8 @@ for (key, sid), pz in sorted(cur.items(), key=lambda x: (order.index(x[0][1]), x
     where = 'related' if any(r['key'] == key for r in st['related']) else ('pre' if any(p['key'] == key for p in st['pre']) else '')
     tagfixes.append({'key': key, 'step': sid, 'action': 'remove',
                      'why': why_of(key, sid, 'generated items do not teach this step' + (f'; kept as a {where} skill' if where else ''))})
+# hand fixes on steps outside this year (another grade's tag a Y4 link relies on) are kept as written
+tagfixes += [dict(t) for t in ns['TAGFIXES'] if t['step'] not in out_steps]
 stale = [k for k in hand if k not in {(t['key'], t['step']) for t in tagfixes}]
 
 missing_steps = [s for s in order if s not in out_steps]
