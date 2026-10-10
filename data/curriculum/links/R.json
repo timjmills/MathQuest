@@ -1188,6 +1188,346 @@
     }
    ],
    "note": ""
+  },
+  "R.B7.S1": {
+   "title": "Introduce zero",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "zero as none: an empty set and the numeral 0",
+   "build": [
+    "zero"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B5.S5 1 less (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (same CCSS K.CC.A.3, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S1 Find 4 and 5 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "one less than 1 is 0"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "next step: R.B7.S2 Find 0 to 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.A.3 in R.B7.S4 Represent 0 to 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S2": {
+   "title": "Find 0 to 5",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "pictures"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "finding a group of zero (the skill always draws at least one)",
+   "build": [
+    "zero"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B5.S5 1 less (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B7.S4 Represent 0 to 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in R.B7.S5 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B7.S7 Composition"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S3": {
+   "title": "Subitise 0 to 5",
+   "direct": [],
+   "partial": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     },
+     "missing": "recognising 0-5 at a glance, including an empty frame"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "subitising 0 to 5",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero"
+   ],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B7.S4 Represent 0 to 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B7.S5 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B7.S7 Composition"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S4": {
+   "title": "Represent 0 to 5",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "partial",
+   "missing": "representing 0 (an empty frame)",
+   "build": [
+    "zero"
+   ],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B7.S3 Subitise 0 to 5 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B7.S5 1 more"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B9.S1 Find 6, 7 and 8"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B7.S7 Composition"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S5": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B7.S4 Represent 0 to 5 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B7.S3 Subitise 0 to 5 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "zero",
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B9.S1 Find 6, 7 and 8"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B7.S4 Represent 0 to 5"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B7.S7 Composition"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S6": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B7.S4 Represent 0 to 5 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B7.S2 Find 0 to 5 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: R.B7.S7 Composition"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B9.S1 Find 6, 7 and 8"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B7.S4 Represent 0 to 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S7": {
+   "title": "Composition",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B7.S6 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B7.S2 Find 0 to 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B7.S4 Represent 0 to 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B7.S5 1 more"
+    }
+   ],
+   "note": ""
+  },
+  "R.B7.S8": {
+   "title": "Conceptual subitising to 5",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "conceptual subitising to 5: seeing 3 and 2 and knowing 5",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B7.S7 Composition (the step before in this block)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B7.S6 1 less (the step before in this block)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B7.S4 Represent 0 to 5 (same CCSS K.CC.B.5, earlier)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B7.S3 Subitise 0 to 5 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [
+    "zero"
+   ],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "the parts named as a bond"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B9.S1 Find 6, 7 and 8"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B9.S2 Represent 6, 7 and 8"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1294,10 +1634,13 @@
    "family": "counting",
    "steps": [
     "R.B3.S2",
-    "R.B5.S2"
+    "R.B5.S2",
+    "R.B7.S3",
+    "R.B7.S8"
    ],
    "ccss": [
-    "K.CC.B.5"
+    "K.CC.B.5",
+    "K.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
@@ -1362,6 +1705,26 @@
     "R.B6.S4"
    ],
    "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "zero": {
+   "kind": "new",
+   "skill": "counting:zero_none",
+   "name": "Zero Means None",
+   "teaches": "zero as the count of an empty set, and writing 0",
+   "representation": "pictures of plates/boxes with some or no objects; write how many, including 0",
+   "family": "counting",
+   "steps": [
+    "R.B7.S1",
+    "R.B7.S2",
+    "R.B7.S4"
+   ],
+   "ccss": [
+    "K.CC.A.3",
+    "K.CC.B.4",
+    "K.CC.B.5"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
