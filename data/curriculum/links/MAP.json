@@ -591,7 +591,7 @@
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 181-190: change-unknown story (47 then 89 points), answer by moving digit tiles."
    },
-   "closes": "map_change_unknown_story adds past-tense join/separate change-unknown stories with 2-digit numbers (the MAP 181-190 item) on add_word_problems / sub_word_problems. (The within-10 First–Then–Now picture strip with unknown \"change\" is VISUAL_BUILDS vis_story_strip, a merge-tool kind the part cannot carry; the lead should link it.)",
+   "closes": "map_change_unknown_story adds past-tense join/separate change-unknown stories with 2-digit numbers (the MAP 181-190 item) on add_word_problems / sub_word_problems; vis_story_strip (in also) adds the within-10 First–Then–Now picture strip with unknown \"change\".",
    "also": [
     "vis_story_strip"
    ]
@@ -698,7 +698,7 @@
    }
   },
   {
-   "task": "Add three numbers / properties of addition",
+   "task": "Add three numbers (sum within 20)",
    "strand": "Operations & algebra",
    "ritBand": "161-180",
    "source": "strand-walk",
@@ -4371,7 +4371,7 @@
     "Greatest or least — pick from a mixed set — ring it / click it"
    ],
    "levels": [
-    "L1: 3 numbers, a whole and decimals with the same whole part (7, 7.4, 6.9); place-value header over each number (structural, stays); 7 written as 7.0 in grey (hint)",
+    "L1: 3 numbers, a whole and decimals with the same whole part (7, 7.4, 7.25); place-value header over each number (structural, stays); 7 written as 7.0 in grey (hint)",
     "L2: the 7.0 grey hint fades: 7 shown bare",
     "L3: 4–5 numbers with different digit counts (0.9, 6.85, 7, 7.1)",
     "L4: greatest → least direction"
@@ -5825,6 +5825,9 @@
     "adds denominators (1/4 + 1/4 = 2/8)",
     "writes the number of shaded parts as the denominator",
     "counts unshaded parts"
+   ],
+   "after": [
+    "vis_frac_bar_modes"
    ]
   },
   "map_frac_compare_reason": {
@@ -6329,15 +6332,15 @@
    "why": "divide deals facts only; MAP places dividing by a multiple of 10 at 201-210",
    "reused": false,
    "problemTypes": [
-    "divide by tens — 360 ÷ 40 — write 9 (fact 36 ÷ 4)",
-    "tens ÷ ones — 360 ÷ 4 — write 90",
-    "find the fact — 2,400 ÷ 60 — write the fact and 40"
+    "tens ÷ tens — 360 ÷ 40 — write 9 (fact 36 ÷ 4)",
+    "hundreds ÷ tens — 2,400 ÷ 60 — write 40 (fact 24 ÷ 6)",
+    "find the fact — 420 ÷ 70 — write the fact 42 ÷ 7 and 6"
    ],
    "levels": [
-    "L1: dividend ÷ one-digit with tens (360 ÷ 4), fact row printed (hint, fades)",
-    "L2: tens ÷ tens (360 ÷ 40), fact row printed",
-    "L3: no fact row",
-    "L4: hundreds ÷ tens (2,400 ÷ 60)"
+    "L1: tens ÷ tens (360 ÷ 40) with the fact row printed (hint, fades)",
+    "L2: tens ÷ tens, no fact row",
+    "L3: hundreds ÷ tens (2,400 ÷ 60) with the fact row",
+    "L4: hundreds ÷ tens, no fact row"
    ],
    "example": {
     "item": "Work out 420 ÷ 70.",
