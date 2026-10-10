@@ -2975,6 +2975,272 @@
     }
    ],
    "note": ""
+  },
+  "R.B12.S1": {
+   "title": "Recognise and name 3-D shapes",
+   "direct": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (same CCSS K.G.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B12.S5 Identify more complex patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B12.S2": {
+   "title": "Find 2-D shapes within 3-D shapes",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding the flat (2-D) faces on 3-D shapes",
+   "build": [
+    "shape_3d_tasks"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (same CCSS K.G.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "naming the face shapes"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B12.S5 Identify more complex patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B12.S3": {
+   "title": "Use 3-D shapes for tasks",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "choosing a 3-D shape for a job (it rolls, it stacks)",
+   "build": [
+    "shape_3d_tasks"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "why": "R.B4.S2 Compare circles and triangles (same CCSS K.G.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B12.S5 Identify more complex patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B12.S4": {
+   "title": "3-D shapes in the environment",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding 3-D shapes in the environment",
+   "build": [
+    "shapes_world"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 Describe position (same CCSS K.G.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "next step: R.B12.S5 Identify more complex patterns"
+    },
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B12.S5": {
+   "title": "Identify more complex patterns",
+   "direct": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {
+      "points": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "shapes_world",
+    "shape_3d_tasks"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    }
+   ],
+   "note": "ABB, AABB, ABC and ABBC are dealt."
+  },
+  "R.B12.S6": {
+   "title": "Copy and continue patterns",
+   "direct": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "shapes_world"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    }
+   ],
+   "note": ""
+  },
+  "R.B12.S7": {
+   "title": "Patterns in the environment",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {},
+     "missing": "patterns in real objects and scenes"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "spotting patterns in the environment",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "R.B12.S1 Recognise and name 3-D shapes (earlier in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    },
+    {
+     "key": "shapes_early:shape_name_match_3d",
+     "why": "same block: R.B12.S1 Recognise and name 3-D shapes"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3069,7 +3335,8 @@
    "family": "algebra",
    "steps": [
     "R.B2.S4",
-    "R.B2.S6"
+    "R.B2.S6",
+    "R.B12.S7"
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -3123,7 +3390,8 @@
    "family": "geometry",
    "steps": [
     "R.B4.S3",
-    "R.B6.S3"
+    "R.B6.S3",
+    "R.B12.S4"
    ],
    "ccss": [
     "K.G.A.1"
@@ -3281,6 +3549,24 @@
     "R.B11.S10"
    ],
    "reused": false
+  },
+  "shape_3d_tasks": {
+   "kind": "new",
+   "skill": "shapes_early:shape_properties_3d",
+   "name": "What Can This Shape Do?",
+   "teaches": "properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes",
+   "representation": "line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape",
+   "family": "geometry",
+   "steps": [
+    "R.B12.S2",
+    "R.B12.S3"
+   ],
+   "ccss": [
+    "K.G.A.3",
+    "K.G.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
