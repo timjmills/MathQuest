@@ -96,14 +96,6 @@
    ],
    "pre": [
     {
-     "key": "placevalue:pv_digit_drag",
-     "why": "Y6.B1.S1 Numbers to 1,000,000 (previous step), band 999,999"
-    },
-    {
-     "key": "placevalue:expand",
-     "why": "Y5.B1.S8 Partition numbers to 1,000,000 (prior learning wk W01)"
-    },
-    {
      "key": "placevalue:place_value_10x",
      "why": "Y5.B1.S6 Powers of 10 - 1,000,000 as ten 100,000s (prior learning wk W01)"
     },
@@ -154,16 +146,8 @@
    ],
    "pre": [
     {
-     "key": "placevalue:number_word_names",
-     "why": "Y5.B1.S5 Read and write numbers to 1,000,000 (prior learning wk W01)"
-    },
-    {
      "key": "composing:number_word_form",
      "why": "Y2.B1.S6 Write numbers to 100 in words (prior learning wk W01)"
-    },
-    {
-     "key": "placevalue:pv_digit_drag",
-     "why": "Y6.B1.S2 Numbers to 10,000,000 (previous step)"
     },
     {
      "key": "placevalue:unit_form",
@@ -203,10 +187,6 @@
     "pv10_exponents"
    ],
    "pre": [
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y5.B1.S6 Powers of 10 (prior learning wk W01)"
-    },
     {
      "key": "multiplication:mult_zeros",
      "why": "x 10 and x 100 fact pattern"
@@ -257,14 +237,6 @@
     "big_numbers"
    ],
    "pre": [
-    {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y5.B1.S9 Number line to 1,000,000 (prior learning wk W02) - the 10,000 band"
-    },
-    {
-     "key": "number_sense:round_nl_hundred_thousands",
-     "why": "Y5.B1.S14 Round within 1,000,000 (prior learning wk W02)"
-    },
     {
      "key": "number_sense:round_nl_ten_thousands",
      "why": "Y5.B1.S13 Round within 100,000 (prior learning wk W02)"
@@ -323,14 +295,6 @@
     "big_numbers"
    ],
    "pre": [
-    {
-     "key": "placevalue:compare",
-     "why": "Y5.B1.S11 Compare and order numbers to 1,000,000 (prior learning wk W02), band 999,999"
-    },
-    {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y5.B1.S11 Compare and order numbers to 1,000,000 (prior learning wk W02)"
-    },
     {
      "key": "number_sense:place_on_number_line",
      "why": "Y5.B1.S9 Number line to 1,000,000 (prior learning wk W02)"
@@ -458,16 +422,8 @@
    ],
    "pre": [
     {
-     "key": "integers:compare_int",
-     "why": "Y5.B13.S4 Compare and order negative numbers"
-    },
-    {
      "key": "integers:order_negatives",
      "why": "Y5.B13.S4 Compare and order negative numbers"
-    },
-    {
-     "key": "integers:number_line_int",
-     "why": "Y5.B13.S2 Count through zero (on a line)"
     },
     {
      "key": "integers:opposite_numbers",
@@ -741,10 +697,6 @@
    "build": [],
    "pre": [
     {
-     "key": "number_theory:prime_composite",
-     "why": "Y5.B3.S5 Prime numbers (prior learning wk W10)"
-    },
-    {
      "key": "number_theory:factor_tchart_medium",
      "why": "Y5.B3.S3 Factors (prior learning wk W10)"
     },
@@ -789,10 +741,6 @@
     "square_cube"
    ],
    "pre": [
-    {
-     "key": "order_of_operations:exponents_simple",
-     "why": "Y5.B3.S6 Square numbers (notation)"
-    },
     {
      "key": "multiplication:arrays_groups",
      "why": "arrays before square arrays"
@@ -844,14 +792,6 @@
     "long_mult"
    ],
    "pre": [
-    {
-     "key": "multiplication:mult_placeholder_zero",
-     "why": "Y5.B5.S5 Multiply a 4-digit number by a 2-digit number (prior learning wk W03)"
-    },
-    {
-     "key": "multiplication:area_model_mult_hard",
-     "why": "2-digit x 3-digit grid"
-    },
     {
      "key": "multiplication:multiply",
      "why": "column multiplication by 1 digit"
@@ -911,16 +851,8 @@
    ],
    "pre": [
     {
-     "key": "number_ops_mixed:word_problems_mixed",
-     "why": "Y5.B5.S6 Solve problems with multiplication (prior learning wk W03)"
-    },
-    {
      "key": "multiplication:mult_placeholder_zero",
      "why": "Y5.B5.S5 Multiply a 4-digit number by a 2-digit number (prior learning wk W03)"
-    },
-    {
-     "key": "multiplication:mult_comparison",
-     "why": "Y5.B5.S11 times-as-many stories"
     },
     {
      "key": "multiplication:area_model_mult_hard",
@@ -968,14 +900,6 @@
     "vis_division_layouts"
    ],
    "pre": [
-    {
-     "key": "division:box_division_hard",
-     "why": "Y5.B5.S7 Short division (prior learning wk W03)"
-    },
-    {
-     "key": "division:div_zero_in_quotient",
-     "why": "Y5.B5.S7 Short division (prior learning wk W03)"
-    },
     {
      "key": "division:div_remainders",
      "why": "Y5.B5.S9 Divide with remainders"
@@ -1129,10 +1053,6 @@
    ],
    "pre": [
     {
-     "key": "division:long_div_2digit",
-     "why": "Y6.B2.S11 Introduction to long division (previous step)"
-    },
-    {
      "key": "division:div_remainders",
      "why": "Y5.B5.S9 Divide with remainders (prior learning wk W04)"
     },
@@ -1189,10 +1109,6 @@
     "wp_multidigit"
    ],
    "pre": [
-    {
-     "key": "division:remainder_interpret",
-     "why": "Y5.B5.S11 Solve problems with multiplication and division (prior learning wk W05)"
-    },
     {
      "key": "number_ops_mixed:word_problems_mixed",
      "why": "Y5.B5.S11 (prior learning wk W05)"
@@ -1253,10 +1169,6 @@
     {
      "key": "algebra:tape_diagram",
      "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W11)"
-    },
-    {
-     "key": "algebra:multi_step_word",
-     "why": "Y5.B2.S6 (prior learning wk W11)"
     },
     {
      "key": "multiplication:mult_comparison",
@@ -1361,12 +1273,7 @@
   },
   "Y6.B2.S16": {
    "title": "Mental calculations and estimation",
-   "direct": [
-    {
-     "key": "number_sense:estimate_products",
-     "opts": {}
-    }
-   ],
+   "direct": [],
    "partial": [
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1375,6 +1282,10 @@
     {
      "key": "number_sense:estimate_quotient",
      "missing": "checking a given answer is reasonable"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "missing": "Rounds and multiplies; no reasonableness check across four operations."
     }
    ],
    "verdict": "partial",
@@ -1383,10 +1294,6 @@
     "mental_estimate"
    ],
    "pre": [
-    {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "Y5.B2.S4 Round to check answers"
-    },
     {
      "key": "number_sense:nearest_1000",
      "why": "Y6.B1.S7 Round any integer"
@@ -1486,10 +1393,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "fractions:equiv_frac_visual",
-     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction"
-    },
     {
      "key": "fractions:equiv_frac_nv",
      "why": "Y5.B4.S1 Find fractions equivalent to a unit fraction"
@@ -1595,10 +1498,6 @@
      "why": "Y5.B4.S6 Compare fractions less than 1 (prior learning wk W15)"
     },
     {
-     "key": "fractions:order_fractions",
-     "why": "Y5.B4.S7 Order fractions less than 1 (prior learning wk W15)"
-    },
-    {
      "key": "fractions:equivalent",
      "why": "Y5.B4.S2 equivalents (prior learning wk W15)"
     },
@@ -1643,10 +1542,6 @@
     "compare_numerator"
    ],
    "pre": [
-    {
-     "key": "fractions:compare",
-     "why": "Y5.B4.S6 Compare fractions less than 1 (prior learning wk W15)"
-    },
     {
      "key": "fractions:order_fractions",
      "why": "Y5.B4.S7 Order fractions less than 1 (prior learning wk W15)"
@@ -1910,10 +1805,6 @@
    ],
    "pre": [
     {
-     "key": "fraction_operations:frac_word_problems",
-     "why": "one-step fraction stories"
-    },
-    {
      "key": "fraction_operations:add_mixed_unlike",
      "why": "Y6.B3.S7 Add mixed numbers"
     },
@@ -1949,31 +1840,23 @@
   },
   "Y6.B4.S1": {
    "title": "Multiply fractions by integers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:mult_frac_whole",
-     "opts": {}
+     "missing": "No mixed number x integer."
     },
     {
      "key": "fraction_operations:mult_frac_whole_nv",
-     "opts": {}
+     "missing": "No mixed number x integer."
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "multiplying a mixed number by an integer (2 1/3 x 4)",
    "build": [
     "mult_mixed_int"
    ],
    "pre": [
-    {
-     "key": "fraction_operations:mult_frac_whole",
-     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W17)"
-    },
-    {
-     "key": "fraction_operations:mult_frac_whole_nv",
-     "why": "Y5.B6.S2 Multiply a non-unit fraction by an integer (prior learning wk W17)"
-    },
     {
      "key": "fractions:fraction_of_set",
      "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W17)"
@@ -2059,22 +1942,17 @@
   },
   "Y6.B4.S3": {
    "title": "Divide a fraction by an integer",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:div_unit_fraction",
-     "opts": {}
+     "missing": "Unit fractions only."
     },
     {
      "key": "fraction_operations:div_unit_frac_nv",
-     "opts": {
-      "forms": [
-       0,
-       1
-      ]
-     }
+     "missing": "Unit fractions only."
     }
    ],
-   "partial": [],
    "verdict": "partial",
    "missing": "dividing a non-unit fraction whose numerator is a multiple of the divisor (6/7 / 3 = 2/7)",
    "build": [
@@ -2130,10 +2008,6 @@
     "frac_div_int_any"
    ],
    "pre": [
-    {
-     "key": "fraction_operations:div_unit_frac_nv",
-     "why": "Y6.B4.S3 previous step"
-    },
     {
      "key": "fractions:equivalent",
      "why": "Y6.B3.S1 Equivalent fractions"
@@ -2258,10 +2132,6 @@
      "why": "Y5.B6.S4 (prior learning wk W18)"
     },
     {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "Y5.B6.S5 Fraction of an amount (prior learning wk W18)"
-    },
-    {
      "key": "division:div_facts",
      "why": "divide by the denominator"
     },
@@ -2302,10 +2172,6 @@
     "frac_find_whole"
    ],
    "pre": [
-    {
-     "key": "fractions:fraction_of_set_hard_nv",
-     "why": "Y5.B6.S6 Find the whole (prior learning wk W18)"
-    },
     {
      "key": "fractions:fraction_of_set_hard",
      "why": "Y6.B4.S6 previous step"
@@ -2374,18 +2240,6 @@
    "build": [],
    "pre": [
     {
-     "key": "measurement:length_metric",
-     "why": "Y5.B14.S3 Convert units of length / Y4.B6.S2 km and m (prior learning wk W21)"
-    },
-    {
-     "key": "measurement:unit_conversions",
-     "why": "Y5.B14.S1 Kilograms and kilometres / Y3.B7.S4 kg and g (prior learning wk W21)"
-    },
-    {
-     "key": "measurement:capacity",
-     "why": "Y5.B14.S2 Millimetres and millilitres / Y3.B7.S9 l and ml (prior learning wk W21)"
-    },
-    {
      "key": "measurement:reading_ruler",
      "why": "Y1.B7.S3 / Y2.B6.S1 Measure in centimetres (prior learning wk W21; cm ruler is a pending option)"
     },
@@ -2435,20 +2289,8 @@
    ],
    "pre": [
     {
-     "key": "measurement:unit_conversions",
-     "why": "Y6.B5.S1 Metric measures (previous step): the unit facts"
-    },
-    {
      "key": "placevalue:place_value_10x",
      "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W21): every metric conversion is one of these"
-    },
-    {
-     "key": "measurement:length_metric",
-     "why": "Y5.B14.S3 Convert units of length / Y4.B6.S2 km and m (prior learning wk W21)"
-    },
-    {
-     "key": "measurement:capacity",
-     "why": "Y5.B14.S2 Millimetres and millilitres / Y3.B7.S9 l and ml (prior learning wk W21)"
     },
     {
      "key": "decimals:compare_thousandths",
@@ -2617,10 +2459,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:length_customary",
-     "why": "Y5.B14.S4 Convert between metric and imperial units (prior learning wk W22)"
-    },
-    {
      "key": "measurement:unit_conversion_word",
      "why": "Y5.B14.S3 Convert units of length (prior learning wk W22)"
     },
@@ -2786,10 +2624,6 @@
    "build": [],
    "pre": [
     {
-     "key": "conversions:ratio_intro",
-     "why": "Y6.B6.S2 Use ratio language (previous step; variant \"Write the ratio\")"
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y3.B3.S2 Use arrays (prior learning wk W33)"
     },
@@ -2836,10 +2670,6 @@
     "ratio_fraction"
    ],
    "pre": [
-    {
-     "key": "conversions:ratio_intro",
-     "why": "Y6.B6.S3 Introduction to the ratio symbol (previous step)"
-    },
     {
      "key": "fractions:fraction_of_set",
      "why": "Y5.B6.S4 Calculate a fraction of a quantity (prior learning wk W34)"
@@ -3837,10 +3667,6 @@
     {
      "key": "multiplication:mult_zeros",
      "why": "Y3.B4.S2 Related calculations (prior learning wk W05)"
-    },
-    {
-     "key": "decimals:compare_thousandths",
-     "why": "Y5.B7.S9 Order and compare decimals to 3 dp (prior learning wk W06)"
     }
    ],
    "preBuild": [
@@ -3882,10 +3708,6 @@
    ],
    "pre": [
     {
-     "key": "decimals:compare_thousandths",
-     "why": "Y6.B8.S1 Place value within 1 (previous step, partial)"
-    },
-    {
      "key": "placevalue:value",
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W05/W06/W08)"
     },
@@ -3900,10 +3722,6 @@
     {
      "key": "comparing:compare_groups",
      "why": "Y1.B1.S12 Less than, greater than, equal to (prior learning wk W06)"
-    },
-    {
-     "key": "decimals:order_decimals",
-     "why": "Y5.B7.S9 Order and compare decimals (prior learning wk W06)"
     }
    ],
    "preBuild": [
@@ -4002,14 +3820,6 @@
    ],
    "pre": [
     {
-     "key": "decimals:add_decimal",
-     "why": "Y5.B12.S6 Add decimals with different numbers of decimal places (prior learning wk W06)"
-    },
-    {
-     "key": "decimals:sub_decimal",
-     "why": "Y5.B12.S7 Subtract decimals with different numbers of decimal places (prior learning wk W06)"
-    },
-    {
      "key": "decimals:compare_thousandths",
      "why": "Y6.B8.S2 place value lines up the digits"
     },
@@ -4053,10 +3863,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W07/W08)"
-    },
     {
      "key": "multiplication:mult_zeros",
      "why": "Y3.B4.S1 / Y4.B5.S3-S4 Multiply by 10 and 100 (prior learning wk W07)"
@@ -4111,10 +3917,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y6.B8.S5 Multiply by 10, 100 and 1,000 (previous step) / Y5.B3.S9 (prior learning wk W08)"
-    },
     {
      "key": "placevalue:value",
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W08)"
@@ -4279,14 +4081,6 @@
    ],
    "pre": [
     {
-     "key": "decimals:mult_decimal",
-     "why": "Y6.B8.S7 Multiply decimals by integers"
-    },
-    {
-     "key": "decimals:div_decimal",
-     "why": "Y6.B8.S8 Divide decimals by integers"
-    },
-    {
      "key": "number_ops_mixed:word_problems_mixed",
      "why": "choosing × or ÷ in a story"
     },
@@ -4342,14 +4136,6 @@
     {
      "key": "fractions:write_fraction",
      "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W20)"
-    },
-    {
-     "key": "conversions:f_to_d",
-     "why": "Y4.B9.S8 Halves and quarters as decimals / Y5.B7.S4 (prior learning wk W20)"
-    },
-    {
-     "key": "conversions:d_to_f",
-     "why": "Y5.B7.S4 Equivalent fractions and decimals (prior learning wk W20)"
     },
     {
      "key": "fractions:equivalent",
@@ -4464,10 +4250,6 @@
    "build": [],
    "pre": [
     {
-     "key": "conversions:percent_visual",
-     "why": "Y5.B7.S12 Understand percentages (prior learning wk W36)"
-    },
-    {
      "key": "fraction_operations:frac_10_100",
      "why": "Y4.B8.S1 / S7 Tenths and hundredths as fractions (prior learning wk W20/W36/W37)"
     },
@@ -4525,10 +4307,6 @@
     {
      "key": "conversions:percent_visual",
      "why": "Y6.B9.S3 Understand percentages (previous step)"
-    },
-    {
-     "key": "conversions:f_to_p",
-     "why": "Y5.B7.S13 Percentages as fractions (prior learning wk W20/W36/W37)"
     },
     {
      "key": "fraction_operations:frac_10_100",
@@ -4605,10 +4383,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "conversions:f_to_p",
-     "why": "Y6.B9.S4 Fractions to percentages (previous step)"
-    },
     {
      "key": "conversions:percent_visual",
      "why": "Y5.B7.S12 Understand percentages (prior learning wk W20/W36/W37)"
@@ -4787,10 +4561,6 @@
    ],
    "pre": [
     {
-     "key": "conversions:percent_of_number",
-     "why": "Y6.B9.S7 Percentage of an amount, one step (previous step)"
-    },
-    {
      "key": "placevalue:place_value_10x",
      "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): 10% and 1%"
     },
@@ -4848,10 +4618,6 @@
     "percent_multi"
    ],
    "pre": [
-    {
-     "key": "conversions:percent_of_number",
-     "why": "Y6.B9.S7-S8 Percentage of an amount"
-    },
     {
      "key": "fractions:fraction_of_set_hard_nv",
      "why": "Y5.B6.S6 Find the whole (prior learning wk W37)"
@@ -5118,10 +4884,6 @@
     "area_triangle_grid"
    ],
    "pre": [
-    {
-     "key": "area_perimeter:area_triangle",
-     "why": "Y6.B10.S4 right-angled triangles (previous step)"
-    },
     {
      "key": "area_perimeter:area",
      "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23)"
@@ -5464,10 +5226,6 @@
     {
      "key": "fractions:fraction_of_set",
      "why": "Y5.B6.S4 fraction of an amount (prior learning wk W37)"
-    },
-    {
-     "key": "graphs:pie_chart",
-     "why": "Y6.B11.S3 previous step"
     }
    ],
    "preBuild": [],
@@ -5609,14 +5367,6 @@
    ],
    "pre": [
     {
-     "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 / Y5.B10.S2 Identify angles (prior learning wk W27)"
-    },
-    {
-     "key": "angles_lines:measure_angles",
-     "why": "Y5.B10.S4 Measure angles (prior learning wk W27)"
-    },
-    {
      "key": "angles_lines:additive_angles",
      "why": "Y5.B10.S6 angles around a point (prior learning wk W27)"
     },
@@ -5655,10 +5405,6 @@
    "missing": "",
    "build": [],
    "pre": [
-    {
-     "key": "angles_lines:additive_angles",
-     "why": "Y5.B10.S6-S7 angles around a point / on a line (prior learning wk W28)"
-    },
     {
      "key": "angles_lines:identify_angles",
      "why": "Y5.B10.S2 Identify angles (prior learning wk W28)"
@@ -5792,10 +5538,6 @@
     "angle_rules"
    ],
    "pre": [
-    {
-     "key": "shapes_classify:classify_triangles",
-     "why": "Y4.B12.S4 Triangles (prior learning wk W30)"
-    },
     {
      "key": "angles_lines:measure_angles",
      "why": "Y5.B10.S4 Measure angles (prior learning wk W30)"
@@ -6091,10 +5833,6 @@
    "build": [],
    "pre": [
     {
-     "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S1-S2 / Y5.B11.S1 coordinates (prior learning wk W13)"
-    },
-    {
      "key": "patterns:seq_2",
      "why": "Y2.B1.S15 counting in steps along an axis (prior learning wk W13)"
     },
@@ -6201,14 +5939,6 @@
     {
      "key": "integers:number_line_int",
      "why": "negative numbers on a number line, needed for the axes"
-    },
-    {
-     "key": "coordinates:coord_polygon",
-     "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
-    },
-    {
-     "key": "coordinates:coordinate_all",
-     "why": "Y6.B13.S2 previous step"
     }
    ],
    "preBuild": [],
@@ -6254,10 +5984,6 @@
     {
      "key": "coordinates:coord_polygon",
      "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
-    },
-    {
-     "key": "coordinates:geo_translate",
-     "why": "Y5.B11.S3-S4 translations (prior learning wk W31)"
     }
    ],
    "preBuild": [],
@@ -6303,10 +6029,6 @@
     {
      "key": "coordinates:coord_polygon",
      "why": "Y5.B11.S2 shapes on a grid (prior learning wk W31)"
-    },
-    {
-     "key": "coordinates:geo_reflect",
-     "why": "Y5.B11.S6 reflection (prior learning wk W31)"
     },
     {
      "key": "angles_lines:symmetry",
@@ -6736,7 +6458,6 @@
    "why": "div_unit_frac_nv and div_unit_fraction only divide UNIT fractions (1/3 / 2); WRM S3 and S4 divide non-unit fractions.",
    "steps": [
     "Y6.B4.S3",
-    "Y6.B4.S4",
     "Y6.B4.S4"
    ],
    "reused": false
@@ -6882,20 +6603,20 @@
   "mean_missing": {
    "kind": "option",
    "skill": "data_analysis:mean",
-   "name": "find a missing value",
-   "teaches": "Find a Missing Value From the Mean (option)",
-   "representation": "using the mean x number of items = total to find a missing value, and the mean in a context",
-   "family": "a boxed list of numbers with one blank box and \"mean = 6\"; write the total, then the missing number",
-   "steps": "data",
-   "ccss": [
+   "name": "Find a Missing Value From the Mean (option)",
+   "teaches": "using the mean x number of items = total to find a missing value, and the mean in a context",
+   "representation": "a boxed list of numbers with one blank box and \"mean = 6\"; write the total, then the missing number",
+   "family": "data",
+   "steps": [
     "Y6.B11.S6"
    ],
-   "why": [
+   "ccss": [
     "5.MD.B.2",
     "6.SP.B.5c"
    ],
+   "why": "mean only asks for the mean of a list; the WRM step also finds a missing value from a given mean.",
    "reused": false,
-   "option": "mean only asks for the mean of a list; the WRM step also finds a missing value from a given mean."
+   "option": "find a missing value"
   },
   "mental_estimate": {
    "kind": "new",
@@ -7009,7 +6730,6 @@
    "representation": "a mixed-number band on mult_frac_whole",
    "family": "fractions",
    "steps": [
-    "Y6.B4.S1",
     "Y6.B4.S1"
    ],
    "ccss": [
@@ -7044,7 +6764,6 @@
    "representation": "a vertical thermometer or number line; write the next numbers or the difference",
    "family": "integers",
    "steps": [
-    "Y6.B1.S8",
     "Y6.B1.S8"
    ],
    "ccss": [
@@ -7057,19 +6776,19 @@
   "net_draw": {
    "kind": "option",
    "skill": "shapes_classify:net_identify",
-   "name": "complete or check the net",
-   "teaches": "Complete the Net (option)",
-   "representation": "deciding whether a net folds into a cube or cuboid, and completing a net by adding the missing face",
-   "family": "a net on squared paper with one face missing; shade where the face goes, or tick Yes / No for \"folds into a cube\"",
-   "steps": "geometry",
-   "ccss": [
+   "name": "Complete the Net (option)",
+   "teaches": "deciding whether a net folds into a cube or cuboid, and completing a net by adding the missing face",
+   "representation": "a net on squared paper with one face missing; shade where the face goes, or tick Yes / No for \"folds into a cube\"",
+   "family": "geometry",
+   "steps": [
     "Y6.B12.S11"
    ],
-   "why": [
+   "ccss": [
     "6.G.A.4"
    ],
+   "why": "net_identify only matches a net to its solid (multiple choice); WRM also draws and checks nets.",
    "reused": false,
-   "option": "net_identify only matches a net to its solid (multiple choice); WRM also draws and checks nets."
+   "option": "complete or check the net"
   },
   "nl_millions": {
    "kind": "option",
@@ -7271,19 +6990,19 @@
   "reflex_angles": {
    "kind": "option",
    "skill": "angles_lines:identify_angles",
-   "name": "reflex angles",
-   "teaches": "Reflex Angles (option)",
-   "representation": "naming reflex angles (more than 180 degrees) alongside acute, right, obtuse and straight",
-   "family": "an angle with the arc drawn on the outside; tick the name from a word bank",
-   "steps": "geometry",
-   "ccss": [
+   "name": "Reflex Angles (option)",
+   "teaches": "naming reflex angles (more than 180 degrees) alongside acute, right, obtuse and straight",
+   "representation": "an angle with the arc drawn on the outside; tick the name from a word bank",
+   "family": "geometry",
+   "steps": [
     "Y6.B12.S1"
    ],
-   "why": [
+   "ccss": [
     "4.MD.C.5"
    ],
+   "why": "identify_angles offers right, acute, obtuse and straight but not reflex, which Y6 classifies.",
    "reused": false,
-   "option": "identify_angles offers right, acute, obtuse and straight but not reflex, which Y6 classifies."
+   "option": "reflex angles"
   },
   "round_whole": {
    "kind": "option",
@@ -7345,7 +7064,6 @@
    "representation": "dot arrays and cube drawings; write the number and the notation; option: is it square?",
    "family": "number_theory",
    "steps": [
-    "Y6.B2.S6",
     "Y6.B2.S6"
    ],
    "ccss": [
@@ -7485,7 +7203,8 @@
    "representation": "isometric drawings of cube solids; write how many cubes / cm³; option: which has more",
    "family": "measurement",
    "steps": [
-    "Y6.B10.S7"
+    "Y6.B10.S7",
+    "Y6.B10.S8"
    ],
    "ccss": [
     "5.MD.C.3",
