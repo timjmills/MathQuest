@@ -5127,6 +5127,618 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B9.S1": {
+   "title": "Count in 2s",
+   "direct": [
+    {
+     "key": "patterns:seq_2",
+     "opts": {}
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W33)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:seq_10",
+     "why": "next step: Y1.B9.S2 Count in 10s"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "next step: Y1.B9.S2 Count in 10s"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "same block: Y1.B9.S3 Count in 5s"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "same block: Y1.B9.S4 Recognise equal groups"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S2": {
+   "title": "Count in 10s",
+   "direct": [
+    {
+     "key": "patterns:seq_10",
+     "opts": {}
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B13.S2 Continue patterns beyond 10 (10-13) (prior learning wk W09)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W09)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W09)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S4 Grouping (prior learning wk W09)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (the step before in this block)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (the step before in this block)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S2 20, 30, 40 and 50 (same CCSS K.CC.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "consolidate"
+   ],
+   "related": [
+    {
+     "key": "patterns:seq_5",
+     "why": "next step: Y1.B9.S3 Count in 5s"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "same block: Y1.B9.S4 Recognise equal groups"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S3": {
+   "title": "Count in 5s",
+   "direct": [
+    {
+     "key": "patterns:seq_5",
+     "opts": {}
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (the step before in this block)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "next step: Y1.B9.S4 Recognise equal groups"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S4": {
+   "title": "Recognise equal groups",
+   "direct": [
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (prior learning wk W19)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S4 How many did I take away (prior learning wk W19)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W19)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W19)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W19)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (the step before in this block)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B9.S3 Count in 5s (the step before in this block)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "next step: Y1.B9.S5 Add equal groups"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "next step: Y1.B9.S5 Add equal groups"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "same CCSS K.OA.A.1 in Y1.B9.S6 Make arrays"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in Y1.B9.S7 Make doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in Y1.B9.S7 Make doubles"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S5": {
+   "title": "Add equal groups",
+   "direct": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (prior learning wk W19)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S4 How many did I take away (prior learning wk W19)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W19)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W19)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W19)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (the step before in this block)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (the step before in this block)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B9.S3 Count in 5s (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "next step: Y1.B9.S6 Make arrays"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in Y1.B9.S7 Make doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in Y1.B9.S7 Make doubles"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S6": {
+   "title": "Make arrays",
+   "direct": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B9.S7 Double to 8 (find a double) (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B9.S8 Double to 8 (make a double) (prior learning wk W20)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W20)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W20)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (the step before in this block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (the step before in this block)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured"
+   ],
+   "related": [
+    {
+     "key": "patterns:double",
+     "why": "next step: Y1.B9.S7 Make doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "next step: Y1.B9.S7 Make doubles"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S7": {
+   "title": "Make doubles",
+   "direct": [
+    {
+     "key": "patterns:double",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W20)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W20)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W20)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "R.B16.S2 Sharing (prior learning wk W20)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (the step before in this block)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (the step before in this block)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (the step before in this block)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "doubles_pictured"
+   ],
+   "related": [
+    {
+     "key": "division:share_into_groups",
+     "why": "next step: Y1.B9.S8 Make equal groups - grouping"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S8": {
+   "title": "Make equal groups - grouping",
+   "direct": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {
+      "band": 12
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W33)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (the step before in this block)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (the step before in this block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (the step before in this block)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y1.B9.S6 Make arrays (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B9.S9": {
+   "title": "Make equal groups - sharing",
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {
+      "band": 12
+     },
+     "missing": "sharing one at a time between a given number of groups (how many in each)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sharing (how many each)",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "R.B9.S6 Make pairs-odd and even (prior learning wk W33)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y1.B9.S7 Make doubles (the step before in this block)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "Y1.B9.S7 Make doubles (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:seq_2",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same block: Y1.B9.S1 Count in 2s"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "same block: Y1.B9.S2 Count in 10s"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5595,6 +6207,22 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "share_group": {
+   "kind": "new",
+   "skill": "division:share_and_group_early",
+   "name": "Share and Make Groups",
+   "teaches": "sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly",
+   "representation": "counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair",
+   "family": "operations",
+   "steps": [
+    "Y1.B9.S9"
+   ],
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -5627,6 +6255,18 @@
    "step": "Y1.B4.S9",
    "action": "partial",
    "why": "counting back on the line"
+  },
+  {
+   "key": "counting:number_seq_fill",
+   "step": "Y1.B9.S2",
+   "action": "add",
+   "why": "teaches this step"
+  },
+  {
+   "key": "counting:number_seq_fill",
+   "step": "Y1.B9.S3",
+   "action": "add",
+   "why": "teaches this step"
   }
  ]
 }
