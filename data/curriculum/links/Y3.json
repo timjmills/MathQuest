@@ -4269,6 +4269,932 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B4.S1": {
+   "title": "Multiples of 10",
+   "direct": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "note": "× 10"
+     }
+    },
+    {
+     "key": "patterns:seq_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "lower-grade skill on 1.NBT.A.1 (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "lower-grade skill on 1.NBT.A.1 (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "lower-grade skill on 1.NBT.B.2b (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "lower-grade skill on 1.NBT.B.2b (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "lower-grade skill on 1.NBT.B.2c (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "lower-grade skill on 1.NBT.B.2a (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "lower-grade skill on 1.NBT.B.2 (same domain as 2.NBT.A.2)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "lower-grade skill on 1.NBT.C.4 (same domain as 2.NBT.A.2)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same standard 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same standard 2.NBT.A.2: Count by 2s"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "same standard 2.NBT.A.2: Count by 5s"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same standard 2.NBT.A.2: Count-By Fill-In (1-12)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same standard 2.NBT.A.2: Skip Counting Number Line (Visual)"
+    },
+    {
+     "key": "patterns:skip_count_grid",
+     "why": "same standard 2.NBT.A.2: Skip Counting Grid (Visual)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "same standard 2.NBT.A.2: Count Up by Step (Grid)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S2": {
+   "title": "Related calculations",
+   "direct": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_10",
+     "why": "Y3.B4.S1 Multiples of 10 (step before in the block)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W30)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W30)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W30)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W30)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W30)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W30)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (next step)"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same cluster 3.NBT.A.2: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same cluster 3.NBT.A.2: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same cluster 3.NBT.A.2: Add within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S3": {
+   "title": "Reasoning about multiplication",
+   "direct": [
+    {
+     "key": "multiplication:mult_properties",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S2 Related calculations (step before in the block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:add",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.C.4)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:multiply",
+     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (next step)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (next step)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "same standard 2.OA.C.4: Arrays & Equal Groups (Visual)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "same standard 2.OA.C.4: Dot Array Multiplication (B&W)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "same standard 2.OA.C.4: Write Repeated Addition as Multiplication (Visual)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "same standard 2.OA.C.4: Equal Groups or Not? (Visual)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "same cluster 2.OA.C.3: Odd or Even? (Visual)"
+    },
+    {
+     "key": "composing:select_even_odd",
+     "why": "same cluster 2.OA.C.3: Circle the Even or Odd Numbers (MAP)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S4": {
+   "title": "Multiply a 2-digit number by a 1-digit number - no exchange",
+   "direct": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "note": "2-digit × 1-digit"
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "same standard 4.NBT.B.5: Area Model (2×2 and 2×3)"
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "same standard 4.NBT.B.5: Write the Placeholder Zero"
+    },
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "same standard 4.NBT.B.5: Find the Missing Digit (Multiplication)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "same cluster 3.OA.B.6: Multiplication Fact Families"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same cluster 3.OA.B.6: Number Families (Multiply & Divide)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "same cluster 3.OA.B.6: Missing Factors (×/÷)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S5": {
+   "title": "Multiply a 2-digit number by a 1-digit number - with exchange",
+   "direct": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "note": "2-digit × 1-digit"
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (next step)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (next step)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "same standard 3.OA.B.5: Multiplication Properties (Visual)"
+    },
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "same standard 4.NBT.B.5: Area Model (2×2 and 2×3)"
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "same standard 4.NBT.B.5: Write the Placeholder Zero"
+    },
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "same standard 4.NBT.B.5: Find the Missing Digit (Multiplication)"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same cluster 3.OA.B.6: Number Families (Multiply & Divide)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same cluster 3.OA.B.6: Parts of a Division Equation (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S6": {
+   "title": "Link multiplication and division",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "division:missing_mult_div",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:multiply",
+     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (step before in the block)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (next step)"
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (next step)"
+    },
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "same standard 3.OA.B.6: Number Families (Multiply & Divide)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.B.6: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "same standard 3.OA.B.6: Check a Division by Multiplying"
+    },
+    {
+     "key": "number_ops_mixed:number_families_mixed",
+     "why": "same standard 3.OA.B.6: Number Families (All Four Operations)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "same standard 3.OA.C.7: Multiplication Chart (Visual)"
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "same standard 3.OA.C.7: Multiplication Chart - Fill the Missing Cells"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S7": {
+   "title": "Divide a 2-digit number by a 1-digit number - no exchange",
+   "direct": [
+    {
+     "key": "division:box_division_easy",
+     "opts": {}
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (step before in the block)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "Y3.B4.S6 Link multiplication and division (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "division:divide",
+     "why": "same standard 4.NBT.B.6: Basic Division"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "same standard 4.NBT.B.6: Division with Remainders (Visual)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "same standard 4.NBT.B.6: Box Method Division (3÷1 digit)"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "same standard 4.NBT.B.6: Area Model Division (3÷1 digit)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S8": {
+   "title": "Divide a 2-digit number by a 1-digit number - flexible partitioning",
+   "direct": [
+    {
+     "key": "division:area_model_div_2by1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (next step)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "division:divide",
+     "why": "same standard 4.NBT.B.6: Basic Division"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "same standard 4.NBT.B.6: Box Method Division (3÷1 digit)"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "same standard 4.NBT.B.6: Area Model Division (3÷1 digit)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S9": {
+   "title": "Divide a 2-digit number by a 1-digit number - with remainders",
+   "direct": [
+    {
+     "key": "division:div_remainders",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W32)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (next step)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.2: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.2: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "same standard 3.OA.A.2: Division Number Line (Visual)"
+    },
+    {
+     "key": "division:div_equation_parts",
+     "why": "same standard 3.OA.A.2: Parts of a Division Equation (Visual)"
+    },
+    {
+     "key": "division:divide",
+     "why": "same standard 4.NBT.B.6: Basic Division"
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "same standard 4.NBT.B.6: Box Method Division (2÷1 digit)"
+    },
+    {
+     "key": "division:box_division_hard",
+     "why": "same standard 4.NBT.B.6: Box Method Division (3÷1 digit)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S10": {
+   "title": "Scaling",
+   "direct": [
+    {
+     "key": "multiplication:mult_comparison",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (step before in the block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W33)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W33)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same standard 3.OA.A.1: Multiplication Number Line (Visual)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "same standard 3.OA.A.1: Write Repeated Addition as Multiplication (Visual)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "same standard 3.OA.A.1: Equal Groups or Not? (Visual)"
+    },
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "same standard 4.OA.A.1: Times as Many (No Pictures)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same cluster 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same cluster 3.OA.A.3: Division Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B4.S11": {
+   "title": "How many ways",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting combinations systematically (3 tops × 4 bottoms) as a multiplication",
+   "build": [
+    "how_many_ways"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (step before in the block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W34)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 10s on the number line to 100 (prior learning wk W34)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [
+    "nonstandard_capacity",
+    "nonstandard_mass",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "same standard 3.OA.A.3: Multiplication Word Problems"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "same standard 3.OA.A.3: Multiplication Word Problems (No Pictures)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "same standard 3.OA.A.3: Division Word Problems"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "why": "same standard 3.OA.A.3: Division Word Problems (No Pictures)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "why": "same standard 3.OA.A.3: Mixed Word Problems (+−×÷) (Visual)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed_plain",
+     "why": "same standard 3.OA.A.3: Mixed Word Problems (+−×÷) (No Pictures)"
+    },
+    {
+     "key": "algebra:build_expr_multdiv",
+     "why": "same standard 3.OA.A.3: Build the Expression: ×/÷"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "same cluster 3.OA.A.1: Multiplication Number Line (Visual)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -4578,6 +5504,81 @@
     "3.OA.D.9",
     "3.NBT.A.3",
     "3.OA.B.6"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "nonstandard_capacity": {
+   "kind": "new",
+   "skill": "measurement:measure_capacity_cups",
+   "name": "Measure Capacity with Cups",
+   "teaches": "measuring capacity and volume with non-standard units (cups, spoons) and comparing",
+   "representation": "containers with a count of cups drawn beside them; write how many cups; circle the one that holds more",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S6",
+    "Y1.B8.S7"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "nonstandard_mass": {
+   "kind": "new",
+   "skill": "measurement:measure_mass_cubes",
+   "name": "Measure Mass with Cubes",
+   "teaches": "measuring mass with non-standard units (cubes, marbles) on a balance, and comparing masses by the count",
+   "representation": "a drawn balance with an object in one pan and cubes in the other; write how many cubes",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S2",
+    "Y1.B8.S3"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "capacity_early": {
+   "kind": "new",
+   "skill": "comparing:compare_capacity",
+   "name": "Full, Empty, Holds More",
+   "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+   "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
+   "family": "measurement",
+   "steps": [
+    "R.B2.S3",
+    "R.B8.S3",
+    "R.B8.S4",
+    "Y1.B8.S4",
+    "Y1.B8.S5",
+    "Y2.B7.S5"
+   ],
+   "ccss": [
+    "K.MD.A.2",
+    "K.MD.A.1",
+    "3.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "how_many_ways": {
+   "kind": "new",
+   "skill": "multiplication:how_many_ways",
+   "name": "How Many Ways?",
+   "teaches": "counting combinations systematically (3 tops × 4 bottoms) as a multiplication",
+   "representation": "a picture grid of items; list or draw every pair; write the multiplication",
+   "family": "operations",
+   "steps": [
+    "Y3.B4.S11"
+   ],
+   "ccss": [
+    "3.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
