@@ -56,10 +56,20 @@ const FEEDS={pv:['pv','misc'],addsub:['addsub','pv'],muldiv:['muldiv','pv','adds
   time:['time','pv','frac'],frac:['frac','muldiv','shape'],shape:['shape','position'],position:['position','shape','frac'],
   stats:['stats','pv','addsub'],misc:['pv','addsub','misc','shape']};
 // a measure step takes number pre-skills only when it calculates or compares with measures
-const feeds=(target,src)=>{const t=topic(target),u=topic(src);if(MEAS.includes(t)&&u!==t)return /operation|add|subtract|difference|compare|problem/i.test(target.title)&&['pv','addsub'].includes(u);return (FEEDS[t]||[]).includes(u);};
+const feeds=(target,src)=>{const t=topic(target),u=topic(src);
+  // r2b: only this year or the year before (a Reception lesson is not the ladder for a Grade 2 step), and cross-topic
+  // sources only where they are the building block: fractions take sharing/grouping, time takes counting in 5s,
+  // multiplication takes counting steps (not "tens to 100")
+  if(src.year!==target.year&&src.year!==prevYear)return false;
+  if(t!==u){const st=src.title.toLowerCase();
+    if(t==='frac'&&u==='muldiv'&&!/shar|group/.test(st))return false;
+    if(t==='time'&&u!=='time'&&!/5s|fives|quarter|half/.test(st))return false;
+    if(t==='muldiv'&&u==='pv'&&!/count in/.test(st))return false;}if(MEAS.includes(t)&&u!==t)return /operation|add|subtract|difference|compare|problem/i.test(target.title)&&['pv','addsub'].includes(u);return (FEEDS[t]||[]).includes(u);};
 
 // tags per step
-const tags={};for(const[k,l]of Object.entries(SKILL_WRM))for(const e of l){const s=typeof e==='string'?e:e.step;(tags[s]??=[]).push({key:k,partial:e.partial||null});}
+const tags={};for(const[k,l]of Object.entries(SKILL_WRM))for(const e of l){const s=typeof e==='string'?e:e.step;(tags[s]??=[]).push({key:k,partial:e.partial||null,note:e.note||null});}
+// an old SKILL_WRM note that names a real option value becomes opts ("band 999"); any other note is dropped, never copied
+const noteOpts=n=>{const m=/^band (\d+)$/.exec(n||'');return m?{band:+m[1]}:{};};
 // a step's skills: its direct ones, else (rule 12) its partial ones
 const directOf=id=>{const o=OV.steps[id];let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return d.length?d:p;};
 const propsOf={};for(const[id,p]of Object.entries(WRM_PROPOSALS))for(const s of p.steps||[])(propsOf[s]??=[]).push(id);
@@ -81,12 +91,12 @@ const yr=W.years.find(y=>y.id===YEAR);
 const usedProps=new Set();const missingReview=[];
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
-  const o=OV.steps[s.id]||{};
+  const o={...(OV.steps[s.id]||{}),...(OV.prePatch?.[s.id]||{})};
   if(!o.direct&&!o.partials&&!o.reviewed)missingReview.push(s.id);
   const T=tags[s.id]||[];
   let direct,partial;
   if(o.direct||o.partials){direct=(o.direct||[]).map(d=>({key:d.key,opts:d.opts||{}}));partial=(o.partials||[]).map(p=>({key:p.key,missing:p.missing,...(p.opts?{opts:p.opts}:{})}));}
-  else{direct=T.filter(t=>!t.partial).map(t=>({key:t.key,opts:{}}));partial=T.filter(t=>t.partial).map(t=>({key:t.key,missing:t.partial}));}
+  else{direct=T.filter(t=>!t.partial).map(t=>({key:t.key,opts:noteOpts(t.note)}));partial=T.filter(t=>t.partial).map(t=>({key:t.key,missing:t.partial}));}
   for(const d of [...direct,...partial]){const r=resolve(d.key);if(!r)throw new Error(s.id+' dead key '+d.key);d.key=r;}
   // tag fixes = diff against SKILL_WRM
   const why=o.why||{};
@@ -154,6 +164,9 @@ for(const id of usedProps){
   for(const n of ['STANDARD_PROPOSALS','WRM_EXTENSIONS','VISUAL_BUILDS']){const q=BL[n]?.[id];if(q){out.proposals[id]={kind:q.kind==='repair'?'option':q.kind,skill:q.skill,...(q.option?{option:q.option}:{}),name:q.name,teaches:q.teaches,representation:(q.templates||[]).join(', ')+(q.answer?'; '+q.answer:''),family:q.family,steps:[...new Set([...(q.wrmSteps||[]),...(OV.extendSteps?.[id]||[])])],ccss:q.standards||[],why:`existing ${n} entry${q.kind==='repair'?' (repair)':''}; reused`,reused:true};break;}}
   if(!out.proposals[id])throw new Error('unknown proposal '+id);
 }
+// rule 13 (revised): every proposal says, per step of this year, the exact clause it closes
+for(const[id,p]of Object.entries(out.proposals)){const c={};for(const[sid,st]of Object.entries(out.steps))if(st.build.includes(id))c[sid]=st.missing;else if(st.preBuild.includes(id))c[sid]='(prerequisite of this step)';
+  p.closes=c;p.kindText=p.kind==='new'?'new skill':'option on '+p.skill;}
 for(const s of Object.values(out.steps))for(const x of [...s.direct,...s.partial,...s.pre,...s.related])if(!live(x.key))throw new Error('dead key '+x.key);
 for(const s of Object.values(out.steps))for(const d of s.direct)if('note' in (d.opts||{}))throw new Error('note in opts '+d.key);
 fs.mkdirSync(root+'data/curriculum/links',{recursive:true});

@@ -43,14 +43,6 @@
     {
      "key": "composing:tens_foundation_visual",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)"
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "Y1.B4.S2 Understand 10 (prior learning wk W01)"
     }
    ],
    "preBuild": [
@@ -73,15 +65,12 @@
    "direct": [
     {
      "key": "placevalue:expand",
-     "opts": {}
+     "opts": {
+      "band": 99
+     }
     }
    ],
-   "partial": [
-    {
-     "key": "composing:base10_build",
-     "missing": "partitioning in more than one way"
-    }
-   ],
+   "partial": [],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -109,20 +98,16 @@
     {
      "key": "composing:tens_foundation_visual",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)"
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "Y1.B4.S2 Understand 10 (prior learning wk W01)"
     }
    ],
    "preBuild": [
     "flex_partition"
    ],
    "related": [
+    {
+     "key": "composing:base10_build",
+     "why": "the same partition built with tens rods and ones cubes"
+    },
     {
      "key": "composing:base10_build_hundreds",
      "why": "Y3.B1.S4 Hundreds (neighbouring step on the same topic: the idea one step before or after)"
@@ -150,22 +135,22 @@
      "why": "Y3.B1.S2 Partition numbers to 100 (step before in the block)"
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+     "key": "composing:base10_build",
+     "why": "Y3.B1.S1 Represent numbers to 100 (earlier in the block)"
     },
     {
-     "key": "patterns:seq_10",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B1.S16 Count in 3s (Y2, same topic)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y2.B1.S14 Order objects and numbers (Y2, same topic)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "composing:base10_build_hundreds",
-     "why": "Y3.B1.S4 Hundreds (next step: the same idea one step on)"
-    },
-    {
-     "key": "multiplication:count_by_tables",
      "why": "Y3.B1.S4 Hundreds (next step: the same idea one step on)"
     }
    ],
@@ -252,7 +237,9 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "partial": [],
@@ -287,10 +274,6 @@
     {
      "key": "composing:base10_build",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)"
     }
    ],
    "preBuild": [
@@ -313,11 +296,15 @@
    "direct": [
     {
      "key": "placevalue:expand",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:unit_form",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "partial": [],
@@ -348,14 +335,6 @@
     {
      "key": "composing:base10_build",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)"
-    },
-    {
-     "key": "counting:count_sequence",
-     "why": "Y1.B4.S7 1 more and 1 less (prior learning wk W02)"
     }
    ],
    "preBuild": [
@@ -434,15 +413,21 @@
    "direct": [
     {
      "key": "placevalue:identify",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:value",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:unit_form",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "partial": [],
@@ -469,18 +454,6 @@
     {
      "key": "composing:base10_build",
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)"
-    },
-    {
-     "key": "counting:count_sequence",
-     "why": "Y1.B4.S7 1 more and 1 less (prior learning wk W02)"
-    },
-    {
-     "key": "placevalue:more_less_10",
-     "why": "Y1.B4.S7 1 more and 1 less (prior learning wk W02)"
     }
    ],
    "preBuild": [
@@ -584,20 +557,16 @@
      "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (step before in the block)"
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (earlier in the block)"
     },
     {
-     "key": "patterns:seq_10",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (earlier in the block)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "placevalue:identify",
-     "why": "Y3.B1.S8 Hundreds, tens and ones (neighbouring step on the same topic: the idea one step before or after)"
-    },
     {
      "key": "placevalue:compare",
      "why": "Y3.B1.S12 Compare numbers to 1,000 (neighbouring step on the same topic: the idea one step before or after)"
@@ -625,16 +594,16 @@
    ],
    "pre": [
     {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
-    },
-    {
      "key": "placevalue:more_less_100",
      "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (earlier in the block)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (earlier in the block)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -655,7 +624,9 @@
    "direct": [
     {
      "key": "placevalue:compare",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "partial": [],
@@ -716,11 +687,15 @@
    "direct": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "opts": {}
+     "opts": {
+      "band": 999
+     }
     }
    ],
    "partial": [],
@@ -734,15 +709,11 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y1.B12.S4 The number line to 100 (prior learning wk W03)"
+     "why": "Y3.B1.S11 Estimate on a number line to 1,000 (earlier in the block)"
     },
     {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -776,28 +747,28 @@
    "build": [],
    "pre": [
     {
-     "key": "placevalue:order_least_to_greatest",
-     "why": "Y3.B1.S13 Order numbers to 1,000 (step before in the block)"
-    },
-    {
-     "key": "placevalue:order_greatest_to_least",
-     "why": "Y3.B1.S13 Order numbers to 1,000 (step before in the block)"
-    },
-    {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y1.B12.S4 The number line to 100 (prior learning wk W03)"
-    },
-    {
-     "key": "counting:number_seq_fill",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
-    },
-    {
      "key": "patterns:seq_10",
-     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W03)"
+     "why": "Y2.B1.S15 counting in 10s"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 the 5 times-table: 50 is 5 tens (opts constant [5])"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S4 counting in 100s: two 50s make 100"
     }
    ],
    "preBuild": [],
    "related": [
+    {
+     "key": "patterns:skip_count_line",
+     "why": "counting in 50s as jumps on a number line"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (neighbouring step on the same topic: the idea one step before or after)"
+    },
     {
      "key": "placevalue:compare",
      "why": "Y3.B1.S12 Compare numbers to 1,000 (neighbouring step on the same topic: the idea one step before or after)"
@@ -887,15 +858,15 @@
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)"
     },
     {
-     "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W03)"
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
     },
     {
      "key": "placevalue:order_least_to_greatest",
+     "why": "Y2.B1.S14 Order objects and numbers (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
      "why": "Y2.B1.S14 Order objects and numbers (prior learning wk W03)"
     }
    ],
@@ -945,10 +916,6 @@
     {
      "key": "composing:make_ten",
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)"
-    },
-    {
-     "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W03)"
     },
     {
      "key": "multiplication:count_by_tables",
@@ -1023,8 +990,8 @@
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W04)"
     },
     {
-     "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W04)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
     }
    ],
    "preBuild": [
@@ -1132,12 +1099,12 @@
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W04)"
     },
     {
-     "key": "addition:add_20_mixed",
-     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W04)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
     },
     {
-     "key": "composing:number_bonds",
-     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W04)"
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
     }
    ],
    "preBuild": [],
@@ -1253,10 +1220,6 @@
     {
      "key": "composing:make_ten",
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)"
-    },
-    {
-     "key": "subtraction:nl_sub",
-     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W05)"
     }
    ],
    "preBuild": [],
@@ -1612,8 +1575,8 @@
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
     },
     {
-     "key": "composing:number_bonds",
-     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W06)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)"
     }
    ],
    "preBuild": [],
@@ -1673,12 +1636,12 @@
      "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     },
     {
-     "key": "subtraction:sub_5_pictures",
-     "why": "R.B14.S3 Take away (prior learning wk W07)"
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     }
    ],
    "preBuild": [],
@@ -1737,16 +1700,12 @@
      "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     },
     {
-     "key": "subtraction:sub_5_pictures",
-     "why": "R.B14.S3 Take away (prior learning wk W07)"
-    },
-    {
-     "key": "subtraction:sub_wp_10",
-     "why": "R.B14.S3 Take away (prior learning wk W07)"
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     }
    ],
    "preBuild": [],
@@ -1782,36 +1741,20 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_across_zeros",
-     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (step before in the block)"
-    },
-    {
-     "key": "subtraction:sub_100_regroup",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)"
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 adding two 3-digit numbers in columns"
     },
     {
      "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)"
+     "why": "Y2.B2.S16 adding two 2-digit numbers across a 10"
     },
     {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W07)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 the place of each digit (lining up the columns)"
     },
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W07)"
-    },
-    {
-     "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
-    },
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "R.B14.S3 Take away (prior learning wk W07)"
+     "key": "placevalue:value",
+     "why": "the value of each digit"
     }
    ],
    "preBuild": [],
@@ -1819,6 +1762,10 @@
     {
      "key": "subtraction:sub_1k_mixed",
      "why": "Y3.B2.S18 Subtract a 2-digit number from a 3-digit number (next step: the same idea one step on)"
+    },
+    {
+     "key": "subtraction:sub_across_zeros",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (neighbouring step on the same topic: the idea one step before or after)"
     },
     {
      "key": "subtraction:sub_1k_regroup",
@@ -1867,12 +1814,12 @@
      "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     },
     {
-     "key": "subtraction:sub_5_pictures",
-     "why": "R.B14.S3 Take away (prior learning wk W07)"
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
     }
    ],
    "preBuild": [],
@@ -1899,41 +1846,23 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_1k_mixed",
-     "why": "Y3.B2.S18 Subtract a 2-digit number from a 3-digit number (step before in the block)"
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 bonds to 10: 3 + 7 gives 30 + 70"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 adding and subtracting 10s"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less"
     },
     {
      "key": "addition:cloze_addition",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
-    },
-    {
-     "key": "subtraction:sub_100_regroup",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)"
-    },
-    {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)"
-    },
-    {
-     "key": "addition:add_three",
-     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W08)"
+     "why": "Y2.B2.S21 missing-number additions"
     }
    ],
-   "preBuild": [
-    "add_next_10"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "number_sense:estimate_sum",
@@ -2158,18 +2087,6 @@
      "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W10)"
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "R.B16.S4 Grouping (prior learning wk W10)"
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)"
     },
@@ -2179,6 +2096,10 @@
     },
     {
      "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
      "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
     }
    ],
@@ -2223,18 +2144,6 @@
      "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W10)"
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "R.B16.S4 Grouping (prior learning wk W10)"
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)"
     },
@@ -2244,6 +2153,10 @@
     },
     {
      "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
      "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
     }
    ],
@@ -2288,20 +2201,20 @@
      "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W10)"
     },
     {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W10)"
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "R.B16.S4 Grouping (prior learning wk W10)"
-    },
-    {
      "key": "addition:cloze_addition",
      "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W10)"
     }
    ],
    "preBuild": [],
@@ -2402,18 +2315,6 @@
     {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W30)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W30)"
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W30)"
-    },
-    {
-     "key": "composing:base10_build",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W30)"
     }
    ],
    "preBuild": [],
@@ -2595,18 +2496,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "Y1.B5.S4 Doubles (prior learning wk W11)"
     }
    ],
    "preBuild": [],
@@ -2658,14 +2547,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
     }
    ],
    "preBuild": [],
@@ -2721,10 +2602,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W31)"
     }
    ],
    "preBuild": [],
@@ -2784,18 +2661,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:seq_2",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
-    },
-    {
-     "key": "patterns:skip_count_line",
-     "why": "Y1.B9.S1 Count in 2s (prior learning wk W11)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "Y1.B5.S4 Doubles (prior learning wk W11)"
     }
    ],
    "preBuild": [],
@@ -2851,10 +2716,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W31)"
     }
    ],
    "preBuild": [],
@@ -2910,10 +2771,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W31)"
     }
    ],
    "preBuild": [],
@@ -2977,10 +2834,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)"
-    },
-    {
-     "key": "number_sense:doubles_near_doubles",
-     "why": "R.B11.S11 Doubles to 10 (find a double) (prior learning wk W31)"
     }
    ],
    "preBuild": [],
@@ -3041,10 +2894,6 @@
     {
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S3 Add equal groups (prior learning wk W32)"
-    },
-    {
-     "key": "placevalue:expand",
-     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W32)"
     }
    ],
    "preBuild": [],
@@ -3151,14 +3000,6 @@
     {
      "key": "multiplication:dot_array_mult",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W30)"
-    },
-    {
-     "key": "patterns:seq_10",
-     "why": "Y1.B9.S2 Count in 10s (prior learning wk W30)"
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W30)"
     }
    ],
    "preBuild": [],
@@ -3290,24 +3131,28 @@
   },
   "Y3.B4.S5": {
    "title": "Multiply a 2-digit number by a 1-digit number - with exchange",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "multiplication:multiply",
+     "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in",
      "opts": {
       "tiles": 21
      }
     },
     {
      "key": "multiplication:area_model_mult",
+     "missing": "the partition picture; exchanges are not controlled (3 × 13)",
      "opts": {
       "tiles": 21
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in; the partition picture; exchanges are not controlled (3 × 13)",
+   "build": [
+    "exchange_count"
+   ],
    "pre": [
     {
      "key": "composing:odd_even",
@@ -3413,27 +3258,28 @@
     },
     {
      "key": "division:area_model_div_2by1",
-     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (next step: the same idea one step on)"
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (neighbouring step on the same topic: the idea one step before or after)"
     }
    ],
    "note": ""
   },
   "Y3.B4.S7": {
    "title": "Divide a 2-digit number by a 1-digit number - no exchange",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "division:box_division_easy",
-     "opts": {}
-    },
-    {
-     "key": "division:area_model_div_2by1",
-     "opts": {}
+     "missing": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available",
+     "opts": {
+      "regroup": "none"
+     }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available",
+   "build": [
+    "exchange_count"
+   ],
    "pre": [
     {
      "key": "multiplication:mult_div_fact_family",
@@ -3470,6 +3316,10 @@
    ],
    "preBuild": [],
    "related": [
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "the next step: dividing by flexible partitioning"
+    },
     {
      "key": "multiplication:multiply",
      "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (neighbouring step on the same topic: the idea one step before or after)"
@@ -3719,12 +3569,12 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W13)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W13)"
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S1 Explore length (prior learning wk W13)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -3754,16 +3604,12 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S2 Compare length (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -3792,12 +3638,16 @@
      "why": "Y3.B5.S2 Measure in millimetres (step before in the block)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S1 Measure in metres and centimetres (earlier in the block)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -3805,8 +3655,8 @@
    ],
    "related": [
     {
-     "key": "measurement:length_metric",
-     "why": "Y3.B5.S4 Metres, centimetres and millimetres (next step: the same idea one step on)"
+     "key": "measurement:estimate_length",
+     "why": "choosing mm or cm for an object"
     }
    ],
    "note": ""
@@ -3835,12 +3685,12 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W14)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -3879,12 +3729,12 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W14)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S2 Compare length (prior learning wk W14)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -3923,16 +3773,12 @@
    ],
    "pre": [
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W14)"
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S2 Compare length (prior learning wk W14)"
-    },
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -4113,12 +3959,16 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (earlier in the block)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (Y2, same topic)"
     },
     {
      "key": "comparing:compare_objects",
-     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+     "why": "Y2.B6.S3 Compare lengths and heights (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -4159,12 +4009,8 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
-    },
-    {
-     "key": "comparing:compare_objects",
-     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (earlier in the block)"
     }
    ],
    "preBuild": [
@@ -4201,12 +4047,8 @@
      "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W16)"
     },
     {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W16)"
-    },
-    {
-     "key": "comparing:compare_objects",
-     "why": "R.B10.S1 Explore length (prior learning wk W16)"
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y3.B5.S10 What is perimeter (earlier in the block)"
     }
    ],
    "preBuild": [
@@ -4215,8 +4057,8 @@
    ],
    "related": [
     {
-     "key": "area_perimeter:perimeter_intro",
-     "why": "Y3.B5.S10 What is perimeter (neighbouring step on the same topic: the idea one step before or after)"
+     "key": "addition:add_three",
+     "why": "adding three or four side lengths is adding three numbers"
     }
    ],
    "note": ""
@@ -4247,24 +4089,12 @@
      "why": "Y2.B8.S7 Recognise a third (prior learning wk W26)"
     },
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (Y2, same topic)"
     },
     {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
-    },
-    {
-     "key": "shapes_early:compose_shapes",
-     "why": "R.B6.S2 Combine shapes with 4 sides (prior learning wk W26)"
+     "key": "patterns:halve",
+     "why": "Y2.B8.S4 Find a half (Y2, same topic)"
     }
    ],
    "preBuild": [
@@ -4317,10 +4147,6 @@
     {
      "key": "fractions:shade_fraction",
      "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
     }
    ],
    "preBuild": [
@@ -4367,22 +4193,6 @@
     {
      "key": "shapes_early:partition_shapes",
      "why": "Y2.B8.S7 Recognise a third (prior learning wk W26)"
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
-    },
-    {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
     }
    ],
    "preBuild": [
@@ -4434,14 +4244,6 @@
     {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
     }
    ],
    "preBuild": [
@@ -4499,10 +4301,6 @@
     {
      "key": "fractions:identify",
      "why": "Y2.B8.S10 Unit fractions (prior learning wk W36)"
-    },
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
     }
    ],
    "preBuild": [
@@ -4760,12 +4558,10 @@
    "pre": [
     {
      "key": "measurement:heavier_lighter_visual",
-     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+     "why": "Y2.B7.S1 Compare mass (Y2, same topic)"
     }
    ],
-   "preBuild": [
-    "nonstandard_mass"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "number_sense:place_on_number_line",
@@ -4776,9 +4572,11 @@
   },
   "Y3.B7.S2": {
    "title": "Measure mass in grams",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:mass_volume_liquid",
+     "missing": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
      "opts": {
       "forms": [
        1
@@ -4786,19 +4584,22 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
+   "build": [
+    "mass_scales"
+   ],
    "pre": [
     {
+     "key": "multiplication:count_by_tables",
+     "why": "counting in 10s, 50s and 100s from 0 to read the scale marks"
+    },
+    {
      "key": "measurement:heavier_lighter_visual",
-     "why": "R.B8.S2 Find a balance (prior learning wk W34)"
+     "why": "Y2.B7.S1 Compare mass (Y2, same topic)"
     }
    ],
-   "preBuild": [
-    "nonstandard_mass"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "number_sense:place_on_number_line",
@@ -4829,12 +4630,15 @@
    "pre": [
     {
      "key": "measurement:heavier_lighter_visual",
-     "why": "Y2.B7.S1 Compare mass (Y2, same topic)"
+     "why": "Y2.B7.S1 heavier and lighter"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "counting in 100s to read a kg scale marked in 100 g"
     }
    ],
    "preBuild": [
-    "mass_ops",
-    "nonstandard_mass"
+    "mass_ops"
    ],
    "related": [
     {
@@ -4864,8 +4668,7 @@
     }
    ],
    "preBuild": [
-    "mass_ops",
-    "nonstandard_mass"
+    "mass_ops"
    ],
    "related": [
     {
@@ -4893,10 +4696,6 @@
     {
      "key": "number_sense:place_on_number_line",
      "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)"
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W18)"
     },
     {
      "key": "measurement:mass_volume_liquid",
@@ -4939,9 +4738,7 @@
      "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W35)"
     }
    ],
-   "preBuild": [
-    "nonstandard_mass"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "addition:add_1k_mixed",
@@ -4976,10 +4773,7 @@
      "why": "capacity language and units (Y2.B7.S5 compare capacity)"
     }
    ],
-   "preBuild": [
-    "nonstandard_capacity",
-    "capacity_early"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "number_sense:place_on_number_line",
@@ -5013,10 +4807,7 @@
      "why": "reading a scale"
     }
    ],
-   "preBuild": [
-    "nonstandard_capacity",
-    "capacity_early"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:capacity",
@@ -5053,10 +4844,7 @@
      "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (step before in the block)"
     }
    ],
-   "preBuild": [
-    "nonstandard_capacity",
-    "capacity_early"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:unit_form",
@@ -5084,18 +4872,21 @@
      "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)"
     },
     {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W18)"
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (earlier in the block)"
     }
    ],
    "preBuild": [
-    "capacity_early",
-    "nonstandard_capacity"
+    "capacity_early"
    ],
    "related": [
     {
-     "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (neighbouring step on the same topic: the idea one step before or after)"
+     "key": "measurement:heavier_lighter_visual",
+     "why": "comparing masses, the same compare idea"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "comparing the numbers once the units match"
     }
    ],
    "note": ""
@@ -5124,8 +4915,7 @@
     }
    ],
    "preBuild": [
-    "capacity_early",
-    "nonstandard_capacity"
+    "capacity_early"
    ],
    "related": [
     {
@@ -5291,10 +5081,6 @@
      "why": "Y2.B8.S4 Find a half (prior learning wk W38)"
     },
     {
-     "key": "fractions:fraction_of_set",
-     "why": "Y1.B10.S8 Find a quarter of a quantity (prior learning wk W38)"
-    },
-    {
      "key": "division:share_into_groups",
      "why": "Y2.B5.S8 Make equal groups – sharing (prior learning wk W38)"
     }
@@ -5303,6 +5089,10 @@
     "fraction_parts"
    ],
    "related": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "Y3.B8.S4 Unit fractions of a set of objects (next step: the same idea one step on)"
+    },
     {
      "key": "fraction_operations:add_fractions_like",
      "why": "Y3.B8.S1 Add fractions (neighbouring step on the same topic: the idea one step before or after)"
@@ -5322,7 +5112,7 @@
    "verdict": "partial",
    "missing": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available",
    "build": [
-    "single_fraction"
+    "fos_kind"
    ],
    "pre": [
     {
@@ -5367,20 +5157,22 @@
   },
   "Y3.B8.S5": {
    "title": "Non-unit fractions of a set of objects",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:fraction_of_set",
-     "opts": {}
+     "missing": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available"
     },
     {
      "key": "fractions:fraction_of_set_nv",
-     "opts": {}
+     "missing": "mixes unit and non-unit fractions, without the set pictured"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available; mixes unit and non-unit fractions, without the set pictured",
+   "build": [
+    "fos_kind"
+   ],
    "pre": [
     {
      "key": "fractions:shade_fraction",
@@ -5498,15 +5290,9 @@
     {
      "key": "measurement:money",
      "why": "Y2.B4.S7 Calculate with money (prior learning wk W19)"
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
     }
    ],
-   "preBuild": [
-    "money_notes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:coin_value",
@@ -5552,15 +5338,9 @@
     {
      "key": "measurement:coin_value",
      "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
     }
    ],
-   "preBuild": [
-    "money_notes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:unit_form",
@@ -5600,15 +5380,9 @@
     {
      "key": "measurement:coin_value",
      "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
     }
    ],
-   "preBuild": [
-    "money_notes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "addition:add_1k_mixed",
@@ -5651,15 +5425,9 @@
     {
      "key": "measurement:coin_value",
      "why": "Y2.B4.S1 Count money - pence (prior learning wk W19)"
-    },
-    {
-     "key": "addition:comparison_word",
-     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W19)"
     }
    ],
-   "preBuild": [
-    "money_notes"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "subtraction:sub_1k_mixed",
@@ -5693,12 +5461,8 @@
      "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W20)"
     },
     {
-     "key": "composing:number_bonds",
-     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W20)"
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y1.B2.S7 Number bonds to 10 (prior learning wk W20)"
+     "key": "measurement:money_count",
+     "why": "Y3.B9.S1 Pounds and pence (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -5741,9 +5505,7 @@
      "why": "Y2.B9.S1 O'clock and half past (prior learning wk W20)"
     }
    ],
-   "preBuild": [
-    "time_talk"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:time_1min",
@@ -5782,9 +5544,7 @@
      "why": "Y2.B9.S1 O'clock and half past (prior learning wk W20)"
     }
    ],
-   "preBuild": [
-    "time_talk"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:time_1min",
@@ -5831,9 +5591,7 @@
      "why": "Y2.B9.S1 O'clock and half past (prior learning wk W20)"
     }
    ],
-   "preBuild": [
-    "time_talk"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:time_analog_digital",
@@ -5877,9 +5635,7 @@
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_talk",
-    "day_order"
+    "time_facts"
    ],
    "related": [
     {
@@ -5920,9 +5676,7 @@
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_talk",
-    "day_order"
+    "time_facts"
    ],
    "related": [
     {
@@ -5960,9 +5714,7 @@
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_talk",
-    "day_order"
+    "time_facts"
    ],
    "related": [
     {
@@ -6000,9 +5752,7 @@
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_talk",
-    "day_order"
+    "time_facts"
    ],
    "related": [
     {
@@ -6046,14 +5796,12 @@
      "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W22)"
     },
     {
-     "key": "measurement:time_half_hour",
-     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W22)"
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S5 Use a.m. and p.m (earlier in the block)"
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_units",
-    "time_talk"
+    "time_facts"
    ],
    "related": [
     {
@@ -6089,14 +5837,12 @@
      "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W22)"
     },
     {
-     "key": "measurement:time_half_hour",
-     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W22)"
+     "key": "measurement:time_sense",
+     "why": "Y3.B10.S5 Use a.m. and p.m (earlier in the block)"
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_units",
-    "time_talk"
+    "time_facts"
    ],
    "related": [
     {
@@ -6131,16 +5877,10 @@
     {
      "key": "measurement:time_fives_ring",
      "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W22)"
-    },
-    {
-     "key": "measurement:time_half_hour",
-     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W22)"
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_units",
-    "time_talk"
+    "time_facts"
    ],
    "related": [
     {
@@ -6169,14 +5909,12 @@
      "why": "Y2.B9.S5 Tell the time to 5 minutes (prior learning wk W22)"
     },
     {
-     "key": "measurement:time_half_hour",
-     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W22)"
+     "key": "measurement:elapsed_mixed",
+     "why": "Y3.B10.S9 Hours and minutes - use durations (earlier in the block)"
     }
    ],
    "preBuild": [
-    "time_facts",
-    "time_units",
-    "time_talk"
+    "time_facts"
    ],
    "related": [
     {
@@ -6212,12 +5950,12 @@
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
     },
     {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W23)"
-    },
-    {
      "key": "measurement:time_sense",
      "why": "Y3.B10.S5 Use a.m. and p.m (earlier in the block)"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "Y3.B10.S4 Read time on a digital clock (earlier in the block)"
     }
    ],
    "preBuild": [
@@ -6260,15 +5998,9 @@
     {
      "key": "shapes_early:name_3d_shapes",
      "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W28)"
     }
    ],
-   "preBuild": [
-    "shape_sort"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "angles_lines:identify_angles",
@@ -6311,15 +6043,9 @@
     {
      "key": "shapes_early:name_3d_shapes",
      "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W28)"
     }
    ],
-   "preBuild": [
-    "shape_sort"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "measurement:reading_ruler",
@@ -6340,39 +6066,19 @@
    "pre": [
     {
      "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S2 Right angles (step before in the block)"
-    },
-    {
-     "key": "angles_lines:symmetry",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W29)"
-    },
-    {
-     "key": "angles_lines:place_symmetry_lines",
-     "why": "Y2.B3.S5 Lines of symmetry on shapes (prior learning wk W29)"
+     "why": "Y3.B11.S2 right angles: the angle every other is compared with"
     },
     {
      "key": "shapes_early:shape_corners_count",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
+     "why": "Y2.B3.S3 corners (vertices) of 2-D shapes"
     },
     {
      "key": "shapes_early:shape_positions",
-     "why": "Y2.B11.S1 Language of position (prior learning wk W29)"
+     "why": "Y2.B11 position and turn language"
     }
    ],
    "preBuild": [
-    "shape_draw"
+    "turns"
    ],
    "related": [
     {
@@ -6398,20 +6104,16 @@
    ],
    "pre": [
     {
+     "key": "measurement:estimate_length",
+     "why": "Y2.B6 choosing and estimating lengths in cm"
+    },
+    {
      "key": "angles_lines:identify_angles",
-     "why": "Y3.B11.S2 Right angles (earlier in the block)"
+     "why": "Y3.B11.S2 right angles for drawing a rectangle"
     },
     {
-     "key": "patterns:shape_pattern",
-     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (Y2, same topic)"
-    },
-    {
-     "key": "shapes_early:count_edges_faces_vertices",
-     "why": "Y2.B3.S10 Count vertices on 3-D shapes (Y2, same topic)"
-    },
-    {
-     "key": "shapes_early:compose_from_attributes",
-     "why": "Y2.B3.S7 Sort 2-D shapes (Y2, same topic)"
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S2 sides of 2-D shapes"
     }
    ],
    "preBuild": [],
@@ -6454,14 +6156,6 @@
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)"
     },
     {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
-    },
-    {
      "key": "shapes_early:shape_positions",
      "why": "Y2.B11.S1 Language of position (prior learning wk W29)"
     }
@@ -6473,6 +6167,10 @@
     {
      "key": "angles_lines:identify_lines",
      "why": "Y3.B11.S6 Parallel and perpendicular (next step: the same idea one step on)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (neighbouring step on the same topic: the idea one step before or after)"
     }
    ],
    "note": ""
@@ -6507,14 +6205,6 @@
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)"
     },
     {
-     "key": "shapes_early:name_2d_shapes",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
-    },
-    {
      "key": "shapes_early:shape_positions",
      "why": "Y2.B11.S1 Language of position (prior learning wk W29)"
     }
@@ -6523,6 +6213,10 @@
     "shape_draw"
    ],
    "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (next step: the same idea one step on)"
+    },
     {
      "key": "measurement:reading_ruler",
      "why": "Y3.B11.S4 Measure and draw accurately (neighbouring step on the same topic: the idea one step before or after)"
@@ -6556,8 +6250,8 @@
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
     },
     {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (earlier in the block)"
     }
    ],
    "preBuild": [],
@@ -6598,10 +6292,6 @@
     {
      "key": "shapes_early:shape_corners_count",
      "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W29)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_2d",
-     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W29)"
     },
     {
      "key": "shapes_early:shape_positions",
@@ -6651,9 +6341,7 @@
      "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)"
     }
    ],
-   "preBuild": [
-    "shape_sort"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "shapes_early:shape_name_match_3d",
@@ -6687,15 +6375,9 @@
     {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y2.B3.S1 Recognise 2-D and 3-D shapes (prior learning wk W28)"
-    },
-    {
-     "key": "shapes_early:shape_name_match_3d",
-     "why": "Y1.B3.S1 Recognise and name 3-D shapes (prior learning wk W28)"
     }
    ],
-   "preBuild": [
-    "shape_sort"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "shapes_early:name_3d_shapes",
@@ -6732,10 +6414,6 @@
     {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W23)"
     }
    ],
    "preBuild": [],
@@ -6777,10 +6455,6 @@
     {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W23)"
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W23)"
     }
    ],
    "preBuild": [],
@@ -6836,10 +6510,6 @@
     {
      "key": "placevalue:compare",
      "why": "Y2.B1.S13 Compare numbers (prior learning wk W24)"
-    },
-    {
-     "key": "comparing:compare_groups",
-     "why": "Y1.B1.S11 Fewer, more, same (prior learning wk W24)"
     }
    ],
    "preBuild": [
@@ -6973,7 +6643,19 @@
     "4.NBT.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B1.S1": "(prerequisite of this step)",
+    "Y3.B1.S2": "(prerequisite of this step)",
+    "Y3.B1.S4": "(prerequisite of this step)",
+    "Y3.B1.S5": "(prerequisite of this step)",
+    "Y3.B1.S6": "(prerequisite of this step)",
+    "Y3.B1.S7": "partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models",
+    "Y3.B1.S8": "(prerequisite of this step)",
+    "Y3.B1.S9": "(prerequisite of this step)",
+    "Y3.B1.S12": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "nl_20": {
    "kind": "new",
@@ -7011,7 +6693,13 @@
     "4.NBT.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B1.S3": "a whole 0-100 line counted in tens then ones (the skill's line spans one ten)",
+    "Y3.B1.S10": "marks a number between two hundreds; a whole 0-1,000 line counted in 100s, and reading the value at an arrow, are not dealt",
+    "Y3.B1.S11": "the hundreds are marked; estimating on a line with only the ends (0 and 1,000) marked is not dealt"
+   },
+   "kindText": "new skill"
   },
   "count_50s": {
    "kind": "option",
@@ -7033,7 +6721,11 @@
     "4.NBT.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B1.S4": "builds 3-digit numbers; counting in 100s and 10 hundreds = 1,000 are not dealt; counts in 100s from 0 but runs past 1,000 (to 1,100)"
+   },
+   "kindText": "option on patterns:count_by_step_up"
   },
   "more_less_1_3digit": {
    "kind": "option",
@@ -7050,7 +6742,11 @@
     "2.NBT.B.8"
    ],
    "why": "more_less_100 has steps 10, 100, 1,000 only; more_less_10 stops at 120",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B1.S9": "steps of 10 and 100 only (step \"mixed\" also adds 1,000 more, past the step); 1 more and 1 less on a 3-digit number is not dealt"
+   },
+   "kindText": "option on placevalue:more_less_100"
   },
   "add_sub_patterns": {
    "kind": "new",
@@ -7072,7 +6768,14 @@
     "3.NBT.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S1": "a decade ± 10 only; 30 + 40 from 3 + 4 is not dealt; a hundred ± 100 only; 300 + 400 from 3 + 4 is not dealt",
+    "Y3.B2.S2": "adding and subtracting only ones to a 2- or 3-digit number mentally",
+    "Y3.B2.S5": "using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same",
+    "Y3.B2.S10": "explaining links between facts, place value and the column method (2.NBT.B.9)"
+   },
+   "kindText": "new skill"
   },
   "one_digit_addend": {
    "kind": "option",
@@ -7093,7 +6796,11 @@
     "2.NBT.B.5"
    ],
    "why": "the bands mix 1-digit + 1-digit and 2-digit + 2-digit; no option isolates 2-digit ± ones",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B2.S2": "adding and subtracting only ones to a 2- or 3-digit number mentally"
+   },
+   "kindText": "option on addition:add_100_mixed"
   },
   "tens_any": {
    "kind": "option",
@@ -7113,7 +6820,11 @@
     "1.NBT.C.6"
    ],
    "why": "existing STANDARD_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S3": "a decade ± 10 only; adding and subtracting 10s to a 2- or 3-digit number (234 + 30) is not dealt; 10 more / 10 less only, not several tens"
+   },
+   "kindText": "option on addition:add_sub_10s"
   },
   "add_next_10": {
    "kind": "new",
@@ -7135,7 +6846,20 @@
     "2.NBT.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S4": "(prerequisite of this step)",
+    "Y3.B2.S5": "(prerequisite of this step)",
+    "Y3.B2.S6": "adding ones across a ten in a 2- or 3-digit number (68 + 5)",
+    "Y3.B2.S7": "(prerequisite of this step)",
+    "Y3.B2.S8": "subtracting ones across a ten mentally (43 − 5)",
+    "Y3.B2.S9": "(prerequisite of this step)",
+    "Y3.B2.S10": "(prerequisite of this step)",
+    "Y3.B2.S20": "(prerequisite of this step)",
+    "Y3.B2.S21": "(prerequisite of this step)",
+    "Y3.B2.S22": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "hundreds_any": {
    "kind": "option",
@@ -7153,7 +6877,11 @@
     "2.NBT.B.8"
    ],
    "why": "add_sub_100s deals only a hundred ± 100 (900 − 100); tens_any is the tens version",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B2.S4": "a hundred ± 100 only; adding hundreds to a 3-digit number (234 + 200) is not dealt; 100 more / 100 less only"
+   },
+   "kindText": "option on addition:add_sub_100s"
   },
   "cross_100": {
    "kind": "option",
@@ -7171,12 +6899,17 @@
     "2.NBT.B.7"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S7": "adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40)",
+    "Y3.B2.S9": "adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40)"
+   },
+   "kindText": "option on addition:add_sub_100s"
   },
   "exchange_count": {
    "kind": "option",
    "skill": "addition:add_1k_regroup",
-   "option": "exchanges: one in the ones / one in the tens / two or more (owner ruling 2026-10-10: on every regroup band, + − ×)",
+   "option": "exchanges: none / one in the ones / one in the tens / two or more (owner ruling 2026-10-10: on every regroup band, + − × and short ÷)",
    "name": "Number and Place of Exchanges (option)",
    "teaches": "column addition, subtraction and short multiplication with exactly one exchange (across a 10, or across a 100) before two or more, so each WRM step adds one new thing",
    "representation": "the existing column cell with its regroup boxes; the generator only picks operands with the chosen exchanges",
@@ -7186,15 +6919,28 @@
     "Y3.B2.S14",
     "Y3.B2.S15",
     "Y3.B2.S16",
-    "Y3.B4.S4"
+    "Y3.B4.S4",
+    "Y3.B4.S5",
+    "Y3.B4.S7"
    ],
    "ccss": [
     "2.NBT.B.7",
     "3.NBT.A.2",
-    "4.NBT.B.5"
+    "4.NBT.B.5",
+    "3.OA.C.7"
    ],
    "why": "the regroup bands mix exchange places and counts; WRM splits \"across a 10\" from \"across a 100\", and Y3.B4.S4 needs no exchange",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B2.S13": "exchanges in the ones and the tens are mixed (167 + 499 exchanges twice); a page with one exchange in the ones only is not available",
+    "Y3.B2.S14": "exchanges are mixed; a page with one exchange in the tens (across a 100) only is not available",
+    "Y3.B2.S15": "exchanges are mixed (307 − 278 exchanges twice); one exchange from the tens only is not available",
+    "Y3.B2.S16": "exchanges are mixed; one exchange from the hundreds only is not available",
+    "Y3.B4.S4": "2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available; the partition picture, exchanges mixed",
+    "Y3.B4.S5": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in; the partition picture; exchanges are not controlled (3 × 13)",
+    "Y3.B4.S7": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available"
+   },
+   "kindText": "option on addition:add_1k_regroup"
   },
   "two_and_three_digit": {
    "kind": "option",
@@ -7212,7 +6958,12 @@
     "2.NBT.B.7"
    ],
    "why": "the 1k bands deal mostly 3-digit with 3-digit; lining up a shorter number is the step",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B2.S17": "mostly 3-digit + 3-digit (404 + 134); a page of 2-digit + 3-digit is not available",
+    "Y3.B2.S18": "mostly 3-digit − 3-digit (538 − 404); a page of 3-digit − 2-digit is not available"
+   },
+   "kindText": "option on addition:add_1k_mixed"
   },
   "bonds_100": {
    "kind": "new",
@@ -7232,7 +6983,11 @@
     "2.NBT.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S19": "pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10"
+   },
+   "kindText": "new skill"
   },
   "make_decisions": {
    "kind": "new",
@@ -7249,7 +7004,11 @@
     "2.NBT.B.7"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B2.S22": "choosing a mental strategy or the column method for a calculation, and explaining the choice"
+   },
+   "kindText": "new skill"
   },
   "multiples_2_5_10": {
    "kind": "option",
@@ -7269,7 +7028,12 @@
     "2.NBT.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B3.S3": "multiples of 2 as even numbers to 100",
+    "Y3.B3.S4": "multiples of 5 and 10 at Grade 2"
+   },
+   "kindText": "option on number_theory:multiples"
   },
   "tables_links": {
    "kind": "new",
@@ -7292,7 +7056,11 @@
     "3.OA.B.6"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B3.S15": "drills the three tables mixed; the doubling link (2 → 4 → 8) is not taught"
+   },
+   "kindText": "new skill"
   },
   "how_many_ways": {
    "kind": "new",
@@ -7308,7 +7076,11 @@
     "3.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B4.S11": "counting combinations systematically (3 tops × 4 bottoms) as a multiplication"
+   },
+   "kindText": "new skill"
   },
   "metres": {
    "kind": "option",
@@ -7326,7 +7098,22 @@
     "2.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S1": "(prerequisite of this step)",
+    "Y3.B5.S2": "(prerequisite of this step)",
+    "Y3.B5.S3": "(prerequisite of this step)",
+    "Y3.B5.S4": "(prerequisite of this step)",
+    "Y3.B5.S5": "(prerequisite of this step)",
+    "Y3.B5.S6": "(prerequisite of this step)",
+    "Y3.B5.S7": "(prerequisite of this step)",
+    "Y3.B5.S8": "(prerequisite of this step)",
+    "Y3.B5.S9": "(prerequisite of this step)",
+    "Y3.B5.S10": "(prerequisite of this step)",
+    "Y3.B5.S11": "(prerequisite of this step)",
+    "Y3.B5.S12": "(prerequisite of this step)"
+   },
+   "kindText": "option on measurement:reading_ruler"
   },
   "mm_cm_m": {
    "kind": "option",
@@ -7348,7 +7135,14 @@
     "4.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S1": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+    "Y3.B5.S3": "measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm)",
+    "Y3.B5.S5": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
+    "Y3.B5.S6": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt"
+   },
+   "kindText": "option on measurement:length_metric"
   },
   "ruler_cm": {
    "kind": "option",
@@ -7369,7 +7163,11 @@
     "1.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S2": "a ruler in millimetres"
+   },
+   "kindText": "option on measurement:reading_ruler"
   },
   "length_ops": {
    "kind": "new",
@@ -7385,7 +7183,16 @@
     "2.MD.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S7": "(prerequisite of this step)",
+    "Y3.B5.S8": "(prerequisite of this step)",
+    "Y3.B5.S9": "(prerequisite of this step)",
+    "Y3.B5.S10": "(prerequisite of this step)",
+    "Y3.B5.S11": "(prerequisite of this step)",
+    "Y3.B5.S12": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "compare_lengths": {
    "kind": "new",
@@ -7401,7 +7208,11 @@
     "2.MD.A.4"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S7": "comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm)"
+   },
+   "kindText": "new skill"
   },
   "add_sub_lengths": {
    "kind": "new",
@@ -7418,7 +7229,12 @@
     "2.MD.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B5.S8": "adding and subtracting lengths in the same and mixed units, including bar-model \"longer by\" / \"shorter by\" problems",
+    "Y3.B5.S9": "adding and subtracting lengths in the same and mixed units, including bar-model \"longer by\" / \"shorter by\" problems"
+   },
+   "kindText": "new skill"
   },
   "fraction_parts": {
    "kind": "new",
@@ -7436,7 +7252,26 @@
     "1.G.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B6.S1": "(prerequisite of this step)",
+    "Y3.B6.S2": "(prerequisite of this step)",
+    "Y3.B6.S3": "(prerequisite of this step)",
+    "Y3.B6.S4": "(prerequisite of this step)",
+    "Y3.B6.S5": "(prerequisite of this step)",
+    "Y3.B6.S6": "(prerequisite of this step)",
+    "Y3.B6.S7": "(prerequisite of this step)",
+    "Y3.B6.S8": "(prerequisite of this step)",
+    "Y3.B6.S9": "(prerequisite of this step)",
+    "Y3.B6.S10": "(prerequisite of this step)",
+    "Y3.B8.S1": "(prerequisite of this step)",
+    "Y3.B8.S2": "(prerequisite of this step)",
+    "Y3.B8.S3": "(prerequisite of this step)",
+    "Y3.B8.S4": "(prerequisite of this step)",
+    "Y3.B8.S5": "(prerequisite of this step)",
+    "Y3.B8.S6": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "frac_count": {
    "kind": "new",
@@ -7458,7 +7293,20 @@
     "3.NF.A.3a"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B6.S2": "(prerequisite of this step)",
+    "Y3.B6.S4": "(prerequisite of this step)",
+    "Y3.B6.S5": "(prerequisite of this step)",
+    "Y3.B6.S6": "(prerequisite of this step)",
+    "Y3.B6.S7": "(prerequisite of this step)",
+    "Y3.B6.S8": "counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4)",
+    "Y3.B6.S9": "equivalent fractions shown on two number lines",
+    "Y3.B6.S10": "(prerequisite of this step)",
+    "Y3.B8.S1": "(prerequisite of this step)",
+    "Y3.B8.S2": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "compare_kind": {
    "kind": "option",
@@ -7476,7 +7324,12 @@
     "3.NF.A.3d"
    ],
    "why": "compare mixes every kind of pair; WRM teaches unit fractions, then same denominators, as separate steps",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B6.S2": "compares any two fractions (2/6 and 7/8); a page of unit fractions only is not available; orders non-unit fractions too",
+    "Y3.B6.S5": "forms [1] mixes same-denominator pairs (3/10, 9/10) with others (5/8, 1/3); mixed denominators"
+   },
+   "kindText": "option on fractions:compare"
   },
   "frac_whole": {
    "kind": "new",
@@ -7493,7 +7346,11 @@
     "3.NF.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B6.S4": "how many parts make one whole for any denominator"
+   },
+   "kindText": "new skill"
   },
   "frac_scales": {
    "kind": "new",
@@ -7509,25 +7366,11 @@
     "2.G.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "nonstandard_mass": {
-   "kind": "new",
-   "skill": "measurement:measure_mass_cubes",
-   "name": "Measure Mass with Cubes",
-   "teaches": "measuring mass with non-standard units (cubes, marbles) on a balance, and comparing masses by the count",
-   "representation": "a drawn balance with an object in one pan and cubes in the other; write how many cubes",
-   "family": "measurement",
-   "steps": [
-    "Y1.B8.S2",
-    "Y1.B8.S3"
-   ],
-   "ccss": [
-    "K.MD.A.1",
-    "K.MD.A.2"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B6.S6": "reading a scale or number line divided into halves, quarters, fifths and tenths of a unit"
+   },
+   "kindText": "new skill"
   },
   "mass_scales": {
    "kind": "new",
@@ -7550,7 +7393,14 @@
     "4.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B7.S1": "reads one kind of scale each; scales with different intervals are not dealt",
+    "Y3.B7.S2": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
+    "Y3.B7.S3": "g or kg alone; mixed kg and g readings are not dealt",
+    "Y3.B7.S8": "millilitres only; mixed l and ml readings are not dealt"
+   },
+   "kindText": "new skill"
   },
   "mass_ops": {
    "kind": "new",
@@ -7572,7 +7422,14 @@
     "K.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B7.S3": "(prerequisite of this step)",
+    "Y3.B7.S4": "(prerequisite of this step)",
+    "Y3.B7.S6": "adding, subtracting, multiplying and dividing masses and capacities in context",
+    "Y3.B7.S11": "adding, subtracting, multiplying and dividing masses and capacities in context"
+   },
+   "kindText": "new skill"
   },
   "metric_mass_capacity": {
    "kind": "option",
@@ -7591,7 +7448,12 @@
     "4.MD.A.1"
    ],
    "why": "unit_conversions is customary only (ounces, pounds); capacity converts L/mL with decimals (1.5 L) and has no mass",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B7.S4": "converting kilograms and grams, including mixed units (1 kg 250 g = 1,250 g)",
+    "Y3.B7.S9": "L ↔ mL but with decimals (1.5 L), above the step; mixed units (1 l 500 ml) are not dealt"
+   },
+   "kindText": "option on measurement:capacity"
   },
   "compare_measures": {
    "kind": "new",
@@ -7608,25 +7470,12 @@
     "3.MD.A.2"
    ],
    "why": "mass_ops is the four operations; heavier_lighter_visual compares pictures without units",
-   "reused": false
-  },
-  "nonstandard_capacity": {
-   "kind": "new",
-   "skill": "measurement:measure_capacity_cups",
-   "name": "Measure Capacity with Cups",
-   "teaches": "measuring capacity and volume with non-standard units (cups, spoons) and comparing",
-   "representation": "containers with a count of cups drawn beside them; write how many cups; circle the one that holds more",
-   "family": "measurement",
-   "steps": [
-    "Y1.B8.S6",
-    "Y1.B8.S7"
-   ],
-   "ccss": [
-    "K.MD.A.1",
-    "K.MD.A.2"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": false,
+   "closes": {
+    "Y3.B7.S5": "pictured objects; comparing masses in g and kg with <, > and = is not dealt",
+    "Y3.B7.S10": "comparing two masses or capacities given in g and kg, ml and l (450 g < 1 kg; 1,200 ml > 1 l) with <, > and =, and ordering three"
+   },
+   "kindText": "new skill"
   },
   "capacity_early": {
    "kind": "new",
@@ -7649,7 +7498,12 @@
     "3.MD.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B7.S10": "(prerequisite of this step)",
+    "Y3.B7.S11": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "within_whole": {
    "kind": "option",
@@ -7667,7 +7521,11 @@
     "4.NF.B.3"
    ],
    "why": "the skill deals sums past 1 (4/5 + 2/5 = 1 1/5), which is Y4",
-   "reused": false
+   "reused": false,
+   "closes": {
+    "Y3.B8.S1": "sums pass one whole (4/5 + 2/5 = 1 1/5), above the step; adding within a whole only is not available"
+   },
+   "kindText": "option on fraction_operations:add_fractions_like"
   },
   "frac_whole_partition": {
    "kind": "new",
@@ -7683,30 +7541,34 @@
     "4.NF.B.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B8.S3": "finding the fraction that completes a whole (1 − 3/5), as a part-whole or bar model"
+   },
+   "kindText": "new skill"
   },
-  "single_fraction": {
+  "fos_kind": {
    "kind": "option",
-   "skill": "fractions:shade_fraction",
-   "option": "fraction: one chosen fraction (1/2, 1/4, 3/4, 1/3, 2/4) instead of a denominator family; also on identify, write_fraction, equiv_frac_visual, fraction_of_set",
-   "name": "One Fraction per Page (option)",
-   "teaches": "a page about ONE fraction (find a quarter, find a third, three-quarters) of a shape and of an amount, as WRM Y2 teaches them one at a time",
-   "representation": "the existing fraction cells (area, bar, circle, set of objects) with the one fraction; answer: shade or write the number",
+   "skill": "fractions:fraction_of_set",
+   "option": "kind: unit fractions only / non-unit fractions only (and denoms honoured in every item type)",
+   "name": "Unit or Non-Unit Fractions of a Set (option)",
+   "teaches": "finding a unit fraction of a set (1/3 of 12: share into 3, count one group), then a non-unit fraction (2/3 of 12: count two groups)",
+   "closes": {
+    "Y3.B8.S4": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available",
+    "Y3.B8.S5": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available; mixes unit and non-unit fractions, without the set pictured"
+   },
+   "representation": "the pictured set ringed into equal groups, the sentence \"2/3 of 12 = ___\"; answer box",
    "family": "fractions",
    "steps": [
-    "Y2.B8.S6",
-    "Y2.B8.S8",
-    "Y2.B8.S12",
-    "Y2.B8.S13",
-    "Y2.B8.S14",
-    "Y3.B8.S4"
+    "Y3.B8.S4",
+    "Y3.B8.S5"
    ],
    "ccss": [
-    "1.G.A.3",
-    "2.G.A.3"
+    "3.NF.A.1"
    ],
-   "why": "`denoms` picks a family (halves → quarters, eighths); WRM Y2 needs one fraction per step",
-   "reused": false
+   "why": "fraction_of_set mixes unit and non-unit items and ignores denoms in its missing-numerator items",
+   "reused": false,
+   "kindText": "option on fractions:fraction_of_set"
   },
   "frac_amount_wp": {
    "kind": "new",
@@ -7723,24 +7585,11 @@
     "3.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "money_notes": {
-   "kind": "option",
-   "skill": "measurement:coin_value",
-   "option": "notes",
-   "name": "Recognise Notes (option)",
-   "teaches": "recognising banknotes and their values alongside coins (the school teaches US dollars)",
-   "representation": "add notes to the coin-value picture bank",
-   "family": "measurement",
-   "steps": [
-    "Y1.B13.S3"
-   ],
-   "ccss": [
-    "2.MD.C.8"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B8.S6": "reasoning and word problems with fractions of amounts (bar model)"
+   },
+   "kindText": "new skill"
   },
   "money_convert": {
    "kind": "option",
@@ -7759,7 +7608,11 @@
     "4.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B9.S2": "converting between cents and dollars-and-cents (345 cents = $3.45) and recording money"
+   },
+   "kindText": "option on measurement:money_notation"
   },
   "money_difference": {
    "kind": "option",
@@ -7777,23 +7630,11 @@
     "2.MD.C.8"
    ],
    "why": "measurement:money only adds prices; money_change finds change from a whole amount, not a difference",
-   "reused": false
-  },
-  "time_talk": {
-   "kind": "new",
-   "skill": "measurement:time_words",
-   "name": "Time Words",
-   "teaches": "the language of time (today, yesterday, tomorrow, days of the week, months, seasons, before, after)",
-   "representation": "calendar strip or picture timeline; circle or write the word from a bank",
-   "family": "measurement",
-   "steps": [
-    "R.B10.S5",
-    "Y1.B14.S2",
-    "Y1.B14.S3"
-   ],
-   "ccss": [],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": false,
+   "closes": {
+    "Y3.B9.S4": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt"
+   },
+   "kindText": "option on measurement:money"
   },
   "roman_12": {
    "kind": "new",
@@ -7807,7 +7648,11 @@
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B10.S1": "reading Roman numerals I to XII on a clock face"
+   },
+   "kindText": "new skill"
   },
   "time_facts": {
    "kind": "new",
@@ -7825,25 +7670,19 @@
     "4.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "day_order": {
-   "kind": "new",
-   "skill": "measurement:order_events",
-   "name": "First, Next, Then",
-   "teaches": "sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then)",
-   "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
-   "family": "measurement",
-   "steps": [
-    "R.B6.S4",
-    "R.B10.S6",
-    "Y1.B14.S1"
-   ],
-   "ccss": [
-    "1.MD.B.3"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B10.S4": "(prerequisite of this step)",
+    "Y3.B10.S5": "(prerequisite of this step)",
+    "Y3.B10.S6": "(prerequisite of this step)",
+    "Y3.B10.S7": "(prerequisite of this step)",
+    "Y3.B10.S8": "(prerequisite of this step)",
+    "Y3.B10.S9": "(prerequisite of this step)",
+    "Y3.B10.S10": "(prerequisite of this step)",
+    "Y3.B10.S11": "(prerequisite of this step)",
+    "Y3.B10.S12": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "time_calendar": {
    "kind": "new",
@@ -7865,44 +7704,14 @@
     "3.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "time_units": {
-   "kind": "new",
-   "skill": "measurement:hours_minutes_seconds",
-   "name": "Hours, Minutes or Seconds?",
-   "teaches": "a sense of time units: which activities take seconds, minutes or hours",
-   "representation": "activity pictures with a unit word bank; option: longer/shorter",
-   "family": "measurement",
-   "steps": [
-    "Y1.B14.S4"
-   ],
-   "ccss": [
-    "1.MD.B.3"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "shape_sort": {
-   "kind": "new",
-   "skill": "shapes_early:sort_shapes",
-   "name": "Sort 2-D and 3-D Shapes",
-   "teaches": "sorting shapes by one property (sides, corners, flat or curved faces, rolls or stacks) and naming the sorting rule",
-   "representation": "shape tiles and two labelled sorting rings or a Carroll-style two-box table",
-   "family": "geometry",
-   "steps": [
-    "Y1.B3.S2",
-    "Y1.B3.S4",
-    "Y2.B3.S7",
-    "Y2.B3.S11"
-   ],
-   "ccss": [
-    "K.G.A.2",
-    "K.G.B.4",
-    "1.G.A.1"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B10.S6": "converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years",
+    "Y3.B10.S7": "converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years",
+    "Y3.B10.S10": "converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years",
+    "Y3.B10.S11": "converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years"
+   },
+   "kindText": "new skill"
   },
   "turns_angles": {
    "kind": "new",
@@ -7925,7 +7734,55 @@
     "3.G.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B11.S1": "an angle as an amount of turn; right angles as quarter turns; comparing angles with a right angle (greater/less)",
+    "Y3.B11.S2": "recognising a right angle as a quarter turn in shapes and around the room",
+    "Y3.B11.S3": "an angle as an amount of turn; right angles as quarter turns; comparing angles with a right angle (greater/less)"
+   },
+   "kindText": "new skill"
+  },
+  "turns": {
+   "kind": "new",
+   "skill": "coordinates:whole_half_quarter_turns",
+   "name": "Whole, Half and Quarter Turns",
+   "teaches": "describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object",
+   "representation": "an arrow or object drawn before and after a turn; circle the turn from a word bank",
+   "family": "geometry",
+   "steps": [
+    "Y1.B11.S1",
+    "Y2.B11.S3"
+   ],
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true,
+   "closes": {
+    "Y3.B11.S3": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
+  },
+  "draw_measure": {
+   "kind": "new",
+   "skill": "measurement:draw_lines_accurately",
+   "name": "Measure and Draw Accurately",
+   "teaches": "measuring lines to the nearest cm/mm and drawing lines of a given length",
+   "representation": "a ruler picture under a line; option: draw a line of 7 cm on the grid (key shows the length)",
+   "family": "geometry",
+   "steps": [
+    "Y3.B11.S4"
+   ],
+   "ccss": [
+    "2.MD.A.1",
+    "3.MD.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true,
+   "closes": {
+    "Y3.B11.S4": "drawing a line of a given length; measuring in mm"
+   },
+   "kindText": "new skill"
   },
   "shape_draw": {
    "kind": "new",
@@ -7944,24 +7801,13 @@
     "K.G.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
-  },
-  "draw_measure": {
-   "kind": "new",
-   "skill": "measurement:draw_lines_accurately",
-   "name": "Measure and Draw Accurately",
-   "teaches": "measuring lines to the nearest cm/mm and drawing lines of a given length",
-   "representation": "a ruler picture under a line; option: draw a line of 7 cm on the grid (key shows the length)",
-   "family": "geometry",
-   "steps": [
-    "Y3.B11.S4"
-   ],
-   "ccss": [
-    "2.MD.A.1",
-    "3.MD.B.4"
-   ],
-   "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B11.S5": "(prerequisite of this step)",
+    "Y3.B11.S6": "(prerequisite of this step)",
+    "Y3.B11.S8": "drawing 2-D shapes on a dot grid from a name or a description (4 sides, 2 long and 2 short)"
+   },
+   "kindText": "new skill"
   },
   "hv_lines": {
    "kind": "new",
@@ -7977,7 +7823,11 @@
     "2.G.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B11.S5": "recognising horizontal and vertical lines in shapes and on a grid"
+   },
+   "kindText": "new skill"
   },
   "make_3d": {
    "kind": "new",
@@ -7996,7 +7846,11 @@
     "1.G.A.2"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B11.S10": "making skeleton 3-D shapes (straws and balls) and matching nets or faces to shapes"
+   },
+   "kindText": "new skill"
   },
   "pictogram_scale": {
    "kind": "option",
@@ -8015,7 +7869,11 @@
     "3.MD.B.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B12.S2": "a key where one picture stands for 2, 5 or 10"
+   },
+   "kindText": "option on graphs:build_pictograph"
   },
   "block_diagram": {
    "kind": "new",
@@ -8032,7 +7890,11 @@
     "2.MD.D.10"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B12.S3": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "table_data": {
    "kind": "new",
@@ -8050,7 +7912,11 @@
     "4.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B12.S3": "(prerequisite of this step)"
+   },
+   "kindText": "new skill"
   },
   "collect_data": {
    "kind": "new",
@@ -8066,7 +7932,11 @@
     "2.MD.D.10"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B12.S5": "collecting data into a tally, then choosing a table, pictogram or bar chart to show it"
+   },
+   "kindText": "new skill"
   },
   "two_way": {
    "kind": "new",
@@ -8084,10 +7954,20 @@
     "4.OA.A.3"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
-   "reused": true
+   "reused": true,
+   "closes": {
+    "Y3.B12.S6": "reading and completing two-way tables"
+   },
+   "kindText": "new skill"
   }
  },
  "tagFixes": [
+  {
+   "key": "composing:base10_build",
+   "step": "Y3.B1.S2",
+   "action": "remove",
+   "why": "items generated with every option do not teach this step"
+  },
   {
    "key": "multiplication:count_by_tables",
    "step": "Y3.B1.S4",
@@ -8221,6 +8101,30 @@
    "why": "the partition picture, exchanges mixed"
   },
   {
+   "key": "multiplication:multiply",
+   "step": "Y3.B4.S5",
+   "action": "partial",
+   "why": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in"
+  },
+  {
+   "key": "multiplication:area_model_mult",
+   "step": "Y3.B4.S5",
+   "action": "partial",
+   "why": "the partition picture; exchanges are not controlled (3 × 13)"
+  },
+  {
+   "key": "division:box_division_easy",
+   "step": "Y3.B4.S7",
+   "action": "partial",
+   "why": "regroup \"none\" still deals 75 ÷ 5 and 84 ÷ 7 (an exchange of tens) and 1-digit dividends (15 ÷ 3): a page of 2-digit ÷ 1-digit with no exchange is not available"
+  },
+  {
+   "key": "division:area_model_div_2by1",
+   "step": "Y3.B4.S7",
+   "action": "remove",
+   "why": "partitions with an exchange (65 ÷ 5 = 50 ÷ 5 + 15 ÷ 5): that is Y3.B4.S8"
+  },
+  {
    "key": "measurement:length_metric",
    "step": "Y3.B5.S5",
    "action": "partial",
@@ -8257,6 +8161,12 @@
    "why": "mixed denominators"
   },
   {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y3.B7.S2",
+   "action": "partial",
+   "why": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale"
+  },
+  {
    "key": "measurement:unit_conversions",
    "step": "Y3.B7.S4",
    "action": "remove",
@@ -8285,6 +8195,18 @@
    "step": "Y3.B8.S4",
    "action": "partial",
    "why": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available"
+  },
+  {
+   "key": "fractions:fraction_of_set",
+   "step": "Y3.B8.S5",
+   "action": "partial",
+   "why": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available"
+  },
+  {
+   "key": "fractions:fraction_of_set_nv",
+   "step": "Y3.B8.S5",
+   "action": "partial",
+   "why": "mixes unit and non-unit fractions, without the set pictured"
   }
  ],
  "retireBuilt": [

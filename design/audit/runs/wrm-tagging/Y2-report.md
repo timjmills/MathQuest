@@ -1,32 +1,50 @@
-# Wave 2 tagging: Year 2 (US Grade 1)
+# Wave 2 tagging: Year 2 (US Grade 1) — round 2
 
-Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, in block order, none skipped).
+Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
 ## Counts
 
-| Steps | full | partial | gap | proposals reused | proposals new | tag fixes |
-|---|---|---|---|---|---|---|
-| 124 | 78 | 20 | 26 | 48 | 0 | 5 |
+| Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
+|---|---|---|---|---|---|---|---|
+| 124 | 67 | 32 | 25 | 5 | 38 | 44 | 75 |
 
-There are no new proposals. Every step that is not full is closed by an existing `WRM_PROPOSALS` or `STANDARD_PROPOSALS` id. `compare_lengths` (WRM_PROPOSALS) is extended to Y2.B6.S3 and Y2.B6.S4. Thirty-six of the 48 proposals are in `build`. Twelve appear only in `preBuild`: they are prior-learning steps (Reception and Y1) that the school's weekly list names and that have no skill yet, for example `part_whole`, `money_notes`, `sort_groups` and `ordinal`.
+New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`.
 
-## Method
+## Method (round 2, after critic Y2–Y3 r1)
 
-- **Direct skills**: the existing `SKILL_WRM` tags, checked against the generator or option evidence. Any tag that carries a `partial` clause goes to `partial` with that clause as `missing`. A note such as `band 99` becomes `opts: {band: 99}`. Other notes are kept as `opts.note`.
-- **Verdict**: `full` means at least one direct skill covers the step and no open proposal names it. `partial` means a skill exists but only a partial cover or an open proposal applies. `gap` means no skill.
-- **Pre-skills**: built from the xlsx "Grade 1" sheet. Each WRM step is matched to its lesson row and so to its week. That week's prior-learning list is matched by title to R, Y1 and Y2 steps (all entries match), ranked by shared CCSS and then nearest first. Next comes the step before in the block, but only when it shares the CCSS cluster. Last come lower-grade skills on the same cluster. A prior step that has no skill puts its proposal in `preBuild`.
-- **Related**: the next step's skills first, then skills on the same CCSS code, then at most 3 on the same cluster. Measurement clusters are skipped because they mix time with money and length with data.
+- **Generated, not inherited.** Every direct and partial skill of every step was generated with `generateQuestionFor`
+  (6 items, the opts recorded in the links file) by `tests/scripts/wrm-tagging/items.mjs`; the first 3 of each are logged in
+  `Y2-Y3-items.md`. Hand verdicts live in `tests/scripts/wrm-tagging/overrides.mjs`; `build.mjs` writes the links file.
+- **Options are values.** No `opts.note` is left (the build refuses one). Old SKILL_WRM notes become opts only when they name
+  a real value (`band 999`); every other step needing an option has hand opts read from `skill-options.js`
+  (`constant`, `forms`, `band`, `kind`, `currency:'usd'`, `wordform`, `rows`, `stimulus`, `span` …).
+- **Range inside the step.** Y2 place-value skills carry `band: 99` (the default 999 deals 3-digit numbers). A skill whose
+  items leave the step (mixed_add_sub sums past 100, box_division_easy "no exchange" dealing 75 ÷ 5, identify/write_fraction
+  denoms [2,3] dealing 7/8) is partial or moved to related.
+- **Pre-skills filtered.** A week-list prior step is kept only when its topic feeds the step's topic, and only from this
+  year or the year before; cross-topic entries only when they are the building block (fractions ← sharing/grouping, time ←
+  counting in 5s, tables ← counting in steps). Test-row weeks and thin lists fall back to earlier steps in the block, then
+  the previous year on the same topic. Never empty. `preBuild` uses the same filter and never holds the step's own build.
+  Six steps whose filtered list was still weak have hand ladders (`prePatch`).
+- **Related share the idea** (inverse, same concept in another form, next step); never a pre key; no same-cluster padding.
+  Every step has at least one.
+- **Proposals (rule 13, short).** Each carries `name`, `kind` (`kindText`), `teaches`, `closes` (per step, the exact
+  missing clause) and `representation`. Reused only after checking `skill-options.js`: built ones go to `retireBuilt`
+  (count_50s for Y3.B1.S14, count_3s, shape_faces, money_uk for notes).
 
 ## Hardest calls
 
-- **Y2.B2.S20 Compare number sentences** is a **gap** with a tag fix (remove `addition:equal_sign`). The build list's `equal_sign_repair` says this skill deals plain column addition today. It also judges true or false and does not compare two expressions with <, > or =. `addition:equal_sign` is excluded from every pre and related list until it is repaired.
-- **Y2.B6.S3 / S4 Compare and order lengths** are now **partial**; they were full. `compare_objects` and `order_objects_length` compare pictured objects. WRM compares measured lengths in cm and m. The fix is `compare_lengths`.
-- **Y2.B1.S2 Count objects to 100 by making 10s**: `base10_build` is added as a partial cover. It shows ready-made rods, so it does not teach grouping loose objects into tens (`tens_ones_group`).
-- **Y2.B9.S3 / S4 past and to the hour** stay full only with `time_5min` set to option `stimulus: 'words-past'`, which carries the "20 past 3" and "10 to 4" language.
-- **Y2.B2.S9 Add across a 10** is full through `add_50_regroup`. `make_a_ten` stays as a partial helper, because it bridges 10 only within 20.
+- **Y2.B2.S14 Add and subtract 10s**: partial (add_sub_10s is decade ± 10 only) → `tens_any`.
+- **Y2.B4.S2 / S3 money**: full with `money_count {kind:'note'|'both', currency:'usd'}`; `money_uk` is built for them.
+  **S4** partial (coins only, fewest) → `make_amount_notes`; **S7** partial (no difference) → `money_difference`.
+- **Y2.B8 fractions**: `denoms` picks a family, so every "one fraction" step (S6, S8, S10–S14) is partial →
+  `single_fraction`; `fraction_of_set` ignores denoms (bug), so it is never claimed full. S4 Find a half is full through
+  `patterns:halve {band:20}` for amounts.
+- **Y2.B9.S3 / S4 past and to the hour**: partial; the words stimulus mixes past and to → `time_past_to`.
+- **Y2.B3.S8–S10 faces, edges, vertices**: full with `count_edges_faces_vertices {forms:[0]|[1]|[2]}`.
 
 ## Owner questions (with suggested answers)
 
-1. **UK money steps (B4)**: are the dollars-and-cents skills, plus the `money_uk` option for notes, enough? *Suggested: yes. The school runs "US: dollars & cents" (see the xlsx prior lists), so keep US money and treat `money_uk` as a notes-and-coins option, not a currency switch.*
-2. **Above-grade steps (B5 multiplication and division, B3 symmetry, B7 g/kg/ml/l)**: should they be tagged and practised at Grade 1? *Suggested: yes, tag them as WRM does (the school teaches them). Pages should use the smallest option band, for example tables 2, 5 and 10 only.*
-3. **Y2.B2.S20**: should `equal_sign_repair` be built before `compare_sentences`? *Suggested: yes. The repair is small, and both pre-skill chains and Y2.B2.S21 depend on a working equal-sign skill.*
+1. `count_edges_faces_vertices` says a cylinder has 3 faces; WRM Y2 says 2 flat faces and 1 curved surface. *Suggested: follow WRM — count flat faces, name the curved surface.*
+2. `fraction_of_set` ignores `denoms` in its missing-numerator items. *Suggested: fix the generator before `single_fraction`/`fos_kind`.*
+3. Above-grade WRM steps (×/÷, g/kg, ml/l) at Grade 1: *suggested: keep them tagged; pages use the smallest band.*
