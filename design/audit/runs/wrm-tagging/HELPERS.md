@@ -39,3 +39,13 @@
   band 1, repair 2, template 3, migration 1. Each carries a `map` facet {strand, ritBand, taskType}.
 - The Wave 6.2 table is re-verified row by row; the 6.4 representation-pair audit is rows with source "6.4" (26 rows).
 - Feeds the "Skills to be made" and MAP pages (White Rose page lane). LEAD: reconcile with the year files' proposals at merge.
+
+### Owner's MAP sources (recovered 2026-10-10 from Todoist, now in data/curriculum/source/)
+- `MAP_Math_Skills_Practice_Guide.md` (task "MAP #2", 30 task types incl. 4A/4B, 21A/B, 22A/B, "Graph") and
+  `MAP-1-two-step-change.md` (task "MAP #1"). The MAP audit's 29 "6.2" rows were derived from this guide (via MASTER_PLAN).
+- Cross-check by the lead: every guide item has a MAP.json row EXCEPT two prompt forms to add at the MAP reconcile:
+  (a) "Which number is between these two values?" (whole numbers and decimals) — no row;
+  (b) guide #17 "choose the option that correctly shows numbers ordered" (select the right ordering) — only the drag
+      ordering row exists; add a select form.
+  Guide #23 "start amount + amount received" (recognise the addition situation) is covered by "Join/separate
+  result-unknown" + "Match: story ↔ operation" rows.
