@@ -6927,6 +6927,180 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B13.S1": {
+   "title": "Unitising",
+   "direct": [
+    {
+     "key": "measurement:coin_value",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B1.S7 Compare amounts (prior learning wk W34)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W34)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W34)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W34)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W34)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_count",
+     "why": "same CCSS 2.MD.C.8 in Y1.B13.S4 Count in coins"
+    }
+   ],
+   "note": "Unitising: one coin can stand for several ones."
+  },
+  "Y1.B13.S2": {
+   "title": "Recognise coins",
+   "direct": [
+    {
+     "key": "measurement:coin_value",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W35)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_count",
+     "why": "same CCSS 2.MD.C.8 in Y1.B13.S4 Count in coins"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B13.S3": {
+   "title": "Recognise notes",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:coin_value",
+     "opts": {},
+     "missing": "notes / bills"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising notes (bills)",
+   "build": [
+    "money_notes"
+   ],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W35)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_count",
+     "why": "next step: Y1.B13.S4 Count in coins"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B13.S4": {
+   "title": "Count in coins",
+   "direct": [
+    {
+     "key": "measurement:money_count",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S5 Verbal counting beyond 20 (prior learning wk W11)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W11)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W11)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B3.S6 Composition of 1, 2 and 3 (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B9.S9 Combine 2 groups (prior learning wk W11)"
+    },
+    {
+     "key": "measurement:coin_value",
+     "why": "Y1.B13.S3 Recognise notes (the step before in this block)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (same CCSS K.CC.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "consolidate",
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "measurement:coin_value",
+     "why": "same block: Y1.B13.S1 Unitising"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -7476,6 +7650,23 @@
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "money_notes": {
+   "kind": "option",
+   "skill": "measurement:coin_value",
+   "option": "notes",
+   "name": "Recognise Notes (option)",
+   "teaches": "recognising banknotes and their values alongside coins (the school teaches US dollars)",
+   "representation": "add notes to the coin-value picture bank",
+   "family": "measurement",
+   "steps": [
+    "Y1.B13.S3"
+   ],
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -7526,6 +7717,12 @@
    "step": "Y1.B11.S2",
    "action": "partial",
    "why": "left and right (the skill does above / below / beside)"
+  },
+  {
+   "key": "measurement:coin_value",
+   "step": "Y1.B13.S3",
+   "action": "partial",
+   "why": "notes / bills"
   }
  ]
 }
