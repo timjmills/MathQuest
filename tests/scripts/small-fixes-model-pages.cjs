@@ -28,8 +28,13 @@ const COMBOS_ALL = [
   { name: '100,000 from 1,000,000', opts: { rows: [R(100000, 'custom', 1000000)] } },
   { name: '100,000 from 1,000,000 + Lines', opts: { rows: [R(100000, 'custom', 1000000)], spaces: 'line' } },
   { name: 'times under each', opts: { rows: [R(7)], times: 'each' } },
+  // critic r5 N13: the sheets whose second Guided row went missing, and the Lines twin of times under each
+  { name: 'step 25 + Lines + one page', opts: { rows: [R(25)], spaces: 'line', onePage: true } },
+  { name: 'times under each + Lines', opts: { rows: [R(7)], times: 'each', spaces: 'line' } },
 ];
-const COMBOS = process.env.SF_ONLY ? COMBOS_ALL.filter((c) => process.env.SF_ONLY.split(',').includes(c.name)) : COMBOS_ALL;
+// SF_ONLY: names joined by ';' (or ',' when no name in the list has a comma of its own)
+const ONLY = process.env.SF_ONLY ? process.env.SF_ONLY.split(process.env.SF_ONLY.includes(';') ? ';' : ',') : null;
+const COMBOS = ONLY ? COMBOS_ALL.filter((c) => ONLY.includes(c.name)) : COMBOS_ALL;
 const ROLES = (process.env.SF_ROLES || 'opener,scripted-model').split(',');   // SF_ROLES / SF_ONLY narrow a quick run
 const SIZES = ['S', 'M', 'L'];
 const PAPERS = ['A4', 'Letter'];
@@ -80,8 +85,11 @@ async function digest() {
         const pxmm = 96 / 25.4;
         const rawFoot = foot ? (foot.getBoundingClientRect().top - lastBottom) / pxmm : 0;
         const footMm = Math.max(0, rawFoot);
+        // the room left in the BODY under the last cell (the footer stands a few mm below the body's foot)
+        const body = d.querySelector('.ws-body');
+        const roomMm = body ? (body.getBoundingClientRect().bottom - lastBottom) / pxmm : rawFoot;
         fr.remove();
-        resolve({ n, empty, maxBand: Math.round(maxBand * 1000) / 1000, worst, footMm: Math.round(footMm * 10) / 10, overMm: Math.round(Math.max(0, -rawFoot) * 10) / 10, lastRowMm: Math.round(lastH / pxmm * 10) / 10 });
+        resolve({ n, empty, maxBand: Math.round(maxBand * 1000) / 1000, worst, footMm: Math.round(footMm * 10) / 10, overMm: Math.round(Math.max(0, -rawFoot) * 10) / 10, roomMm: Math.round(roomMm * 10) / 10, lastRowMm: Math.round(lastH / pxmm * 10) / 10 });
       };
       fr.srcdoc = doc.replace(/<head>/i, `<head><base href="${location.href}">`);
     }) : null;
@@ -90,8 +98,11 @@ async function digest() {
       try {
         const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: c.opts }] }], size, paper, seed: 4242, key: true });
         const note = String((r.fits && r.fits.note) || '');
-        const ind = /(\d+) independent/.exec(note);
-        res[k] = { pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null };
+        const ind = /(\d+) independent/.exec(note), gd = /(\d+) guided/.exec(note);
+        res[k] = { pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null,
+          guided: gd ? Number(gd[1]) : null, cols: r.fits && r.fits.cols };
+        const sec = (r.fits && r.fits.sections && r.fits.sections[0]) || {};
+        if (sec.rowMm !== undefined) Object.assign(res[k], { rowMm: sec.rowMm, growMm: sec.growMm || 0 });
         if (role === 'opener' && measureCells) { res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper })); res[k].cells.strip = size === 'L' ? 9.5 : 7.5; }
       } catch (e) { res[k] = { error: String(e && e.message || e).slice(0, 80) }; }
     }
@@ -122,14 +133,26 @@ async function digest() {
       if (k.includes('| scripted-model |') && a.sha !== b.sha) errs.push('scripted model differs from base');
     }
     if (a.cells) {
-      // critic r4 N12 (PT-OPN-7): fewer than 2 Independent rows while the blank foot could hold an Independent strip and a row
-      if (a.indep !== null && a.indep < 2 && a.cells.footMm >= a.cells.strip + a.cells.lastRowMm) errs.push(`${a.indep} Independent row(s) with ${a.cells.footMm} mm blank (a strip + row is ${(a.cells.strip + a.cells.lastRowMm).toFixed(1)} mm)`);
+      // A row the plan left out "fits" when the body still holds it within PT-ENG-3's budget (fixed heights <= bodyH - 4): the room
+      // under the last cell, plus the grow the drawn rows would hand back, less the 4 mm the budget keeps, holds the row's natural
+      // height (and a band strip when it would open a band). r6: measured to the BODY's foot - the blank to the footer also counts
+      // the gap between the body and the footer, which no row may use - so the r5 form of this check (foot >= strip + row) passed
+      // sheets the budget forbids and could not see a missing second row of a band (no strip).
+      const rows = a.cols ? Math.round(((a.guided || 0) + (a.indep || 0)) / a.cols) : 0;
+      const natural = a.rowMm !== undefined ? a.rowMm : a.cells.lastRowMm;
+      // less 1 mm: the same sheet measures up to ~1.5 mm apart in two Chromium hosts (fonts, rounding), so a row the plan's own
+      // drawn heights put 2.5 mm over the budget (100,000 + Lines, S Letter) must not read as fitting by 0.1 mm here
+      const free = Math.round((a.cells.roomMm + (a.growMm || 0) * rows - 4 - 1) * 10) / 10;
+      // critic r4 N12 (PT-OPN-7): fewer than 2 Independent rows while the budget holds one more (with its strip if it opens the band)
+      if (a.indep !== null && a.indep < 2 && free >= (a.indep ? 0 : a.cells.strip) + natural) errs.push(`${a.indep} Independent row(s) with ${free} mm free in the budget (a${a.indep ? '' : ' strip +'} row is ${((a.indep ? 0 : a.cells.strip) + natural).toFixed(1)} mm)`);
+      // critic r5 N13 (PT-OPN-6: one Guided column gives 2 rows): a single Guided row while the budget holds a second one
+      if (a.cols === 1 && a.guided === 1 && free >= natural) errs.push(`1 Guided row with ${free} mm free in the budget (a row is ${natural.toFixed(1)} mm)`);
       if (a.cells.overMm > 0.5) errs.push(`the last row runs ${a.cells.overMm} mm into the footer`);
       if (a.cells.empty) errs.push(`${a.cells.empty} empty cell(s)`);
       if (a.cells.maxBand >= 0.3) errs.push(`empty band ${Math.round(a.cells.maxBand * 100)} % (>= 30 %) in "${a.cells.worst}"`);
     }
     if (errs.length) bad++;
-    const ind = k.includes('| opener |') ? `  independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm` : ''}` : '';
+    const ind = k.includes('| opener |') ? `  guided ${b.guided === undefined ? '?' : b.guided} -> ${a.guided}, independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm, room ${a.cells.roomMm} mm` : ''}` : '';
     console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
   }
   console.log(`small-fixes-model-pages: ${bad ? 'FAIL' : 'OK'} (${Object.keys(now).length} sheets${bad ? `, ${bad} failing` : ''})`);

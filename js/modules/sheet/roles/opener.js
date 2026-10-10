@@ -42,8 +42,11 @@ function stepLines(list, textPt, zoneMm = 93) {
     return list.reduce((a, s) => a + Math.max(1, Math.ceil(s.length / perLine)), 0);
 }
 
-/** Every height decision of the page, from the probe (or final) items. */
-function geometry(items, input) {
+/**
+ * Every height decision of the page, from the probe (or final) items. `cap` ({gMax, iMax}) holds the Guided and Independent row
+ * counts at most at those of a page already chosen (critic r5 N13: the placed rows are re-fitted, never re-counted).
+ */
+function geometry(items, input, cap = {}) {
     const ctx = ctxOf(input);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1', score: 1 });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
@@ -60,19 +63,26 @@ function geometry(items, input) {
     const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
     const modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
-    const gc = bestCols(items, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
-    const gH = hMinAt(items, gc, ctx);
+    // critic r5 N13: a count-row page sizes its practice rows from the practice items only - the Model row is drawn in the Model
+    // cell, so a taller Model row never blocks a practice row (other skills keep the probe-wide sizing they always had)
+    const nModel = twoModels ? 2 : 1;
+    const practice = first && first.template === 'count-row' && items.length > nModel ? items.slice(nModel) : items;
+    const gc = bestCols(practice, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
+    const gH = hMinAt(practice, gc, ctx);
     let used = (whatsNew ? m.strip + 2 : 0) + modelBand + m.say + m.strip + gH;
     let iRows = 0;
     // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
     const hand = first && first.template === 'count-row' && ctx.size === 'L' ? m.strip : 0;   // the labels wrap at L only
-    while (iRows < 2 && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
+    const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
+    while (iRows < iMax && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
+    // the L label-wrap reserve is for the Independent band's label: with no Independent band drawn it is not held (critic r5 N13a)
+    const held = iRows ? hand : 0;
     // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a page of count rows - each a full-width line - takes a second
     // Guided row where the page would otherwise end in a blank band; the Independent rows are fitted first, so none is lost
     let gRows = 1;
-    if (first && first.template === 'count-row' && gc === 1 && used + gH + hand <= m.budget) { gRows = 2; used += gH; }
-    const spare = Math.max(0, m.budget - used - hand);
+    if (first && first.template === 'count-row' && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
+    const spare = Math.max(0, m.budget - used - held);
     const rowsThatGrow = gRows + iRows;
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first));
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
@@ -82,32 +92,47 @@ const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
 const countRowFirst = (items) => !!(items[0] && items[0].template === 'count-row');
 
 /**
- * critic r4 N12: count rows differ in height (a 12-row of 2-digit numbers wraps where a 5-row does not), and the page is sized
- * from its tallest row. So a count-row Opener asks for every item it could place, and the plan then takes the fullest page
- * whose rows are sized from exactly the items it places: no row it fits is left out, and no taller row it leaves out shrinks it.
+ * critic r4 N12 / r5 N13: count rows differ in height (a 12-row of 2-digit numbers wraps where a 5-row does not; a Lines row on two
+ * lines is taller than one on one line), and the page is sized from its tallest row. So a count-row Opener asks for more items than
+ * it could place, and the plan takes the fullest page (most rows) it can build from them: it tries the deal as dealt, and the deal
+ * without its tallest practice rows, each at every length, so a taller spare row never blocks a row that fits. The chosen rows are
+ * then re-fitted from exactly the items placed (`cap` keeps the counts), so the cells are as tall as the rows they hold.
+ * Returns {g, items}: the geometry and the items the plan places, in order.
  */
 function bestGeometry(items, input) {
     const all = geometry(items, input);
-    if (!countRowFirst(items)) return all;
+    if (!countRowFirst(items)) return { g: all, items };
+    const nModel = all.twoModels ? 2 : 1;
+    const models = items.slice(0, nModel), practice = items.slice(nModel);
+    const hOf = (it) => hMinAt([it], all.gc, all.ctx);
+    const heights = [...new Set(practice.map(hOf))].sort((a, b) => b - a);
     let best = null;
-    for (let m = items.length; m >= 1; m--) {
-        const g = geometry(items.slice(0, m), input);
-        if (needOf(g) <= m && (!best || needOf(g) > needOf(best))) best = g;
+    for (const top of heights.length ? heights : [Infinity]) {
+        const pool = models.concat(practice.filter((it) => hOf(it) <= top));
+        for (let n = pool.length; n > nModel; n--) {
+            const g = geometry(pool.slice(0, n), input);
+            if ((g.twoModels ? 2 : 1) !== nModel || needOf(g) > n) continue;
+            // the most rows; at a tie, the more scored Independent rows (PT-OPN-7)
+            if (!best || needOf(g) > needOf(best.g) || (needOf(g) === needOf(best.g) && g.iRows > best.g.iRows)) best = { g, items: pool.slice(0, needOf(g)) };
+        }
     }
-    return best || all;
+    if (!best) return { g: all, items };
+    const g = geometry(best.items, input, { gMax: best.g.gRows, iMax: best.g.iRows });
+    return needOf(g) === needOf(best.g) ? { g, items: best.items } : best;
 }
 
 export function counts(pools, input) {
     const probe = pools.main || [];
     const g = geometry(probe, input);
     // a count-row page asks for the most it could hold (2 Guided rows, 2 Independent rows); the plan places what fits
-    if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 4 * g.gc };
+    // (critic r5 N13: and one spare row more, so a taller row can be left out without the page coming up short)
+    if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 5 * g.gc };
     return { main: needOf(g) };
 }
 
 export function plan(input = {}) {
-    const items = poolItems(input, 'main');
-    const g = bestGeometry(items, input);
+    const fit = bestGeometry(poolItems(input, 'main'), input);
+    const { g, items } = fit;
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
     const models = items.slice(0, nModel);
@@ -152,7 +177,7 @@ export function plan(input = {}) {
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 
