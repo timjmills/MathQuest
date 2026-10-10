@@ -2,6 +2,322 @@
  "year": "Y6",
  "generatedBy": "wave2-tagging",
  "steps": {
+  "Y6.B5.S1": {
+   "title": "Metric measures",
+   "direct": [
+    {
+     "key": "measurement:unit_conversions",
+     "opts": {
+      "units": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "measurement:length_metric",
+     "opts": {}
+    },
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {}
+    },
+    {
+     "key": "measurement:estimate_length",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y5.B14.S3 Convert units of length / Y4.B6.S2 km and m (prior learning wk W21)"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y5.B14.S1 Kilograms and kilometres / Y3.B7.S4 kg and g (prior learning wk W21)"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "Y5.B14.S2 Millimetres and millilitres / Y3.B7.S9 l and ml (prior learning wk W21)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 / Y2.B6.S1 Measure in centimetres (prior learning wk W21; cm ruler is a pending option)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W21): every metric conversion is one of these"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "next step: the same facts used in a story (units option Metric)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "the same idea in the customary system (Y6.B5.S5)"
+    },
+    {
+     "key": "decimals:mult_decimal",
+     "why": "metric amounts are often decimals (2.5 kg)"
+    }
+   ],
+   "note": "Full only with the metric unit options: unit_conversions units=Metric and capacity units=Metric (mL and L); mass_volume_liquid supplies the \"which unit would you use\" sort for mass and capacity, estimate_length the same for length."
+  },
+  "Y6.B5.S2": {
+   "title": "Convert metric measures",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversions",
+     "missing": "amounts with decimals and conversions to the larger unit with a non-whole answer (2.5 kg = 2,500 g; 750 ml = 0.75 l); the generator deals whole-number amounts only"
+    },
+    {
+     "key": "measurement:length_metric",
+     "missing": "only larger → smaller unit with a whole-number count (How many mm are in 7 cm?); no decimals, no converting back"
+    },
+    {
+     "key": "measurement:capacity",
+     "missing": "metric l ↔ ml with whole amounts only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "converting metric measures that are decimals, in both directions (3.4 km = 3,400 m; 650 g = 0.65 kg; 1,250 ml = 1.25 l), the Y6 heart of this step",
+   "build": [
+    "metric_decimal_convert"
+   ],
+   "pre": [
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y6.B5.S1 Metric measures (previous step): the unit facts"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W21): every metric conversion is one of these"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y5.B14.S3 Convert units of length / Y4.B6.S2 km and m (prior learning wk W21)"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "Y5.B14.S2 Millimetres and millilitres / Y3.B7.S9 l and ml (prior learning wk W21)"
+    },
+    {
+     "key": "decimals:compare_thousandths",
+     "why": "Y5.B7.S9 decimals to 3 dp, needed to read 0.65 kg"
+    },
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "4.MD.A.1 lower-grade link on the same standard (relative sizes of units)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "the same conversions in a story (units option Metric)"
+    },
+    {
+     "key": "conversions:double_num_line",
+     "why": "a double number line is the model WRM uses for kg | g"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "reading a g/kg or ml scale"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "converting in the other system"
+    }
+   ],
+   "note": "The existing tags (capacity, length_metric) were judged full before; read honestly they never deal a decimal amount or a conversion to the larger unit, which is what Y6 adds over Y5."
+  },
+  "Y6.B5.S3": {
+   "title": "Calculate with metric measures",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "only converts one amount in a story; never adds, subtracts, multiplies or compares two measures in mixed units"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "calculating with metric measures in context (total, difference, times as much, how much left) when the two amounts are in different units, so the pupil converts first",
+   "build": [
+    "metric_calc"
+   ],
+   "pre": [
+    {
+     "key": "measurement:unit_conversions",
+     "why": "Y6.B5.S2 Convert metric measures (previous step)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W21)"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step problems with a bar model (prior learning wk W21)"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "why": "Y5.B12.S6 adding decimals, because 1.2 kg + 450 g lands on decimals"
+    },
+    {
+     "key": "decimals:sub_decimal",
+     "why": "Y5.B12.S7 subtracting decimals"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S8-S9 Multiply and divide by 10, 100 and 1,000 (prior learning wk W21): every metric conversion is one of these"
+    }
+   ],
+   "preBuild": [
+    "metric_decimal_convert"
+   ],
+   "related": [
+    {
+     "key": "decimals:mult_decimal",
+     "why": "\"times as much\" items"
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "why": "two-step stories without pictures"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "metric capacity facts"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "metric length facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B5.S4": {
+   "title": "Miles and kilometres",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "converting between miles and kilometres with 5 miles ≈ 8 km (scale up and down, and read a conversion graph)",
+   "build": [
+    "miles_km"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "why": "Y4.B6.S2 / Y5.B14.S3 km and m (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "Y5.B14.S3 Convert units of length (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "miles appear in customary length (Miles to feet)"
+    },
+    {
+     "key": "conversions:ratio_tables",
+     "why": "scaling 5 : 8 up and down is a ratio table"
+    },
+    {
+     "key": "multiplication:mult_comparison",
+     "why": "Y3.B4.S10 Scaling (prior learning wk W19/W22 chain): times as many"
+    }
+   ],
+   "preBuild": [
+    "metric_imperial"
+   ],
+   "related": [
+    {
+     "key": "conversions:double_num_line",
+     "why": "a double number line of miles and km"
+    },
+    {
+     "key": "conversions:equiv_ratios",
+     "why": "5 : 8 = 15 : 24"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "other conversions"
+    }
+   ],
+   "note": "Y5.B14.S4 Convert between metric and imperial units (prior learning) has no skill either, so metric_imperial is a pre-build."
+  },
+  "Y6.B5.S5": {
+   "title": "Imperial measures",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversions",
+     "missing": "customary units only, exact facts; no stone, and no approximate imperial ↔ metric (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb, 1 pint ≈ 570 ml)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "missing": "imperial length within the system only (in, ft, yd, mi)"
+    },
+    {
+     "key": "measurement:capacity",
+     "missing": "customary capacity within the system only (cups, pints, quarts, gallons)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "approximate conversions between imperial and metric units, and the stone",
+   "build": [
+    "metric_imperial"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_customary",
+     "why": "Y5.B14.S4 Convert between metric and imperial units (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "Y5.B14.S3 Convert units of length (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y4.B6.S2 Equivalent lengths km and m (prior learning wk W22)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres; the ruler skill reads inches (prior learning wk W22)"
+    }
+   ],
+   "preBuild": [
+    "miles_km"
+   ],
+   "related": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "customary conversions in stories (units option Customary)"
+    },
+    {
+     "key": "conversions:double_num_line",
+     "why": "inch | cm double number line"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "metric mass and capacity"
+    }
+   ],
+   "note": "The US customary units our skills teach are the imperial units WRM names (except stone and the UK pint), so the within-system half is covered; the approximate cross-system half is not."
+  },
   "Y6.B10.S1": {
    "title": "Shapes - same area",
    "direct": [],
@@ -1618,6 +1934,74 @@
    "reused": false,
    "option": "mean only asks for the mean of a list; the WRM step also finds a missing value from a given mean."
   },
+  "metric_calc": {
+   "kind": "new",
+   "skill": "measurement:metric_measure_problems",
+   "name": "Calculate with Metric Measures",
+   "teaches": "calculating with metric measures in context, converting first when the units differ",
+   "representation": "a problem with two units; write the conversion then the answer",
+   "family": "measurement",
+   "steps": [
+    "Y6.B5.S3"
+   ],
+   "ccss": [
+    "5.MD.A.1"
+   ],
+   "why": "no skill adds, subtracts or compares two measures given in different metric units",
+   "reused": true
+  },
+  "metric_decimal_convert": {
+   "kind": "option",
+   "skill": "measurement:unit_conversions",
+   "name": "Convert Metric Measures With Decimals (option)",
+   "teaches": "converting metric length, mass and capacity in both directions when the amount is a decimal or the answer is (3.4 km = 3,400 m; 650 g = __ kg)",
+   "representation": "a boxed cell: \"3.4 km = [ ] m\" with the unit fact (1 km = 1,000 m) above; support: a place-value shift chart as on place_value_10x, fading to the equation only",
+   "family": "measurement",
+   "steps": [
+    "Y6.B5.S2",
+    "Y6.B5.S3"
+   ],
+   "ccss": [
+    "5.MD.A.1"
+   ],
+   "why": "Y6 conversions are decimal and two-way; every metric skill today deals whole amounts, larger unit to smaller",
+   "reused": false,
+   "option": "amounts \"with decimals\" and direction \"to the larger unit\" (units Metric)"
+  },
+  "metric_imperial": {
+   "kind": "new",
+   "skill": "measurement:metric_imperial",
+   "name": "Metric and Imperial Units",
+   "teaches": "approximate conversions between metric and imperial units (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb)",
+   "representation": "a conversion fact box beside each question",
+   "family": "measurement",
+   "steps": [
+    "Y6.B5.S4",
+    "Y6.B5.S5"
+   ],
+   "ccss": [
+    "5.MD.A.1"
+   ],
+   "why": "imperial ↔ metric approximations (and stone) are dealt by no skill",
+   "reused": true
+  },
+  "miles_km": {
+   "kind": "new",
+   "skill": "measurement:miles_kilometres",
+   "name": "Miles and Kilometres",
+   "teaches": "converting between miles and kilometres using 5 miles ≈ 8 km",
+   "representation": "a conversion graph or double number line",
+   "family": "measurement",
+   "steps": [
+    "Y6.B5.S4",
+    "Y6.B5.S5"
+   ],
+   "ccss": [
+    "5.MD.A.1"
+   ],
+   "why": "no skill uses 5 miles ≈ 8 km",
+   "reused": true
+  },
   "net_draw": {
    "kind": "option",
    "skill": "shapes_classify:net_identify",
@@ -1821,6 +2205,54 @@
    "step": "Y6.B13.S3",
    "action": "partial",
    "why": "reads/plots points but no coordinate problems"
+  },
+  {
+   "key": "measurement:capacity",
+   "step": "Y6.B5.S2",
+   "action": "partial",
+   "why": "whole metric amounts only; Y6 converts decimals both ways"
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y6.B5.S2",
+   "action": "partial",
+   "why": "larger → smaller unit, whole counts only"
+  },
+  {
+   "key": "measurement:unit_conversions",
+   "step": "Y6.B5.S2",
+   "action": "add",
+   "why": "partial cover: metric conversions both ways but whole numbers only"
+  },
+  {
+   "key": "measurement:capacity",
+   "step": "Y6.B5.S1",
+   "action": "add",
+   "why": "metric ml/l facts (units option Metric)"
+  },
+  {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y6.B5.S1",
+   "action": "add",
+   "why": "choosing g/kg/ml/l and reading metric scales"
+  },
+  {
+   "key": "measurement:unit_conversion_word",
+   "step": "Y6.B5.S3",
+   "action": "add",
+   "why": "partial cover: converts in a story but never calculates with two measures"
+  },
+  {
+   "key": "measurement:unit_conversions",
+   "step": "Y6.B5.S5",
+   "action": "partial",
+   "why": "customary within-system only; no imperial ↔ metric approximations"
+  },
+  {
+   "key": "measurement:length_customary",
+   "step": "Y6.B5.S5",
+   "action": "partial",
+   "why": "within-system imperial length only"
   }
  ]
 }
