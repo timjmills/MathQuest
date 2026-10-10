@@ -793,7 +793,11 @@
     "conversions:equiv_ratios"
    ],
    "proposal": "map_ratio_picture",
-   "note": "Sampled 4 each: ratio_intro/equiv_ratios are text-only (\"5 boys and 3 girls\"), no picture form. Still partial."
+   "note": "Sampled 4 each: ratio_intro/equiv_ratios are text-only (\"5 boys and 3 girls\"), no picture form. Still partial. Re-sampled ratio_intro n=20: 0/20 from a picture; all text stories with a:b entry.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: 6+ chart 201-210 asks unit price from a priced bag (rate from a quantity)"
+   }
   },
   {
    "task": "Equal sharing from a visual (\"share N among M\")",
@@ -806,7 +810,11 @@
     "fraction_operations:frac_as_division"
    ],
    "proposal": "map_share_among",
-   "note": "share_into_groups sampled 4: all \"make groups of k, how many groups\" (quotitive); no partitive share-among with counters."
+   "note": "Sampled share_into_groups n=20: 20/20 \"make groups of k, how many groups\" (quotitive); 0/20 share N among M. frac_as_division shares wholes, not counters. Option map_share_among adds sharing mode + screen drag.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 181-190: picture of toys, \"Sonja and Kai share the toys equally\", how many each"
+   }
   },
   {
    "task": "Division by making equal groups (drag)",
@@ -818,8 +826,12 @@
     "division:share_into_groups",
     "division:div_remainders"
    ],
-   "proposal": "map_groups_drag",
-   "note": "share_into_groups answerType=number (count); div_remainders is \"ring groups\" on paper, text entry on screen; no drag."
+   "proposal": "map_share_among",
+   "note": "Sampled share_into_groups n=20: 20/20 count-only number entry, no drag to make the groups; div_remainders rings groups on paper only. Closed by the merged option map_share_among (screen drag response).",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: uses manipulatives to divide a small set of objects into groups of equal size; uses sharing for division"
+   }
   },
   {
    "task": "Picture <-> multiplication equation",
@@ -833,12 +845,16 @@
     "multiplication:repeated_add_to_mult"
    ],
    "proposal": "map_array_to_eq",
-   "note": "arrays_groups is inline-blanks \"rows of _ make _\"; dot_array_mult number entry. Picture->total exists; picture->equation symbol form and equation->picture missing."
+   "note": "arrays_groups is inline-blanks \"rows of _ make _\"; dot_array_mult number entry. Picture->total exists; picture->equation symbol form and equation->picture missing. Re-sampled arrays_groups n=20: 20/20 inline-blank sentence from a picture; no equation-to-picture match.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: models multiplication and division using arrays; multiplication as repeated addition"
+   }
   },
   {
    "task": "Compare / order decimals",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "181-200",
    "source": "6.2",
    "status": "exists-regrade",
    "skills": [
@@ -847,12 +863,16 @@
     "decimals:order_decimals"
    ],
    "proposal": "dec_compare_model",
-   "note": "Sampled: symbol choice, dnd order, multi-select \"click all less than\". MAP-like forms present; needs re-grade, and the model support is a reused proposal."
+   "note": "Sampled: symbol choice, dnd order, multi-select \"click all less than\". MAP-like forms present; needs re-grade, and the model support is a reused proposal.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_190: compares and orders decimals to the hundredths place, RIT 181-190"
+   }
   },
   {
    "task": "Fraction multiplication with visual models",
    "strand": "Fractions & decimals",
-   "ritBand": "211-220",
+   "ritBand": "201-220",
    "source": "6.2",
    "status": "exists-regrade",
    "skills": [
@@ -861,19 +881,27 @@
     "fraction_operations:mult_scaling"
    ],
    "proposal": "mult_mixed_int",
-   "note": "Sampled: frac-model cell text entry, dnd sort by size, multi-select equal expressions. Sound; re-grade. Mixed-number × whole still missing (reused)."
+   "note": "Sampled: frac-model cell text entry, dnd sort by size, multi-select equal expressions. Sound; re-grade. Mixed-number × whole still missing (reused).",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210/220: multiplies a fraction by a fraction; uses models to multiply fractions, RIT 201-220"
+   }
   },
   {
    "task": "Adding decimals",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "191-200",
    "source": "6.2",
    "status": "exists-regrade",
    "skills": [
     "decimals:add_decimal"
    ],
    "proposal": "decimal_models",
-   "note": "col-arith decimal column add, tenths and hundredths sampled. Re-grade; no decimal model support (reused proposal)."
+   "note": "col-arith decimal column add, tenths and hundredths sampled. Re-grade; no decimal model support (reused proposal).",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: adds decimals to the hundredths place, vertical format, RIT 191-200"
+   }
   },
   {
    "task": "Equal groups total",
@@ -887,7 +915,11 @@
     "multiplication:repeated_add_to_mult"
    ],
    "proposal": "map_array_to_eq",
-   "note": "arrays_groups \"groups of\" picture + mult_word_problems \"boxes each has\" sampled: total is dealt. Needs re-grade only."
+   "note": "arrays_groups \"groups of\" picture + mult_word_problems \"boxes each has\" sampled: total is dealt. Needs re-grade only.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: solves word problems involving basic whole number multiplication; arrays"
+   }
   },
   {
    "task": "Equal or unequal groups",
@@ -898,17 +930,25 @@
    "skills": [
     "multiplication:equal_or_unequal_groups"
    ],
-   "note": "Sampled: decide multiply/add from a picture of groups."
+   "note": "Sampled: decide multiply/add from a picture of groups.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: divides a small set of objects into groups of equal size"
+   }
   },
   {
    "task": "Make equal groups (early, K-2 sharing)",
    "strand": "Multiplication & division",
-   "ritBand": "161-180",
+   "ritBand": "171-190",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
    "proposal": "share_group",
-   "note": "No early share/group skill; WRM share_group reused."
+   "note": "No live skill deals K-2 sharing counters into groups (share_into_groups starts at quotitive ÷). Reused share_group (WRM: counters by plates/rings, draw shared or grouped, how many each) matches.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: uses manipulatives to divide a small set into equal groups; uses sharing for division"
+   }
   },
   {
    "task": "Repeated addition <-> multiplication",
@@ -920,65 +960,89 @@
     "multiplication:repeated_add_to_mult"
    ],
    "proposal": "map_array_to_eq",
-   "note": "Sampled: \"6+6+6+6+6 = 5 × 6 = ?\" — the equation is given; pupil only computes. Writing the × form is not asked."
+   "note": "Sampled: \"6+6+6+6+6 = 5 × 6 = ?\" — the equation is given; pupil only computes. Writing the × form is not asked.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: interprets multiplication as repeated addition, division as repeated subtraction"
+   }
   },
   {
    "task": "Multiplication facts 0-10",
    "strand": "Multiplication & division",
-   "ritBand": "181-200",
+   "ritBand": "171-200",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "multiplication:mult_facts",
     "multiplication:multiply"
    ],
-   "note": "Fact cells, number entry."
+   "note": "Fact cells, number entry.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 171-190: instantly recalls multiplication facts, one factor 0-12; multiplies facts to 10x10"
+   }
   },
   {
    "task": "Division facts",
    "strand": "Multiplication & division",
-   "ritBand": "191-200",
+   "ritBand": "181-200",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "division:div_facts"
    ],
-   "note": "Number entry."
+   "note": "Number entry.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_190/200: instantly recalls division facts with dividend and divisor less than 10/13, RIT 181-200"
+   }
   },
   {
    "task": "Unknown factor in × / ÷ equation",
    "strand": "Multiplication & division",
-   "ritBand": "191-200",
+   "ritBand": "171-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "division:missing_mult_div"
    ],
-   "note": "Sampled \"99 ÷ ___ = 11\", \"___ × 4 = 12\"."
+   "note": "Sampled \"99 ÷ ___ = 11\", \"___ × 4 = 12\".",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_180/210: solves basic-facts open sentences (× ÷); simple open sentences with missing factors, RIT 171-210"
+   }
   },
   {
    "task": "Fact families / relate × and ÷",
    "strand": "Multiplication & division",
-   "ritBand": "191-200",
+   "ritBand": "181-190",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "multiplication:mult_div_fact_family",
     "multiplication:number_families_mult"
    ],
-   "note": "Fact-family and number-family inputs."
+   "note": "Fact-family and number-family inputs.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: demonstrates the inverse relationship between multiplication and division"
+   }
   },
   {
    "task": "Properties of multiplication (commutative, distributive, zero)",
    "strand": "Multiplication & division",
-   "ritBand": "191-210",
+   "ritBand": "181-230",
    "source": "strand-walk",
    "status": "exists-regrade",
    "skills": [
     "multiplication:mult_properties"
    ],
    "proposal": "map_array_to_eq",
-   "note": "Sampled: property items are number entry; no array showing the split (distributive with picture)."
+   "note": "Sampled: property items are number entry; no array showing the split (distributive with picture).",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_190/230: zero property of multiplication (181-200); understanding of multiple properties (221-230)"
+   }
   },
   {
    "task": "Multiplication on a number line (hops)",
@@ -989,7 +1053,11 @@
    "skills": [
     "multiplication:nl_mult"
    ],
-   "note": "hop-line cell, number entry."
+   "note": "hop-line cell, number entry.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
+   }
   },
   {
    "task": "Multiplication word problems (equal groups)",
@@ -1001,7 +1069,11 @@
     "multiplication:mult_word_problems",
     "multiplication:mult_word_problems_plain"
    ],
-   "note": "Story-work cell sampled."
+   "note": "Sampled mult_word_problems n=20: 20/20 equal-groups result-unknown stories, number entry.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-200: solves word problems involving basic whole number multiplication"
+   }
   },
   {
    "task": "Division word problems",
@@ -1013,7 +1085,11 @@
     "division:div_word_problems",
     "division:div_word_problems_plain"
    ],
-   "note": "Story-work cell."
+   "note": "Story-work cell.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_200: solves word problems with division facts, dividend/divisor less than 11, RIT 191-200"
+   }
   },
   {
    "task": "Choose the equation for a × / ÷ story",
@@ -1025,12 +1101,16 @@
     "multiplication:mult_word_problems"
    ],
    "proposal": "map_equation_story",
-   "note": "Stories return only the number; no equation-choice/build form."
+   "note": "Sampled mult_word_problems n=20: 0/20 ask which equation fits the story (all compute a total). Missing.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: \"Which number sentence means 3 times as many as 12?\" choose the equation"
+   }
   },
   {
    "task": "Multiplicative comparison (times as many)",
    "strand": "Multiplication & division",
-   "ritBand": "201-210",
+   "ritBand": "191-210",
    "source": "strand-walk",
    "status": "exists-regrade",
    "skills": [
@@ -1038,33 +1118,45 @@
     "multiplication:mult_comparison_plain"
    ],
    "proposal": "comparison_statements",
-   "note": "Sampled: both unknown-product and unknown-multiplier; statement<->equation missing (reused)."
+   "note": "Sampled mult_comparison n=20: 20/20 compute (product, factor or unknown smaller); 0/20 choose the number sentence. Regrade + equation form via comparison_statements.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: choose the number sentence for \"3 times as many as 12\""
+   }
   },
   {
    "task": "Multiply by 10, 100, multiples of 10",
    "strand": "Multiplication & division",
-   "ritBand": "191-200",
+   "ritBand": "181-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "multiplication:mult_zeros"
    ],
-   "note": "Sampled \"3 × 100\"."
+   "note": "Sampled \"3 × 100\".",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 NO 181-190: \"Find the product 60 × 5\"; DesCartes NO 211-220 multiplies by multiples of 100/1000"
+   }
   },
   {
    "task": "Multi-digit × 1-digit / 2-digit × 2-digit (area model)",
    "strand": "Multiplication & division",
-   "ritBand": "201-210",
+   "ritBand": "181-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "multiplication:area_model_mult",
     "multiplication:area_model_mult_hard"
    ],
-   "note": "area-model answerType."
+   "note": "area-model answerType.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_190/200: multiplies a 2-digit number by a 1-digit (and 2-digit, no regrouping) number, RIT 181-200"
+   }
   },
   {
-   "task": "Multi-digit multiplication (standard algorithm, 4-digit × 1)",
+   "task": "Multi-digit multiplication (standard algorithm, 3-/4-digit × 2-digit)",
    "strand": "Multiplication & division",
    "ritBand": "201-220",
    "source": "strand-walk",
@@ -1074,12 +1166,16 @@
     "multiplication:area_model_mult"
    ],
    "proposal": "long_mult",
-   "note": "4-digit × 2-digit long multiplication not dealt; WRM long_mult reused."
+   "note": "Sampled multiply n=20: 20/20 basic facts; area_model_mult is partial products, no column standard algorithm. long_mult (WRM) builds the column grid (4-digit by 2-digit), matching 5.NBT.B.5.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210/220: multiplies 3-digit by 2-digit and 3-digit by 3-digit; multiplies multiple-digit numbers, RIT 201-220"
+   }
   },
   {
    "task": "Division with remainders",
    "strand": "Multiplication & division",
-   "ritBand": "201-210",
+   "ritBand": "191-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1087,7 +1183,11 @@
     "division:box_division_easy",
     "division:box_division_hard"
    ],
-   "note": "Sampled \"Ring groups of 5... 4 R 3\"."
+   "note": "Sampled \"Ring groups of 5... 4 R 3\".",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_200: solves simple word problems on division with remainder (1-step, 1-digit divisor), RIT 191-200"
+   }
   },
   {
    "task": "Interpret the remainder in context",
@@ -1099,7 +1199,11 @@
     "division:remainder_interpret",
     "division:remainder_contexts"
    ],
-   "note": "Sampled cars-needed (round up) and left over."
+   "note": "Sampled cars-needed (round up) and left over.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 201-210: 50 ÷ 8 = 6 r2, least packages of buns needed (round up)"
+   }
   },
   {
    "task": "Multi-digit division (area model / partial quotients)",
@@ -1111,24 +1215,32 @@
     "division:area_model_div_2by1",
     "division:area_model_div_3by1"
    ],
-   "note": "Area model division."
+   "note": "Area model division.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: divides a 4-digit number by a 1-digit number with no remainder, RIT 201-210"
+   }
   },
   {
    "task": "Divide by 2-digit divisor with remainders",
    "strand": "Multiplication & division",
-   "ritBand": "211-220",
+   "ritBand": "211-230",
    "source": "strand-walk",
    "status": "partial",
    "skills": [
     "division:long_div_2digit"
    ],
    "proposal": "long_div_rem",
-   "note": "Exact quotients only."
+   "note": "Exact quotients only.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_220/230: complex word problems on division with remainder (2-step, 2-digit divisor), RIT 211-230"
+   }
   },
   {
    "task": "Factors and factor pairs",
    "strand": "Multiplication & division",
-   "ritBand": "191-210",
+   "ritBand": "211-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1136,29 +1248,41 @@
     "number_theory:factor_tchart_easy",
     "number_theory:factor_links_easy"
    ],
-   "note": "Circle all, T-chart drag."
+   "note": "Circle all, T-chart drag.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 211-220: \"Which set contains all the factors of 20?\"; DesCartes: determines factors"
+   }
   },
   {
    "task": "Multiples",
    "strand": "Multiplication & division",
-   "ritBand": "191-200",
+   "ritBand": "181-200",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "number_theory:multiples"
    ],
-   "note": "Fill, list, click-all forms sampled."
+   "note": "Fill, list, click-all forms sampled.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
+   }
   },
   {
    "task": "Prime and composite",
    "strand": "Multiplication & division",
-   "ritBand": "201-210",
+   "ritBand": "191-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "number_theory:prime_composite"
    ],
-   "note": "Choice, dnd sort sampled."
+   "note": "Choice, dnd sort sampled.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_220: identifies numbers as prime, RIT 211-220 (vocabulary prime/composite enters 191-200)"
+   }
   },
   {
    "task": "GCF / LCM",
@@ -1171,7 +1295,11 @@
     "number_theory:gcf_hard",
     "number_theory:lcm"
    ],
-   "note": "Number entry."
+   "note": "Number entry.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 6.NS.B.4 (GCF/LCM) is in MAP's blueprint"
+   }
   },
   {
    "task": "Divisibility",
@@ -1182,7 +1310,11 @@
    "skills": [
     "number_theory:divisibility_sort"
    ],
-   "note": "divisibility-sort drag."
+   "note": "divisibility-sort drag.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.OA.B.4 (multiples and divisibility) is in MAP's blueprint"
+   }
   },
   {
    "task": "Multiply three numbers / associative",
@@ -1192,29 +1324,41 @@
    "status": "missing",
    "skills": [],
    "proposal": "mult_three",
-   "note": "No three-factor skill; WRM proposal reused."
+   "note": "Reused mult_three (WRM: three 1-digit factors, bracket the easy pair) matches \"multiplies multiple 1-digit numbers\".",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: multiplies multiple 1-digit numbers, RIT 201-210"
+   }
   },
   {
    "task": "Estimate products and quotients",
    "strand": "Multiplication & division",
-   "ritBand": "201-210",
+   "ritBand": "211-220",
    "source": "strand-walk",
-   "status": "partial",
+   "status": "missing",
    "skills": [
     "division:div_fix_estimate"
    ],
    "proposal": "map_mult_estimate",
-   "note": "Only long-division estimate fix; no estimate-a-product item."
+   "note": "Sampled div_fix_estimate n=20: 20/20 fix a trial quotient in long division; 0/20 round-to-estimate a product or quotient. No skill deals estimation of × / ÷.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_220: uses rounding to estimate answers involving multiplication and division of numbers under 100/1000, RIT 211-220"
+   }
   },
   {
    "task": "Equal parts / halves and quarters of shapes",
    "strand": "Fractions & decimals",
-   "ritBand": "161-180",
+   "ritBand": "171-180",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
    "proposal": "fraction_parts",
-   "note": "No equal/unequal parts skill; WRM fraction_parts reused."
+   "note": "Reused fraction_parts (WRM: equal/unequal parts, tick equal, draw the whole) covers halves/quarters as equal parts; naming 1/2 of a region is already in fractions:identify. Row is the early equal-parts task.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_180: represents 1/2 with a diagram; identifies one-half from a region or set, RIT 171-180"
+   }
   },
   {
    "task": "Identify fraction of a shape (area model)",
@@ -1227,12 +1371,16 @@
     "fractions:write_fraction",
     "fractions:shade_fraction"
    ],
-   "note": "Sampled: write shaded fraction, which model shows."
+   "note": "Sampled: write shaded fraction, which model shows.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_190: identifies 2/3, 3/3 and tenths from a region or set; represents 3/4 with a model, RIT 181-190"
+   }
   },
   {
    "task": "Unit fractions / build a fraction from unit fractions",
    "strand": "Fractions & decimals",
-   "ritBand": "181-190",
+   "ritBand": "191-200",
    "source": "strand-walk",
    "status": "partial",
    "skills": [
@@ -1240,7 +1388,11 @@
     "composing:compose_whole"
    ],
    "proposal": "map_frac_unit_build",
-   "note": "compose_whole builds 1 only; decompose is a grade 4 sum form."
+   "note": "compose_whole builds 1 only; decompose is a grade 4 sum form.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: uses models to add and subtract fractions and connect the actions, RIT 191-200"
+   }
   },
   {
    "task": "Fraction of a set",
@@ -1252,12 +1404,16 @@
     "fractions:fraction_of_set",
     "fractions:fraction_of_set_hard"
    ],
-   "note": "Sampled: compute, click 3/3 of, missing numerator."
+   "note": "Sampled: compute, click 3/3 of, missing numerator.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_190: identifies a fraction from a region or set, RIT 181-190"
+   }
   },
   {
    "task": "Place a fraction on a number line (drag)",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1265,29 +1421,41 @@
     "fractions:mixed_nl_drag",
     "composing:fraction_number_line"
    ],
-   "note": "nl-drag cell, click tick."
+   "note": "nl-drag cell, click tick.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 NO 211-220: \"Move the fractions to the correct location on the number line\""
+   }
   },
   {
    "task": "Read a fraction at a point on a number line",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "composing:fraction_number_line"
    ],
-   "note": "Sampled \"What fraction is at the arrow?\" fraction-input."
+   "note": "Sampled \"What fraction is at the arrow?\" fraction-input.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: compares fractions on a number line; orders fractions on a number line, RIT 201-220"
+   }
   },
   {
    "task": "Whole numbers as fractions",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "composing:whole_as_fraction"
    ],
-   "note": "Sampled 6/6, 2/1."
+   "note": "Sampled 6/6, 2/1.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: expresses 1 in many different ways (3/3, 4/4), RIT 201-210"
+   }
   },
   {
    "task": "Equivalent fractions (models and number)",
@@ -1300,23 +1468,31 @@
     "fractions:select_equiv_frac",
     "fractions:equivalent"
    ],
-   "note": "Sampled visual write and =/≠."
+   "note": "Sampled visual write and =/≠.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: identifies equivalent fractions using visual representations, RIT 191-200"
+   }
   },
   {
    "task": "Compare fractions (same whole, models)",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "fractions:compare"
    ],
-   "note": "Sampled symbol with models."
+   "note": "Sampled symbol with models.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: compares fractions (common denominator, 1 in the numerator), RIT 201-210"
+   }
   },
   {
    "task": "Compare fractions with benchmark 1/2",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "partial",
    "skills": [
@@ -1324,31 +1500,43 @@
     "fractions:compare_frac_lcd"
    ],
    "proposal": "map_frac_compare_reason",
-   "note": "Benchmark exists as placement only; compare via 1/2 not dealt."
+   "note": "Benchmark exists as placement only; compare via 1/2 not dealt.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: compares fractions greater or less than a given fraction using several representations, RIT 211-220"
+   }
   },
   {
    "task": "Order fractions",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "fractions:order_fractions",
     "fractions:order_frac_numline"
    ],
-   "note": "Ordering forms."
+   "note": "Ordering forms.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210/220: orders fractions on a number line, RIT 201-220"
+   }
   },
   {
    "task": "Fractions greater than 1 from models",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-210",
    "source": "strand-walk",
    "status": "partial",
    "skills": [
     "fractions:mixed_improper_visual"
    ],
    "proposal": "frac_beyond_1",
-   "note": "Pizza model only."
+   "note": "Pizza model only.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: writes mixed numbers as improper fractions and the reverse, RIT 201-210"
+   }
   },
   {
    "task": "Mixed numbers <-> improper fractions",
@@ -1360,19 +1548,27 @@
     "fractions:improper_mixed",
     "fractions:mixed_improper_visual"
    ],
-   "note": "Sampled 25/6, 5/2."
+   "note": "Sampled 25/6, 5/2.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: writes mixed numbers as improper fractions and improper fractions as mixed numbers, RIT 201-210"
+   }
   },
   {
    "task": "Add / subtract fractions like denominators",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "191-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "fraction_operations:add_fractions_like",
     "fraction_operations:sub_fractions_like"
    ],
-   "note": "frac-model cell."
+   "note": "frac-model cell.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: adds and subtracts fractions with like denominators without reducing, RIT 191-200"
+   }
   },
   {
    "task": "Add / subtract mixed numbers",
@@ -1384,7 +1580,11 @@
     "fraction_operations:add_mixed_like",
     "fraction_operations:sub_mixed_like"
    ],
-   "note": "Like denominators."
+   "note": "Like denominators.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: subtracts mixed fractions with like denominators, no regrouping, RIT 201-210"
+   }
   },
   {
    "task": "Add / subtract unlike denominators",
@@ -1396,7 +1596,11 @@
     "fraction_operations:add_frac_unlike",
     "fraction_operations:sub_frac_unlike"
    ],
-   "note": "Sampled 1/8 + 5/12."
+   "note": "Sampled 1/8 + 5/12.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: adds/subtracts fractions with unlike denominators without reducing, RIT 211-220"
+   }
   },
   {
    "task": "Fraction word problems (+/-)",
@@ -1408,31 +1612,42 @@
     "fraction_operations:frac_word_problems",
     "fraction_operations:frac_word_problems_plain"
    ],
-   "note": "Sampled pie/cake stories."
+   "note": "Sampled pie/cake stories.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: solves real-world 1-step problems adding/subtracting fractions with like denominators, RIT 201-210"
+   }
   },
   {
    "task": "Fraction as division (a/b = a ÷ b)",
    "strand": "Fractions & decimals",
-   "ritBand": "211-220",
+   "ritBand": "191-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "fraction_operations:frac_as_division",
     "fraction_operations:frac_as_div_word"
    ],
-   "note": "Share pizzas sampled."
+   "note": "Share pizzas sampled.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: explains interpretations of fractions incl. division of whole numbers by whole numbers, RIT 191-200"
+   }
   },
   {
    "task": "Fraction of an amount / fraction as operator",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "191-210",
    "source": "strand-walk",
-   "status": "partial",
+   "status": "exists-ok",
    "skills": [
     "fractions:fraction_of_set"
    ],
-   "proposal": "frac_operator",
-   "note": "Sets only, no bar-model amount."
+   "note": "Sampled fraction_of_set n=20: ~10/20 \"What is a/b of N\" or story number entry, rest click a/b of a set (multi-select). Deals fraction of an amount; frac_operator (×-form) stays on the WRM list, not needed for this row.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: solves 1-step real-world problems multiplying a whole number by a fraction, RIT 191-200"
+   }
   },
   {
    "task": "Divide unit fraction by whole / whole by unit fraction",
@@ -1443,7 +1658,11 @@
    "skills": [
     "fraction_operations:div_unit_fraction"
    ],
-   "note": "Sampled 4 ÷ 1/3."
+   "note": "Sampled 4 ÷ 1/3.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: uses models to multiply and divide fractions and connect the actions, RIT 211-220"
+   }
   },
   {
    "task": "Divide fraction by fraction",
@@ -1453,7 +1672,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "div_frac_frac",
-   "note": "Not dealt."
+   "note": "Not dealt.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_230: divides a mixed fraction by a fraction, RIT 221-230"
+   }
   },
   {
    "task": "Multiplication as scaling",
@@ -1464,12 +1687,16 @@
    "skills": [
     "fraction_operations:mult_scaling"
    ],
-   "note": "Present."
+   "note": "Present.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_OAT_220: predicts the relative size of the answer when multiplying, RIT 211-220"
+   }
   },
   {
    "task": "Tenths and hundredths: fraction <-> decimal",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1477,17 +1704,25 @@
     "conversions:d_to_f",
     "fraction_operations:frac_10_100"
    ],
-   "note": "Sampled 7/100 -> 0.07, dnd bins."
+   "note": "Sampled 7/100 -> 0.07, dnd bins.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210/220: writes a terminating decimal as a fraction; expresses a simple fraction as a decimal, RIT 201-220"
+   }
   },
   {
    "task": "Decimal place value (value of a digit)",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "211-220",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
    "proposal": "decimal_pv",
-   "note": "No decimals:decimal_place_value skill."
+   "note": "No decimals:decimal_place_value skill.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: represents a decimal to the hundredths place in words and numerals, RIT 211-220"
+   }
   },
   {
    "task": "Decimal on a number line (place)",
@@ -1498,7 +1733,11 @@
    "skills": [
     "decimals:decimal_nl_drag"
    ],
-   "note": "nl-drag sampled."
+   "note": "nl-drag sampled.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.NF.C.6 (decimals on a number line) is in MAP's blueprint"
+   }
   },
   {
    "task": "Compare decimals to thousandths",
@@ -1509,12 +1748,16 @@
    "skills": [
     "decimals:compare_thousandths"
    ],
-   "note": "Present."
+   "note": "Present.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: compares and orders decimals past the thousandths place, RIT 211-220"
+   }
   },
   {
    "task": "Round decimals",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "211-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1522,53 +1765,73 @@
     "decimals:round_thousandths",
     "number_sense:round_sort_tenths"
    ],
-   "note": "Sampled nearest tenth/hundredth."
+   "note": "Sampled nearest tenth/hundredth.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: rounds decimals to the nearest whole number and nearest tenth, RIT 211-220"
+   }
   },
   {
    "task": "Subtract decimals",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "191-210",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "decimals:sub_decimal"
    ],
-   "note": "Column."
+   "note": "Column.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200/210: subtracts decimals to the hundredths place, RIT 191-210"
+   }
   },
   {
    "task": "Multiply decimals (by whole, by decimal)",
    "strand": "Fractions & decimals",
-   "ritBand": "211-220",
+   "ritBand": "191-230",
    "source": "strand-walk",
    "status": "partial",
    "skills": [
     "decimals:mult_decimal"
    ],
    "proposal": "mult_dec_dec",
-   "note": "Sampled: decimal × whole only."
+   "note": "Sampled mult_decimal n=20: 20/20 decimal × whole number; 0/20 decimal × decimal. mult_dec_dec adds it.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200/230: multiplies a decimal by a whole number (191-200); decimal by decimal later (221-230)"
+   }
   },
   {
    "task": "Divide decimals",
    "strand": "Fractions & decimals",
-   "ritBand": "211-220",
+   "ritBand": "201-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "decimals:div_decimal"
    ],
-   "note": "Sampled 15.5 ÷ 5, 2.4 ÷ 0.2."
+   "note": "Sampled 15.5 ÷ 5, 2.4 ÷ 0.2.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: divides a decimal by a whole number, RIT 201-210"
+   }
   },
   {
    "task": "Powers of ten with decimals and exponents",
    "strand": "Fractions & decimals",
-   "ritBand": "211-220",
+   "ritBand": "221-230",
    "source": "strand-walk",
    "status": "missing",
    "skills": [
     "multiplication:mult_zeros"
    ],
    "proposal": "map_power10_exponent",
-   "note": "mult_zeros whole-number only."
+   "note": "Sampled mult_zeros n=20: whole numbers × 10/100/multiples only; 0/20 decimals × powers of ten or exponent form.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_230: multiplies/divides a decimal by 10, 100, 1000; writes numbers in exponential form, RIT 221-230"
+   }
   },
   {
    "task": "Percent from a grid",
@@ -1579,7 +1842,11 @@
    "skills": [
     "conversions:percent_visual"
    ],
-   "note": "Sampled percent shaded, click all 25%."
+   "note": "Sampled percent shaded, click all 25%.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: expresses the equivalent form of a fraction, decimal and/or percent, RIT 211-220"
+   }
   },
   {
    "task": "Fraction/decimal/percent conversions and order",
@@ -1592,7 +1859,11 @@
     "conversions:d_to_p",
     "conversions:order_fdp"
    ],
-   "note": "Present."
+   "note": "Present.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: expresses the equivalent form of a fraction, decimal and/or percent, RIT 211-220"
+   }
   },
   {
    "task": "Percent of a number",
@@ -1604,23 +1875,31 @@
     "conversions:percent_of_number"
    ],
    "proposal": "map_percent_of_grid_bar",
-   "note": "Text only; no bar model."
+   "note": "Sampled percent_of_number n=20: number entry \"What is p% of N\" plus click-all expressions; no grid or bar model. Regrade with a model.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 6.RP.A.3c (percent of a quantity) is in MAP's blueprint"
+   }
   },
   {
    "task": "Unit rate",
    "strand": "Fractions & decimals",
-   "ritBand": "221-230",
+   "ritBand": "201-230",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "conversions:unit_rate_intro"
    ],
-   "note": "Sampled pages per day."
+   "note": "Sampled pages per day.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 6+ Real & Complex Numbers 201-210: unit price per apple from $20.40 for 24"
+   }
   },
   {
    "task": "Ratio tables / equivalent ratios",
    "strand": "Fractions & decimals",
-   "ritBand": "221-230",
+   "ritBand": "211-240",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
@@ -1628,28 +1907,40 @@
     "conversions:equiv_ratios",
     "conversions:double_num_line"
    ],
-   "note": "Missing-value forms."
+   "note": "Missing-value forms.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 6+ 231-240: 3 lb for 12 servings, how much for 48 (proportion); DesCartes NO 211-220 proportions"
+   }
   },
   {
    "task": "Ratio word problems with bar model",
    "strand": "Fractions & decimals",
-   "ritBand": "221-230",
+   "ritBand": "211-230",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
    "proposal": "ratio_problems",
-   "note": "Reused WRM proposal."
+   "note": "Reused WRM proposal.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: solves 1-step problems involving proportions, RIT 211-220"
+   }
   },
   {
    "task": "Line plot with fractions",
    "strand": "Fractions & decimals",
-   "ritBand": "201-210",
+   "ritBand": "211-220",
    "source": "strand-walk",
    "status": "exists-ok",
    "skills": [
     "graphs:line_plot_fractions"
    ],
-   "note": "Data strand overlap; sampled."
+   "note": "Data strand overlap; sampled.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 Measurement & Data 211-220: line plot of strip lengths in 1/2, 1/4 inch, total length"
+   }
   },
   {
    "task": "Match: picture <-> equation (multiplication)",
@@ -1662,7 +1953,11 @@
     "multiplication:dot_array_mult"
    ],
    "proposal": "map_array_to_eq",
-   "note": "Picture -> total exists; picture <-> equation match in either direction missing."
+   "note": "Picture -> total exists; picture <-> equation match in either direction missing.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: models multiplication and division using arrays"
+   }
   },
   {
    "task": "Match: array <-> multiplication",
@@ -1675,7 +1970,11 @@
     "multiplication:dot_array_mult"
    ],
    "proposal": "map_array_to_eq",
-   "note": "Same gap; array given, equation not produced; equation -> array not dealt."
+   "note": "Same gap; array given, equation not produced; equation -> array not dealt.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: models multiplication and division algorithms using arrays"
+   }
   },
   {
    "task": "Match: story <-> operation (× / ÷)",
@@ -1688,7 +1987,11 @@
     "division:div_word_problems"
    ],
    "proposal": "map_equation_story",
-   "note": "No story -> equation form."
+   "note": "No story -> equation form.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 191-200: choose the number sentence that matches a times-as-many statement"
+   }
   },
   {
    "task": "Match: number line <-> multiplication (hops)",
@@ -1701,12 +2004,16 @@
     "division:nl_div"
    ],
    "proposal": "map_array_to_eq",
-   "note": "Hop line -> product exists; write the × equation from hops is not asked (covered by the same \"write the equation\" option)."
+   "note": "Hop line -> product exists; write the × equation from hops is not asked (covered by the same \"write the equation\" option).",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes OAT 181-190: uses counting by multiples for multiplication"
+   }
   },
   {
    "task": "Match: model <-> number (fraction models)",
    "strand": "Fractions & decimals",
-   "ritBand": "181-190",
+   "ritBand": "181-200",
    "source": "6.4",
    "status": "partial",
    "skills": [
@@ -1714,31 +2021,43 @@
     "fractions:shade_fraction"
    ],
    "proposal": "map_frac_model_match",
-   "note": "One model each way; no many-to-many match."
+   "note": "One model each way; no many-to-many match.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_200: matches numeric and visual representation of equivalent fractions, RIT 191-200"
+   }
   },
   {
    "task": "Match: model <-> number (decimal grids)",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "181-200",
    "source": "6.4",
    "status": "missing",
    "skills": [
     "conversions:percent_visual"
    ],
    "proposal": "map_decimal_grid",
-   "note": "Only percent grid."
+   "note": "Only percent grid.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_190: identifies tenths from a region or set, RIT 181-190"
+   }
   },
   {
    "task": "Match: number line <-> number (fractions)",
    "strand": "Fractions & decimals",
-   "ritBand": "191-200",
+   "ritBand": "201-220",
    "source": "6.4",
    "status": "exists-ok",
    "skills": [
     "composing:fraction_number_line",
     "fractions:fraction_nl_drag"
    ],
-   "note": "Both read-the-point and place."
+   "note": "Both read-the-point and place.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 NO 211-220: move fractions to the correct location on a number line"
+   }
   },
   {
    "task": "Match: number line <-> number (decimals)",
@@ -1750,7 +2069,11 @@
     "decimals:decimal_nl_drag"
    ],
    "proposal": "map_nl_read_decimal",
-   "note": "Place only, no read."
+   "note": "Place only, no read.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.NF.C.6 (decimal at a point on a number line) is in MAP's blueprint"
+   }
   },
   {
    "task": "Match: story <-> operation (fractions)",
@@ -1763,7 +2086,61 @@
     "fraction_operations:frac_mult_word"
    ],
    "proposal": "map_frac_story_op",
-   "note": "Stories answer only."
+   "note": "Stories answer only.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_220: solves 1-step real-world problems involving fractions with multiplication and division, RIT 211-220"
+   }
+  },
+  {
+   "task": "Divide by a multiple of 10 (e.g. 360 ÷ 40, 3-digit ÷ tens)",
+   "strand": "Multiplication & division",
+   "ritBand": "201-210",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "division:divide",
+    "multiplication:mult_zeros"
+   ],
+   "proposal": "map_div_tens",
+   "note": "Sampled divide n=20: basic facts (incl. 40 ÷ 10) only; 0/20 dividend ÷ multiple of 10 beyond facts. mult_zeros multiplies only.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/mod/book/tool/print/index.php?id=855660",
+    "says": "NWEA DesCartes continuum M2_NO_210: divides a 3-digit number by a multiple of 10; mental computation with division, RIT 201-210"
+   }
+  },
+  {
+   "task": "Build fractions equal to a whole or mixed number (move digits into boxes)",
+   "strand": "Fractions & decimals",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "composing:whole_as_fraction",
+    "fractions:improper_mixed"
+   ],
+   "proposal": "map_equal_frac_build",
+   "note": "Sampled whole_as_fraction n=12: 12/12 \"write 1 (or n) as a fraction with denominator d\"; 0/12 several fractions equal to a mixed number with a digit bank.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 NO 221-230: \"Move numbers to the boxes to show fractions that are equal to 1 ...\" (digit tiles)"
+   }
+  },
+  {
+   "task": "Select all the factors of a number (choose all)",
+   "strand": "Multiplication & division",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "number_theory:factors_identify",
+    "number_theory:factor_tchart_easy"
+   ],
+   "note": "Sampled factors_identify n=12: 12/12 fill the missing factors of N in pairs (production). Stronger than MAP choose-the-set; no option needed.",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "NWEA RIT Reference Chart sample item: Math 2-5 OAT 211-220: \"Which set contains all the factors of 20?\""
+   }
   },
   {
    "task": "Symmetry: compare shapes' numbers of lines",
@@ -1776,7 +2153,11 @@
     "angles_lines:place_symmetry_lines"
    ],
    "proposal": "map_symmetry_compare",
-   "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare"
+   "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
+   }
   },
   {
    "task": "Symmetry: is this proposed line correct?",
@@ -1788,7 +2169,11 @@
     "angles_lines:symmetry"
    ],
    "proposal": "map_symmetry_check_line",
-   "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial"
+   "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
+   }
   },
   {
    "task": "Area: pick the picture with area N",
@@ -1800,7 +2185,11 @@
     "area_perimeter:area_unit_squares"
    ],
    "proposal": "map_area_pick",
-   "note": "area_unit_squares: \"Count the unit squares. What is the area?\" number entry on one shape only"
+   "note": "area_unit_squares: \"Count the unit squares. What is the area?\" number entry on one shape only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
+   }
   },
   {
    "task": "Nets of 3-D solids",
@@ -1812,7 +2201,11 @@
     "shapes_classify:net_identify"
    ],
    "proposal": "shapes_3d_props",
-   "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade"
+   "note": "net_identify: \"Which net folds into a cube/triangular prism?\" MC A–D (MAP form is also select); legacy visual, needs vis_migrate_shapes + regrade",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
+   }
   },
   {
    "task": "Missing angle in a triangle",
@@ -1822,7 +2215,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "angle_rules",
-   "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360)"
+   "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360)",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
+   }
   },
   {
    "task": "Volume by unit cubes",
@@ -1835,7 +2232,11 @@
     "area_perimeter:volume_composite"
    ],
    "proposal": "volume_cubes",
-   "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form)"
+   "note": "volume: \"length = 3, width = 2, height = 2\"; volume_composite deals single prisms with dimensions (no cube-count form)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
+   }
   },
   {
    "task": "Perimeter",
@@ -1849,7 +2250,11 @@
     "area_perimeter:perimeter_intro"
    ],
    "proposal": "missing_lengths",
-   "note": "number entry, rectangles + rare missing-side; perimeter \"Find the perimeter of a rectangle: length = 5, width = 2\" text-only — regrade; missing-side/rectilinear via missing_lengths"
+   "note": "number entry, rectangles + rare missing-side; perimeter \"Find the perimeter of a rectangle: length = 5, width = 2\" text-only — regrade; missing-side/rectilinear via missing_lengths",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
+   }
   },
   {
    "task": "Reading clocks",
@@ -1865,7 +2270,11 @@
     "measurement:time_1min",
     "measurement:time_match_clock"
    ],
-   "note": "kit clock cell, write the time / draw hands / match clock (response + stimulus options); MAP select-the-clock and number entry both covered"
+   "note": "kit clock cell, write the time / draw hands / match clock (response + stimulus options); MAP select-the-clock and number entry both covered",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D chart: 'What time is shown on the clock?' 3:45 / 9:15 options"
+   }
   },
   {
    "task": "Minutes → hours (90 min = 1.5 h = 1 ½ h)",
@@ -1878,7 +2287,11 @@
     "measurement:unit_conversions"
    ],
    "proposal": "map_minutes_to_hours",
-   "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours"
+   "note": "200-item dist of unit_conversion_word: every time item large → small (hr→min, min→sec); no decimal or mixed hours",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
+   }
   },
   {
    "task": "Line / dot plots",
@@ -1892,7 +2305,11 @@
     "graphs:line_plot_fractions"
    ],
    "proposal": "make_line_plot",
-   "note": "read-only (how many at 1/2, most common); line_plot_g2 is legacy \"wide\" print; MAP also has build-a-line-plot"
+   "note": "read-only (how many at 1/2, most common); line_plot_g2 is legacy \"wide\" print; MAP also has build-a-line-plot",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
+   }
   },
   {
    "task": "Ordering times / a time between two times",
@@ -1906,7 +2323,11 @@
     "measurement:elapsed_visual_medium",
     "measurement:elapsed_find_duration"
    ],
-   "note": "order 3 clocks by writing 1,2,3; time-line duration \"__ h __ min\"; kit cells"
+   "note": "order 3 clocks by writing 1,2,3; time-line duration \"__ h __ min\"; kit cells",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+   }
   },
   {
    "task": "Meaning of a coordinate point in context",
@@ -1918,7 +2339,11 @@
     "coordinates:coordinate_q1"
    ],
    "proposal": "coord_context",
-   "note": "coordinate_q1 deals read/plot abstract points A, B only; no context"
+   "note": "coordinate_q1 deals read/plot abstract points A, B only; no context",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
+   }
   },
   {
    "task": "Match: graph ↔ sentence (data)",
@@ -1931,7 +2356,11 @@
     "graphs:pictograph"
    ],
    "proposal": "map_graph_sentence",
-   "note": "graph skills ask one numeric/text question; no statement-matching form"
+   "note": "graph skills ask one numeric/text question; no statement-matching form",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
+   }
   },
   {
    "task": "Match: shape ↔ property (geometry)",
@@ -1944,7 +2373,11 @@
     "shapes_early:shape_attributes",
     "shapes_classify:classify_quads"
    ],
-   "note": "\"Click ALL the shapes that have 4 right angles\" multi-select, classify_quads categories multi-select"
+   "note": "\"Click ALL the shapes that have 4 right angles\" multi-select, classify_quads categories multi-select",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+   }
   },
   {
    "task": "Match: clock ↔ time words (measurement)",
@@ -1956,7 +2389,11 @@
     "measurement:time_5min",
     "measurement:time_match_clock"
    ],
-   "note": "clock skills have stimulus \"words\" / \"words-past\" / \"words-oh\" and draw-the-hands response (skill-options.js _tmStimulus)"
+   "note": "clock skills have stimulus \"words\" / \"words-past\" / \"words-oh\" and draw-the-hands response (skill-options.js _tmStimulus)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D chart: 'What time is shown on the clock?' 3:45 / 9:15 options"
+   }
   },
   {
    "task": "Match: number line ↔ number (rulers, scales)",
@@ -1969,7 +2406,11 @@
     "measurement:reading_ruler_hard",
     "measurement:temperature"
    ],
-   "note": "ruler cell arrow → length (incl. quarter inches); thermometer cell → °C/°F; number entry"
+   "note": "ruler cell arrow → length (incl. quarter inches); thermometer cell → °C/°F; number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
+   }
   },
   {
    "task": "Match: picture ↔ equation (area / perimeter)",
@@ -1981,7 +2422,11 @@
     "area_perimeter:area_distributive_visual"
    ],
    "proposal": "map_area_equation",
-   "note": "distributive model computes a total; nothing asks which equation models the picture"
+   "note": "distributive model computes a total; nothing asks which equation models the picture",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: area figure and volume expressions items pair a picture with a number/expression"
+   }
   },
   {
    "task": "Match: model ↔ number (unit cubes)",
@@ -1993,7 +2438,11 @@
     "area_perimeter:volume"
    ],
    "proposal": "volume_cubes",
-   "note": "no cube-drawing volume item"
+   "note": "no cube-drawing volume item",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
+   }
   },
   {
    "task": "Compare / order objects by length (K-1)",
@@ -2005,7 +2454,11 @@
     "shapes_early:order_objects_length",
     "comparing:compare_objects"
    ],
-   "note": "drag to order shortest → longest (dnd-generic)"
+   "note": "drag to order shortest → longest (dnd-generic)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
+   }
   },
   {
    "task": "What attribute can be measured (length, weight, capacity)",
@@ -2015,7 +2468,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "measurable_attributes",
-   "note": "none of comparing:* names the attribute"
+   "note": "none of comparing:* names the attribute",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because K.MD.A.1 is in MAP's blueprint"
+   }
   },
   {
    "task": "Measure with non-standard units",
@@ -2026,7 +2483,11 @@
    "skills": [
     "shapes_early:measure_nonstandard"
    ],
-   "note": "\"How many paper clips long is the pencil?\" number entry"
+   "note": "\"How many paper clips long is the pencil?\" number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Measure the length of the bus using blocks. How many blocks long?' number entry"
+   }
   },
   {
    "task": "Compare two lengths: how much longer",
@@ -2038,7 +2499,11 @@
     "shapes_early:order_objects_length"
    ],
    "proposal": "compare_lengths",
-   "note": "no difference item"
+   "note": "no difference item",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Which student is the shortest?' picture comparison"
+   }
   },
   {
    "task": "Measure an object with a ruler (incl. not at 0)",
@@ -2050,7 +2515,11 @@
     "measurement:reading_ruler"
    ],
    "proposal": "map_ruler_measure_object",
-   "note": "reading_ruler: \"What length does the arrow point to?\" only"
+   "note": "reading_ruler: \"What length does the arrow point to?\" only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
+   }
   },
   {
    "task": "Two objects on a ruler: difference",
@@ -2060,7 +2529,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "ruler_difference",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'How long is the pencil?' on a cm ruler, MC 4-8 cm"
+   }
   },
   {
    "task": "Estimate length / choose the unit",
@@ -2071,7 +2544,11 @@
    "skills": [
     "measurement:estimate_length"
    ],
-   "note": "\"About how long is a shoe?\" MC + click all reasonable estimates (MAP form is select)"
+   "note": "\"About how long is a shoe?\" MC + click all reasonable estimates (MAP form is select)",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 2.MD.A.3 is in MAP's blueprint"
+   }
   },
   {
    "task": "Heavier / lighter (K)",
@@ -2083,7 +2560,11 @@
     "measurement:heavier_lighter_visual"
    ],
    "proposal": "mass_scales",
-   "note": "MC with emoji answers (ans=\"📕\"), not B&W; regrade"
+   "note": "MC with emoji answers (ans=\"📕\"), not B&W; regrade",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D strand: measurement of masses of objects (Measurement and Data summary)"
+   }
   },
   {
    "task": "Read a scale or measuring jug (g, kg, mL, L)",
@@ -2095,7 +2576,11 @@
     "measurement:mass_volume_liquid"
    ],
    "proposal": "mass_scales",
-   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell"
+   "note": "some read-scale items (one returned ans=0 kg), rest click-all; needs kit scale cell",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
+   }
   },
   {
    "task": "Mass / liquid volume word problems",
@@ -2105,7 +2590,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "mass_ops",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'solve measurement problems involving length, mass, liquid volume ...'"
+   }
   },
   {
    "task": "Length word problems (add/sub lengths)",
@@ -2115,7 +2604,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "length_ops",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'total length of paper Jai will use' from line plot (add lengths)"
+   }
   },
   {
    "task": "Convert units large → small (ft→in, kg→g, L→mL)",
@@ -2130,7 +2623,11 @@
     "measurement:capacity",
     "measurement:unit_conversion_word"
    ],
-   "note": "number entry and column arithmetic; length_customary reaches 11 mi → ft (58080), heavy but sound"
+   "note": "number entry and column arithmetic; length_customary reaches 11 mi → ft (58080), heavy but sound",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
+   }
   },
   {
    "task": "Conversion table: complete and use",
@@ -2140,7 +2637,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "conversion_table",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'choose all measurements equal to 5 hours' (unit conversion, multi-select)"
+   }
   },
   {
    "task": "Coins: identify value / count coins",
@@ -2152,7 +2653,11 @@
     "measurement:coin_value",
     "measurement:money_count"
    ],
-   "note": "kit coin cell, number entry"
+   "note": "kit coin cell, number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+   }
   },
   {
    "task": "Coins: make an amount (drag coins)",
@@ -2165,7 +2670,11 @@
     "measurement:make_change_least_coins"
    ],
    "proposal": "map_money_build",
-   "note": "check a given set or write fewest coins; no free build"
+   "note": "check a given set or write fewest coins; no free build",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+   }
   },
   {
    "task": "Money: change and comparisons",
@@ -2178,7 +2687,11 @@
     "measurement:money_compare",
     "measurement:enough_money"
    ],
-   "note": "money columns subtraction, compare"
+   "note": "money columns subtraction, compare",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+   }
   },
   {
    "task": "Money two-step word problems",
@@ -2188,7 +2701,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "money_2step",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Julia bought a robot for 79 cents, paid $1. Show the change' (drag coins)"
+   }
   },
   {
    "task": "Time to the hour / half hour (K-1)",
@@ -2200,7 +2717,11 @@
     "measurement:time_hour",
     "measurement:time_half_hour"
    ],
-   "note": "kit clock, write or draw"
+   "note": "kit clock, write or draw",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D chart: 'What time is shown on the clock?' 3:45 / 9:15 options"
+   }
   },
   {
    "task": "a.m. / p.m. and time units (hours, minutes, seconds)",
@@ -2211,7 +2732,11 @@
    "skills": [
     "measurement:time_sense"
    ],
-   "note": "a.m./p.m. choice; units choice still in WRM time_units"
+   "note": "a.m./p.m. choice; units choice still in WRM time_units",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' (s, min)"
+   }
   },
   {
    "task": "Elapsed time: end, start, duration",
@@ -2224,7 +2749,11 @@
     "measurement:elapsed_find_start",
     "measurement:elapsed_find_duration"
    ],
-   "note": "time-line cell, \"__ h __ min\" production"
+   "note": "time-line cell, \"__ h __ min\" production",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+   }
   },
   {
    "task": "Elapsed time word problems (story)",
@@ -2236,7 +2765,11 @@
     "measurement:elapsed_mixed"
    ],
    "proposal": "elapsed_stories",
-   "note": "time line only, no story context"
+   "note": "time line only, no story context",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts lists 'Time: elapsed time' at 181-190 (search summary; PDF 503 today)"
+   }
   },
   {
    "task": "Temperature: read a thermometer",
@@ -2247,7 +2780,11 @@
    "skills": [
     "measurement:temperature"
    ],
-   "note": "kit thermometer cell, number entry"
+   "note": "kit thermometer cell, number entry",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because MAP 2-5 M&D measurement (no thermometer item in public chart); 3.MD-adjacent is in MAP's blueprint"
+   }
   },
   {
    "task": "Area by counting / tiling, then multiply",
@@ -2259,7 +2796,11 @@
     "area_perimeter:area_unit_squares",
     "area_perimeter:area"
    ],
-   "note": "count unit squares; area of rectangle"
+   "note": "count unit squares; area of rectangle",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
+   }
   },
   {
    "task": "Area and perimeter together; same area different perimeter",
@@ -2271,7 +2812,11 @@
     "area_perimeter:area_perimeter"
    ],
    "proposal": "same_area",
-   "note": "dual P= A= of one shape only"
+   "note": "dual P= A= of one shape only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: separate area and perimeter items in 181-210 bands"
+   }
   },
   {
    "task": "Rectilinear area by decomposing",
@@ -2283,7 +2828,11 @@
     "area_perimeter:area_polygon_decompose",
     "area_perimeter:composite_shapes"
    ],
-   "note": "L/T/U total area and perimeter, number entry"
+   "note": "L/T/U total area and perimeter, number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D chart: 'What is the area of the figure?' counted unit squares, MC"
+   }
   },
   {
    "task": "Missing side given perimeter / area",
@@ -2295,7 +2844,11 @@
     "area_perimeter:perimeter"
    ],
    "proposal": "missing_lengths",
-   "note": "about 1 in 3 perimeter items, rectangles only"
+   "note": "about 1 in 3 perimeter items, rectangles only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D chart: 'What is the perimeter?' labelled rectangle 10 in x 2 in; K-2 perimeter item 3/5 cm"
+   }
   },
   {
    "task": "Volume of a prism (l × w × h), incl. missing edge",
@@ -2306,7 +2859,11 @@
    "skills": [
     "area_perimeter:volume"
    ],
-   "note": "formula + missing dimension items"
+   "note": "formula + missing dimension items",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D top band (221-230): 'choose all expressions to find the volume of the prism'"
+   }
   },
   {
    "task": "Volume with fractional edges",
@@ -2316,7 +2873,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "volume_fractional",
-   "note": "integer edges only"
+   "note": "integer edges only",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 5.NF.B.4b / 6.G.A.2 is in MAP's blueprint"
+   }
   },
   {
    "task": "Area of a triangle / parallelogram (Gr 6 edge of MAP 2-5)",
@@ -2327,7 +2888,11 @@
    "skills": [
     "area_perimeter:area_triangle"
    ],
-   "note": "b×h÷2 number entry"
+   "note": "b×h÷2 number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "6+ chart: area items; 2-5 chart tops out at area of figure (Gr6 edge)"
+   }
   },
   {
    "task": "Name 2-D shapes",
@@ -2339,7 +2904,11 @@
     "shapes_early:name_2d_shapes",
     "shapes_early:shape_name_match_2d"
    ],
-   "note": "MC name + click all squares"
+   "note": "MC name + click all squares",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+   }
   },
   {
    "task": "Name 3-D shapes",
@@ -2351,7 +2920,11 @@
     "shapes_early:name_3d_shapes",
     "shapes_early:shape_name_match_3d"
    ],
-   "note": "MC + click all"
+   "note": "MC + click all",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'Look at the objects. Choose the pyramid.'"
+   }
   },
   {
    "task": "Position words (above, below, beside)",
@@ -2362,7 +2935,11 @@
    "skills": [
     "shapes_early:shape_positions"
    ],
-   "note": "visual positions"
+   "note": "visual positions",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'Which bird is over the cloud?'; 'Move the block next to the ball'"
+   }
   },
   {
    "task": "Count sides, vertices, faces, edges",
@@ -2374,7 +2951,11 @@
     "shapes_early:count_sides_vertices_2d",
     "shapes_early:count_edges_faces_vertices"
    ],
-   "note": "number entry on drawn shape"
+   "note": "number entry on drawn shape",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+   }
   },
   {
    "task": "Defining vs non-defining attributes",
@@ -2384,7 +2965,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "defining_attributes",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+   }
   },
   {
    "task": "Compose shapes (pattern blocks, make a rectangle)",
@@ -2397,7 +2982,11 @@
     "shapes_early:compose_hexagon",
     "shapes_early:compose_rect_from_squares"
    ],
-   "note": "visual compose"
+   "note": "visual compose",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; kept because 1.G.A.2 is in MAP's blueprint"
+   }
   },
   {
    "task": "Partition shapes into equal shares",
@@ -2409,7 +2998,11 @@
     "shapes_early:partition_shapes"
    ],
    "proposal": "map_shape_partition_pick",
-   "note": "fraction shaded / count parts; no equal-vs-unequal pick"
+   "note": "fraction shaded / count parts; no equal-vs-unequal pick",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
+   }
   },
   {
    "task": "Regular and irregular polygons; name polygons by sides",
@@ -2421,7 +3014,11 @@
     "shapes_early:shape_attributes"
    ],
    "proposal": "polygons",
-   "note": "sides/vertices counts only"
+   "note": "sides/vertices counts only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
+   }
   },
   {
    "task": "Points, lines, segments, rays",
@@ -2431,7 +3028,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "points_lines_rays",
-   "note": "identify_lines covers parallel/perpendicular/intersecting only"
+   "note": "identify_lines covers parallel/perpendicular/intersecting only",
+   "evidence": {
+    "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
+    "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
+   }
   },
   {
    "task": "Parallel and perpendicular lines",
@@ -2442,7 +3043,11 @@
    "skills": [
     "angles_lines:identify_lines"
    ],
-   "note": "MC type + click all parallel pairs"
+   "note": "MC type + click all parallel pairs",
+   "evidence": {
+    "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
+    "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
+   }
   },
   {
    "task": "Classify angles (acute, right, obtuse)",
@@ -2453,7 +3058,11 @@
    "skills": [
     "angles_lines:identify_angles"
    ],
-   "note": "MC + click all acute"
+   "note": "MC + click all acute",
+   "evidence": {
+    "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
+    "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+   }
   },
   {
    "task": "Measure an angle with a protractor",
@@ -2465,7 +3074,11 @@
     "angles_lines:measure_angles"
    ],
    "proposal": "protractor_read",
-   "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor"
+   "note": "MC of 4 degree values (\"150°\"), no protractor drawn; MAP reads a protractor",
+   "evidence": {
+    "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
+    "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+   }
   },
   {
    "task": "Draw an angle of a given size",
@@ -2475,7 +3088,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "draw_angles",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
+    "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+   }
   },
   {
    "task": "Additive angles (part + part = whole)",
@@ -2486,7 +3103,11 @@
    "skills": [
     "angles_lines:additive_angles"
    ],
-   "note": "missing part number entry; note sampled \"One part is 292°\" of 360 — odd but valid"
+   "note": "missing part number entry; note sampled \"One part is 292°\" of 360 — odd but valid",
+   "evidence": {
+    "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
+    "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
+   }
   },
   {
    "task": "Classify triangles (sides and angles)",
@@ -2497,7 +3118,11 @@
    "skills": [
     "shapes_classify:classify_triangles"
    ],
-   "note": "MC + click all equilateral"
+   "note": "MC + click all equilateral",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'All rectangles are parallelograms'; 'choose all the quadrilaterals'; 'choose all terms'"
+   }
   },
   {
    "task": "Classify quadrilaterals (hierarchy)",
@@ -2509,7 +3134,11 @@
     "shapes_classify:classify_quads",
     "shapes_classify:hotspot_quads"
    ],
-   "note": "select all categories; hot-spot quads"
+   "note": "select all categories; hot-spot quads",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'All rectangles are parallelograms'; 'choose all the quadrilaterals'; 'choose all terms'"
+   }
   },
   {
    "task": "Lines of symmetry: count and draw",
@@ -2521,7 +3150,11 @@
     "angles_lines:symmetry",
     "angles_lines:place_symmetry_lines"
    ],
-   "note": "count + draw lines (place-symmetry-lines production)"
+   "note": "count + draw lines (place-symmetry-lines production)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
+   }
   },
   {
    "task": "3-D shape properties and nets",
@@ -2534,7 +3167,11 @@
     "shapes_early:count_edges_faces_vertices"
    ],
    "proposal": "shapes_3d_props",
-   "note": "no \"which shape has 5 faces\" property items"
+   "note": "no \"which shape has 5 faces\" property items",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
+   }
   },
   {
    "task": "Coordinates: name and plot a point (Q1)",
@@ -2545,7 +3182,11 @@
    "skills": [
     "coordinates:coordinate_q1"
    ],
-   "note": "coord-input and coord-plot (click to plot) answer types"
+   "note": "coord-input and coord-plot (click to plot) answer types",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
+   }
   },
   {
    "task": "Distance between points / polygon on a grid",
@@ -2557,7 +3198,11 @@
     "coordinates:coord_distance_q1",
     "coordinates:coord_polygon"
    ],
-   "note": "number entry"
+   "note": "number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
+   }
   },
   {
    "task": "Four quadrants problems",
@@ -2570,7 +3215,11 @@
     "coordinates:coordinate_graph"
    ],
    "proposal": "four_quadrants",
-   "note": "naming points only"
+   "note": "naming points only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
+   }
   },
   {
    "task": "Horizontal / vertical lines",
@@ -2580,7 +3229,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "hv_lines",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
+    "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
+   }
   },
   {
    "task": "Reflections / translations on a grid",
@@ -2593,7 +3246,11 @@
     "coordinates:geo_translate"
    ],
    "note": "MC pick the figure; MAP 2-5 rarely; regrade only",
-   "proposal": "reflect_grid"
+   "proposal": "reflect_grid",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "6+ Geometry: 'triangle reflected across the y-axis; coordinates of P'' (Gr5-6 edge)"
+   }
   },
   {
    "task": "Sort and count by category (K)",
@@ -2604,7 +3261,11 @@
    "skills": [
     "comparing:classify_count"
    ],
-   "note": "visual sort and count"
+   "note": "visual sort and count",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'Which object belongs with the group?' sort/categorise"
+   }
   },
   {
    "task": "Read a picture graph (key = 1)",
@@ -2616,7 +3277,11 @@
     "measurement:pictograph_intro",
     "graphs:pictograph"
    ],
-   "note": "kit pictograph cell; how many / how many more"
+   "note": "kit pictograph cell; how many / how many more",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
+   }
   },
   {
    "task": "Picture graph with a key of 2, 5, 10: build",
@@ -2628,7 +3293,11 @@
     "graphs:build_pictograph"
    ],
    "proposal": "pictogram_scale",
-   "note": "build uses each picture = 1"
+   "note": "build uses each picture = 1",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
+   }
   },
   {
    "task": "Read a bar graph: how many, how many more/fewer",
@@ -2640,7 +3309,11 @@
     "measurement:bar_graph_intro",
     "graphs:bar_graph"
    ],
-   "note": "kit bar-graph cell, number entry"
+   "note": "kit bar-graph cell, number entry",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
+   }
   },
   {
    "task": "Build / complete a bar graph",
@@ -2651,7 +3324,11 @@
    "skills": [
     "graphs:build_bar_graph"
    ],
-   "note": "graph-builder answer type (drag bar heights), scale 1"
+   "note": "graph-builder answer type (drag bar heights), scale 1",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
+   }
   },
   {
    "task": "Build a scaled bar graph",
@@ -2663,7 +3340,11 @@
     "graphs:build_bar_graph"
    ],
    "proposal": "bar_graph_scale",
-   "note": "scale 1 only"
+   "note": "scale 1 only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
+   }
   },
   {
    "task": "Read a tally chart",
@@ -2674,7 +3355,11 @@
    "skills": [
     "graphs:tally_chart"
    ],
-   "note": "kit tally cell; how many more, most"
+   "note": "kit tally cell; how many more, most",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
+   }
   },
   {
    "task": "Complete a tally chart from data",
@@ -2686,7 +3371,11 @@
     "graphs:tally_chart"
    ],
    "proposal": "map_tally_build",
-   "note": "read only"
+   "note": "read only",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
+   }
   },
   {
    "task": "Read a table of data",
@@ -2696,7 +3385,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "table_data",
-   "note": "none (tables only inside other items)"
+   "note": "none (tables only inside other items)",
+   "evidence": {
+    "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
+    "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
+   }
   },
   {
    "task": "Make a line plot from measurements",
@@ -2708,7 +3401,11 @@
     "graphs:line_plot_fractions"
    ],
    "proposal": "make_line_plot",
-   "note": "read only"
+   "note": "read only",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
+   }
   },
   {
    "task": "Line plot with fractions: operations (total, difference)",
@@ -2721,7 +3418,11 @@
     "graphs:line_plot_fractions"
    ],
    "proposal": "make_line_plot",
-   "note": "counts at a value and total; few add/subtract-fraction items"
+   "note": "counts at a value and total; few add/subtract-fraction items",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
+   }
   },
   {
    "task": "Line graphs (Gr 5 edge)",
@@ -2731,7 +3432,11 @@
    "status": "missing",
    "skills": [],
    "proposal": "line_graph",
-   "note": "none"
+   "note": "none",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "6+ Data chart: 'graph shows change in price over time; identify intervals' (line graph, Gr5-6 edge)"
+   }
   },
   {
    "task": "Mean / median / mode / range (upper band)",
@@ -2745,7 +3450,170 @@
     "data_analysis:mode",
     "data_analysis:range"
    ],
-   "note": "number entry + click-all"
+   "note": "number entry + click-all",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "6+ Data chart: 'Use the box plot... What is the median?' measures of center"
+   }
+  },
+  {
+   "task": "Heavier / lighter with B&W objects (emoji answer breaks print)",
+   "strand": "Measurement",
+   "ritBand": "141-160",
+   "source": "strand-walk",
+   "status": "exists-regrade",
+   "skills": [
+    "measurement:heavier_lighter_visual"
+   ],
+   "proposal": "map_heavier_lighter_bw",
+   "note": "--dist 200: 200/200 answers are emoji (🍃 40, 🚛 37 ...) - colour glyphs, no B&W line art, no balance scale",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D strand: 'measurement and estimation of ... masses of objects'"
+   }
+  },
+  {
+   "task": "Choose ALL measurements equal to a time (5 h = 300 min = 18,000 s)",
+   "strand": "Measurement",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:unit_conversions"
+   ],
+   "proposal": "map_minutes_to_hours",
+   "note": "--dist 200: 49 'Click ALL measurements equivalent', 0 with hours/minutes/seconds (--n 20 grep: feet, pound, gallon only)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'A flight lasted 5 hours. Choose all measurements equal to 5 hours' multi-select"
+   }
+  },
+  {
+   "task": "Choose ALL expressions that give the volume of a prism",
+   "strand": "Measurement",
+   "ritBand": "221-230",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "area_perimeter:volume"
+   ],
+   "proposal": "map_volume_expressions",
+   "note": "--dist 200: 68 'Find the volume l,w,h', 66 missing edge; 0 select-the-expressions items",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D top band: 'Choose all the expressions that can be used to find the volume' multi-select"
+   }
+  },
+  {
+   "task": "Choose ALL figures that show a line of symmetry",
+   "strand": "Geometry",
+   "ritBand": "191-200",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "angles_lines:symmetry"
+   ],
+   "note": "--dist 200: 57/200 'Click ALL shapes that have a line of symmetry' multi-select",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'Some figures are shown. Choose all the figures that show a line of symmetry'"
+   }
+  },
+  {
+   "task": "Sort shapes into a two-attribute chart (symmetry / acute angle / both)",
+   "strand": "Geometry",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "angles_lines:symmetry",
+    "shapes_classify:classify_quads"
+   ],
+   "proposal": "map_shape_attribute_sort",
+   "note": "symmetry --dist 200: count/click-all only; no skill sorts shapes into a 2-attribute chart",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'Move the shapes to the correct part of the chart' - line of symmetry / acute / both"
+   }
+  },
+  {
+   "task": "Choose ALL terms that describe a set of shapes (squares, parallelograms, quadrilaterals)",
+   "strand": "Geometry",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "shapes_classify:classify_quads"
+   ],
+   "note": "--dist 200: 143/200 'Click ALL categories that apply', rest click-all-<type>; matches MAP multi-select",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 Geometry: 'Choose all the terms that describe the set of shapes' (parallelograms, quadrilaterals)"
+   }
+  },
+  {
+   "task": "Choose ALL objects with six faces (3-D attributes, K-2)",
+   "strand": "Geometry",
+   "ritBand": "171-180",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "shapes_early:count_edges_faces_vertices"
+   ],
+   "proposal": "shapes_3d_props",
+   "note": "count_edges_faces asks one solid's count; no select-all-with-property item",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
+   }
+  },
+  {
+   "task": "Show the change from $1 (drag coins)",
+   "strand": "Measurement",
+   "ritBand": "171-190",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "measurement:money_change"
+   ],
+   "proposal": "map_money_build",
+   "note": "--dist 200: 200/200 'Subtract to find the change' number entry, answers 0.25-1.00; no coin-building",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "K-2 M&D: 'paid with one dollar. Show the change Julia should receive' (coins moved)"
+   }
+  },
+  {
+   "task": "Read a picture graph: who has the most (key = 1)",
+   "strand": "Data & graphing",
+   "ritBand": "171-180",
+   "source": "strand-walk",
+   "status": "exists-ok",
+   "skills": [
+    "graphs:pictograph",
+    "measurement:pictograph_intro"
+   ],
+   "note": "--dist 200 pictograph: totals 'in all' 36, 'fewest' 18+, most/which-category items present; key 2-25 scaled",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: 'Who has the most library books?' picture graph, key = 1 book"
+   }
+  },
+  {
+   "task": "Total from a fraction line plot (sum of lengths)",
+   "strand": "Data & graphing",
+   "ritBand": "211-220",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [
+    "graphs:line_plot_fractions"
+   ],
+   "proposal": "make_line_plot",
+   "note": "--dist 200: 79 total count, 52 mode, 69 how-many-at; 0 ask the total LENGTH (sum of the values)",
+   "evidence": {
+    "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
+    "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
+   }
   }
  ],
  "proposals": {
@@ -3622,10 +4490,10 @@
   "map_share_among": {
    "kind": "option",
    "skill": "division:share_into_groups",
-   "option": "mode \"share among M\"",
-   "name": "Share N Among M Equally (option)",
-   "teaches": "Partitive division: deal N counters one at a time into M circles and write how many in each (the twin of the existing \"groups of\" quotitive form)",
-   "representation": "B&W cell: N counters in a row above M empty outline circles; answer \"___ in each group\" plus the ÷ equation. Screen: drag counters into the circles, then type the number in each",
+   "option": "mode \"share among M\" + response \"drag\"",
+   "name": "Share Among M, and Make Groups by Dragging (option)",
+   "teaches": "Partitive division (deal N counters into M circles, how many in each) beside the existing quotitive form, with an on-screen drag response for both modes",
+   "representation": "Print: B&W boxed cell, N outline counters above M (share) or ring outlines (group); pupil draws them in, writes \"___ in each\" / \"___ groups\" and the ÷ equation. Screen: counters drag into circles/rings that snap; checked when every ring holds the same count, then the pupil types the number (production, not multiple choice)",
    "family": "division",
    "ccss": [
     "3.OA.A.2"
@@ -3634,31 +4502,10 @@
     {
      "strand": "Multiplication & division",
      "ritBand": "181-190",
-     "taskType": "drag to share, number entry"
+     "taskType": "drag objects into groups; number entry"
     }
    ],
-   "why": "share_into_groups deals only \"make groups of k, how many groups\"; MAP also asks \"share N among M\"",
-   "reused": false
-  },
-  "map_groups_drag": {
-   "kind": "option",
-   "skill": "division:share_into_groups",
-   "option": "response \"drag\"",
-   "name": "Make Equal Groups by Dragging (option)",
-   "teaches": "Make the groups on screen by dragging counters into rings, then answer the quotient",
-   "representation": "Paper: unchanged ring-the-groups cell. Screen: counters are draggable into outline rings that snap; checked when every ring holds the same count, then the quotient box opens",
-   "family": "division",
-   "ccss": [
-    "3.OA.A.2"
-   ],
-   "map": [
-    {
-     "strand": "Multiplication & division",
-     "ritBand": "181-190",
-     "taskType": "drag objects into groups"
-    }
-   ],
-   "why": "MAP division items let the pupil drag objects into groups; today the screen form is count-only",
+   "why": "share_into_groups deals only \"make groups of k\" with count-only entry; MAP asks \"share equally, how many each\" and lets pupils drag. Lead ruling: one option, not two.",
    "reused": false
   },
   "map_array_to_eq": {
@@ -3898,30 +4745,6 @@
      "strand": "Fractions & decimals",
      "ritBand": "191-210",
      "taskType": "value of the digit, number entry"
-    }
-   ],
-   "reused": true
-  },
-  "frac_operator": {
-   "ccss": [
-    "5.NF.B.4a"
-   ],
-   "why": "Fraction of an amount beyond sets",
-   "kind": "new",
-   "skill": "fractions:fraction_as_operator",
-   "name": "Fractions as Operators",
-   "teaches": "using a fraction as an operator (2/5 of 30 = 30 ÷ 5 × 2) and seeing that 1/4 of 20 = 20 ÷ 4 = 20 × 1/4",
-   "representation": "a bar model with the operator arrows; write the calculation both ways",
-   "family": "fractions",
-   "steps": [
-    "Y5.B6.S7"
-   ],
-   "source": "WRM_PROPOSALS",
-   "map": [
-    {
-     "strand": "Fractions & decimals",
-     "ritBand": "201-210",
-     "taskType": "number entry"
     }
    ],
    "reused": true
@@ -4423,6 +5246,49 @@
     }
    ],
    "reused": true
+  },
+  "map_div_tens": {
+   "kind": "option",
+   "skill": "division:divide",
+   "option": "divisor \"multiple of 10\" (3-digit ÷ tens, basic fact × 10)",
+   "name": "Divide by Multiples of Ten (option)",
+   "teaches": "Dividing by 10s using the basic fact (360 ÷ 40 = 36 ÷ 4), quotient a whole number",
+   "representation": "Print: B&W boxed cell, horizontal equation with the related fact shown as a faded hint line, one answer box. Screen: same cell, number entry",
+   "family": "division",
+   "ccss": [
+    "4.NBT.B.6"
+   ],
+   "map": [
+    {
+     "strand": "Multiplication & division",
+     "ritBand": "201-210",
+     "taskType": "number entry"
+    }
+   ],
+   "why": "divide deals facts only; MAP places dividing by a multiple of 10 at 201-210",
+   "reused": false
+  },
+  "map_equal_frac_build": {
+   "kind": "option",
+   "skill": "composing:whole_as_fraction",
+   "option": "target \"mixed number\" + response \"digit bank\"",
+   "name": "Fractions Equal to a Mixed Number (option)",
+   "teaches": "Writing several fractions equal to a whole or mixed number (1 1/3 = 4/3 = 8/6) using a digit bank",
+   "representation": "Print: B&W boxed cell, target number then two or three empty fraction frames; pupil writes numerator and denominator. Screen: digit tiles drag into the fraction boxes (MAP move-numbers form), production not choice",
+   "family": "fractions",
+   "ccss": [
+    "4.NF.A.1",
+    "3.NF.A.3c"
+   ],
+   "map": [
+    {
+     "strand": "Fractions & decimals",
+     "ritBand": "221-230",
+     "taskType": "move digits into boxes"
+    }
+   ],
+   "why": "whole_as_fraction writes only n/1 and d/d; MAP asks several equivalents of a mixed number with digit tiles",
+   "reused": false
   },
   "map_symmetry_compare": {
    "kind": "option",
@@ -5695,6 +6561,70 @@
     }
    ],
    "reused": true
+  },
+  "map_heavier_lighter_bw": {
+   "kind": "option",
+   "skill": "measurement:heavier_lighter_visual",
+   "option": "look \"bw\": B&W line-art objects (or a pan balance drawing) instead of emoji; answer is a label",
+   "name": "Heavier or Lighter, B&W pictures (option)",
+   "teaches": "comparing the mass of two objects by experience and on a pan balance",
+   "representation": "print: one boxed cell, two B&W outline objects labelled A and B (or a tipped balance), pupil circles or writes the letter; screen: click the object (production by selection of the object itself, two choices only)",
+   "family": "measurement",
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "141-160",
+     "taskType": "select an object"
+    }
+   ],
+   "why": "200/200 answers are colour emoji, which breaks the B&W print contract; needs re-grade after the redraw",
+   "reused": false
+  },
+  "map_volume_expressions": {
+   "kind": "option",
+   "skill": "area_perimeter:volume",
+   "option": "form \"expressions\": pick every expression that gives the volume (l×w×h, B×h, layers added)",
+   "name": "Volume Expressions (option)",
+   "teaches": "that l×w×h, base area × height and repeated layers all give the volume",
+   "representation": "print: boxed cell with a B&W prism (edges labelled) and 4-5 expressions with check boxes, pupil ticks all that work; screen: multi-select check boxes (MAP's own form)",
+   "family": "measurement",
+   "ccss": [
+    "5.MD.C.5a",
+    "5.MD.C.5b"
+   ],
+   "map": [
+    {
+     "strand": "Measurement",
+     "ritBand": "221-230",
+     "taskType": "multi-select"
+    }
+   ],
+   "why": "MAP's top-band volume item; volume today only computes a number",
+   "reused": false
+  },
+  "map_shape_attribute_sort": {
+   "kind": "new",
+   "skill": "shapes_classify:attribute_sort_chart",
+   "name": "Sort Shapes by Two Attributes",
+   "teaches": "sorting figures by line of symmetry, angle type, or both",
+   "representation": "print: boxed cell, 4-6 B&W figures lettered, a 3-column chart (A only / B only / both) where pupil writes letters; screen: drag letters/figures into chart columns",
+   "family": "geometry",
+   "ccss": [
+    "4.G.A.2",
+    "4.G.A.3"
+   ],
+   "map": [
+    {
+     "strand": "Geometry",
+     "ritBand": "211-220",
+     "taskType": "drag into chart"
+    }
+   ],
+   "why": "MAP 2-5 sample item; no skill sorts by two attributes",
+   "reused": false
   }
  }
 }
