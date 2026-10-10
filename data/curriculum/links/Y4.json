@@ -44,10 +44,6 @@
     {
      "key": "composing:base10_build",
      "why": "Y1.B6.S4 Groups of tens and ones (prior learning wk W11)"
-    },
-    {
-     "key": "composing:teen_compose",
-     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W11)"
     }
    ],
    "preBuild": [],
@@ -209,7 +205,17 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "nl_20",
+     "name": "Numbers on a Number Line (any scale)",
+     "kind": "new skill number_sense:number_line_scales",
+     "teaches": "read the number at an arrow and place numbers on 0-1,000 lines counted in 10s, 50s or 100s with some ticks unlabelled, and estimate on a line with only 0 and 1,000 marked",
+     "closes": "reading the number at a point and lines with intervals other than 10/100; estimating on an unmarked 0-1,000 line",
+     "representation": "a drawn number line with some ticks labelled"
+    }
+   ]
   },
   "Y4.B1.S4": {
    "title": "Thousands",
@@ -278,7 +284,25 @@
      "why": "a digit moving into the thousands place"
     }
    ],
-   "note": "Generated: count_by_powers_of_10 {step:[2]} gave \"Count down by 100,000s\", \"Count up by 1,000,000s\"; no 1,000s within 10,000."
+   "note": "Generated: count_by_powers_of_10 {step:[2]} gave \"Count down by 100,000s\", \"Count up by 1,000,000s\"; no 1,000s within 10,000.",
+   "envision": [
+    {
+     "proposal": "regroup_thousands",
+     "name": "A Thousand Is Ten Hundreds (option)",
+     "kind": "option on composing:base10_regroup",
+     "teaches": "exchange 1 thousand cube for 10 hundred flats and back, and write 1,000 = __ hundreds = __ tens",
+     "closes": "1,000 = 10 hundreds as an exchange",
+     "representation": "one boxed cell: a black-outline thousand cube beside ten flats with an exchange arrow"
+    },
+    {
+     "proposal": "count_50s",
+     "name": "Count in 50s, 100s and 1,000s (option)",
+     "kind": "option on patterns:count_by_step_up",
+     "teaches": "count on and back in 1,000s from any multiple of 1,000 to 10,000 (3,000, 4,000, __)",
+     "closes": "counting in 1,000s within 10,000",
+     "representation": "step values 50, 100 and 1,000 on count_by_step_up / skip_count_line with a base-10 picture support"
+    }
+   ]
   },
   "Y4.B1.S5": {
    "title": "Represent numbers to 10,000",
@@ -345,13 +369,6 @@
      "opts": {
       "band": 9999
      }
-    },
-    {
-     "key": "placevalue:value",
-     "why": "the value of each digit",
-     "opts": {
-      "band": 9999
-     }
     }
    ],
    "note": "Existing partial tags on place_value_disks and pv_digit_drag become full with band 9,999."
@@ -411,13 +428,6 @@
     {
      "key": "placevalue:pv_digit_drag",
      "why": "the parts placed in a place-value chart",
-     "opts": {
-      "band": 9999
-     }
-    },
-    {
-     "key": "placevalue:value",
-     "why": "value of each digit",
      "opts": {
       "band": 9999
      }
@@ -494,7 +504,17 @@
      "why": "exchanging in subtraction is a flexible partition"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "flex_partition",
+     "name": "Partition Numbers Flexibly",
+     "kind": "new skill placevalue:flexible_partition",
+     "teaches": "complete a part-whole model for a 4-digit number split in a non-standard way (3,452 = 2,000 + __ + 52)",
+     "closes": "non-standard partitions of 4-digit numbers into two or more parts, with a part-whole or bar model",
+     "representation": "a part-whole diagram with one part given"
+    }
+   ]
   },
   "Y4.B1.S8": {
    "title": "Find 1, 10, 100, 1,000 more or less",
@@ -515,12 +535,9 @@
    "partial": [
     {
      "key": "placevalue:more_less_10",
-     "missing": "1 more/less and 10 more/less on 4-digit numbers (the skill stops at 120)",
+     "missing": "generated: 1 and 10 more or less, but only to 120 (99 + 1, 86 − 10); never a 4-digit number",
      "opts": {
-      "step": [
-       1,
-       10
-      ]
+      "step": 0
      }
     }
    ],
@@ -547,7 +564,7 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (step before in the block)",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier step in the block)",
      "opts": {
       "band": 9999
      }
@@ -567,7 +584,17 @@
      }
     }
    ],
-   "note": "more_less_100 already offers step 1,000; with it the existing partial tag is full for the 100/1,000 part."
+   "note": "more_less_100 already offers step 1,000; with it the existing partial tag is full for the 100/1,000 part.",
+   "envision": [
+    {
+     "proposal": "more_less_all",
+     "name": "1, 10, 100 or 1,000 More or Less (option)",
+     "kind": "option on placevalue:more_less_100",
+     "teaches": "write 1, 10, 100 or 1,000 more or less than a 4-digit number on one mixed page, including across a boundary (3,995 + 10)",
+     "closes": "1 and 10 more/less of 4-digit numbers and a mixed page of all four steps (1, 10, 100, 1,000), crossing boundaries",
+     "representation": "a \"−n | number | +n\" table cell with one empty box per row"
+    }
+   ]
   },
   "Y4.B1.S9": {
    "title": "Number line to 10,000",
@@ -633,26 +660,37 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "nl_20",
+     "name": "Numbers on a Number Line (any scale)",
+     "kind": "new skill number_sense:number_line_scales",
+     "teaches": "read the number at an arrow on 0-10,000 lines counted in 100s, 500s or 1,000s with some labels missing",
+     "closes": "reading numbers at points and lines counting in 100s, 500s or 1,000s with some labels missing",
+     "representation": "a drawn number line with some ticks labelled"
+    }
+   ]
   },
   "Y4.B1.S10": {
    "title": "Estimate on a number line to 10,000",
    "direct": [],
-   "partial": [],
-   "verdict": "gap",
-   "missing": "estimating where a number sits, and which number is at an arrow, on 0-10,000 lines with only the ends labelled",
-   "build": [
-    "nl_20"
-   ],
-   "pre": [
+   "partial": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (step before in the block)",
+     "missing": "generated: marks 9,700 or 3,500 on a line between two labelled thousands (9,000-10,000); never a whole 0-10,000 line with only the ends labelled, never reads the number at an arrow",
      "opts": {
       "span": 1000,
       "band": 10000
      }
-    },
+    }
+   ],
+   "verdict": "partial",
+   "missing": "estimating on a 0-10,000 line with only the ends labelled (where is 6,500? what is at the arrow?)",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
     {
      "key": "number_sense:place_on_number_line",
      "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W13)",
@@ -686,16 +724,19 @@
       "place": 1000,
       "band": 10000
      }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "comparing estimates",
-     "opts": {
-      "band": 9999
-     }
     }
    ],
-   "note": "place_on_number_line marks a number on a ticked line; estimation on a line with only end labels is not dealt."
+   "note": "",
+   "envision": [
+    {
+     "proposal": "nl_20",
+     "name": "Numbers on a Number Line (any scale)",
+     "kind": "new skill number_sense:number_line_scales",
+     "teaches": "estimate where a number goes, and what number an arrow shows, on a 0-10,000 line with only the ends labelled",
+     "closes": "estimating on a 0-10,000 line with only the ends labelled (where is 6,500? what is at the arrow?)",
+     "representation": "a drawn number line with some ticks labelled"
+    }
+   ]
   },
   "Y4.B1.S11": {
    "title": "Compare numbers to 10,000",
@@ -728,14 +769,14 @@
     },
     {
      "key": "placevalue:place_value_disks",
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S5 Represent numbers to 10,000 (earlier step in the block)",
      "opts": {
       "band": 9999
      }
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S9 Number line to 10,000 (earlier step in the block)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -753,14 +794,6 @@
      "why": "the next step: ordering",
      "opts": {
       "band": 9999
-     }
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "numbers with different numbers of digits",
-     "opts": {
-      "band": 9999,
-      "lengths": "mixed"
      }
     },
     {
@@ -839,9 +872,9 @@
    "direct": [],
    "partial": [],
    "verdict": "gap",
-   "missing": "reading and writing Roman numerals to 100 (I, V, X, L, C), and Roman numerals on clocks",
+   "missing": "reading and writing Roman numerals to 100 (I, V, X, L, C)",
    "build": [
-    "roman_100"
+    "roman_numerals"
    ],
    "pre": [
     {
@@ -856,9 +889,7 @@
      }
     }
    ],
-   "preBuild": [
-    "roman_12"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "placevalue:number_word_names",
@@ -869,7 +900,17 @@
      "why": "Roman numerals are additive like expanded form"
     }
    ],
-   "note": "Non-CCSS (UK only); taught as enrichment in W12."
+   "note": "Beyond CCSS (UK National Curriculum); taught as enrichment in W12. The prior learning \"Y3 Roman numerals to 12\" is band 12 of the same roman_numerals proposal, so it is not a separate preBuild.",
+   "envision": [
+    {
+     "proposal": "roman_numerals",
+     "name": "Roman Numerals",
+     "kind": "new skill placevalue:roman_numerals",
+     "teaches": "band 100: read a Roman numeral to C and write its value, and write a number to 100 in Roman numerals",
+     "closes": "reading and writing Roman numerals to 100 (I, V, X, L, C)",
+     "representation": "one boxed cell: the numeral or the number, a symbol key (I = 1, V = 5 …) as a hint that fades, one answer box"
+    }
+   ]
   },
   "Y4.B1.S14": {
    "title": "Round to the nearest 10",
@@ -883,7 +924,9 @@
     },
     {
      "key": "number_sense:nearest_10",
-     "opts": {}
+     "opts": {
+      "band": 1000
+     }
     }
    ],
    "partial": [],
@@ -896,23 +939,19 @@
      "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster)"
     },
     {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W12)",
-     "opts": {
-      "span": 10,
-      "band": 1000
-     }
-    },
-    {
      "key": "placevalue:more_less_10",
      "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W12)"
     },
     {
+     "key": "number_sense:nearest_10",
+     "why": "Y3.B1.S10 Number line to 1,000 (lower grade, same CCSS cluster)"
+    },
+    {
      "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W12)",
+     "why": "Y3.B1.S10 Number line to 1,000 (prior learning wk W12)",
      "opts": {
-      "span": 1000,
-      "band": 10000
+      "span": 100,
+      "band": 1000
      }
     }
    ],
@@ -934,7 +973,7 @@
      }
     }
    ],
-   "note": "Generated: rounding_visual {place:10, band:1000} rounds 3-digit numbers (272 → 270); nearest_10 deals 2-digit numbers, the review form."
+   "note": "Generated: rounding_visual {place:10, band:1000} and nearest_10 {band:1000} round 3-digit numbers (981 → 980, 295 → 300, 899 → 900)."
   },
   "Y4.B1.S15": {
    "title": "Round to the nearest 100",
@@ -1034,7 +1073,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y4.B1.S9 Number line to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S9 Number line to 10,000 (earlier step in the block)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -1050,7 +1089,7 @@
     },
     {
      "key": "placevalue:compare",
-     "why": "Y4.B1.S11 Compare numbers to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (earlier step in the block)",
      "opts": {
       "band": 9999
      }
@@ -1099,11 +1138,11 @@
     },
     {
      "key": "number_sense:nearest_100",
-     "why": "Y4.B1.S15 Round to the nearest 100 (step before in the block)"
+     "why": "Y4.B1.S15 Round to the nearest 100 (earlier step in the block)"
     },
     {
      "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (step before in the block)"
+     "why": "Y4.B1.S14 Round to the nearest 10 (earlier step in the block)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -1201,7 +1240,17 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "add_sub_place_units",
+     "name": "Add and Subtract 1s, 10s, 100s and 1,000s (option)",
+     "kind": "option on addition:add_sub_100s",
+     "teaches": "add or subtract a multiple of 1, 10, 100 or 1,000 to a 4-digit number (3,452 + 300), with a place-value chart showing the one column that changes",
+     "closes": "adding and subtracting multiples of 1, 10, 100 and 1,000 to and from 4-digit numbers, including crossing a boundary",
+     "representation": "equation cell (3,452 + 300 = □) with an optional place-value chart above it, the changing column outlined in black"
+    }
+   ]
   },
   "Y4.B2.S2": {
    "title": "Add up to two 4-digit numbers - no exchange",
@@ -1230,7 +1279,7 @@
     },
     {
      "key": "placevalue:expand",
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S6 Partition numbers to 10,000 (earlier block this year)",
      "opts": {
       "band": 9999
      }
@@ -1313,7 +1362,17 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "exchange_count_add",
+     "name": "How Many Exchanges? Addition (option)",
+     "kind": "option on addition:add_10k_regroup",
+     "teaches": "set exchanges \"exactly one\": add two 4-digit numbers in columns where exactly one column exchanges",
+     "closes": "a page where every item has exactly one exchange (in any one column)",
+     "representation": "the existing stack cell with regroup boxes (structural, every level)"
+    }
+   ]
   },
   "Y4.B2.S4": {
    "title": "Add two 4-digit numbers - more than one exchange",
@@ -1365,7 +1424,17 @@
      "why": "word problems"
     }
    ],
-   "note": "Existing tag lists add_10k_regroup as full for S3 and S4; it is partial for both until the exchange-count option exists."
+   "note": "Existing tag lists add_10k_regroup as full for S3 and S4; it is partial for both until the exchange-count option exists.",
+   "envision": [
+    {
+     "proposal": "exchange_count_add",
+     "name": "How Many Exchanges? Addition (option)",
+     "kind": "option on addition:add_10k_regroup",
+     "teaches": "set exchanges \"two or more\": add two 4-digit numbers in columns with two or more exchanges, including a chain (2,999 + 1,001)",
+     "closes": "a page where every item has two or more exchanges (including a chain such as 2,999 + 1)",
+     "representation": "the existing stack cell with regroup boxes (structural, every level)"
+    }
+   ]
   },
   "Y4.B2.S5": {
    "title": "Subtract two 4-digit numbers - no exchange",
@@ -1390,11 +1459,7 @@
     },
     {
      "key": "addition:add_10k_no_regroup",
-     "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "subtraction:sub_10_mixed",
-     "why": "Y1.B2.S15 Subtraction - take away (How many left ) (prior learning wk W15)"
+     "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -1461,26 +1526,36 @@
      "why": "word problems"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "exchange_count_sub",
+     "name": "How Many Exchanges? Subtraction (option)",
+     "kind": "option on subtraction:sub_10k_regroup",
+     "teaches": "set exchanges \"exactly one\": subtract two 4-digit numbers in columns where exactly one column exchanges",
+     "closes": "a page where every item has exactly one exchange",
+     "representation": "the existing stack cell with exchange boxes"
+    }
+   ]
   },
   "Y4.B2.S7": {
    "title": "Subtract two 4-digit numbers - more than one exchange",
-   "direct": [
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "missing": "generated items mix one and several exchanges (5,710 − 2,907 has one, 4,266 − 2,398 three); a page cannot be held to two or more"
+    },
     {
      "key": "subtraction:sub_across_zeros",
+     "missing": "generated: only exchanges across zeros, and half the items are 3-digit (900 − 205, 800 − 351, 801 − 427)",
      "opts": {
       "band": 10000
      }
     }
    ],
-   "partial": [
-    {
-     "key": "subtraction:sub_10k_regroup",
-     "missing": "items cannot be held to MORE THAN ONE exchange"
-    }
-   ],
    "verdict": "partial",
-   "missing": "two or more exchanges in numbers without zeros (5,342 − 2,868)",
+   "missing": "a page where every item is two 4-digit numbers with two or more exchanges, including numbers without zeros (5,342 − 2,868)",
    "build": [
     "exchange_count_sub"
    ],
@@ -1524,7 +1599,17 @@
      "why": "a mental alternative (Y4.B2.S8)"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "exchange_count_sub",
+     "name": "How Many Exchanges? Subtraction (option)",
+     "kind": "option on subtraction:sub_10k_regroup",
+     "teaches": "set exchanges \"two or more\": subtract two 4-digit numbers with two or more exchanges, with and without zeros (5,342 − 2,868; 4,003 − 1,467)",
+     "closes": "a page where every item is two 4-digit numbers with two or more exchanges, including numbers without zeros (5,342 − 2,868)",
+     "representation": "the existing stack cell with exchange boxes"
+    }
+   ]
   },
   "Y4.B2.S8": {
    "title": "Efficient subtraction",
@@ -1584,7 +1669,25 @@
      "why": "counting on is the inverse"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "mental_add_sub",
+     "name": "Mental Addition and Subtraction",
+     "kind": "new skill addition:mental_strategies",
+     "teaches": "choose and use the quickest method for a 4-digit subtraction (count on for 4,002 − 3,997, constant difference, compensate) and say why",
+     "closes": "choosing an efficient method for 4-digit subtraction: counting on, constant difference, compensating, column",
+     "representation": "a strategy prompt (round and adjust) beside each calculation"
+    },
+    {
+     "proposal": "vis_strategy_pictures",
+     "name": "Strategy Pictures: Doubles and Constant Difference",
+     "kind": "visual option on patterns:double, patterns:halve, number_sense:doubles_near_doubles",
+     "teaches": "see the constant-difference shift as two short number lines with matching hops",
+     "closes": "the picture of a constant-difference shift",
+     "representation": "two short number lines with matching hops"
+    }
+   ]
   },
   "Y4.B2.S9": {
    "title": "Estimate answers",
@@ -1610,11 +1713,11 @@
    "pre": [
     {
      "key": "number_sense:nearest_1000",
-     "why": "Y4.B1.S16 Round to the nearest 1,000 (lower grade, same CCSS cluster)"
+     "why": "Y4.B1.S16 Round to the nearest 1,000 (earlier block this year)"
     },
     {
      "key": "number_sense:nearest_100",
-     "why": "Y4.B1.S15 Round to the nearest 100 (lower grade, same CCSS cluster)"
+     "why": "Y4.B1.S15 Round to the nearest 100 (earlier block this year)"
     },
     {
      "key": "number_sense:estimate_sum",
@@ -1679,11 +1782,11 @@
     },
     {
      "key": "addition:add_10k_regroup",
-     "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (lower grade, same CCSS cluster)"
+     "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (earlier step in the block)"
     },
     {
      "key": "subtraction:sub_10k_regroup",
-     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (lower grade, same CCSS cluster)"
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -1701,7 +1804,17 @@
      "why": "the bar model that shows why the inverse works"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "inverse_check",
+     "name": "Inverse Operations (option)",
+     "kind": "option on subtraction:sub_check_by_adding",
+     "teaches": "check a 4-digit addition by subtracting and a subtraction by adding, and check an answer by estimating",
+     "closes": "using the inverse to check 4-digit additions and subtractions both ways, and estimating to check",
+     "representation": "band option to 1,000,000 and an \"addition checked by subtracting\" variant"
+    }
+   ]
   },
   "Y4.B3.S1": {
    "title": "What is area",
@@ -1763,7 +1876,17 @@
      "why": "area by multiplying, the Grade 3 build that follows"
     }
    ],
-   "note": "area_unit_squares counts squares; the \"what is area\" comparing idea is in the area_compare proposal."
+   "note": "area_unit_squares counts squares; the \"what is area\" comparing idea is in the area_compare proposal.",
+   "envision": [
+    {
+     "proposal": "area_compare",
+     "name": "Make and Compare Areas",
+     "kind": "new skill area_perimeter:compare_areas",
+     "teaches": "compare two surfaces by covering them with squares, and say which covers more",
+     "closes": "area as the amount of surface covered: comparing two surfaces by covering, and why squares (not circles) tile",
+     "representation": "two shapes on squared paper"
+    }
+   ]
   },
   "Y4.B3.S2": {
    "title": "Count squares",
@@ -1812,7 +1935,17 @@
      "why": "count rows of squares"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "area_half_squares",
+     "name": "Count Squares and Half Squares (option)",
+     "kind": "option on area_perimeter:area_unit_squares",
+     "teaches": "count the area of a shape on a grid where some squares are cut in half (two halves make one square)",
+     "closes": "counting squares where shapes include half squares (two halves make one)",
+     "representation": "black-line square grid in the boxed cell"
+    }
+   ]
   },
   "Y4.B3.S3": {
    "title": "Make shapes",
@@ -1840,13 +1973,6 @@
     {
      "key": "multiplication:arrays_groups",
      "why": "Y3.B3.S2 Use arrays (prior learning wk W18)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y1.B1.S13 Compare numbers (lower grade, same CCSS cluster)",
-     "opts": {
-      "band": 99
-     }
     }
    ],
    "preBuild": [],
@@ -1864,7 +1990,17 @@
      "why": "rectangles with the same area are factor pairs (Y4.B5.S1)"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "area_compare",
+     "name": "Make and Compare Areas",
+     "kind": "new skill area_perimeter:compare_areas",
+     "teaches": "make two or more different rectilinear shapes from the same number of squares on a grid and write the area of each",
+     "closes": "making several different rectilinear shapes with a given number of squares (area stays the same)",
+     "representation": "two shapes on squared paper"
+    }
+   ]
   },
   "Y4.B3.S4": {
    "title": "Compare areas",
@@ -1878,18 +2014,11 @@
    "pre": [
     {
      "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (step before in the block)"
+     "why": "Y4.B3.S2 Count squares (earlier step in the block)"
     },
     {
      "key": "shapes_early:compose_rect_from_squares",
      "why": "Y4.B3.S3 Make shapes (step before in the block)"
-    },
-    {
-     "key": "placevalue:compare",
-     "why": "Y1.B1.S13 Compare numbers (prior learning wk W19)",
-     "opts": {
-      "band": 99
-     }
     },
     {
      "key": "comparing:compare_groups",
@@ -1911,7 +2040,17 @@
      "why": "compare perimeters on the same shapes"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "area_compare",
+     "name": "Make and Compare Areas",
+     "kind": "new skill area_perimeter:compare_areas",
+     "teaches": "count the squares in two or three shapes, write which has the greater area and by how much",
+     "closes": "comparing and ordering the areas of shapes by counting squares (which is larger, by how much)",
+     "representation": "two shapes on squared paper"
+    }
+   ]
   },
   "Y4.B4.S1": {
    "title": "Multiples of 3",
@@ -1981,15 +2120,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "multiplication:mult_facts",
-     "why": "the 3 times-table facts",
-     "opts": {
-      "constant": [
-       3
-      ]
-     }
-    },
     {
      "key": "number_theory:multiples",
      "why": "multiples of other numbers (no table option: it mixes 6, 7, 8 …)"
@@ -2106,10 +2236,6 @@
    "title": "6 times-table and division facts",
    "direct": [
     {
-     "key": "multiplication:mult_div_fact_family",
-     "opts": {}
-    },
-    {
      "key": "multiplication:mult_facts",
      "opts": {
       "constant": [
@@ -2194,9 +2320,13 @@
     {
      "key": "multiplication:mult_chart_easy",
      "why": "missing products on the chart"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 6s"
     }
    ],
-   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+   "note": "Direct: mult_facts and div_facts with constant [6] (generated: every item is a 6× or ÷6 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
   },
   "Y4.B4.S4": {
    "title": "Multiply and divide by 9",
@@ -2265,10 +2395,6 @@
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
     },
     {
-     "key": "number_theory:multiples",
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y4.B4.S3 6 times-table and division facts (step before in the block)",
      "opts": {
@@ -2302,10 +2428,6 @@
   "Y4.B4.S5": {
    "title": "9 times-table and division facts",
    "direct": [
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "opts": {}
-    },
     {
      "key": "multiplication:mult_facts",
      "opts": {
@@ -2391,9 +2513,13 @@
     {
      "key": "multiplication:mult_chart_easy",
      "why": "missing products on the chart"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 9s"
     }
    ],
-   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+   "note": "Direct: mult_facts and div_facts with constant [9] (generated: every item is a 9× or ÷9 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
   },
   "Y4.B4.S6": {
    "title": "The 3, 6 and 9 times-tables",
@@ -2429,7 +2555,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S3 6 times-table and division facts (step before in the block)",
+     "why": "Y4.B4.S3 6 times-table and division facts (earlier step in the block)",
      "opts": {
       "constant": [
        6
@@ -2476,7 +2602,17 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "tables_links",
+     "name": "Related Times-Tables",
+     "kind": "new skill multiplication:related_tables",
+     "teaches": "use a known 3× fact to find the 6× fact (double) and the 9× fact (triple), and ring the multiples the tables share",
+     "closes": "using the 3 times-table to find 6 and 9 facts (doubling, tripling) and spotting the shared multiples",
+     "representation": "a three-column table with the known table given"
+    }
+   ]
   },
   "Y4.B4.S7": {
    "title": "Multiply and divide by 7",
@@ -2543,13 +2679,6 @@
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
     },
     {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W02)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y1.B9.S5 Add equal groups (prior learning wk W02)"
     },
@@ -2589,10 +2718,6 @@
   "Y4.B4.S8": {
    "title": "7 times-table and division facts",
    "direct": [
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "opts": {}
-    },
     {
      "key": "multiplication:mult_facts",
      "opts": {
@@ -2652,13 +2777,6 @@
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)"
     },
     {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y1.B9.S5 Add equal groups (prior learning wk W03)"
     }
@@ -2683,17 +2801,17 @@
     {
      "key": "multiplication:mult_chart_easy",
      "why": "missing products on the chart"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 7s"
     }
    ],
-   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+   "note": "Direct: mult_facts and div_facts with constant [7] (generated: every item is a 7× or ÷7 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
   },
   "Y4.B4.S9": {
    "title": "11 times-table and division facts",
    "direct": [
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "opts": {}
-    },
     {
      "key": "multiplication:mult_facts",
      "opts": {
@@ -2740,13 +2858,6 @@
       "constant": [
        1
       ]
-     }
-    },
-    {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
-     "opts": {
-      "band": 99
      }
     },
     {
@@ -2788,17 +2899,17 @@
     {
      "key": "division:div_word_problems",
      "why": "division stories"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 11s"
     }
    ],
-   "note": "The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4."
+   "note": "Direct: mult_facts and div_facts with constant [11] (generated: every item is a 11× or ÷11 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2). The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4. The owner's tables_to_15 build (13-15 tables) is the next step up; no Y4 step asks for it."
   },
   "Y4.B4.S10": {
    "title": "12 times-table and division facts",
    "direct": [
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "opts": {}
-    },
     {
      "key": "multiplication:mult_facts",
      "opts": {
@@ -2848,13 +2959,6 @@
      }
     },
     {
-     "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
-     "opts": {
-      "band": 99
-     }
-    },
-    {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
      "opts": {
@@ -2865,7 +2969,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S8 7 times-table and division facts (step before in the block)",
+     "why": "Y4.B4.S8 7 times-table and division facts (earlier step in the block)",
      "opts": {
       "constant": [
        7
@@ -2874,7 +2978,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S3 6 times-table and division facts (lower grade, same CCSS cluster)",
+     "why": "Y4.B4.S3 6 times-table and division facts (earlier step in the block)",
      "opts": {
       "constant": [
        6
@@ -2906,9 +3010,13 @@
     {
      "key": "division:div_word_problems",
      "why": "division stories"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 12s"
     }
    ],
-   "note": "The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4."
+   "note": "Direct: mult_facts and div_facts with constant [12] (generated: every item is a 12× or ÷12 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2). The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4. The owner's tables_to_15 build (13-15 tables) is the next step up; no Y4 step asks for it."
   },
   "Y4.B4.S11": {
    "title": "Multiply by 1 and 0",
@@ -3049,7 +3157,17 @@
      "why": "4/4 = 1 is n ÷ n = 1 in fraction form"
     }
    ],
-   "note": "mult_properties is tagged here today as partial; the existing proposal mult_three also lists this step, which looks like a numbering slip (owner question)."
+   "note": "mult_properties is tagged here today as partial; the existing proposal mult_three also lists this step, which looks like a numbering slip (owner question).",
+   "envision": [
+    {
+     "proposal": "div_by_itself",
+     "name": "Divide by 1 and by Itself (option)",
+     "kind": "option on division:div_facts",
+     "teaches": "solve n ÷ 1 = __ and n ÷ n = __ from a sharing picture, then as facts only",
+     "closes": "dividing a number by itself (n ÷ n = 1) alongside n ÷ 1 = n, with sharing pictures",
+     "representation": "equation cell 7 ÷ 7 = □ with an optional row of dots ringed into one group / seven groups (hint scaffold that fades)"
+    }
+   ]
   },
   "Y4.B4.S13": {
    "title": "Multiply three numbers",
@@ -3072,7 +3190,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (step before in the block)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier step in the block)"
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3094,7 +3212,17 @@
      "why": "factor pairs inside the product"
     }
    ],
-   "note": "mult_three teaches exactly this step."
+   "note": "mult_three teaches exactly this step.",
+   "envision": [
+    {
+     "proposal": "mult_three",
+     "name": "Multiply Three Numbers",
+     "kind": "new skill multiplication:multiply_three_numbers",
+     "teaches": "multiply three 1-digit numbers, choosing which two to multiply first (2 × 7 × 5 = 10 × 7)",
+     "closes": "multiplying three 1-digit numbers, choosing the order (associative property: 2 × 5 × 7 = 10 × 7)",
+     "representation": "three-factor expressions with a bracket prompt to choose the easy pair first"
+    }
+   ]
   },
   "Y4.B5.S1": {
    "title": "Factor pairs",
@@ -3127,7 +3255,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "division:share_into_groups",
@@ -3222,7 +3350,17 @@
      }
     }
    ],
-   "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form."
+   "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form.",
+   "envision": [
+    {
+     "proposal": "factor_pair_strategy",
+     "name": "Use Factor Pairs to Multiply (option)",
+     "kind": "option on multiplication:mult_properties",
+     "teaches": "replace one factor by a factor pair to make the product easy (14 × 5 = 7 × 2 × 5 = 7 × 10)",
+     "closes": "using a factor pair to multiply mentally (14 × 5 = 7 × 2 × 5 = 7 × 10)",
+     "representation": "equation chain cell: 14 × 5 = □ × □ × 5 = □ × 10 = □, boxes in a row"
+    }
+   ]
   },
   "Y4.B5.S3": {
    "title": "Multiply by 10",
@@ -3372,15 +3510,6 @@
        1
       ]
      }
-    },
-    {
-     "key": "multiplication:mult_zeros",
-     "why": "multiples of ten (Y4.B5.S7)",
-     "opts": {
-      "forms": [
-       2
-      ]
-     }
     }
    ],
    "note": ""
@@ -3406,7 +3535,7 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S3 Multiply by 10 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S3 Multiply by 10 (earlier step in the block)",
      "opts": {
       "op": "x",
       "power": [
@@ -3449,17 +3578,6 @@
       "forms": [
        0
       ]
-     }
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "later: dividing a 1-digit number by 10 (Y4.B8.S5)",
-     "opts": {
-      "op": "/",
-      "power": [
-       10
-      ],
-      "decimals": true
      }
     }
    ],
@@ -3510,7 +3628,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S4 Multiply by 100 (earlier step in the block)",
      "opts": {
       "op": "x",
       "power": [
@@ -3529,17 +3647,6 @@
       "forms": [
        1
       ]
-     }
-    },
-    {
-     "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S10 divides 1- and 2-digit numbers by 100",
-     "opts": {
-      "op": "/",
-      "power": [
-       100
-      ],
-      "decimals": true
      }
     }
    ],
@@ -3567,7 +3674,7 @@
    "pre": [
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S4 Multiply by 100 (step before in the block)",
+     "why": "Y4.B5.S4 Multiply by 100 (earlier step in the block)",
      "opts": {
       "forms": [
        0,
@@ -3607,7 +3714,17 @@
      "why": "multiples of ten used to estimate"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "scaled_fact_family",
+     "name": "Related Facts Times Ten (option)",
+     "kind": "option on multiplication:mult_zeros",
+     "teaches": "from 3 × 4 = 12, write the related facts scaled by 10: 30 × 4 = 120, 120 ÷ 4 = 30, 120 ÷ 30 = 4",
+     "closes": "writing the related multiplication and division facts from one known fact scaled by 10 (3 × 4 = 12 so 30 × 4 = 120, 120 ÷ 4 = 30, 120 ÷ 30 = 4)",
+     "representation": "a known-fact box at the top of the cell, then three equations with one answer box each"
+    }
+   ]
   },
   "Y4.B5.S8": {
    "title": "Informal written methods for multiplication",
@@ -3684,7 +3801,25 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "informal_mult",
+     "name": "Partition to Multiply",
+     "kind": "new skill multiplication:partition_multiply",
+     "teaches": "multiply a 2-digit by a 1-digit number by partitioning (23 × 4 = 20 × 4 + 3 × 4) and add the parts",
+     "closes": "informal written multiplication by partitioning shown with place-value counters (23 × 4 = 20 × 4 + 3 × 4)",
+     "representation": "a part-whole or grid model with the partial products to fill"
+    },
+    {
+     "proposal": "vis_array_options",
+     "name": "Array Options (split, hidden, place-value counters, three factors)",
+     "kind": "visual option on multiplication:dot_array_mult, multiplication:mult_chart, multiplication:multiply_three_numbers",
+     "teaches": "see the partition as place-value counters in an array split into tens and ones",
+     "closes": "the place-value-counter array picture",
+     "representation": "an array of place-value counters split into tens and ones"
+    }
+   ]
   },
   "Y4.B5.S9": {
    "title": "Multiply a 2-digit number by a 1-digit number",
@@ -3718,7 +3853,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "placevalue:expand",
@@ -3792,7 +3927,7 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S4 Multiply by 100 (earlier step in the block)",
      "opts": {
       "forms": [
        1
@@ -3823,13 +3958,12 @@
   },
   "Y4.B5.S11": {
    "title": "Divide a 2-digit number by a 1-digit number (1)",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "division:area_model_div_2by1",
-     "opts": {}
-    }
-   ],
-   "partial": [
+     "missing": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to no exchange"
+    },
     {
      "key": "division:divide",
      "missing": "generated items mix no-exchange (88 ÷ 2) with exchange (76 ÷ 4, 96 ÷ 4)",
@@ -3891,17 +4025,26 @@
      "why": "division on a number line"
     }
    ],
-   "note": "area_model_div_2by1 is the WRM partition picture; it is direct for the method but the page cannot be held to no exchange either."
+   "note": "Generated: area_model_div_2by1, divide {tiles:21} and box_division_easy all mix exchange and no-exchange items; div_exchange is one shared option on the three.",
+   "envision": [
+    {
+     "proposal": "div_exchange",
+     "name": "Division With or Without an Exchange (option)",
+     "kind": "option on division:divide",
+     "teaches": "set exchange \"none\": divide a 2-digit number by a 1-digit number where no ten is exchanged (84 ÷ 4, 69 ÷ 3)",
+     "closes": "a page held to no exchange (84 ÷ 4, 69 ÷ 3)",
+     "representation": "the existing bus-stop/bracket cell with the exchange box"
+    }
+   ]
   },
   "Y4.B5.S12": {
    "title": "Divide a 2-digit number by a 1-digit number (2)",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "division:area_model_div_2by1",
-     "opts": {}
-    }
-   ],
-   "partial": [
+     "missing": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to an exchange of a ten"
+    },
     {
      "key": "division:divide",
      "missing": "exchange items appear (76 ÷ 4) but mixed with no-exchange items",
@@ -3953,7 +4096,17 @@
      "why": "is the remainder finished?"
     }
    ],
-   "note": "Generated: divide {regroup:\"always\"} gives a remainder on every item, so \"regroup\" is the remainder option, not the exchange."
+   "note": "Generated: area_model_div_2by1, divide {tiles:21} and box_division_easy all mix exchange and no-exchange items; div_exchange is one shared option on the three.",
+   "envision": [
+    {
+     "proposal": "div_exchange",
+     "name": "Division With or Without an Exchange (option)",
+     "kind": "option on division:divide",
+     "teaches": "set exchange \"in the tens\": divide a 2-digit number by a 1-digit number exchanging one ten, no remainder (52 ÷ 4)",
+     "closes": "a page held to an exchange of a ten with no remainder (52 ÷ 4, 72 ÷ 3)",
+     "representation": "the existing bus-stop/bracket cell with the exchange box"
+    }
+   ]
   },
   "Y4.B5.S13": {
    "title": "Divide a 3-digit number by a 1-digit number",
@@ -3999,7 +4152,7 @@
     },
     {
      "key": "multiplication:multiply",
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (earlier step in the block)",
      "opts": {
       "tiles": 31
      }
@@ -4038,7 +4191,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "multiplication:mult_word_problems",
@@ -4062,7 +4215,17 @@
      "why": "reasoning with two quantities"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "correspondence",
+     "name": "Correspondence Problems",
+     "kind": "new skill multiplication:correspondence_problems",
+     "teaches": "find how many combinations n items make with m items (3 shirts × 4 hats) by listing them in a table, then multiplying",
+     "closes": "correspondence problems: how many combinations of n items with m items (3 shirts × 4 hats) using lists and tables",
+     "representation": "a table or tree diagram to complete, then the multiplication"
+    }
+   ]
   },
   "Y4.B5.S15": {
    "title": "Efficient multiplication",
@@ -4082,11 +4245,11 @@
    "pre": [
     {
      "key": "number_theory:factor_links_easy",
-     "why": "Y4.B5.S2 Use factor pairs (step before in the block)"
+     "why": "Y4.B5.S2 Use factor pairs (earlier step in the block)"
     },
     {
      "key": "multiplication:multiply",
-     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (step before in the block)",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (earlier step in the block)",
      "opts": {
       "tiles": 21
      }
@@ -4115,7 +4278,25 @@
      "why": "estimate to check"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "tables_links",
+     "name": "Related Times-Tables",
+     "kind": "new skill multiplication:related_tables",
+     "teaches": "use a near multiple or a double to multiply (9 × 7 = 10 × 7 − 7; 8 × 6 = double 4 × 6)",
+     "closes": "doubling and near multiples",
+     "representation": "a three-column table with the known table given"
+    },
+    {
+     "proposal": "factor_pair_strategy",
+     "name": "Use Factor Pairs to Multiply (option)",
+     "kind": "option on multiplication:mult_properties",
+     "teaches": "use a factor pair when it is the quickest way (16 × 5 = 8 × 10)",
+     "closes": "factor pairs as a choice",
+     "representation": "equation chain cell: 14 × 5 = □ × □ × 5 = □ × 10 = □, boxes in a row"
+    }
+   ]
   },
   "Y4.B6.S1": {
    "title": "Measure in kilometres and metres",
@@ -4156,7 +4337,7 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S4 Multiply by 100 (earlier block this year)",
      "opts": {
       "forms": [
        1
@@ -4187,7 +4368,17 @@
      }
     }
    ],
-   "note": "School teaches this as enrichment (W36)."
+   "note": "School teaches this as enrichment (W36).",
+   "envision": [
+    {
+     "proposal": "km_m",
+     "name": "Kilometres and Metres (option)",
+     "kind": "option on measurement:length_metric",
+     "teaches": "choose km or m for a distance, and write a route length as km and m (2 km 300 m) from a map",
+     "closes": "a sense of 1 km (distances on a map or route), writing mixed km and m measures, and choosing the unit",
+     "representation": "mixed-unit answer option"
+    }
+   ]
   },
   "Y4.B6.S2": {
    "title": "Equivalent lengths (kilometres and metres)",
@@ -4234,7 +4425,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S6 Divide by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S6 Divide by 100 (earlier block this year)",
      "opts": {
       "op": "/",
       "power": [
@@ -4259,7 +4450,17 @@
      "why": "other conversions"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "km_m",
+     "name": "Kilometres and Metres (option)",
+     "kind": "option on measurement:length_metric",
+     "teaches": "convert km to m and back, including 500 m = 1/2 km and mixed measures (2 km 300 m = 2,300 m)",
+     "closes": "converting both ways between km and m, including 500 m = 1/2 km and mixed measures",
+     "representation": "mixed-unit answer option"
+    }
+   ]
   },
   "Y4.B6.S3": {
    "title": "Perimeter on a grid",
@@ -4280,7 +4481,7 @@
     },
     {
      "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (lower grade, same CCSS cluster)"
+     "why": "Y4.B3.S2 Count squares (earlier block this year)"
     },
     {
      "key": "counting:count_objects",
@@ -4455,7 +4656,7 @@
     },
     {
      "key": "area_perimeter:perimeter",
-     "why": "Y4.B6.S4 Perimeter of a rectangle (step before in the block)",
+     "why": "Y4.B6.S4 Perimeter of a rectangle (earlier step in the block)",
      "opts": {
       "forms": [
        1
@@ -4478,7 +4679,17 @@
      "why": "the subtraction used"
     }
    ],
-   "note": "composite_shapes asks only for the perimeter; it never asks for the missing side by itself."
+   "note": "composite_shapes asks only for the perimeter; it never asks for the missing side by itself.",
+   "envision": [
+    {
+     "proposal": "missing_lengths",
+     "name": "Missing Lengths in Rectilinear Shapes",
+     "kind": "new skill area_perimeter:rectilinear_missing_sides",
+     "teaches": "find a missing side of a rectilinear shape from the opposite sides (the two short sides add to the long one)",
+     "closes": "finding a missing side length of a rectilinear shape from the opposite sides (the two short sides add to the long side)",
+     "representation": "an L or T shape with some sides labelled"
+    }
+   ]
   },
   "Y4.B6.S7": {
    "title": "Calculate the perimeter of rectilinear shapes",
@@ -4533,7 +4744,17 @@
      "why": "mixed review"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "missing_lengths",
+     "name": "Missing Lengths in Rectilinear Shapes",
+     "kind": "new skill area_perimeter:rectilinear_missing_sides",
+     "teaches": "find the missing sides of a rectilinear shape first, then its perimeter",
+     "closes": "calculating the perimeter when some side lengths are not given and must be found first",
+     "representation": "an L or T shape with some sides labelled"
+    }
+   ]
   },
   "Y4.B6.S8": {
    "title": "Perimeter of regular polygons",
@@ -4562,7 +4783,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
@@ -4570,7 +4791,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     }
    ],
    "preBuild": [],
@@ -4588,36 +4809,68 @@
      "why": "equal sides as equal groups"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "regular_polygon",
+     "name": "Perimeter of Regular Polygons (option)",
+     "kind": "option on area_perimeter:perimeter",
+     "teaches": "find the perimeter of a regular polygon from one marked side (5 sides of 7 cm = 35 cm), and the side from the perimeter",
+     "closes": "perimeter as side × number of sides, and the side from the perimeter",
+     "representation": "a polygon-type option on the perimeter skill"
+    },
+    {
+     "proposal": "polygons",
+     "name": "Regular and Irregular Polygons",
+     "kind": "new skill shapes_classify:regular_irregular_polygons",
+     "teaches": "tell whether a polygon is regular, so one side is enough",
+     "closes": "knowing a shape is regular",
+     "representation": "polygon line drawings"
+    }
+   ]
   },
   "Y4.B6.S9": {
    "title": "Perimeter of polygons",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "area_perimeter:perimeter_intro",
-     "opts": {}
+     "missing": "generated: triangles, rectangles and squares only (7 + 7 + 5, 9 + 8 + 9 + 8); no pentagon, hexagon or irregular polygon"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "perimeter of polygons with 5 or more sides, regular and irregular, from their side lengths",
+   "build": [
+    "regular_polygon"
+   ],
    "pre": [
     {
-     "key": "addition:add_column_multi",
-     "why": "Y3.B5.S8 Add lengths (lower grade, same CCSS cluster)"
+     "key": "area_perimeter:perimeter",
+     "why": "Y3.B5.S12 Calculate perimeter (prior learning wk W21)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "area_perimeter:perimeter_intro",
+     "why": "Y4.B6.S8 Perimeter of regular polygons (step before in the block)",
+     "opts": {
+      "labels": "some"
+     }
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "Y2/Gr.1 Count sides and vertices on 2D shapes (lower grade)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "adding several side lengths in turn (Grade 1, 1.OA.A.2)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "area_perimeter:perimeter",
-     "why": "rectangles"
-    },
     {
      "key": "area_perimeter:composite_shapes",
      "why": "rectilinear shapes"
@@ -4627,7 +4880,17 @@
      "why": "polygons on a grid"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "regular_polygon",
+     "name": "Perimeter of Regular Polygons (option)",
+     "kind": "option on area_perimeter:perimeter",
+     "teaches": "add the side lengths of a pentagon, hexagon or irregular polygon to find its perimeter",
+     "closes": "perimeter of polygons with 5 or more sides, regular and irregular, from their side lengths",
+     "representation": "a polygon-type option on the perimeter skill"
+    }
+   ]
   },
   "Y4.B7.S1": {
    "title": "Understand the whole",
@@ -4734,7 +4997,25 @@
      "why": "counting in equal steps"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "frac_beyond_1",
+     "name": "Fractions Beyond 1",
+     "kind": "new skill fractions:mixed_numbers_intro",
+     "teaches": "name the mixed number shown by whole and part-shaded shapes (1 1/4) as the count passes 1",
+     "closes": "naming the mixed number",
+     "representation": "bar and number-line models with wholes shaded"
+    },
+    {
+     "proposal": "frac_count",
+     "name": "Count in Fractions",
+     "kind": "new skill fractions:count_in_fractions",
+     "teaches": "count on in unit fractions past 1 on a line (3/4, 1, 1 1/4, __)",
+     "closes": "counting past 1 on a line",
+     "representation": "a number line with fraction ticks"
+    }
+   ]
   },
   "Y4.B7.S3": {
    "title": "Partition a mixed number",
@@ -4783,15 +5064,21 @@
      "why": "adding the parts back"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "frac_beyond_1",
+     "name": "Fractions Beyond 1",
+     "kind": "new skill fractions:mixed_numbers_intro",
+     "teaches": "split a mixed number into wholes and a fraction in a part-whole model (2 3/4 = 2 + 3/4 = 1 + 1 + 3/4)",
+     "closes": "partitioning a mixed number into wholes and a fraction (2 3/4 = 2 + 3/4 = 1 + 1 + 3/4) with a part-whole model",
+     "representation": "bar and number-line models with wholes shaded"
+    }
+   ]
   },
   "Y4.B7.S4": {
    "title": "Number lines with mixed numbers",
    "direct": [
-    {
-     "key": "composing:fraction_number_line",
-     "opts": {}
-    },
     {
      "key": "fractions:mixed_nl_drag",
      "opts": {}
@@ -4816,7 +5103,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (step before in the block)"
+     "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
     }
    ],
    "preBuild": [
@@ -4834,9 +5121,13 @@
     {
      "key": "decimals:decimal_nl_drag",
      "why": "decimals on a line (Y4.B8.S4)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "reading a fraction at an arrow; mostly 0-1 lines, sometimes past 1 (3/2)"
     }
    ],
-   "note": ""
+   "note": "Generated mixed_nl_drag {}: mixed numbers and improper fractions placed on 0-3 lines with every whole labelled."
   },
   "Y4.B7.S5": {
    "title": "Compare and order mixed numbers",
@@ -4873,15 +5164,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:compare",
-     "why": "comparing proper fractions with bars",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "fractions:improper_mixed",
      "why": "converting to compare"
     },
@@ -4890,7 +5172,25 @@
      "why": "the same idea with decimals"
     }
    ],
-   "note": "fractions:compare deals proper fractions only; the existing partial tag of compare on this step should be dropped (it covers none of mixed numbers)."
+   "note": "fractions:compare deals proper fractions only; the existing partial tag of compare on this step should be dropped (it covers none of mixed numbers).",
+   "envision": [
+    {
+     "proposal": "frac_compare_gt1",
+     "name": "Compare and Order Fractions Greater Than 1 (option)",
+     "kind": "option on fractions:compare",
+     "teaches": "compare two mixed numbers with < > = (whole parts first, then the fractions) and order three or more",
+     "closes": "comparing and ordering mixed numbers",
+     "representation": "a band option on compare / order_fractions"
+    },
+    {
+     "proposal": "frac_beyond_1",
+     "name": "Fractions Beyond 1",
+     "kind": "new skill fractions:mixed_numbers_intro",
+     "teaches": "see the order of mixed numbers on a 0-3 line",
+     "closes": "mixed numbers on a line as the model",
+     "representation": "bar and number-line models with wholes shaded"
+    }
+   ]
   },
   "Y4.B7.S6": {
    "title": "Understand improper fractions",
@@ -4923,7 +5223,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
     }
    ],
    "preBuild": [
@@ -4947,16 +5247,18 @@
   },
   "Y4.B7.S7": {
    "title": "Convert mixed numbers to improper fractions",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:improper_mixed",
-     "opts": {}
+     "missing": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of mixed number → improper fraction only",
+   "build": [
+    "improper_mixed_dir"
+   ],
    "pre": [
     {
      "key": "fractions:mixed_improper_visual",
@@ -4964,11 +5266,11 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "fractions:equiv_frac_visual",
@@ -4990,24 +5292,36 @@
      "why": "review"
     }
    ],
-   "note": "improper_mixed deals both directions; there is no direction option (owner question)."
+   "note": "Generated improper_mixed {}: both directions on one page. Owner said yes to a one-direction option.",
+   "envision": [
+    {
+     "proposal": "improper_mixed_dir",
+     "name": "Mixed to Improper, or Improper to Mixed (option)",
+     "kind": "option on fractions:improper_mixed",
+     "teaches": "set direction \"to improper\": convert a mixed number to an improper fraction (2 3/4 = 11/4), counters ringed into wholes as a fading hint",
+     "closes": "a page of mixed number → improper fraction only",
+     "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot"
+    }
+   ]
   },
   "Y4.B7.S8": {
    "title": "Convert improper fractions to mixed numbers",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "fractions:improper_mixed",
-     "opts": {}
+     "missing": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing)",
+   "build": [
+    "improper_mixed_dir"
+   ],
    "pre": [
     {
      "key": "fractions:mixed_improper_visual",
-     "why": "Y4.B7.S6 Understand improper fractions (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S6 Understand improper fractions (earlier step in the block)"
     },
     {
      "key": "division:div_remainders",
@@ -5015,7 +5329,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "fractions:equiv_frac_visual",
@@ -5029,10 +5343,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "sums past 1 written as mixed numbers"
-    },
-    {
      "key": "fractions:mixed_nl_drag",
      "why": "both forms at one point"
     },
@@ -5041,7 +5351,17 @@
      "why": "the remainder becomes the fraction"
     }
    ],
-   "note": ""
+   "note": "Generated improper_mixed {}: both directions on one page. Owner said yes to a one-direction option.",
+   "envision": [
+    {
+     "proposal": "improper_mixed_dir",
+     "name": "Mixed to Improper, or Improper to Mixed (option)",
+     "kind": "option on fractions:improper_mixed",
+     "teaches": "set direction \"to mixed\": convert an improper fraction to a mixed number (11/4 = 2 3/4) by grouping into wholes",
+     "closes": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing)",
+     "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot"
+    }
+   ]
   },
   "Y4.B7.S9": {
    "title": "Equivalent fractions on a number line",
@@ -5069,7 +5389,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -5087,7 +5407,25 @@
      "why": "fractions on a line beyond 1"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "frac_nl_equiv",
+     "name": "Equivalent Fractions on a Number Line (option)",
+     "kind": "option on fractions:equiv_frac_visual",
+     "teaches": "read two stacked number lines and write the equivalent fraction at the same point (1/2 = 2/4)",
+     "closes": "equivalent fractions on stacked lines",
+     "representation": "a double number-line representation option"
+    },
+    {
+     "proposal": "frac_count",
+     "name": "Count in Fractions",
+     "kind": "new skill fractions:count_in_fractions",
+     "teaches": "count along each stacked line in its unit fraction",
+     "closes": "counting in unit fractions along a line",
+     "representation": "a number line with fraction ticks"
+    }
+   ]
   },
   "Y4.B7.S10": {
    "title": "Equivalent fraction families",
@@ -5116,11 +5454,11 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)"
     },
     {
      "key": "multiplication:mult_chart",
-     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (lower grade, same CCSS cluster)"
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (earlier block this year)"
     },
     {
      "key": "fractions:identify",
@@ -5168,7 +5506,7 @@
    "pre": [
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (step before in the block)"
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (earlier step in the block)"
     },
     {
      "key": "composing:compose_whole",
@@ -5194,7 +5532,17 @@
      "why": "bar model of the sum"
     }
    ],
-   "note": "add_frac_like_nv is listed direct for the two-addend part; the step verdict stays partial."
+   "note": "add_frac_like_nv is listed direct for the two-addend part; the step verdict stays partial.",
+   "envision": [
+    {
+     "proposal": "frac_add_multi",
+     "name": "Add and Subtract More Fractions (option)",
+     "kind": "option on fraction_operations:add_fractions_like",
+     "teaches": "add three or more fractions with the same denominator, totals past 1 (2/5 + 3/5 + 1/5 = 6/5)",
+     "closes": "adding three or more fractions with the same denominator, with totals past 1",
+     "representation": "addend-count and \"from a whole\" options with a bar-model support"
+    }
+   ]
   },
   "Y4.B7.S12": {
    "title": "Add fractions and mixed numbers",
@@ -5222,12 +5570,8 @@
      "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (prior learning wk W10)"
     },
     {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "Y3.B8.S1 Add fractions (prior learning wk W10)"
-    },
-    {
      "key": "fractions:mixed_nl_drag",
-     "why": "Y4.B7.S4 Number lines with mixed numbers (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S4 Number lines with mixed numbers (earlier step in the block)"
     }
    ],
    "preBuild": [
@@ -5313,7 +5657,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S1 Understand the whole (earlier step in the block)"
     },
     {
      "key": "composing:compose_whole",
@@ -5321,7 +5665,7 @@
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -5339,7 +5683,25 @@
      "why": "stories"
     }
    ],
-   "note": "sub_mixed_like never deals a whole-number minuend; sub_break_whole (Y5) and frac_add_multi both name this exchange."
+   "note": "sub_mixed_like never deals a whole-number minuend; sub_break_whole (Y5) and frac_add_multi both name this exchange.",
+   "envision": [
+    {
+     "proposal": "sub_break_whole",
+     "name": "Subtract from a Mixed Number: Break the Whole (option)",
+     "kind": "option on fraction_operations:sub_mixed_like",
+     "teaches": "subtract a fraction from a whole number by renaming one whole (3 − 1/4 = 2 4/4 − 1/4)",
+     "closes": "renaming one whole to subtract",
+     "representation": "an \"exchange a whole\" band with a bar-model support"
+    },
+    {
+     "proposal": "frac_add_multi",
+     "name": "Add and Subtract More Fractions (option)",
+     "kind": "option on fraction_operations:add_fractions_like",
+     "teaches": "subtract a fraction from a whole as one of the add-and-subtract forms on the same page",
+     "closes": "whole − fraction as an item form",
+     "representation": "addend-count and \"from a whole\" options with a bar-model support"
+    }
+   ]
   },
   "Y4.B7.S15": {
    "title": "Subtract from mixed numbers",
@@ -5360,29 +5722,21 @@
    "pre": [
     {
      "key": "fraction_operations:sub_fractions_like",
-     "why": "Y4.B7.S13 Subtract two fractions (step before in the block)"
+     "why": "Y4.B7.S13 Subtract two fractions (earlier step in the block)"
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (earlier step in the block)"
     },
     {
      "key": "fraction_operations:add_mixed_like",
-     "why": "Y4.B7.S12 Add fractions and mixed numbers (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "fraction_operations:sub_fractions_like",
-     "why": "Y3.B8.S2 Subtract fractions (prior learning wk W11)"
+     "why": "Y4.B7.S12 Add fractions and mixed numbers (earlier step in the block)"
     }
    ],
    "preBuild": [
     "sub_break_whole"
    ],
    "related": [
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "why": "the inverse"
-    },
     {
      "key": "fraction_operations:frac_word_mixed",
      "why": "mixed fraction stories"
@@ -5433,7 +5787,7 @@
     },
     {
      "key": "composing:compose_whole",
-     "why": "Y4.B7.S1 Understand the whole (lower grade, same CCSS cluster)"
+     "why": "Y4.B7.S1 Understand the whole (earlier block this year)"
     }
    ],
    "preBuild": [],
@@ -5451,7 +5805,25 @@
      "why": "tenths on a line"
     }
    ],
-   "note": "frac_10_100 (tenths written as hundredths) is the hundredths step, not this one: tag fix."
+   "note": "frac_10_100 (tenths written as hundredths) is the hundredths step, not this one: tag fix.",
+   "envision": [
+    {
+     "proposal": "tenths_only",
+     "name": "Tenths as Fractions (option)",
+     "kind": "option on fractions:write_fraction",
+     "teaches": "write the tenths shaded in a whole cut into 10 equal parts (3/10), including past 1 (13/10)",
+     "closes": "tenths only, written n/10, past 1",
+     "representation": "a 10-part strip (black outline, the single grey for shaded parts) in the boxed cell, one fraction slot (stacked numerator/denominator boxes)"
+    },
+    {
+     "proposal": "frac_count",
+     "name": "Count in Fractions",
+     "kind": "new skill fractions:count_in_fractions",
+     "teaches": "count in tenths on a line past 1",
+     "closes": "counting in tenths on a line",
+     "representation": "a number line with fraction ticks"
+    }
+   ]
   },
   "Y4.B8.S2": {
    "title": "Tenths as decimals",
@@ -5516,7 +5888,17 @@
      "why": "comparing tenths"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "dec_fraction_basics",
+     "name": "Tenths, Hundredths, Halves and Quarters as Decimals (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "write tenths as decimals and back (3/10 = 0.3, 1.3 = 13/10) with a tenths strip",
+     "closes": "tenths only, both ways (3/10 = 0.3), with a tenths strip, including numbers past 1 (1.3)",
+     "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    }
+   ]
   },
   "Y4.B8.S3": {
    "title": "Tenths on a place value chart",
@@ -5574,22 +5956,43 @@
      }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "decimal_pv",
+     "name": "Tenths and Hundredths in a Place-Value Chart",
+     "kind": "new skill decimals:decimal_place_value",
+     "teaches": "read and write a number with tenths from counters in a ones . tenths chart (2 ones and 3 tenths = 2.3)",
+     "closes": "reading and writing tenths from counters",
+     "representation": "a place-value chart with counters"
+    },
+    {
+     "proposal": "vis_pv_decimal_places",
+     "name": "Decimal Places in the Place-Value Chart",
+     "kind": "new template on placevalue:place_value_disks, placevalue:pv_disks_build, placevalue:value",
+     "teaches": "the chart itself: a tenths column after the decimal point",
+     "closes": "the tenths column in the chart",
+     "representation": "the pv chart with tenths and hundredths columns after the point"
+    }
+   ]
   },
   "Y4.B8.S4": {
    "title": "Tenths on a number line",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "decimals:decimal_nl_drag",
+     "missing": "generated: places a tenth on a 0-1 line with 0, 0.5 and 1 labelled (0.9, 0.2, 0.6); never a line past 1 and never reads the decimal at a marked point",
      "opts": {
-      "ticks": "one"
+      "ticks": "some"
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "tenths on lines past 1 (0-2, 3-4) and writing the decimal at a marked point",
+   "build": [
+    "dec_nl_past_1"
+   ],
    "pre": [
     {
      "key": "composing:fraction_number_line",
@@ -5597,7 +6000,7 @@
     },
     {
      "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S2 Tenths as decimals (earlier step in the block)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -5625,7 +6028,17 @@
      "why": "position shows which is greater"
     }
    ],
-   "note": "Generated: tenths on a 0-1 line (0.2, 0.4, 0.8). WRM also goes past 1; the 0-1 line is the core of the step."
+   "note": "ticks \"one\" labels every tenth except the answer, which gives it away; \"some\" (0, 0.5, 1) is the honest page.",
+   "envision": [
+    {
+     "proposal": "dec_nl_past_1",
+     "name": "Tenths on Number Lines Past 1 (option)",
+     "kind": "option on decimals:decimal_nl_drag",
+     "teaches": "place a tenth on a 0-2 or 3-4 line and write the decimal at an arrow",
+     "closes": "tenths on lines past 1 (0-2, 3-4) and writing the decimal at a marked point",
+     "representation": "the existing nl-place line with 0, the halfway and the end labelled"
+    }
+   ]
   },
   "Y4.B8.S5": {
    "title": "Divide a 1-digit number by 10",
@@ -5651,7 +6064,7 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S5 Divide by 10 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S5 Divide by 10 (earlier block this year)",
      "opts": {
       "op": "/",
       "power": [
@@ -5675,7 +6088,7 @@
     },
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S2 Tenths as decimals (earlier step in the block)"
     }
    ],
    "preBuild": [
@@ -5700,7 +6113,17 @@
      "why": "tenths on a line"
     }
    ],
-   "note": "Needs the decimals option ON; verify the generator gives 1-digit ÷ 10 = 0.n items."
+   "note": "Needs the decimals option ON; verify the generator gives 1-digit ÷ 10 = 0.n items.",
+   "envision": [
+    {
+     "proposal": "div10_small_numbers",
+     "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+     "kind": "option on placevalue:place_value_10x",
+     "teaches": "divide a 1-digit number by 10 on a shift chart (7 ÷ 10 = 0.7), the digit sliding into the tenths",
+     "closes": "only 1-digit numbers ÷ 10 (7 ÷ 10 = 0.7)",
+     "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h"
+    }
+   ]
   },
   "Y4.B8.S6": {
    "title": "Divide a 2-digit number by 10",
@@ -5759,21 +6182,25 @@
    "preBuild": [],
    "related": [
     {
-     "key": "placevalue:place_value_10x",
-     "why": "the inverse",
-     "opts": {
-      "op": "x",
-      "power": [
-       10
-      ]
-     }
-    },
-    {
      "key": "measurement:money_notation",
      "why": "cents as tenths and hundredths"
+    },
+    {
+     "key": "conversions:f_to_d",
+     "why": "34 ÷ 10 = 34/10 = 3.4: the same number as a fraction and a decimal"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "div10_small_numbers",
+     "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+     "kind": "option on placevalue:place_value_10x",
+     "teaches": "divide a 2-digit number by 10 on a shift chart (34 ÷ 10 = 3.4)",
+     "closes": "only 2-digit numbers ÷ 10 (34 ÷ 10 = 3.4)",
+     "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h"
+    }
+   ]
   },
   "Y4.B8.S7": {
    "title": "Hundredths as fractions",
@@ -5793,7 +6220,7 @@
    "pre": [
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same CCSS cluster)",
+     "why": "Y4.B8.S1 Tenths as fractions (earlier step in the block)",
      "opts": {
       "denoms": [
        5
@@ -5844,7 +6271,25 @@
      "why": "hundredths as decimals (next step)"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "vis_hundred_square",
+     "name": "Hundred Square as One Whole (and the thousand square)",
+     "kind": "new template on conversions:percent_visual, fraction_operations:frac_10_100, decimals:decimal_place_value",
+     "teaches": "read the hundredths shaded in a hundred square",
+     "closes": "the hundred-square model",
+     "representation": "a 10 × 10 hundred square as one whole, shade or read"
+    },
+    {
+     "proposal": "dec_fraction_basics",
+     "name": "Tenths, Hundredths, Halves and Quarters as Decimals (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "write the shaded hundredths as a fraction (37/100) and count in hundredths",
+     "closes": "hundredths written as fractions",
+     "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    }
+   ]
   },
   "Y4.B8.S8": {
    "title": "Hundredths as decimals",
@@ -5881,7 +6326,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same CCSS cluster)",
+     "why": "Y4.B8.S1 Tenths as fractions (earlier step in the block)",
      "opts": {
       "denoms": [
        5
@@ -5904,7 +6349,25 @@
      "why": "hundred grid"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "dec_fraction_basics",
+     "name": "Tenths, Hundredths, Halves and Quarters as Decimals (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "write hundredths as decimals and back (37/100 = 0.37, 0.07 = 7/100)",
+     "closes": "hundredths both ways, held to hundredths",
+     "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    },
+    {
+     "proposal": "vis_hundred_square",
+     "name": "Hundred Square as One Whole (and the thousand square)",
+     "kind": "new template on conversions:percent_visual, fraction_operations:frac_10_100, decimals:decimal_place_value",
+     "teaches": "shade or read the hundred square that shows it",
+     "closes": "the hundred-square model",
+     "representation": "a 10 × 10 hundred square as one whole, shade or read"
+    }
+   ]
   },
   "Y4.B8.S9": {
    "title": "Hundredths on a place value chart",
@@ -5957,7 +6420,25 @@
      "why": "compare digit by digit"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "decimal_pv",
+     "name": "Tenths and Hundredths in a Place-Value Chart",
+     "kind": "new skill decimals:decimal_place_value",
+     "teaches": "read and write a number to hundredths from counters in a chart, and exchange 10 hundredths for 1 tenth",
+     "closes": "hundredths from counters and the exchange of 10 hundredths",
+     "representation": "a place-value chart with counters"
+    },
+    {
+     "proposal": "vis_pv_decimal_places",
+     "name": "Decimal Places in the Place-Value Chart",
+     "kind": "new template on placevalue:place_value_disks, placevalue:pv_disks_build, placevalue:value",
+     "teaches": "the chart itself: tenths and hundredths columns after the point",
+     "closes": "the hundredths column in the chart",
+     "representation": "the pv chart with tenths and hundredths columns after the point"
+    }
+   ]
   },
   "Y4.B8.S10": {
    "title": "Divide a 1- or 2-digit number by 100",
@@ -5983,7 +6464,7 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (step before in the block)",
+     "why": "Y4.B8.S6 Divide a 2-digit number by 10 (earlier step in the block)",
      "opts": {
       "op": "/",
       "power": [
@@ -5994,7 +6475,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B5.S6 Divide by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B5.S6 Divide by 100 (earlier block this year)",
      "opts": {
       "op": "/",
       "power": [
@@ -6015,10 +6496,6 @@
     {
      "key": "addition:add_sub_10s",
      "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W32)"
-    },
-    {
-     "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (prior learning wk W32)"
     }
    ],
    "preBuild": [],
@@ -6041,7 +6518,17 @@
      "why": "7/100 = 0.07"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "div10_small_numbers",
+     "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+     "kind": "option on placevalue:place_value_10x",
+     "teaches": "divide a 1- or 2-digit number by 100 on a shift chart (7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34)",
+     "closes": "1- and 2-digit numbers ÷ 100 (7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34)",
+     "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h"
+    }
+   ]
   },
   "Y4.B9.S1": {
    "title": "Make a whole with tenths",
@@ -6063,7 +6550,7 @@
     },
     {
      "key": "conversions:d_to_f",
-     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S2 Tenths as decimals (earlier block this year)"
     },
     {
      "key": "composing:compose_whole",
@@ -6087,7 +6574,17 @@
      "why": "change from $1"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "decimal_whole",
+     "name": "Make a Whole with Decimals",
+     "kind": "new skill decimals:make_a_whole",
+     "teaches": "find the tenths that make 1 whole (0.3 + __ = 1) with a tenths strip",
+     "closes": "making 1 whole from tenths (0.3 + 0.7 = 1) with a tenths strip and a part-whole model",
+     "representation": "a tenths strip or hundred square with part shaded"
+    }
+   ]
   },
   "Y4.B9.S2": {
    "title": "Make a whole with hundredths",
@@ -6114,7 +6611,7 @@
     },
     {
      "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S7 Hundredths as fractions (earlier block this year)"
     }
    ],
    "preBuild": [],
@@ -6132,7 +6629,25 @@
      "why": "1 − 0.36"
     }
    ],
-   "note": "Bonds to 100 (Y3.B2.S19) are the key pre-skill and have no skill yet."
+   "note": "Bonds to 100 (Y3.B2.S19) are the key pre-skill and have no skill yet.",
+   "envision": [
+    {
+     "proposal": "decimal_whole",
+     "name": "Make a Whole with Decimals",
+     "kind": "new skill decimals:make_a_whole",
+     "teaches": "find the hundredths that make 1 whole (0.36 + __ = 1)",
+     "closes": "complements to 1 in hundredths",
+     "representation": "a tenths strip or hundred square with part shaded"
+    },
+    {
+     "proposal": "vis_hundred_square",
+     "name": "Hundred Square as One Whole (and the thousand square)",
+     "kind": "new template on conversions:percent_visual, fraction_operations:frac_10_100, decimals:decimal_place_value",
+     "teaches": "a hundred square shaded in two tones as the model",
+     "closes": "the two-tone hundred square",
+     "representation": "a 10 × 10 hundred square as one whole, shade or read"
+    }
+   ]
   },
   "Y4.B9.S3": {
    "title": "Partition decimals",
@@ -6153,7 +6668,7 @@
     },
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)"
     },
     {
      "key": "placevalue:unit_form",
@@ -6175,7 +6690,17 @@
      "why": "recombine the parts"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "decimal_pv",
+     "name": "Tenths and Hundredths in a Place-Value Chart",
+     "kind": "new skill decimals:decimal_place_value",
+     "teaches": "partition a decimal into ones, tenths and hundredths (3.45 = 3 + 0.4 + 0.05) from a place-value chart",
+     "closes": "partitioning a decimal into ones, tenths and hundredths (3.45 = 3 + 0.4 + 0.05) with a place-value chart",
+     "representation": "a place-value chart with counters"
+    }
+   ]
   },
   "Y4.B9.S4": {
    "title": "Flexibly partition decimals",
@@ -6220,7 +6745,17 @@
      "why": "money made in different ways"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "decimal_pv",
+     "name": "Tenths and Hundredths in a Place-Value Chart",
+     "kind": "new skill decimals:decimal_place_value",
+     "teaches": "partition a decimal in a second way in a part-whole model (3.45 = 3.4 + 0.05 = 2 + 1.45)",
+     "closes": "partitioning decimals in more than one way (3.45 = 3.4 + 0.05 = 2 + 1.45) with a part-whole model",
+     "representation": "a place-value chart with counters"
+    }
+   ]
   },
   "Y4.B9.S5": {
    "title": "Compare decimals",
@@ -6228,19 +6763,26 @@
    "partial": [
     {
      "key": "decimals:compare_decimal",
-     "missing": "deals up to thousandths and mixed lengths; cannot be held to 1 or 2 decimal places, no models"
+     "missing": "generated: 1- and 2-place decimals below 10 compared with < > (6.36 vs 5.99, 6.1 vs 2.88), but the whole parts nearly always differ; no same-whole items (0.4 vs 0.38) and no hundred-square model",
+     "opts": {
+      "decimals": 2,
+      "forms": [
+       0
+      ]
+     },
+     "maxNumber": 10
     }
    ],
    "verdict": "partial",
-   "missing": "comparing decimals with one or two decimal places (0.4 vs 0.38) with hundred-square models",
+   "missing": "comparing decimals with the same whole part (0.4 vs 0.38), reasoning with hundred squares",
    "build": [
-    "dec_compare_2dp",
+    "dec_same_whole",
     "dec_compare_model"
    ],
    "pre": [
     {
      "key": "placevalue:compare",
-     "why": "Y4.B1.S11 Compare numbers to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S11 Compare numbers to 10,000 (earlier block this year)",
      "opts": {
       "band": 9999
      }
@@ -6254,11 +6796,11 @@
     },
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S4 Tenths on a number line (earlier block this year)"
     },
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)"
     }
    ],
    "preBuild": [
@@ -6266,19 +6808,40 @@
    ],
    "related": [
     {
-     "key": "decimals:order_decimals",
-     "why": "the next step"
-    },
-    {
      "key": "measurement:money_compare",
      "why": "comparing money amounts"
     },
     {
      "key": "fractions:compare",
      "why": "comparing fractions"
+    },
+    {
+     "key": "decimals:order_decimals",
+     "why": "the next step: the same comparison made three or more times to order",
+     "opts": {
+      "decimals": 2
+     }
     }
    ],
-   "note": ""
+   "note": "decimals 2 and Max Number 10 (maxNumber) hold the page to hundredths below 10: the old \"cannot be held\" reason was wrong. maxNumber is the generateQuestionFor range, not the skill's own range option.",
+   "envision": [
+    {
+     "proposal": "dec_same_whole",
+     "name": "Decimals With the Same Whole Part (option)",
+     "kind": "option on decimals:compare_decimal",
+     "teaches": "compare two decimals with the same whole part and 1 or 2 places (0.4 vs 0.38) with < > =",
+     "closes": "comparing with the same whole part",
+     "representation": "the existing compare / order cell"
+    },
+    {
+     "proposal": "dec_compare_model",
+     "name": "Compare Decimals With Models (option)",
+     "kind": "option on decimals:compare_decimal",
+     "teaches": "shade both on hundred squares, then compare",
+     "closes": "reasoning with hundred squares",
+     "representation": ""
+    }
+   ]
   },
   "Y4.B9.S6": {
    "title": "Order decimals",
@@ -6286,13 +6849,17 @@
    "partial": [
     {
      "key": "decimals:order_decimals",
-     "missing": "deals up to thousandths; cannot be held to 1 or 2 decimal places"
+     "missing": "generated: 3-5 decimals below 10 ordered both ways (1.36, 2.41, 3.46, 5.99, 6.36), but nearly every number has a different whole part, so the places are never compared",
+     "opts": {
+      "decimals": 2
+     },
+     "maxNumber": 10
     }
    ],
    "verdict": "partial",
-   "missing": "ordering decimals with up to two decimal places, including whole-number parts",
+   "missing": "ordering decimals that share the whole part, with 1 and 2 places mixed (3.6, 3.65, 3.06)",
    "build": [
-    "dec_order_2dp"
+    "dec_same_whole"
    ],
    "pre": [
     {
@@ -6301,7 +6868,7 @@
     },
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y4.B1.S12 Order numbers to 10,000 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S12 Order numbers to 10,000 (earlier block this year)",
      "opts": {
       "band": 9999
      }
@@ -6329,7 +6896,17 @@
      "why": "ordering prices"
     }
    ],
-   "note": ""
+   "note": "decimals 2 and Max Number 10 hold the page to hundredths below 10.",
+   "envision": [
+    {
+     "proposal": "dec_same_whole",
+     "name": "Decimals With the Same Whole Part (option)",
+     "kind": "option on decimals:compare_decimal",
+     "teaches": "order three to five decimals that share the whole part (3.6, 3.65, 3.06), least to greatest or back",
+     "closes": "ordering decimals that share the whole part, with 1 and 2 places mixed (3.6, 3.65, 3.06)",
+     "representation": "the existing compare / order cell"
+    }
+   ]
   },
   "Y4.B9.S7": {
    "title": "Round to the nearest whole number",
@@ -6349,14 +6926,14 @@
    "pre": [
     {
      "key": "number_sense:rounding_visual",
-     "why": "Y4.B1.S14 Round to the nearest 10 (lower grade, same CCSS cluster)",
+     "why": "Y4.B1.S14 Round to the nearest 10 (earlier block this year)",
      "opts": {
       "place": 10
      }
     },
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S4 Tenths on a number line (earlier block this year)"
     },
     {
      "key": "placevalue:expand",
@@ -6385,7 +6962,25 @@
      "why": "estimating by rounding"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "round_whole",
+     "name": "Round Decimals to the Nearest Whole (option)",
+     "kind": "option on decimals:round_decimals",
+     "teaches": "round a decimal with 1 or 2 places to the nearest whole number",
+     "closes": "rounding to the nearest whole",
+     "representation": "a \"nearest whole\" target option with a number-line support"
+    },
+    {
+     "proposal": "vis_round_line_decimals",
+     "name": "Rounding Lines for Decimals",
+     "kind": "visual option on number_sense:rounding_visual, number_sense:round_nl_thousands, decimals:round_decimals",
+     "teaches": "on a number line between the two wholes, bounds circled",
+     "closes": "the decimal rounding line",
+     "representation": "a rounding line between two wholes, bounds circled"
+    }
+   ]
   },
   "Y4.B9.S8": {
    "title": "Halves and quarters as decimals",
@@ -6417,7 +7012,7 @@
     },
     {
      "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same CCSS cluster)"
+     "why": "Y4.B8.S7 Hundredths as fractions (earlier block this year)"
     },
     {
      "key": "fractions:benchmark_fractions",
@@ -6439,7 +7034,17 @@
      "why": "the reverse"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "dec_fraction_basics",
+     "name": "Tenths, Hundredths, Halves and Quarters as Decimals (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "write 1/2, 1/4 and 3/4 as 0.5, 0.25 and 0.75 (and back) from a hundred square",
+     "closes": "1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75 (and 0.5 = 5/10 = 50/100) with a hundred square",
+     "representation": "equation cell 3/10 = □ with a tenths strip or hundred square beside it (hint scaffold, fades)"
+    }
+   ]
   },
   "Y4.B10.S1": {
    "title": "Write money using decimals",
@@ -6466,11 +7071,7 @@
     },
     {
      "key": "conversions:f_to_d",
-     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same CCSS cluster)"
-    },
-    {
-     "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S3 Number line to 100 (prior learning wk W37)"
+     "why": "Y4.B8.S8 Hundredths as decimals (earlier block this year)"
     }
    ],
    "preBuild": [
@@ -6524,7 +7125,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y4.B8.S10 Divide a 1- or 2-digit number by 100 (lower grade, same CCSS cluster)",
+     "why": "Y4.B8.S10 Divide a 1- or 2-digit number by 100 (earlier block this year)",
      "opts": {
       "op": "/",
       "power": [
@@ -6549,7 +7150,17 @@
      "why": "cents as hundredths"
     }
    ],
-   "note": "School swaps pounds and pence for dollars and cents."
+   "note": "School swaps pounds and pence for dollars and cents.",
+   "envision": [
+    {
+     "proposal": "money_convert",
+     "name": "Dollars and Cents (option)",
+     "kind": "option on measurement:money_notation",
+     "teaches": "convert cents to dollars and cents and back (345¢ = $3.45)",
+     "closes": "converting between cents and dollars-and-cents both ways",
+     "representation": "option: cents to dollars and back"
+    }
+   ]
   },
   "Y4.B10.S3": {
    "title": "Compare amounts of money",
@@ -6571,7 +7182,7 @@
    "pre": [
     {
      "key": "measurement:money_compare",
-     "why": "Y2.B4.S6"
+     "why": "Y2.B4.S6 Compare amounts of money (lower grade, same idea)"
     },
     {
      "key": "measurement:money_notation",
@@ -6610,7 +7221,17 @@
      "why": "ordering"
     }
    ],
-   "note": "money_compare has no usd value: the money_compare_written option should add it."
+   "note": "money_compare has no usd value: the money_compare_written option should add it.",
+   "envision": [
+    {
+     "proposal": "money_compare_written",
+     "name": "Compare Amounts Written in $ and ¢ (option)",
+     "kind": "option on measurement:money_compare",
+     "teaches": "compare and order amounts written in $ and ¢ ($2.35 vs 189¢) by changing to one unit first",
+     "closes": "comparing and ordering amounts written in $ and ¢ notation",
+     "representation": "compare cell: two price tags (black outline) with a boxed sign slot"
+    }
+   ]
   },
   "Y4.B10.S4": {
    "title": "Estimate with money",
@@ -6635,7 +7256,7 @@
     },
     {
      "key": "number_sense:nearest_10",
-     "why": "Y4.B1.S14 Round to the nearest 10 (lower grade, same CCSS cluster)"
+     "why": "Y4.B1.S14 Round to the nearest 10 (earlier block this year)"
     },
     {
      "key": "number_sense:estimate_products",
@@ -6659,7 +7280,17 @@
      "why": "rounding decimals"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "money_estimate",
+     "name": "Estimate with Money",
+     "kind": "new skill measurement:estimate_with_money",
+     "teaches": "round each price to the nearest dollar to estimate a total or the change",
+     "closes": "estimating totals and change by rounding prices to the nearest dollar",
+     "representation": "a price list"
+    }
+   ]
   },
   "Y4.B10.S5": {
    "title": "Calculate with money",
@@ -6690,11 +7321,11 @@
    "pre": [
     {
      "key": "measurement:money",
-     "why": "Y3.B9.S3"
+     "why": "Y3.B9.S3 Add money (prior learning wk W07)"
     },
     {
      "key": "measurement:money_change",
-     "why": "Y3.B9.S5"
+     "why": "Y3.B9.S5 Find change (prior learning wk W07)"
     },
     {
      "key": "measurement:enough_money",
@@ -6777,7 +7408,17 @@
      "why": "enough money?"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "money_2step",
+     "name": "Two-Step Money Problems",
+     "kind": "new skill measurement:money_two_step",
+     "teaches": "solve a two-step money story: buy two or three items, then find the change from a note",
+     "closes": "two-step money word problems (buy three items then find the change)",
+     "representation": "a price list drawn as tags plus a short story"
+    }
+   ]
   },
   "Y4.B11.S1": {
    "title": "Years, months, weeks and days",
@@ -6795,7 +7436,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)",
+     "why": "Y4.B4.S10 12 times-table and division facts (earlier block this year)",
      "opts": {
       "constant": [
        7,
@@ -6821,17 +7462,36 @@
      "why": "conversion tables"
     }
    ],
-   "note": "The xlsx prior list (Days of the week, Months of the year, Y3 Years, months and days) maps to no live skill."
+   "note": "The xlsx prior list (Days of the week, Months of the year, Y3 Years, months and days) maps to no live skill.",
+   "envision": [
+    {
+     "proposal": "time_calendar",
+     "name": "Years, Months, Days, Hours",
+     "kind": "new skill measurement:calendar_and_units",
+     "teaches": "convert between years, months, weeks and days (3 weeks = __ days) using a calendar page and a conversion table",
+     "closes": "converting between years, months, weeks and days (and days in each month, leap years)",
+     "representation": "a calendar page or conversion table"
+    }
+   ]
   },
   "Y4.B11.S2": {
    "title": "Hours, minutes and seconds",
    "direct": [],
-   "partial": [],
-   "verdict": "gap",
-   "missing": "converting between hours, minutes and seconds (and comparing durations given in different units)",
+   "partial": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "generated: hours → minutes, minutes → seconds and hours → seconds word problems (4 min = 240 s, 2 hr = 120 min); never seconds → minutes, mixed units (1 min 20 s) or comparing durations",
+     "opts": {
+      "units": [
+       0
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "converting from the smaller unit to the larger (180 s = 3 min), mixed units (1 min 20 s = 80 s) and comparing durations in different units",
    "build": [
-    "time_calendar",
-    "time_convert"
+    "time_calendar"
    ],
    "pre": [
     {
@@ -6848,7 +7508,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y4.B4.S3 6 times-table and division facts (lower grade, same CCSS cluster)",
+     "why": "Y4.B4.S3 6 times-table and division facts (earlier block this year)",
      "opts": {
       "constant": [
        6
@@ -6861,19 +7521,34 @@
    ],
    "related": [
     {
-     "key": "measurement:unit_conversion_word",
-     "why": "its \"hr → min\" items"
-    },
-    {
      "key": "measurement:elapsed_find_duration",
      "why": "durations"
     },
     {
      "key": "measurement:time_1min",
      "why": "minutes on the clock"
+    },
+    {
+     "key": "measurement:unit_conversion_word",
+     "why": "the same conversion routine with lengths (multiply by the unit size)",
+     "opts": {
+      "units": [
+       1
+      ]
+     }
     }
    ],
-   "note": "unit_conversion_word deals some hr → min items among customary units; not a cover."
+   "note": "time_convert is already built: unit_conversion_word {units:[0]} is the time-only page.",
+   "envision": [
+    {
+     "proposal": "time_calendar",
+     "name": "Years, Months, Days, Hours",
+     "kind": "new skill measurement:calendar_and_units",
+     "teaches": "convert seconds to minutes and back, mixed units (1 min 20 s = 80 s), and compare two durations given in different units",
+     "closes": "converting from the smaller unit to the larger (180 s = 3 min), mixed units (1 min 20 s = 80 s) and comparing durations in different units",
+     "representation": "a calendar page or conversion table"
+    }
+   ]
   },
   "Y4.B11.S3": {
    "title": "Convert between analogue and digital times",
@@ -6970,7 +7645,17 @@
      "why": "reading the clock"
     }
    ],
-   "note": "The US school uses a.m./p.m.; 24-hour time is a WRM/UK step (owner question)."
+   "note": "The US school uses a.m./p.m.; 24-hour time is a WRM/UK step (owner question).",
+   "envision": [
+    {
+     "proposal": "time_24h_convert",
+     "name": "The 24-Hour Clock",
+     "kind": "new skill measurement:twenty_four_hour_clock",
+     "teaches": "write a 12-hour time with a.m. or p.m. as a 24-hour time (3:15 p.m. = 15:15)",
+     "closes": "converting 12-hour times (a.m./p.m.) to the 24-hour clock",
+     "representation": "an analogue clock beside a 24-hour display"
+    }
+   ]
   },
   "Y4.B11.S5": {
    "title": "Convert from the 24 hour clock",
@@ -6988,7 +7673,7 @@
     },
     {
      "key": "measurement:time_analog_digital",
-     "why": "Y4.B11.S3 Convert between analogue and digital times (lower grade, same CCSS cluster)"
+     "why": "Y4.B11.S3 Convert between analogue and digital times (earlier step in the block)"
     },
     {
      "key": "subtraction:sub_20_mixed",
@@ -7006,7 +7691,17 @@
      "why": "ordering times"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "time_24h_convert",
+     "name": "The 24-Hour Clock",
+     "kind": "new skill measurement:twenty_four_hour_clock",
+     "teaches": "write a 24-hour time as a 12-hour time with a.m. or p.m. (19:40 = 7:40 p.m.)",
+     "closes": "converting 24-hour times to 12-hour times with a.m./p.m.",
+     "representation": "an analogue clock beside a 24-hour display"
+    }
+   ]
   },
   "Y4.B12.S1": {
    "title": "Understand angles as turns",
@@ -7048,7 +7743,17 @@
      "why": "angles that add up"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "turns_angles",
+     "name": "Turns and Angles",
+     "kind": "new skill angles_lines:turns_and_angles",
+     "teaches": "say how far an arrow turns (quarter, half, three-quarter, whole), clockwise or anticlockwise, and that a quarter turn is a right angle",
+     "closes": "angles as an amount of turn: quarter, half, three-quarter and whole turns, clockwise and anticlockwise, and a right angle as a quarter turn",
+     "representation": "an angle tester (a square corner) beside each angle"
+    }
+   ]
   },
   "Y4.B12.S2": {
    "title": "Identify angles",
@@ -7089,8 +7794,8 @@
      "why": "triangles by their angles"
     },
     {
-     "key": "angles_lines:identify_lines",
-     "why": "perpendicular lines make right angles"
+     "key": "shapes_classify:classify_quads",
+     "why": "right angles name squares and rectangles"
     }
    ],
    "note": ""
@@ -7138,7 +7843,17 @@
      "why": "angles inside triangles"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "turns_angles",
+     "name": "Turns and Angles",
+     "kind": "new skill angles_lines:turns_and_angles",
+     "teaches": "compare and order two or three angles by size, whatever the length of their arms",
+     "closes": "comparing and ordering angles by size (independent of line length)",
+     "representation": "an angle tester (a square corner) beside each angle"
+    }
+   ]
   },
   "Y4.B12.S4": {
    "title": "Triangles",
@@ -7155,7 +7870,7 @@
    "pre": [
     {
      "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 Identify angles (lower grade, same CCSS cluster)"
+     "why": "Y4.B12.S2 Identify angles (earlier step in the block)"
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -7218,7 +7933,7 @@
     },
     {
      "key": "angles_lines:identify_angles",
-     "why": "Y4.B12.S2 Identify angles (lower grade, same CCSS cluster)"
+     "why": "Y4.B12.S2 Identify angles (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -7283,7 +7998,17 @@
      "why": "symmetry of regular polygons"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "polygons",
+     "name": "Regular and Irregular Polygons",
+     "kind": "new skill shapes_classify:regular_irregular_polygons",
+     "teaches": "name a polygon by its sides (pentagon … octagon) and tick regular or irregular",
+     "closes": "naming polygons by their number of sides (pentagon … octagon) and sorting regular from irregular",
+     "representation": "polygon line drawings"
+    }
+   ]
   },
   "Y4.B12.S7": {
    "title": "Lines of symmetry",
@@ -7312,7 +8037,7 @@
     },
     {
      "key": "shapes_classify:classify_quads",
-     "why": "Y4.B12.S5 Quadrilaterals (step before in the block)"
+     "why": "Y4.B12.S5 Quadrilaterals (earlier step in the block)"
     }
    ],
    "preBuild": [],
@@ -7348,7 +8073,7 @@
     },
     {
      "key": "area_perimeter:perimeter_grid",
-     "why": "Y4.B6.S3 Perimeter on a grid (lower grade, same CCSS cluster)"
+     "why": "Y4.B6.S3 Perimeter on a grid (earlier block this year)"
     }
    ],
    "preBuild": [],
@@ -7362,7 +8087,17 @@
      "why": "grid positions"
     }
    ],
-   "note": "Y2.B3.S6 (Use lines of symmetry to complete shapes) is the prior step with the same proposal."
+   "note": "Y2.B3.S6 (Use lines of symmetry to complete shapes) is the prior step with the same proposal.",
+   "envision": [
+    {
+     "proposal": "symmetry_complete",
+     "name": "Complete the Symmetric Shape",
+     "kind": "new skill angles_lines:complete_symmetric_shape",
+     "teaches": "complete a shape on a square grid by reflecting it in a given line",
+     "closes": "completing a symmetric figure on a square grid by reflecting it in a given line",
+     "representation": "half a shape on squared paper beside a dashed mirror line"
+    }
+   ]
   },
   "Y4.B13.S1": {
    "title": "Interpret charts",
@@ -7488,10 +8223,6 @@
      "why": "drawing the chart"
     },
     {
-     "key": "addition:comparison_word",
-     "why": "how many more stories"
-    },
-    {
      "key": "graphs:mixed_graphs",
      "why": "mixed graph questions"
     }
@@ -7519,7 +8250,7 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S1 Describe position using coordinates (lower grade, same CCSS cluster)"
+     "why": "Y4.B14.S1 Describe position using coordinates (earlier block this year)"
     },
     {
      "key": "number_sense:place_on_number_line",
@@ -7533,10 +8264,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "graphs:line_plot",
-     "why": "line plots are a different chart"
-    },
-    {
      "key": "coordinates:coordinate_graph",
      "why": "points on a grid"
     },
@@ -7545,7 +8272,17 @@
      "why": "temperature over a day is the usual context"
     }
    ],
-   "note": "5.G.A.2 preview, taught as enrichment W37."
+   "note": "5.G.A.2 preview, taught as enrichment W37.",
+   "envision": [
+    {
+     "proposal": "line_graph",
+     "name": "Line Graphs",
+     "kind": "new skill graphs:line_graphs",
+     "teaches": "read a line graph: the value at a time, the change between two times, and when it was greatest",
+     "closes": "reading a line graph: the value at a time, change between times, and when it was greatest",
+     "representation": "a line graph on a grid with labelled axes"
+    }
+   ]
   },
   "Y4.B13.S4": {
    "title": "Draw line graphs",
@@ -7563,28 +8300,48 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "Y4.B14.S2 Plot coordinates (lower grade, same CCSS cluster)"
+     "why": "Y4.B14.S2 Plot coordinates (earlier block this year)"
     }
    ],
    "preBuild": [],
    "related": [
     {
-     "key": "graphs:build_bar_graph",
-     "why": "drawing a bar chart from the same data"
-    },
-    {
      "key": "coordinates:coordinate_graph",
      "why": "plotting points"
+    },
+    {
+     "key": "graphs:bar_graph",
+     "why": "reading back the values a drawn graph shows",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "line_graph",
+     "name": "Line Graphs",
+     "kind": "new skill graphs:line_graphs",
+     "teaches": "draw a line graph from a table: label the axes, plot each point, join them with straight lines",
+     "closes": "drawing a line graph from a table: scale the axes, plot points, join them",
+     "representation": "a line graph on a grid with labelled axes"
+    }
+   ]
   },
   "Y4.B14.S1": {
    "title": "Describe position using coordinates",
    "direct": [
     {
      "key": "coordinates:coordinate_q1",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
    "partial": [],
@@ -7618,14 +8375,18 @@
      "why": "distance between points"
     }
    ],
-   "note": "5.G.A.1 content; school enrichment W37."
+   "note": "forms [0] \"Read the coordinates\": generated without itemIndex, every item asks for the coordinates of drawn points. DEFECT for the lead: the forms filter is honoured in live play, but generateQuestionFor with itemIndex (the print path, print-sheet.js) deals the other form too (3 of 8 items), because the page deal gives the same variant on every redraw of one item. Not a tagging question; reported in Y4-report.md."
   },
   "Y4.B14.S2": {
    "title": "Plot coordinates",
    "direct": [
     {
      "key": "coordinates:coordinate_q1",
-     "opts": {}
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "partial": [],
@@ -7633,6 +8394,15 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1 Describe position using coordinates (step before in the block)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
     {
      "key": "shapes_early:shape_positions",
      "why": "R.B4.S4 Describe position (prior learning wk W38)"
@@ -7657,7 +8427,7 @@
      "why": "coordinate graphing"
     }
    ],
-   "note": "coordinate_q1 deals both \"read the coordinates\" and \"plot these points\"; full for S1 and S2."
+   "note": "forms [1] \"Plot the points\": generated without itemIndex, every item plots given points. DEFECT for the lead: the forms filter is honoured in live play, but generateQuestionFor with itemIndex (the print path, print-sheet.js) deals the other form too (3 of 8 items), because the page deal gives the same variant on every redraw of one item. Not a tagging question; reported in Y4-report.md."
   },
   "Y4.B14.S3": {
    "title": "Draw 2-D shapes on a grid",
@@ -7680,7 +8450,7 @@
     },
     {
      "key": "shapes_classify:classify_quads",
-     "why": "Y4.B12.S5 Quadrilaterals (lower grade, same CCSS cluster)"
+     "why": "Y4.B12.S5 Quadrilaterals (earlier block this year)"
     },
     {
      "key": "shapes_early:shape_positions",
@@ -7700,7 +8470,17 @@
      "why": "perimeter on a grid"
     }
    ],
-   "note": "translate_grid lists this step; translating is S4/S5, so drawing shapes needs its own option."
+   "note": "translate_grid lists this step; translating is S4/S5, so drawing shapes needs its own option.",
+   "envision": [
+    {
+     "proposal": "coord_polygon_draw",
+     "name": "Draw Shapes on a Coordinate Grid (option)",
+     "kind": "option on coordinates:coord_polygon",
+     "teaches": "plot given vertices and join them to draw a shape, and find the missing vertex of a square or rectangle",
+     "closes": "drawing a 2-D shape by plotting given vertices, and finding the missing vertex of a square or rectangle",
+     "representation": "first-quadrant grid in the boxed cell (black lines, axes labelled 0-10), plotted points as filled dots"
+    }
+   ]
   },
   "Y4.B14.S4": {
    "title": "Translate on a grid",
@@ -7743,7 +8523,17 @@
      "why": "rotation"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "translate_grid",
+     "name": "Translate on a Grid",
+     "kind": "new skill coordinates:translate_on_grid",
+     "teaches": "translate a point or shape on a first-quadrant grid (3 right, 2 up), draw it, and write the new coordinates",
+     "closes": "translating a point or shape on a first-quadrant grid by drawing it, and giving the new coordinates",
+     "representation": "a coordinate grid with a shape and its image"
+    }
+   ]
   },
   "Y4.B14.S5": {
    "title": "Describe translation on a grid",
@@ -7784,7 +8574,17 @@
      "why": "distance moved"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "translate_grid",
+     "name": "Translate on a Grid",
+     "kind": "new skill coordinates:translate_on_grid",
+     "teaches": "describe the translation from a shape to its image (\"__ right, __ up\")",
+     "closes": "describing a translation from a shape and its image (\"__ right, __ up\")",
+     "representation": "a coordinate grid with a shape and its image"
+    }
+   ]
   }
  },
  "proposals": {
@@ -7888,32 +8688,25 @@
    ],
    "reused": false
   },
-  "roman_100": {
+  "roman_numerals": {
    "kind": "new",
    "skill": "placevalue:roman_numerals",
+   "option": "band 12 | 100 | 1,000 | 3,999; direction read | write | both",
    "name": "Roman Numerals",
-   "teaches": "reading and writing Roman numerals to 100 (I, V, X, L, C) and knowing there is no zero",
-   "representation": "numeral cards with a symbol key; write the value or the numeral",
+   "teaches": "reading and writing Roman numerals in four bands: to 12 (clock faces), to 100 (I V X L C), to 1,000 (D M) and to 3,999 (years); there is no zero",
+   "representation": "one boxed cell: the numeral or the number, a symbol key (I = 1, V = 5 …) as a hint that fades, one answer box",
    "family": "placevalue",
+   "ccss": [],
+   "supersedes": [
+    "roman_12",
+    "roman_100",
+    "roman_1000"
+   ],
+   "why": "owner ruling 2026-10-10: one skill with bands to 12 / 100 / 1,000 / 3,999 replaces roman_12, roman_100 and roman_1000",
    "steps": [
     "Y4.B1.S13"
    ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
-  },
-  "roman_12": {
-   "kind": "new",
-   "skill": "measurement:roman_numerals_clock",
-   "name": "Roman Numerals to 12",
-   "teaches": "reading Roman numerals I to XII on a clock face",
-   "representation": "a clock face with Roman numerals; write the time or the numeral value",
-   "family": "measurement",
-   "steps": [
-    "Y4.B1.S13",
-    "Y3.B10.S1"
-   ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
+   "reused": false
   },
   "add_sub_place_units": {
    "kind": "option",
@@ -7937,7 +8730,7 @@
   "exchange_count_add": {
    "kind": "option",
    "skill": "addition:add_10k_regroup",
-   "option": "exchanges: exactly one / two or more",
+   "option": "exchanges: exactly one / two or more (default mixed), on every addition regroup band (100, 1,000, 10,000, 100,000, 1,000,000)",
    "name": "How Many Exchanges? Addition (option)",
    "teaches": "column addition held to exactly one exchange, or to two or more exchanges, so the WRM one-exchange and more-than-one-exchange steps are separate pages",
    "representation": "the existing stack cell with regroup boxes (structural, every level); only the dealing changes",
@@ -7946,7 +8739,14 @@
     "3.NBT.A.2",
     "4.NBT.B.4"
    ],
-   "why": "WRM splits one exchange from several (P-1: one new thing per step); the skill mixes them",
+   "why": "owner ruling 2026-10-10: one shared option on every *_regroup band; WRM splits one exchange from several (P-1)",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_1k_regroup",
+    "addition:add_10k_regroup",
+    "addition:add_100k_regroup",
+    "addition:add_1m_regroup"
+   ],
    "steps": [
     "Y4.B2.S3",
     "Y4.B2.S4"
@@ -7956,7 +8756,7 @@
   "exchange_count_sub": {
    "kind": "option",
    "skill": "subtraction:sub_10k_regroup",
-   "option": "exchanges: exactly one / two or more",
+   "option": "exchanges: exactly one / two or more (default mixed), on every subtraction regroup band (100, 1,000, 10,000, 100,000, 1,000,000)",
    "name": "How Many Exchanges? Subtraction (option)",
    "teaches": "column subtraction held to exactly one exchange, or to two or more exchanges (not only across zeros)",
    "representation": "the existing stack cell with exchange boxes; only the dealing changes",
@@ -7965,7 +8765,14 @@
     "3.NBT.A.2",
     "4.NBT.B.4"
    ],
-   "why": "WRM splits one exchange from several; the skill mixes them",
+   "why": "owner ruling 2026-10-10: one shared option on every *_regroup band; WRM splits one exchange from several",
+   "skills": [
+    "subtraction:sub_100_regroup",
+    "subtraction:sub_1k_regroup",
+    "subtraction:sub_10k_regroup",
+    "subtraction:sub_100k_regroup",
+    "subtraction:sub_1m_regroup"
+   ],
    "steps": [
     "Y4.B2.S6",
     "Y4.B2.S7"
@@ -8193,7 +9000,7 @@
   "div_exchange": {
    "kind": "option",
    "skill": "division:divide",
-   "option": "exchange \"none\" / \"in the tens\" (tiles 21, 31)",
+   "option": "exchange \"none\" / \"in the tens\" (no remainder), on divide (tiles 21, 31), area_model_div_2by1 and box_division_easy",
    "name": "Division With or Without an Exchange (option)",
    "teaches": "2- and 3-digit ÷ 1-digit held to no exchange (84 ÷ 4) or to an exchange of a ten (52 ÷ 4), with no remainder",
    "representation": "the existing bus-stop/bracket cell with the exchange box; only the dealing changes",
@@ -8203,6 +9010,11 @@
     "4.NBT.B.6"
    ],
    "why": "generated: divide {regroup:\"none\"} mixes 76 ÷ 4 (exchange) with 88 ÷ 2 (none); regroup \"always\" means a remainder, not an exchange",
+   "skills": [
+    "division:divide",
+    "division:area_model_div_2by1",
+    "division:box_division_easy"
+   ],
    "steps": [
     "Y4.B5.S11",
     "Y4.B5.S12"
@@ -8290,6 +9102,7 @@
    "family": "measurement",
    "steps": [
     "Y4.B6.S8",
+    "Y4.B6.S9",
     "Y5.B8.S3"
    ],
    "reused": true,
@@ -8375,6 +9188,25 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "improper_mixed_dir": {
+   "kind": "option",
+   "skill": "fractions:improper_mixed",
+   "option": "dir: \"to-improper\" | \"to-mixed\" | \"both\" (default both)",
+   "name": "Mixed to Improper, or Improper to Mixed (option)",
+   "teaches": "one conversion direction per page: mixed number → improper fraction (2 3/4 = 11/4) or improper fraction → mixed number (11/4 = 2 3/4)",
+   "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.1",
+    "4.NF.B.3b"
+   ],
+   "why": "owner ruling 2026-10-10; generated improper_mixed {} deals \"improper AND mixed\", \"click all equal to 2 3/6\" and \"convert to a mixed number\" on one page",
+   "steps": [
+    "Y4.B7.S7",
+    "Y4.B7.S8"
+   ],
+   "reused": false
   },
   "frac_nl_equiv": {
    "kind": "option",
@@ -8513,19 +9345,37 @@
    "reused": true,
    "source": "VISUAL_BUILDS"
   },
+  "dec_nl_past_1": {
+   "kind": "option",
+   "skill": "decimals:decimal_nl_drag",
+   "option": "span \"0-2\" and \"n to n+1\" (e.g. 3-4); form \"write the decimal at the arrow\"",
+   "name": "Tenths on Number Lines Past 1 (option)",
+   "teaches": "placing and reading tenths on lines that go past 1 (0-2, 3-4): mark 1.7, write the decimal at the arrow (3.4)",
+   "representation": "the existing nl-place line with 0, the halfway and the end labelled; one answer box under the arrow for the read form",
+   "family": "decimals",
+   "ccss": [
+    "3.NF.A.2",
+    "4.NF.C.6"
+   ],
+   "why": "generated decimal_nl_drag deals 0-1 lines only and only the place form; WRM tenths lines run past 1 and ask for the number at a point",
+   "steps": [
+    "Y4.B8.S4"
+   ],
+   "reused": false
+  },
   "div10_small_numbers": {
    "kind": "option",
    "skill": "placevalue:place_value_10x",
    "option": "band \"1-digit\" and \"2-digit\" when decimals are on",
    "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
    "teaches": "7 ÷ 10 = 0.7, 34 ÷ 10 = 3.4, 7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34 on a place-value chart with the digits sliding right",
-   "representation": "the existing shift-chart cell (O . t h columns, arrows under the digits), one decimal answer box with a fixed point",
+   "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h; today it shows H T O only on decimal items), arrows under the sliding digits, one decimal answer box with a fixed point",
    "family": "placevalue",
    "ccss": [
     "4.NF.C.6",
     "5.NBT.A.2"
    ],
-   "why": "generated: place_value_10x {op:\"/\", decimals:true} dealt 274 ÷ 10, 866 ÷ 100; the smallest band is 1,000",
+   "why": "generated: place_value_10x {op:\"/\", power:[10], decimals:true} dealt 990 ÷ 10, 298 ÷ 10 = 29.8 (3-digit dividends, two whole answers) and drops to an H T O chart with no tenths column",
    "steps": [
     "Y4.B8.S5",
     "Y4.B8.S6",
@@ -8573,20 +9423,21 @@
    "reused": true,
    "source": "WRM_PROPOSALS"
   },
-  "dec_compare_2dp": {
+  "dec_same_whole": {
    "kind": "option",
    "skill": "decimals:compare_decimal",
-   "option": "places \"1 or 2\" (no thousandths)",
-   "name": "Compare Decimals to Hundredths (option)",
-   "teaches": "comparing decimals with one or two decimal places, including different lengths (0.4 vs 0.38)",
-   "representation": "compare cell: two decimals with a boxed sign slot; optional hundred squares beside each (dec_compare_model)",
+   "option": "items \"same whole part\" (also on decimals:order_decimals)",
+   "name": "Decimals With the Same Whole Part (option)",
+   "teaches": "comparing and ordering decimals that share the whole-number part, with 1 and 2 places mixed (0.4 vs 0.38; 3.6, 3.65, 3.06), so the tenths digit decides",
+   "representation": "the existing compare / order cell; a ones . tenths hundredths column header over the numbers (hint, fades)",
    "family": "decimals",
    "ccss": [
     "4.NF.C.7"
    ],
-   "why": "compare_decimal deals thousandths; Grade 3/Y4 stops at hundredths",
+   "why": "generated compare_decimal / order_decimals {decimals:2} at Max Number 10 almost always differ in the whole part (6.36 vs 5.99, 1.36 < 2.41 < 3.46), so the decimal places are never compared",
    "steps": [
-    "Y4.B9.S5"
+    "Y4.B9.S5",
+    "Y4.B9.S6"
    ],
    "reused": false
   },
@@ -8628,23 +9479,6 @@
    ],
    "reused": true,
    "source": "STANDARD_PROPOSALS"
-  },
-  "dec_order_2dp": {
-   "kind": "option",
-   "skill": "decimals:order_decimals",
-   "option": "places \"1 or 2\"",
-   "name": "Order Decimals to Hundredths (option)",
-   "teaches": "ordering three to five decimals with up to two places",
-   "representation": "order cell: numbers in boxed cards, answer slots in a row; optional 0-1 or 0-10 line",
-   "family": "decimals",
-   "ccss": [
-    "4.NF.C.7"
-   ],
-   "why": "order_decimals deals thousandths",
-   "steps": [
-    "Y4.B9.S6"
-   ],
-   "reused": false
   },
   "round_whole": {
    "kind": "option",
@@ -8780,21 +9614,6 @@
     "R.B10.S6",
     "R.B6.S4",
     "Y1.B14.S1"
-   ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
-  },
-  "time_convert": {
-   "kind": "option",
-   "skill": "measurement:unit_conversion_word",
-   "option": "time",
-   "name": "Convert Units of Time (option)",
-   "teaches": "converting between seconds, minutes, hours, days, weeks, months and years",
-   "representation": "a time-only unit option",
-   "family": "measurement",
-   "steps": [
-    "Y4.B11.S2",
-    "Y5.B14.S5"
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
@@ -8996,274 +9815,975 @@
  },
  "tagFixes": [
   {
-   "key": "placevalue:compare",
-   "step": "Y4.B1.S11",
-   "action": "add",
-   "why": "re-tag as FULL (drop the partial flag) with opts band 9,999"
-  },
-  {
-   "key": "placevalue:order_least_to_greatest",
-   "step": "Y4.B1.S12",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
-  },
-  {
-   "key": "placevalue:order_greatest_to_least",
-   "step": "Y4.B1.S12",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
+   "key": "composing:base10_build_hundreds",
+   "step": "Y4.B1.S1",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "band": 999
+   }
   },
   {
    "key": "placevalue:place_value_disks",
-   "step": "Y4.B1.S5",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
-  },
-  {
-   "key": "placevalue:pv_digit_drag",
-   "step": "Y4.B1.S5",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
-  },
-  {
-   "key": "placevalue:unit_form",
-   "step": "Y4.B1.S5",
-   "action": "add",
-   "why": "missing tag: unit form to 9,999 represents 4-digit numbers"
-  },
-  {
-   "key": "placevalue:expand",
-   "step": "Y4.B1.S6",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
-  },
-  {
-   "key": "placevalue:combine",
-   "step": "Y4.B1.S6",
-   "action": "add",
-   "why": "re-tag as FULL with band 9,999"
-  },
-  {
-   "key": "placevalue:expand",
-   "step": "Y4.B1.S2",
-   "action": "add",
-   "why": "re-tag as FULL with band 999 (standard partition is all the step asks)"
+   "step": "Y4.B1.S1",
+   "action": "full",
+   "why": "re-tag as FULL with band 999",
+   "opts": {
+    "band": 999
+   }
   },
   {
    "key": "placevalue:pv_disks_build",
    "step": "Y4.B1.S1",
    "action": "add",
-   "why": "missing tag: draw counters for a 3-digit number"
+   "why": "missing tag: draw counters for a 3-digit number",
+   "opts": {
+    "band": 999
+   }
+  },
+  {
+   "key": "placevalue:combine",
+   "step": "Y4.B1.S2",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "band": 999
+   }
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y4.B1.S2",
+   "action": "full",
+   "why": "re-tag as FULL with band 999 (standard partition is all the step asks)",
+   "opts": {
+    "band": 999
+   }
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S2",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "band": 999
+   }
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y4.B1.S3",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "span": 100,
+    "band": 1000
+   }
+  },
+  {
+   "key": "patterns:count_by_powers_of_10",
+   "step": "Y4.B1.S4",
+   "action": "add",
+   "partial": "generated items count in 10,000s-1,000,000s, not 1,000s within 10,000",
+   "why": "generated items count in 10,000s and up, not 1,000s",
+   "opts": {
+    "step": [
+     2
+    ]
+   }
   },
   {
    "key": "placevalue:place_value_disks",
-   "step": "Y4.B1.S1",
+   "step": "Y4.B1.S4",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:place_value_disks",
+   "step": "Y4.B1.S5",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:pv_digit_drag",
+   "step": "Y4.B1.S5",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S5",
    "action": "add",
-   "why": "re-tag as FULL with band 999"
+   "why": "missing tag: unit form to 9,999 represents 4-digit numbers",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:combine",
+   "step": "Y4.B1.S6",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:expand",
+   "step": "Y4.B1.S6",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S6",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "band": 9999
+   }
   },
   {
    "key": "placevalue:unit_form",
    "step": "Y4.B1.S7",
-   "action": "partial",
-   "why": "unit form with rename \"more\" is a partial cover of flexible partitioning"
+   "action": "add",
+   "partial": "other partitions (3,452 = 2,000 + 1,400 + 52) and the part-whole/bar layout",
+   "why": "unit form with rename \"more\" is a partial cover of flexible partitioning",
+   "opts": {
+    "band": 9999,
+    "rename": "more"
+   }
   },
   {
-   "key": "placevalue:unit_form",
-   "step": "Y4.B1.S1",
-   "action": "remove",
-   "why": "unit form is the partition step (Y4.B1.S2), not representing"
+   "key": "placevalue:more_less_10",
+   "step": "Y4.B1.S8",
+   "action": "add",
+   "partial": "generated: 1 and 10 more or less, but only to 120 (99 + 1, 86 − 10); never a 4-digit number",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "step": 0
+   }
+  },
+  {
+   "key": "placevalue:more_less_100",
+   "step": "Y4.B1.S8",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": [
+    {
+     "step": 1000
+    },
+    {
+     "step": 100
+    }
+   ]
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y4.B1.S9",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "span": 1000,
+    "band": 10000
+   }
+  },
+  {
+   "key": "number_sense:place_on_number_line",
+   "step": "Y4.B1.S10",
+   "action": "add",
+   "partial": "generated: marks 9,700 or 3,500 on a line between two labelled thousands (9,000-10,000); never a whole 0-10,000 line with only the ends labelled, never reads the number at an arrow",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "span": 1000,
+    "band": 10000
+   }
+  },
+  {
+   "key": "placevalue:compare",
+   "step": "Y4.B1.S11",
+   "action": "full",
+   "why": "re-tag as FULL (drop the partial flag) with opts band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:order_greatest_to_least",
+   "step": "Y4.B1.S12",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "placevalue:order_least_to_greatest",
+   "step": "Y4.B1.S12",
+   "action": "full",
+   "why": "re-tag as FULL with band 9,999",
+   "opts": {
+    "band": 9999
+   }
+  },
+  {
+   "key": "number_sense:nearest_10",
+   "step": "Y4.B1.S14",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "band": 1000
+   }
+  },
+  {
+   "key": "number_sense:rounding_visual",
+   "step": "Y4.B1.S14",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "place": 10,
+    "band": 1000
+   }
+  },
+  {
+   "key": "number_sense:rounding_visual",
+   "step": "Y4.B1.S15",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "place": 100,
+    "band": 1000
+   }
+  },
+  {
+   "key": "placevalue:more_less_100",
+   "step": "Y4.B2.S1",
+   "action": "add",
+   "partial": "only 1 more/less of each unit, not adding several (3,452 + 3,000)",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "step": 1000
+   }
   },
   {
    "key": "addition:add_10k_regroup",
    "step": "Y4.B2.S3",
    "action": "partial",
+   "partial": "generated items mix one and several exchanges and include 3-digit + 3-digit (868 + 697)",
    "why": "cannot hold a page to exactly one exchange"
   },
   {
    "key": "addition:add_10k_regroup",
    "step": "Y4.B2.S4",
    "action": "partial",
+   "partial": "generated items mix one and several exchanges (8,357 + 484 has two, 1,678 + 235 has two, 4,678 + 4,813 three)",
    "why": "cannot hold a page to more than one exchange"
   },
   {
    "key": "subtraction:sub_10k_regroup",
    "step": "Y4.B2.S6",
    "action": "partial",
+   "partial": "items cannot be held to exactly ONE exchange",
    "why": "cannot hold a page to exactly one exchange"
   },
   {
    "key": "subtraction:sub_10k_regroup",
    "step": "Y4.B2.S7",
    "action": "partial",
+   "partial": "generated items mix one and several exchanges (5,710 − 2,907 has one, 4,266 − 2,398 three); a page cannot be held to two or more",
    "why": "cannot hold a page to more than one exchange"
+  },
+  {
+   "key": "subtraction:sub_across_zeros",
+   "step": "Y4.B2.S7",
+   "action": "partial",
+   "partial": "generated: only exchanges across zeros, and half the items are 3-digit (900 − 205, 800 − 351, 801 − 427)",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "band": 10000
+   }
   },
   {
    "key": "number_sense:compensation",
    "step": "Y4.B2.S8",
    "action": "partial",
+   "partial": "only 2-digit numbers; no counting on, constant difference or \"choose the method\" with 4-digit numbers (7,000 − 2,999)",
    "why": "2-digit only; the step is 4-digit efficient subtraction"
   },
   {
    "key": "number_sense:estimate_sums_diffs",
    "step": "Y4.B2.S9",
-   "action": "add",
-   "why": "re-tag as FULL with place 1,000 and task reasonable"
+   "action": "full",
+   "why": "re-tag as FULL with place 1,000 and task reasonable",
+   "opts": [
+    {
+     "place": 1000,
+     "task": "reasonable"
+    },
+    {
+     "place": 100
+    }
+   ]
   },
   {
    "key": "subtraction:sub_check_by_adding",
    "step": "Y4.B2.S10",
    "action": "partial",
+   "partial": "generated: 3-digit subtractions only (525 − 457 = 68); no checking an addition by subtracting, no 4-digit numbers, no checking by estimating",
    "why": "3-digit subtraction only (generated); the step checks 4-digit sums and differences both ways"
-  },
-  {
-   "key": "addition:add_sub_100s",
-   "step": "Y4.B2.S1",
-   "action": "partial",
-   "why": "kept partial; missing clause now names 1s, 10s, 1,000s on 4-digit numbers"
-  },
-  {
-   "key": "area_perimeter:area_unit_squares",
-   "step": "Y4.B3.S2",
-   "action": "partial",
-   "why": "no half squares"
   },
   {
    "key": "area_perimeter:area_unit_squares",
    "step": "Y4.B3.S1",
-   "action": "add",
-   "why": "kept as direct (forms rectangles) but the step verdict is partial: comparing surfaces is missing"
+   "action": "opts",
+   "why": "kept as direct (forms rectangles) but the step verdict is partial: comparing surfaces is missing",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "shapes_early:compose_rect_from_squares",
    "step": "Y4.B3.S1",
    "action": "add",
+   "partial": "covers a shape with squares but never names \"area\" or compares surfaces",
    "why": "covering a rectangle with unit squares is the \"what is area\" model (partial)"
   },
   {
-   "key": "multiplication:mult_facts",
-   "step": "Y4.B4.S2",
-   "action": "add",
-   "why": "re-tag as FULL with opts constant [6] (likewise S4 with [9], S7 [7], S9 [11], S10 [12])"
-  },
-  {
-   "key": "division:div_facts",
-   "step": "Y4.B4.S2",
-   "action": "add",
-   "why": "re-tag as FULL with opts constant [6] (likewise S4, S7, S9, S10)"
+   "key": "area_perimeter:area_unit_squares",
+   "step": "Y4.B3.S2",
+   "action": "partial",
+   "partial": "whole squares in rectangles and L-shapes only; WRM counts half squares too",
+   "why": "no half squares"
   },
   {
    "key": "multiplication:count_by_tables",
    "step": "Y4.B4.S1",
-   "action": "add",
-   "why": "re-tag as FULL with constant [3]"
+   "action": "full",
+   "why": "re-tag as FULL with constant [3]",
+   "opts": {
+    "constant": [
+     3
+    ]
+   }
   },
   {
    "key": "multiplication:mult_chart",
    "step": "Y4.B4.S1",
    "action": "add",
-   "why": "missing tag: shade the multiples of 3"
+   "why": "missing tag: shade the multiples of 3",
+   "opts": {
+    "task": "shade",
+    "constant": [
+     3
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S2",
+   "action": "full",
+   "why": "re-tag as FULL with opts constant [6] (likewise S4, S7, S9, S10)",
+   "opts": {
+    "constant": [
+     6
+    ]
+   }
   },
   {
    "key": "multiplication:count_by_tables",
    "step": "Y4.B4.S2",
    "action": "add",
-   "why": "missing tag on S2, S4, S7, S9, S10 with the table constant"
+   "why": "missing tag on S2, S4, S7, S9, S10 with the table constant",
+   "opts": {
+    "constant": [
+     6
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S2",
+   "action": "full",
+   "why": "re-tag as FULL with opts constant [6] (likewise S4 with [9], S7 [7], S9 [11], S10 [12])",
+   "opts": {
+    "constant": [
+     6
+    ],
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S3",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     6
+    ],
+    "support": [
+     "think"
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S3",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     6
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S4",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     9
+    ]
+   }
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S4",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     9
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S4",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     9
+    ],
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S5",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     9
+    ],
+    "support": [
+     "think"
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S5",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     9
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_chart",
+   "step": "Y4.B4.S6",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "task": "pattern",
+    "constant": [
+     3,
+     6,
+     9
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S7",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     7
+    ]
+   }
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S7",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     7
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S7",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     7
+    ],
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S8",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     7
+    ],
+    "support": [
+     "think"
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S8",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     7
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S9",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     11
+    ]
+   }
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S9",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     11
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S9",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     11
+    ]
+   }
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S10",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     12
+    ]
+   }
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S10",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "constant": [
+     12
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S10",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "constant": [
+     12
+    ]
+   }
   },
   {
    "key": "multiplication:mult_facts",
    "step": "Y4.B4.S11",
    "action": "add",
-   "why": "missing tag: constant [0, 1]"
+   "why": "missing tag: constant [0, 1]",
+   "opts": {
+    "constant": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_properties",
+   "step": "Y4.B4.S11",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     2,
+     3
+    ]
+   }
   },
   {
    "key": "division:div_facts",
    "step": "Y4.B4.S12",
    "action": "add",
-   "why": "missing tag: constant [1] covers n ÷ 1"
+   "why": "missing tag: constant [1] covers n ÷ 1",
+   "opts": {
+    "constant": [
+     1
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_properties",
+   "step": "Y4.B4.S12",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     2
+    ]
+   }
+  },
+  {
+   "key": "multiplication:mult_properties",
+   "step": "Y4.B5.S2",
+   "action": "opts",
+   "why": "kept partial (breaking apart by addition, not a factor pair)",
+   "opts": {
+    "forms": [
+     1
+    ]
+   }
   },
   {
    "key": "multiplication:mult_zeros",
    "step": "Y4.B5.S3",
-   "action": "add",
-   "why": "re-tag as FULL with forms [0] (S4: forms [1])"
+   "action": "full",
+   "why": "re-tag as FULL with forms [0] (S4: forms [1])",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B5.S3",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "op": "x",
+    "power": [
+     10
+    ],
+    "band": 1000
+   }
+  },
+  {
+   "key": "multiplication:mult_zeros",
+   "step": "Y4.B5.S4",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "forms": [
+     1
+    ]
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B5.S4",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "op": "x",
+    "power": [
+     100
+    ],
+    "band": 10000
+   }
   },
   {
    "key": "placevalue:place_value_10x",
    "step": "Y4.B5.S5",
-   "action": "add",
-   "why": "re-tag as FULL with op ÷, power [10] (S6: power [100])"
+   "action": "full",
+   "why": "re-tag as FULL with op ÷, power [10] (S6: power [100])",
+   "opts": {
+    "op": "/",
+    "power": [
+     10
+    ],
+    "band": 10000
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B5.S6",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "op": "/",
+    "power": [
+     100
+    ],
+    "band": 10000
+   }
+  },
+  {
+   "key": "multiplication:mult_zeros",
+   "step": "Y4.B5.S7",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     2
+    ]
+   }
+  },
+  {
+   "key": "multiplication:area_model_mult",
+   "step": "Y4.B5.S8",
+   "action": "partial",
+   "partial": "the grid split, but not the informal partitioned layout with place-value counters",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "tiles": 21
+   }
+  },
+  {
+   "key": "multiplication:multiply",
+   "step": "Y4.B5.S8",
+   "action": "opts",
+   "why": "kept partial: the column method is not the informal layout",
+   "opts": {
+    "tiles": 21
+   }
+  },
+  {
+   "key": "multiplication:area_model_mult",
+   "step": "Y4.B5.S9",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "tiles": 21
+   }
   },
   {
    "key": "multiplication:multiply",
    "step": "Y4.B5.S9",
-   "action": "add",
-   "why": "re-tag as FULL with tiles 21 (S10: tiles 31)"
+   "action": "full",
+   "why": "re-tag as FULL with tiles 21 (S10: tiles 31)",
+   "opts": {
+    "tiles": 21
+   }
+  },
+  {
+   "key": "multiplication:area_model_mult",
+   "step": "Y4.B5.S10",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "tiles": 31
+   }
+  },
+  {
+   "key": "multiplication:multiply",
+   "step": "Y4.B5.S10",
+   "action": "full",
+   "why": "tagged partial; with these option values the generated items teach the whole step",
+   "opts": {
+    "tiles": 31
+   }
+  },
+  {
+   "key": "division:area_model_div_2by1",
+   "step": "Y4.B5.S11",
+   "action": "partial",
+   "partial": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to no exchange",
+   "why": "direct method; page not held to no exchange"
+  },
+  {
+   "key": "division:box_division_easy",
+   "step": "Y4.B5.S11",
+   "action": "partial",
+   "partial": "generated items mix no-exchange (86 ÷ 2) and exchange (72 ÷ 4)",
+   "why": "mixes exchange and no-exchange items"
   },
   {
    "key": "division:divide",
    "step": "Y4.B5.S11",
    "action": "add",
-   "why": "missing tag: tiles 21, regroup none (S12: regroup always; S13: tiles 31)"
+   "partial": "generated items mix no-exchange (88 ÷ 2) with exchange (76 ÷ 4, 96 ÷ 4)",
+   "why": "missing tag: tiles 21, regroup none (S12: regroup always; S13: tiles 31)",
+   "opts": {
+    "tiles": 21,
+    "regroup": "none"
+   }
   },
   {
-   "key": "multiplication:mult_properties",
-   "step": "Y4.B5.S2",
-   "action": "partial",
-   "why": "kept partial (breaking apart by addition, not a factor pair)"
+   "key": "division:area_model_div_2by1",
+   "step": "Y4.B5.S12",
+   "action": "add",
+   "partial": "the WRM partition picture, but generated items mix no exchange (93 ÷ 3), an exchange (52 ÷ 4) and 1-digit quotients (64 ÷ 8); a page cannot be held to an exchange of a ten",
+   "why": "not tagged yet; generated items teach this step in part"
   },
   {
-   "key": "multiplication:multiply",
-   "step": "Y4.B5.S8",
-   "action": "partial",
-   "why": "kept partial: the column method is not the informal layout"
+   "key": "division:divide",
+   "step": "Y4.B5.S12",
+   "action": "add",
+   "partial": "exchange items appear (76 ÷ 4) but mixed with no-exchange items",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "tiles": 21,
+    "regroup": "none"
+   }
+  },
+  {
+   "key": "division:divide",
+   "step": "Y4.B5.S13",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step",
+   "opts": {
+    "tiles": 31
+   }
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y4.B6.S1",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     3
+    ]
+   }
+  },
+  {
+   "key": "measurement:length_metric",
+   "step": "Y4.B6.S2",
+   "action": "opts",
+   "why": "km → m whole numbers only",
+   "opts": {
+    "forms": [
+     3
+    ]
+   }
   },
   {
    "key": "area_perimeter:perimeter",
    "step": "Y4.B6.S4",
-   "action": "add",
-   "why": "re-tag as FULL with forms [0, 1]"
+   "action": "full",
+   "why": "re-tag as FULL with forms [0, 1]",
+   "opts": {
+    "forms": [
+     0,
+     1
+    ]
+   }
   },
   {
    "key": "area_perimeter:composite_shapes",
    "step": "Y4.B6.S5",
    "action": "add",
-   "why": "missing tag: L/T/U perimeters with lengths given"
+   "why": "missing tag: L/T/U perimeters with lengths given",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "area_perimeter:perimeter_grid",
    "step": "Y4.B6.S5",
-   "action": "add",
+   "action": "full",
    "why": "re-tag as FULL (L-shapes on a grid)"
   },
   {
    "key": "area_perimeter:composite_shapes",
    "step": "Y4.B6.S7",
    "action": "add",
-   "why": "missing tag (direct); perimeter_grid stays partial"
+   "why": "missing tag (direct); perimeter_grid stays partial",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "area_perimeter:perimeter_intro",
    "step": "Y4.B6.S8",
    "action": "add",
+   "partial": "adds the sides of a drawn polygon; never uses \"regular\" (side × number of sides) or finds the side from the perimeter",
    "why": "missing tag (partial): adding sides of a polygon"
   },
   {
-   "key": "measurement:length_metric",
-   "step": "Y4.B6.S2",
+   "key": "area_perimeter:perimeter_intro",
+   "step": "Y4.B6.S9",
    "action": "partial",
-   "why": "km → m whole numbers only"
+   "partial": "generated: triangles, rectangles and squares only (7 + 7 + 5, 9 + 8 + 9 + 8); no pentagon, hexagon or irregular polygon",
+   "why": "tagged full; generated items teach only part of the step"
   },
   {
-   "key": "fractions:compare",
-   "step": "Y4.B7.S5",
-   "action": "remove",
-   "why": "deals proper fractions only; nothing about mixed numbers"
-  },
-  {
-   "key": "fractions:mixed_nl_drag",
-   "step": "Y4.B7.S5",
-   "action": "partial",
-   "why": "ordering shown on a line, no compare/order task"
+   "key": "composing:fraction_number_line",
+   "step": "Y4.B7.S2",
+   "action": "add",
+   "partial": "reads mixed numbers at an arrow sometimes; no counting on in fractions past 1 with wholes as diagrams",
+   "why": "reads mixed numbers on a line, part of counting beyond 1"
   },
   {
    "key": "fractions:mixed_nl_drag",
@@ -9272,10 +10792,25 @@
    "why": "missing tag: place mixed numbers on a line"
   },
   {
-   "key": "composing:fraction_number_line",
-   "step": "Y4.B7.S2",
+   "key": "fractions:mixed_nl_drag",
+   "step": "Y4.B7.S5",
+   "action": "add",
+   "partial": "places mixed numbers on a line, which shows the order, but never asks to compare (<, >) or write an order",
+   "why": "ordering shown on a line, no compare/order task"
+  },
+  {
+   "key": "fractions:improper_mixed",
+   "step": "Y4.B7.S7",
    "action": "partial",
-   "why": "reads mixed numbers on a line, part of counting beyond 1"
+   "partial": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
+   "key": "fractions:improper_mixed",
+   "step": "Y4.B7.S8",
+   "action": "partial",
+   "partial": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed",
+   "why": "tagged full; generated items teach only part of the step"
   },
   {
    "key": "fractions:select_equiv_frac",
@@ -9302,94 +10837,277 @@
    "why": "missing tag"
   },
   {
-   "key": "fractions:improper_mixed",
-   "step": "Y4.B7.S6",
-   "action": "add",
-   "why": "kept: improper fractions shown and named"
-  },
-  {
-   "key": "fraction_operations:frac_10_100",
-   "step": "Y4.B8.S1",
-   "action": "remove",
-   "why": "tenths as hundredths is Y4.B8.S7, not tenths as fractions"
-  },
-  {
    "key": "fractions:write_fraction",
    "step": "Y4.B8.S1",
-   "action": "partial",
-   "why": "kept partial with denoms [5]"
-  },
-  {
-   "key": "fraction_operations:frac_10_100",
-   "step": "Y4.B8.S7",
-   "action": "partial",
-   "why": "renames tenths as hundredths; does not read hundredths from a hundred square"
+   "action": "opts",
+   "why": "kept partial with denoms [5]",
+   "opts": {
+    "denoms": [
+     5
+    ]
+   }
   },
   {
    "key": "conversions:d_to_f",
    "step": "Y4.B8.S2",
    "action": "partial",
+   "partial": "mixes fifths (0.6 = 3/5); no tenths-only page",
    "why": "mixes fifths"
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y4.B8.S2",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "denoms": [
+     5
+    ]
+   }
+  },
+  {
+   "key": "decimals:decimal_nl_drag",
+   "step": "Y4.B8.S4",
+   "action": "partial",
+   "partial": "generated: places a tenth on a 0-1 line with 0, 0.5 and 1 labelled (0.9, 0.2, 0.6); never a line past 1 and never reads the decimal at a marked point",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "ticks": "some"
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B8.S5",
+   "action": "opts",
+   "why": "generated 3-digit ÷ 10; step is 1-digit (S6 2-digit, S10 ÷100 likewise)",
+   "opts": {
+    "op": "/",
+    "power": [
+     10
+    ],
+    "decimals": true
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B8.S6",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "op": "/",
+    "power": [
+     10
+    ],
+    "decimals": true
+   }
+  },
+  {
+   "key": "fraction_operations:frac_10_100",
+   "step": "Y4.B8.S7",
+   "action": "partial",
+   "partial": "tenths renamed as hundredths; never reads hundredths from a hundred square or counts in hundredths",
+   "why": "renames tenths as hundredths; does not read hundredths from a hundred square"
   },
   {
    "key": "conversions:d_to_f",
    "step": "Y4.B8.S8",
    "action": "partial",
+   "partial": "mixes fifths; no hundredths-only page",
    "why": "mixes fifths"
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y4.B8.S8",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "denoms": [
+     5
+    ]
+   }
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B8.S10",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "op": "/",
+    "power": [
+     100
+    ],
+    "decimals": true
+   }
   },
   {
    "key": "decimals:compare_decimal",
    "step": "Y4.B9.S5",
    "action": "partial",
-   "why": "thousandths; cannot be held to hundredths"
+   "partial": "generated: 1- and 2-place decimals below 10 compared with < > (6.36 vs 5.99, 6.1 vs 2.88), but the whole parts nearly always differ; no same-whole items (0.4 vs 0.38) and no hundred-square model",
+   "why": "with decimals 2, forms [0] and Max Number 10 the page is held to hundredths; partial because no same-whole items and no model",
+   "opts": {
+    "decimals": 2,
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "decimals:order_decimals",
    "step": "Y4.B9.S6",
    "action": "partial",
-   "why": "thousandths"
+   "partial": "generated: 3-5 decimals below 10 ordered both ways (1.36, 2.41, 3.46, 5.99, 6.36), but nearly every number has a different whole part, so the places are never compared",
+   "why": "with decimals 2 and Max Number 10 the page is held to hundredths; partial because the whole parts nearly always differ, so the decimal places are never compared",
+   "opts": {
+    "decimals": 2
+   }
   },
   {
    "key": "decimals:round_decimals",
    "step": "Y4.B9.S7",
    "action": "add",
+   "partial": "rounds to the nearest tenth/hundredth; never to the nearest whole number",
    "why": "missing partial tag: rounding decimals, but not to the whole"
   },
   {
-   "key": "measurement:money",
-   "step": "Y4.B10.S6",
-   "action": "add",
-   "why": "missing partial tag (one-step only)"
+   "key": "conversions:f_to_d",
+   "step": "Y4.B9.S8",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "denoms": [
+     2
+    ]
+   }
   },
   {
-   "key": "measurement:money_compare",
-   "step": "Y4.B10.S3",
-   "action": "partial",
-   "why": "coin sets only, not written amounts"
+   "key": "measurement:money_notation",
+   "step": "Y4.B10.S1",
+   "action": "opts",
+   "why": "full with opts currency usd",
+   "opts": {
+    "currency": "usd"
+   }
   },
   {
    "key": "measurement:money_notation",
    "step": "Y4.B10.S2",
    "action": "add",
-   "why": "missing partial tag"
+   "partial": "writes the amount shown in coins; never converts 345¢ ↔ $3.45",
+   "why": "missing partial tag",
+   "opts": {
+    "currency": "usd"
+   }
   },
   {
-   "key": "angles_lines:identify_angles",
-   "step": "Y4.B12.S3",
+   "key": "measurement:money_compare",
+   "step": "Y4.B10.S3",
    "action": "partial",
-   "why": "kept partial: names angles, no compare/order"
+   "partial": "coin sets only, and no US currency option (plain or riyal); not written amounts or ordering",
+   "why": "coin sets only, not written amounts",
+   "opts": {
+    "response": "sign"
+   }
+  },
+  {
+   "key": "measurement:money",
+   "step": "Y4.B10.S5",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "currency": "usd",
+    "step": 5,
+    "band": 2000,
+    "regroup": "mixed"
+   }
+  },
+  {
+   "key": "measurement:money_change",
+   "step": "Y4.B10.S5",
+   "action": "opts",
+   "why": "full with opts currency usd, step 5",
+   "opts": {
+    "currency": "usd",
+    "step": 5,
+    "band": 2000,
+    "paid": "note"
+   }
+  },
+  {
+   "key": "measurement:money",
+   "step": "Y4.B10.S6",
+   "action": "add",
+   "partial": "one-step totals only",
+   "why": "missing partial tag (one-step only)",
+   "opts": {
+    "currency": "usd",
+    "step": 5
+   }
+  },
+  {
+   "key": "measurement:money_change",
+   "step": "Y4.B10.S6",
+   "action": "add",
+   "partial": "one-step change only",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "currency": "usd",
+    "step": 5
+   }
+  },
+  {
+   "key": "measurement:unit_conversion_word",
+   "step": "Y4.B11.S2",
+   "action": "add",
+   "partial": "generated: hours → minutes, minutes → seconds and hours → seconds word problems (4 min = 240 s, 2 hr = 120 min); never seconds → minutes, mixed units (1 min 20 s) or comparing durations",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "units": [
+     0
+    ]
+   }
+  },
+  {
+   "key": "measurement:time_analog_digital",
+   "step": "Y4.B11.S3",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": [
+    {
+     "dir": "to-digital",
+     "precision": 1
+    },
+    {
+     "dir": "to-analog",
+     "precision": 1
+    }
+   ]
+  },
+  {
+   "key": "shapes_early:count_sides_vertices_2d",
+   "step": "Y4.B12.S6",
+   "action": "add",
+   "partial": "counts sides and vertices only",
+   "why": "not tagged yet; generated items teach this step in part"
   },
   {
    "key": "shapes_early:shape_attributes",
    "step": "Y4.B12.S6",
    "action": "add",
+   "partial": "shapes by sides and corners; no regular vs irregular, no naming polygons by number of sides past 6",
    "why": "missing partial tag for polygons"
   },
   {
    "key": "graphs:bar_graph",
-   "step": "Y4.B13.S2",
-   "action": "add",
-   "why": "re-tag as FULL with forms [2, 3] (how many more, total)"
+   "step": "Y4.B13.S1",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     0,
+     1
+    ]
+   }
   },
   {
    "key": "graphs:tally_chart",
@@ -9398,16 +11116,57 @@
    "why": "missing tag: reading a table of tallies"
   },
   {
+   "key": "graphs:bar_graph",
+   "step": "Y4.B13.S2",
+   "action": "full",
+   "why": "re-tag as FULL with forms [2, 3] (how many more, total)",
+   "opts": {
+    "forms": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "key": "graphs:pictograph",
+   "step": "Y4.B13.S2",
+   "action": "add",
+   "why": "not tagged yet; generated items teach this step"
+  },
+  {
+   "key": "coordinates:coordinate_q1",
+   "step": "Y4.B14.S1",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
+  },
+  {
+   "key": "coordinates:coordinate_q1",
+   "step": "Y4.B14.S2",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     1
+    ]
+   }
+  },
+  {
    "key": "coordinates:geo_translate",
    "step": "Y4.B14.S5",
    "action": "partial",
+   "partial": "picks the image for a given translation; does not ask the pupil to describe a translation (3 right, 2 up)",
    "why": "multiple choice of the image; does not describe a translation"
   },
   {
-   "key": "patterns:count_by_powers_of_10",
-   "step": "Y4.B1.S4",
-   "action": "partial",
-   "why": "generated items count in 10,000s and up, not 1,000s"
+   "key": "placevalue:unit_form",
+   "step": "Y4.B1.S1",
+   "action": "remove",
+   "why": "unit form is the partition step (Y4.B1.S2), not representing"
   },
   {
    "key": "number_theory:multiples",
@@ -9416,10 +11175,22 @@
    "why": "no table option; generated items are multiples of 6, 7, 8, 9, 10"
   },
   {
-   "key": "division:box_division_easy",
-   "step": "Y4.B5.S11",
-   "action": "partial",
-   "why": "mixes exchange and no-exchange items"
+   "key": "multiplication:mult_div_fact_family",
+   "step": "Y4.B4.S3",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a related skill"
+  },
+  {
+   "key": "multiplication:mult_div_fact_family",
+   "step": "Y4.B4.S5",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a related skill"
+  },
+  {
+   "key": "multiplication:mult_div_fact_family",
+   "step": "Y4.B4.S8",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a related skill"
   },
   {
    "key": "division:box_division_easy",
@@ -9428,28 +11199,28 @@
    "why": "not an exchange-only page; S11 skill"
   },
   {
-   "key": "division:area_model_div_2by1",
-   "step": "Y4.B5.S11",
-   "action": "add",
-   "why": "direct method; page not held to no exchange"
+   "key": "division:div_remainders",
+   "step": "Y4.B5.S12",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a pre skill"
   },
   {
-   "key": "placevalue:place_value_10x",
-   "step": "Y4.B8.S5",
-   "action": "partial",
-   "why": "generated 3-digit ÷ 10; step is 1-digit (S6 2-digit, S10 ÷100 likewise)"
+   "key": "composing:fraction_number_line",
+   "step": "Y4.B7.S4",
+   "action": "remove",
+   "why": "generated items do not teach this step; kept as a related skill"
   },
   {
-   "key": "measurement:money_notation",
-   "step": "Y4.B10.S1",
-   "action": "add",
-   "why": "full with opts currency usd"
+   "key": "fractions:compare",
+   "step": "Y4.B7.S5",
+   "action": "remove",
+   "why": "deals proper fractions only; nothing about mixed numbers"
   },
   {
-   "key": "measurement:money_change",
-   "step": "Y4.B10.S5",
-   "action": "add",
-   "why": "full with opts currency usd, step 5"
+   "key": "fraction_operations:frac_10_100",
+   "step": "Y4.B8.S1",
+   "action": "remove",
+   "why": "tenths as hundredths is Y4.B8.S7, not tenths as fractions"
   }
  ]
 }

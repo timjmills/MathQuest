@@ -21,26 +21,36 @@ for y in wrm['years']:
                 order.append(s['id'])
 errs = []
 
+MAXN = {}
 def pk(k):
-    m = re.match(r'^([a-z_0-9]+:[a-z_0-9]+)(\{.*\})?$', k)
+    # 'cat:skill{opts}@N' : opts are the skill's option values; @N is the Max Number (generateQuestionFor range)
+    m = re.match(r'^([a-z_0-9]+:[a-z_0-9]+)(\{.*\})?(?:@(\d+))?$', k)
     if not m:
         errs.append('bad key ' + k); return k, {}
     key, o = m.group(1), json.loads(m.group(2)) if m.group(2) else {}
+    if m.group(3): MAXN[(key, json.dumps(o, sort_keys=True))] = int(m.group(3))
     if key not in keys:
         errs.append('unknown skill ' + key)
     return key, o
+def mx(e, key, o):
+    n = MAXN.get((key, json.dumps(o, sort_keys=True)))
+    if n: e['maxNumber'] = n
+    return e
 
 def why_for(sid, ref, kind):
+    t = steps[ref]['title'] if ref in steps else ''
     if kind == 'P':
         wk = prior.get(sid, {}).get('wk')
-        t = steps[ref]['title'] if ref in steps else ref
-        return f"{ref} {t} (prior learning wk {wk})"
-    if kind == 'B':
-        return f"{ref} {steps[ref]['title']} (step before in the block)"
-    if kind == 'L':
-        return f"{ref} {steps[ref]['title']} (lower grade, same CCSS cluster)"
+        return f"{ref} {t or ''} (prior learning wk {wk})".replace('  ', ' ')
     if kind == 'C':
         return f"{ref} (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk {prior.get(sid, {}).get('wk')})"
+    if ref in steps and kind in ('B', 'L', 'X'):
+        # say exactly where the pre-skill sits relative to this step
+        if ref.startswith('Y4.'):
+            same_block = ref.rsplit('.', 1)[0] == sid.rsplit('.', 1)[0]
+            prev = same_block and order.index(ref) == order.index(sid) - 1
+            return f"{ref} {t} ({'step before in the block' if prev else ('earlier step in the block' if same_block else 'earlier block this year')})"
+        return f"{ref} {t} (lower grade, same idea)" if kind == 'X' else f"{ref} {t} (lower grade, same CCSS cluster)"
     return ref
 
 out_steps = {}
@@ -51,17 +61,20 @@ for sp in ns['STEPS']:
         errs.append('no step ' + sid); continue
     direct = []
     for k in sp.get('direct', []):
-        key, o = pk(k); direct.append({'key': key, 'opts': o})
+        key, o = pk(k); direct.append(mx({'key': key, 'opts': o}, key, o))
     partial = []
     for k, miss in sp.get('partial', []):
         key, o = pk(k); e = {'key': key, 'missing': miss}
         if o: e['opts'] = o
-        partial.append(e)
+        partial.append(mx(e, key, o))
     dk = {(d['key'], json.dumps(d['opts'], sort_keys=True)) for d in direct} | {(p['key'], json.dumps(p.get('opts', {}), sort_keys=True)) for p in partial}
     pre = []
+    seen_pre = set()
     for k, ref, kind in sp.get('pre', []):
         key, o = pk(k)
         if (key, json.dumps(o, sort_keys=True)) in dk: continue  # same skill as a direct one: dropped
+        if (key, json.dumps(o, sort_keys=True)) in seen_pre: continue  # the same pre listed twice
+        seen_pre.add((key, json.dumps(o, sort_keys=True)))
         e = {'key': key, 'why': why_for(sid, ref, kind)}
         if o: e['opts'] = o
         pre.append(e)
@@ -73,6 +86,11 @@ for sp in ns['STEPS']:
         if o: e['opts'] = o
         rel.append(e)
     if len(pre) > 8 or len(rel) > 8: errs.append(sid + ' too many pre/related')
+    # BRIEF rule 10: a key is never in both pre and related, whatever its options
+    both = {p['key'] for p in pre} & {r['key'] for r in rel}
+    if both: errs.append(f'{sid}: R10 key in both pre and related: {sorted(both)}')
+    if not rel: errs.append(f'{sid}: no related')
+    if not pre: errs.append(f'{sid}: no pre')
     v = sp['verdict']
     if v == 'full' and (sp.get('build') or partial): errs.append(sid + ' full but build/partial')
     if v != 'full' and not sp.get('build'): errs.append(sid + ' not full but no build')
@@ -83,6 +101,7 @@ for sp in ns['STEPS']:
     out_steps[sid] = {'title': steps[sid]['title'], 'direct': direct, 'partial': partial, 'verdict': v,
                       'missing': sp.get('missing', ''), 'build': sp.get('build', []), 'pre': pre,
                       'preBuild': sp.get('preBuild', []), 'related': rel, 'note': sp.get('note', '')}
+    if v != 'full': out_steps[sid]['envision'] = sp.get('envision')
 
 NEW = ns['NEW_PROPOSALS']
 proposals = {}
@@ -100,13 +119,82 @@ for pid, sids in used.items():
     proposals[pid] = p
 for pid in NEW:
     if pid not in used: errs.append('unused new proposal ' + pid)
+# Rule 13 (revised): every partial or gap step names the skill or option, still to be made, that would make it full.
+ENV, CLOSES, ENVREP = ns.get('ENVISION', {}), ns.get('CLOSES', {}), ns.get('ENVREP', {})
+def short_rep(r):
+    r = (r or '').split(';')[0].strip()
+    return r if len(r) <= 160 else r[:157].rsplit(' ', 1)[0] + ' …'
+for sid, st in out_steps.items():
+    if st['verdict'] == 'full':
+        continue
+    env = []
+    for pid in st['build']:
+        p = proposals.get(pid, {})
+        t = ENV.get(sid, {}).get(pid)
+        if not t: errs.append(f'{sid}: no envisioned skill for {pid}')
+        kind = p.get('kind') or 'new'
+        if p.get('skill'):
+            kind_s = f"new skill {p['skill']}" if kind == 'new' else f"option on {p['skill']}"
+        else:
+            kind_s = ('new template' if kind == 'template' else 'visual option') + ' on ' + ', '.join(p.get('hosts', [])[:3])
+        env.append({'proposal': pid, 'name': p.get('name', pid), 'kind': kind_s.strip(), 'teaches': t or p.get('teaches', ''),
+                    'closes': CLOSES.get(sid, {}).get(pid, st['missing']), 'representation': ENVREP.get(pid) or short_rep(p.get('representation') or p.get('build', ''))})
+    st['envision'] = env
+
+# Tag fixes, DERIVED: what this file says each Y4 step's direct (full) and partial skills are, against SKILL_WRM now.
+# action: add (no tag yet; `partial` carries the missing clause when it is a partial cover), full (an existing partial
+# tag becomes full), partial (an existing full tag becomes partial), opts (tag unchanged, record the option values),
+# remove (tagged now, not a direct or partial skill here). The hand-written why is kept where one exists.
+cur = {}
+for k, v in K['tags'].items():
+    for e in v:
+        sid_ = e if isinstance(e, str) else e['step']
+        if sid_ in out_steps: cur[(k, sid_)] = None if isinstance(e, str) else e.get('partial', '')
+hand = {(t['key'], t['step']): t for t in ns['TAGFIXES']}
+want = {}
+for sid, st in out_steps.items():
+    for d in st['direct']:
+        want.setdefault((d['key'], sid), {'status': 'full', 'opts': []})['opts'].append(d['opts'])
+    for pz in st['partial']:
+        w = want.setdefault((pz['key'], sid), {'status': 'partial', 'opts': [], 'missing': pz['missing']})
+        w['opts'].append(pz.get('opts', {}))
+        if w['status'] == 'partial': w['missing'] = pz['missing']
+tagfixes = []
+def why_of(key, sid, dflt):
+    h = hand.get((key, sid)); return h['why'] if h else dflt
+for (key, sid), w in sorted(want.items(), key=lambda x: (order.index(x[0][1]), x[0][0])):
+    opts = [o for o in w['opts'] if o]
+    t = {'key': key, 'step': sid}
+    if (key, sid) not in cur:
+        t['action'] = 'add'
+        if w['status'] == 'partial': t['partial'] = w['missing']
+        t['why'] = why_of(key, sid, 'not tagged yet; generated items teach this step' + (' in part' if w['status'] == 'partial' else ''))
+    elif cur[(key, sid)] is not None and w['status'] == 'full':
+        t['action'] = 'full'; t['why'] = why_of(key, sid, 'tagged partial; with these option values the generated items teach the whole step')
+    elif cur[(key, sid)] is None and w['status'] == 'partial':
+        t['action'] = 'partial'; t['partial'] = w['missing']; t['why'] = why_of(key, sid, 'tagged full; generated items teach only part of the step')
+    elif opts:
+        t['action'] = 'opts'; t['why'] = why_of(key, sid, 'tag unchanged; record the option values that make the generated items fit the step')
+    else:
+        continue
+    if opts: t['opts'] = opts if len(opts) > 1 else opts[0]
+    tagfixes.append(t)
+for (key, sid), pz in sorted(cur.items(), key=lambda x: (order.index(x[0][1]), x[0][0])):
+    if (key, sid) in want: continue
+    st = out_steps[sid]
+    where = 'related' if any(r['key'] == key for r in st['related']) else ('pre' if any(p['key'] == key for p in st['pre']) else '')
+    tagfixes.append({'key': key, 'step': sid, 'action': 'remove',
+                     'why': why_of(key, sid, 'generated items do not teach this step' + (f'; kept as a {where} skill' if where else ''))})
+stale = [k for k in hand if k not in {(t['key'], t['step']) for t in tagfixes}]
+
 missing_steps = [s for s in order if s not in out_steps]
 doc = {'year': 'Y4', 'generatedBy': 'wave2-tagging', 'steps': {s: out_steps[s] for s in order if s in out_steps},
-       'proposals': proposals, 'tagFixes': ns['TAGFIXES']}
+       'proposals': proposals, 'tagFixes': tagfixes}
 os.makedirs(R + 'data/curriculum/links', exist_ok=True)
 json.dump(doc, open(R + 'data/curriculum/links/Y4.json', 'w'), indent=1, ensure_ascii=False)
 from collections import Counter
 c = Counter(s['verdict'] for s in out_steps.values())
 print('steps', len(out_steps), dict(c), 'remaining', len(missing_steps))
-print('proposals new', sum(1 for p in proposals.values() if not p['reused']), 'reused', sum(1 for p in proposals.values() if p['reused']), 'tagFixes', len(ns['TAGFIXES']))
+print('proposals new', sum(1 for p in proposals.values() if not p['reused']), 'reused', sum(1 for p in proposals.values() if p['reused']), 'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')}, 'hand fixes now moot', len(stale))
+if os.environ.get('SHOW_STALE'): print('\n'.join(f'stale: {k}' for k in stale))
 print('\n'.join(errs) or 'OK')
