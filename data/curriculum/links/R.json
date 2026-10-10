@@ -778,6 +778,289 @@
     }
    ],
    "note": ""
+  },
+  "R.B5.S1": {
+   "title": "Find 4 and 5",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "pictures"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B3.S5 1 less (same CCSS K.CC.B.4, earlier)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B5.S3 Represent 4 and 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in R.B5.S4 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B5.S6 Composition of 4 and 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S2": {
+   "title": "Subitise 4 and 5",
+   "direct": [],
+   "partial": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     },
+     "missing": "recognising 4 and 5 at a glance"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "perceptual subitising of 4 and 5",
+   "build": [
+    "subitise"
+   ],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (same CCSS K.CC.B.5, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B5.S3 Represent 4 and 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B5.S4 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B5.S6 Composition of 4 and 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S3": {
+   "title": "Represent 4 and 5",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S2 Subitise 4 and 5 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B5.S4 1 more"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B7.S2 Find 0 to 5"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B5.S6 Composition of 4 and 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S4": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S2 Subitise 4 and 5 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B7.S2 Find 0 to 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B5.S3 Represent 4 and 5"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B5.S6 Composition of 4 and 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S5": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B5.S3 Represent 4 and 5 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B5.S1 Find 4 and 5 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: R.B5.S6 Composition of 4 and 5"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B7.S2 Find 0 to 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B5.S3 Represent 4 and 5"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S6": {
+   "title": "Composition of 4 and 5",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B5.S5 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B5.S1 Find 4 and 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B5.S3 Represent 4 and 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B5.S4 1 more"
+    }
+   ],
+   "note": ""
+  },
+  "R.B5.S7": {
+   "title": "Composition of 1 - 5",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 5,
+      "unknown": "mixed"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B5.S5 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B5.S1 Find 4 and 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B5.S3 Represent 4 and 5"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B5.S4 1 more"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -883,7 +1166,8 @@
    "representation": "standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts",
    "family": "counting",
    "steps": [
-    "R.B3.S2"
+    "R.B3.S2",
+    "R.B5.S2"
    ],
    "ccss": [
     "K.CC.B.5"
