@@ -11,7 +11,7 @@
         "angles_lines:place_symmetry_lines"
       ],
       "proposal": "map_symmetry_compare",
-      "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare",
+      "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare; re-check --n 12, checked: symmetry (count one shape / click-all / click lines), place_symmetry_lines (draw) — none compare two shapes",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
@@ -27,7 +27,7 @@
         "angles_lines:symmetry"
       ],
       "proposal": "map_symmetry_check_line",
-      "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial",
+      "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
@@ -72,7 +72,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "angle_rules",
-      "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360)",
+      "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
@@ -196,7 +196,7 @@
         "coordinates:coordinate_q1"
       ],
       "proposal": "coord_context",
-      "note": "coordinate_q1 deals read/plot abstract points A, B only; no context",
+      "note": "coordinate_q1 deals read/plot abstract points A, B only; no context; re-check --n 12, checked: coordinate_q1, coordinate_all, coordinate_graph — name/plot only, no context meaning",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
@@ -213,7 +213,7 @@
         "graphs:pictograph"
       ],
       "proposal": "map_graph_sentence",
-      "note": "graph skills ask one numeric/text question; no statement-matching form",
+      "note": "graph skills ask one numeric/text question; no statement-matching form; re-check --n 12, checked: bar_graph (how many / how many more / in all), tally_chart, pictograph — one numeric/name question, no statements",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
@@ -823,7 +823,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "defining_attributes",
-      "note": "none",
+      "note": "none; re-check --n 12, checked: shape_attributes (count sides, click 4 right angles), compose_from_attributes, classify_quads — no defining vs non-defining (colour/size/turn)",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
@@ -856,7 +856,7 @@
         "shapes_early:partition_shapes"
       ],
       "proposal": "map_shape_partition_pick",
-      "note": "fraction shaded / count parts; no equal-vs-unequal pick",
+      "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
@@ -872,7 +872,7 @@
         "shapes_early:shape_attributes"
       ],
       "proposal": "polygons",
-      "note": "sides/vertices counts only",
+      "note": "sides/vertices counts only; re-check --n 12, checked: shape_attributes (sides by name), shape_corners_count, classify_quads — no regular/irregular",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
@@ -886,7 +886,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "points_lines_rays",
-      "note": "identify_lines covers parallel/perpendicular/intersecting only",
+      "note": "identify_lines covers parallel/perpendicular/intersecting only; re-check --n 12, checked: identify_lines (parallel/perpendicular/intersecting), identify_angles — no point/line/segment/ray naming",
       "evidence": {
         "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
         "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
@@ -946,7 +946,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "draw_angles",
-      "note": "none",
+      "note": "none; re-check --n 12, checked: measure_angles (read only), identify_angles — no draw",
       "evidence": {
         "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
         "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
@@ -1025,7 +1025,7 @@
         "shapes_early:count_edges_faces_vertices"
       ],
       "proposal": "shapes_3d_props",
-      "note": "no \"which shape has 5 faces\" property items",
+      "note": "no \"which shape has 5 faces\" property items; re-check --n 12, checked: count_edges_faces_vertices (one solid), cross_section_3d, net_identify — no property→shape items",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
@@ -1073,7 +1073,7 @@
         "coordinates:coordinate_graph"
       ],
       "proposal": "four_quadrants",
-      "note": "naming points only",
+      "note": "naming points only; re-check --n 12, checked: coordinate_all (name/plot 4 quadrants), coordinate_graph — no distance/polygon/reflection problems across quadrants",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
@@ -1087,7 +1087,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "hv_lines",
-      "note": "none",
+      "note": "none; re-check --n 12, checked: identify_lines, coordinate_graph, coord_distance_q1 — no horizontal/vertical line items",
       "evidence": {
         "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
         "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
@@ -1151,7 +1151,7 @@
         "graphs:build_pictograph"
       ],
       "proposal": "pictogram_scale",
-      "note": "build uses each picture = 1",
+      "note": "build uses each picture = 1; re-check --n 12, checked: build_pictograph — 12/12 key = 1; pictograph read only",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
@@ -1198,7 +1198,7 @@
         "graphs:build_bar_graph"
       ],
       "proposal": "bar_graph_scale",
-      "note": "scale 1 only",
+      "note": "scale 1 only; re-check --n 12, checked: build_bar_graph — 12/12 values ≤ 10, unit scale",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
@@ -1229,7 +1229,7 @@
         "graphs:tally_chart"
       ],
       "proposal": "map_tally_build",
-      "note": "read only",
+      "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
@@ -1243,7 +1243,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "table_data",
-      "note": "none (tables only inside other items)",
+      "note": "none (tables only inside other items); re-check --n 12, checked: tally_chart, function_table_*, ratio_tables — no data table read",
       "evidence": {
         "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
         "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
@@ -1259,7 +1259,7 @@
         "graphs:line_plot_fractions"
       ],
       "proposal": "make_line_plot",
-      "note": "read only",
+      "note": "read only; re-check --n 12, checked: line_plot, line_plot_g2, line_plot_fractions — 36/36 read a finished plot; none build",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
@@ -1290,7 +1290,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "line_graph",
-      "note": "none",
+      "note": "none; re-check --n 12, checked: bar_graph, line_plot, pie_chart, mixed_graphs — no line graph",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "6+ Data chart: 'graph shows change in price over time; identify intervals' (line graph, Gr5-6 edge)"
@@ -1388,7 +1388,7 @@
         "shapes_classify:classify_quads"
       ],
       "proposal": "map_shape_attribute_sort",
-      "note": "symmetry --dist 200: count/click-all only; no skill sorts shapes into a 2-attribute chart",
+      "note": "symmetry --dist 200: count/click-all only; no skill sorts shapes into a 2-attribute chart; re-check --n 12, checked: symmetry, identify_angles, classify_quads, classify_triangles — click-all one property; no two-attribute sort",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 Geometry: 'Move the shapes to the correct part of the chart' - line of symmetry / acute / both"
@@ -1419,7 +1419,7 @@
         "shapes_early:count_edges_faces_vertices"
       ],
       "proposal": "shapes_3d_props",
-      "note": "count_edges_faces asks one solid's count; no select-all-with-property item",
+      "note": "count_edges_faces asks one solid's count; no select-all-with-property item; re-check --n 12, checked: count_edges_faces_vertices (one solid count), cross_section_3d — no select-all-by-property",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
@@ -1467,7 +1467,7 @@
         "graphs:line_plot_fractions"
       ],
       "proposal": "make_line_plot",
-      "note": "--dist 200: 79 total count, 52 mode, 69 how-many-at; 0 ask the total LENGTH (sum of the values)",
+      "note": "--dist 200: 79 total count, 52 mode, 69 how-many-at; 0 ask the total LENGTH (sum of the values); re-check --n 12, checked: line_plot_fractions (count at a value / most common / how many), line_plot — 0/24 sum lengths",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
@@ -1481,7 +1481,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "turns_angles",
-      "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap",
+      "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap; re-check --n 12, checked: measure_angles, identify_angles, additive_angles — none (see note)",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
@@ -1549,7 +1549,7 @@
         "graphs:build_pictograph"
       ],
       "proposal": "table_data",
-      "note": "build_bar_graph/build_pictograph build a graph from given counts (production, better than MAP's choose-one); no item reads a two-column table first",
+      "note": "build_bar_graph/build_pictograph build a graph from given counts (production, better than MAP's choose-one); no item reads a two-column table first; re-check --n 12, checked: build_bar_graph, build_pictograph (counts given inline), tally_chart — no two-column table",
       "evidence": {
         "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
         "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"

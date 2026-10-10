@@ -1,1684 +1,1678 @@
 {
- "rows": [
-  {
-   "task": "One-step equations (x + 9 = 13)",
-   "strand": "Operations & algebra",
-   "ritBand": "181-230",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "algebra:solve_eq_addsub",
-    "algebra:solve_unknown"
-   ],
-   "note": "Re-sampled n=20: \"Solve: a − 3 = 36\" number entry plus drag candidates to yes/no bins; content right, needs the 8/10 re-grade.",
-   "proposal": "map_regrade_solve_eq_addsub",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_190.pdf",
-    "says": "DesCartes 181-200: solves 1-step addition linear equations using a letter; 1-step linear equations at 211-230."
-   }
-  },
-  {
-   "task": "Order whole numbers and decimals mixed",
-   "strand": "Number & place value",
-   "ritBand": "211-220",
-   "source": "6.2",
-   "status": "partial",
-   "skills": [
-    "decimals:order_decimals",
-    "placevalue:order_least_to_greatest"
-   ],
-   "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets.",
-   "proposal": "map_order_whole_decimal_mixed",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_220.pdf",
-    "says": "DesCartes 211-230: compares and orders decimals (not same number of digits)."
-   }
-  },
-  {
-   "task": "Compare numbers: pick the lesser / greater",
-   "strand": "Number & place value",
-   "ritBand": "131-140",
-   "source": "6.2",
-   "status": "partial",
-   "skills": [
-    "placevalue:compare",
-    "integers:compare_int"
-   ],
-   "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only).",
-   "proposal": "map_compare_pick",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 131-140 sample: \"Choose the coatrack that has the fewest coats\" (pick-the-least)."
-   }
-  },
-  {
-   "task": ">, <, =",
-   "strand": "Number & place value",
-   "ritBand": "181-190",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "placevalue:compare",
-    "integers:compare_int"
-   ],
-   "note": "Re-sampled n=20: placevalue:compare deals \"Compare: 722 ___ 892\" symbol entry 20/20; sound, needs re-grade.",
-   "proposal": "map_regrade_compare",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 181-190: \"Put the correct symbol in each problem\" (drag <, >, =) for 3-digit pairs."
-   }
-  },
-  {
-   "task": "Compare expressions without computing",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "6.2",
-   "status": "partial",
-   "skills": [
-    "order_of_operations:compare_expressions"
-   ],
-   "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing.",
-   "proposal": "compare_sentences",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: understands equivalence and extends it to number sentences; calculations on both sides."
-   }
-  },
-  {
-   "task": "Order of operations e.g. 47 − (2 × 8)",
-   "strand": "Operations & algebra",
-   "ritBand": "191-230",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "order_of_operations:paren_simple",
-    "order_of_operations:oop_medium"
-   ],
-   "note": "Re-sampled n=20: paren_simple/oop_medium number entry plus \"click ALL expressions equal to\"; needs re-grade only.",
-   "proposal": "map_regrade_oop",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart 2-5 221-230 sample: evaluate 6 × (9 − 4) + (6 + 4) ÷ 2; DesCartes 191-210 grouping symbols."
-   }
-  },
-  {
-   "task": "Multi-digit addition",
-   "strand": "Operations & algebra",
-   "ritBand": "191-200",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "addition:add_100_regroup",
-    "addition:add_1k_regroup",
-    "addition:add_10k_regroup"
-   ],
-   "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade.",
-   "proposal": "map_regrade_multidigit_add",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-200: adds 3- and 4-digit numbers with regrouping, sums over 1000."
-   }
-  },
-  {
-   "task": "Base-ten model → number",
-   "strand": "Number & place value",
-   "ritBand": "161-170",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "composing:tens_foundation_visual",
-    "placevalue:place_value_disks",
-    "composing:base10_build"
-   ],
-   "note": "Re-sampled n=20: place_value_disks 20/20 \"What number do the disks show?\" entry; base10_build builds; needs re-grade.",
-   "proposal": "map_regrade_base10_read",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 161-170: \"What number do the blocks show?\" (base-ten blocks → number)."
-   }
-  },
-  {
-   "task": "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option",
-   "strand": "Operations & algebra",
-   "ritBand": "191-210",
-   "source": "6.2",
-   "status": "exists-regrade",
-   "skills": [
-    "algebra:multi_step_word"
-   ],
-   "note": "Re-sampled n=20: multi_step_word deals got/gave/lost/found two-step stories, number entry 20/20; needs re-grade and teacher option for change patterns.",
-   "proposal": "map_change_patterns",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: solves real-world problems involving 2-step multiple operations."
-   }
-  },
-  {
-   "task": "Count objects to 20 / how many",
-   "strand": "Number & place value",
-   "ritBand": "121-160",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "counting:count_objects"
-   ],
-   "note": "Sampled 200: 'How many triangles' 3–20, number entry.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 below 131: \"How many superheroes are there?\"; 2-5 below 161: how many apples."
-   }
-  },
-  {
-   "task": "Count on / before / after a number",
-   "strand": "Number & place value",
-   "ritBand": "161-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "counting:count_sequence",
-    "counting:number_seq_fill"
-   ],
-   "note": "Next/before/after with visual, number entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
-    "says": "DesCartes 161-180: identifies missing numbers in a series to 100; counts backwards from a given number."
-   }
-  },
-  {
-   "task": "Zero as a count; ordinal positions",
-   "strand": "Number & place value",
-   "ritBand": "131-150",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [],
-   "note": "No skill deals zero items or 1st/2nd/3rd.",
-   "proposal": "ordinal",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because K.CC.3 (zero as a count); ordinals are not in CCSS is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Teen numbers as ten and ones",
-   "strand": "Number & place value",
-   "ritBand": "161-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "composing:teen_compose",
-    "composing:ten_frame_build_teen"
-   ],
-   "note": "10 + ones, ten-frame build.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
-    "says": "DesCartes 161-180: equivalent forms of 11-20 with physical models (ten and ones)."
-   }
-  },
-  {
-   "task": "Skip count by 2s, 5s, 10s, 100s",
-   "strand": "Number & place value",
-   "ritBand": "171-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "patterns:seq_2",
-    "patterns:seq_5",
-    "patterns:seq_10",
-    "patterns:count_by_step_up"
-   ],
-   "note": "Sequences and fill-in grids, number entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
-    "says": "DesCartes 171-180: counts by 2s to 100; 181-190 uses counting by multiples."
-   }
-  },
-  {
-   "task": "Odd and even (select all)",
-   "strand": "Number & place value",
-   "ritBand": "171-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "composing:select_even_odd",
-    "composing:odd_even"
-   ],
-   "note": "Sampled: 'Click ALL the EVEN numbers' multi-select, MAP form.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart 2-5 171-180 sample: \"Choose all the sets that show an odd number\" (multi-select)."
-   }
-  },
-  {
-   "task": "Hundreds / number chart missing numbers to 1,000",
-   "strand": "Number & place value",
-   "ritBand": "151-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "composing:hundreds_chart_fill",
-    "composing:number_chart_fill"
-   ],
-   "note": "Chart windows, number entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
-    "says": "DesCartes 161-180: identifies missing numbers in a series through 100."
-   }
-  },
-  {
-   "task": "10 more / 10 less / 100 more / 100 less",
-   "strand": "Number & place value",
-   "ritBand": "161-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:more_less_10",
-    "placevalue:more_less_100"
-   ],
-   "note": "Sampled 'What is 10 more than 52', entry.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart 2-5 161-170: \"What number is 10 less than 46?\" move digits; K-2 171-180: 100 more than 347."
-   }
-  },
-  {
-   "task": "Value of a digit / name the place",
-   "strand": "Number & place value",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:value",
-    "placevalue:identify"
-   ],
-   "note": "Underlined digit worth, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-200: place value and value of each digit through the hundred thousands."
-   }
-  },
-  {
-   "task": "Digit is ten times the digit to its right",
-   "strand": "Number & place value",
-   "ritBand": "201-215",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "placevalue:value"
-   ],
-   "note": "value only asks the worth of one digit.",
-   "proposal": "value_ten_times",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 4.NBT.1 (digit is ten times the digit to its right) is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Expanded form, standard form, unit form",
-   "strand": "Number & place value",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:expand",
-    "placevalue:combine",
-    "placevalue:unit_form"
-   ],
-   "note": "'Write 654 in expanded form' entry; standard and unit forms exist.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-210: writes whole numbers in standard and expanded form; uses place value terms and vice versa."
-   }
-  },
-  {
-   "task": "Word form ↔ number to millions",
-   "strand": "Number & place value",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-regrade",
-   "skills": [
-    "placevalue:number_word_names",
-    "composing:number_word_form"
-   ],
-   "note": "number_word_names re-sampled n=20: 20/20 \"Which is the word name for #,#?\" MC; no word→number entry.",
-   "proposal": "map_word_to_number_entry",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-210: identifies numeral and written name for numbers over 100,000."
-   }
-  },
-  {
-   "task": "Place value to millions (7 digits)",
-   "strand": "Number & place value",
-   "ritBand": "201-210",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "placevalue:pv_digit_drag"
-   ],
-   "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table.",
-   "proposal": "vis_pv_bands_millions",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart 2-5 201-210: \"Use the numeral 612,398 … move digits to the correct place value in the boxes\"."
-   }
-  },
-  {
-   "task": "Compare numbers with >, <, = (pictures, to 20)",
-   "strand": "Number & place value",
-   "ritBand": "171-180",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "placevalue:compare"
-   ],
-   "note": "compare starts at 3 digits in sampling.",
-   "proposal": "compare_small",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
-    "says": "DesCartes 171-180: compares sets of objects (1-10): equal to, more than, less than."
-   }
-  },
-  {
-   "task": "Order 3-4 whole numbers (drag)",
-   "strand": "Number & place value",
-   "ritBand": "161-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:order_least_to_greatest",
-    "placevalue:order_greatest_to_least"
-   ],
-   "note": "Sampled ordering interactive (drag), MAP form.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
-    "says": "DesCartes 161-170: orders whole numbers less than 10; 201-210 orders to millions."
-   }
-  },
-  {
-   "task": "Rounding to 10/100/1,000 and decimals",
-   "strand": "Number & place value",
-   "ritBand": "191-220",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "number_sense:nearest_10",
-    "number_sense:nearest_100",
-    "number_sense:rounding_visual",
-    "number_sense:round_sort_tenths"
-   ],
-   "note": "Number line rounding and sort forms, entry and drag.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-220: rounds 2-6 digit whole numbers; rounds decimals to whole/tenth at 211-220."
-   }
-  },
-  {
-   "task": "Place a number on a number line (drag/tap)",
-   "strand": "Number & place value",
-   "ritBand": "171-200",
-   "source": "strand-walk",
-   "status": "exists-regrade",
-   "skills": [
-    "number_sense:place_on_number_line"
-   ],
-   "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only.",
-   "proposal": "nl_20",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 2.MD.6 (whole numbers on a number line); MAP shows fraction drag-to-number-line at 211-220 is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Read a number shown on a number line (which number is at the arrow)",
-   "strand": "Number & place value",
-   "ritBand": "171-200",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "number_sense:place_on_number_line"
-   ],
-   "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only).",
-   "proposal": "nl_20",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 2.MD.6 (read a whole number on a number line) is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Integers: compare, order, place on line",
-   "strand": "Number & place value",
-   "ritBand": "211-230",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "integers:compare_int",
-    "integers:order_negatives",
-    "integers:integer_nl_drag"
-   ],
-   "note": "compare_int multi-select and symbol; drag to line.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_220.pdf",
-    "says": "DesCartes (6+) 211-230: solves linear equations with integers; integer comparison is 6.NS.7."
-   }
-  },
-  {
-   "task": "Money: count coins and bills",
-   "strand": "Number & place value",
-   "ritBand": "161-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "measurement:money_count"
-   ],
-   "note": "Sampled 'Count the coins. Write the total' entry (Measurement family; MAP puts money in Number/OA).",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 2.MD.8 (count coins and bills) — in MAP Measurement & Data is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Estimate sums and differences by rounding",
-   "strand": "Operations & algebra",
-   "ritBand": "181-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "number_sense:estimate_sum",
-    "number_sense:estimate_diff"
-   ],
-   "note": "Round each number then add, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes 181-210: uses rounding to estimate answers to addition/subtraction problems."
-   }
-  },
-  {
-   "task": "Add/sub within 20 fluency",
-   "strand": "Operations & algebra",
-   "ritBand": "161-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:add_facts",
-    "subtraction:sub_facts"
-   ],
-   "note": "Fact items, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
-    "says": "DesCartes 161-180: adds 1-digit numbers sums 10-19; subtracts 1-digit from teen numbers."
-   }
-  },
-  {
-   "task": "Add with pictures within 5/10",
-   "strand": "Operations & algebra",
-   "ritBand": "121-140",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:add_5_pictures",
-    "subtraction:sub_5_pictures"
-   ],
-   "note": "Picture add/sub, entry.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 below 131: \"Two trucks and one more truck is how many trucks altogether?\" (pictures)."
-   }
-  },
-  {
-   "task": "Join/separate result-unknown word problems",
-   "strand": "Operations & algebra",
-   "ritBand": "141-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:add_wp_20",
-    "subtraction:sub_wp_20"
-   ],
-   "note": "Sampled 'gets N more', 'takes N', entry.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 141-150: move Xs to goats to show how many left; 171-180: Bella's 78 shells, 43 given away."
-   }
-  },
-  {
-   "task": "Change-unknown and start-unknown word problems",
-   "strand": "Operations & algebra",
-   "ritBand": "181-200",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "subtraction:unknown_start_wp"
-   ],
-   "note": "Sampled 'had some cards. Then collected…' start-unknown; change-unknown appears in missing_add_sub stories? Only equations. Start-unknown OK.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 181-190: \"Lions had 47 at halftime, 89 at end; how many after halftime?\" (change unknown)."
-   }
-  },
-  {
-   "task": "Change-unknown word problems (had 5, got some, now 12)",
-   "strand": "Operations & algebra",
-   "ritBand": "181-190",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "subtraction:missing_add_sub"
-   ],
-   "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories.",
-   "proposal": "map_change_unknown_story",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 181-190: change-unknown story (47 then 89 points), answer by moving digit tiles."
-   }
-  },
-  {
-   "task": "Compare word problems (how many more/fewer)",
-   "strand": "Operations & algebra",
-   "ritBand": "171-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:comparison_word"
-   ],
-   "note": "Sampled 200 difference-unknown, entry. Bigger/smaller-unknown not seen.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes 181-200: solves real-world subtraction problems (compare situations)."
-   }
-  },
-  {
-   "task": "Compare problems with bigger or smaller unknown",
-   "strand": "Operations & algebra",
-   "ritBand": "181-200",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "addition:comparison_word"
-   ],
-   "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown.",
-   "proposal": "map_compare_bigger_unknown",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 1.OA.1 / 2.OA.1 (compare, bigger or smaller unknown) is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Part-whole (put together / take apart, both addends unknown)",
-   "strand": "Operations & algebra",
-   "ritBand": "151-160",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "composing:number_bonds"
-   ],
-   "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\".",
-   "proposal": "part_whole",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 151-160: \"Move dots to the empty domino to show a different way to make 5\"."
-   }
-  },
-  {
-   "task": "Missing addend / missing number in +/− equation",
-   "strand": "Operations & algebra",
-   "ritBand": "161-170",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "subtraction:missing_add_sub",
-    "addition:cloze_addition"
-   ],
-   "note": "Sampled all six positions of the unknown, entry; cloze bank pick.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 161-170: \"Move the correct number to the blank: 4 + __ = 6\"; 2-5 161-170: __ + 7 = 13."
-   }
-  },
-  {
-   "task": "Meaning of the equal sign (true/false equations)",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "addition:equal_sign"
-   ],
-   "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items.",
-   "proposal": "equal_sign_repair",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: understands equivalence and extends the concept to number sentences."
-   }
-  },
-  {
-   "task": "Balance equations (7 + 5 = __ + 3)",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "algebra:balance_addsub"
-   ],
-   "note": "MAP-labelled form, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: solves open sentences with basic-facts calculations on both sides."
-   }
-  },
-  {
-   "task": "Add three numbers / properties of addition",
-   "strand": "Operations & algebra",
-   "ritBand": "161-180",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:add_three"
-   ],
-   "note": "Add three, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
-    "says": "DesCartes 161-170: adds multiple 1-digit numbers; 171-180 adds with parentheses."
-   }
-  },
-  {
-   "task": "Identify the property (commutative/associative) / equivalent sum",
-   "strand": "Operations & algebra",
-   "ritBand": "191-220",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [],
-   "note": "No skill asks which equation shows the same sum, or names a property.",
-   "proposal": "map_properties_equivalent",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
-    "says": "DesCartes 191-220: demonstrates understanding of commutative, then associative property."
-   }
-  },
-  {
-   "task": "Fact families / related facts",
-   "strand": "Operations & algebra",
-   "ritBand": "171-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "addition:add_sub_fact_family",
-    "addition:fact_family_sort"
-   ],
-   "note": "Fact family inputs and sort.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
-    "says": "DesCartes 171-190: recognizes addition and subtraction fact families through 18."
-   }
-  },
-  {
-   "task": "Input-output / function tables",
-   "strand": "Operations & algebra",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "algebra:function_table_easy"
-   ],
-   "note": "'Use the rule. Fill in the table.' entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
-    "says": "DesCartes 191-210: completes a function table based on real-life situations / given a rule."
-   }
-  },
-  {
-   "task": "Find the rule of an input-output table",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "algebra:function_table_easy"
-   ],
-   "note": "Re-sampled n=20: function_table_easy 20/20 \"Use the rule. Fill in the table.\"; 0/20 find-the-rule.",
-   "proposal": "function_machine",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: determines the rule and completes a simple function machine output."
-   }
-  },
-  {
-   "task": "Number patterns: extend / missing terms",
-   "strand": "Operations & algebra",
-   "ritBand": "171-200",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "patterns:number_pattern",
-    "patterns:number_patterns_rule"
-   ],
-   "note": "Fill missing terms + drag order, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
-    "says": "DesCartes 171-200: extends and analyzes a growing arithmetic pattern defined by numbers."
-   }
-  },
-  {
-   "task": "Shape / repeating patterns",
-   "strand": "Operations & algebra",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "patterns:shape_pattern"
-   ],
-   "note": "Shape patterns visual.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
-    "says": "DesCartes 191-210: extends a growing pattern defined by objects or diagrams."
-   }
-  },
-  {
-   "task": "Two patterns, find relationship",
-   "strand": "Operations & algebra",
-   "ritBand": "201-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "patterns:pattern_relationship"
-   ],
-   "note": "Exists.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_210.pdf",
-    "says": "DesCartes (6+) 201-210: uses a table of input/output values to represent patterns."
-   }
-  },
-  {
-   "task": "Write an expression from words (variable)",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "algebra:write_expression"
-   ],
-   "note": "Sampled entry 'n − 3' + click-ALL form.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
-    "says": "DesCartes 191-220: translates a 1-step problem to a symbolic expression or equation."
-   }
-  },
-  {
-   "task": "Write a numerical expression with brackets from words",
-   "strand": "Operations & algebra",
-   "ritBand": "201-230",
-   "source": "strand-walk",
-   "status": "missing",
-   "skills": [
-    "algebra:write_expression"
-   ],
-   "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets.",
-   "proposal": "write_numeric_expression",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-    "says": "DesCartes 201-220: translates a 2-step problem to a symbolic expression; 221-230 represents relationships as expression."
-   }
-  },
-  {
-   "task": "Evaluate expressions with variables",
-   "strand": "Operations & algebra",
-   "ritBand": "221-230",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "algebra:evaluate_expression"
-   ],
-   "note": "Exists.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
-    "says": "DesCartes (6+) 221-230: basic operations on algebraic expressions, substituting for variables."
-   }
-  },
-  {
-   "task": "Inequalities: true/false, solutions on a line",
-   "strand": "Operations & algebra",
-   "ritBand": "221-230",
-   "source": "strand-walk",
-   "status": "exists-regrade",
-   "skills": [
-    "algebra:inequalities"
-   ],
-   "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words.",
-   "proposal": "inequality_write_graph",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
-    "says": "DesCartes (6+) 221-230: solves simple one-step inequality open sentences and inequalities using graphs."
-   }
-  },
-  {
-   "task": "Tape diagram / bar model problems",
-   "strand": "Operations & algebra",
-   "ritBand": "191-210",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "algebra:tape_diagram"
-   ],
-   "note": "Bar model with story, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
-    "says": "DesCartes 211-230: uses pictures to represent problems."
-   }
-  },
-  {
-   "task": "Add/sub 10s and 100s mentally",
-   "strand": "Operations & algebra",
-   "ritBand": "171-195",
-   "source": "strand-walk",
-   "status": "exists-regrade",
-   "skills": [
-    "addition:add_sub_10s",
-    "addition:add_sub_100s"
-   ],
-   "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited.",
-   "proposal": "tens_any",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-200: performs mental subtraction with numbers under 1000."
-   }
-  },
-  {
-   "task": "Subtract across zeros / multi-digit subtraction",
-   "strand": "Operations & algebra",
-   "ritBand": "191-215",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "subtraction:sub_across_zeros",
-    "subtraction:sub_1k_regroup"
-   ],
-   "note": "Column stack, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-210: subtracts 3- or 4-digit numbers with regrouping; 5+ digits at 201-220."
-   }
-  },
-  {
-   "task": "Match: picture <-> equation (addition/subtraction)",
-   "strand": "Operations & algebra",
-   "ritBand": "171-180",
-   "source": "6.4",
-   "status": "partial",
-   "skills": [
-    "addition:add_5_pictures"
-   ],
-   "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture.",
-   "proposal": "pictures_to_sentence",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
-    "says": "DesCartes 171-180: represents a basic-facts addition problem with a number sentence."
-   }
-  },
-  {
-   "task": "Match: model <-> number (base-ten / place-value)",
-   "strand": "Number & place value",
-   "ritBand": "161-200",
-   "source": "6.4",
-   "status": "partial",
-   "skills": [
-    "placevalue:place_value_disks",
-    "composing:base10_build"
-   ],
-   "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items.",
-   "proposal": "map_match_model_number",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 161-170: pick the number the blocks show (1, 21, 20, 201)."
-   }
-  },
-  {
-   "task": "Match: story <-> operation / equation",
-   "strand": "Operations & algebra",
-   "ritBand": "171-200",
-   "source": "6.4",
-   "status": "missing",
-   "skills": [
-    "algebra:write_equation",
-    "addition:add_wp_20"
-   ],
-   "note": "Re-sampled n=20: add_wp_20 20/20 answer-only stories; write_equation needs letters (algebra); 0 pick-the-equation-for-story.",
-   "proposal": "map_story_equation_match",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
-    "says": "DesCartes 171-200: determines the operation needed; writes a number sentence for a simple problem."
-   }
-  },
-  {
-   "task": "Match: number line <-> number",
-   "strand": "Number & place value",
-   "ritBand": "161-200",
-   "source": "6.4",
-   "status": "partial",
-   "skills": [
-    "number_sense:place_on_number_line"
-   ],
-   "note": "Re-sampled n=20: place_on_number_line place only; read direction missing.",
-   "proposal": "nl_20",
-   "evidence": {
-    "url": null,
-    "says": "not found in public NWEA material; kept because 2.MD.6 (number line ↔ whole number) is in MAP's blueprint"
-   }
-  },
-  {
-   "task": "Match: number line <-> addition/subtraction equation",
-   "strand": "Operations & algebra",
-   "ritBand": "161-200",
-   "source": "6.4",
-   "status": "exists-ok",
-   "skills": [
-    "addition:number_line_add",
-    "subtraction:number_line_sub"
-   ],
-   "note": "Jumps on a line with the equation.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
-    "says": "DesCartes 161-180: uses a number line to construct addition facts with sums through 20."
-   }
-  },
-  {
-   "task": "Match: word form <-> number",
-   "strand": "Number & place value",
-   "ritBand": "171-210",
-   "source": "6.4",
-   "status": "exists-regrade",
-   "skills": [
-    "placevalue:number_word_names"
-   ],
-   "note": "Re-sampled n=20: number_word_names MC word name only.",
-   "proposal": "map_word_to_number_entry",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
-    "says": "DesCartes 171-180: numeral and written name 21-999; 191-210 to over 100,000."
-   }
-  },
-  {
-   "task": "Match: expanded form <-> standard form",
-   "strand": "Number & place value",
-   "ritBand": "191-210",
-   "source": "6.4",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:expand",
-    "placevalue:combine"
-   ],
-   "note": "Both directions, entry.",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
-    "says": "DesCartes 191-210: writes whole numbers in standard and expanded form through thousands."
-   }
-  },
-  {
-   "task": "Match: table <-> rule (input-output)",
-   "strand": "Operations & algebra",
-   "ritBand": "201-220",
-   "source": "6.4",
-   "status": "missing",
-   "skills": [
-    "algebra:function_table_easy"
-   ],
-   "note": "Re-sampled n=20: function_table_easy gives the rule 20/20.",
-   "proposal": "function_machine",
-   "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
-    "says": "DesCartes 211-220: determines the rule given a simple real-world function table."
-   }
-  },
-  {
-   "task": "Show another way to make a number (move dots to an empty domino)",
-   "strand": "Operations & algebra",
-   "ritBand": "151-160",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "composing:number_bonds",
-    "composing:make_ten"
-   ],
-   "proposal": "map_another_way_to_make",
-   "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
-   }
-  },
-  {
-   "task": "Pick the group with the fewest / most (coatracks)",
-   "strand": "Number & place value",
-   "ritBand": "131-140",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "comparing:compare_groups"
-   ],
-   "note": "Sampled n=20: compare_groups \"Which group has fewer/more counters?\" plus same; answer A/B.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 131-140: \"Choose the coatrack that has the fewest coats\"."
-   }
-  },
-  {
-   "task": "1 more / 1 less than a teen number (pick from a set)",
-   "strand": "Number & place value",
-   "ritBand": "151-160",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:more_less_10",
-    "counting:count_sequence"
-   ],
-   "note": "Sampled n=20: more_less_10 \"What is # more/less than #?\" entry; count_sequence before/after/between.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 151-160: \"Which number is 1 more than 13?\" choose from 4, 14, 15, 17, 20."
-   }
-  },
-  {
-   "task": "Write the number from place-value words (6 hundreds and 5 ones)",
-   "strand": "Number & place value",
-   "ritBand": "181-200",
-   "source": "strand-walk",
-   "status": "partial",
-   "skills": [
-    "placevalue:unit_form",
-    "placevalue:combine"
-   ],
-   "proposal": "map_units_to_number",
-   "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place.",
-   "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 above 191: \"6 hundreds and 5 ones. Write the number\" with digit tiles; DesCartes 171-200 place value terms."
-   }
-  },
-  {
-   "task": "Answer by moving digit tiles into answer boxes (number entry form)",
-   "strand": "Number & place value",
-   "ritBand": "161-190",
-   "source": "strand-walk",
-   "status": "exists-ok",
-   "skills": [
-    "placevalue:more_less_10",
-    "subtraction:missing_add_sub"
-   ],
-   "note": "Our number entry is the production equivalent of MAP digit tiles; sampled n=20 both skills answerType number.",
-   "evidence": {
-    "url": "https://www.nwea.org/blog/2025/how-the-map-growth-item-pool-stays-deep-aligned-and-up-to-date/",
-    "says": "NWEA: MAP items use text-entry boxes and drag-and-drop (e.g. digit tiles 0-9 in RIT chart samples)."
-   }
+  "rows": [
+    {
+      "task": "One-step equations (x + 9 = 13)",
+      "strand": "Operations & algebra",
+      "ritBand": "181-230",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "algebra:solve_eq_addsub",
+        "algebra:solve_unknown"
+      ],
+      "note": "Re-sampled n=20: \"Solve: a − 3 = 36\" number entry plus drag candidates to yes/no bins; content right, needs the 8/10 re-grade.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_190.pdf",
+        "says": "DesCartes 181-200: solves 1-step addition linear equations using a letter; 1-step linear equations at 211-230."
+      }
+    },
+    {
+      "task": "Order whole numbers and decimals mixed",
+      "strand": "Number & place value",
+      "ritBand": "211-220",
+      "source": "6.2",
+      "status": "partial",
+      "skills": [
+        "decimals:order_decimals",
+        "placevalue:order_least_to_greatest"
+      ],
+      "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets.",
+      "proposal": "map_order_whole_decimal_mixed",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_220.pdf",
+        "says": "DesCartes 211-230: compares and orders decimals (not same number of digits)."
+      }
+    },
+    {
+      "task": "Compare numbers: pick the lesser / greater",
+      "strand": "Number & place value",
+      "ritBand": "141-170",
+      "source": "6.2",
+      "status": "partial",
+      "skills": [
+        "placevalue:compare",
+        "integers:compare_int"
+      ],
+      "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only). Checked compare_groups (picture groups, row \"fewest/most\"), order_least_to_greatest (order a set) — neither asks pick-the-greater number.",
+      "proposal": "map_compare_pick",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_160.pdf",
+        "says": "DesCartes <161-170: orders whole numbers less than 10 (number comparison, not picture groups)."
+      }
+    },
+    {
+      "task": ">, <, =",
+      "strand": "Number & place value",
+      "ritBand": "181-190",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "placevalue:compare",
+        "integers:compare_int"
+      ],
+      "note": "Re-sampled n=20: placevalue:compare deals \"Compare: 722 ___ 892\" symbol entry 20/20; sound, needs re-grade.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 181-190: \"Put the correct symbol in each problem\" (drag <, >, =) for 3-digit pairs."
+      }
+    },
+    {
+      "task": "Compare expressions without computing",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "6.2",
+      "status": "partial",
+      "skills": [
+        "order_of_operations:compare_expressions"
+      ],
+      "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing.",
+      "proposal": "compare_sentences",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: understands equivalence and extends it to number sentences; calculations on both sides."
+      }
+    },
+    {
+      "task": "Order of operations e.g. 47 − (2 × 8)",
+      "strand": "Operations & algebra",
+      "ritBand": "191-230",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "order_of_operations:paren_simple",
+        "order_of_operations:oop_medium"
+      ],
+      "note": "Re-sampled n=20: paren_simple/oop_medium number entry plus \"click ALL expressions equal to\"; needs re-grade only. Re-grade lands in regrades; residual build = map_oop_small_band (paren_simple sampled 34 × (70 − 28) = 1428, MAP keeps results within 100).",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart 2-5 221-230 sample: evaluate 6 × (9 − 4) + (6 + 4) ÷ 2; DesCartes 191-210 grouping symbols."
+      },
+      "proposal": "map_oop_small_band"
+    },
+    {
+      "task": "Multi-digit addition",
+      "strand": "Operations & algebra",
+      "ritBand": "191-200",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "addition:add_100_regroup",
+        "addition:add_1k_regroup",
+        "addition:add_10k_regroup"
+      ],
+      "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-200: adds 3- and 4-digit numbers with regrouping, sums over 1000."
+      }
+    },
+    {
+      "task": "Base-ten model → number",
+      "strand": "Number & place value",
+      "ritBand": "161-170",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "composing:tens_foundation_visual",
+        "placevalue:place_value_disks",
+        "composing:base10_build"
+      ],
+      "note": "Re-sampled n=20: place_value_disks 20/20 \"What number do the disks show?\" entry; base10_build builds; needs re-grade.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 161-170: \"What number do the blocks show?\" (base-ten blocks → number)."
+      }
+    },
+    {
+      "task": "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option",
+      "strand": "Operations & algebra",
+      "ritBand": "191-210",
+      "source": "6.2",
+      "status": "exists-regrade",
+      "skills": [
+        "algebra:multi_step_word"
+      ],
+      "note": "Re-sampled n=20: multi_step_word deals got/gave/lost/found two-step stories, number entry 20/20; needs re-grade and teacher option for change patterns.",
+      "proposal": "map_change_patterns",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: solves real-world problems involving 2-step multiple operations."
+      }
+    },
+    {
+      "task": "Count objects to 20 / how many",
+      "strand": "Number & place value",
+      "ritBand": "121-160",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "counting:count_objects"
+      ],
+      "note": "Sampled 200: 'How many triangles' 3–20, number entry.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 below 131: \"How many superheroes are there?\"; 2-5 below 161: how many apples."
+      }
+    },
+    {
+      "task": "Count on / before / after a number",
+      "strand": "Number & place value",
+      "ritBand": "161-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "counting:count_sequence",
+        "counting:number_seq_fill"
+      ],
+      "note": "Next/before/after with visual, number entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
+        "says": "DesCartes 161-180: identifies missing numbers in a series to 100; counts backwards from a given number."
+      }
+    },
+    {
+      "task": "Zero as a count (how many? 0; write 0 for an empty set)",
+      "strand": "Number & place value",
+      "ritBand": "131-150",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [],
+      "proposal": "zero",
+      "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS).",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because K.CC.A.3 (write 0 for no objects) is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Ordinal positions (1st, 2nd, 3rd …)",
+      "strand": "Number & place value",
+      "ritBand": "131-150",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [],
+      "proposal": "ordinal",
+      "note": "LOW PRIORITY: ordinals are not CCSS. Checked skills.tsv for ordinal/first/position: no skill.",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; not a CCSS standard, kept low priority for K-1 position language"
+      }
+    },
+    {
+      "task": "Teen numbers as ten and ones",
+      "strand": "Number & place value",
+      "ritBand": "161-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "composing:teen_compose",
+        "composing:ten_frame_build_teen"
+      ],
+      "note": "10 + ones, ten-frame build.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
+        "says": "DesCartes 161-180: equivalent forms of 11-20 with physical models (ten and ones)."
+      }
+    },
+    {
+      "task": "Skip count by 2s, 5s, 10s, 100s",
+      "strand": "Number & place value",
+      "ritBand": "171-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "patterns:seq_2",
+        "patterns:seq_5",
+        "patterns:seq_10",
+        "patterns:count_by_step_up"
+      ],
+      "note": "Sequences and fill-in grids, number entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
+        "says": "DesCartes 171-180: counts by 2s to 100; 181-190 uses counting by multiples."
+      }
+    },
+    {
+      "task": "Odd and even (select all)",
+      "strand": "Number & place value",
+      "ritBand": "171-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "composing:select_even_odd",
+        "composing:odd_even"
+      ],
+      "note": "Sampled: 'Click ALL the EVEN numbers' multi-select, MAP form.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart 2-5 171-180 sample: \"Choose all the sets that show an odd number\" (multi-select)."
+      }
+    },
+    {
+      "task": "Hundreds / number chart missing numbers to 1,000",
+      "strand": "Number & place value",
+      "ritBand": "151-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "composing:hundreds_chart_fill",
+        "composing:number_chart_fill"
+      ],
+      "note": "Chart windows, number entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
+        "says": "DesCartes 161-180: identifies missing numbers in a series through 100."
+      }
+    },
+    {
+      "task": "10 more / 10 less / 100 more / 100 less",
+      "strand": "Number & place value",
+      "ritBand": "161-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:more_less_10",
+        "placevalue:more_less_100"
+      ],
+      "note": "Sampled 'What is 10 more than 52', entry.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart 2-5 161-170: \"What number is 10 less than 46?\" move digits; K-2 171-180: 100 more than 347."
+      }
+    },
+    {
+      "task": "Value of a digit / name the place",
+      "strand": "Number & place value",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:value",
+        "placevalue:identify"
+      ],
+      "note": "Underlined digit worth, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-200: place value and value of each digit through the hundred thousands."
+      }
+    },
+    {
+      "task": "Digit is ten times the digit to its right",
+      "strand": "Number & place value",
+      "ritBand": "201-215",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "placevalue:value"
+      ],
+      "note": "value only asks the worth of one digit.",
+      "proposal": "value_ten_times",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 4.NBT.1 (digit is ten times the digit to its right) is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Expanded form, standard form, unit form",
+      "strand": "Number & place value",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:expand",
+        "placevalue:combine",
+        "placevalue:unit_form"
+      ],
+      "note": "'Write 654 in expanded form' entry; standard and unit forms exist.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-210: writes whole numbers in standard and expanded form; uses place value terms and vice versa."
+      }
+    },
+    {
+      "task": "Word form ↔ number to millions",
+      "strand": "Number & place value",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "composing:number_word_form",
+        "placevalue:number_word_names"
+      ],
+      "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
+      "proposal": "map_word_form_millions",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-210: identifies numeral and written name for numbers over 100,000."
+      }
+    },
+    {
+      "task": "Place value to millions (7 digits)",
+      "strand": "Number & place value",
+      "ritBand": "201-210",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "placevalue:pv_digit_drag"
+      ],
+      "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table.",
+      "proposal": "vis_pv_bands_millions",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart 2-5 201-210: \"Use the numeral 612,398 … move digits to the correct place value in the boxes\"."
+      }
+    },
+    {
+      "task": "Compare numbers with >, <, = (pictures, to 20)",
+      "strand": "Number & place value",
+      "ritBand": "171-180",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "placevalue:compare"
+      ],
+      "note": "compare starts at 3 digits in sampling.",
+      "proposal": "compare_small",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
+        "says": "DesCartes 171-180: compares sets of objects (1-10): equal to, more than, less than."
+      }
+    },
+    {
+      "task": "Order 3-4 whole numbers (drag)",
+      "strand": "Number & place value",
+      "ritBand": "161-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:order_least_to_greatest",
+        "placevalue:order_greatest_to_least"
+      ],
+      "note": "Sampled ordering interactive (drag), MAP form.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
+        "says": "DesCartes 161-170: orders whole numbers less than 10; 201-210 orders to millions."
+      }
+    },
+    {
+      "task": "Rounding to 10/100/1,000 and decimals",
+      "strand": "Number & place value",
+      "ritBand": "191-220",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "number_sense:nearest_10",
+        "number_sense:nearest_100",
+        "number_sense:rounding_visual",
+        "number_sense:round_sort_tenths"
+      ],
+      "note": "Number line rounding and sort forms, entry and drag.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-220: rounds 2-6 digit whole numbers; rounds decimals to whole/tenth at 211-220."
+      }
+    },
+    {
+      "task": "Place a number on a number line (drag/tap)",
+      "strand": "Number & place value",
+      "ritBand": "171-200",
+      "source": "strand-walk",
+      "status": "exists-regrade",
+      "skills": [
+        "number_sense:place_on_number_line"
+      ],
+      "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only.",
+      "proposal": "nl_20",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.6 (whole numbers on a number line); MAP shows fraction drag-to-number-line at 211-220 is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Read a number shown on a number line (which number is at the arrow)",
+      "strand": "Number & place value",
+      "ritBand": "171-200",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "number_sense:place_on_number_line"
+      ],
+      "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only).",
+      "proposal": "nl_20",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.6 (read a whole number on a number line) is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Integers: compare, order, place on line",
+      "strand": "Number & place value",
+      "ritBand": "211-230",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "integers:compare_int",
+        "integers:order_negatives",
+        "integers:integer_nl_drag"
+      ],
+      "note": "compare_int multi-select and symbol; drag to line.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_220.pdf",
+        "says": "DesCartes (6+) 211-230: solves linear equations with integers; integer comparison is 6.NS.7."
+      }
+    },
+    {
+      "task": "Money: count coins and bills",
+      "strand": "Number & place value",
+      "ritBand": "161-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "measurement:money_count"
+      ],
+      "note": "Sampled 'Count the coins. Write the total' entry (Measurement family; MAP puts money in Number/OA).",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.8 (count coins and bills) — in MAP Measurement & Data is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Estimate sums and differences by rounding",
+      "strand": "Operations & algebra",
+      "ritBand": "181-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "number_sense:estimate_sum",
+        "number_sense:estimate_diff"
+      ],
+      "note": "Round each number then add, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+        "says": "DesCartes 181-210: uses rounding to estimate answers to addition/subtraction problems."
+      }
+    },
+    {
+      "task": "Add/sub within 20 fluency",
+      "strand": "Operations & algebra",
+      "ritBand": "161-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:add_facts",
+        "subtraction:sub_facts"
+      ],
+      "note": "Fact items, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
+        "says": "DesCartes 161-180: adds 1-digit numbers sums 10-19; subtracts 1-digit from teen numbers."
+      }
+    },
+    {
+      "task": "Add with pictures within 5/10",
+      "strand": "Operations & algebra",
+      "ritBand": "121-140",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:add_5_pictures",
+        "subtraction:sub_5_pictures"
+      ],
+      "note": "Picture add/sub, entry.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 below 131: \"Two trucks and one more truck is how many trucks altogether?\" (pictures)."
+      }
+    },
+    {
+      "task": "Join/separate result-unknown word problems",
+      "strand": "Operations & algebra",
+      "ritBand": "141-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:add_wp_20",
+        "subtraction:sub_wp_20"
+      ],
+      "note": "Sampled 'gets N more', 'takes N', entry.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 141-150: move Xs to goats to show how many left; 171-180: Bella's 78 shells, 43 given away."
+      }
+    },
+    {
+      "task": "Start-unknown word problems (some, then 8 more, now 15)",
+      "strand": "Operations & algebra",
+      "ritBand": "181-200",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "subtraction:unknown_start_wp"
+      ],
+      "note": "unknown_start_wp sampled n=12: 12/12 start-unknown stories, number entry. Change-unknown is NOT dealt (see the change-unknown row, map_change_unknown_story).",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+        "says": "DesCartes 181-200: solves addition/subtraction problems with the unknown in all positions."
+      }
+    },
+    {
+      "task": "Change-unknown word problems (had 5, got some, now 12)",
+      "strand": "Operations & algebra",
+      "ritBand": "181-190",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "subtraction:missing_add_sub"
+      ],
+      "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown.",
+      "proposal": "map_change_unknown_story",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 181-190: change-unknown story (47 then 89 points), answer by moving digit tiles."
+      }
+    },
+    {
+      "task": "Compare word problems (how many more/fewer)",
+      "strand": "Operations & algebra",
+      "ritBand": "171-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:comparison_word"
+      ],
+      "note": "Sampled 200 difference-unknown, entry. Bigger/smaller-unknown not seen.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+        "says": "DesCartes 181-200: solves real-world subtraction problems (compare situations)."
+      }
+    },
+    {
+      "task": "Compare problems with bigger or smaller unknown",
+      "strand": "Operations & algebra",
+      "ritBand": "181-200",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "addition:comparison_word"
+      ],
+      "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown.",
+      "proposal": "map_compare_bigger_unknown",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 1.OA.1 / 2.OA.1 (compare, bigger or smaller unknown) is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Part-whole (put together / take apart, both addends unknown)",
+      "strand": "Operations & algebra",
+      "ritBand": "151-160",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "composing:number_bonds"
+      ],
+      "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\".",
+      "proposal": "part_whole",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 151-160: \"Move dots to the empty domino to show a different way to make 5\"."
+      }
+    },
+    {
+      "task": "Missing addend / missing number in +/− equation",
+      "strand": "Operations & algebra",
+      "ritBand": "161-170",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "subtraction:missing_add_sub",
+        "addition:cloze_addition"
+      ],
+      "note": "Sampled all six positions of the unknown, entry; cloze bank pick.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 161-170: \"Move the correct number to the blank: 4 + __ = 6\"; 2-5 161-170: __ + 7 = 13."
+      }
+    },
+    {
+      "task": "Meaning of the equal sign (true/false equations)",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "addition:equal_sign"
+      ],
+      "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items.",
+      "proposal": "equal_sign_repair",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: understands equivalence and extends the concept to number sentences."
+      }
+    },
+    {
+      "task": "Balance equations (7 + 5 = __ + 3)",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "algebra:balance_addsub"
+      ],
+      "note": "MAP-labelled form, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: solves open sentences with basic-facts calculations on both sides."
+      }
+    },
+    {
+      "task": "Add three numbers / properties of addition",
+      "strand": "Operations & algebra",
+      "ritBand": "161-180",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:add_three"
+      ],
+      "note": "Add three, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_170.pdf",
+        "says": "DesCartes 161-170: adds multiple 1-digit numbers; 171-180 adds with parentheses."
+      }
+    },
+    {
+      "task": "Identify the property (commutative/associative) / equivalent sum",
+      "strand": "Operations & algebra",
+      "ritBand": "191-220",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [],
+      "note": "No skill asks which equation shows the same sum, or names a property.",
+      "proposal": "map_properties_equivalent",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
+        "says": "DesCartes 191-220: demonstrates understanding of commutative, then associative property."
+      }
+    },
+    {
+      "task": "Fact families / related facts",
+      "strand": "Operations & algebra",
+      "ritBand": "171-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "addition:add_sub_fact_family",
+        "addition:fact_family_sort"
+      ],
+      "note": "Fact family inputs and sort.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
+        "says": "DesCartes 171-190: recognizes addition and subtraction fact families through 18."
+      }
+    },
+    {
+      "task": "Input-output / function tables",
+      "strand": "Operations & algebra",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "algebra:function_table_easy"
+      ],
+      "note": "'Use the rule. Fill in the table.' entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
+        "says": "DesCartes 191-210: completes a function table based on real-life situations / given a rule."
+      }
+    },
+    {
+      "task": "Find the rule of an input-output table",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "strand-walk",
+      "status": "exists-regrade",
+      "skills": [
+        "algebra:function_table_hard",
+        "algebra:function_table_easy"
+      ],
+      "note": "function_table_hard sampled n=8: 8/8 \"Find the rule. Write the rule.\" (one- and two-operation rules, rule entry). Content dealt; re-grade only. function_table_easy gives the rule.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: determines the rule and completes a simple function machine output."
+      }
+    },
+    {
+      "task": "Number patterns: extend / missing terms",
+      "strand": "Operations & algebra",
+      "ritBand": "171-200",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "patterns:number_pattern",
+        "patterns:number_patterns_rule"
+      ],
+      "note": "Fill missing terms + drag order, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
+        "says": "DesCartes 171-200: extends and analyzes a growing arithmetic pattern defined by numbers."
+      }
+    },
+    {
+      "task": "Shape / repeating patterns",
+      "strand": "Operations & algebra",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "patterns:shape_pattern"
+      ],
+      "note": "Shape patterns visual.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
+        "says": "DesCartes 191-210: extends a growing pattern defined by objects or diagrams."
+      }
+    },
+    {
+      "task": "Two patterns, find relationship",
+      "strand": "Operations & algebra",
+      "ritBand": "201-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "patterns:pattern_relationship"
+      ],
+      "note": "Exists.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_210.pdf",
+        "says": "DesCartes (6+) 201-210: uses a table of input/output values to represent patterns."
+      }
+    },
+    {
+      "task": "Write an expression from words (variable)",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "algebra:write_expression"
+      ],
+      "note": "Sampled entry 'n − 3' + click-ALL form.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
+        "says": "DesCartes 191-220: translates a 1-step problem to a symbolic expression or equation."
+      }
+    },
+    {
+      "task": "Write a numerical expression with brackets from words",
+      "strand": "Operations & algebra",
+      "ritBand": "201-230",
+      "source": "strand-walk",
+      "status": "missing",
+      "skills": [
+        "algebra:write_expression"
+      ],
+      "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets.",
+      "proposal": "write_numeric_expression",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: translates a 2-step problem to a symbolic expression; 221-230 represents relationships as expression."
+      }
+    },
+    {
+      "task": "Evaluate expressions with variables",
+      "strand": "Operations & algebra",
+      "ritBand": "221-230",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "algebra:evaluate_expression"
+      ],
+      "note": "Exists.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
+        "says": "DesCartes (6+) 221-230: basic operations on algebraic expressions, substituting for variables."
+      }
+    },
+    {
+      "task": "Inequalities: true/false, solutions on a line",
+      "strand": "Operations & algebra",
+      "ritBand": "221-230",
+      "source": "strand-walk",
+      "status": "exists-regrade",
+      "skills": [
+        "algebra:inequalities"
+      ],
+      "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words.",
+      "proposal": "inequality_write_graph",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
+        "says": "DesCartes (6+) 221-230: solves simple one-step inequality open sentences and inequalities using graphs."
+      }
+    },
+    {
+      "task": "Tape diagram / bar model problems",
+      "strand": "Operations & algebra",
+      "ritBand": "191-210",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "algebra:tape_diagram"
+      ],
+      "note": "Bar model with story, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
+        "says": "DesCartes 211-230: uses pictures to represent problems."
+      }
+    },
+    {
+      "task": "Add/sub 10s and 100s mentally",
+      "strand": "Operations & algebra",
+      "ritBand": "171-195",
+      "source": "strand-walk",
+      "status": "exists-regrade",
+      "skills": [
+        "addition:add_sub_10s",
+        "addition:add_sub_100s"
+      ],
+      "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited.",
+      "proposal": "tens_any",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-200: performs mental subtraction with numbers under 1000."
+      }
+    },
+    {
+      "task": "Subtract across zeros / multi-digit subtraction",
+      "strand": "Operations & algebra",
+      "ritBand": "191-215",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "subtraction:sub_across_zeros",
+        "subtraction:sub_1k_regroup"
+      ],
+      "note": "Column stack, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-210: subtracts 3- or 4-digit numbers with regrouping; 5+ digits at 201-220."
+      }
+    },
+    {
+      "task": "Match: picture <-> equation (addition/subtraction)",
+      "strand": "Operations & algebra",
+      "ritBand": "171-180",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "addition:add_5_pictures"
+      ],
+      "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture.",
+      "proposal": "pictures_to_sentence",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
+        "says": "DesCartes 171-180: represents a basic-facts addition problem with a number sentence."
+      }
+    },
+    {
+      "task": "Match: model <-> number (base-ten / place-value)",
+      "strand": "Number & place value",
+      "ritBand": "161-200",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "placevalue:place_value_disks",
+        "composing:base10_build"
+      ],
+      "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items.",
+      "proposal": "map_match_model_number",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 161-170: pick the number the blocks show (1, 21, 20, 201)."
+      }
+    },
+    {
+      "task": "Match: story <-> operation / equation",
+      "strand": "Operations & algebra",
+      "ritBand": "171-200",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "algebra:build_expr_addsub",
+        "algebra:build_expr_multdiv",
+        "algebra:write_equation"
+      ],
+      "note": "build_expr_addsub n=8: 8/8 story → build \"89 − 3 = 86\" (build-expr, production — stronger than MAP choose-one); build_expr_multdiv n=8 the same for × ÷. Residual: only result-unknown join/separate/equal-groups stories; no unknown-in-other-positions, no compare or fraction stories. write_equation is letters (algebra).",
+      "proposal": "map_story_equation_match",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
+        "says": "DesCartes 171-200: determines the operation needed; writes a number sentence for a simple problem."
+      }
+    },
+    {
+      "task": "Match: number line <-> number",
+      "strand": "Number & place value",
+      "ritBand": "161-200",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "number_sense:place_on_number_line"
+      ],
+      "note": "Re-sampled n=20: place_on_number_line place only; read direction missing.",
+      "proposal": "nl_20",
+      "evidence": {
+        "url": null,
+        "says": "not found in public NWEA material; kept because 2.MD.6 (number line ↔ whole number) is in MAP's blueprint"
+      }
+    },
+    {
+      "task": "Match: number line <-> addition/subtraction equation",
+      "strand": "Operations & algebra",
+      "ritBand": "161-200",
+      "source": "6.4",
+      "status": "exists-ok",
+      "skills": [
+        "addition:number_line_add",
+        "subtraction:number_line_sub"
+      ],
+      "note": "Jumps on a line with the equation.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_170.pdf",
+        "says": "DesCartes 161-180: uses a number line to construct addition facts with sums through 20."
+      }
+    },
+    {
+      "task": "Match: word form <-> number",
+      "strand": "Number & place value",
+      "ritBand": "171-210",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "composing:number_word_form",
+        "placevalue:number_word_names"
+      ],
+      "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
+      "proposal": "map_word_form_millions",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
+        "says": "DesCartes 171-180: numeral and written name 21-999; 191-210 to over 100,000."
+      }
+    },
+    {
+      "task": "Match: expanded form <-> standard form",
+      "strand": "Number & place value",
+      "ritBand": "191-210",
+      "source": "6.4",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:expand",
+        "placevalue:combine"
+      ],
+      "note": "Both directions, entry.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
+        "says": "DesCartes 191-210: writes whole numbers in standard and expanded form through thousands."
+      }
+    },
+    {
+      "task": "Match: table <-> rule (input-output)",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "6.4",
+      "status": "partial",
+      "skills": [
+        "algebra:function_table_hard",
+        "algebra:function_table_easy"
+      ],
+      "note": "function_table_hard n=8: 8/8 find-and-write the rule, but 0/8 real-world tables (all bare In/Out). Residual = DesCartes 211-220 real-world function table. function_machine dropped (hard already finds rules).",
+      "proposal": "map_function_table_context",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
+        "says": "DesCartes 211-220: determines the rule given a simple real-world function table."
+      }
+    },
+    {
+      "task": "Show another way to make a number (move dots to an empty domino)",
+      "strand": "Operations & algebra",
+      "ritBand": "151-160",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "composing:number_bonds",
+        "composing:make_ten"
+      ],
+      "proposal": "map_another_way_to_make",
+      "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
+      }
+    },
+    {
+      "task": "Pick the group with the fewest / most (coatracks)",
+      "strand": "Number & place value",
+      "ritBand": "131-140",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "comparing:compare_groups"
+      ],
+      "note": "Sampled n=20: compare_groups \"Which group has fewer/more counters?\" plus same; answer A/B.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 131-140: \"Choose the coatrack that has the fewest coats\"."
+      }
+    },
+    {
+      "task": "1 more / 1 less than a teen number (pick from a set)",
+      "strand": "Number & place value",
+      "ritBand": "151-160",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:more_less_10",
+        "counting:count_sequence"
+      ],
+      "note": "Sampled n=20: more_less_10 \"What is # more/less than #?\" entry; count_sequence before/after/between.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 151-160: \"Which number is 1 more than 13?\" choose from 4, 14, 15, 17, 20."
+      }
+    },
+    {
+      "task": "Write the number from place-value words (6 hundreds and 5 ones)",
+      "strand": "Number & place value",
+      "ritBand": "181-200",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "placevalue:unit_form",
+        "placevalue:combine"
+      ],
+      "proposal": "map_units_to_number",
+      "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place.",
+      "evidence": {
+        "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
+        "says": "RIT chart K-2 above 191: \"6 hundreds and 5 ones. Write the number\" with digit tiles; DesCartes 171-200 place value terms."
+      }
+    },
+    {
+      "task": "Answer by moving digit tiles into answer boxes (number entry form)",
+      "strand": "Number & place value",
+      "ritBand": "161-190",
+      "source": "strand-walk",
+      "status": "exists-ok",
+      "skills": [
+        "placevalue:more_less_10",
+        "subtraction:missing_add_sub"
+      ],
+      "note": "Our number entry is the production equivalent of MAP digit tiles; sampled n=20 both skills answerType number.",
+      "evidence": {
+        "url": "https://www.nwea.org/blog/2025/how-the-map-growth-item-pool-stays-deep-aligned-and-up-to-date/",
+        "says": "NWEA: MAP items use text-entry boxes and drag-and-drop (e.g. digit tiles 0-9 in RIT chart samples)."
+      }
+    },
+    {
+      "task": "Multi-step word problems, all four operations, letter for the unknown (4.OA.A.3)",
+      "strand": "Operations & algebra",
+      "ritBand": "201-220",
+      "source": "strand-walk",
+      "status": "partial",
+      "skills": [
+        "algebra:multi_step_word",
+        "number_ops_mixed:word_problems_mixed",
+        "algebra:algebra_word_mixed_plain"
+      ],
+      "proposal": "multi_step_four_ops",
+      "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation.",
+      "evidence": {
+        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+        "says": "DesCartes 201-220: solves multi-step real-world problems using the four operations."
+      }
+    }
+  ],
+  "proposals": {
+    "map_order_whole_decimal_mixed": {
+      "kind": "option",
+      "skill": "decimals:order_decimals",
+      "option": "pool: whole numbers and decimals mixed (7, 6.85, 7.1, 0.9)",
+      "name": "Order Whole Numbers and Decimals Together",
+      "teaches": "Order a set that mixes whole numbers and decimals with different numbers of places",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number cards in a row with ordered answer slots and a place-value chart pane aligned on the decimal point; screen: drag the cards into order (ordering), never MC",
+      "family": "decimals",
+      "ccss": [
+        "5.NBT.A.3b",
+        "4.NF.C.7"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "211-220",
+        "taskType": "drag to order"
+      },
+      "why": "MAP sets mix whole numbers and decimals; the trap (6.85 > 7 because it is longer) is never dealt today",
+      "reused": false
+    },
+    "map_compare_pick": {
+      "kind": "option",
+      "skill": "placevalue:compare",
+      "option": "form: pick the greater / lesser (2–4 numbers; click one, or ring it on paper)",
+      "name": "Which Is Greater? Which Is Less?",
+      "teaches": "Choose the greatest or least of 2–4 whole numbers by comparing place by place",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 2–4 numbers in equal boxes, pupil rings one on paper; screen: click the number (MAP click/select item), with the words greater/less bolded",
+      "family": "placevalue",
+      "ccss": [
+        "2.NBT.A.4",
+        "1.NBT.B.3",
+        "4.NBT.A.2"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "171-190",
+        "taskType": "click to select"
+      },
+      "why": "MAP asks 'which number is greater' as a select item; we only deal the symbol",
+      "reused": false
+    },
+    "compare_sentences": {
+      "kind": "new",
+      "skill": "algebra:compare_number_sentences",
+      "name": "Compare Number Sentences",
+      "teaches": "Compare two expressions by seeing what changed (37 + 25 vs 37 + 28) without working them out",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two expressions in one row with a symbol box; a 'Why?' line from a sentence bank; screen: symbol entry + sentence-bank pick",
+      "family": "algebra",
+      "ccss": [
+        "2.NBT.B.9",
+        "3.OA.D.9",
+        "5.OA.A.2"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "191-220",
+        "taskType": "symbol select, reason without computing"
+      },
+      "why": "MAP 'without calculating' items; compare_expressions only evaluates",
+      "reused": true
+    },
+    "map_change_patterns": {
+      "kind": "option",
+      "skill": "algebra:multi_step_word",
+      "option": "pattern: add-add / add-sub / sub-add / sub-sub (default all four, equal weight)",
+      "name": "Two-Step Change Stories (choose the pattern)",
+      "teaches": "Two successive changes to a start amount, the teacher choosing which change patterns",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Then strip (structural) and answer box; screen: number entry",
+      "family": "algebra",
+      "ccss": [
+        "2.OA.A.1",
+        "3.OA.D.8"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "191-210",
+        "taskType": "number entry"
+      },
+      "why": "Owner asked for the teacher option; re-grade with it",
+      "reused": false
+    },
+    "ordinal": {
+      "kind": "new",
+      "skill": "counting:ordinal_numbers",
+      "name": "1st, 2nd, 3rd",
+      "teaches": "Ordinal position words",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a row of objects, ring the 3rd; screen: click the object",
+      "family": "counting",
+      "ccss": [
+        "K.CC.B.4"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "141-160",
+        "taskType": "click the nth object"
+      },
+      "why": "MAP K-1 asks for the nth object; nothing deals ordinals",
+      "reused": true
+    },
+    "value_ten_times": {
+      "kind": "option",
+      "skill": "placevalue:value",
+      "name": "Ten Times the Value (option)",
+      "teaches": "Compare the value of the same digit in two places",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number with two digits underlined and 'is ___ times' box; screen: number entry",
+      "family": "placevalue",
+      "ccss": [
+        "4.NBT.A.1",
+        "5.NBT.A.1"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "201-215",
+        "taskType": "number entry / select"
+      },
+      "why": "MAP 4.NBT.1 item",
+      "reused": true,
+      "option": "form \"ten times / one tenth\""
+    },
+    "vis_pv_bands_millions": {
+      "kind": "band",
+      "skill": null,
+      "name": "Widen Place Value to 7 Digits (millions)",
+      "teaches": "Read/write millions",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 7-column chart cell; screen: drag digits",
+      "family": "placevalue",
+      "ccss": [
+        "4.NBT.A.2",
+        "5.NBT.A.1"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "201-220",
+        "taskType": "drag digits into chart"
+      },
+      "why": "MAP grade 4-5 uses millions",
+      "reused": true
+    },
+    "compare_small": {
+      "kind": "option",
+      "skill": "placevalue:compare",
+      "name": "Compare Numbers to 10 and 20 (option)",
+      "teaches": "Compare small numbers with pictures",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two pictured sets, symbol box; screen: symbol entry",
+      "family": "placevalue",
+      "ccss": [
+        "K.CC.C.7",
+        "1.NBT.B.3"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "151-170",
+        "taskType": "symbol select"
+      },
+      "why": "MAP K-1 compare items",
+      "reused": true,
+      "option": "band 10/20 and pictures"
+    },
+    "nl_20": {
+      "kind": "new",
+      "skill": "number_sense:number_line_scales",
+      "name": "Numbers on a Number Line (any scale)",
+      "teaches": "Read and place numbers on lines of any scale",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with labelled ends and unlabelled ticks; screen: drag the marker",
+      "family": "number_sense",
+      "ccss": [
+        "2.MD.B.6",
+        "3.NBT.A.1"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "171-200",
+        "taskType": "drag/click point on number line"
+      },
+      "why": "place_on_number_line only uses 0–100",
+      "reused": true
+    },
+    "map_change_unknown_story": {
+      "kind": "option",
+      "skill": "subtraction:unknown_start_wp",
+      "option": "unknown: change (start known, result known)",
+      "name": "How Many Were Added? (change unknown)",
+      "teaches": "Join/separate stories where the change is unknown",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Now strip, the Then box empty; screen: number entry",
+      "family": "subtraction",
+      "ccss": [
+        "1.OA.A.1",
+        "2.OA.A.1"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "171-190",
+        "taskType": "number entry"
+      },
+      "why": "CGI change-unknown is a MAP problem type with no skill",
+      "reused": false
+    },
+    "map_compare_bigger_unknown": {
+      "kind": "option",
+      "skill": "addition:comparison_word",
+      "option": "unknown: bigger / smaller quantity",
+      "name": "Compare Stories: Find the Bigger or Smaller Amount",
+      "teaches": "'Zoe has 4 more than Owen, who has 7' — find the unknown quantity",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a two-bar comparison model (structural), answer box; screen: number entry",
+      "family": "addition",
+      "ccss": [
+        "1.OA.A.1",
+        "2.OA.A.1"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "181-200",
+        "taskType": "number entry"
+      },
+      "why": "The hardest CGI compare forms are MAP items; not dealt",
+      "reused": false
+    },
+    "part_whole": {
+      "kind": "new",
+      "skill": "composing:part_whole_model",
+      "name": "Part-Whole Model",
+      "teaches": "Part-whole with any part unknown",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; cherry/bar part-whole diagram; screen: number entry",
+      "family": "composing",
+      "ccss": [
+        "K.OA.A.3",
+        "1.OA.A.1"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "151-180",
+        "taskType": "number entry in model"
+      },
+      "why": "Put-together/take-apart types",
+      "reused": true
+    },
+    "equal_sign_repair": {
+      "kind": "repair",
+      "skill": "addition:equal_sign",
+      "name": "True/False Equations repair",
+      "teaches": "Equal sign means 'same as' (6 = 6, 4 + 1 = 5 + 0)",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation in a box, ring True/False; screen: two-button True/False (the response is binary)",
+      "family": "addition",
+      "ccss": [
+        "1.OA.D.7"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "181-200",
+        "taskType": "true/false select"
+      },
+      "why": "Skill contradicts its name",
+      "reused": true
+    },
+    "map_properties_equivalent": {
+      "kind": "new",
+      "skill": "algebra:properties_of_operations",
+      "name": "Same Answer? Properties of Operations",
+      "teaches": "Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; one expression and a missing box in the rewritten expression (production); select-all form for 'which are equal'; screen: number entry, multi-select only for the select-all form",
+      "family": "algebra",
+      "ccss": [
+        "1.OA.B.3",
+        "3.OA.B.5"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "191-210",
+        "taskType": "number entry / select all"
+      },
+      "why": "MAP asks property recognition; no skill",
+      "reused": false
+    },
+    "write_numeric_expression": {
+      "kind": "option",
+      "skill": "algebra:write_expression",
+      "name": "Write Numerical Expressions (option)",
+      "teaches": "Words → 2 × (8 + 7)",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; words above an expression-entry row; screen: build-the-expression tiles",
+      "family": "algebra",
+      "ccss": [
+        "5.OA.A.2"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "211-225",
+        "taskType": "expression entry"
+      },
+      "why": "MAP 5.OA.2",
+      "reused": true,
+      "option": "numbers only, with brackets"
+    },
+    "inequality_write_graph": {
+      "kind": "option",
+      "skill": "algebra:inequalities",
+      "name": "Write and Graph Inequalities (option)",
+      "teaches": "x > c from words, open/closed circle",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with circle and ray; screen: click the circle type and drag the ray",
+      "family": "algebra",
+      "ccss": [
+        "6.EE.B.8"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "211-230",
+        "taskType": "graph on number line"
+      },
+      "why": "MAP graphing item",
+      "reused": true,
+      "option": "write from words + graph"
+    },
+    "tens_any": {
+      "kind": "option",
+      "skill": "addition:add_sub_10s",
+      "name": "Add and Subtract Multiples of 10 (option)",
+      "teaches": "70 − 30, 34 + 20",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation cell, entry; screen: entry",
+      "family": "addition",
+      "ccss": [
+        "1.NBT.C.4",
+        "1.NBT.C.6"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "171-195",
+        "taskType": "number entry"
+      },
+      "why": "MAP 1.NBT.6",
+      "reused": true,
+      "option": "task: any multiple of 10"
+    },
+    "pictures_to_sentence": {
+      "kind": "option",
+      "skill": "addition:add_5_pictures",
+      "name": "Write the Number Sentence (option)",
+      "teaches": "Picture → 3 + 2 = 5",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; picture over a three-box sentence frame; screen: fill the boxes (production, not MC)",
+      "family": "addition",
+      "ccss": [
+        "K.OA.A.1",
+        "1.OA.A.1"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "141-170",
+        "taskType": "equation entry from a picture"
+      },
+      "why": "6.4 picture↔equation for OA",
+      "reused": true,
+      "option": "response \"write the number sentence\""
+    },
+    "map_match_model_number": {
+      "kind": "option",
+      "skill": "placevalue:place_value_disks",
+      "option": "form: match 3 models to 3 numbers",
+      "name": "Match the Model to the Number",
+      "teaches": "Pair each base-ten model with its number, incl. near-misses (304 vs 340)",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three models left, three numbers right, pupil writes the letter beside each number; screen: drag each number onto its model",
+      "family": "placevalue",
+      "ccss": [
+        "1.NBT.B.2",
+        "2.NBT.A.1"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "161-190",
+        "taskType": "drag to match"
+      },
+      "why": "6.4 match form for model↔number",
+      "reused": false
+    },
+    "map_story_equation_match": {
+      "kind": "option",
+      "skill": "algebra:build_expr_addsub",
+      "option": "stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv",
+      "name": "Build the Equation for Any Story",
+      "teaches": "Represent a story with an equation using a box for the unknown (9 + ☐ = 14, 4 × ☐ = 28, 3/8 + ☐ = 7/8), across + − × ÷ and fraction stories, without solving first",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box; pupil writes the numbers and the sign; screen: build-expr tiles (production, never MC)",
+      "family": "algebra",
+      "ccss": [
+        "1.OA.A.1",
+        "2.OA.A.1",
+        "3.OA.A.3",
+        "3.OA.D.8",
+        "4.NF.B.3d",
+        "5.NF.B.6"
+      ],
+      "map": [
+        {
+          "strand": "Operations & algebra",
+          "ritBand": "171-200",
+          "taskType": "build/choose the equation"
+        },
+        {
+          "strand": "Multiplication & division",
+          "ritBand": "181-210",
+          "taskType": "build/choose the equation"
+        },
+        {
+          "strand": "Fractions & decimals",
+          "ritBand": "201-230",
+          "taskType": "build/choose the equation"
+        }
+      ],
+      "why": "One option grows the live build_expr_* production form instead of three separate story→equation proposals; it closes the 6.4 story↔equation pair for +/−, ×/÷ and fraction stories",
+      "reused": false
+    },
+    "map_another_way_to_make": {
+      "kind": "option",
+      "skill": "composing:number_bonds",
+      "option": "response: show another way (open decomposition)",
+      "name": "Another Way to Make It",
+      "teaches": "Given one split of a number to 10 (domino/bond), show a different split",
+      "representation": "Print: one B&W boxed Andika cell, a drawn domino/bond with one split filled and an empty twin; the pupil draws dots or writes the two parts in boxes. Screen: tap dots into the empty domino halves (production, any valid split accepted), never MC.",
+      "family": "composing",
+      "ccss": [
+        "K.OA.3"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "151-160",
+        "taskType": "drag dots to domino"
+      },
+      "why": "number_bonds asks for one missing part; MAP asks for an open, different decomposition with more than one right answer.",
+      "reused": false
+    },
+    "map_units_to_number": {
+      "kind": "option",
+      "skill": "placevalue:unit_form",
+      "option": "direction: units → number (incl. zero place)",
+      "name": "Write the Number from Units",
+      "teaches": "Read \"6 hundreds and 5 ones\" and write 605, including the zero place",
+      "representation": "Print: one B&W boxed Andika cell, the unit words in big type above a digit-box answer slot (one box per place). Screen: number entry into the same place boxes.",
+      "family": "placevalue",
+      "ccss": [
+        "2.NBT.1",
+        "2.NBT.3"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "181-200",
+        "taskType": "digit tiles to boxes"
+      },
+      "why": "unit_form goes number → units only; MAP asks the reverse with a missing place.",
+      "reused": false
+    },
+    "map_oop_small_band": {
+      "kind": "option",
+      "skill": "order_of_operations:paren_simple",
+      "option": "band: small numbers (MAP) — operands to 50, every step and the result within 100, e.g. 47 − (2 × 8)",
+      "name": "Simple Parentheses: Small-Number Band",
+      "teaches": "Evaluate a two-operation expression with one set of parentheses when the arithmetic is light, so the item tests structure, not computation",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step marked and a working line under it; screen: number entry (production, not MC)",
+      "family": "order_of_operations",
+      "ccss": [
+        "5.OA.A.1"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "191-230",
+        "taskType": "number entry"
+      },
+      "why": "paren_simple sampled products to 1,400; MAP grouping-symbol items use small numbers. This is a real option (new number band), not a re-grade",
+      "reused": false
+    },
+    "map_function_table_context": {
+      "kind": "option",
+      "skill": "algebra:function_table_hard",
+      "option": "context: real-world table (headers such as Boxes / Pencils, Hours / Dollars) instead of In / Out",
+      "name": "Function Tables in a Story",
+      "teaches": "Find and write the rule of an input-output table whose columns are real quantities, then use it for a missing row",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two-column table with word headers, rule frame \"___ × ___\" under it; screen: rule-frame entry (operation tile + number), never MC",
+      "family": "algebra",
+      "ccss": [
+        "3.OA.D.9",
+        "4.OA.C.5"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "211-220",
+        "taskType": "rule entry"
+      },
+      "why": "DesCartes 211-220 \"determines the rule given a simple real-world function table\"; function_table_hard deals bare In/Out only",
+      "reused": false
+    },
+    "map_word_form_millions": {
+      "kind": "option",
+      "skill": "composing:number_word_form",
+      "option": "band: to 999,999 and to millions (adds the thousands/millions period words), both directions via wordform",
+      "name": "Number Word Form to Millions",
+      "teaches": "Write the numeral for a number name to millions, and the name for a numeral, period by period",
+      "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name over a digit-box row with comma separators between periods; screen: number entry (words → numeral) or word-bank entry (numeral → words)",
+      "family": "composing",
+      "ccss": [
+        "2.NBT.A.3",
+        "4.NBT.A.2"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "191-210",
+        "taskType": "number entry"
+      },
+      "why": "number_word_form is the live production skill but stops at 9,999; DesCartes 191-210 asks numeral/name over 100,000",
+      "reused": false
+    },
+    "zero": {
+      "kind": "option",
+      "skill": "counting:count_objects",
+      "name": "Zero (reused WRM_EXTENSIONS)",
+      "ccss": [
+        "K.CC.A.3"
+      ],
+      "map": {
+        "strand": "Number & place value",
+        "ritBand": "131-150",
+        "taskType": "number entry"
+      },
+      "reused": true
+    },
+    "multi_step_four_ops": {
+      "kind": "option",
+      "skill": "algebra:multi_step_word",
+      "name": "Two-Step Problems With All Four Operations",
+      "ccss": [
+        "4.OA.A.3"
+      ],
+      "map": {
+        "strand": "Operations & algebra",
+        "ritBand": "201-220",
+        "taskType": "number entry + write the equation"
+      },
+      "reused": true
+    }
   }
- ],
- "proposals": {
-  "map_regrade_solve_eq_addsub": {
-   "kind": "option",
-   "skill": "algebra:solve_eq_addsub",
-   "option": "re-grade (no new content)",
-   "name": "One-Step Equations re-grade",
-   "teaches": "Solve x + a = b and x − a = b with the unknown in any position",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation with an answer box for the letter; screen: number entry (MAP number-entry), the bin-sort form kept as a second form",
-   "family": "algebra",
-   "ccss": [
-    "6.EE.B.7",
-    "1.OA.D.8"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "201-210",
-    "taskType": "number entry"
-   },
-   "why": "Exists but has not been graded to the 8/10 rubric on every host",
-   "reused": false
-  },
-  "map_order_whole_decimal_mixed": {
-   "kind": "option",
-   "skill": "decimals:order_decimals",
-   "option": "pool: whole numbers and decimals mixed (7, 6.85, 7.1, 0.9)",
-   "name": "Order Whole Numbers and Decimals Together",
-   "teaches": "Order a set that mixes whole numbers and decimals with different numbers of places",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number cards in a row with ordered answer slots and a place-value chart pane aligned on the decimal point; screen: drag the cards into order (ordering), never MC",
-   "family": "decimals",
-   "ccss": [
-    "5.NBT.A.3b",
-    "4.NF.C.7"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "211-220",
-    "taskType": "drag to order"
-   },
-   "why": "MAP sets mix whole numbers and decimals; the trap (6.85 > 7 because it is longer) is never dealt today",
-   "reused": false
-  },
-  "map_compare_pick": {
-   "kind": "option",
-   "skill": "placevalue:compare",
-   "option": "form: pick the greater / lesser (2–4 numbers; click one, or ring it on paper)",
-   "name": "Which Is Greater? Which Is Less?",
-   "teaches": "Choose the greatest or least of 2–4 whole numbers by comparing place by place",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 2–4 numbers in equal boxes, pupil rings one on paper; screen: click the number (MAP click/select item), with the words greater/less bolded",
-   "family": "placevalue",
-   "ccss": [
-    "2.NBT.A.4",
-    "1.NBT.B.3",
-    "4.NBT.A.2"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "171-190",
-    "taskType": "click to select"
-   },
-   "why": "MAP asks 'which number is greater' as a select item; we only deal the symbol",
-   "reused": false
-  },
-  "map_regrade_compare": {
-   "kind": "option",
-   "skill": "placevalue:compare",
-   "option": "re-grade (no new content)",
-   "name": "Compare Numbers re-grade",
-   "teaches": "Compare two numbers with >, <, =",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two numbers with a symbol box between; screen: symbol entry",
-   "family": "placevalue",
-   "ccss": [
-    "1.NBT.B.3",
-    "2.NBT.A.4",
-    "4.NBT.A.2"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "161-200",
-    "taskType": "symbol select"
-   },
-   "why": "Exists; not yet graded 8/10 on every host",
-   "reused": false
-  },
-  "compare_sentences": {
-   "kind": "new",
-   "skill": "algebra:compare_number_sentences",
-   "name": "Compare Number Sentences",
-   "teaches": "Compare two expressions by seeing what changed (37 + 25 vs 37 + 28) without working them out",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two expressions in one row with a symbol box; a 'Why?' line from a sentence bank; screen: symbol entry + sentence-bank pick",
-   "family": "algebra",
-   "ccss": [
-    "2.NBT.B.9",
-    "3.OA.D.9",
-    "5.OA.A.2"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "191-220",
-    "taskType": "symbol select, reason without computing"
-   },
-   "why": "MAP 'without calculating' items; compare_expressions only evaluates",
-   "reused": true
-  },
-  "map_regrade_oop": {
-   "kind": "option",
-   "skill": "order_of_operations:paren_simple",
-   "option": "re-grade; band 'MAP' keeping results within 100 (47 − (2 × 8))",
-   "name": "Simple Parentheses re-grade",
-   "teaches": "Evaluate a two-operation expression with one set of parentheses",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step underlined and a working line; screen: number entry",
-   "family": "order_of_operations",
-   "ccss": [
-    "5.OA.A.1"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "211-230",
-    "taskType": "number entry"
-   },
-   "why": "Sampled products to 1,400; MAP items are small-number structure checks",
-   "reused": false
-  },
-  "map_regrade_multidigit_add": {
-   "kind": "option",
-   "skill": "addition:add_1k_regroup",
-   "option": "re-grade (whole add_*_regroup ladder)",
-   "name": "Multi-Digit Addition re-grade",
-   "teaches": "Column addition with regrouping",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; stack cell with regroup boxes; screen: digit entry in the stack",
-   "family": "addition",
-   "ccss": [
-    "2.NBT.B.7",
-    "4.NBT.B.4"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "181-220",
-    "taskType": "number entry"
-   },
-   "why": "Exists; ladder not yet graded 8/10",
-   "reused": false
-  },
-  "map_regrade_base10_read": {
-   "kind": "option",
-   "skill": "placevalue:place_value_disks",
-   "option": "re-grade; add base-10 blocks (rods/flats) as an alternate picture",
-   "name": "Read a Base-Ten Model re-grade",
-   "teaches": "Read the number shown by a base-ten model",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; block or disk picture over an answer box; screen: number entry",
-   "family": "placevalue",
-   "ccss": [
-    "1.NBT.B.2",
-    "2.NBT.A.1"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "161-190",
-    "taskType": "number entry"
-   },
-   "why": "MAP shows blocks (rods/flats), our read form only shows disks",
-   "reused": false
-  },
-  "map_change_patterns": {
-   "kind": "option",
-   "skill": "algebra:multi_step_word",
-   "option": "pattern: add-add / add-sub / sub-add / sub-sub (default all four, equal weight)",
-   "name": "Two-Step Change Stories (choose the pattern)",
-   "teaches": "Two successive changes to a start amount, the teacher choosing which change patterns",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Then strip (structural) and answer box; screen: number entry",
-   "family": "algebra",
-   "ccss": [
-    "2.OA.A.1",
-    "3.OA.D.8"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "191-210",
-    "taskType": "number entry"
-   },
-   "why": "Owner asked for the teacher option; re-grade with it",
-   "reused": false
-  },
-  "ordinal": {
-   "kind": "new",
-   "skill": "counting:ordinal_numbers",
-   "name": "1st, 2nd, 3rd",
-   "teaches": "Ordinal position words",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; a row of objects, ring the 3rd; screen: click the object",
-   "family": "counting",
-   "ccss": [
-    "K.CC.B.4"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "141-160",
-    "taskType": "click the nth object"
-   },
-   "why": "MAP K-1 asks for the nth object; nothing deals ordinals",
-   "reused": true
-  },
-  "value_ten_times": {
-   "kind": "option",
-   "skill": "placevalue:value",
-   "name": "Ten Times the Value (option)",
-   "teaches": "Compare the value of the same digit in two places",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number with two digits underlined and 'is ___ times' box; screen: number entry",
-   "family": "placevalue",
-   "ccss": [
-    "4.NBT.A.1",
-    "5.NBT.A.1"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "201-215",
-    "taskType": "number entry / select"
-   },
-   "why": "MAP 4.NBT.1 item",
-   "reused": true,
-   "option": "form \"ten times / one tenth\""
-  },
-  "map_word_to_number_entry": {
-   "kind": "option",
-   "skill": "placevalue:number_word_names",
-   "option": "direction: words → digits (number entry)",
-   "name": "Write the Number from Its Name",
-   "teaches": "Write the numeral for a number name up to 1,000,000",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name in words over a digit-box row with comma separators; screen: number entry",
-   "family": "placevalue",
-   "ccss": [
-    "2.NBT.A.3",
-    "4.NBT.A.2"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "181-210",
-    "taskType": "number entry"
-   },
-   "why": "MC-only today; a production form fits",
-   "reused": false
-  },
-  "vis_pv_bands_millions": {
-   "kind": "band",
-   "skill": null,
-   "name": "Widen Place Value to 7 Digits (millions)",
-   "teaches": "Read/write millions",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; 7-column chart cell; screen: drag digits",
-   "family": "placevalue",
-   "ccss": [
-    "4.NBT.A.2",
-    "5.NBT.A.1"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "201-220",
-    "taskType": "drag digits into chart"
-   },
-   "why": "MAP grade 4-5 uses millions",
-   "reused": true
-  },
-  "compare_small": {
-   "kind": "option",
-   "skill": "placevalue:compare",
-   "name": "Compare Numbers to 10 and 20 (option)",
-   "teaches": "Compare small numbers with pictures",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two pictured sets, symbol box; screen: symbol entry",
-   "family": "placevalue",
-   "ccss": [
-    "K.CC.C.7",
-    "1.NBT.B.3"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "151-170",
-    "taskType": "symbol select"
-   },
-   "why": "MAP K-1 compare items",
-   "reused": true,
-   "option": "band 10/20 and pictures"
-  },
-  "nl_20": {
-   "kind": "new",
-   "skill": "number_sense:number_line_scales",
-   "name": "Numbers on a Number Line (any scale)",
-   "teaches": "Read and place numbers on lines of any scale",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with labelled ends and unlabelled ticks; screen: drag the marker",
-   "family": "number_sense",
-   "ccss": [
-    "2.MD.B.6",
-    "3.NBT.A.1"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "171-200",
-    "taskType": "drag/click point on number line"
-   },
-   "why": "place_on_number_line only uses 0–100",
-   "reused": true
-  },
-  "map_change_unknown_story": {
-   "kind": "option",
-   "skill": "subtraction:unknown_start_wp",
-   "option": "unknown: change (start known, result known)",
-   "name": "How Many Were Added? (change unknown)",
-   "teaches": "Join/separate stories where the change is unknown",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a First–Then–Now strip, the Then box empty; screen: number entry",
-   "family": "subtraction",
-   "ccss": [
-    "1.OA.A.1",
-    "2.OA.A.1"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "171-190",
-    "taskType": "number entry"
-   },
-   "why": "CGI change-unknown is a MAP problem type with no skill",
-   "reused": false
-  },
-  "map_compare_bigger_unknown": {
-   "kind": "option",
-   "skill": "addition:comparison_word",
-   "option": "unknown: bigger / smaller quantity",
-   "name": "Compare Stories: Find the Bigger or Smaller Amount",
-   "teaches": "'Zoe has 4 more than Owen, who has 7' — find the unknown quantity",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story with a two-bar comparison model (structural), answer box; screen: number entry",
-   "family": "addition",
-   "ccss": [
-    "1.OA.A.1",
-    "2.OA.A.1"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "181-200",
-    "taskType": "number entry"
-   },
-   "why": "The hardest CGI compare forms are MAP items; not dealt",
-   "reused": false
-  },
-  "part_whole": {
-   "kind": "new",
-   "skill": "composing:part_whole_model",
-   "name": "Part-Whole Model",
-   "teaches": "Part-whole with any part unknown",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; cherry/bar part-whole diagram; screen: number entry",
-   "family": "composing",
-   "ccss": [
-    "K.OA.A.3",
-    "1.OA.A.1"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "151-180",
-    "taskType": "number entry in model"
-   },
-   "why": "Put-together/take-apart types",
-   "reused": true
-  },
-  "equal_sign_repair": {
-   "kind": "repair",
-   "skill": "addition:equal_sign",
-   "name": "True/False Equations repair",
-   "teaches": "Equal sign means 'same as' (6 = 6, 4 + 1 = 5 + 0)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation in a box, ring True/False; screen: two-button True/False (the response is binary)",
-   "family": "addition",
-   "ccss": [
-    "1.OA.D.7"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "181-200",
-    "taskType": "true/false select"
-   },
-   "why": "Skill contradicts its name",
-   "reused": true
-  },
-  "map_properties_equivalent": {
-   "kind": "new",
-   "skill": "algebra:properties_of_operations",
-   "name": "Same Answer? Properties of Operations",
-   "teaches": "Recognise equal expressions by commutative/associative/identity properties (8 + 5 = 5 + 8; (2 + 3) + 7 = 2 + (3 + 7))",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; one expression and a missing box in the rewritten expression (production); select-all form for 'which are equal'; screen: number entry, multi-select only for the select-all form",
-   "family": "algebra",
-   "ccss": [
-    "1.OA.B.3",
-    "3.OA.B.5"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "191-210",
-    "taskType": "number entry / select all"
-   },
-   "why": "MAP asks property recognition; no skill",
-   "reused": false
-  },
-  "function_machine": {
-   "kind": "new",
-   "skill": "algebra:function_machines",
-   "name": "Function Machines",
-   "teaches": "Find and apply rules",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; machine diagram with in/out; screen: entry",
-   "family": "algebra",
-   "ccss": [
-    "3.OA.D.9",
-    "4.OA.C.5"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "191-210",
-    "taskType": "rule entry"
-   },
-   "why": "MAP 'what is the rule' items",
-   "reused": true
-  },
-  "write_numeric_expression": {
-   "kind": "option",
-   "skill": "algebra:write_expression",
-   "name": "Write Numerical Expressions (option)",
-   "teaches": "Words → 2 × (8 + 7)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; words above an expression-entry row; screen: build-the-expression tiles",
-   "family": "algebra",
-   "ccss": [
-    "5.OA.A.2"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "211-225",
-    "taskType": "expression entry"
-   },
-   "why": "MAP 5.OA.2",
-   "reused": true,
-   "option": "numbers only, with brackets"
-  },
-  "inequality_write_graph": {
-   "kind": "option",
-   "skill": "algebra:inequalities",
-   "name": "Write and Graph Inequalities (option)",
-   "teaches": "x > c from words, open/closed circle",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; line with circle and ray; screen: click the circle type and drag the ray",
-   "family": "algebra",
-   "ccss": [
-    "6.EE.B.8"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "211-230",
-    "taskType": "graph on number line"
-   },
-   "why": "MAP graphing item",
-   "reused": true,
-   "option": "write from words + graph"
-  },
-  "tens_any": {
-   "kind": "option",
-   "skill": "addition:add_sub_10s",
-   "name": "Add and Subtract Multiples of 10 (option)",
-   "teaches": "70 − 30, 34 + 20",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation cell, entry; screen: entry",
-   "family": "addition",
-   "ccss": [
-    "1.NBT.C.4",
-    "1.NBT.C.6"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "171-195",
-    "taskType": "number entry"
-   },
-   "why": "MAP 1.NBT.6",
-   "reused": true,
-   "option": "task: any multiple of 10"
-  },
-  "pictures_to_sentence": {
-   "kind": "option",
-   "skill": "addition:add_5_pictures",
-   "name": "Write the Number Sentence (option)",
-   "teaches": "Picture → 3 + 2 = 5",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; picture over a three-box sentence frame; screen: fill the boxes (production, not MC)",
-   "family": "addition",
-   "ccss": [
-    "K.OA.A.1",
-    "1.OA.A.1"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "141-170",
-    "taskType": "equation entry from a picture"
-   },
-   "why": "6.4 picture↔equation for OA",
-   "reused": true,
-   "option": "response \"write the number sentence\""
-  },
-  "map_match_model_number": {
-   "kind": "option",
-   "skill": "placevalue:place_value_disks",
-   "option": "form: match 3 models to 3 numbers",
-   "name": "Match the Model to the Number",
-   "teaches": "Pair each base-ten model with its number, incl. near-misses (304 vs 340)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; three models left, three numbers right, pupil writes the letter beside each number; screen: drag each number onto its model",
-   "family": "placevalue",
-   "ccss": [
-    "1.NBT.B.2",
-    "2.NBT.A.1"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "161-190",
-    "taskType": "drag to match"
-   },
-   "why": "6.4 match form for model↔number",
-   "reused": false
-  },
-  "map_story_equation_match": {
-   "kind": "option",
-   "skill": "algebra:write_equation",
-   "option": "form: write the equation for an add/sub story (no solving), with the unknown as a box",
-   "name": "Write the Equation for the Story",
-   "teaches": "Represent a story with an equation using a symbol for the unknown (9 + ? = 14)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a sentence frame with operation box and digit boxes; screen: fill the frame (tiles), never MC",
-   "family": "algebra",
-   "ccss": [
-    "1.OA.A.1",
-    "2.OA.A.1",
-    "3.OA.D.8"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "171-200",
-    "taskType": "choose/build the equation"
-   },
-   "why": "MAP 'which equation shows the story'; 6.4 story↔operation",
-   "reused": false
-  },
-  "map_another_way_to_make": {
-   "kind": "option",
-   "skill": "composing:number_bonds",
-   "option": "response: show another way (open decomposition)",
-   "name": "Another Way to Make It",
-   "teaches": "Given one split of a number to 10 (domino/bond), show a different split",
-   "representation": "Print: one B&W boxed Andika cell, a drawn domino/bond with one split filled and an empty twin; the pupil draws dots or writes the two parts in boxes. Screen: tap dots into the empty domino halves (production, any valid split accepted), never MC.",
-   "family": "composing",
-   "ccss": [
-    "K.OA.3"
-   ],
-   "map": {
-    "strand": "Operations & algebra",
-    "ritBand": "151-160",
-    "taskType": "drag dots to domino"
-   },
-   "why": "number_bonds asks for one missing part; MAP asks for an open, different decomposition with more than one right answer.",
-   "reused": false
-  },
-  "map_units_to_number": {
-   "kind": "option",
-   "skill": "placevalue:unit_form",
-   "option": "direction: units → number (incl. zero place)",
-   "name": "Write the Number from Units",
-   "teaches": "Read \"6 hundreds and 5 ones\" and write 605, including the zero place",
-   "representation": "Print: one B&W boxed Andika cell, the unit words in big type above a digit-box answer slot (one box per place). Screen: number entry into the same place boxes.",
-   "family": "placevalue",
-   "ccss": [
-    "2.NBT.1",
-    "2.NBT.3"
-   ],
-   "map": {
-    "strand": "Number & place value",
-    "ritBand": "181-200",
-    "taskType": "digit tiles to boxes"
-   },
-   "why": "unit_form goes number → units only; MAP asks the reverse with a missing place.",
-   "reused": false
-  }
- }
 }

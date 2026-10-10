@@ -12,7 +12,6 @@
     "algebra:solve_unknown"
    ],
    "note": "Re-sampled n=20: \"Solve: a − 3 = 36\" number entry plus drag candidates to yes/no bins; content right, needs the 8/10 re-grade.",
-   "proposal": "map_regrade_solve_eq_addsub",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_190.pdf",
     "says": "DesCartes 181-200: solves 1-step addition linear equations using a letter; 1-step linear equations at 211-230."
@@ -38,18 +37,18 @@
   {
    "task": "Compare numbers: pick the lesser / greater",
    "strand": "Number & place value",
-   "ritBand": "131-140",
+   "ritBand": "141-170",
    "source": "6.2",
    "status": "partial",
    "skills": [
     "placevalue:compare",
     "integers:compare_int"
    ],
-   "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only).",
+   "note": "Re-sampled n=20: placevalue:compare 20/20 symbol entry, 0/20 pick-the-greater/least; compare_int mixes symbol choice with \"click ALL greater than\" (integers only). Checked compare_groups (picture groups, row \"fewest/most\"), order_least_to_greatest (order a set) — neither asks pick-the-greater number.",
    "proposal": "map_compare_pick",
    "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 131-140 sample: \"Choose the coatrack that has the fewest coats\" (pick-the-least)."
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_160.pdf",
+    "says": "DesCartes <161-170: orders whole numbers less than 10 (number comparison, not picture groups)."
    }
   },
   {
@@ -63,7 +62,6 @@
     "integers:compare_int"
    ],
    "note": "Re-sampled n=20: placevalue:compare deals \"Compare: 722 ___ 892\" symbol entry 20/20; sound, needs re-grade.",
-   "proposal": "map_regrade_compare",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 181-190: \"Put the correct symbol in each problem\" (drag <, >, =) for 3-digit pairs."
@@ -95,12 +93,12 @@
     "order_of_operations:paren_simple",
     "order_of_operations:oop_medium"
    ],
-   "note": "Re-sampled n=20: paren_simple/oop_medium number entry plus \"click ALL expressions equal to\"; needs re-grade only.",
-   "proposal": "map_regrade_oop",
+   "note": "Re-sampled n=20: paren_simple/oop_medium number entry plus \"click ALL expressions equal to\"; needs re-grade only. Re-grade lands in regrades; residual build = map_oop_small_band (paren_simple sampled 34 × (70 − 28) = 1428, MAP keeps results within 100).",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart 2-5 221-230 sample: evaluate 6 × (9 − 4) + (6 + 4) ÷ 2; DesCartes 191-210 grouping symbols."
-   }
+   },
+   "proposal": "map_oop_small_band"
   },
   {
    "task": "Multi-digit addition",
@@ -114,7 +112,6 @@
     "addition:add_10k_regroup"
    ],
    "note": "add_100_regroup sampled column stack, number entry, sound ('16 + 4' a weak regroup item). Re-grade.",
-   "proposal": "map_regrade_multidigit_add",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
     "says": "DesCartes 191-200: adds 3- and 4-digit numbers with regrouping, sums over 1000."
@@ -132,7 +129,6 @@
     "composing:base10_build"
    ],
    "note": "Re-sampled n=20: place_value_disks 20/20 \"What number do the disks show?\" entry; base10_build builds; needs re-grade.",
-   "proposal": "map_regrade_base10_read",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
     "says": "RIT chart K-2 161-170: \"What number do the blocks show?\" (base-ten blocks → number)."
@@ -186,17 +182,31 @@
    }
   },
   {
-   "task": "Zero as a count; ordinal positions",
+   "task": "Zero as a count (how many? 0; write 0 for an empty set)",
    "strand": "Number & place value",
    "ritBand": "131-150",
    "source": "strand-walk",
    "status": "missing",
    "skills": [],
-   "note": "No skill deals zero items or 1st/2nd/3rd.",
-   "proposal": "ordinal",
+   "proposal": "zero",
+   "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS).",
    "evidence": {
     "url": null,
-    "says": "not found in public NWEA material; kept because K.CC.3 (zero as a count); ordinals are not in CCSS is in MAP's blueprint"
+    "says": "not found in public NWEA material; kept because K.CC.A.3 (write 0 for no objects) is in MAP's blueprint"
+   }
+  },
+  {
+   "task": "Ordinal positions (1st, 2nd, 3rd …)",
+   "strand": "Number & place value",
+   "ritBand": "131-150",
+   "source": "strand-walk",
+   "status": "missing",
+   "skills": [],
+   "proposal": "ordinal",
+   "note": "LOW PRIORITY: ordinals are not CCSS. Checked skills.tsv for ordinal/first/position: no skill.",
+   "evidence": {
+    "url": null,
+    "says": "not found in public NWEA material; not a CCSS standard, kept low priority for K-1 position language"
    }
   },
   {
@@ -335,13 +345,13 @@
    "strand": "Number & place value",
    "ritBand": "191-210",
    "source": "strand-walk",
-   "status": "exists-regrade",
+   "status": "partial",
    "skills": [
-    "placevalue:number_word_names",
-    "composing:number_word_form"
+    "composing:number_word_form",
+    "placevalue:number_word_names"
    ],
-   "note": "number_word_names re-sampled n=20: 20/20 \"Which is the word name for #,#?\" MC; no word→number entry.",
-   "proposal": "map_word_to_number_entry",
+   "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
+   "proposal": "map_word_form_millions",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
     "says": "DesCartes 191-210: identifies numeral and written name for numbers over 100,000."
@@ -542,7 +552,7 @@
    }
   },
   {
-   "task": "Change-unknown and start-unknown word problems",
+   "task": "Start-unknown word problems (some, then 8 more, now 15)",
    "strand": "Operations & algebra",
    "ritBand": "181-200",
    "source": "strand-walk",
@@ -550,10 +560,10 @@
    "skills": [
     "subtraction:unknown_start_wp"
    ],
-   "note": "Sampled 'had some cards. Then collected…' start-unknown; change-unknown appears in missing_add_sub stories? Only equations. Start-unknown OK.",
+   "note": "unknown_start_wp sampled n=12: 12/12 start-unknown stories, number entry. Change-unknown is NOT dealt (see the change-unknown row, map_change_unknown_story).",
    "evidence": {
-    "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 181-190: \"Lions had 47 at halftime, 89 at end; how many after halftime?\" (change unknown)."
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
+    "says": "DesCartes 181-200: solves addition/subtraction problems with the unknown in all positions."
    }
   },
   {
@@ -565,7 +575,7 @@
    "skills": [
     "subtraction:missing_add_sub"
    ],
-   "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories.",
+   "note": "Re-sampled n=20: missing_add_sub 20/20 bare equations; unknown_start_wp covers start-unknown only; 0 change-unknown stories. Checked: unknown_start_wp (start only), missing_add_sub (bare), add_wp_20/sub_wp_20 (result only), build_expr_addsub (result only) — none ask change-unknown.",
    "proposal": "map_change_unknown_story",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -731,12 +741,12 @@
    "strand": "Operations & algebra",
    "ritBand": "201-220",
    "source": "strand-walk",
-   "status": "missing",
+   "status": "exists-regrade",
    "skills": [
+    "algebra:function_table_hard",
     "algebra:function_table_easy"
    ],
-   "note": "Re-sampled n=20: function_table_easy 20/20 \"Use the rule. Fill in the table.\"; 0/20 find-the-rule.",
-   "proposal": "function_machine",
+   "note": "function_table_hard sampled n=8: 8/8 \"Find the rule. Write the rule.\" (one- and two-operation rules, rule entry). Content dealt; re-grade only. function_table_easy gives the rule.",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
     "says": "DesCartes 201-220: determines the rule and completes a simple function machine output."
@@ -936,12 +946,13 @@
    "strand": "Operations & algebra",
    "ritBand": "171-200",
    "source": "6.4",
-   "status": "missing",
+   "status": "partial",
    "skills": [
-    "algebra:write_equation",
-    "addition:add_wp_20"
+    "algebra:build_expr_addsub",
+    "algebra:build_expr_multdiv",
+    "algebra:write_equation"
    ],
-   "note": "Re-sampled n=20: add_wp_20 20/20 answer-only stories; write_equation needs letters (algebra); 0 pick-the-equation-for-story.",
+   "note": "build_expr_addsub n=8: 8/8 story → build \"89 − 3 = 86\" (build-expr, production — stronger than MAP choose-one); build_expr_multdiv n=8 the same for × ÷. Residual: only result-unknown join/separate/equal-groups stories; no unknown-in-other-positions, no compare or fraction stories. write_equation is letters (algebra).",
    "proposal": "map_story_equation_match",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
@@ -985,12 +996,13 @@
    "strand": "Number & place value",
    "ritBand": "171-210",
    "source": "6.4",
-   "status": "exists-regrade",
+   "status": "partial",
    "skills": [
+    "composing:number_word_form",
     "placevalue:number_word_names"
    ],
-   "note": "Re-sampled n=20: number_word_names MC word name only.",
-   "proposal": "map_word_to_number_entry",
+   "note": "number_word_form n=8: 8/8 \"Write the numeral: eighty-two\" (number entry; option wordform to_number/to_words; to 9,999). number_word_names n=20 MC only. Residual: names past 9,999 to millions.",
+   "proposal": "map_word_form_millions",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
     "says": "DesCartes 171-180: numeral and written name 21-999; 191-210 to over 100,000."
@@ -1017,12 +1029,13 @@
    "strand": "Operations & algebra",
    "ritBand": "201-220",
    "source": "6.4",
-   "status": "missing",
+   "status": "partial",
    "skills": [
+    "algebra:function_table_hard",
     "algebra:function_table_easy"
    ],
-   "note": "Re-sampled n=20: function_table_easy gives the rule 20/20.",
-   "proposal": "function_machine",
+   "note": "function_table_hard n=8: 8/8 find-and-write the rule, but 0/8 real-world tables (all bare In/Out). Residual = DesCartes 211-220 real-world function table. function_machine dropped (hard already finds rules).",
+   "proposal": "map_function_table_context",
    "evidence": {
     "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_220.pdf",
     "says": "DesCartes 211-220: determines the rule given a simple real-world function table."
@@ -1107,6 +1120,24 @@
    "evidence": {
     "url": "https://www.nwea.org/blog/2025/how-the-map-growth-item-pool-stays-deep-aligned-and-up-to-date/",
     "says": "NWEA: MAP items use text-entry boxes and drag-and-drop (e.g. digit tiles 0-9 in RIT chart samples)."
+   }
+  },
+  {
+   "task": "Multi-step word problems, all four operations, letter for the unknown (4.OA.A.3)",
+   "strand": "Operations & algebra",
+   "ritBand": "201-220",
+   "source": "strand-walk",
+   "status": "partial",
+   "skills": [
+    "algebra:multi_step_word",
+    "number_ops_mixed:word_problems_mixed",
+    "algebra:algebra_word_mixed_plain"
+   ],
+   "proposal": "multi_step_four_ops",
+   "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation.",
+   "evidence": {
+    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
+    "says": "DesCartes 201-220: solves multi-step real-world problems using the four operations."
    }
   },
   {
@@ -2480,7 +2511,7 @@
     "angles_lines:place_symmetry_lines"
    ],
    "proposal": "map_symmetry_compare",
-   "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare",
+   "note": "sampled 200: count-one-shape 104, click-all-symmetric 57, click-the-lines 39; no two-shape compare; re-check --n 12, checked: symmetry (count one shape / click-all / click lines), place_symmetry_lines (draw) — none compare two shapes",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
@@ -2496,7 +2527,7 @@
     "angles_lines:symmetry"
    ],
    "proposal": "map_symmetry_check_line",
-   "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial",
+   "note": "\"Click ALL the lines of symmetry\" (39/200) judges candidate lines but never a single yes/no line; was \"missing\" in 6.2, now partial; re-check --n 12, checked: symmetry, place_symmetry_lines — pupil draws/clicks lines; never judges a given line",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry chart: 'choose all figures that show a line of symmetry'; sort by symmetry AND acute"
@@ -2541,7 +2572,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "angle_rules",
-   "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360)",
+   "note": "no generator deals triangle angle sum; additive_angles only splits one angle (90/180/360); re-check --n 12, checked: classify_triangles, identify_angles, additive_angles, area_triangle — none find a missing triangle angle",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.MD.C.7 / 7.G.B.5 is in MAP's blueprint"
@@ -2665,7 +2696,7 @@
     "coordinates:coordinate_q1"
    ],
    "proposal": "coord_context",
-   "note": "coordinate_q1 deals read/plot abstract points A, B only; no context",
+   "note": "coordinate_q1 deals read/plot abstract points A, B only; no context; re-check --n 12, checked: coordinate_q1, coordinate_all, coordinate_graph — name/plot only, no context meaning",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
@@ -2682,7 +2713,7 @@
     "graphs:pictograph"
    ],
    "proposal": "map_graph_sentence",
-   "note": "graph skills ask one numeric/text question; no statement-matching form",
+   "note": "graph skills ask one numeric/text question; no statement-matching form; re-check --n 12, checked: bar_graph (how many / how many more / in all), tally_chart, pictograph — one numeric/name question, no statements",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'use the graph to answer'; K-2 'how many students chose hot dog' graph item"
@@ -3292,7 +3323,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "defining_attributes",
-   "note": "none",
+   "note": "none; re-check --n 12, checked: shape_attributes (count sides, click 4 right angles), compose_from_attributes, classify_quads — no defining vs non-defining (colour/size/turn)",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
@@ -3325,7 +3356,7 @@
     "shapes_early:partition_shapes"
    ],
    "proposal": "map_shape_partition_pick",
-   "note": "fraction shaded / count parts; no equal-vs-unequal pick",
+   "note": "fraction shaded / count parts; no equal-vs-unequal pick; re-check --n 12, checked: partition_shapes (what fraction shaded / how many parts) — no partition or choose-all-equal-shares",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Choose ALL shapes divided into equal shares'; 'ALL shapes show one-third shaded'"
@@ -3341,7 +3372,7 @@
     "shapes_early:shape_attributes"
    ],
    "proposal": "polygons",
-   "note": "sides/vertices counts only",
+   "note": "sides/vertices counts only; re-check --n 12, checked: shape_attributes (sides by name), shape_corners_count, classify_quads — no regular/irregular",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'which shape has only 3 sides?', 'move ALL shapes with four corners to the mat'"
@@ -3355,7 +3386,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "points_lines_rays",
-   "note": "identify_lines covers parallel/perpendicular/intersecting only",
+   "note": "identify_lines covers parallel/perpendicular/intersecting only; re-check --n 12, checked: identify_lines (parallel/perpendicular/intersecting), identify_angles — no point/line/segment/ray naming",
    "evidence": {
     "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
     "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
@@ -3415,7 +3446,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "draw_angles",
-   "note": "none",
+   "note": "none; re-check --n 12, checked: measure_angles (read only), identify_angles — no draw",
    "evidence": {
     "url": "https://www.trotwood.k12.oh.us/Downloads/MAP to Khan Grades 2-5 OCT16.pdf",
     "says": "Trotwood MAP-to-Khan 2-5: classify acute/right/obtuse at RIT 203-212, protractor provided"
@@ -3494,7 +3525,7 @@
     "shapes_early:count_edges_faces_vertices"
    ],
    "proposal": "shapes_3d_props",
-   "note": "no \"which shape has 5 faces\" property items",
+   "note": "no \"which shape has 5 faces\" property items; re-check --n 12, checked: count_edges_faces_vertices (one solid), cross_section_3d, net_identify — no property→shape items",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'choose ALL objects with six faces'; nets listed in the 6+ chart"
@@ -3542,7 +3573,7 @@
     "coordinates:coordinate_graph"
    ],
    "proposal": "four_quadrants",
-   "note": "naming points only",
+   "note": "naming points only; re-check --n 12, checked: coordinate_all (name/plot 4 quadrants), coordinate_graph — no distance/polygon/reflection problems across quadrants",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'solve problems by graphing points on the coordinate plane'; 6+ 'move the point to (-5,6)'"
@@ -3556,7 +3587,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "hv_lines",
-   "note": "none",
+   "note": "none; re-check --n 12, checked: identify_lines, coordinate_graph, coord_distance_q1 — no horizontal/vertical line items",
    "evidence": {
     "url": "https://www.hasd.org/cms_files/resources/Math Geometry DesCartesHandler.pdf",
     "says": "DesCartes Geometry continuum: points on a line, line segments, parallel/perpendicular (older NWEA)"
@@ -3620,7 +3651,7 @@
     "graphs:build_pictograph"
    ],
    "proposal": "pictogram_scale",
-   "note": "build uses each picture = 1",
+   "note": "build uses each picture = 1; re-check --n 12, checked: build_pictograph — 12/12 key = 1; pictograph read only",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 'sticker chart: which student has most'; 2-5 'who has the most library books' key=1 book"
@@ -3667,7 +3698,7 @@
     "graphs:build_bar_graph"
    ],
    "proposal": "bar_graph_scale",
-   "note": "scale 1 only",
+   "note": "scale 1 only; re-check --n 12, checked: build_bar_graph — 12/12 values ≤ 10, unit scale",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: 'Move the square to make a bar graph of the data' (recess activities, 1 square = 1 student)"
@@ -3698,7 +3729,7 @@
     "graphs:tally_chart"
    ],
    "proposal": "map_tally_build",
-   "note": "read only",
+   "note": "read only; re-check --n 12, checked: tally_chart — 12/12 read a finished chart; no build",
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts: picture graph 131-140, bar graph / table or chart 141-150 (search summary)"
@@ -3712,7 +3743,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "table_data",
-   "note": "none (tables only inside other items)",
+   "note": "none (tables only inside other items); re-check --n 12, checked: tally_chart, function_table_*, ratio_tables — no data table read",
    "evidence": {
     "url": "https://teach.mapnwea.org/impl/RIT2ConceptK2.pdf",
     "says": "K-2 RIT-to-concepts: 'table or chart' at 141-150 (search summary)"
@@ -3728,7 +3759,7 @@
     "graphs:line_plot_fractions"
    ],
    "proposal": "make_line_plot",
-   "note": "read only",
+   "note": "read only; re-check --n 12, checked: line_plot, line_plot_g2, line_plot_fractions — 36/36 read a finished plot; none build",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: line plot of paper-strip lengths in 1/4 in; 'total length of paper Jai will use'"
@@ -3759,7 +3790,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "line_graph",
-   "note": "none",
+   "note": "none; re-check --n 12, checked: bar_graph, line_plot, pie_chart, mixed_graphs — no line graph",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "6+ Data chart: 'graph shows change in price over time; identify intervals' (line graph, Gr5-6 edge)"
@@ -3857,7 +3888,7 @@
     "shapes_classify:classify_quads"
    ],
    "proposal": "map_shape_attribute_sort",
-   "note": "symmetry --dist 200: count/click-all only; no skill sorts shapes into a 2-attribute chart",
+   "note": "symmetry --dist 200: count/click-all only; no skill sorts shapes into a 2-attribute chart; re-check --n 12, checked: symmetry, identify_angles, classify_quads, classify_triangles — click-all one property; no two-attribute sort",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 Geometry: 'Move the shapes to the correct part of the chart' - line of symmetry / acute / both"
@@ -3888,7 +3919,7 @@
     "shapes_early:count_edges_faces_vertices"
    ],
    "proposal": "shapes_3d_props",
-   "note": "count_edges_faces asks one solid's count; no select-all-with-property item",
+   "note": "count_edges_faces asks one solid's count; no select-all-with-property item; re-check --n 12, checked: count_edges_faces_vertices (one solid count), cross_section_3d — no select-all-by-property",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 Geometry: 'Look at the objects. Choose ALL the objects that have six faces.'"
@@ -3936,7 +3967,7 @@
     "graphs:line_plot_fractions"
    ],
    "proposal": "make_line_plot",
-   "note": "--dist 200: 79 total count, 52 mode, 69 how-many-at; 0 ask the total LENGTH (sum of the values)",
+   "note": "--dist 200: 79 total count, 52 mode, 69 how-many-at; 0 ask the total LENGTH (sum of the values); re-check --n 12, checked: line_plot_fractions (count at a value / most common / how many), line_plot — 0/24 sum lengths",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "2-5 M&D: line plot of strips in 1/4 in; 'What is the total length of paper Jai will use?'"
@@ -3950,7 +3981,7 @@
    "status": "missing",
    "skills": [],
    "proposal": "turns_angles",
-   "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap",
+   "note": "checked: measure_angles (--n 12: protractor read only), identify_angles, additive_angles — none relate an angle to a fraction of a turn; standards-audit 4.MD.C.5a/b = gap; re-check --n 12, checked: measure_angles, identify_angles, additive_angles — none (see note)",
    "evidence": {
     "url": null,
     "says": "not found in public NWEA material; kept because 4.MD.C.5 is in MAP's blueprint"
@@ -4018,7 +4049,7 @@
     "graphs:build_pictograph"
    ],
    "proposal": "table_data",
-   "note": "build_bar_graph/build_pictograph build a graph from given counts (production, better than MAP's choose-one); no item reads a two-column table first",
+   "note": "build_bar_graph/build_pictograph build a graph from given counts (production, better than MAP's choose-one); no item reads a two-column table first; re-check --n 12, checked: build_bar_graph, build_pictograph (counts given inline), tally_chart — no two-column table",
    "evidence": {
     "url": "https://cdn.nwea.org/docs/RIT+Reference+Brochure_July19_CC.pdf",
     "says": "K-2 / 2-5 charts: data given in a table or chart, 'use the data to complete the graph'"
@@ -4026,28 +4057,6 @@
   }
  ],
  "proposals": {
-  "map_regrade_solve_eq_addsub": {
-   "kind": "option",
-   "skill": "algebra:solve_eq_addsub",
-   "option": "re-grade (no new content)",
-   "name": "One-Step Equations re-grade",
-   "teaches": "Solve x + a = b and x − a = b with the unknown in any position",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; equation with an answer box for the letter; screen: number entry (MAP number-entry), the bin-sort form kept as a second form",
-   "family": "algebra",
-   "ccss": [
-    "6.EE.B.7",
-    "1.OA.D.8"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "201-210",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "Exists but has not been graded to the 8/10 rubric on every host",
-   "reused": false
-  },
   "map_order_whole_decimal_mixed": {
    "kind": "option",
    "skill": "decimals:order_decimals",
@@ -4093,29 +4102,6 @@
    "why": "MAP asks 'which number is greater' as a select item; we only deal the symbol",
    "reused": false
   },
-  "map_regrade_compare": {
-   "kind": "option",
-   "skill": "placevalue:compare",
-   "option": "re-grade (no new content)",
-   "name": "Compare Numbers re-grade",
-   "teaches": "Compare two numbers with >, <, =",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two numbers with a symbol box between; screen: symbol entry",
-   "family": "placevalue",
-   "ccss": [
-    "1.NBT.B.3",
-    "2.NBT.A.4",
-    "4.NBT.A.2"
-   ],
-   "map": [
-    {
-     "strand": "Number & place value",
-     "ritBand": "161-200",
-     "taskType": "symbol select"
-    }
-   ],
-   "why": "Exists; not yet graded 8/10 on every host",
-   "reused": false
-  },
   "compare_sentences": {
    "ccss": [
     "2.NBT.B.9",
@@ -4141,71 +4127,6 @@
     }
    ],
    "reused": true
-  },
-  "map_regrade_oop": {
-   "kind": "option",
-   "skill": "order_of_operations:paren_simple",
-   "option": "re-grade; band 'MAP' keeping results within 100 (47 − (2 × 8))",
-   "name": "Simple Parentheses re-grade",
-   "teaches": "Evaluate a two-operation expression with one set of parentheses",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step underlined and a working line; screen: number entry",
-   "family": "order_of_operations",
-   "ccss": [
-    "5.OA.A.1"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "211-230",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "Sampled products to 1,400; MAP items are small-number structure checks",
-   "reused": false
-  },
-  "map_regrade_multidigit_add": {
-   "kind": "option",
-   "skill": "addition:add_1k_regroup",
-   "option": "re-grade (whole add_*_regroup ladder)",
-   "name": "Multi-Digit Addition re-grade",
-   "teaches": "Column addition with regrouping",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; stack cell with regroup boxes; screen: digit entry in the stack",
-   "family": "addition",
-   "ccss": [
-    "2.NBT.B.7",
-    "4.NBT.B.4"
-   ],
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "181-220",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "Exists; ladder not yet graded 8/10",
-   "reused": false
-  },
-  "map_regrade_base10_read": {
-   "kind": "option",
-   "skill": "placevalue:place_value_disks",
-   "option": "re-grade; add base-10 blocks (rods/flats) as an alternate picture",
-   "name": "Read a Base-Ten Model re-grade",
-   "teaches": "Read the number shown by a base-ten model",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; block or disk picture over an answer box; screen: number entry",
-   "family": "placevalue",
-   "ccss": [
-    "1.NBT.B.2",
-    "2.NBT.A.1"
-   ],
-   "map": [
-    {
-     "strand": "Number & place value",
-     "ritBand": "161-190",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "MAP shows blocks (rods/flats), our read form only shows disks",
-   "reused": false
   },
   "map_change_patterns": {
    "kind": "option",
@@ -4302,28 +4223,6 @@
     }
    ],
    "reused": true
-  },
-  "map_word_to_number_entry": {
-   "kind": "option",
-   "skill": "placevalue:number_word_names",
-   "option": "direction: words → digits (number entry)",
-   "name": "Write the Number from Its Name",
-   "teaches": "Write the numeral for a number name up to 1,000,000",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name in words over a digit-box row with comma separators; screen: number entry",
-   "family": "placevalue",
-   "ccss": [
-    "2.NBT.A.3",
-    "4.NBT.A.2"
-   ],
-   "map": [
-    {
-     "strand": "Number & place value",
-     "ritBand": "181-210",
-     "taskType": "number entry"
-    }
-   ],
-   "why": "MC-only today; a production form fits",
-   "reused": false
   },
   "vis_pv_bands_millions": {
    "ccss": [
@@ -4583,31 +4482,6 @@
    "why": "MAP asks property recognition; no skill",
    "reused": false
   },
-  "function_machine": {
-   "ccss": [
-    "3.OA.D.9",
-    "4.OA.C.5"
-   ],
-   "why": "MAP 'what is the rule' items",
-   "kind": "new",
-   "skill": "algebra:function_machines",
-   "name": "Function Machines",
-   "teaches": "1-step and 2-step function machines: find the output, the input (work backwards) or the rule",
-   "representation": "drawn machine boxes with arrows; fill the empty box",
-   "family": "algebra",
-   "steps": [
-    "Y6.B7.S2"
-   ],
-   "source": "WRM_PROPOSALS",
-   "map": [
-    {
-     "strand": "Operations & algebra",
-     "ritBand": "191-210",
-     "taskType": "rule entry"
-    }
-   ],
-   "reused": true
-  },
   "write_numeric_expression": {
    "ccss": [
     "5.OA.A.2"
@@ -4830,25 +4704,38 @@
   },
   "map_story_equation_match": {
    "kind": "option",
-   "skill": "algebra:write_equation",
-   "option": "form: write the equation for an add/sub story (no solving), with the unknown as a box",
-   "name": "Write the Equation for the Story",
-   "teaches": "Represent a story with an equation using a symbol for the unknown (9 + ? = 14)",
-   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a sentence frame with operation box and digit boxes; screen: fill the frame (tiles), never MC",
+   "skill": "algebra:build_expr_addsub",
+   "option": "stories: widen the pool to all four operations (+ − × ÷), compare and fraction stories, and the unknown in any position (box for the unknown); the same option is declared on algebra:build_expr_multdiv",
+   "name": "Build the Equation for Any Story",
+   "teaches": "Represent a story with an equation using a box for the unknown (9 + ☐ = 14, 4 × ☐ = 28, 3/8 + ☐ = 7/8), across + − × ÷ and fraction stories, without solving first",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over an equation frame of number boxes and one operation box; pupil writes the numbers and the sign; screen: build-expr tiles (production, never MC)",
    "family": "algebra",
    "ccss": [
     "1.OA.A.1",
     "2.OA.A.1",
-    "3.OA.D.8"
+    "3.OA.A.3",
+    "3.OA.D.8",
+    "4.NF.B.3d",
+    "5.NF.B.6"
    ],
    "map": [
     {
      "strand": "Operations & algebra",
      "ritBand": "171-200",
-     "taskType": "choose/build the equation"
+     "taskType": "build/choose the equation"
+    },
+    {
+     "strand": "Multiplication & division",
+     "ritBand": "181-210",
+     "taskType": "build/choose the equation"
+    },
+    {
+     "strand": "Fractions & decimals",
+     "ritBand": "201-230",
+     "taskType": "build/choose the equation"
     }
    ],
-   "why": "MAP 'which equation shows the story'; 6.4 story↔operation",
+   "why": "One option grows the live build_expr_* production form instead of three separate story→equation proposals; it closes the 6.4 story↔equation pair for +/−, ×/÷ and fraction stories",
    "reused": false
   },
   "map_another_way_to_make": {
@@ -4893,6 +4780,151 @@
    ],
    "why": "unit_form goes number → units only; MAP asks the reverse with a missing place.",
    "reused": false
+  },
+  "map_oop_small_band": {
+   "kind": "option",
+   "skill": "order_of_operations:paren_simple",
+   "option": "band: small numbers (MAP) — operands to 50, every step and the result within 100, e.g. 47 − (2 × 8)",
+   "name": "Simple Parentheses: Small-Number Band",
+   "teaches": "Evaluate a two-operation expression with one set of parentheses when the arithmetic is light, so the item tests structure, not computation",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; expression with the bracketed step marked and a working line under it; screen: number entry (production, not MC)",
+   "family": "order_of_operations",
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "191-230",
+     "taskType": "number entry"
+    }
+   ],
+   "why": "paren_simple sampled products to 1,400; MAP grouping-symbol items use small numbers. This is a real option (new number band), not a re-grade",
+   "reused": false
+  },
+  "map_function_table_context": {
+   "kind": "option",
+   "skill": "algebra:function_table_hard",
+   "option": "context: real-world table (headers such as Boxes / Pencils, Hours / Dollars) instead of In / Out",
+   "name": "Function Tables in a Story",
+   "teaches": "Find and write the rule of an input-output table whose columns are real quantities, then use it for a missing row",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; two-column table with word headers, rule frame \"___ × ___\" under it; screen: rule-frame entry (operation tile + number), never MC",
+   "family": "algebra",
+   "ccss": [
+    "3.OA.D.9",
+    "4.OA.C.5"
+   ],
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "211-220",
+     "taskType": "rule entry"
+    }
+   ],
+   "why": "DesCartes 211-220 \"determines the rule given a simple real-world function table\"; function_table_hard deals bare In/Out only",
+   "reused": false
+  },
+  "map_word_form_millions": {
+   "kind": "option",
+   "skill": "composing:number_word_form",
+   "option": "band: to 999,999 and to millions (adds the thousands/millions period words), both directions via wordform",
+   "name": "Number Word Form to Millions",
+   "teaches": "Write the numeral for a number name to millions, and the name for a numeral, period by period",
+   "representation": "One boxed B&W Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; number name over a digit-box row with comma separators between periods; screen: number entry (words → numeral) or word-bank entry (numeral → words)",
+   "family": "composing",
+   "ccss": [
+    "2.NBT.A.3",
+    "4.NBT.A.2"
+   ],
+   "map": [
+    {
+     "strand": "Number & place value",
+     "ritBand": "191-210",
+     "taskType": "number entry"
+    }
+   ],
+   "why": "number_word_form is the live production skill but stops at 9,999; DesCartes 191-210 asks numeral/name over 100,000",
+   "reused": false
+  },
+  "zero": {
+   "ccss": [
+    "K.CC.A.3"
+   ],
+   "kind": "new",
+   "skill": "counting:zero_none",
+   "name": "Zero Means None",
+   "teaches": "zero as the count of an empty set, and writing 0",
+   "representation": "pictures of plates/boxes with some or no objects; write how many, including 0",
+   "family": "counting",
+   "steps": [
+    "R.B7.S1"
+   ],
+   "source": "WRM_PROPOSALS",
+   "map": [
+    {
+     "strand": "Number & place value",
+     "ritBand": "131-150",
+     "taskType": "number entry"
+    }
+   ],
+   "reused": true
+  },
+  "multi_step_four_ops": {
+   "ccss": [
+    "4.OA.A.3"
+   ],
+   "kind": "option",
+   "skill": "algebra:multi_step_word",
+   "also": [
+    "algebra:multi_step_word_plain"
+   ],
+   "option": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate",
+   "name": "Two-Step Problems With All Four Operations (option)",
+   "grade": "3-4",
+   "family": "algebra",
+   "standards": [
+    "3.OA.D.8",
+    "4.OA.A.3"
+   ],
+   "ee": [
+    "M.EE.3.OA.7",
+    "M.EE.4.OA.3"
+   ],
+   "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+   "problemTypes": [
+    "× then −",
+    "÷ then +",
+    "write the equation with n",
+    "remainder decides the answer",
+    "is the answer reasonable? (round)"
+   ],
+   "templates": [
+    "word-work"
+   ],
+   "newTemplates": [
+    "bar-model"
+   ],
+   "answer": "write each step answer; write the equation",
+   "ladder": "O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain",
+   "misconceptions": [
+    "answers the first step",
+    "uses the letter as a label, not a number",
+    "ignores the remainder"
+   ],
+   "wrmSteps": [
+    "Y3.B4.S10",
+    "Y4.B5.S13"
+   ],
+   "after": [],
+   "source": "STANDARD_PROPOSALS",
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "201-220",
+     "taskType": "number entry + write the equation"
+    }
+   ],
+   "reused": true
   },
   "map_ratio_picture": {
    "kind": "option",
@@ -7149,15 +7181,14 @@
   "algebra:multi_step_word": [
    "Two-step change problems (add-add, add-sub, sub-add, sub-sub) + teacher option"
   ],
-  "placevalue:number_word_names": [
-   "Word form ↔ number to millions",
-   "Match: word form <-> number"
-  ],
-  "composing:number_word_form": [
-   "Word form ↔ number to millions"
-  ],
   "number_sense:place_on_number_line": [
    "Place a number on a number line (drag/tap)"
+  ],
+  "algebra:function_table_hard": [
+   "Find the rule of an input-output table"
+  ],
+  "algebra:function_table_easy": [
+   "Find the rule of an input-output table"
   ],
   "algebra:inequalities": [
    "Inequalities: true/false, solutions on a line"
