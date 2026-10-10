@@ -7408,6 +7408,494 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B9.S1": {
+   "title": "O'clock and half past",
+   "direct": [
+    {
+     "key": "measurement:time_hour",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (next step)"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 1.MD.B.3: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "same standard 1.MD.B.3: Parts of a Clock"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B9.S2": {
+   "title": "Quarter past and quarter to",
+   "direct": [
+    {
+     "key": "measurement:time_quarter",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_hour",
+     "why": "Y2.B9.S1 O'clock and half past (step before in the block)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y2.B9.S1 O'clock and half past (step before in the block)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S3 Tell time past the hour (next step)"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 2.MD.C.7: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:time_match_clock",
+     "why": "same standard 2.MD.C.7: Find the Clock for a Time"
+    },
+    {
+     "key": "measurement:order_clocks_analog_asc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_analog_desc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Latest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_desc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Latest First"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.MD.C.7: Count the Minutes by Fives"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B9.S3": {
+   "title": "Tell time past the hour",
+   "direct": [
+    {
+     "key": "measurement:time_5min",
+     "opts": {
+      "stimulus": "words-past"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (step before in the block)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B6.S7 Estimate on a number line to 50 (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 2.MD.C.7: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:time_match_clock",
+     "why": "same standard 2.MD.C.7: Find the Clock for a Time"
+    },
+    {
+     "key": "measurement:order_clocks_analog_asc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_analog_desc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Latest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_desc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Latest First"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.MD.C.7: Count the Minutes by Fives"
+    },
+    {
+     "key": "measurement:time_sense",
+     "why": "same standard 2.MD.C.7: a.m. or p.m.?"
+    }
+   ],
+   "note": "time_5min with the \"words-past\" stimulus reads and writes \"20 past 3\""
+  },
+  "Y2.B9.S4": {
+   "title": "Tell time to the hour",
+   "direct": [
+    {
+     "key": "measurement:time_5min",
+     "opts": {
+      "stimulus": "words-past"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W37)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W37)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (next step)"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "same standard 2.MD.C.7: Time to Quarter Hour"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 2.MD.C.7: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:time_match_clock",
+     "why": "same standard 2.MD.C.7: Find the Clock for a Time"
+    },
+    {
+     "key": "measurement:order_clocks_analog_asc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_analog_desc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Latest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_desc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Latest First"
+    }
+   ],
+   "note": "time_5min with the \"words-past\" stimulus covers \"10 to 4\" (minutes to the hour)"
+  },
+  "Y2.B9.S5": {
+   "title": "Tell the time to 5 minutes",
+   "direct": [
+    {
+     "key": "measurement:time_5min",
+     "opts": {}
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W37)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W37)"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "Y1.B1.S1 Sort objects (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W37)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 Count objects (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_quarter",
+     "why": "same standard 2.MD.C.7: Time to Quarter Hour"
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 2.MD.C.7: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:time_match_clock",
+     "why": "same standard 2.MD.C.7: Find the Clock for a Time"
+    },
+    {
+     "key": "measurement:order_clocks_analog_asc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_analog_desc",
+     "why": "same standard 2.MD.C.7: Put Clocks in Order, Latest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_asc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Earliest First"
+    },
+    {
+     "key": "measurement:order_clocks_digital_desc",
+     "why": "same standard 2.MD.C.7: Put Digital Times in Order, Latest First"
+    },
+    {
+     "key": "measurement:time_sense",
+     "why": "same standard 2.MD.C.7: a.m. or p.m.?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B9.S6": {
+   "title": "Minutes in an hour",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "knowing and using 60 minutes in an hour, 24 hours in a day, 7 days in a week, and converting simple times",
+   "build": [
+    "time_facts"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (step before in the block)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (step before in the block)"
+    },
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 1.MD.B.3: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "same standard 1.MD.B.3: Parts of a Clock"
+    },
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "same standard 4.MD.A.1: How Long From Start to End?"
+    },
+    {
+     "key": "measurement:capacity",
+     "why": "same standard 4.MD.A.1: Capacity/Volume Units"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "why": "same standard 4.MD.A.1: Measurement Conversions (Visual)"
+    },
+    {
+     "key": "measurement:length_customary",
+     "why": "same standard 4.MD.A.1: Customary Length (in/ft/yd/mi)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "same standard 4.MD.A.1: Metric Length (mm/cm/m/km)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B9.S7": {
+   "title": "Hours in a day",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "knowing and using 60 minutes in an hour, 24 hours in a day, 7 days in a week, and converting simple times",
+   "build": [
+    "time_facts"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:time_hour",
+     "why": "Y1.B14.S5 Tell the time to the hour (prior learning wk W23)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W23)"
+    }
+   ],
+   "preBuild": [
+    "time_units",
+    "day_order",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "measurement:time_analog_digital",
+     "why": "same standard 1.MD.B.3: Analog and Digital Time"
+    },
+    {
+     "key": "measurement:clock_parts",
+     "why": "same standard 1.MD.B.3: Parts of a Clock"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -8138,6 +8626,24 @@
     "3.NF.A.3c",
     "3.NF.A.2",
     "3.NF.A.3a"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "time_facts": {
+   "kind": "new",
+   "skill": "measurement:time_facts",
+   "name": "Minutes, Hours and Days",
+   "teaches": "knowing and using 60 minutes in an hour, 24 hours in a day, 7 days in a week, and converting simple times",
+   "representation": "fact cells with a clock or timeline support; option: word problems",
+   "family": "measurement",
+   "steps": [
+    "Y2.B9.S6",
+    "Y2.B9.S7"
+   ],
+   "ccss": [
+    "1.MD.B.3",
+    "4.MD.A.1"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
