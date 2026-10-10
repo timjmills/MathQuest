@@ -1,0 +1,253 @@
+{
+ "year": "R",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "R.B1.S1": {
+   "title": "Match objects",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "matching an object to an identical object (same / different)",
+   "build": [
+    "match_same"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "matching one to one is the next use of \"same\""
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: R.B1.S4 Sort objects to a type"
+    }
+   ],
+   "note": "Pre-number step; no existing skill matches pictures."
+  },
+  "R.B1.S2": {
+   "title": "Match pictures and objects",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "matching a picture to its object and objects to pictures",
+   "build": [
+    "match_same"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: R.B1.S4 Sort objects to a type"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B1.S7 Compare amounts"
+    }
+   ],
+   "note": ""
+  },
+  "R.B1.S3": {
+   "title": "Identify a set",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "deciding which objects belong to a set and which does not",
+   "build": [
+    "odd_one_out"
+   ],
+   "pre": [],
+   "preBuild": [
+    "match_same"
+   ],
+   "related": [
+    {
+     "key": "comparing:classify_count",
+     "why": "sorting by kind follows"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B1.S7 Compare amounts"
+    }
+   ],
+   "note": ""
+  },
+  "R.B1.S4": {
+   "title": "Sort objects to a type",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:classify_count",
+     "opts": {
+      "band": 3,
+      "tiles": 2
+     },
+     "missing": "the sort itself: putting every object into its group by type; the skill counts one kind"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "putting every object into a group by type (the skill only counts one kind)",
+   "build": [
+    "sort_groups"
+   ],
+   "pre": [],
+   "preBuild": [
+    "odd_one_out",
+    "match_same"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B1.S7 Compare amounts"
+    }
+   ],
+   "note": ""
+  },
+  "R.B1.S5": {
+   "title": "Explore sorting techniques",
+   "direct": [],
+   "partial": [
+    {
+     "key": "comparing:classify_count",
+     "opts": {
+      "band": 6
+     },
+     "missing": "sorting the same set in different ways (colour, size, kind)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sorting the same objects by different attributes",
+   "build": [
+    "sort_groups"
+   ],
+   "pre": [],
+   "preBuild": [
+    "odd_one_out"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_groups",
+     "why": "same block: R.B1.S7 Compare amounts"
+    }
+   ],
+   "note": ""
+  },
+  "R.B1.S6": {
+   "title": "Create sorting rules",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "creating and saying a sorting rule",
+   "build": [
+    "sort_groups"
+   ],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S5 Explore sorting techniques (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:classify_count",
+     "why": "counts one group of a sort"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "next step: R.B1.S7 Compare amounts"
+    }
+   ],
+   "note": ""
+  },
+  "R.B1.S7": {
+   "title": "Compare amounts",
+   "direct": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S5 Explore sorting techniques (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "sort_groups"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "compare by an attribute, not an amount"
+    },
+    {
+     "key": "comparing:classify_count",
+     "why": "same block: R.B1.S4 Sort objects to a type"
+    }
+   ],
+   "note": "Compare amounts by looking and matching one to one (level 1, to 5)."
+  }
+ },
+ "proposals": {
+  "match_same": {
+   "kind": "new",
+   "skill": "counting:match_same",
+   "name": "Match the Same",
+   "teaches": "matching identical objects and pictures one to one (the first step before sorting and counting)",
+   "representation": "two columns of line-drawn pictures; draw a line to join each pair that is the same",
+   "family": "counting",
+   "steps": [
+    "R.B1.S1",
+    "R.B1.S2"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "odd_one_out": {
+   "kind": "new",
+   "skill": "comparing:odd_one_out",
+   "name": "Which One Does Not Belong?",
+   "teaches": "identifying a set: objects that belong together because they share one attribute",
+   "representation": "a row of four line drawings; circle the one that is not in the set, say why",
+   "family": "counting",
+   "steps": [
+    "R.B1.S3"
+   ],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "sort_groups": {
+   "kind": "new",
+   "skill": "comparing:sort_into_groups",
+   "name": "Sort into Groups",
+   "teaches": "sorting objects by one attribute (kind, colour, size, shape) into labelled groups, then saying the sorting rule",
+   "representation": "picture tiles and two or three labelled sorting rings; write the letter of each tile in its ring; option: rule given or rule found",
+   "family": "counting",
+   "steps": [
+    "R.B1.S4",
+    "R.B1.S5",
+    "R.B1.S6"
+   ],
+   "ccss": [
+    "K.MD.B.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  }
+ },
+ "tagFixes": []
+}
