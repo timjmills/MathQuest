@@ -1061,6 +1061,133 @@
     }
    ],
    "note": ""
+  },
+  "R.B6.S1": {
+   "title": "Identify and name shapes with 4 sides",
+   "direct": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "count the 4 sides"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "match the word to the shape"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "next step: R.B6.S2 Combine shapes with 4 sides"
+    }
+   ],
+   "note": "Squares, rectangles and other 4-sided shapes."
+  },
+  "R.B6.S2": {
+   "title": "Combine shapes with 4 sides",
+   "direct": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:compose_hexagon",
+     "why": "composing with pattern blocks"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B6.S1 Identify and name shapes with 4 sides"
+    }
+   ],
+   "note": ""
+  },
+  "R.B6.S3": {
+   "title": "Shapes in the environment",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "finding 4-sided shapes in the environment",
+   "build": [
+    "shapes_world"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B4.S4 Describe position (same CCSS K.G.A.1, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B6.S1 Identify and name shapes with 4 sides"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same block: R.B6.S2 Combine shapes with 4 sides"
+    }
+   ],
+   "note": ""
+  },
+  "R.B6.S4": {
+   "title": "My day and night",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "sequencing a day (morning, afternoon, night) and talking about routines",
+   "build": [
+    "day_order"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "shapes_world"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "same block: R.B6.S1 Identify and name shapes with 4 sides"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "same block: R.B6.S2 Combine shapes with 4 sides"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1199,7 +1326,8 @@
    "representation": "line drawings of everyday objects; circle or write the matching shape name from a word bank",
    "family": "geometry",
    "steps": [
-    "R.B4.S3"
+    "R.B4.S3",
+    "R.B6.S3"
    ],
    "ccss": [
     "K.G.A.1"
@@ -1220,6 +1348,20 @@
    "ccss": [
     "K.G.A.1"
    ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "day_order": {
+   "kind": "new",
+   "skill": "measurement:order_events",
+   "name": "First, Next, Then",
+   "teaches": "sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then)",
+   "representation": "three or four picture cards; number them 1-4 in order; option: before/after questions",
+   "family": "measurement",
+   "steps": [
+    "R.B6.S4"
+   ],
+   "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
