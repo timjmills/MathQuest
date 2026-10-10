@@ -122,3 +122,7 @@ Owner 2026-10-10 additions: KEEP the 24-hour clock (propose it); Roman numerals 
     Rule 18 also covers CONTENT and LAYOUT, not only number size: no eighths/fifths for a halves step, no unlike-fraction
     compares at Grade 2, no customary units on a metric/time step, no column regrouping before the column steps, and
     coordinate skills are checked too. Judge size against what the pupil has met BY THAT SCHOOL WEEK (xlsx order).
+19. SCHOOL-WEEK ORDER, NOT WRM ORDER: a PRE skill must be content the pupil has met BY THE STEP'S SCHOOL WEEK (xlsx order),
+    or in an earlier grade. Order the "earlier step" tiers by school week. Each content type (thirds, quarter past,
+    ×6/7/9 tables, ÷3/÷4, decimals, angles, customary units …) has a first-taught week per grade — record it in the
+    link checker and never link it earlier. Tables beyond the grade (×6/7/9 at Grade 2) are never linked.
