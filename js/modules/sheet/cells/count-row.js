@@ -82,7 +82,7 @@ function wrapRows(n, rows0, boxW, gap, avail) {
     return { rows: n, perRow: 1 };
 }
 /** The one-page sheet's air above and below a row; none where the role sizes the cell to the row (opener, critic r2 N4). */
-const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 0 : Number(p.vpad) > 0 ? Number(p.vpad) : 0);
+const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 1.2 : Number(p.vpad) > 0 ? Number(p.vpad) : 0);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);

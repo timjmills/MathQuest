@@ -66,7 +66,7 @@ function geometry(items, input) {
     let iRows = 0;
     // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
-    const hand = first && first.template === 'count-row' ? m.strip : 0;
+    const hand = first && first.template === 'count-row' && ctx.size === 'L' ? m.strip : 0;   // the labels wrap at L only
     while (iRows < 2 && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
     // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a page of count rows - each a full-width line - takes a second
     // Guided row where the page would otherwise end in a blank band; the Independent rows are fitted first, so none is lost
@@ -78,20 +78,45 @@ function geometry(items, input) {
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
 }
 
+const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
+const countRowFirst = (items) => !!(items[0] && items[0].template === 'count-row');
+
+/**
+ * critic r4 N12: count rows differ in height (a 12-row of 2-digit numbers wraps where a 5-row does not), and the page is sized
+ * from its tallest row. So a count-row Opener asks for every item it could place, and the plan then takes the fullest page
+ * whose rows are sized from exactly the items it places: no row it fits is left out, and no taller row it leaves out shrinks it.
+ */
+function bestGeometry(items, input) {
+    const all = geometry(items, input);
+    if (!countRowFirst(items)) return all;
+    let best = null;
+    for (let m = items.length; m >= 1; m--) {
+        const g = geometry(items.slice(0, m), input);
+        if (needOf(g) <= m && (!best || needOf(g) > needOf(best))) best = g;
+    }
+    return best || all;
+}
+
 export function counts(pools, input) {
-    const g = geometry(pools.main || [], input);
-    return { main: (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc };
+    const probe = pools.main || [];
+    const g = geometry(probe, input);
+    // a count-row page asks for the most it could hold (2 Guided rows, 2 Independent rows); the plan places what fits
+    if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 4 * g.gc };
+    return { main: needOf(g) };
 }
 
 export function plan(input = {}) {
     const items = poolItems(input, 'main');
-    const g = geometry(items, input);
+    const g = bestGeometry(items, input);
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
     const models = items.slice(0, nModel);
-    const nGuided = g.gc * g.gRows;
-    const guided = items.slice(nModel, nModel + nGuided);
-    const indep = items.slice(nModel + nGuided, nModel + nGuided + g.iRows * g.gc);
+    // critic r4 N12: when the deal comes up short of the plan, the Independent rows are filled before the second Guided row
+    // (PT-OPN-7 rows are scored; the second Guided row only fills a page that would otherwise end in a blank band)
+    const rest = items.slice(nModel);
+    const guided1 = rest.slice(0, g.gc);
+    const indep = rest.slice(g.gc, g.gc + g.iRows * g.gc);
+    const guided = guided1.concat(g.gRows > 1 ? rest.slice(g.gc + indep.length, g.gc + indep.length + g.gc) : []);
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
