@@ -3541,6 +3541,236 @@
     }
    ],
    "note": ""
+  },
+  "R.B14.S1": {
+   "title": "Add more",
+   "direct": [
+    {
+     "key": "addition:add_5_pictures",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_wp_10",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "why": "R.B11.S12 Doubles to 10 (make a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "same CCSS K.OA.A.1, K.OA.A.2 in R.B14.S3 Take away"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "same CCSS K.OA.A.1, K.OA.A.2 in R.B14.S3 Take away"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B14.S2": {
+   "title": "How many did I add",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_wp_10",
+     "opts": {},
+     "missing": "finding how many were added (change unknown); the skill asks for the total"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "change unknown: how many were added",
+   "build": [
+    "pictures_change_unknown"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (the step before in this block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B11.S12 Doubles to 10 (make a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "the abstract missing-number form"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "next step: R.B14.S3 Take away"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "next step: R.B14.S3 Take away"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
+  },
+  "R.B14.S3": {
+   "title": "Take away",
+   "direct": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (the step before in this block)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (the step before in this block)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B11.S12 Doubles to 10 (make a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "pictures_change_unknown"
+   ],
+   "related": [
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "same block: R.B14.S1 Add more"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "same block: R.B14.S1 Add more"
+    }
+   ],
+   "note": ""
+  },
+  "R.B14.S4": {
+   "title": "How many did I take away",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_wp_10",
+     "opts": {},
+     "missing": "finding how many were taken away (change unknown)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "change unknown: how many were taken away",
+   "build": [
+    "pictures_change_unknown"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (the step before in this block)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "R.B14.S2 How many did I add (the step before in this block)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "R.B14.S1 Add more (same CCSS K.OA.A.1, K.OA.A.2, earlier)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "R.B11.S12 Doubles to 10 (make a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "R.B11.S11 Doubles to 10 (find a double) (same CCSS K.OA.A.1, earlier)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (same CCSS K.OA.A.1, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "the abstract missing-number form"
+    },
+    {
+     "key": "patterns:double",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    },
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "why": "same CCSS K.OA.A.1 in R.B16.S6 Play with and build doubles"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -3883,6 +4113,25 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
+  },
+  "pictures_change_unknown": {
+   "kind": "option",
+   "skill": "addition:add_5_pictures",
+   "option": "unknown: change; band to 10",
+   "name": "How Many Were Added / Taken Away? (option)",
+   "teaches": "change-unknown stories with pictures: how many were added or taken away, totals to 10; also lifts the pictures band to 10",
+   "representation": "a before box and an after box of counters in one cell; write how many were added (or crossed out); applies to subtraction:sub_5_pictures too",
+   "family": "operations",
+   "ccss": [
+    "K.OA.A.2",
+    "K.OA.A.1"
+   ],
+   "why": "the picture skills ask only for the result and stop at 5",
+   "steps": [
+    "R.B14.S2",
+    "R.B14.S4"
+   ],
+   "reused": false
   }
  },
  "tagFixes": [
