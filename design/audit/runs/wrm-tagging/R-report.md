@@ -184,3 +184,13 @@ record each critic round (r1-r7) and what changed.
 - **D10.** R.B17.S5 and R.B17.S8-S11 drop the `compose_shapes` pre. On R.B17.S4 and S6 the why reads "R.B15.S5 two shapes
   put together make a new shape".
 - **R.B13.S2.** The related why reads "the hundred square to 10 (the step continues past 10)".
+- **Loose ends (before critic r8).**
+  - Every "(see build)" / "(see preBuild)" claim was checked against the files: 34 claims, 0 false, including all 12
+    steps on the critic's D2r list.
+  - Three related whys were re-written from 60 generated items each:
+    - R.B13.S6 `hundreds_chart_fill {band:30}`: "the hundred square to 30, three rows at a time: down each column the ones
+      digit repeats (6, 16, 26)". Every item is a 3-row window of 1-30.
+    - R.B16.S1 `share_into_groups {band:12}`: "the other way to split a set: make groups of a given size and count the
+      groups". Every item is "N counters, make groups of k, how many groups?".
+    - R.B16.S6 `halve {band:10}`: "the inverse: half of a number to 10 (half of 8 is 4) undoes a double". Every item is
+      "Half of n", n even, to 10.

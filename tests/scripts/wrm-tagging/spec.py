@@ -199,7 +199,7 @@ st('R.B13.S5', d=[P(NSF,'saying the counting sequence aloud past 20; the skill f
    m='oral counting past 20 (the written track is the only check)', b=['oral_count'])
 st('R.B13.S6', d=[P(NSF,'the spoken pattern of the decades (21, 22 … 29, 30); a written track only', step=1, range=100)], v='partial',
    m='saying the counting pattern and noticing that 1-9 repeat in every decade', b=['oral_count'],
-   r=[(HCF,'the hundred square shows the repeating ones digits')])
+   r=[(HCF,'the hundred square to 30, three rows at a time: down each column the ones digit repeats (6, 16, 26)',{'band':30})])
 # R.B14 How many now?
 st('R.B14.S1', d=[P(A5,'adding more with totals 6-10: the skill stops at 5'), P(AWP,'a word-work cell with an operation bank and a unit-word bank: not a Reception response', band=10)], v='partial',
    m='adding more to a pictured group, totals to 10, by counting on and writing how many now (add_5_pictures stops at 5; add_wp_10 is a word-work cell)', b=['add_10_pictures'],
@@ -222,7 +222,7 @@ st('R.B15.S6', d=[P(CMP,'decomposing: finding the shapes inside a shape (the ski
 st('R.B15.S7', v='gap', m='copying a picture made of 2-D shapes', b=['scenes'], r=[(CMP,'combining shapes')])
 st('R.B15.S8', v='gap', m='finding 2-D faces within 3-D shapes', b=['shape_3d_tasks'], r=[(N3D,'naming the 3-D shape')])
 # R.B16 Sharing and grouping
-st('R.B16.S1', v='gap', m='exploring sharing an amount fairly', b=['share_group'], r=[(SHG,'grouping, the inverse view',{'band':12})])
+st('R.B16.S1', v='gap', m='exploring sharing an amount fairly', b=['share_group'], r=[(SHG,'the other way to split a set: make groups of a given size and count the groups (12 counters, groups of 3)',{'band':12})])
 st('R.B16.S2', d=[P(SHG,'sharing one at a time (how many each); the skill makes groups of a size', band=12)], v='partial',
    m='sharing one by one between a given number (how many each)', b=['share_group'])
 st('R.B16.S3', d=[P(SHG,'exploring: making equal groups freely; the skill gives the group size', band=12)], v='partial', m='exploring making equal groups', b=['share_group'])
@@ -546,7 +546,7 @@ FORMS = {
  TC: [(TFT, _f+'build on two ten frames'), (B10, _f+'base-10 blocks')], TFT: [(TC, _f+'10 and n more')],
  TFV: [(B10, _f+'build with rods and cubes')], B10: [(TFV, _f+'count the tens'), (UF, _f+'write tens and ones')], UF: [(B10, _f+'build it with blocks')],
  PVC: [(OLG, _f+'order three numbers')], OLG: [(OGL, _f+'greatest to least'), (PVC, _f+'compare two')], ML10: [(CS, _f+'next / before'), (HCF, _f+'the hundred square')],
- DND: [(DBL, _f+'"double n"'), (HALF, _i+'halve')], DBL: [(DND, _f+'n + n'), (HALF, _i+'halve')], HALF: [(DBL, _i+'double'), (FOS, _f+'a fraction of a set')],
+ DND: [(DBL, _f+'"double n"'), (HALF, _i+'half of a number to 10 (half of 8 is 4) undoes a double', {'band': 10})], DBL: [(DND, _f+'n + n'), (HALF, _i+'half of a number to 10 (half of 8 is 4) undoes a double', {'band': 10})], HALF: [(DBL, _i+'double'), (FOS, _f+'a fraction of a set')],
  OE: [(SHG, _f+'make equal groups')], SHG: [(ARR, _f+'groups drawn in rings'), (EQG, _f+'equal or not')], ARR: [(SHG, _i+'make groups from a total'), (RAM, _f+'repeated addition, later')],
  EQG: [(ARR, _f+'groups of ... make ...')], SHF: [(PART, _f+'how many equal parts'), (FOS, _f+'a fraction of a set')], PART: [(SHF, _f+'shade the part')],
  FOS: [(HALF, _f+'half of a number'), (SHF, _f+'a fraction of a shape')], COIN: [(MON, _f+'count the coins')], MON: [(COIN, _f+'find each coin')],

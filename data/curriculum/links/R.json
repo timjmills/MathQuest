@@ -3726,7 +3726,7 @@
    "related": [
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "the hundred square shows the repeating ones digits",
+     "why": "the hundred square to 30, three rows at a time: down each column the ones digit repeats (6, 16, 26)",
      "opts": {
       "band": 30
      }
@@ -4362,7 +4362,7 @@
    "related": [
     {
      "key": "division:share_into_groups",
-     "why": "grouping, the inverse view",
+     "why": "the other way to split a set: make groups of a given size and count the groups (12 counters, groups of 3)",
      "opts": {
       "band": 12
      }
@@ -4625,7 +4625,7 @@
    "related": [
     {
      "key": "patterns:halve",
-     "why": "the inverse: halve",
+     "why": "the inverse: half of a number to 10 (half of 8 is 4) undoes a double",
      "opts": {
       "band": 10
      }
