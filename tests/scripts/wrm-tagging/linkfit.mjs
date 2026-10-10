@@ -15,7 +15,9 @@
 //                       text, every part of the answer, the visual and the payload; 20 print-path items per link.
 //   G7-G9 (r8): option / tile / bin labels are read; denominators also as ?/16, _/16 and "den" fields; unlike-denominator
 //   ±, decimal ± past a whole or with unlike places, fifths as decimals, quarters as decimals before W33 and 4-digit
-//   column ± before W14 are flagged. Two seed sets, 20 items each.
+//   column ± before W14 are flagged.
+//   G10-G12 (r9): five seed sets, 150 items a link; nets, cross-sections, volume and probability; fractions in a pre
+//   before W07; and each free-text `why` is checked against the items (a named table, denominator family, unit, "one line").
 // usage: node linkfit.mjs [--all]
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
@@ -33,8 +35,8 @@ const NUM = /(\d{1,3}(?:,\d{3})+(?!\d)|\d+)(\.\d+)?/g;
 const TIME = /^measurement:(time|elapsed|clock|order_clocks)/;   // clock payloads hold minutes (19:00 = 1140)
 const DECOY = new Set(['number_sense:estimate_sums_diffs{"place":1000,"task":"reasonable"}']);
 const WK_FIRST_DECIMAL = 'W29';
-const N_ITEMS = 20;
-const SEEDS = [[9100, 17], [777, 53]];   // two seed sets, 40 items a link
+const N_ITEMS = 30;
+const SEEDS = [[9100, 17], [777, 53], [31337, 101], [4242, 29], [61, 7]];   // G10: five seed sets, 150 items a link
 const lab = x => x == null ? '' : typeof x === 'object' ? (x.label ?? x.text ?? x.html ?? JSON.stringify(x)) : String(x);   // G6: margins show up late (estimate_sums_diffs reaches 16,000 only after item 8)
 const cache = new Map();
 function probe(key, opts, range) {
@@ -79,6 +81,7 @@ const MONEY = /\$|¢|\bdollars?\b|\bmoney\b|\bprices?\b|\bcosts?\b|\bspend|\bcha
 const tablesBy = wk => { const t = new Set([0, 1, 2, 3, 4, 5, 8, 10]); if (wk >= 'W01') t.add(6); if (wk >= 'W02') { t.add(7); t.add(9); } if (wk >= 'W03') { t.add(11); t.add(12); } return t; };
 // Rule 19: the week the school first teaches each content type in Grade 3 (xlsx; earlier grades' content is met)
 const FIRST = [
+  ['fractions (a/b)', 'W07', (e, said) => /\b\d+\/\d+\b/.test(said)],
   ['mixed numbers / fractions past 1', 'W07', (e, said) => /\b\d+ \d+\/\d+\b/.test(said)],
   ['angles', 'W27', (e, said) => /^angles_lines:(identify_angles|measure_angles|additive_angles)/.test(e.key) || /\b(acute|obtuse|right angle)/i.test(said)],
   ['hundredths', 'W31', (e, said) => !/money|coin/.test(e.key) && /\/100\b|\b0\.\d\d\b|hundredth/i.test(said)],
@@ -131,6 +134,9 @@ function content(sid, e, r) {
   if (/triangle/i.test(said) && /\barea\b/i.test(said)) out.push('triangle area (6.G.A.1)');
   if (/%|\bpercent/i.test(all)) out.push('percent (6.RP)');
   if (/\bGCF\b|greatest common|simplif/i.test(said)) out.push('GCF / simplifying');
+  if (/cross-section|\bnets?\b|folds? into/i.test(said)) out.push('nets / cross-sections (6.G.A.4, 7.G.A.3)');      // G11
+  if (/\bvolume\b|cubic units/i.test(said)) out.push('volume of solids (5.MD.C)');
+  if (/probabilit|\blikely\b|\bunlikely\b|\bimpossible\b/i.test(said)) out.push('probability (7.SP)');
   if (/\bratio\b|x value|y value/i.test(said)) out.push('ratio tables (6.RP)');
   if (/\bprime\b|composite number|prime or composite/i.test(said)) out.push('prime / composite (4.OA.B.4)');
   if (/[xy]-axis/i.test(said) && /reflect/i.test(said)) out.push('reflection in an axis');
@@ -153,6 +159,29 @@ function content(sid, e, r) {
   if (wk < 'W36' && r.items.some(i => i.tpl === 'stack' && /"op":"[×x*]"/.test(i.pay) && /"operands":\[\d{3,}/.test(i.pay))) out.push(`column 3-digit × in ${wk} (B5.S10 is W36)`);
   return out;
 }
+// G12: a `why` that names a table, a denominator family, a unit or "one line" must match what the items deal
+const FAM = { halves: [2], half: [2], quarters: [4], fourths: [4], eighths: [8], thirds: [3], sixths: [6], ninths: [9], twelfths: [12], fifths: [5], tenths: [10], hundredths: [100] };
+function whyCheck(e, r) {
+  const w = String(e.why || ''); if (/^(R|Y\d)\.B\d+\.S\d+/.test(w)) return [];      // a cited step's title is not a claim
+  const out = [], texts = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''}`);
+  const tm = w.match(/\b(\d+)s? times-table|\bthe (\d+) row|\bwith (\d+) in a group|\bdividing by (\d+)|counting in (\d+)s\b/i);
+  if (tm) { const n = tm.slice(1).find(Boolean);
+    const grid = r.items.filter(i => i.tpl === 'mult-grid');
+    const hitGrid = grid.filter(i => { try { const p = JSON.parse(i.pay); return (p.blanks || []).length && p.blanks.every(([a, b]) => p.rows[a] == n || p.cols[b] == n); } catch (x) { return false; } }).length;
+    const hit = hitGrid + texts.filter((t, k) => r.items[k].tpl !== 'mult-grid' && new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b`).test(t)).length;
+    if (hit < texts.length / 2) out.push(`why names ${n} but only ${hit} of ${texts.length} items use it`); }
+  const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(w));
+  if (fams.length && !/to\s+(eighths|twelfths|tenths)|halves to/i.test(w)) {
+    const ok = new Set(fams.flatMap(f => FAM[f]).concat([1]));
+    const dens = new Set(texts.flatMap(t => [...t.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1])));
+    const off = [...dens].filter(d => !ok.has(d));
+    if (off.length) out.push(`why names ${fams.join('/')} but items deal /${off.join(', /')}`);
+  }
+  const um = w.match(/\bin (metres|meters|kilometres|km|centimetres|cm|millimetres|mm|grams|kg|litres|ml|hours|minutes|seconds)\b/i);
+  if (um && !texts.some(t => new RegExp(`\\b${um[1]}`, 'i').test(t))) out.push(`why says "in ${um[1]}" but no item has that unit`);
+  if (/one line|share a point|same point|land on one point/i.test(w) && !/one denominator a line/i.test(w)) out.push('why claims fractions share a point on one line (unchecked: each item is one line)');
+  return out;
+}
 let bad = 0, nContent = 0, checked = 0;
 for (const [sid, s] of Object.entries(d.steps)) {
   const fails = [];
@@ -164,7 +193,7 @@ for (const [sid, s] of Object.entries(d.steps)) {
     const limit = Math.max(1.5 * base, 100);
     const tag = `${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}`;
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
-    for (const c of [...content(sid, e, r), ...firstTaught(sid, e, r, role)]) { fails.push(`${tag}: ${c}`); nContent++; }
+    for (const c of [...content(sid, e, r), ...firstTaught(sid, e, r, role), ...whyCheck(e, r)]) { fails.push(`${tag}: ${c}`); nContent++; }
   }
   bad += fails.length;
   if (fails.length || ALL) console.log(`${sid} [${wkOf(sid) || '—'}] own ceiling ${own[sid]}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);

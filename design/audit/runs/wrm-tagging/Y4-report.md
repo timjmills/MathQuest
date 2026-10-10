@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 8
+# Wave 2 tagging: Y4 (Grade 3) report, round 9
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **536 / 233** (round 8). Every step has at least 3 pre and at least 1 related. 0 keys in both |
-| Option checks | — | — | Round 8: 364 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 769 links misfit** (`linkfit.mjs`, two seed sets, 40 items a link; per-step result in `Y4-linkfit.txt`) |
+| Pre / related entries | 528 / — | 570 / 319 | **536 / 229** (round 9). Every step has at least 3 pre and at least 1 related. 0 keys in both |
+| Option checks | — | — | Round 9: 369 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 765 links misfit** (`linkfit.mjs`, five seed sets, 150 items a link, `why` checked; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,61 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 9 (after critic r8: 9 new misfit links found by fresh seeds, and `why` texts)
+All changes are in `spec_zz_zz_r9.py`. They touch links, except the B7.S7 and B7.S8 clauses.
+
+**R. `improper_mixed` (7 links).**
+- **The problem.** Its "Click ALL fractions equal to …" branch scales to 15ths–24ths (54/15, 93/24) whatever `denoms` says.
+- **The fix.**
+  - The pre links on B7.S11, S12, S14 and S15 → `mixed_improper_visual`, citing B7.S6. Its denominators stay at 2–8 over
+    154 items.
+  - The related links on B7.S3, S4 and S5 → `mixed_improper_visual`, with the why "the same amount as a mixed number and an
+    improper fraction".
+- **B7.S7 and B7.S8.** These use `improper_mixed` as their own partial skill, so their partial and missing clauses now
+  name the 15ths–24ths items. Both verdicts stay partial; the missing clause adds "with denominators no larger than
+  twelfths". `improper_mixed_dir` now also keeps the click-all equivalents at twelfths or below.
+
+**Later-grade concepts.**
+- `mixed_shapes` dropped on B12.S5: it deals nets and 3-D cross-sections.
+- `probability_basic` dropped on B5.S14: probability as a fraction, in W06.
+- `round_fractions` dropped on B9.S7: fifths as decimals.
+- `mult_div_fact_family` dropped on B4.S8: 11 × 12 = 132, past the step.
+
+**Size.** `div_word_problems {range:100}` on B5.S11.
+
+**`why` texts rewritten to say what the skill deals.**
+- B7.S10: `fraction_nl_drag {denoms:[2]}`, "quarters or eighths placed on a 0-1 line, one denominator a line".
+- B7.S9: `graph_fractions {denoms:[2]}`, "halves, quarters and eighths placed on a 0-1 line".
+- B4.S2, S4, S7, S9 and S10: `mult_word_problems`, "equal-groups stories (the facts the stories use)".
+- B6.S1 and B6.S2: "4-digit numbers placed on a 0-10,000 line (metres before kilometres)".
+
+**B9.S8 (halves and quarters as decimals).**
+- `compose_whole {parts:[0]}`: halves, quarters and eighths only.
+- `partition_shapes {parts:[2], forms:[0]}`: fourths, "how many equal parts?". Its shaded form offers 4/3 decoys.
+- `benchmark_fractions` (eighths) → `money_notation {usd}`, citing Y3.B9.S1: a quarter is 25¢ = $0.25.
+
+**`linkfit.mjs`: G10–G12 closed.**
+- **G10.** Five seed sets of 30 items, so 150 items a link. A run takes about 45 seconds.
+- **G11.** New later-grade guards: nets and cross-sections, volume of solids, and probability. A fraction (a/b) in a pre
+  link is flagged before W07.
+- **G12.** Each free-text `why` is checked against the items.
+  - A named table, row or group size must appear in at least half the items. For a chart (`mult-grid`), every blank must
+    be in the named row or column.
+  - A named denominator family must cover every denominator dealt.
+  - "in <unit>" must appear in an item.
+  - A "one line" or "same point" claim is flagged.
+
+**Scan results.**
+- `linkfit.mjs`: 0 of 765 links misfit.
+- `optcheck.mjs`: 369 opts entries, 0 problems. `optchange.mjs`: 0 non-default values that change nothing.
+- The critic's `own8.mjs`, at 40 and at 150 items, flags only its 11 "prime" hits. These are the words "composite shape" in
+  `perimeter_grid` and `composite_shapes`, already ruled false positives in r7 and r8.
+
+**Generator defects for the lead (round 9).**
+1. `improper_mixed`'s click-all branch scales past twelfths and ignores `denoms`.
+2. `mixed_shapes` has no option to leave out nets and cross-sections.
+3. `partition_shapes`' shaded form offers improper decoys (4/3).
 
 ## Changes in round 8 (after critic r7: 21 links on 18 steps; rules 18 and 19)
 All changes are in `spec_zz_z_r8.py`, and every change is to a link. The 28 new or changed links are generated at the end

@@ -1530,3 +1530,92 @@ Same command as round 6, against the round-7 file. Dropped links are listed in t
 3. How many corners does this shape have? → 4
 4. How many corners does this shape have? → 4
 
+
+# Round 9: generated items for every new or changed pre / related link
+
+Same command as round 6, against the round-8 file.
+
+**Y4.B5.S11 related** `division:div_word_problems` opts `{"range":100}` Max Number 10000 — division stories
+
+1. Tom has 6 stickers. Tom puts them into 3 equal groups. How many stickers are in each group? → 2
+2. Sam has 15 pencils. Sam shares them equally among 3 friends. How many pencils does each friend get? → 5
+3. Leo has 42 apples. Leo puts them into 6 equal groups. How many apples are in each group? → 7
+4. Mia has 56 cookies. Mia puts 7 cookies in each pack. How many packs does Mia fill? → 8
+
+**Y4.B7.S3 related** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — the same amount as a mixed number and an improper fraction
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S4 related** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — the same amount as a mixed number and an improper fraction
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S5 related** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — the same amount as a mixed number and an improper fraction
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S9 related** `fractions:graph_fractions` opts `{"denoms":[2]}` Max Number 10000 — halves, quarters and eighths placed on a 0-1 line
+
+1. Place 7/8 on the number line by clicking the correct tick mark. → 7
+2. Place 1/4 on the number line by clicking the correct tick mark. → 1
+3. Place 1/2 on the number line by clicking the correct tick mark. → 1
+4. Place 3/4 on the number line by clicking the correct tick mark. → 3
+
+**Y4.B7.S11 pre** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S12 pre** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S14 pre** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B7.S15 pre** `fractions:mixed_improper_visual` opts `{}` Max Number 10000 — Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)
+
+1. Write this amount as a mixed number AND an improper fraction: → 26/6
+2. Write this amount as a mixed number AND an improper fraction: → 10/6
+3. Write this amount as a mixed number AND an improper fraction: → 5/2
+4. Write this amount as a mixed number AND an improper fraction: → 23/5
+
+**Y4.B9.S8 pre** `composing:compose_whole` opts `{"parts":[0]}` Max Number 10000 — Y3.B6.S4 Understand the whole (lower grade, same idea)
+
+1. Use halves and quarters and eighths to make 1 whole. → 1 whole
+2. Use halves and quarters and eighths to make 1 whole. → 1 whole
+3. Use halves and quarters to make 1 whole. → 1 whole
+4. Use halves and quarters and eighths to make 1 whole. → 1 whole
+
+**Y4.B9.S8 pre** `shapes_early:partition_shapes` opts `{"parts":[2],"forms":[0]}` Max Number 10000 — Y2.B8.S3 Recognise a half (prior learning wk W33)
+
+1. How many equal parts is this shape divided into? → 4
+2. How many equal parts is this shape divided into? → 4
+3. How many equal parts is this shape divided into? → 4
+4. How many equal parts is this shape divided into? → 4
+
+**Y4.B9.S8 pre** `measurement:money_notation` opts `{"currency":"usd"}` Max Number 10000 — Y3.B9.S1 Pounds and pence (lower grade, same idea)
+
+1. Write the amount. Use the point. → 7.05
+2. Write the amount. Use the point. → 7.50
+3. Write the amount. Use the point. → 0.75
+4. Write the amount. Use the point. → 6.00
+

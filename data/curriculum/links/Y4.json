@@ -2210,7 +2210,7 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups and array stories (the facts the stories use)",
+     "why": "equal-groups stories (the facts the stories use)",
      "opts": {
       "range": 100
      }
@@ -2405,7 +2405,7 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories with 9 in a group"
+     "why": "equal-groups stories (the facts the stories use)"
     },
     {
      "key": "multiplication:nl_mult",
@@ -2706,7 +2706,7 @@
    "related": [
     {
      "key": "multiplication:mult_word_problems",
-     "why": "equal-groups stories with 7 in a group",
+     "why": "equal-groups stories (the facts the stories use)",
      "opts": {
       "range": 100
      }
@@ -2819,10 +2819,6 @@
      "opts": {
       "range": 100
      }
-    },
-    {
-     "key": "multiplication:mult_div_fact_family",
-     "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 7s"
     }
    ],
    "note": "Direct: mult_facts and div_facts with constant [7] (generated: every item is a 7× or ÷7 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
@@ -4016,7 +4012,10 @@
    "related": [
     {
      "key": "division:div_word_problems",
-     "why": "division stories"
+     "why": "division stories",
+     "opts": {
+      "range": 100
+     }
     },
     {
      "key": "division:div_check_by_multiplying",
@@ -4210,10 +4209,6 @@
      "opts": {
       "range": 100
      }
-    },
-    {
-     "key": "probability:probability_basic",
-     "why": "listing outcomes"
     }
    ],
    "note": "",
@@ -4352,7 +4347,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "1 km = 1,000 m: distances in metres placed on a 0-10,000 line",
+     "why": "4-digit numbers placed on a 0-10,000 line (metres before kilometres)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -4431,7 +4426,7 @@
    "related": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "1 km = 1,000 m: distances in metres placed on a 0-10,000 line",
+     "why": "4-digit numbers placed on a 0-10,000 line (metres before kilometres)",
      "opts": {
       "span": 1000,
       "band": 10000
@@ -5076,8 +5071,8 @@
      "why": "decomposing a fraction into unit fractions"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "mixed ↔ improper"
+     "key": "fractions:mixed_improper_visual",
+     "why": "the same amount as a mixed number and an improper fraction"
     },
     {
      "key": "fraction_operations:add_mixed_like",
@@ -5141,8 +5136,8 @@
      "why": "ordering on a line"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "the same point as an improper fraction"
+     "key": "fractions:mixed_improper_visual",
+     "why": "the same amount as a mixed number and an improper fraction"
     }
    ],
    "note": "Generated mixed_nl_drag {} (print path): place-only, and 2 of 8 items carry no mixed number.",
@@ -5192,8 +5187,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fractions:improper_mixed",
-     "why": "converting to compare"
+     "key": "fractions:mixed_improper_visual",
+     "why": "the same amount as a mixed number and an improper fraction"
     }
    ],
    "note": "fractions:compare deals proper fractions only; the existing partial tag of compare on this step should be dropped (it covers none of mixed numbers).",
@@ -5267,11 +5262,11 @@
    "partial": [
     {
      "key": "fractions:improper_mixed",
-     "missing": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper"
+     "missing": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper; its \"Click ALL fractions equal to\" items also scale to 15ths-24ths (54/15, 93/24), past the step's twelfths"
     }
    ],
    "verdict": "partial",
-   "missing": "a page of mixed number → improper fraction only",
+   "missing": "a page of mixed number → improper fraction only, with denominators no larger than twelfths",
    "build": [
     "improper_mixed_dir"
    ],
@@ -5307,7 +5302,7 @@
      "name": "Mixed to Improper, or Improper to Mixed (option)",
      "kind": "option on fractions:improper_mixed",
      "teaches": "set direction \"to improper\": convert a mixed number to an improper fraction (2 3/4 = 11/4), counters ringed into wholes as a fading hint",
-     "closes": "a page of mixed number → improper fraction only",
+     "closes": "a page of mixed number → improper fraction only, with denominators no larger than twelfths",
      "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot"
     }
    ]
@@ -5318,11 +5313,11 @@
    "partial": [
     {
      "key": "fractions:improper_mixed",
-     "missing": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed"
+     "missing": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed; its \"Click ALL fractions equal to\" items also scale to 15ths-24ths (54/15, 93/24), past the step's twelfths"
     }
    ],
    "verdict": "partial",
-   "missing": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing)",
+   "missing": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing), with denominators no larger than twelfths",
    "build": [
     "improper_mixed_dir"
    ],
@@ -5362,7 +5357,7 @@
      "name": "Mixed to Improper, or Improper to Mixed (option)",
      "kind": "option on fractions:improper_mixed",
      "teaches": "set direction \"to mixed\": convert an improper fraction to a mixed number (11/4 = 2 3/4) by grouping into wholes",
-     "closes": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing)",
+     "closes": "a page of improper fraction → mixed number only (11/4 = 2 3/4, by grouping into wholes or dividing), with denominators no larger than twelfths",
      "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot"
     }
    ]
@@ -5404,7 +5399,12 @@
    "related": [
     {
      "key": "fractions:graph_fractions",
-     "why": "fractions marked on a line (halves to eighths): equal ones land on one point"
+     "why": "halves, quarters and eighths placed on a 0-1 line",
+     "opts": {
+      "denoms": [
+       2
+      ]
+     }
     }
    ],
    "note": "",
@@ -5471,7 +5471,7 @@
    "related": [
     {
      "key": "fractions:fraction_nl_drag",
-     "why": "quarters and eighths placed on one line: 2/4 and 4/8 share a point",
+     "why": "quarters or eighths placed on a 0-1 line, one denominator a line",
      "opts": {
       "denoms": [
        2
@@ -5501,8 +5501,8 @@
    ],
    "pre": [
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (taught the same school week, W10)"
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)"
     },
     {
      "key": "composing:compose_whole",
@@ -5560,8 +5560,8 @@
      "why": "Y4.B7.S11 Add two or more fractions (taught the same school week, W10)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (taught earlier this year, wk W09; on the prior-learning list of wk W10)"
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)"
     },
     {
      "key": "fractions:mixed_nl_drag",
@@ -5664,8 +5664,8 @@
      "why": "Y4.B7.S13 Subtract two fractions (taught the same school week, W11)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S7 Convert mixed numbers to improper fractions (taught earlier this year, wk W09)"
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)"
     },
     {
      "key": "composing:whole_as_fraction",
@@ -5731,12 +5731,12 @@
      "why": "Y4.B7.S13 Subtract two fractions (taught the same school week, W11)"
     },
     {
-     "key": "fractions:improper_mixed",
-     "why": "Y4.B7.S8 Convert improper fractions to mixed numbers (taught earlier this year, wk W10)"
-    },
-    {
      "key": "fraction_operations:add_mixed_like",
      "why": "Y4.B7.S12 Add fractions and mixed numbers (taught earlier this year, wk W10)"
+    },
+    {
+     "key": "fractions:mixed_improper_visual",
+     "why": "Y4.B7.S6 Understand improper fractions (taught earlier this year, wk W09)"
     }
    ],
    "preBuild": [],
@@ -6963,10 +6963,6 @@
     {
      "key": "number_sense:round_sort_tenths",
      "why": "rounding sort"
-    },
-    {
-     "key": "fractions:round_fractions",
-     "why": "rounding mixed numbers"
     }
    ],
    "note": "",
@@ -7011,15 +7007,31 @@
    "pre": [
     {
      "key": "composing:compose_whole",
-     "why": "Y3.B6.S4 Understand the whole (lower grade, same idea)"
+     "why": "Y3.B6.S4 Understand the whole (lower grade, same idea)",
+     "opts": {
+      "parts": [
+       0
+      ]
+     }
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)"
+     "why": "Y2.B8.S3 Recognise a half (prior learning wk W33)",
+     "opts": {
+      "parts": [
+       2
+      ],
+      "forms": [
+       0
+      ]
+     }
     },
     {
-     "key": "fractions:benchmark_fractions",
-     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same CCSS cluster)"
+     "key": "measurement:money_notation",
+     "why": "Y3.B9.S1 Pounds and pence (lower grade, same idea)",
+     "opts": {
+      "currency": "usd"
+     }
     }
    ],
    "preBuild": [],
@@ -7873,10 +7885,6 @@
     {
      "key": "shapes_early:shape_attributes",
      "why": "attributes of shapes"
-    },
-    {
-     "key": "shapes_classify:mixed_shapes",
-     "why": "mixed classification"
     }
    ],
    "note": ""
@@ -9156,7 +9164,7 @@
    "skill": "fractions:improper_mixed",
    "option": "dir: \"to-improper\" | \"to-mixed\" | \"both\" (default both)",
    "name": "Mixed to Improper, or Improper to Mixed (option)",
-   "teaches": "one conversion direction per page: mixed number → improper fraction (2 3/4 = 11/4) or improper fraction → mixed number (11/4 = 2 3/4)",
+   "teaches": "one conversion direction per page: mixed number → improper fraction (2 3/4 = 11/4) or improper fraction → mixed number (11/4 = 2 3/4); the click-all equivalents stay at twelfths or below",
    "representation": "the existing cell: the number to convert, fraction counters ringed into wholes beside it (hint, fades), one fraction answer slot",
    "family": "fractions",
    "ccss": [
@@ -10860,14 +10868,14 @@
    "key": "fractions:improper_mixed",
    "step": "Y4.B7.S7",
    "action": "partial",
-   "partial": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper",
+   "partial": "generated items mix both directions and the \"write it both ways\" picture item (\"Convert to a mixed number\", \"Click ALL fractions equal to 2 1/2\"); a page cannot be held to mixed → improper; its \"Click ALL fractions equal to\" items also scale to 15ths-24ths (54/15, 93/24), past the step's twelfths",
    "why": "generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)"
   },
   {
    "key": "fractions:improper_mixed",
    "step": "Y4.B7.S8",
    "action": "partial",
-   "partial": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed",
+   "partial": "generated items mix both directions (\"write as an improper fraction AND a mixed number\", \"Click ALL fractions equal to 2 3/6\"); a page cannot be held to improper → mixed; its \"Click ALL fractions equal to\" items also scale to 15ths-24ths (54/15, 93/24), past the step's twelfths",
    "why": "generated items mix both directions on one page; partial until the one-direction option (improper_mixed_dir)"
   },
   {
