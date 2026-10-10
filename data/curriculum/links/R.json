@@ -55,10 +55,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S1 have no live skill yet (see preBuild)."
@@ -87,10 +83,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -129,10 +121,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 0 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -179,10 +167,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -212,10 +196,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "the sorted groups shown as rows of pictures and counted (K.MD.B.3)"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "the sorted groups shown as bars"
     }
    ],
    "note": "Pre: 1 only; the earlier steps R.B1.S3, R.B1.S2, R.B1.S1 have no live skill yet (see preBuild)."
@@ -262,10 +242,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "compare two rows of pictures: which has more"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "compare two bars: which is taller"
     }
    ],
    "note": "Compare two groups to 5 by matching one to one (tap A or B). Pre: 2 only; this is the first step on this idea (compare) in the curriculum, so its pre-skills are building blocks from other ideas."
@@ -421,20 +397,10 @@
    "build": [
     "pattern_make"
    ],
-   "pre": [
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B2.S5 Copy and continue simple patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0
-      ]
-     }
-    }
-   ],
+   "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 1 only; no other live skill teaches an earlier step on this idea. Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 0 only; no other live skill teaches an earlier step on this idea. Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B3.S1": {
    "title": "Find 1, 2 and 3",
@@ -2808,10 +2774,6 @@
     {
      "key": "measurement:pictograph_intro",
      "why": "compare two rows of pictures: which has more"
-    },
-    {
-     "key": "measurement:bar_graph_intro",
-     "why": "compare two bars: which is taller"
     }
    ],
    "note": ""
@@ -3717,20 +3679,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B2.S5 Copy and continue simple patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B12.S6": {
    "title": "Copy and continue patterns",
@@ -3761,29 +3714,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S5 Identify more complex patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       1
-      ]
-     }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B2.S5 Copy and continue simple patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B12.S7": {
    "title": "Patterns in the environment",
@@ -3813,30 +3748,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S6 Copy and continue patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0,
-       1
-      ]
-     }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S5 Identify more complex patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       1
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B13.S1": {
    "title": "Build numbers beyond 10 (10 -13)",
@@ -3908,11 +3824,17 @@
     },
     {
      "key": "counting:number_seq_fill",
-     "why": "a later step on this idea: R.B13.S2 Continue patterns beyond 10 (10-13)",
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
      "opts": {
       "step": 1,
-      "dir": "forward",
       "range": 20
+     }
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "opts": {
+      "band": 30
      }
     }
    ],
@@ -4052,13 +3974,6 @@
       "band": 10,
       "objects": "frame"
      }
-    },
-    {
-     "key": "composing:ten_frame_build",
-     "why": "R.B11.S9 Make arrangements of 10 (earlier step; the next step on this idea: Y1.B4.S2 Understand 10)",
-     "opts": {
-      "band": 10
-     }
     }
    ],
    "preBuild": [],
@@ -4072,9 +3987,16 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "a later step on this idea: Y1.B6.S1 Count from 20 to 50",
+     "why": "the next step on this idea: Y1.B6.S1 Count from 20 to 50",
      "opts": {
       "band": 30
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "the next step on this idea: Y1.B6.S2 20, 30, 40 and 50",
+     "opts": {
+      "band": 50
      }
     }
    ],
@@ -5304,29 +5226,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S7 Patterns in the environment (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0
-      ]
-     }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S5 Identify more complex patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       1
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; every other live form of this idea is already a pre-skill or a direct skill."
+   "note": "Pre: 1 only; the earlier steps on this idea use this step's own skill (shape_pattern); the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: none; every other live form of this idea is already a pre-skill or a direct skill."
   },
   "R.B17.S2": {
    "title": "Create own pattern rules",
@@ -5346,21 +5250,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B17.S1 Identify units of repeating patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 1 only; the earlier steps R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S3": {
    "title": "Explore own pattern rules",
@@ -5380,21 +5274,11 @@
        1
       ]
      }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B17.S1 Identify units of repeating patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Pre: 2 only; the earlier steps R.B17.S2, R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
+   "note": "Pre: 1 only; the earlier steps R.B17.S2, R.B2.S6 have no live skill yet (see preBuild). Related: no live skill shows this idea in another form yet (see build)."
   },
   "R.B17.S4": {
    "title": "Replicate and build scenes and constructions",
@@ -5741,16 +5625,6 @@
     {
      "key": "subtraction:sub_5_pictures",
      "why": "R.B14.S3 take away"
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B17.S1 Identify units of repeating patterns (earlier step; patterns, reviewed in S2)",
-     "opts": {
-      "points": [
-       0,
-       1
-      ]
-     }
     }
    ],
    "preBuild": [
@@ -5807,25 +5681,6 @@
      "opts": {
       "forms": [
        0
-      ]
-     }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B17.S1 Identify units of repeating patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       0,
-       1
-      ]
-     }
-    },
-    {
-     "key": "patterns:shape_pattern",
-     "why": "R.B12.S5 Identify more complex patterns (earlier, same idea: pattern)",
-     "opts": {
-      "points": [
-       1
       ]
      }
     }

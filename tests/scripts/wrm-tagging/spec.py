@@ -283,7 +283,7 @@ st('Y1.B2.S9', d=[F(AWP, band=10), F(NLA, range=10)])
 st('Y1.B2.S10', d=[F(AWP, band=10), F(AWPP, band=10)])
 st('Y1.B2.S11', d=[F(NB, band=10, unknown='first')])
 st('Y1.B2.S12', d=[F(NB, band=10, unknown='second'), F(MAS, range=10)])
-st('Y1.B2.S13', d=[F(FF, range=10), F(NFA, band=10)], r=[(FFS,'is it a fact family? A typed yes / no answer (rule 8), so related, not direct',{'range':10})])
+st('Y1.B2.S13', d=[F(FF, range=10), F(NFA, band=10)], n='fact_family_sort (is it a fact family?) is not listed: its answer is a typed yes / no, not a Kindergarten response (rules 8 and 18).')
 st('Y1.B2.S14', d=[P(S5,'crossing out from amounts 6 to 10 (the pictures skill stops at 5)')], v='partial', m='crossing out to take away from amounts to 10',
    b=['sub_10_pictures'], r=[(SWP,'take-away stories')])
 st('Y1.B2.S15', d=[P(S5,'amounts 6 to 10 (stops at 5)'), P(SWP,'a pictured take-away; the stories are text with a picture row')], v='partial',
@@ -305,7 +305,8 @@ st('Y1.B4.S5', d=[P(TC,'17-19 only (band 19 deals 11-19)', band=19), P(TFT,'17-1
 st('Y1.B4.S6', d=[P(TFT,'20 as two full tens', band=19)], v='partial', m='20 as two tens', b=['teen_structure'])
 st('Y1.B4.S7', d=[F(CS, band=20), F(ML10, step=1, band=20)])
 st('Y1.B4.S8', v='gap', m='the 0-20 number line: reading and labelling ticks', b=['nl_20'],
-   p=[(NLA,'Y1.B2.S9 jump along a 0-10 line: the line is the building block',{'range':10}),(NLS2,'Y1.B2.S16 jump back on a 0-10 line',{'range':10}),(CS,'Y1.B4.S7 the order of the numbers to 20',{'band':20,'dir':'forward'})],
+   p=[(CS,'Y1.B4.S7 the order of the numbers to 20 (school week 5)',{'band':20,'dir':'forward'}),(NSF,'a number track to 20: the line is a track of equal steps',{'step':1,'range':20}),(CO,'Y1.B4.S1 count to 20',{'band':20})],
+   n='The 0-10 line jumps (Y1.B2.S9, S16) come after this step in the school order (weeks 14 and 16), so they are not pre-skills here.',
    xp=[PVC], r=[(PNL,'the same line read in tens later (to 100)',{'span':10,'band':100})])
 st('Y1.B4.S9', d=[F(NLA, range=20), F(NLS2, range=20)], n='At Max Number 20 both skills draw a 0-20 line (13 + 2, 16 − 7): count on and back along it.')
 st('Y1.B4.S10', v='gap', m='estimating where a number lies on a 0-20 line with only the ends marked', b=['nl_20'])
@@ -616,7 +617,7 @@ for _s in ('R.B17.S5', 'R.B17.S6'):
     addpre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the shapes being placed', {'forms': [1]}), (N3D, 'R.B12.S1 name the solids in the scene', {'forms': [1]}), (CMP, 'R.B15.S5 arrange shapes to make a picture', {}))
 for _s in ('R.B17.S8', 'R.B17.S9', 'R.B17.S10', 'R.B17.S11'):
     addpre(_s, (POS, 'R.B4.S4 / R.B17.S6 the position words a map uses', {'forms': [0]}), (N3D, 'R.B12.S1 the solids used as models', {'forms': [1]}), (CMP, 'R.B15.S5 arrange shapes to show a place', {}))
-addpre('Y1.B11.S1', (PART, 'Y1.B10.S1 / S5 a half and a quarter of a shape: a half turn, a quarter turn', {'parts': [0, 2]}),
+addpre('Y1.B11.S1', (N2D, 'R.B15.S2 a turned shape is the same shape', {'forms': [1]}),
        (CLK, 'the clock hand turns round the face', {'task': 'hands'}), (POS, 'R.B17.S6 position words', {'forms': [0]}))
 addpre('Y1.B11.S3', (POS, 'R.B17.S6 / Y1.B11.S2 position words', {'forms': [0, 1]}), (CS, 'Y1.B1.S6 / S8 count forwards and backwards', {'band': 10, 'dir': 'mixed'}),
        (NSF, 'Y1.B1.S6 steps along a number track', {'step': 1, 'range': 10}))
@@ -639,15 +640,21 @@ for _s in ('R.B8.S1', 'R.B8.S2'): addpre(_s, (COB, 'R.B2.S1 / R.B10 compare by s
 for _s in ('R.B10.S1', 'R.B10.S2'): addpre(_s, (HL, 'R.B2.S2 / R.B8.S1 compare two objects (mass): the compare words', {}))
 for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S4 sort and count one kind', {'band': 3}))
 addpre('Y1.B14.S5', (CLK, 'the numbers on the clock face', {'task': 'numerals'}), (CS, 'Y1.B4.S7 the order of the numbers 1 to 12', {'band': 20, 'dir': 'forward'}))
-R_NOLINK = {AWP, AWPP, SWP, SWPP, CMPW}   # word-work cells (text lines, operation and unit banks): never a pre / related link in Reception
+# Rule 18 content and layout: skills whose response or content no PK / K pupil meets, never a pre / related link in R or Y1
+# (they may still be a step's own direct or partial skill, with the defect named there):
+# word-work cells always print a + − × ÷ operation bank; shape_pattern, equal_or_unequal_groups and fact_family_sort need typed
+# words; shade_fraction / fraction_of_set {denoms:[2]} also deal quarters, eighths (and leak thirds, fifths, sixths);
+# bar_graph_intro asks "which has the most?" with a typed category name.
+NOLINK = {AWP, AWPP, SWP, SWPP, SP, EQG, FFS, SHF, FOS, 'measurement:bar_graph_intro'}
+R_NOLINK = NOLINK | {CMPW}
 for _s in ('Y1.B2.S14', 'Y1.B2.S15'):
     addpre(_s, (CS, 'R.B11.S6 / Y1.B1.S9 1 less: take away one', {'band': 10, 'dir': 'back'}), (CO, 'Y1.B1.S2 count what is left', {'band': 10}))
 # Related forms a pupil meets next that no R / Y1 step teaches (rule 4): used when a step has fewer than 2 related.
 PIC = 'measurement:pictograph_intro'; BARI = 'measurement:bar_graph_intro'; NLAV = 'addition:nl_add'; A10NR = 'addition:add_10_no_regroup'
 SEO = 'composing:select_even_odd'; ECS = 'measurement:equiv_coin_sets'; TMC = 'measurement:time_match_clock'; EQS2 = 'addition:equal_sign'
 EXTRA = {
- 'sort': [(PIC, 'the sorted groups shown as rows of pictures and counted (K.MD.B.3)', {}), (BARI, 'the sorted groups shown as bars', {})],
- 'compare': [(PIC, 'compare two rows of pictures: which has more', {}), (BARI, 'compare two bars: which is taller', {})],
+ 'sort': [(PIC, 'the sorted groups shown as rows of pictures and counted (K.MD.B.3)', {})],
+ 'compare': [(PIC, 'compare two rows of pictures: which has more', {})],
  'more1': [(NLAV, 'one more as one jump on a 0-10 number line', {'range': 10})],
  'bond': [(A10NR, 'the two parts written as an addition sentence', {'notation': ['across']}), (NLAV, 'the parts as two jumps on a 0-10 line', {'range': 10})],
  'add': [(NLAV, 'the same addition as jumps on a 0-10 line', {'range': 10}), (EQS2, 'is the sentence true? the = sign', {'range': 10})],
@@ -655,3 +662,11 @@ EXTRA = {
  'money': [(ECS, 'do these coins make the amount? (nickels, dimes, pennies)', {'currency': 'usd', 'band': 25, 'values': [1, 5, 10]})],
  'time': [(TMC, 'choose the clock that shows the time (hours and half hours)', {'precision': 30})],
 }
+# Round 3 (school week order, rule 18 content): building blocks the school has taught by these weeks
+addpre('Y1.B13.S4', (NSF, 'Y1.B6.S1 count on in ones to 50 (school week 8)', {'step': 1, 'range': 50}), (TFV, 'Y1.B6.S2 20, 30, 40 and 50 as tens (week 8)', {'band': 50}),
+       (CO, 'Y1.B4.S1 count the coins one by one, to 20', {'band': 20}))
+addpre('Y1.B3.S5', (N2D, 'Y1.B3.S3 name the 2-D shapes in the pattern', {'forms': [1]}), (N3D, 'Y1.B3.S1 name the 3-D shapes in the pattern', {'forms': [1]}),
+       (M2D, 'Y1.B3.S3 match the name to the shape', {}))
+addpre('Y1.B10.S5', (N2D, 'Y1.B3.S3 name the shape being split', {'forms': [1]}), (CMP, 'R.B15.S5 / S6 shapes put together and split', {}))
+addpre('Y1.B10.S8', (SHG, 'Y1.B9.S9 share into equal groups', {'band': 12}))
+addpre('Y1.B10.S3', (DBL, 'Y1.B9.S7 doubles: two equal groups', {'band': 20}))

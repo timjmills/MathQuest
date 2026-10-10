@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, EXTRA
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -48,6 +48,12 @@ def prior_r_steps(step):
         out.append(best[-1])
     return wk, out
 
+# Rule 18 (school week): Y1 is taught in the school's xlsx week order, not WRM block order. "Earlier" and "later" use SORD.
+def school_week(x):
+    w = lesson_week.get(norm(info[x]['title']))
+    return int(str(w)[1:]) if w else 99
+SORD = [x for x in order if x.startswith('R.')] + sorted([x for x in order if x.startswith('Y1.')], key=lambda x: (school_week(x), idx[x]))
+sidx = {x: i for i, x in enumerate(SORD)}
 READS = json.load(open(f'{HERE}/reads_range.json'))   # skill -> True when its items change with Max Number
 
 SUBS = [  # (family, sub, regex on the step title) — first match wins; order matters
@@ -138,7 +144,7 @@ def build(step):
     sig = lambda k, o: k + json.dumps(o or {}, sort_keys=True)
     seen = {sig(k, o) for k, o in dentries(step)}; seen_keys = set()
     xp = set(sp['xp']); xr = set(sp['xr'])
-    if s['year'] == 'R': xp |= R_NOLINK; xr |= R_NOLINK   # rule 8: word-work cells are not a Reception response
+    nl = R_NOLINK if s['year'] == 'R' else NOLINK; xp |= nl; xr |= nl   # rule 18 content / layout (spec.NOLINK)
     def addp(k, why, o=None, explicit=False):
         # a pre may be the step's own skill on an earlier rung (other opts); never the same skill+opts as a direct
         if k in xp or not live(k) or len(pre) >= 8: return False
@@ -172,7 +178,7 @@ def build(step):
             if S[rs]['v'] == 'gap': take_builds(rs)
     # earlier steps on the same idea: same sub-topic first, then the same family, nearest first (rule 11);
     # rule 15: keep going through the family until 3 pre-skills are found
-    cands = [x for x in reversed(order[:idx[step]]) if related_topic(step, x) and (info[x]['year'] == s['year'] or s['year'] == 'Y1')]
+    cands = [x for x in reversed(SORD[:sidx[step]]) if related_topic(step, x) and (info[x]['year'] == s['year'] or s['year'] == 'Y1')]
     cands.sort(key=lambda x: -related_topic(step, x))   # stable: nearest first inside each rank
     for x in cands:
         if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 3): break
@@ -182,7 +188,7 @@ def build(step):
     pb = pb[:3]
     rel = []; rseen = set(own) | {p['key'] for p in pre} | xr
     def earlier(k):   # rule 14: the latest earlier step that teaches k
-        ts = [(x, o) for x, o in TAUGHT.get(k, []) if idx[x] < idx[step]]
+        ts = [(x, o) for x, o in TAUGHT.get(k, []) if sidx[x] < sidx[step]]
         return ts[-1] if ts else None
     promoted = []
     def addr(k, why, o=None):
@@ -195,6 +201,7 @@ def build(step):
                 use = eo if fits(k, eo, step) else fit(k, step)
                 if use is not None and addp(k, f"{fmt_step(x)} (earlier step; {why})", use): promoted.append(k)
             return
+        if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])): return   # WRM-earlier but school-later: neither pre nor related
         if o is None:
             o = fit(k, step)
             if o is None: return
@@ -208,11 +215,11 @@ def build(step):
         for e in FORMS.get(k, []):
             k2, why, o = split(e); addr(k2, why, o)
     # the next steps' skills when they carry the same idea forward (rule 4/10: a reason beyond "same block")
-    later = [x for x in order[idx[step] + 1:] if related_topic(step, x) == 2]
+    later = [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2]
     for x in later[:3]:
         for k, o in dentries(x): addr(k, f"the next step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)
     if len(rel) < 2:   # a later step on the same idea whose skill is new (not taught yet): the next form a pupil meets
-        for x in [x for x in order[idx[step] + 1:] if related_topic(step, x) == 2 or (related_topic(step, x) and info[x]['block'] == s['block'])]:
+        for x in [x for x in SORD[sidx[step] + 1:] if related_topic(step, x) == 2 or (related_topic(step, x) and info[x]['block'] == s['block'])]:
             if len(rel) >= 2: break
             for k, o in dentries(x):
                 if not earlier(k): addr(k, f"a later step on this idea: {fmt_step(x)}", o if fits(k, o, step) else None)

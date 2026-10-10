@@ -31,6 +31,11 @@ skill+opts, 6 generated items, Max Number recorded).
   max(1.5 × ceiling, ceiling + 2), where the ceiling is the step's own block range, what its full skills deal, and the numbers in
   its title. A link that does not fit gets the largest smaller rung that does, or is dropped (`more_less_10` never reaches R.B3; the
   1-3 steps see count_objects band 5 at most).
+- **Rule 18, content and layout.** A skill whose response or content a PK / K pupil has not met is never a pre / related link
+  (`spec.NOLINK`): word-work cells (they always print a + − × ÷ bank), typed-name `shape_pattern`, typed "multiply / add"
+  `equal_or_unequal_groups`, typed yes / no `fact_family_sort`, `shade_fraction` / `fraction_of_set` (eighths, quarters on halves
+  steps, leaked thirds and fifths), `bar_graph_intro` (typed category). Scan: 0 typed-word, column, ×/÷, wrong-fraction or
+  coordinate links.
 - **Rules 14-15.** An earlier step's skill is never related only: it is promoted to pre (with the earlier step's opts) or
   dropped. Composition, position, sharing, doubles and pattern steps got their building blocks (R.B5.S6 / R.B3.S6 / R.B7.S7 count,
   frame and compare; R.B17.S7 `shape_positions {forms:[0]}` + `name_2d_shapes {forms:[1]}`; maps get position words, solids and

@@ -27,11 +27,23 @@ Round 3 answers critic `R-Y1-critic-r2.md` (round 2 FAIL, Y1 mean 7.12). Evidenc
   Also seen: `shape_positions {forms:[0]}` answers "Below" in most items.
 - **Rule 18, per step.** As in R-report: every link's dealt maximum is measured and held to the step's own ceiling; links that
   overreach take a smaller rung or are dropped (no 3-digit compare / order / unit form below Y1.B12, no column layouts).
+- **Rule 18, content and layout.** A skill whose response or content a PK / K pupil has not met is never a pre / related link
+  (`spec.NOLINK`): word-work cells (they always print a + − × ÷ bank), typed-name `shape_pattern`, typed "multiply / add"
+  `equal_or_unequal_groups`, typed yes / no `fact_family_sort`, `shade_fraction` / `fraction_of_set` (eighths, quarters on halves
+  steps, leaked thirds and fifths), `bar_graph_intro` (typed category). Scan: 0 typed-word, column, ×/÷, wrong-fraction or
+  coordinate links.
+- **School week order (rule 18).** Y1 is taught in the xlsx week order, not WRM block order (count in 10s is week 9; count in 2s
+  and 5s week 33; recognise coins week 35 after count in coins week 11). gen.py now ranks "earlier" and "later" by school week:
+  0 pre-skills name a step the school teaches later (e.g. Y1.B4.S8 no longer lists the 0-10 line jumps of weeks 14 and 16).
+- **Open generator issue.** `add_wp_10` (direct on Y1.B2.S9 / S10, accepted by the critic) prints a + − × ÷ operation bank in
+  its word-work cell; the verdict is kept, but the bank is not Kindergarten content. Owner question 2.
 - **Rules 14-15.** Earlier-step skills are pre, never related only. The critic's fixes are in: count back before counting back on
   a line (Y1.B5.S7); measure length with cubes before mass (Y1.B8.S2, `capacity_early` dropped); count in 5s and 10s before coins
   and notes (Y1.B13.S1-S4, rods dropped); half a shape and the clock hands before half past (Y1.B14.S6); doubles, pairs and counting
-  to 50 before counting in 2s; left / right after above / below (Y1.B11.S2). 8 steps keep fewer than 3 pre, each with its reason.
+  to 50 before counting in 2s; left / right after above / below (Y1.B11.S2). 8 steps keep fewer than 3 pre (mostly the time block, whose earlier steps have no live skill), each with its reason.
 
 ## Owner questions (suggested answers)
 1. `count_start_at` and `tens_name_100`: two small options, or fold the start into the `number_focus` window idea? Suggested: keep
    them separate (they are on different skills and answer different steps).
+2. Should the word-work cell hide the × and ÷ in its operation bank below Grade 2? Suggested: yes (a cell option), so
+   `add_wp_10` stays the Y1.B2.S9 / S10 skill.
