@@ -928,6 +928,1144 @@
    ],
    "note": ""
   },
+  "Y5.B2.S1": {
+   "title": "Mental strategies",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:compensation",
+     "missing": "large numbers: it deals 2-digit sums only (47 + 36), not 4- to 6-digit mental calculations"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "missing": "adding a multiple of 1,000 / 10,000 to a large number; it deals only whole hundreds (700 - 100)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "mental strategies with 4- to 6-digit numbers: partitioning, counting on in 1,000s/10,000s, compensating with near multiples (45,000 + 9,999 = 45,000 + 10,000 - 1)",
+   "build": [
+    "mental_add_sub"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y4.B2.S1 Add and subtract 1s, 10s, 100s and 1,000s (prior learning wk W08)"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y4.B2.S8 Efficient subtraction (lower grade, same cluster CCSS 3.NBT.A.2)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (earlier Y5 step)"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "Y5.B1.S12 Round to the nearest 10, 100 or 1,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [
+    "bonds_100"
+   ],
+   "related": [
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "bridge through a ten, the small-number form"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "count on and back in 10s"
+    },
+    {
+     "key": "addition:add_1m_mixed",
+     "why": "the written method this replaces when numbers are easy"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "rounding to calculate"
+    }
+   ],
+   "note": "Prior-learning Y3.B2.S19 Complements to 100 has no skill (bonds_100)."
+  },
+  "Y5.B2.S2": {
+   "title": "Add whole numbers with more than four digits",
+   "direct": [
+    {
+     "key": "addition:add_100k_regroup",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_1m_mixed",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_1m_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S3 Add two 4-digit numbers - one exchange (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_10k_no_regroup",
+     "why": "Y4.B2.S2 Add up to two 4-digit numbers - no exchange (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y5.B2.S1 Mental strategies (previous step)"
+    },
+    {
+     "key": "placevalue:pv_digit_drag",
+     "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "why": "the inverse (Y5.B2.S3)"
+    },
+    {
+     "key": "addition:add_column_multi",
+     "why": "add three or four numbers in columns"
+    },
+    {
+     "key": "addition:add_missing_digit",
+     "why": "reason about a column"
+    },
+    {
+     "key": "addition:add_wp_1m_plain",
+     "why": "addition stories to 1,000,000"
+    },
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "estimate first"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B2.S3": {
+   "title": "Subtract whole numbers with more than four digits",
+   "direct": [
+    {
+     "key": "subtraction:sub_100k_regroup",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_1m_regroup",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_across_zeros",
+     "opts": {
+      "band": 10000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_across_zeros",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S6 Subtract two 4-digit numbers - one exchange (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_10k_no_regroup",
+     "why": "Y4.B2.S5 Subtract two 4-digit numbers - no exchange (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_1m_mixed",
+     "why": "Y5.B2.S2 Add whole numbers with more than four digits (previous step)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B2.S16 Subtraction on a number line (prior learning wk W09)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "check by adding (Y5.B2.S5)"
+    },
+    {
+     "key": "subtraction:sub_missing_digit",
+     "why": "reason about a column"
+    },
+    {
+     "key": "subtraction:sub_wp_1m_plain",
+     "why": "subtraction stories to 1,000,000"
+    },
+    {
+     "key": "number_sense:estimate_diff",
+     "why": "estimate first"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B2.S4": {
+   "title": "Round to check answers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "missing": "5- and 6-digit numbers rounded to 10,000 / 100,000 (its places stop at 1,000, numbers at 4 digits)",
+     "opts": {
+      "place": 1000,
+      "task": "reasonable"
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "round-to-check with 5- and 6-digit calculations (round to 10,000 or 100,000, then judge the answer)",
+   "build": [
+    "estimate_big_place"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y4.B2.S9 Estimate answers (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:nearest_10000",
+     "why": "Y5.B1.S13 Round within 100,000 (earlier Y5 step)"
+    },
+    {
+     "key": "number_sense:nearest_100000",
+     "why": "Y5.B1.S14 Round within 1,000,000 (earlier Y5 step)"
+    },
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "why": "Y5.B2.S3 Subtract whole numbers with more than four digits (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "estimate a sum"
+    },
+    {
+     "key": "number_sense:estimate_diff",
+     "why": "estimate a difference"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "check exactly with the inverse (Y5.B2.S5)"
+    },
+    {
+     "key": "number_sense:rounding_table",
+     "why": "choose the place to round to"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "the same check for ×"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B2.S5": {
+   "title": "Inverse operations (addition and subtraction)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "missing": "5- and 6-digit numbers and checking an addition by subtracting (it deals 3-digit subtractions checked by adding)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "inverse checks with 5- and 6-digit numbers, and checking an addition by subtracting",
+   "build": [
+    "inverse_check"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y4.B2.S10 Checking strategies (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W09)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W09)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y5.B2.S4 Round to check answers (previous step)"
+    },
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "why": "Y5.B2.S3 Subtract whole numbers with more than four digits (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "use the inverse to find a missing number (Y5.B2.S8)"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "the same idea for ÷"
+    },
+    {
+     "key": "addition:add_1m_mixed",
+     "why": "the calculation being checked"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "one bar shows both facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B2.S6": {
+   "title": "Multi-step addition and subtraction problems",
+   "direct": [],
+   "partial": [
+    {
+     "key": "algebra:multi_step_word",
+     "missing": "numbers beyond 2-3 digits: it deals stories to about 150, not 4- to 6-digit numbers"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "missing": "multi-step and large numbers: one-step bar models with 2-3-digit numbers"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "two-step +/− problems with 4- to 6-digit numbers drawn as bar models",
+   "build": [
+    "multi_step_big",
+    "vis_bar_family"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y5.B2.S5 Inverse operations (addition and subtraction) (previous step)"
+    },
+    {
+     "key": "addition:add_10k_regroup",
+     "why": "Y4.B2.S4 Add two 4-digit numbers - more than one exchange (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_10k_regroup",
+     "why": "Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_1m_mixed",
+     "why": "Y5.B2.S2 Add whole numbers with more than four digits (earlier Y5 step)"
+    },
+    {
+     "key": "subtraction:sub_1m_mixed",
+     "why": "Y5.B2.S3 Subtract whole numbers with more than four digits (earlier Y5 step)"
+    },
+    {
+     "key": "addition:add_wp_1m_plain",
+     "why": "Y5.B2.S2 Add whole numbers with more than four digits (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:multi_step_word_plain",
+     "why": "the same stories without pictures"
+    },
+    {
+     "key": "algebra:tape_diagram_plain",
+     "why": "bar model, no pictures"
+    },
+    {
+     "key": "subtraction:sub_wp_1m_plain",
+     "why": "one-step subtraction stories to 1,000,000"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "check the answer is reasonable"
+    },
+    {
+     "key": "algebra:algebra_word_mixed",
+     "why": "stories with an unknown"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B2.S7": {
+   "title": "Compare calculations",
+   "direct": [],
+   "partial": [
+    {
+     "key": "order_of_operations:compare_expressions",
+     "missing": "reasoning without calculating: it compares small mixed-operation expressions by working both sides out; no large-number +/− pairs like 4,580 + 2,000 vs 4,580 + 1,999"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers",
+   "build": [
+    "compare_calcs"
+   ],
+   "pre": [
+    {
+     "key": "addition:equal_sign",
+     "why": "Y2.B2.S20 Compare number sentences (prior learning wk W09)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "Y4.B2.S8 Efficient subtraction (prior learning wk W09)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y5.B1.S11 Compare and order numbers to 1,000,000 (earlier Y5 step)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:balance_addsub",
+     "why": "keep both sides equal"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "change one number, adjust the other"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "<, > and = signs"
+    },
+    {
+     "key": "addition:equal_sign",
+     "why": "true or false equations"
+    }
+   ],
+   "note": "Weeks W09-W10."
+  },
+  "Y5.B2.S8": {
+   "title": "Find missing numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "missing": "large numbers: it deals facts within 20"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "missing": "large numbers and bar models: 2-digit unknowns only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "missing numbers in 4- to 6-digit addition and subtraction found with the inverse and a bar model",
+   "build": [
+    "inverse_check",
+    "vis_bar_family"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W01)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W01)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W01)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y5.B2.S5 Inverse operations (addition and subtraction) (earlier Y5 step)"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:solve_eq_addsub",
+     "why": "one-step equations with a letter"
+    },
+    {
+     "key": "algebra:balance_addsub",
+     "why": "balance both sides"
+    },
+    {
+     "key": "addition:add_missing_digit",
+     "why": "a missing digit in a column"
+    },
+    {
+     "key": "subtraction:sub_missing_digit",
+     "why": "a missing digit in a subtraction column"
+    }
+   ],
+   "note": "School places this in week W01 (with Y5.B3)."
+  },
+  "Y5.B3.S1": {
+   "title": "Multiples",
+   "direct": [
+    {
+     "key": "number_theory:multiples",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S1 Multiples of 3 (prior learning wk W01)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:lcm",
+     "why": "common multiples (Y5.B3.S2)"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "is it a multiple of 2, 5, 10?"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "the inverse idea: factors (Y5.B3.S3)"
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "multiples in the chart"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S2": {
+   "title": "Common multiples",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_theory:lcm",
+     "missing": "listing both sets of multiples side by side or in a Venn diagram and circling the shared ones; the click-all form only picks from a printed set and pairs stay small (to about 60)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "listing multiples of two numbers and finding all the common ones (two lists / Venn diagram)",
+   "build": [
+    "common_mf"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (previous step)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S3 Multiples of 2 (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S1 Multiples of 3 (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "common factors (Y5.B3.S4)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of one number"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "tables facts"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "sort by divisor"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S3": {
+   "title": "Factors",
+   "direct": [
+    {
+     "key": "number_theory:factors_identify",
+     "opts": {}
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "opts": {}
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "why": "Y4.B5.S1 Factor pairs (prior learning wk W01)"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y4.B5.S1 Factor pairs (prior learning wk W01)"
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "Y4.B5.S2 Use factor pairs (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (prior learning wk W02)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_tchart_hard",
+     "why": "larger numbers"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "exactly two factors (Y5.B3.S5)"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "common factors"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "factor pairs as facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S4": {
+   "title": "Common factors",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_theory:gcf_easy",
+     "missing": "listing all factors of both numbers (two lists / Venn) and circling every common one; the click-all form only picks from a printed set",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "listing factors of two numbers and finding all the common ones (two lists / Venn diagram)",
+   "build": [
+    "common_mf"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors (previous step)"
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y5.B3.S3 Factors (previous step)"
+    },
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "why": "Y4.B5.S1 Factor pairs (prior learning wk W02)"
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "Y4.B5.S2 Use factor pairs (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:lcm",
+     "why": "common multiples (Y5.B3.S2)"
+    },
+    {
+     "key": "number_theory:gcf_hard",
+     "why": "greatest common factor of larger pairs"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "primes have only 1 in common with others"
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "factor pairs as links"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S5": {
+   "title": "Prime numbers",
+   "direct": [
+    {
+     "key": "number_theory:prime_composite",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors (earlier Y5 step)"
+    },
+    {
+     "key": "number_theory:gcf_easy",
+     "why": "Y5.B3.S4 Common factors (previous step)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (prior learning wk W02)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "list factors to decide"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "divisibility rules rule numbers out"
+    },
+    {
+     "key": "number_theory:mixed_number_theory",
+     "why": "mixed review"
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "factor pairs"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S6": {
+   "title": "Square numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "missing": "square numbers as square arrays and recognising which numbers are square; it only evaluates 5² (and can deal bases above 12)",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "step": [
+       0
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "square numbers drawn as square arrays, recognising square numbers to 144, and the ² notation linked to n × n",
+   "build": [
+    "square_cube"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W37)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S6 Make arrays (prior learning wk W37)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W37)"
+    },
+    {
+     "key": "number_theory:factors_identify",
+     "why": "Y5.B3.S3 Factors (earlier Y5 step)"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "Y5.B3.S5 Prime numbers (previous step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "a square number has a repeated factor pair"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "n × n facts"
+    },
+    {
+     "key": "area_perimeter:area_perimeter",
+     "why": "area of a square"
+    },
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "odd number of factors"
+    }
+   ],
+   "note": "Above CCSS K-5 (6.EE.A.1); the school teaches it in week W37."
+  },
+  "Y5.B3.S7": {
+   "title": "Cube numbers",
+   "direct": [],
+   "partial": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "missing": "cube numbers as cubes of cubes and the n × n × n link; it evaluates 5³ only and deals bases far above 10 (21³)",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "step": [
+       0
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "cube numbers built from unit cubes, recognising cube numbers, the ³ notation as n × n × n",
+   "build": [
+    "square_cube"
+   ],
+   "pre": [
+    {
+     "key": "order_of_operations:exponents_simple",
+     "why": "Y5.B3.S6 Square numbers (previous step)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W37)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W37)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
+    }
+   ],
+   "preBuild": [
+    "mult_three"
+   ],
+   "related": [
+    {
+     "key": "area_perimeter:volume",
+     "why": "volume of a cube"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "multiply three numbers in any order"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "n × n facts"
+    }
+   ],
+   "note": "Above CCSS K-5 (6.EE.A.1). Prior-learning Y4.B4.S13 Multiply three numbers has no skill (mult_three)."
+  },
+  "Y5.B3.S8": {
+   "title": "Multiply by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100,
+       1000
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W10)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:value",
+     "why": "each place 10 times the next"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "tables facts scaled by 10"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "round then multiply"
+    }
+   ],
+   "note": "Divide is the next step (place_value_10x op ÷)."
+  },
+  "Y5.B3.S9": {
+   "title": "Divide by 10, 100 and 1,000",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100,
+       1000
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (previous step)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S6 Divide by 100 (prior learning wk W10)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "the inverse: × 10, × 100"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "the digits move right"
+    },
+    {
+     "key": "division:divide",
+     "why": "division facts and beyond"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "round then divide"
+    }
+   ],
+   "note": ""
+  },
+  "Y5.B3.S10": {
+   "title": "Multiples of 10, 100 and 1,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_theory:divisibility_sort",
+     "missing": "multiples of 100 and 1,000 and generating them: it sorts by 2, 5 and 10 only",
+     "opts": {
+      "step": [
+       0
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recognising and generating multiples of 100 and 1,000 (is 45,300 a multiple of 100?)",
+   "build": [
+    "mult_multiples"
+   ],
+   "pre": [
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W02)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (previous step)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (earlier Y5 step)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of a 1-digit number"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "multiply by a multiple of ten"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "count in 100s and 1,000s"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "the nearest multiple of 1,000"
+    }
+   ],
+   "note": "The school teaches this in week W02 beside Y5.B3.S4."
+  },
   "Y5.B4.S1": {
    "title": "Find fractions equivalent to a unit fraction",
    "direct": [
@@ -6529,6 +7667,183 @@
    ],
    "why": "closes Y5.B1.S9 Number line to 1,000,000 (existing wrm_props entry, reused)"
   },
+  "mental_add_sub": {
+   "kind": "new",
+   "skill": "addition:mental_strategies",
+   "name": "Mental Addition and Subtraction",
+   "teaches": "mental strategies for large numbers: partitioning, counting on, compensating, near multiples",
+   "representation": "a strategy prompt (round and adjust) beside each calculation",
+   "family": "operations",
+   "steps": [
+    "Y5.B2.S1"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4"
+   ],
+   "why": "closes Y5.B2.S1 Mental strategies (existing wrm_props entry, reused)"
+  },
+  "estimate_big_place": {
+   "kind": "option",
+   "skill": "number_sense:estimate_sums_diffs",
+   "option": "place 10,000 and 100,000 (5- and 6-digit numbers)",
+   "name": "Estimate With Large Numbers (option)",
+   "teaches": "rounding 5- and 6-digit numbers to the nearest 10,000 or 100,000 to estimate a sum or difference and judge whether a worked answer is reasonable",
+   "representation": "B&W boxed cell: the calculation and its claimed answer in big Andika digits, two rounding boxes under the numbers (≈ ___ + ___ = ___) and a Reasonable / Not reasonable check box; key shows the rounded numbers",
+   "family": "placevalue",
+   "steps": [
+    "Y5.B2.S4"
+   ],
+   "ccss": [
+    "4.NBT.A.3",
+    "4.NBT.B.4"
+   ],
+   "why": "estimate_sums_diffs places stop at 1,000, so Y5 checks with 5- and 6-digit numbers are not dealt",
+   "reused": false
+  },
+  "inverse_check": {
+   "kind": "option",
+   "skill": "subtraction:sub_check_by_adding",
+   "option": "large numbers and addition",
+   "name": "Inverse Operations (option)",
+   "teaches": "using the inverse to check and to find missing numbers in addition and subtraction with 5- and 6-digit numbers",
+   "representation": "band option to 1,000,000 and an \"addition checked by subtracting\" variant",
+   "family": "operations",
+   "steps": [
+    "Y5.B2.S5",
+    "Y5.B2.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4",
+    "4.OA.A.3"
+   ],
+   "why": "closes Y5.B2.S5 Inverse operations (addition and subtraction); Y5.B2.S8 Find missing numbers (existing wrm_props entry, reused)"
+  },
+  "multi_step_big": {
+   "kind": "option",
+   "skill": "algebra:multi_step_word",
+   "option": "numbers to 1,000,000 (4- to 6-digit quantities)",
+   "name": "Multi-Step Problems With Large Numbers (option)",
+   "teaches": "two-step addition and subtraction stories with 4- to 6-digit numbers (populations, distances, money), each step drawn as a bar",
+   "representation": "B&W boxed cell: the short story, a two-row bar model with the known parts in Andika digits and ? on the unknown, two answer boxes (step 1, step 2); key fills the bars",
+   "family": "algebra",
+   "steps": [
+    "Y5.B2.S6"
+   ],
+   "ccss": [
+    "4.OA.A.3",
+    "4.NBT.B.4"
+   ],
+   "why": "multi_step_word and tape_diagram deal only small numbers, so Y5 large-number problems are not produced",
+   "reused": false
+  },
+  "vis_bar_family": {
+   "lane": "operations",
+   "kind": "template",
+   "name": "The Bar-Model Family (every WRM bar)",
+   "build": "the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: 'counters' | 'disks' | 'numbers'` and `task: 'part' | 'whole'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar (\"100 %\" over 2–20 cells; two levels) and the journey line; offered as `model: 'bar'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model",
+   "hosts": [
+    "division:share_into_groups",
+    "division:div_equation_parts",
+    "multiplication:mult_comparison",
+    "algebra:tape_diagram"
+   ],
+   "templates": [
+    "word-work"
+   ],
+   "newTemplates": [
+    "bar-model"
+   ],
+   "files": [
+    "js/modules/sheet/cells/bar-model.js",
+    "js/modules/sheet/cells/panes/models.js (pane:bar)"
+   ],
+   "after": [],
+   "steps": [
+    "Y5.B2.S6",
+    "Y5.B2.S8"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4",
+    "4.OA.A.3"
+   ],
+   "skill": "division:share_into_groups",
+   "family": "operations",
+   "teaches": "the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: 'counters' | 'disks' | 'numbers'` and `task: 'part' | 'whole'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar (\"100 %\" over 2–20 cells; two levels) and the journey line; offered as `model: 'bar'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model",
+   "representation": "the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: 'counters' | 'disks' | 'numbers'` and `task: 'part' | 'whole'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar (\"100 %\" over 2–20 cells; two levels) and the journey line; offered as `model: 'bar'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model",
+   "why": "closes Y5.B2.S6 Multi-step addition and subtraction problems; Y5.B2.S8 Find missing numbers (existing vis_builds entry, reused)"
+  },
+  "compare_calcs": {
+   "kind": "new",
+   "skill": "algebra:compare_calculations",
+   "name": "Compare Calculations",
+   "teaches": "comparing two calculations without working them out (4,580 + 2,000 vs 4,580 + 1,999)",
+   "representation": "two expressions with a circle between them; write <, > or =; reasoning prompt",
+   "family": "operations",
+   "steps": [
+    "Y5.B2.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.NBT.B.4"
+   ],
+   "why": "closes Y5.B2.S7 Compare calculations (existing wrm_ext entry, reused)"
+  },
+  "common_mf": {
+   "kind": "option",
+   "skill": "number_theory:multiples",
+   "option": "common multiples and factors",
+   "name": "Common Multiples and Common Factors (option)",
+   "teaches": "listing multiples and factors of two numbers and circling those they share (all of them, not only the least or greatest)",
+   "representation": "two lists side by side or a Venn diagram; circle the common ones",
+   "family": "number_theory",
+   "steps": [
+    "Y5.B3.S2",
+    "Y5.B3.S4"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.B.4",
+    "6.NS.B.4"
+   ],
+   "why": "closes Y5.B3.S2 Common multiples; Y5.B3.S4 Common factors (existing wrm_props entry, reused)"
+  },
+  "square_cube": {
+   "kind": "new",
+   "skill": "number_theory:square_and_cube_numbers",
+   "name": "Square and Cube Numbers",
+   "teaches": "square numbers as square arrays and cube numbers as cubes, with the notation 5² and 2³",
+   "representation": "dot arrays and cube drawings; write the number and the notation; option: is it square?",
+   "family": "number_theory",
+   "steps": [
+    "Y5.B3.S6",
+    "Y5.B3.S7"
+   ],
+   "reused": true,
+   "ccss": [
+    "6.EE.A.1"
+   ],
+   "why": "closes Y5.B3.S6 Square numbers; Y5.B3.S7 Cube numbers (existing wrm_ext entry, reused)"
+  },
+  "mult_multiples": {
+   "kind": "option",
+   "skill": "multiplication:mult_zeros",
+   "option": "multiples of 10, 100, 1,000",
+   "name": "Multiples of 10, 100 and 1,000 (option)",
+   "teaches": "recognising and generating multiples of 10, 100 and 1,000",
+   "representation": "a \"is it a multiple of\" task on number_theory:multiples with base 10/100/1,000",
+   "family": "operations",
+   "steps": [
+    "Y5.B3.S10"
+   ],
+   "reused": true,
+   "ccss": [
+    "4.OA.B.4"
+   ],
+   "why": "closes Y5.B3.S10 Multiples of 10, 100 and 1,000 (existing wrm_props entry, reused)"
+  },
   "equiv_from_unit": {
    "kind": "option",
    "skill": "fractions:equivalent",
@@ -7648,6 +8963,102 @@
    "step": "Y5.B1.S14",
    "action": "add",
    "why": "6-digit numbers rounded to 10,000 are part of \"within 1,000,000\""
+  },
+  {
+   "key": "number_sense:compensation",
+   "step": "Y5.B2.S1",
+   "action": "add",
+   "why": "partial: compensation strategy, 2-digit only"
+  },
+  {
+   "key": "addition:add_sub_100s",
+   "step": "Y5.B2.S1",
+   "action": "add",
+   "why": "partial: adds whole hundreds only"
+  },
+  {
+   "key": "addition:add_1m_regroup",
+   "step": "Y5.B2.S2",
+   "action": "add",
+   "why": "6-digit column addition with exchanges"
+  },
+  {
+   "key": "subtraction:sub_1m_regroup",
+   "step": "Y5.B2.S3",
+   "action": "add",
+   "why": "6-digit column subtraction with exchanges"
+  },
+  {
+   "key": "subtraction:sub_across_zeros",
+   "step": "Y5.B2.S3",
+   "action": "add",
+   "why": "exchanging across zeros in large numbers (band 10,000)"
+  },
+  {
+   "key": "algebra:multi_step_word",
+   "step": "Y5.B2.S6",
+   "action": "partial",
+   "why": "partial: two-step stories but numbers stay under about 150"
+  },
+  {
+   "key": "algebra:tape_diagram",
+   "step": "Y5.B2.S6",
+   "action": "partial",
+   "why": "partial: one-step bars with small numbers"
+  },
+  {
+   "key": "order_of_operations:compare_expressions",
+   "step": "Y5.B2.S7",
+   "action": "add",
+   "why": "partial: compares calculations by evaluating, small numbers"
+  },
+  {
+   "key": "subtraction:missing_add_sub",
+   "step": "Y5.B2.S8",
+   "action": "partial",
+   "why": "partial: facts within 20 only"
+  },
+  {
+   "key": "number_ops_mixed:missing_factor_or_addend",
+   "step": "Y5.B2.S8",
+   "action": "partial",
+   "why": "partial: 2-digit unknowns, no bar model"
+  },
+  {
+   "key": "number_theory:factor_links_medium",
+   "step": "Y5.B3.S3",
+   "action": "add",
+   "why": "factor pairs drawn as links: same step"
+  },
+  {
+   "key": "order_of_operations:exponents_simple",
+   "step": "Y5.B3.S7",
+   "action": "add",
+   "why": "partial: evaluates cubes (forms Cubes) without the cube picture"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y5.B3.S8",
+   "action": "add",
+   "why": "upgrade the partial tag: option op × with powers 10, 100, 1,000 is the whole step"
+  },
+  {
+   "key": "multiplication:mult_zeros",
+   "step": "Y5.B3.S8",
+   "action": "add",
+   "why": "× 10 and × 100 forms"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y5.B3.S9",
+   "action": "add",
+   "why": "upgrade the partial tag: option op ÷ with powers 10, 100, 1,000 is the whole step"
+  },
+  {
+   "key": "number_theory:divisibility_sort",
+   "step": "Y5.B3.S10",
+   "action": "add",
+   "why": "partial: multiples of 10 (divisible by 10) only"
   },
   {
    "key": "fractions:equiv_frac_visual",
