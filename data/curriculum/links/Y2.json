@@ -1172,6 +1172,1671 @@
     }
    ],
    "note": ""
+  },
+  "Y2.B2.S1": {
+   "title": "Bonds to 10",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "note": "bonds to 10"
+     }
+    },
+    {
+     "key": "composing:make_ten",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1 numbers to 10 on a ten frame: the picture a bond to 10 is read from"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "Y1.B1.S2 count to 10: a pupil must count the two parts"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S4 Fact families - addition facts (prior learning wk W09)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S4 Fact families - addition facts (prior learning wk W09)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.C.6)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "same standard 1.OA.C.6: Add within 20"
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "why": "same standard 1.OA.C.6: Subtraction Facts (within 20)"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 1.OA.C.6: Basic Subtraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S2": {
+   "title": "Fact families - addition and subtraction bonds within 20",
+   "direct": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_families_add",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (step before in the block)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.B.3)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.B.3)"
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.B.3)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (next step)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same standard 1.OA.B.4: Missing Numbers (+/−)"
+    },
+    {
+     "key": "number_ops_mixed:number_families_mixed",
+     "why": "same standard 1.OA.B.4: Number Families (All Four Operations)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S3": {
+   "title": "Related facts",
+   "direct": [
+    {
+     "key": "addition:number_families_add",
+     "opts": {}
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (step before in the block)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (next step)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "same standard 1.OA.B.4: Missing Numbers (+/−)"
+    },
+    {
+     "key": "number_ops_mixed:number_families_mixed",
+     "why": "same standard 1.OA.B.4: Number Families (All Four Operations)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S4": {
+   "title": "Bonds to 100 (tens)",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_sub_10s",
+     "missing": "bonds of tens to 100 (30 + 70) from bonds to 10"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "bonds of tens to 100 (30 + 70) from bonds to 10",
+   "build": [
+    "bonds_100"
+   ],
+   "pre": [
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (step before in the block)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (step before in the block)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W05)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W05)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W05)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y1.B9.S4 Recognise equal groups (prior learning wk W05)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "Y1.B12.S1 Count from 50 to 100 (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (next step)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y2.B2.S5 Add and subtract 1s (next step)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same standard 1.NBT.B.2: Build a Number with Base-10 Blocks"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S5": {
+   "title": "Add and subtract 1s",
+   "direct": [
+    {
+     "key": "addition:number_line_add",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (step before in the block)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:nl_add",
+     "why": "same standard 1.OA.C.5: Addition Number Line (Visual)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same standard 1.OA.C.6: Number Bonds within 10 (Visual)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "same standard 1.OA.C.6: Addition Facts (within 20)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S6": {
+   "title": "Add by making 10",
+   "direct": [
+    {
+     "key": "addition:add_10_regroup",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (step before in the block)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y2.B2.S5 Add and subtract 1s (step before in the block)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "R.B11.S10 Bonds to 10 (3 parts) (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:fact_family_sort",
+     "why": "same standard 1.OA.B.3: Is It a Fact Family? (+/−)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same standard 1.OA.C.6: Number Bonds within 10 (Visual)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "same standard 1.OA.C.6: Addition Facts (within 20)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "why": "same standard 1.OA.C.6: Subtraction Facts (within 20)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S7": {
+   "title": "Add three 1-digit numbers",
+   "direct": [
+    {
+     "key": "addition:add_three",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y2.B2.S6 Add by making 10 (step before in the block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S6 Add by making 10 (step before in the block)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W10)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y1.B5.S1 Add by counting on within 20 (prior learning wk W10)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_word_problems",
+     "why": "same cluster 1.OA.A.1: Addition Word Problems"
+    },
+    {
+     "key": "addition:add_word_problems_plain",
+     "why": "same cluster 1.OA.A.1: Addition Word Problems (No Pictures)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "same cluster 1.OA.A.1: How Many More/Fewer? (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S8": {
+   "title": "Add to the next 10",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3)",
+   "build": [
+    "add_next_10"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W06)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (next step)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.4: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same standard 1.OA.C.6: Number Bonds within 10 (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S9": {
+   "title": "Add across a 10",
+   "direct": [
+    {
+     "key": "addition:add_50_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "number_sense:make_a_ten",
+     "missing": "bridging 10 in a 2-digit number (38 + 5)"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W07)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (next step)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.4: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "same standard 1.OA.C.6: Addition Facts (within 20)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S10": {
+   "title": "Subtract across 10",
+   "direct": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (step before in the block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (step before in the block)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "same standard 1.OA.C.6: Number Bonds within 10 (Visual)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "same standard 1.OA.C.6: Addition Facts (within 20)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "same standard 1.OA.C.6: Add — Bridging Ten (sums 11–18)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S11": {
+   "title": "Subtract from a 10",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3); subtracting within 20 by decomposing to a ten: 13 − 4 = 13 − 3 − 1 = 10 − 1",
+   "build": [
+    "add_next_10",
+    "make_ten_subtract"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (step before in the block)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (next step)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (next step)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same standard 1.OA.C.6: Number Bonds within 10 (Visual)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "same standard 1.OA.C.6: Addition Facts (within 20)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "same standard 1.OA.C.6: Add — Bridging Ten (sums 11–18)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S12": {
+   "title": "Subtract a 1-digit number from a 2-digit number (across a 10)",
+   "direct": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W09)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W09)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W09)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (2 parts) (prior learning wk W09)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "lower-grade skill on K.OA.A.5 (same domain as 1.OA.C.6)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (next step)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 1.OA.C.6: Basic Addition"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 10 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "same standard 1.OA.C.6: Add within 10"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "same standard 1.OA.C.6: Add within 20 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "same standard 1.OA.C.6: Add within 20"
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "why": "same standard 1.OA.C.6: Subtraction Facts (within 20)"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S13": {
+   "title": "10 more, 10 less",
+   "direct": [
+    {
+     "key": "placevalue:more_less_10",
+     "opts": {
+      "note": "10 more and 10 less"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (next step)"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same cluster 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same cluster 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same cluster 1.NBT.C.4: Add within 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S14": {
+   "title": "Add and subtract 10s",
+   "direct": [
+    {
+     "key": "addition:add_sub_10s",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y1.B5.S2 Add ones using number bonds (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S15": {
+   "title": "Add two 2-digit numbers (not across a 10)",
+   "direct": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W06)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "same cluster 1.NBT.C.5: 1 More, 1 Less, 10 More, 10 Less"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S16": {
+   "title": "Add two 2-digit numbers (across a 10)",
+   "direct": [
+    {
+     "key": "addition:add_100_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W07)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W07)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y1.B12.S5 1 more, 1 less (prior learning wk W07)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y1.B5.S3 Find and make number bonds to 20 (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.4: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S17": {
+   "title": "Subtract two 2-digit numbers (not across a 10)",
+   "direct": [
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W06)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.6: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S18": {
+   "title": "Subtract two 2-digit numbers (across a 10)",
+   "direct": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (step before in the block)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W06)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W06)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (next step)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (next step)"
+    },
+    {
+     "key": "subtraction:mixed_add_sub",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (next step)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.6: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S19": {
+   "title": "Mixed addition and subtraction",
+   "direct": [
+    {
+     "key": "addition:add_wp_100",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:mixed_add_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (step before in the block)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y1.B9.S3 Count in 5s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W08)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "Y1.B9.S1 Count in 2s (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_10",
+     "why": "Y1.B2.S10 Addition problems (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_10_plain",
+     "why": "Y1.B2.S10 Addition problems (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "money_notes"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "same standard 1.NBT.C.4: Add & Subtract by 10s"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 1.NBT.C.4: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 1.NBT.C.4: Add within 100"
+    },
+    {
+     "key": "addition:add_word_problems",
+     "why": "same standard 1.OA.A.1: Addition Word Problems"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S20": {
+   "title": "Compare number sentences",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing two number sentences (expression vs expression, e.g. 7 + 3 ○ 6 + 5) with <, > or =",
+   "build": [
+    "compare_sentences",
+    "equal_sign_repair"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (step before in the block)"
+    },
+    {
+     "key": "subtraction:mixed_add_sub",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (step before in the block)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y1.B5.S10 Missing number problems (prior learning wk W11)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_ops_mixed:which_sign",
+     "why": "same standard 1.OA.D.7: Which Sign Makes It True? (+ − × ÷)"
+    },
+    {
+     "key": "algebra:balance_addsub",
+     "why": "same standard 1.OA.D.7: Balance Equations (7 + 5 = __ + 3) (MAP)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "same cluster 1.OA.D.8: Missing Addend or Missing Factor?"
+    }
+   ],
+   "note": ""
+  },
+  "Y2.B2.S21": {
+   "title": "Missing number problems",
+   "direct": [
+    {
+     "key": "addition:cloze_addition",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S13 Fact families - the eight facts (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y1.B5.S7 Subtraction - counting back (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:sub_5_pictures",
+     "why": "R.B14.S3 Take away (prior learning wk W11)"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "why": "R.B14.S3 Take away (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "same standard 1.OA.D.8: Missing Addend or Missing Factor?"
+    },
+    {
+     "key": "algebra:balance_addsub",
+     "why": "same standard 1.OA.D.8: Balance Equations (7 + 5 = __ + 3) (MAP)"
+    },
+    {
+     "key": "number_ops_mixed:which_sign",
+     "why": "same cluster 1.OA.D.7: Which Sign Makes It True? (+ − × ÷)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1307,6 +2972,114 @@
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
+  },
+  "bonds_100": {
+   "kind": "new",
+   "skill": "addition:bonds_to_100",
+   "name": "Bonds to 100",
+   "teaches": "pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10",
+   "representation": "a hundred square or bead string with part shaded; part-whole diagram; write the missing part",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S4",
+    "Y3.B2.S19"
+   ],
+   "ccss": [
+    "1.NBT.B.2",
+    "1.NBT.C.4",
+    "K.OA.A.4",
+    "2.NBT.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "add_next_10": {
+   "kind": "new",
+   "skill": "addition:bridge_to_next_ten",
+   "name": "To the Next Ten",
+   "teaches": "adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3)",
+   "representation": "a number line with the ten marked; write the jump to the ten and then the rest",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S8",
+    "Y2.B2.S11",
+    "Y3.B2.S6",
+    "Y3.B2.S8"
+   ],
+   "ccss": [
+    "1.NBT.C.4",
+    "1.OA.C.6",
+    "2.NBT.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "make_ten_subtract": {
+   "kind": "option",
+   "skill": "number_sense:make_a_ten",
+   "option": "subtraction: back through ten (13 − 4 = 13 − 3 − 1)",
+   "name": "Subtract Back Through Ten (option)",
+   "teaches": "subtracting within 20 by decomposing to a ten: 13 − 4 = 13 − 3 − 1 = 10 − 1",
+   "representation": "hop-line, bond; write the split and the answer in the step boxes",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S11"
+   ],
+   "ccss": [
+    "1.OA.C.6"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "money_notes": {
+   "kind": "option",
+   "skill": "measurement:coin_value",
+   "option": "notes",
+   "name": "Recognise Notes (option)",
+   "teaches": "recognising banknotes and their values alongside coins (the school teaches US dollars)",
+   "representation": "add notes to the coin-value picture bank",
+   "family": "measurement",
+   "steps": [
+    "Y1.B13.S3"
+   ],
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "compare_sentences": {
+   "kind": "new",
+   "skill": "algebra:compare_number_sentences",
+   "name": "Compare Number Sentences",
+   "teaches": "comparing two expressions with <, > or = by reasoning, not only calculating (7 + 5 ___ 7 + 6)",
+   "representation": "two expressions with a circle between; write <, > or =",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S20"
+   ],
+   "ccss": [
+    "1.OA.D.7"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "equal_sign_repair": {
+   "kind": "option",
+   "skill": "addition:equal_sign",
+   "option": "route the skill to its own generator (it deals plain column addition today) and add the forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2",
+   "name": "True or False Equations (repair)",
+   "teaches": "the equal sign means \"the same as\"; deciding whether equations with + and − on either side are true or false",
+   "representation": "equation; tick True or False; write the number",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S20"
+   ],
+   "ccss": [
+    "1.OA.D.7"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry (repair); reused",
+   "reused": true
   }
  },
  "tagFixes": [
@@ -1315,6 +3088,12 @@
    "step": "Y2.B1.S2",
    "action": "add",
    "why": "partial: grouping loose objects into tens to count them (the skill shows ready-made tens rods)"
+  },
+  {
+   "key": "addition:equal_sign",
+   "step": "Y2.B2.S20",
+   "action": "remove",
+   "why": "the skill deals plain column addition today (build-list equal_sign_repair); it does not compare two number sentences"
   }
  ]
 }
