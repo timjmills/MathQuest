@@ -1,6 +1,7 @@
 # Y6 (US Grade 5) — Wave 2 tagging report
 
-Output: `data/curriculum/links/Y6.json` (format per `BRIEF.md`). Critic reports: `Y6-critic.md`.
+Output: `data/curriculum/links/Y6.json` (format per `BRIEF.md`). Critic: `Y6-critic.md` — round 3, **8.09/10 PASS**
+(min 7; 32 steps); earlier rounds `Y6-critic-r1.md` 7.47 FAIL, `Y6-critic-r2.md` 7.50 FAIL.
 
 ## Method
 - Every Y6 small step (114, 13 blocks, block order) was judged by reading what the skills really deal
@@ -104,3 +105,7 @@ is a helper lane that does not own that file — the lead should copy the line a
    should apply the rule used here.
 7. **Fix the three generator bugs above now** (they mislead pupils today), independent of any build.
    *Suggested: yes — small, local fixes in their owning lanes.*
+8. **Existing proposals to tidy (lead-owned):** split `long_mult` (it bundles long multiplication with
+   short/efficient division); re-home `frac_find_whole` from the No-Visuals `fraction_of_set_hard_nv` to
+   `fraction_of_set_hard` or `tape_diagram`; give the 9,999,999 band on `number_word_names`/`compare` to one
+   of `big_numbers` / `vis_pv_bands_millions`, not both. *Suggested: yes to all three.*

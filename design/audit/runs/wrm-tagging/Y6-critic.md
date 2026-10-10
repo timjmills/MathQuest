@@ -1,159 +1,124 @@
-# Y6 wave-2 tagging: independent critic report
+# Y6 (US Grade 5) WRM tagging: independent critic, round 3
 
-Critic lane (Opus medium), 2026-10-10. Graded `data/curriculum/links/Y6.json` at commit `55aa51c2`
-(branch `claude/sweet-newton-c8wrv1-wip-wrm-tag-y6`) against `BRIEF.md` ("For each step, decide", "Quality", "Output").
+Critic lane: fresh independent critic (Opus, medium). I did not write the work. Inputs:
+`data/curriculum/links/Y6.json` and `Y6-report.md`, graded against `BRIEF.md` ("For each step, decide", "Output", "Quality").
 
 ## Method
+- **Sample.** 28 steps drawn at random with seed 3141 (a new draw), plus 4 re-checks of round 2's lowest steps
+  (B9.S7, B7.S4, B13.S1, B2.S15). I graded all 32 and swapped none out.
+- **Step records.** For each step I read its record in `data/curriculum/wrm-steps.json` (title, CCSS, notes).
+- **Skill keys.** I loaded `SKILLS` from `js/modules/data.js` in node. Every key in direct, partial, pre and related
+  across all 114 steps is live, and none is a tombstone. Every `build` and `preBuild` id exists in `proposals`. No
+  related entry repeats a direct skill, and no list is longer than 8.
+- **Items.** I generated items in the browser with `generateQuestionFor` through the `ws-harness`. The browser ran
+  one gate at a time, with seeded items, using each entry's own `opts`. I did this for 45 skills, among them
+  mult_placeholder_zero (at Max Number 100 and 10,000), multiply, area_model_mult_hard, number_word_names and
+  pv_digit_drag (at range 10M), divisibility_sort, exponents_simple {step:[0]}, the fraction_of_set family, compare_frac_lcd,
+  order_fractions, add/sub_frac_unlike_nv, mass_volume_liquid, unit_conversions {units:[0]}, capacity {units:[1]},
+  length_metric, estimate_length {forms:[0]}, percent_of_number {forms:[0]}, the six f/d/p converters,
+  evaluate_expression(_hard), write_expression, coordinate_q1, composite_shapes {forms:[1]}, mult_comparison, the
+  four OoO direct skills with their opts, count_by_step_down, temperature, ratio_tables and classify_triangles. I also
+  ran `ws-content-audit --skill mult_placeholder_zero --n 12 --report-only --json` (OK).
+- **Options.** I checked every entry's `opts` key against `js/modules/skill-options.js`: `forms` (from
+  _p12Match/_p12Variants), `units`, `step` and `source`.
+- **Prior learning.** I read the school prior-learning lists from the xlsx, sheet "Grade 5": col 0 is the week, col 6
+  the lesson, and col 14 the prior list on the first lesson row of each week.
+- **tagFixes.** For each sampled step I took the diff between direct/partial and the live `SKILL_WRM` in
+  `js/modules/wrm.js`, and compared it with the step's tagFixes. All 32 match exactly (add, partial and remove).
+- **Format.** Every step has all 10 keys. Verdicts are consistent: a full step has empty build, missing and
+  partial; a partial or gap step has a build; a gap step has no skills. Every proposal has the full shape plus
+  `reused`. The report's counts (114 = 25 full / 69 partial / 20 gap) match the file.
+- **Earlier rounds.** I formed the scores first. Only then did I read `Y6-critic.md` and `Y6-critic-r2.md`. Every
+  round-1 and round-2 defect on my sampled steps is resolved:
+  - B9.S7 is partial, with the 33% bug and pct_one_step.
+  - B7.S4 is partial, with expr_two_letters.
+  - B13.S1 no longer has coordinate_graph as direct.
+  - B2.S15 has its pre grounded in W11, plus mult_three.
+  - B6.S6 is a gap.
+  - B5.S1 has estimate_length {forms:[0]} and pre from W21.
+  - B2.S6 names the size clause and has mult_three.
+  - B2.S1, B2.S4 and B10.S2 are fixed.
 
-- **Sample (32 steps).** The 28 steps the lead drew at random with a fixed seed, plus 4 that the tagger named as its
-  hardest calls (Y6.B2.S1, Y6.B2.S2, Y6.B7.S2, Y6.B4.S7). I graded every sampled step, and none was swapped out.
-- **Keys.** I loaded `SKILLS` from `js/modules/data.js` in node (609 live keys). Every `direct`, `partial`, `pre` and
-  `related` key in all 114 steps is live, and none is retired.
-- **Claims checked against the code, not the tagger's wording.**
-  - Option schemas in `js/modules/skill-options.js`: the pv bands stop at 999,999; `place_on_number_line` spans go
-    up to 1,000; `round_decimals` rounds to tenth or hundredth only; `fraction_of_set_hard_nv` type2 is "Find the
-    whole"; `gcf_*` forms[1] is "Click every common factor"; `composite_shapes` forms[1] is `dual_pa`; `volume` has
-    variants standard / missing / word; the `function_table_hard` `ftTask` and `ftRules` enums; the
-    `divisibility_sort` divisor sets.
-  - Generators:
-    - `pv_digit_drag` and `area_triangle`: right-angled triangles only, with a b×h÷2 prompt.
-    - `pie_chart`: reads printed percentages only.
-    - `geo_translate`: MC on a [-5,5] four-quadrant grid.
-    - `remainder_interpret`: divisor ≤ 20, dividend ≤ 10 × divisor.
-    - `add_mixed_unlike`: crosses the whole.
-    - `divisibility_sort`: prints a rule card.
-    - `tape_diagram`: additive only.
-    - `round_decimals`: tenth or hundredth only.
-    - `unit_rate_intro`.
-  - Catalogue rows in `design/SKILL_CATALOGUE.md`.
-- **Tags.** I loaded `SKILL_WRM` and `WRM_PROPOSALS` from `js/modules/wrm.js` in node. I diffed each step's
-  direct/partial lists against the live tags and against `tagFixes`.
-- **Proposals.** Every `build` and `preBuild` id resolves in the file's `proposals`. I searched
-  `WRM_PROPOSALS`, `build-list.js` and `design/BUILD_LIST.md` for existing ids that each new proposal duplicates.
-- **School prior learning.** I read `Awsaj-Domain-Sequence-K-5-2026-27.xlsx`, sheet "Grade 5", column 15 (week
-  lists) and column 7 (lesson to week).
-- **File format.** All 114 Y6 steps are present, in the order of `wrm-steps.json`, with titles matching. Every
-  step has all 10 keys. Verdicts: 38 full, 57 partial, 19 gap. No `pre` or `related` list exceeds 8, no `related`
-  or `pre` repeats a direct key, every partial entry has `missing`, every non-full step has `build`, and every
-  proposal has the contract fields.
-- **Output contract.** `design/audit/runs/wrm-tagging/Y6-report.md`, the required report (counts, hardest calls,
-  owner questions), **does not exist**.
+Scores are 0–10 on (a) direct skills, (b) honest verdict, (c) pre and related, and (d) proposals. Each step gets
+one overall score.
 
 ## Scores
 
-Scale 0–10 on the brief's criteria: (a) direct skills, (b) honest verdict, (c) pre / related, (d) proposals.
-
 | Step | Score | Weakest | Defects |
 |---|---|---|---|
-| Y6.B1.S2 Numbers to 10,000,000 | 8 | c | Pre `place_value_10x` (× / ÷ by 10/100/1,000) is a stretch for "1,000,000 as ten 100,000s". The partial tags are not in tagFixes. |
-| Y6.B1.S4 Powers of 10 | 8 | c | `patterns:count_by_powers_of_10` was never considered (add it as related). `pv10_exponents` (index notation) goes beyond the WRM Y6 intent; keep it, but name `value_ten_times` as the closing build. |
-| Y6.B1.S5 Number line to 10,000,000 | 7 | d | New `nl_millions` duplicates existing `nl_20` (`number_sense:number_line_scales`, which already reaches 0–1,000,000 lines, Y5.B1.S9, and V017 "to 10,000,000"). Reuse `nl_20` and extend it to 0–10,000,000. Partial tags are not in tagFixes. |
-| Y6.B1.S6 Compare and order any integers | 8 | c | Sound partial. tagFixes miss `add integers:compare_int` (full) and `placevalue:order_greatest_to_least` (partial). |
-| Y6.B2.S4 Rules of divisibility | 6 | d | The missing clause is factually wrong. `divisibility_sort` does print the rule for its divisor (rule card in gen-number-theory.js and print-generate.js), so "sorts by trying the division / never states a rule" is false. What is really missing: divisor 25 (and 100), and the pupil choosing or naming the rule ("which rule tells you?"). Re-scope `divisibility_rules`, because "a rule card beside each sort" already exists. |
-| Y6.B2.S13 Solve problems with division | 7 | d | Verdict right. New `wp_multidigit` hangs on `multiplication:mult_word_problems` and is "(on division:div_word_problems)" too, so it is two skills in one option. For this step it should be an option on `division:remainder_interpret` / `division:div_word_problems`. tagFix for `div_word_problems` partial is missing. |
-| Y6.B3.S1 Equivalent fractions and simplifying | 8 | c | The note "School W14 prior entry is a test week" is false: row 69 is W14's list (Y3 equivalent fractions as bar models / on a number line, Y4 equivalent fraction families). Ground the pre list on it. |
-| Y6.B3.S2 Equivalent fractions on a number line | 8 | d | Fine. The reused `frac_nl_equiv` representation is vague ("a double number-line representation option"); give the B&W cell: two stacked 0–1 lines, same length, the shared point marked. Partial tags are not in tagFixes. |
-| Y6.B3.S4 Compare and order (numerator) | 8 | c | Sound. `fractions:compare` partial is not in tagFixes. |
-| Y6.B3.S7 Add mixed numbers | 8 | – | Verified that it crosses the whole and uses non-multiple denominators. Full is fair. |
-| Y6.B4.S1 Multiply fractions by integers | 7 | c | `preBuild: ["mult_mixed_int"]` misuses preBuild: it is the step's own build, not a missing pre-skill. Remove it. The note says the two skills are "listed direct", but they are in `partial`; fix the note. Pre `fraction_of_set` is week-list noise, not a prerequisite. |
-| Y6.B5.S4 Miles and kilometres | 8 | d | Gap and reuse of `miles_km` are right. Its representation "a conversion graph or double number line" should fix one B&W cell (double number line, 5 mi : 8 km ticks). |
-| Y6.B6.S1 Add or multiply | 7 | c | Pre lists `fractions:improper_mixed` and `fraction_operations:mult_frac_whole` only because they share week W19. They are not prerequisites for additive-vs-multiplicative reasoning. Replace them with `algebra:function_table_easy` (+ and × rules) and `multiplication:mult_comparison`. |
-| Y6.B6.S2 Use ratio language | 8 | – | New `ratio_language` is justified (no existing "for every" entry) and well specified for B&W. |
-| Y6.B6.S9 Proportion problems | 8 | c | Sound. Pre `subtraction:sub_check_by_adding` is weak. tagFix for `ratio_tables` partial is missing. |
-| Y6.B8.S3 Round decimals | 9 | – | Verified (`pick(["tenth","hundredth"])`). Precise missing clause, correct reuse. |
-| Y6.B9.S8 Percentage of an amount – multi-step | 8 | c | Pre `composing:number_bonds` (within 10) is far below need. Use `subtraction:missing_add_sub` or complements to 100 (W36 list). |
-| Y6.B10.S1 Shapes – same area | 8 | – | Sound. `area_perimeter` partial is not in tagFixes. |
-| Y6.B10.S2 Area and perimeter | 6 | b | "Full" is generous. The step carries 3.MD.D.8 (same perimeter, different areas, and the reverse), and no live skill sets shapes of equal perimeter side by side. The note pushes the comparison to S1, whose title is "same area" only. Make it partial (missing: "shapes with the same perimeter but different areas") with build `same_area` (it already "teaches … and the reverse"). Add tagFix `area_perimeter:composite_shapes` add. |
-| Y6.B10.S5 Area of any triangle | 7 | b/format | Partial is correct (verified right-angled only), but the live tag is FULL and there is no tagFix to downgrade it (same for Y6.B10.S4). |
-| Y6.B10.S6 Area of a parallelogram | 8 | – | Gap and reuse are right. |
-| Y6.B10.S8 Volume of a cuboid | 8 | – | Full is fair (standard / missing edge / story verified). |
-| Y6.B11.S3 Read and interpret pie charts | 8 | – | Verified that `pie_chart` reads printed percents only. |
-| Y6.B11.S5 Draw pie charts | 8 | c | Sound. Related has 2 entries and one repeats pre. |
-| Y6.B12.S3 Vertically opposite angles | 7 | c | Pre and related are the same three or four skills, and both are copied verbatim into S4. `classify_triangles` is no prerequisite for vertically opposite angles. Related should be genuinely other skills (e.g. `angles_lines:identify_lines` for intersecting lines, `angles_lines:mixed_angles_lines`). |
-| Y6.B12.S4 Angles in a triangle | 7 | c | Same copy-paste: related equals pre. |
-| Y6.B12.S9 Circles | 7 | c | Pre is generic (`mult_facts`, `div_facts`). Use `patterns:double` / `patterns:halve` (d = 2r) and `measurement:reading_ruler` (measure the radius) as pre. The note "week W29 has no prior list" is false (row 138; it opens with "Rec/PK4 Identify and name circles and triangles"). |
-| Y6.B13.S4 Translations | 6 | d/c | The reused `translate_grid` is a FIRST-QUADRANT Y4/Y5 skill ("translating … on a first-quadrant grid"), so as specified it does not close the Y6 four-quadrant clause the step's `missing` names. It missed `vis_migrate_coordinates` (geo_translate onto coord-grid with the image drawn and the move described) and `four_quadrants`. Pre misses the nearest skill `coordinates:coordinate_all` (Y6.B13.S2, full) and uses `coordinate_q1` instead. The W31 prior "Y4 Translate on a grid" is not used. |
-| Y6.B2.S1 Add and subtract integers (hard call) | 7 | b | "Full" contradicts the tagger's own Y6.B1.S6 ruling, where the same 7-digit band made it partial. `add_1m_mixed` / `sub_1m_mixed` are "within 1,000,000", but Y6 numbers reach 10,000,000. Make it partial (missing: "operands and answers to 10,000,000") with build `big_numbers` (add the step to it), or rule consistently both ways and record the rule as an owner question. |
-| Y6.B2.S2 Common factors (hard call) | 8 | format | Full is fair with forms [1]. The note "W09 is a test week" is false (row 42 is W09's list: Y4 factor pairs, Y5 factors / common factors). tagFix to lift `gcf_easy` from partial to full is missing. |
-| Y6.B7.S2 2-step function machines (hard call) | 6 | a/b | (1) The direct opts omit `ftTask`. The default for `function_table_hard` is `rule-check` (find the rule), so the backward clause the note relies on is not in the opts; it needs `ftTask: "inputs"` or `"mixed"` (or two direct entries, outputs and inputs). (2) `ftRules` only has × / ÷ first. WRM 2-step machines also put + / − first and teach that the order matters, which is the misconception the existing `function_machine` proposal names ("reads a two-step machine in the wrong order"). (3) The existing `function_machine` proposal (wrm.js and BUILD_LIST, steps [Y6.B7.S2]) is neither reused nor explicitly retired in this step. Make it partial (missing: "machines with + / − first; order matters") with build `function_machine` (or a new `ftRules` option "+ then ×"). |
-| Y6.B4.S7 Fraction of an amount – find the whole (hard call) | 7 | c | The partial-on-representation call is defensible. Pre is thin: `algebra:tape_diagram` is additive part-whole only, and `div_facts` is generic. Add `fractions:fraction_of_set_nv` / `fraction_of_set_hard_nv` type1 (Y5 fraction of an amount) and cite the W18 prior list ("Y2 Find the whole", "Y3 Reasoning with fractions of an amount"). |
+| Y6.B1.S3 Read and write numbers to 10,000,000 | 7.5 | d | The partial `pv_digit_drag` has no `opts`, yet its note and `missing` both rest on the words source. It should carry `{"source":"word"}`. `big_numbers` and `vis_pv_bands_millions` both claim the same 9,999,999 band on `number_word_names` and `compare`, so that build is listed twice. `vis_pv_bands_millions.teaches` is a copy of its representation, not what the pupil learns. Verdict and pre are sound: number_word_names never goes past 999,999 at range 10M (verified). |
+| Y6.B1.S8 Negative numbers | 8 | c | Partial is honest. negative_count is sound (thermometer cell, difference across 0). Two pre whys overclaim. `patterns:count_by_step_down` never reaches 0 (sampled 29→26, 74, 167→131), so it is Y1 "count backwards", not "Count through zero". `measurement:temperature` scales never go below 0 °C. Say so in the whys. The real nearest prior is the preBuild `negative_count`. |
+| Y6.B2.S1 Add and subtract integers | 8.5 | d | Sound. big_numbers reuse is right. |
+| Y6.B2.S4 Rules of divisibility | 8.5 | – | Sound. Verified: the divisors are 2–12 and 25 never appears. Pre is grounded in W10. |
+| Y6.B2.S6 Square and cube numbers | 8.5 | – | Sound. exponents_simple {step:[0]} deals 54², 24³ and 21³ (verified), and the missing clause names it. square_cube is a good B&W cell. |
+| Y6.B2.S7 Multiply 4-digit by 2-digit | 7 | b/d | (1) The `mult_placeholder_zero` missing clause is wrong. At Max Number 100 and 10,000 it always deals a 2-digit × 2-digit item (65 × 13, 84 × 42). Its answer is only the placeholder digit (ans 0), so the pupil never completes a product. It is not "top number at most 3 digits". (2) The reused `long_mult` bundles long multiplication, 4-digit short division and "efficient division" under the id `long_multiplication_4x2`. The name contradicts the content, and it breaks one-new-thing-per-step. Split it, or keep this step's part as its own option. (3) The W03 list names Y5 "Multiply a 3-digit / 4-digit number by a 2-digit number" (gaps). Pre does not cite them or list `long_mult` as preBuild. |
+| Y6.B3.S3 Compare and order (denominator) | 8.5 | – | Full verified: compare_frac_lcd shows an LCD frame, and order_fractions orders 3–6 unlike fractions. |
+| Y6.B3.S6 Add and subtract any two fractions | 8.5 | – | Full verified: non-multiple denominators (2/5 + 5/6) and answers above 1. |
+| Y6.B4.S7 Fraction of an amount – find the whole | 7.5 | d | (1) The partial `fraction_of_set_hard_nv` has no `opts`, though only `forms:[1]` ("Find the whole") teaches the step (verified "3/6 of a number is 18"). Add `{"forms":[1]}`. (2) `frac_find_whole` puts a bar model on a "(No Visuals)" skill, which contradicts its name. Make it a find-the-whole form of `fractions:fraction_of_set_hard` (Visual), or an option on `algebra:tape_diagram`. (3) The W18 "Y5 Find the whole" lesson is not cited in pre. |
+| Y6.B5.S1 Metric measures | 7 | a | `mass_volume_liquid` is direct with `opts {}`. The step's own note documents that every "mass in kg" scale item has answer 0. I confirmed it: "Read the scale. What is the mass in kg? → 0", an empty dial. A full verdict must not rest on a form that marks pupils wrong. Give it `{"forms":[0,2]}` (cylinder and sort) until the bug is fixed, or move it to partial. Pre `reading_ruler` reads inches, so it is a weak stand-in for the W21 "Measure length in cm" lesson. |
+| Y6.B5.S2 Convert metric measures | 8.5 | – | Honest partial, verified: capacity deals 0.5 and 1.5 L, while length_metric and unit_conversions deal whole amounts. metric_decimal_convert is a good cell. |
+| Y6.B5.S4 Miles and kilometres | 8.5 | – | Sound. Gap, with a double-number-line cell. |
+| Y6.B5.S5 Imperial measures | 7.5 | a/d | The step is imperial, but the partials `unit_conversions` and `capacity` carry no `opts`. By default they also deal metric. Set `unit_conversions {"units":[1]}` and `capacity {"units":[0]}`. `metric_imperial.representation` gives "1 foot = 12 inches" as its fact box, which is within the system, not imperial ↔ metric. Its `teaches` drops the stone that `missing` names. |
+| Y6.B6.S1 Add or multiply | 8 | – | Sound. add_or_mult is a good table cell. |
+| Y6.B6.S6 Use scale factors | 8 | d | Gap is right. The reused `scale` spans S5–S7; options must split drawing, factor and similar. |
+| Y6.B6.S7 Similar shapes | 8 | – | Sound. |
+| Y6.B6.S10 Recipes | 8 | – | Honest partial. ratio_tables does one pair per table (verified). |
+| Y6.B7.S3 Form expressions | 7.5 | c | Pre leads with `function_table_hard` as "Y6.B7.S2 previous step". In the school order, Form expressions is W11 and 2-step function machines is W12, so that skill is taught after this step. Lead with the W11 list instead (missing numbers, bar model, build_expr). The `missing` text "no algebraic convention (3n)" is partly false. The click form deals "twice a number n → 2n" as a correct answer and "3n" as a distractor, so the convention is recognised but never produced. Reword it to "never written by the pupil". |
+| Y6.B9.S5 Equivalent FDP | 8.5 | – | Honest partial. Pools verified (f_to_d 1/2, 1/4, 7/10, 1/100; p_to_f 10/25/50%). |
+| Y6.B9.S8 Percentage – multi-step | 8 | – | Sound. |
+| Y6.B10.S2 Area and perimeter | 8 | – | Sound. composite_shapes {forms:[1]} measures one shape (verified). |
+| Y6.B10.S3 Area of a triangle – counting squares | 8.5 | – | Sound. area_triangle_grid and the area_estimate preBuild are right. |
+| Y6.B10.S6 Area of a parallelogram | 8 | c | Pre whys cite "prior learning wk W23/W25". This step's list is on W24 (Y3 Parallel and perpendicular, Y4 Quadrilaterals, Y4 Count squares), which is what the pre uses. Fix the citation. |
+| Y6.B10.S7 Volume – counting cubes | 8.5 | – | Sound. |
+| Y6.B11.S1 Line graphs | 8 | – | Sound. Pre is short (3), but it is the W30 list. |
+| Y6.B11.S2 Dual bar charts | 8.5 | – | Sound. |
+| Y6.B12.S5 Angles in a triangle – special cases | 7.5 | c | Pre `identify_lines` (parallel/perpendicular) is not a prerequisite for using equal base angles or a right angle. Use `angles_lines:identify_angles` (right angle = 90°) instead. The nearest prior (S4, 180°) is correctly the preBuild `angle_rules`. The classify_triangles partial is generous but defensible. |
+| Y6.B12.S10 Draw shapes accurately | 8.5 | – | Sound. The draw_angles preBuild is right. |
+| Y6.B9.S7 (re-check) | 8.5 | – | Fixed. 33% of 60 = 20 confirmed as a bug and recorded. pct_one_step is a good option. |
+| Y6.B7.S4 (re-check) | 8.5 | – | Fixed. One varName per item confirmed (gen-algebraic.js:4809, :4940). expr_two_letters is good. |
+| Y6.B13.S1 (re-check) | 8.5 | – | Fixed. coordinate_graph moved to related and the remove tagFix added. |
+| Y6.B2.S15 (re-check) | 8 | a | Fixed pre. Not noted: `three_ops_no_paren` at Max 100 can deal a negative answer (16 + 8 × 2 − 42 = −10, 1 in 40), which is beyond G5. Name it in the note next to the Max Number advice. |
 
-**Mean: 239 / 32 = 7.47.** **Minimum: 6** (Y6.B2.S4, Y6.B10.S2, Y6.B13.S4, Y6.B7.S2). No step is below 6.
+**Mean: 259 / 32 = 8.09.** **Minimum: 7** (Y6.B2.S7, Y6.B5.S1). No step is below 6.
 
-## File-level findings
+**tagFixes:** all 32 sampled steps equal the diff against the live `SKILL_WRM`. **Format:** conforms to the brief.
 
-1. **The output contract is breached.** `design/audit/runs/wrm-tagging/Y6-report.md` is missing (counts, the
-   hardest calls, owner questions with suggested answers).
-2. **tagFixes are incomplete and inconsistent.** Across all 114 steps, 36 differences between the step lists and
-   the live `SKILL_WRM` are not recorded. The tagger records some partial adds (B6.S1, B9.S8) but not others, and
-   some partial→full lifts (B7.S2) but not others. The ones that matter most:
-   - Downgrades not recorded: `area_perimeter:area_triangle` Y6.B10.S4 and Y6.B10.S5 (full → partial).
-   - Partial → full lifts not recorded: `pv_digit_drag` Y6.B1.S1, `gcf_easy` Y6.B2.S2, `lcm` Y6.B2.S3,
-     `place_value_10x` Y6.B8.S5 and Y6.B8.S6, `mult_decimal` Y6.B8.S7, `div_decimal` Y6.B8.S8.
-   - Adds not recorded: `compare_int` B1.S6; `order_greatest_to_least` B1.S6; `composite_shapes` B10.S2;
-     `area_perimeter` B10.S1; `graph_fractions` and `order_frac_numline` B3.S2; `fractions:compare` B3.S4;
-     `ratio_tables` B6.S9; `div_word_problems` B2.S13; `place_on_number_line` and `round_nl_hundred_thousands`
-     B1.S5; `pv_digit_drag` and `expand` B1.S2; `number_word_names` and `pv_digit_drag` B1.S3; `integers:sub_int`
-     B1.S8; `mult_word_problems` and `mult_comparison` B2.S8; `estimate_sums_diffs` and `estimate_quotient` B2.S16;
-     `frac_word_mixed` B3.S9 and B4.S5; `estimate_length` B5.S1; `capacity` B5.S5; `order_decimals` B8.S2;
-     `pie_chart` B11.S4; `classify_triangles` B12.S5.
+## Required fixes
+- **Y6.B2.S7**
+  - Change the `mult_placeholder_zero` `missing` to: "always 2-digit × 2-digit at any Max Number; the pupil writes only the placeholder 0, never the product".
+  - Split `long_mult` so that this step's id teaches long multiplication only (4-digit × 2-digit). Move short division and "efficient division" to their own option or id.
+  - Cite the W03 lessons "Y5 Multiply a 3-digit / 4-digit number by a 2-digit number" in pre, and add `long_mult` to `preBuild`.
+- **Y6.B5.S1**
+  - Set `mass_volume_liquid` `opts` to `{"forms":[0,2]}` (drop the broken kg scale). Or move it to `partial` with missing "the kg scale items are broken (answer 0)".
+  - Keep the generator bug in the note for the lead.
+- **Y6.B4.S7**
+  - Add `"opts":{"forms":[1]}` to the partial `fraction_of_set_hard_nv`.
+  - Re-target `frac_find_whole` to `fractions:fraction_of_set_hard` (Visual) or `algebra:tape_diagram`, not a No-Visuals skill.
+  - Cite the W18 "Y5 Find the whole" lesson in pre.
+- **Y6.B5.S5**
+  - Set `unit_conversions` to `"opts":{"units":[1]}` and `capacity` to `"opts":{"units":[0]}`.
+  - In the `metric_imperial` representation, use a cross-system fact (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb), and add stone to `teaches`.
+- **Y6.B1.S3**
+  - Add `"opts":{"source":"word"}` to the partial `pv_digit_drag`.
+  - Remove the duplicate 9,999,999 band on `number_word_names` and `compare` from one of `big_numbers` / `vis_pv_bands_millions`.
+  - Give `vis_pv_bands_millions` a real `teaches`.
+- **Y6.B7.S3**
+  - Re-order pre to the W11 list first (`algebra:tape_diagram`, `algebra:build_expr_*`, `subtraction:missing_add_sub`). Move `function_table_hard` down, or to related (it is taught in W12).
+  - Change `missing` to "algebraic notation (3n) is recognised in the click form but never written".
+- **Y6.B12.S5**: replace pre `angles_lines:identify_lines` with `angles_lines:identify_angles` (right angle).
+- **Y6.B1.S8**: correct the whys for pre `count_by_step_down` (counts down, never through 0) and `temperature` (scales never go below 0 °C).
+- **Y6.B10.S6**: change the pre citations "wk W23/W25" to "wk W24".
+- **Y6.B2.S15**: in the note, name the negative answers `three_ops_no_paren` can deal at Max 100 (−10).
 
-   Either emit one tagFix per difference, or state in the report that the lead derives tags from the step lists.
-3. **False school-calendar notes.** At least 3 notes misread the xlsx: W09 (row 42), W14 (row 69) and W29 (row 138)
-   each have a full prior-learning list. The test week is a separate row. Steps relying on "no list" should be
-   re-grounded.
-4. **Format is otherwise clean.** Keys, order, titles, field set, limits and proposal fields all pass.
+OVERALL: 8.09/10 — PASS
 
-## Fixes required (step id → exact change)
-
-- **Y6.B1.S5**: replace build `nl_millions` with the existing `nl_20` (`number_sense:number_line_scales`). Add
-  Y6.B1.S5 to its steps and its ladder to 0–10,000,000. Delete proposal `nl_millions`. Add tagFixes for the two
-  partial tags.
-- **Y6.B1.S4**: add related `patterns:count_by_powers_of_10` ("count on and back in powers of 10 to 1,000,000").
-- **Y6.B1.S6**: add tagFixes `integers:compare_int` add, and `placevalue:order_greatest_to_least` add (partial).
-- **Y6.B2.S1**: verdict → partial; missing "operands and answers to 10,000,000 (live skills stop at 1,000,000)";
-  build `big_numbers` (add Y6.B2.S1 to its steps). If you keep "full", state the rule (method beats size) and apply
-  it to Y6.B1.S6 too.
-- **Y6.B2.S2**: tagFix `number_theory:gcf_easy` partial → full. Fix the note: W09 has a prior list (row 42).
-- **Y6.B2.S4**: partial `missing` → "no rule for 25 (or 100); the pupil never chooses or names the rule (the rule is
-  printed as a card)". Re-scope `divisibility_rules` to "divisors 25 and 100, plus a 'which rule tells you?' task with
-  the rule card faded".
-- **Y6.B2.S13**: move `wp_multidigit` to `skill: "division:div_word_problems"` (option), with the multiplication half
-  split out or attached to Y6.B2.S8 only. tagFix `division:div_word_problems` add (partial).
-- **Y6.B3.S1**: fix the note. Ground pre on the W14 list (Y3 equivalent fractions as bar models / on a number line →
-  `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`).
-- **Y6.B3.S2**: make the `frac_nl_equiv` representation concrete: "two stacked 0–1 number lines of equal length,
-  thirds above sixths, the shared point boxed; write the equivalent fraction". tagFixes for its two partials.
-- **Y6.B3.S4**: tagFix `fractions:compare` add (partial).
-- **Y6.B4.S1**: remove `mult_mixed_int` from preBuild. Correct the note ("listed partial"). Replace pre
-  `fractions:fraction_of_set` with `fraction_operations:add_frac_like_nv` or `multiplication:repeated_add_to_mult`.
-- **Y6.B4.S7**: add pre `fractions:fraction_of_set_hard_nv` {forms:[0]} and `fractions:fraction_of_set_nv` (Y5
-  fraction of an amount, W18 list). Keep `tape_diagram` only with the why "bar model, additive form".
-- **Y6.B5.S4**: `miles_km` representation → one B&W double number line (miles above, km below, 5 : 8 ticks), with a
-  write-the-missing-value slot.
-- **Y6.B6.S1**: drop pre `fractions:improper_mixed` and `fraction_operations:mult_frac_whole`. Add
-  `algebra:function_table_easy` (rules + n and × n) and `multiplication:mult_comparison`.
-- **Y6.B6.S9**: tagFix `conversions:ratio_tables` add (partial).
-- **Y6.B9.S8**: replace pre `composing:number_bonds` with `subtraction:missing_add_sub` (find the part left after a
-  discount).
-- **Y6.B10.S1**: tagFix `area_perimeter:area_perimeter` add (partial).
-- **Y6.B10.S2**: verdict → partial. Move `area_perimeter` to partial with missing "same perimeter, different areas
-  (3.MD.D.8) is never compared". Build `same_area` (add Y6.B10.S2 to its steps). tagFix
-  `area_perimeter:composite_shapes` add.
-- **Y6.B10.S4 / Y6.B10.S5**: add tagFix `{ key: "area_perimeter:area_triangle", action: "partial" }` on each.
-- **Y6.B12.S3 / Y6.B12.S4**: rewrite related so it does not mirror pre. For S3: `angles_lines:identify_lines`,
-  `angles_lines:mixed_angles_lines`. Drop `classify_triangles` from S3's pre.
-- **Y6.B12.S9**: pre → `patterns:double`, `patterns:halve`, `measurement:reading_ruler`,
-  `shapes_early:name_2d_shapes` (W29 list). Fix the note.
-- **Y6.B13.S4**: add build `vis_migrate_coordinates`, and either widen `translate_grid` to four quadrants (add
-  Y6.B13.S4 and "four quadrants" to its teaches/representation) or add `four_quadrants`. Put pre
-  `coordinates:coordinate_all` (Y6.B13.S2) first. Add preBuild `translate_grid` for the W31 prior "Y4 Translate on a
-  grid".
-- **Y6.B7.S2**: direct opts → `{ "ftRules": ["x+","x-","/+","/-"], "ftTask": "mixed" }` (or two entries:
-  `ftTask: "outputs"` and `ftTask: "inputs"`). Verdict → partial, missing "two-step machines with + or − first, and
-  that changing the order changes the output". Build `function_machine` (existing) or a new `ftRules` option "+ then ×
-  / − then ×". If the owner rules the existing order is enough, retire `function_machine` explicitly in the report.
-- **File**: write `design/audit/runs/wrm-tagging/Y6-report.md`. Emit the missing tagFixes listed under "File-level
-  findings" item 2. Re-check every note that claims a week "has no prior list" or "is a test week".
-
-OVERALL: 7.47/10 — FAIL
+---
+## Lead follow-up after this PASS (round 3)
+Applied after the grade: B5.S1 `mass_volume_liquid` opts `{forms:[0,2]}` + bug note; B5.S5 partial opts
+(`unit_conversions {units:[1]}`, `capacity {units:[0]}`), `metric_imperial` fact box now 1 inch ≈ 2.5 cm and
+stone added; B1.S3 `pv_digit_drag {source:'word'}`; B1.S8 pre whys corrected; B12.S5 pre `identify_lines` →
+`identify_angles`; B10.S6 pre cites W24; B2.S15 negative-answer caution; B7.S3 missing clause and pre order
+(W11 list first); B4.S7 `{forms:[1]}`; B2.S7 `mult_placeholder_zero` missing clause. Left to the lead (they
+change EXISTING proposals, which helper lanes do not own): split `long_mult` (multiplication vs division),
+re-home `frac_find_whole` off the No-Visuals skill, de-duplicate the 9,999,999 band between `big_numbers` and
+`vis_pv_bands_millions`. Earlier rounds: Y6-critic-r1.md (7.47 FAIL), Y6-critic-r2.md (7.50 FAIL).

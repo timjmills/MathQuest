@@ -143,7 +143,10 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
-     "missing": "the words source for 7-digit numbers"
+     "missing": "the words source for 7-digit numbers",
+     "opts": {
+      "source": "word"
+     }
     }
    ],
    "verdict": "partial",
@@ -460,11 +463,11 @@
     },
     {
      "key": "patterns:count_by_step_down",
-     "why": "Y5.B13.S2 Count through zero in 1s / Y1 Count backwards (prior learning wk W33)"
+     "why": "Y1 Count backwards (prior learning wk W33): counting back in steps, the move made before counting on past 0 (the skill itself stops at 0)"
     },
     {
      "key": "measurement:temperature",
-     "why": "Y2 Temperature: reading a thermometer scale (prior learning wk W33)"
+     "why": "Y2 Temperature (prior learning wk W33): reading a vertical thermometer scale (positive degrees only; the scale model for below 0)"
     },
     {
      "key": "integers:opposite_numbers",
@@ -840,7 +843,7 @@
    "partial": [
     {
      "key": "multiplication:mult_placeholder_zero",
-     "missing": "4-digit x 2-digit (top number is at most 3 digits)"
+     "missing": "the whole long multiplication: it deals only 2-digit x 2-digit and asks only for the placeholder 0 of the second row, never the complete product of a 4-digit x 2-digit"
     },
     {
      "key": "multiplication:area_model_mult_hard",
@@ -889,7 +892,7 @@
      "why": "problems with multiplication (next step)"
     }
    ],
-   "note": ""
+   "note": "Prior learning wk W03 names Y5 Multiply a 3-digit / 4-digit number by a 2-digit number: no live skill teaches either (they are long_mult's own content). The reused long_mult proposal bundles long multiplication with short division / efficient division; the lead should split it so this step's build is long multiplication only."
   },
   "Y6.B2.S8": {
    "title": "Solve problems with multiplication",
@@ -1359,7 +1362,7 @@
      "why": "several operations with brackets"
     }
    ],
-   "note": "Y6 = 5.OA.A.1: brackets first, x and ÷ before + and −. Checked: two_ops and three_ops cover both orders on the line and left-to-right after the x step; paren_simple and oop_medium cover brackets. oop_medium is tagged without \"Brackets inside brackets\" (nested brackets are beyond Y6). The numbers scale with Max Number (x 5 at 100: 32 x 33); Max Number 10 keeps them fact-sized for ELL/SPED pupils. Y4 Multiply three numbers (W11) has no skill: mult_three."
+   "note": "Y6 = 5.OA.A.1: brackets first, x and ÷ before + and −. Checked: two_ops and three_ops cover both orders on the line and left-to-right after the x step; paren_simple and oop_medium cover brackets. oop_medium is tagged without \"Brackets inside brackets\" (nested brackets are beyond Y6). The numbers scale with Max Number (x 5 at 100: 32 x 33); Max Number 10 keeps them fact-sized for ELL/SPED pupils. Y4 Multiply three numbers (W11) has no skill: mult_three. Caution: three_ops_no_paren at Max Number 100 can give a negative answer (16 + 8 x 2 - 42 = -10), beyond Grade 5; use Max Number 10-50."
   },
   "Y6.B2.S16": {
    "title": "Mental calculations and estimation",
@@ -2283,7 +2286,12 @@
    "partial": [
     {
      "key": "fractions:fraction_of_set_hard_nv",
-     "missing": "the bar model (forms \"Find the whole\" is numbers only)"
+     "missing": "the bar model (forms \"Find the whole\" is numbers only)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
     }
    ],
    "verdict": "partial",
@@ -2302,7 +2310,7 @@
     },
     {
      "key": "algebra:tape_diagram",
-     "why": "Y2 Find the whole (prior learning wk W18): the bar model, additive part-whole form"
+     "why": "Y5 Find the whole (prior learning wk W18): the bar model in its additive part-whole form"
     },
     {
      "key": "division:div_facts",
@@ -2324,7 +2332,7 @@
      "why": "find the whole from a percentage"
     }
    ],
-   "note": "Partial on representation, not content: the pupil can already compute the whole with forms [1]; the WRM bar model is missing."
+   "note": "Partial on representation, not content: the pupil can already compute the whole with forms [1]; the WRM bar model is missing. The reused frac_find_whole proposal puts a bar model on the No-Visuals skill fraction_of_set_hard_nv; the lead may re-home it on fraction_of_set_hard (Visual) or tape_diagram."
   },
   "Y6.B5.S1": {
    "title": "Metric measures",
@@ -2351,7 +2359,12 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     }
     },
     {
      "key": "measurement:estimate_length",
@@ -2399,7 +2412,7 @@
      "why": "the double number line WRM draws for 1 kg = 1,000 g (the skill itself scales ratios, Y6.B6)"
     }
    ],
-   "note": "Full with the metric options: unit_conversions units Metric, capacity units Metric (mL and L, including 0.25 L), estimate_length form \"About how long?\" (cm and m; its sort form deals in, ft, yd, mi). mass_volume_liquid gives the \"which unit\" sort and scale reading. GENERATOR BUG: js/modules/gen-measurement.js:672-678 - when maxKg is 5 or 10 the kg dial uses gram increments (500, 1000) against a kg maximum, so numMarks < 1 and every \"What is the mass in kg?\" item has answer 0; the g dial and mL cylinder items are correct."
+   "note": "Full with the metric options: unit_conversions units Metric, capacity units Metric (mL and L, including 0.25 L), estimate_length form \"About how long?\" (cm and m; its sort form deals in, ft, yd, mi). mass_volume_liquid gives the \"which unit\" sort and scale reading. GENERATOR BUG: js/modules/gen-measurement.js:672-678 - when maxKg is 5 or 10 the kg dial uses gram increments (500, 1000) against a kg maximum, so numMarks < 1 and every \"What is the mass in kg?\" item has answer 0; the g dial and mL cylinder items are correct. mass_volume_liquid is set to forms [0,2] (cylinder, sort): its kg scale items are wrong (GENERATOR BUG gen-measurement.js:672-678, every kg answer is 0)."
   },
   "Y6.B5.S2": {
    "title": "Convert metric measures",
@@ -2583,7 +2596,12 @@
    "partial": [
     {
      "key": "measurement:unit_conversions",
-     "missing": "customary units only, exact facts; no stone, and no approximate imperial ↔ metric (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb, 1 pint ≈ 570 ml)"
+     "missing": "customary units only, exact facts; no stone, and no approximate imperial ↔ metric (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb, 1 pint ≈ 570 ml)",
+     "opts": {
+      "units": [
+       1
+      ]
+     }
     },
     {
      "key": "measurement:length_customary",
@@ -2591,7 +2609,12 @@
     },
     {
      "key": "measurement:capacity",
-     "missing": "customary capacity within the system only (cups, pints, quarts, gallons)"
+     "missing": "customary capacity within the system only (cups, pints, quarts, gallons)",
+     "opts": {
+      "units": [
+       0
+      ]
+     }
     }
    ],
    "verdict": "partial",
@@ -3310,7 +3333,7 @@
    "partial": [
     {
      "key": "algebra:write_expression",
-     "missing": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, no algebraic convention (3n for 3 × n)"
+     "missing": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, the algebraic convention (3n for 3 × n) is recognised in the click form but never written"
     }
    ],
    "verdict": "partial",
@@ -3320,24 +3343,24 @@
    ],
    "pre": [
     {
-     "key": "algebra:function_table_hard",
-     "why": "Y6.B7.S2 2-step function machines (previous step)"
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step problems with a bar model (prior learning wk W11)"
     },
     {
      "key": "algebra:build_expr_addsub",
-     "why": "5.OA.A.2 building a number expression"
+     "why": "5.OA.A.2 building a number expression (prior learning wk W11)"
     },
     {
      "key": "algebra:build_expr_multdiv",
-     "why": "5.OA.A.2 building a × / ÷ expression"
+     "why": "5.OA.A.2 building a × / ÷ expression (prior learning wk W11)"
     },
     {
      "key": "subtraction:missing_add_sub",
      "why": "Y2.B2.S21 / Y5.B2.S8 Missing number problems (prior learning)"
     },
     {
-     "key": "algebra:tape_diagram",
-     "why": "Y5.B2.S6 Multi-step problems with a bar model (prior learning wk W11)"
+     "key": "algebra:function_table_hard",
+     "why": "Y6.B7.S2 2-step function machines (the WRM step before; the school teaches it in W12, after this lesson)"
     }
    ],
    "preBuild": [],
@@ -5002,7 +5025,7 @@
    "pre": [
     {
      "key": "area_perimeter:area",
-     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W23/W25)"
+     "why": "Y5.B8.S4 Area of rectangles (prior learning wk W24)"
     },
     {
      "key": "area_perimeter:area_triangle",
@@ -5014,11 +5037,11 @@
     },
     {
      "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (prior learning wk W23/W25)"
+     "why": "Y4.B3.S2 Count squares (prior learning wk W24)"
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "perpendicular height"
+     "why": "Y3 Parallel and perpendicular (prior learning wk W24): the perpendicular height"
     }
    ],
    "preBuild": [],
@@ -5606,8 +5629,8 @@
      "why": "Y5.B10.S4 Measure angles (prior learning wk W30)"
     },
     {
-     "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 parallel and perpendicular (prior learning wk W30)"
+     "key": "angles_lines:identify_angles",
+     "why": "Y5 Classify angles (prior learning wk W30): a right angle is 90°, the fact a right-angled triangle uses"
     },
     {
      "key": "angles_lines:additive_angles",
@@ -6881,8 +6904,8 @@
    "kind": "new",
    "skill": "measurement:metric_imperial",
    "name": "Metric and Imperial Units",
-   "teaches": "approximate conversions between metric and imperial units (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb)",
-   "representation": "one boxed cell: a conversion fact box (1 foot = 12 inches) above one question; write the converted amount in the slot; the fact box fades on later pages",
+   "teaches": "approximate conversions between metric and imperial units (1 inch ≈ 2.5 cm, 1 kg ≈ 2.2 lb); imperial units including stone (1 stone = 14 lb)",
+   "representation": "one boxed cell: a conversion fact box (1 inch ≈ 2.5 cm) above one question; write the converted amount in the slot; the fact box fades on later pages",
    "family": "measurement",
    "steps": [
     "Y6.B5.S4",
@@ -8001,7 +8024,7 @@
    "key": "algebra:write_expression",
    "step": "Y6.B7.S3",
    "action": "partial",
-   "why": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, no algebraic convention (3n for 3 × n)"
+   "why": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, the algebraic convention (3n for 3 × n) is recognised in the click form but never written"
   },
   {
    "key": "algebra:evaluate_expression",
