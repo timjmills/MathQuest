@@ -680,7 +680,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const fineParts = new Set(sectionsIn.flatMap((s, i) => (s.fineSplit ? [i, s.splitOf] : [])));
     const layouts = sectionsIn.map((sec, si) => {
         const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -829,7 +829,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(sec); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -950,7 +950,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -1046,7 +1046,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const pcH = partCellH((sec.splitOf !== undefined && sec.splitOf !== null) || norm.sections.some((x) => x && x.splitOf === part.section), its, L);
-            const shape0 = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
+            // (a lone first page of a skill held to its owner page ceiling - print-sheet.js PAGE_CAP,
+            // critic r8 D8-2 - fills its page by size: its rows keep their proportions, scaled to the grid)
+            const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && !pg.cont && part.chunk.gridMm && part.chunk.rowsTpl;
+            const shape0 = capFill ? { heightMm: Math.max(part.chunk.gridMm, L.gridH - 1), rowsTpl: part.chunk.rowsTpl }
+                : part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
                 : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH);
             // a split part's uniform rows take what the part holds, never the section's tallest cell
             const shape = shape0 || (!fillByFlex && !noCapSec && pcH < L.cellH - 0.5 && !its.some((it) => it.anchor)

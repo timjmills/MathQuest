@@ -272,6 +272,8 @@ const nfBlanks = (p) => {
     return out;
 };
 const nfDigits = (p) => Math.max(1, ...(p.eqs || []).flatMap((eq) => eq.nums.map((v) => String(v).length)));
+/** The operator track and the column gap, em: tighter at M (critic r8 D8-3), as drawn at S and L otherwise. */
+const nfTracks = (g) => (g.size === 'M' ? { op: 0.7, gap: 0.18 } : { op: 1, gap: 0.28 });
 const nfOp = (op) => ({ '*': '×', x: '×', '/': '÷', '-': '−' })[op] || op;
 /**
  * The family's ORDER-FREE identity (wave 1 lane D round 6, critic r5 D5-1): 4, 5, 20 and 5, 4, 20
@@ -308,7 +310,11 @@ register('number-family', {
             const v = b ? box(g, b.id, { wMm: bw, hMm: g.stripMm, value: vals[b.id] || '', ink, mark: g.twin ? 'cell' : null }) : c(esc(eq.nums[k]), 'text-align:center');
             return k === 0 ? v : k === 1 ? c(nfOp(eq.op), 'font-weight:700;text-align:center') + v : c('=', 'font-weight:700;text-align:center') + v;
         }).join('')).join('');
-        const lines = `<div style="display:inline-grid;grid-template-columns:auto 1em auto 1em auto;column-gap:0.28em;row-gap:${g.em(0.8)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
+        // (critic r8 D8-3) at M the operator tracks and gaps are drawn tighter so a family with a
+        // two-digit whole stands in a third of the page (3 x 3 at M, the owner's 8 or more); the
+        // boxes, the digits and the row gap are the size's own
+        const t = nfTracks(g);
+        const lines = `<div style="display:inline-grid;grid-template-columns:auto ${t.op}em auto ${t.op}em auto;column-gap:${t.gap}em;row-gap:${g.em(0.8)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
         // (round 5 D-E: the gaps are kept tight so three families stand in a column at L, 2 x 3)
         const set = `<div style="display:inline-block;white-space:nowrap;border:${HAIR} solid ${INK.ink};border-radius:${g.em(3)};padding:${g.em(0.5)} ${g.em(2.5)};line-height:1">`
             + (p.nums || []).map((v) => esc(v)).join(', ') + '</div>';
@@ -327,7 +333,8 @@ register('number-family', {
         const g = geo(ctx);
         const n = nfDigits(p);
         const bw = Math.max(g.writeMm * 1.6, (n * 0.62 + 0.8) * g.E);
-        const line = 3 * Math.max(bw, n * 0.56 * g.E) + 2 * g.E + 4 * 0.28 * g.E;
+        const t = nfTracks(g);
+        const line = 3 * Math.max(bw, n * 0.56 * g.E) + 2 * t.op * g.E + 4 * t.gap * g.E;
         return { wMm: Math.ceil(line + 8), hMm: null, measure: true, factLike: false, maxCols: 3 };
     },
     inputs(p) {

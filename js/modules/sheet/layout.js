@@ -690,6 +690,12 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // tallest measured cell (RUBRIC H13, owner 2026-09-25): a row far taller than what it holds
     // leaves an empty band of a third of every cell, even centred. When the ceiling (12.1) stops
     // more rows, the spare height stays under the grid instead of inside every cell.
+    // The OWNER's per-skill page ceiling (print-sheet.js PAGE_CAP, critic r8 D8-2): never more
+    // whole rows than it allows; the rows it keeps then share the grid (the page fills by size).
+    if (Number(section.pageCap) > 0 && rows * cols > Number(section.pageCap)) {
+        rows = Math.max(1, Math.floor(Number(section.pageCap) / cols));
+        notes.push(`At most ${rows * cols} problems on this page (the skill's own page size).`);
+    }
     const even = G / rows;
     // Long procedures and word problems are exempt: their cell's spare height IS the pupil's
     // working space (PT 2.4's 93 x 114 long-division cell).

@@ -55,6 +55,22 @@ export const SHEET_ROLES = Object.freeze(['independent', 'more-practice', ...Obj
 const ROLES = new Set(SHEET_ROLES);
 const LETTERS = 'ABCDEFGHIJ';
 const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol items
+/**
+ * The OWNER's per-skill page ceiling (design/STATUS.md 2, 2026-10-09), by print size: the most
+ * problems one page of a single-skill section holds when the page decides the count. The page is
+ * then filled by the problems' size (rows grow), never by adding more of them (critic r8 D8-2:
+ * dot_array_mult dealt 16 arrays at S and 9 at L when short arrays left height).
+ */
+const PAGE_CAP = Object.freeze({
+    'multiplication:dot_array_mult': { S: 8, M: 6, L: 6 },
+});
+/** The page ceiling of a section (Infinity when its skill has none). */
+function pageCapOf(sec, size) {
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    const c = sk && PAGE_CAP[`${sk.categoryId}:${sk.skillId}`];
+    const v = c && Number(c[String(size || 'L').toUpperCase()]);
+    return v > 0 ? v : Infinity;
+}
 const RETRIES = 40;               // duplicate retries per item before a duplicate is accepted (12 let a 20-fact pool repeat at 18, round 4 D-B)
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
@@ -101,6 +117,15 @@ function normaliseRequest(req = {}) {
             freeRows: !!(s && s.freeRows),
         }))
         .filter((s) => s.skills.length);
+    // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
+    // problems' size: its rows share the whole grid instead of leaving a strip under capped rows.
+    // The ceiling is the section's own dense ceiling too, so the grid is laid for that count.
+    for (const sec of sections) {
+        if (!Number.isFinite(pageCapOf(sec, size))) continue;
+        sec.noCap = true;
+        sec.pageCap = pageCapOf(sec, size);
+        if (sec.dense) sec.dense = { S: pageCapOf(sec, 'S'), M: pageCapOf(sec, 'M'), L: pageCapOf(sec, 'L') };
+    }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
     let onePage = false;
@@ -1538,7 +1563,7 @@ function oneColumnOnly(it, n) {
  * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
  * clocks a page in one column because two of its nine skills are full width).
  */
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, freeRows: section.freeRows });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -1822,7 +1847,7 @@ async function buildSheetDeal(req = {}) {
             return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
         }
         if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
-        return L.perPage;
+        return Math.min(L.perPage, pageCapOf(sec, n.size));
     };
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
@@ -1922,7 +1947,7 @@ async function buildSheetDeal(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, freeRows: sec.freeRows },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -2270,7 +2295,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, freeRows: s.freeRows })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -3253,7 +3278,8 @@ async function buildSheetFill0(req = {}) {
             // never past the page ceiling the gate holds a page to (12.3 dense capacity: 30 / 20 / 12
             // standard problems at S / M / L): the fill never adds past it
             const sz = String(req.size || 'M').toUpperCase();
-            const ceil = () => ({ S: 30, M: 20, L: 12 })[sz] || 12;
+            // (critic r8 D8-2) and never past the skill's own owner ceiling (PAGE_CAP)
+            const ceil = () => Math.min(({ S: 30, M: 20, L: 12 })[sz] || 12, pageCapOf(s, sz));
             // A count that leaves a bordered empty run after the last problem (grid.js blankRun) is
             // a hole on the page (critic 2026-10-03: mixed_multiplication L, a lone area model
             // beside an empty cell): the largest count without one is kept, stepping back one
@@ -3266,6 +3292,8 @@ async function buildSheetFill0(req = {}) {
                 const pg = x.plan && x.plan.pages && x.plan.pages[0];
                 const grids = pg ? pg.sections.filter((g) => g.kind === 'grid') : [];
                 if (grids.length !== 1 || !(grids[0].availMm > 0)) return 1;
+                // (a grid that fills its page by flex carries no height: it fills it)
+                if (grids[0].height === '' || grids[0].height === undefined) return 1;
                 return (parseFloat(grids[0].height) || 0) / grids[0].availMm;
             };
             // A single-skill page never prints the same problem twice (round 4 D-B: add_sub_10s S
@@ -3276,6 +3304,9 @@ async function buildSheetFill0(req = {}) {
                 const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
                 if (!(more.pageCount <= wanted) || more.items.length <= best.items.length) break;
                 if (dup(more) && !dup(best)) break;
+                // (critic r8 D8-4) one problem more never trades a filled page for a strip (missing_add_sub
+                // M: 16 in 2 x 8 at 93 % grew to 18 in 3 x 6 at 72 %)
+                if (fillOf(best) >= 0.85 && fillOf(more) < 0.85) break;
                 best = more;
                 tried.push(more);
             }
@@ -3295,7 +3326,7 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     for (let c = c0; c >= 1; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
-                            if (n % c) continue;
+                            if (n % c || n > ceil() * wanted) continue;
                             const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c, freeRows: true })] }));
                             if (alt.pageCount > wanted || dup(alt) || hole(alt) || alt.items.length !== n || Number(alt.fits && alt.fits.cols) !== c) continue;
                             const f = fillOf(alt);
@@ -3323,7 +3354,7 @@ async function buildSheetFill0(req = {}) {
                     const c0 = Number(best.fits && best.fits.cols) || 1;
                     const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
                     let pick = best, pickFill = fillOf(best), poolCapped = false;
-                    for (let n = best.items.length + c0; n <= best.items.length + 3 * c0 && n <= Math.max(ceil(), best.items.length + 2 * c0) * wanted; n += c0) {
+                    for (let n = best.items.length + c0; n <= best.items.length + 3 * c0 && n <= Math.max(ceil(), best.items.length + 2 * c0) * wanted && n <= pageCapOf(s, sz) * wanted; n += c0) {
                         let alt = null;
                         for (let k = 0; k <= 3; k++) {
                             const a1 = await buildSheetOnce(Object.assign({}, req, k ? { seed: (base + k * 7919) >>> 0 } : {}, { sections: [Object.assign({}, s, { count: n, columns: c0, freeRows: true })] }));
@@ -3335,7 +3366,10 @@ async function buildSheetFill0(req = {}) {
                         if (f > 1.001 || f <= pickFill) break;
                         pick = alt; pickFill = f;
                     }
-                    if (pickFill < 0.85 && poolCapped) return relay(pick);
+                    // (critic r8 D8-4) a page the same columns cannot fill - its ceiling stops the
+                    // rows (missing_add_sub M: 18 in 3 x 6 over a 29 % strip, DN-1 holds 20) - is laid
+                    // in fewer, longer columns too, whether the pool or the ceiling stopped it
+                    if (pickFill < 0.85) return relay(pick);
                     return pick;
                 }
             }
