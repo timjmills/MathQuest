@@ -5924,6 +5924,777 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B6.S1": {
+   "title": "Understand the denominators of unit fractions",
+   "direct": [
+    {
+     "key": "fractions:identify",
+     "opts": {}
+    },
+    {
+     "key": "fractions:write_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S7 Recognise a third (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S2 Compare and order unit fractions (next step)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S2 Compare and order unit fractions (next step)"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same cluster 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S2": {
+   "title": "Compare and order unit fractions",
+   "direct": [
+    {
+     "key": "fractions:compare",
+     "opts": {
+      "note": "unit fractions"
+     }
+    },
+    {
+     "key": "fractions:order_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:identify",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "same standard 3.NF.A.1: Compose 1 Whole from Unit Fractions"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S3": {
+   "title": "Understand the numerators of non-unit fractions",
+   "direct": [
+    {
+     "key": "fractions:write_fraction",
+     "opts": {}
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S2 Compare and order unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S2 Compare and order unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S7 Recognise a third (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "R.B6.S2 Combine shapes with 4 sides (prior learning wk W26)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W26)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (next step)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "same cluster 2.G.A.1: Count Sides & Vertices on 2D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 2.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S4": {
+   "title": "Understand the whole",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:compose_whole",
+     "missing": "how many parts make one whole for any denominator"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "how many parts make one whole for any denominator",
+   "build": [
+    "frac_whole"
+   ],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (step before in the block)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S7 Recognise a third (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (next step)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S5 Compare and order non-unit fractions (next step)"
+    },
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 2.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    },
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "same cluster 2.G.A.2: Compose a Rectangle from Squares"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S5": {
+   "title": "Compare and order non-unit fractions",
+   "direct": [
+    {
+     "key": "fractions:compare",
+     "opts": {
+      "note": "same denominator"
+     }
+    },
+    {
+     "key": "fractions:order_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (step before in the block)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W36)"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "why": "Y2.B7.S7 Measure in litres (prior learning wk W36)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W36)"
+    },
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y1.B1.S14 Order objects and numbers (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts",
+    "nonstandard_capacity",
+    "capacity_early"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_of_set",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (Visual)"
+    },
+    {
+     "key": "fractions:identify_nv",
+     "why": "same standard 3.NF.A.1: Identify Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:fraction_of_set_nv",
+     "why": "same standard 3.NF.A.1: Fraction of a Set (No Visuals)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S6": {
+   "title": "Fractions and scales",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "reading a scale or number line divided into halves, quarters, fifths and tenths of a unit",
+   "build": [
+    "frac_scales"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "why": "Y2.B8.S7 Recognise a third (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:shape_name_match_2d",
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S13 Recognise three-quarters (prior learning wk W27)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S13 Recognise three-quarters (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W27)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y1.B10.S2 Find a half of an object or a shape (prior learning wk W27)"
+    }
+   ],
+   "preBuild": [
+    "fraction_parts",
+    "frac_count"
+   ],
+   "related": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (next step)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (next step)"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "same cluster 2.G.A.1: Count Edges, Faces & Vertices on 3D Shape (Visual)"
+    },
+    {
+     "key": "shapes_early:compose_from_attributes",
+     "why": "same cluster 2.G.A.1: Find Shapes by Attributes (Multi-Select)"
+    },
+    {
+     "key": "shapes_early:compose_rect_from_squares",
+     "why": "same cluster 2.G.A.2: Compose a Rectangle from Squares"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S7": {
+   "title": "Fractions on a number line",
+   "direct": [
+    {
+     "key": "composing:fraction_number_line",
+     "opts": {}
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W18)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y2.B7.S1 Compare mass (prior learning wk W18)"
+    },
+    {
+     "key": "addition:comparison_word",
+     "why": "Y1.B5.S8 Subtraction - finding the difference (prior learning wk W18)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "capacity_early",
+    "length_ops",
+    "nonstandard_capacity"
+   ],
+   "related": [
+    {
+     "key": "addition:nl_add",
+     "why": "same standard 2.MD.B.6: Addition Number Line (Visual)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same standard 2.MD.B.6: Number Line Addition (B&W)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same standard 2.MD.B.6: Subtraction Number Line (Visual)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same standard 2.MD.B.6: Number Line Subtraction (B&W)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "same standard 2.MD.B.6: Temperature (°C/°F)"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    },
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "same cluster 3.NF.A.2b: Fractions on Number Line"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "same cluster 3.NF.A.2b: Benchmark Fractions (0, ¼, ½, ¾, 1)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S8": {
+   "title": "Count in fractions on a number line",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4); recognising fractions equivalent to whole numbers and locating 4/4 and 1 at the same point",
+   "build": [
+    "frac_count",
+    "whole_frac_reverse"
+   ],
+   "pre": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (step before in the block)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "Y3.B6.S7 Fractions on a number line (step before in the block)"
+    },
+    {
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    },
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "same cluster 3.NF.A.2b: Fractions on Number Line"
+    },
+    {
+     "key": "fractions:benchmark_fractions",
+     "why": "same cluster 3.NF.A.2b: Benchmark Fractions (0, ¼, ½, ¾, 1)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S9": {
+   "title": "Equivalent fractions on a number line",
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "missing": "equivalent fractions shown on two number lines"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "equivalent fractions shown on two number lines",
+   "build": [
+    "frac_count"
+   ],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B6.S10": {
+   "title": "Equivalent fractions as bar models",
+   "direct": [
+    {
+     "key": "fractions:equiv_frac_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "fractions:identify",
+     "why": "Y2.B8.S10 Unit fractions (prior learning wk W37)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W37)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y1.B2.S2 Part-whole model (prior learning wk W37)"
+    }
+   ],
+   "preBuild": [
+    "frac_count",
+    "fraction_parts"
+   ],
+   "related": [
+    {
+     "key": "fractions:equiv_frac_nv",
+     "why": "same standard 3.NF.A.3b: Equivalent Fractions (No Visuals)"
+    },
+    {
+     "key": "fractions:select_equiv_frac",
+     "why": "same standard 3.NF.A.3b: Circle the Equivalent Fractions (MAP)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "same cluster 3.NF.A.2a: Fractions on Number Line (Visual)"
+    },
+    {
+     "key": "fractions:graph_fractions",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on Number Line"
+    },
+    {
+     "key": "fractions:fraction_nl_drag",
+     "why": "same cluster 3.NF.A.2a: Place Fractions on a Number Line"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -6439,6 +7210,96 @@
     "K.G.B.5"
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "fraction_parts": {
+   "kind": "new",
+   "skill": "fractions:equal_parts",
+   "name": "Equal and Unequal Parts",
+   "teaches": "parts and wholes; deciding whether parts are equal; finding the whole from a part",
+   "representation": "shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter",
+   "family": "fractions",
+   "steps": [
+    "Y2.B8.S1",
+    "Y2.B8.S2",
+    "Y2.B8.S9"
+   ],
+   "ccss": [
+    "1.G.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_count": {
+   "kind": "new",
+   "skill": "fractions:count_in_fractions",
+   "name": "Count in Fractions",
+   "teaches": "counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4)",
+   "representation": "a number line with fraction ticks; fill the missing counts",
+   "family": "fractions",
+   "steps": [
+    "Y2.B8.S15",
+    "Y3.B6.S8",
+    "Y3.B6.S9",
+    "Y4.B7.S9"
+   ],
+   "ccss": [
+    "3.NF.A.1",
+    "3.NF.A.3c",
+    "3.NF.A.2",
+    "3.NF.A.3a"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_whole": {
+   "kind": "new",
+   "skill": "fractions:understand_the_whole",
+   "name": "Understand the Whole",
+   "teaches": "how many parts of a given size make a whole (4/4 = 1), and finding the whole from a part",
+   "representation": "a bar split into parts with some shaded; write how many more make the whole",
+   "family": "fractions",
+   "steps": [
+    "Y3.B6.S4"
+   ],
+   "ccss": [
+    "2.G.A.3",
+    "3.NF.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "frac_scales": {
+   "kind": "new",
+   "skill": "fractions:fractions_on_scales",
+   "name": "Fractions and Scales",
+   "teaches": "reading a scale or number line divided into halves, quarters, fifths and tenths of a unit",
+   "representation": "a measuring scale (jug, ruler, number line) with unlabelled intervals; write the reading as a fraction",
+   "family": "fractions",
+   "steps": [
+    "Y3.B6.S6"
+   ],
+   "ccss": [
+    "2.G.A.3"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "whole_frac_reverse": {
+   "kind": "option",
+   "skill": "composing:whole_as_fraction",
+   "option": "direction \"fraction → whole\" (6/1 = 6, 8/4 = 2) and \"same point\" on a number line (4/4 and 1)",
+   "name": "Fractions That Equal Whole Numbers (option)",
+   "teaches": "recognising fractions equivalent to whole numbers and locating 4/4 and 1 at the same point",
+   "representation": "frac-model, number-line; write the whole number; mark",
+   "family": "fractions",
+   "steps": [
+    "Y3.B6.S8"
+   ],
+   "ccss": [
+    "3.NF.A.3c"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
    "reused": true
   }
  },
