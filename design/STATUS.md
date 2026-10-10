@@ -14,6 +14,8 @@ ws-print-lint learns the SL-3a exception: narrow Lines allowed at size S only; o
 14.7 pt; print rules CL-9a (problems numbered 1, 2, 3; letters only for parts) and the dot-array / number-family density target are
 the owner's — keep. Follow-up for the first two goes with the skip_count grid/line redo lane.
 
+**Owner answers 2026-10-10:** (1) Lane D More Practice DN-2 lint compares item counts within one letter only (each letter is its own sheet); (2) number_families_mult gains a "6 × 6" band choice, default unchanged (share codes stable); (3) touch column stacks keep the greys of earlier columns; (4) "Touched N" stays on × stacks; (5) a search with no hits says "No skill teaches this yet".
+
 **Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
 passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
 
