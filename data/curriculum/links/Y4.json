@@ -1957,6 +1957,2233 @@
     }
    ],
    "note": ""
+  },
+  "Y4.B4.S1": {
+   "title": "Multiples of 3",
+   "direct": [
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "number_theory:multiples",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "shade",
+      "constant": [
+       3
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 (Grade 2 lesson COPIED IN to the Grade 3 sequence, prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W01)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B3.S7 Divide by 3 (prior learning wk W01)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
+     "opts": {
+      "step": [
+       1
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "the 3 times-table facts",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "counting in 3s on a line"
+    },
+    {
+     "key": "number_theory:divisibility_sort",
+     "why": "is it a multiple of 3?"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "jumps of 3"
+    }
+   ],
+   "note": "number_theory:multiples has no table option; its items mix tables. Pair it with count_by_tables/mult_chart held to 3."
+  },
+  "Y4.B4.S2": {
+   "title": "Multiply and divide by 6",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       6
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W01)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W01)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B3.S7 Divide by 3 (prior learning wk W01)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "Y2.B1.S16 Count in 3s (prior learning wk W01)",
+     "opts": {
+      "step": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "equal-groups stories with 6 in a group"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "jumps of 6 on a number line"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of 6"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing-factor form of the same facts"
+    }
+   ],
+   "note": "Existing tags are partial only because opts were not recorded; with constant 6 they are full."
+  },
+  "Y4.B4.S3": {
+   "title": "6 times-table and division facts",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       6
+      ],
+      "support": [
+       "think"
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S2 Multiply and divide by 6 (step before in the block)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W02)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B3.S7 Divide by 3 (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "the four facts as a number family"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 6 row of the chart",
+     "opts": {
+      "task": "fill"
+     }
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "sharing and grouping stories"
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "missing products on the chart"
+    }
+   ],
+   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+  },
+  "Y4.B4.S4": {
+   "title": "Multiply and divide by 9",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       9
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S3 6 times-table and division facts (step before in the block)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "equal-groups stories with 9 in a group"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "jumps of 9 on a number line"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of 9"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing-factor form of the same facts"
+    }
+   ],
+   "note": "Existing tags are partial only because opts were not recorded; with constant 9 they are full."
+  },
+  "Y4.B4.S5": {
+   "title": "9 times-table and division facts",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       9
+      ],
+      "support": [
+       "think"
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S4 Multiply and divide by 9 (step before in the block)",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "the four facts as a number family"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 9 row of the chart",
+     "opts": {
+      "task": "fill"
+     }
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "sharing and grouping stories"
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "missing products on the chart"
+    }
+   ],
+   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+  },
+  "Y4.B4.S6": {
+   "title": "The 3, 6 and 9 times-tables",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_chart",
+     "missing": "shows the 3, 6, 9 rows but does not ask the link (6 × 4 = double 3 × 4; 9 × 4 = 3 × 3 × 4)",
+     "opts": {
+      "task": "pattern",
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "using the 3 times-table to find 6 and 9 facts (doubling, tripling) and spotting the shared multiples",
+   "build": [
+    "tables_links"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S5 9 times-table and division facts (step before in the block)",
+     "opts": {
+      "constant": [
+       9
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S3 6 times-table and division facts (step before in the block)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S8 The 3 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       3
+      ]
+     }
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:multiples",
+     "why": "common multiples of 3, 6 and 9"
+    },
+    {
+     "key": "patterns:pattern_relationship",
+     "why": "two patterns compared"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "count in 3s, 6s, 9s side by side",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B4.S7": {
+   "title": "Multiply and divide by 7",
+   "direct": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       7
+      ],
+      "support": [
+       "array"
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 The 5 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S11 The 4 times-table (prior learning wk W02)",
+     "opts": {
+      "constant": [
+       4
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W02)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (step before in the block)",
+     "opts": {
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "equal-groups stories with 7 in a group"
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "jumps of 7 on a number line"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of 7"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing-factor form of the same facts"
+    }
+   ],
+   "note": "Existing tags are partial only because opts were not recorded; with constant 7 they are full."
+  },
+  "Y4.B4.S8": {
+   "title": "7 times-table and division facts",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       7
+      ],
+      "support": [
+       "think"
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "why": "Y4.B4.S7 Multiply and divide by 7 (step before in the block)",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S15 The 5 times-table (prior learning wk W03)",
+     "opts": {
+      "constant": [
+       2,
+       5,
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y3.B3.S11 The 4 times-table (prior learning wk W03)",
+     "opts": {
+      "constant": [
+       4
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "the four facts as a number family"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 7 row of the chart",
+     "opts": {
+      "task": "fill"
+     }
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "sharing and grouping stories"
+    },
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "missing products on the chart"
+    }
+   ],
+   "note": "mult_div_fact_family has no constant option: its items are any table, so pair it with the constant-set fact skills."
+  },
+  "Y4.B4.S9": {
+   "title": "11 times-table and division facts",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       11
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       11
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       11
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W03)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S11",
+     "opts": {
+      "constant": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S8 7 times-table and division facts (step before in the block)",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "11 × n split as 10 × n + 1 × n"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 12 × 12 chart",
+     "opts": {
+      "band": 144
+     }
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of 11"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "division stories"
+    }
+   ],
+   "note": "The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4."
+  },
+  "Y4.B4.S10": {
+   "title": "12 times-table and division facts",
+   "direct": [
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "opts": {}
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       12
+      ]
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       12
+      ]
+     }
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       12
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W03)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S11",
+     "opts": {
+      "constant": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W03)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S8 7 times-table and division facts (step before in the block)",
+     "opts": {
+      "constant": [
+       7
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S3 6 times-table and division facts (lower grade, same CCSS cluster)",
+     "opts": {
+      "constant": [
+       6
+      ]
+     }
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "12 × n split as 10 × n + 2 × n"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 12 × 12 chart",
+     "opts": {
+      "band": 144
+     }
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "multiples of 12"
+    },
+    {
+     "key": "division:div_word_problems",
+     "why": "division stories"
+    }
+   ],
+   "note": "The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4."
+  },
+  "Y4.B4.S11": {
+   "title": "Multiply by 1 and 0",
+   "direct": [
+    {
+     "key": "multiplication:mult_properties",
+     "opts": {
+      "forms": [
+       2,
+       3
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       0,
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S1 Multiplication - equal groups (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "multiplication:equal_or_unequal_groups",
+     "why": "Y2.B5.S1 Recognise equal groups (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_facts",
+     "why": "dividing by 1 (next step)",
+     "opts": {
+      "constant": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "why": "the 0 and 1 rows"
+    },
+    {
+     "key": "algebra:solve_unknown",
+     "why": "__ × 7 = 0"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B4.S12": {
+   "title": "Divide a number by 1 and itself",
+   "direct": [
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "multiplication:mult_properties",
+     "missing": "times 1 only; never n ÷ n = 1 or n ÷ 1 = n as a pair",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "dividing a number by itself (n ÷ n = 1) alongside n ÷ 1 = n, with sharing pictures",
+   "build": [
+    "div_by_itself"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y4.B4.S11 Multiply by 1 and 0 (step before in the block)",
+     "opts": {
+      "forms": [
+       2,
+       3
+      ]
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W04)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S16 Divide by 5 (prior learning wk W04)",
+     "opts": {
+      "constant": [
+       5
+      ]
+     }
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (prior learning wk W04)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_equation_parts",
+     "why": "dividend, divisor, quotient named"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "n × 1 = n so n ÷ 1 = n"
+    },
+    {
+     "key": "composing:whole_as_fraction",
+     "why": "4/4 = 1 is n ÷ n = 1 in fraction form"
+    }
+   ],
+   "note": "mult_properties is tagged here today as partial; the existing proposal mult_three also lists this step, which looks like a numbering slip (owner question)."
+  },
+  "Y4.B4.S13": {
+   "title": "Multiply three numbers",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "multiplying three 1-digit numbers, choosing the order (associative property: 2 × 5 × 7 = 10 × 7)",
+   "build": [
+    "mult_three"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W04)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (step before in the block)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S1 Bonds to 10 (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "making 10 first (2 × 5)"
+    },
+    {
+     "key": "order_of_operations:two_ops_no_paren",
+     "why": "two operations in one expression"
+    },
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "factor pairs inside the product"
+    }
+   ],
+   "note": "mult_three teaches exactly this step."
+  },
+  "Y4.B5.S1": {
+   "title": "Factor pairs",
+   "direct": [
+    {
+     "key": "number_theory:factors_identify",
+     "opts": {}
+    },
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:dot_array_mult",
+     "why": "Y2.B5.S6 Use arrays (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y1.B9.S8 Make equal groups - grouping (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "factor pairs drawn as links"
+    },
+    {
+     "key": "number_theory:prime_composite",
+     "why": "numbers with only one factor pair"
+    },
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "why": "rectangles of a given area are factor pairs"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "the inverse idea"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S2": {
+   "title": "Use factor pairs",
+   "direct": [
+    {
+     "key": "number_theory:factor_links_easy",
+     "opts": {}
+    }
+   ],
+   "partial": [
+    {
+     "key": "multiplication:mult_properties",
+     "missing": "breaking apart by addition only; never replacing a factor by a factor pair (12 × 5 = 6 × 2 × 5)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "using a factor pair to multiply mentally (14 × 5 = 7 × 2 × 5 = 7 × 10)",
+   "build": [
+    "mult_three"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "why": "Y4.B5.S1 Factor pairs (step before in the block)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (prior learning wk W05)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "mult_three"
+   ],
+   "related": [
+    {
+     "key": "number_theory:factors_identify",
+     "why": "listing the factor pairs"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "another way to make a product easy"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "the ×10 fact the pair makes",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    }
+   ],
+   "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form."
+  },
+  "Y4.B5.S3": {
+   "title": "Multiply by 10",
+   "direct": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "power": [
+       10
+      ],
+      "band": 1000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S13 The 10 times-table (prior learning wk W16)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W16)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S1 Multiples of 10 (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the inverse: divide by 10 (Y4.B5.S5)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "band": 1000
+     }
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "1 cm = 10 mm, a ×10 conversion",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_placeholder_zero",
+     "why": "the placeholder zero"
+    }
+   ],
+   "note": "mult_zeros with form ×10 only; existing partial tags become full with opts."
+  },
+  "Y4.B5.S4": {
+   "title": "Multiply by 100",
+   "direct": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S3 Multiply by 10 (step before in the block)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S4 Hundreds (prior learning wk W17)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "the inverse: divide by 100",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "1 m = 100 cm",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "multiples of ten (Y4.B5.S7)",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S5": {
+   "title": "Divide by 10",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "band": 10000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S3 Multiply by 10 (lower grade, same CCSS cluster)",
+     "opts": {
+      "op": "x",
+      "power": [
+       10
+      ],
+      "band": 1000
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W35)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W35)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (prior learning wk W35)",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:divide",
+     "why": "division in other forms"
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "mm to cm divides by 10",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "later: dividing a 1-digit number by 10 (Y4.B8.S5)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "note": "School teaches this as enrichment (W35)."
+  },
+  "Y4.B5.S6": {
+   "title": "Divide by 100",
+   "direct": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S5 Divide by 10 (step before in the block)",
+     "opts": {
+      "op": "/",
+      "power": [
+       10
+      ],
+      "band": 10000
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S14 Divide by 10 (prior learning wk W35)",
+     "opts": {
+      "constant": [
+       10
+      ]
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W35)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same CCSS cluster)",
+     "opts": {
+      "op": "x",
+      "power": [
+       100
+      ],
+      "band": 10000
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:length_metric",
+     "why": "cm to m divides by 100",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "why": "Y4.B8.S10 divides 1- and 2-digit numbers by 100",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "decimals": true
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S7": {
+   "title": "Related facts – multiplication and division",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_zeros",
+     "missing": "multiplication only; not the matching division (120 ÷ 4 = 30) or the fact family of 3 × 4 = 12",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "writing the related multiplication and division facts from one known fact scaled by 10 (3 × 4 = 12 so 30 × 4 = 120, 120 ÷ 4 = 30, 120 ÷ 30 = 4)",
+   "build": [
+    "tables_links"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S4 Multiply by 100 (step before in the block)",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S2 Related calculations (prior learning wk W17)"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W17)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S4 Hundreds (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:number_families_mult",
+     "why": "number families"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing factors"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "multiples of ten used to estimate"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S8": {
+   "title": "Informal written methods for multiplication",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:area_model_mult",
+     "missing": "the grid split, but not the informal partitioned layout with place-value counters",
+     "opts": {
+      "tiles": 21
+     }
+    },
+    {
+     "key": "multiplication:multiply",
+     "missing": "goes straight to the column method",
+     "opts": {
+      "tiles": 21
+     }
+    }
+   ],
+   "verdict": "partial",
+   "missing": "informal written multiplication by partitioning shown with place-value counters (23 × 4 = 20 × 4 + 3 × 4)",
+   "build": [
+    "informal_mult",
+    "vis_array_options"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts – multiplication and division (step before in the block)",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "Y3.B4.S4 Multiply a 2-digit number by a 1-digit number - no exchange (prior learning wk W05)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W05)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W05)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y3.B4.S2 Related calculations (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult_hard",
+     "why": "bigger area models"
+    },
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "why": "the distributive area picture"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "breaking apart",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S9": {
+   "title": "Multiply a 2-digit number by a 1-digit number",
+   "direct": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "tiles": 21
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {
+      "tiles": 21
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S7 Related facts – multiplication and division (prior learning wk W17)",
+     "opts": {
+      "forms": [
+       2
+      ]
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y1.B9.S5 Add equal groups (prior learning wk W17)"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W17)"
+    }
+   ],
+   "preBuild": [
+    "informal_mult"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "stories with 2-digit × 1-digit"
+    },
+    {
+     "key": "multiplication:mult_missing_digit",
+     "why": "reasoning about digits"
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "the inverse: 2-digit ÷ 1-digit"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S10": {
+   "title": "Multiply a 3-digit number by a 1-digit number",
+   "direct": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "tiles": 31
+     }
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {
+      "tiles": 31
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:multiply",
+     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (prior learning wk W36)",
+     "opts": {
+      "tiles": 21
+     }
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W36)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same CCSS cluster)",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (prior learning wk W36)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:box_division_hard",
+     "why": "the inverse"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate first"
+    },
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "stories"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S11": {
+   "title": "Divide a 2-digit number by a 1-digit number (1)",
+   "direct": [
+    {
+     "key": "division:divide",
+     "opts": {
+      "tiles": 21,
+      "regroup": "none"
+     }
+    },
+    {
+     "key": "division:box_division_easy",
+     "opts": {}
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:share_into_groups",
+     "why": "Y3.B3.S5 Sharing and grouping (prior learning wk W06)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S16 Divide by 5 (prior learning wk W06)"
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y3.B4.S5 Multiply a 2-digit number by a 1-digit number - with exchange (prior learning wk W06)",
+     "opts": {
+      "tiles": 21
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_word_problems",
+     "why": "division stories"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check by multiplying"
+    },
+    {
+     "key": "division:nl_div",
+     "why": "division on a number line"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S12": {
+   "title": "Divide a 2-digit number by a 1-digit number (2)",
+   "direct": [
+    {
+     "key": "division:divide",
+     "opts": {
+      "tiles": 21,
+      "regroup": "always"
+     }
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:divide",
+     "why": "Y4.B5.S11 Divide a 2-digit number by a 1-digit number (1) (step before in the block)",
+     "opts": {
+      "tiles": 21,
+      "regroup": "none"
+     }
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (prior learning wk W06)"
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (lower grade, same CCSS cluster)",
+     "opts": {
+      "band": 99,
+      "rename": "more"
+     }
+    },
+    {
+     "key": "composing:base10_regroup",
+     "why": "Y2.B1.S3 Recognise tens and ones (lower grade, same CCSS cluster)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:remainder_interpret",
+     "why": "what a remainder means when the exchange leaves one"
+    },
+    {
+     "key": "division:div_check_by_multiplying",
+     "why": "check"
+    },
+    {
+     "key": "division:remainder_too_big",
+     "why": "is the remainder finished?"
+    }
+   ],
+   "note": "Step (2) is the exchange of a ten into ones (52 ÷ 4). box_division_easy deals exact no-exchange quotients, so it belongs to S11; divide with regroup \"always\" gives the exchange. Remainders stay a pre-skill (Y3.B4.S9)."
+  },
+  "Y4.B5.S13": {
+   "title": "Divide a 3-digit number by a 1-digit number",
+   "direct": [
+    {
+     "key": "division:divide",
+     "opts": {
+      "tiles": 31
+     }
+    },
+    {
+     "key": "division:box_division_hard",
+     "opts": {}
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "division:divide",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (step before in the block)",
+     "opts": {
+      "tiles": 21,
+      "regroup": "always"
+     }
+    },
+    {
+     "key": "division:div_remainders",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W36)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (prior learning wk W36)",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (lower grade, same CCSS cluster)",
+     "opts": {
+      "tiles": 31
+     }
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:div_zero_in_quotient",
+     "why": "zero in the quotient"
+    },
+    {
+     "key": "division:remainder_interpret",
+     "why": "remainders in context"
+    },
+    {
+     "key": "number_sense:estimate_quotient",
+     "why": "estimate first"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S14": {
+   "title": "Correspondence problems",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "correspondence problems: how many combinations of n items with m items (3 shirts × 4 hats) using lists and tables",
+   "build": [
+    "correspondence"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W06)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same CCSS cluster)"
+    },
+    {
+     "key": "multiplication:mult_word_problems",
+     "why": "Y3.B4.S11 How many ways (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [
+    "how_many_ways"
+   ],
+   "related": [
+    {
+     "key": "multiplication:mult_word_problems_plain",
+     "why": "multiplication stories"
+    },
+    {
+     "key": "probability:probability_basic",
+     "why": "listing outcomes"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "reasoning with two quantities"
+    }
+   ],
+   "note": ""
+  },
+  "Y4.B5.S15": {
+   "title": "Efficient multiplication",
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_properties",
+     "missing": "order and breaking apart, but not choosing a method (doubling, near multiples, factor pairs) for a calculation"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "choosing an efficient strategy for a given multiplication: doubling, near multiples (9 × 7 = 10 × 7 − 7), factor pairs, partitioning",
+   "build": [
+    "tables_links"
+   ],
+   "pre": [
+    {
+     "key": "number_theory:factor_links_easy",
+     "why": "Y4.B5.S2 Use factor pairs (step before in the block)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (step before in the block)",
+     "opts": {
+      "tiles": 21
+     }
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)"
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [
+    "mult_three"
+   ],
+   "related": [
+    {
+     "key": "multiplication:area_model_mult",
+     "why": "partitioning as a method"
+    },
+    {
+     "key": "number_sense:compensation",
+     "why": "compensation in addition"
+    },
+    {
+     "key": "number_sense:estimate_products",
+     "why": "estimate to check"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -2245,6 +4472,129 @@
     "Y4.B3.S2"
    ],
    "reused": false
+  },
+  "tables_links": {
+   "kind": "new",
+   "skill": "multiplication:related_tables",
+   "name": "Related Times-Tables",
+   "teaches": "using one table to find another: 2 → 4 → 8 by doubling, 3 → 6 → 12, 5 and 10, and 9 as 10 − 1",
+   "representation": "a three-column table with the known table given; fill the doubled table",
+   "family": "operations",
+   "steps": [
+    "Y4.B4.S6",
+    "Y4.B5.S7",
+    "Y4.B5.S15",
+    "Y3.B3.S15"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "div_by_itself": {
+   "kind": "option",
+   "skill": "division:div_facts",
+   "option": "form \"÷ 1 and ÷ itself\"",
+   "name": "Divide by 1 and by Itself (option)",
+   "teaches": "n ÷ 1 = n and n ÷ n = 1 (and 0 ÷ n = 0), each with a sharing picture, then as facts only",
+   "representation": "equation cell 7 ÷ 7 = □ with an optional row of dots ringed into one group / seven groups (hint scaffold that fades); one answer box",
+   "family": "division",
+   "ccss": [
+    "3.OA.B.5",
+    "3.OA.B.6"
+   ],
+   "why": "the 1 constant gives n ÷ 1 only; dividing by itself is not dealt",
+   "steps": [
+    "Y4.B4.S12"
+   ],
+   "reused": false
+  },
+  "mult_three": {
+   "kind": "new",
+   "skill": "multiplication:multiply_three_numbers",
+   "name": "Multiply Three Numbers",
+   "teaches": "multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)",
+   "representation": "three-factor expressions with a bracket prompt to choose the easy pair first",
+   "family": "operations",
+   "steps": [
+    "Y4.B4.S12",
+    "Y4.B4.S13",
+    "Y4.B5.S2",
+    "Y4.B5.S15"
+   ],
+   "improves": [
+    "Y4.B5.S2"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "informal_mult": {
+   "kind": "new",
+   "skill": "multiplication:partition_multiply",
+   "name": "Partition to Multiply",
+   "teaches": "informal written multiplication by partitioning (23 × 4 = 20 × 4 + 3 × 4), before the column method",
+   "representation": "a part-whole or grid model with the partial products to fill",
+   "family": "operations",
+   "steps": [
+    "Y4.B5.S8",
+    "Y4.B5.S9"
+   ],
+   "improves": [
+    "Y4.B5.S8"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "vis_array_options": {
+   "lane": "operations",
+   "kind": "option",
+   "name": "Array Options (split, hidden, place-value counters, three factors)",
+   "build": "arrays gain a split line, a hidden part, finish-the-array, `counter: 'one' | 'ten' | 'hundred'`, `model: 'array-groups'` (an array of arrays for three factors) and expression matching; mult-grid takes non-consecutive heads",
+   "hosts": [
+    "multiplication:dot_array_mult",
+    "multiplication:mult_chart",
+    "multiplication:multiply_three_numbers"
+   ],
+   "templates": [
+    "arrays",
+    "mult-grid"
+   ],
+   "newTemplates": [],
+   "files": [
+    "js/modules/sheet/cells/arrays.js",
+    "js/modules/sheet/cells/mult-grid.js"
+   ],
+   "after": [],
+   "steps": [
+    "Y4.B5.S8"
+   ],
+   "reused": true,
+   "source": "VISUAL_BUILDS"
+  },
+  "correspondence": {
+   "kind": "new",
+   "skill": "multiplication:correspondence_problems",
+   "name": "Correspondence Problems",
+   "teaches": "one-to-many correspondence (each of 3 hats with each of 4 scarves; 1 bag holds 5) as multiplication",
+   "representation": "a table or tree diagram to complete, then the multiplication",
+   "family": "operations",
+   "steps": [
+    "Y4.B5.S14"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
+  },
+  "how_many_ways": {
+   "kind": "new",
+   "skill": "multiplication:how_many_ways",
+   "name": "How Many Ways?",
+   "teaches": "counting combinations systematically (3 tops × 4 bottoms) as a multiplication",
+   "representation": "a picture grid of items; list or draw every pair; write the multiplication",
+   "family": "operations",
+   "steps": [
+    "Y4.B5.S14",
+    "Y3.B4.S11"
+   ],
+   "reused": true,
+   "source": "WRM_PROPOSALS"
   }
  },
  "tagFixes": [
@@ -2397,6 +4747,90 @@
    "step": "Y4.B3.S1",
    "action": "add",
    "why": "covering a rectangle with unit squares is the \"what is area\" model (partial)"
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S2",
+   "action": "add",
+   "why": "re-tag as FULL with opts constant [6] (likewise S4 with [9], S7 [7], S9 [11], S10 [12])"
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S2",
+   "action": "add",
+   "why": "re-tag as FULL with opts constant [6] (likewise S4, S7, S9, S10)"
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S1",
+   "action": "add",
+   "why": "re-tag as FULL with constant [3]"
+  },
+  {
+   "key": "multiplication:mult_chart",
+   "step": "Y4.B4.S1",
+   "action": "add",
+   "why": "missing tag: shade the multiples of 3"
+  },
+  {
+   "key": "multiplication:count_by_tables",
+   "step": "Y4.B4.S2",
+   "action": "add",
+   "why": "missing tag on S2, S4, S7, S9, S10 with the table constant"
+  },
+  {
+   "key": "multiplication:mult_facts",
+   "step": "Y4.B4.S11",
+   "action": "add",
+   "why": "missing tag: constant [0, 1]"
+  },
+  {
+   "key": "division:div_facts",
+   "step": "Y4.B4.S12",
+   "action": "add",
+   "why": "missing tag: constant [1] covers n ÷ 1"
+  },
+  {
+   "key": "multiplication:mult_zeros",
+   "step": "Y4.B5.S3",
+   "action": "add",
+   "why": "re-tag as FULL with forms [0] (S4: forms [1])"
+  },
+  {
+   "key": "placevalue:place_value_10x",
+   "step": "Y4.B5.S5",
+   "action": "add",
+   "why": "re-tag as FULL with op ÷, power [10] (S6: power [100])"
+  },
+  {
+   "key": "multiplication:multiply",
+   "step": "Y4.B5.S9",
+   "action": "add",
+   "why": "re-tag as FULL with tiles 21 (S10: tiles 31)"
+  },
+  {
+   "key": "division:divide",
+   "step": "Y4.B5.S11",
+   "action": "add",
+   "why": "missing tag: tiles 21, regroup none (S12: regroup always; S13: tiles 31)"
+  },
+  {
+   "key": "multiplication:mult_properties",
+   "step": "Y4.B5.S2",
+   "action": "partial",
+   "why": "kept partial (breaking apart by addition, not a factor pair)"
+  },
+  {
+   "key": "division:box_division_easy",
+   "step": "Y4.B5.S12",
+   "action": "remove",
+   "why": "deals exact quotients with no exchange-plus-remainder; it is the S11 skill"
+  },
+  {
+   "key": "multiplication:multiply",
+   "step": "Y4.B5.S8",
+   "action": "partial",
+   "why": "kept partial: the column method is not the informal layout"
   }
  ]
 }
