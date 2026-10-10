@@ -75,7 +75,7 @@
       "skills": [
         "order_of_operations:compare_expressions"
       ],
-      "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing.",
+      "note": "Re-sampled n=20: compare_expressions computes both sides (MC + drag-to-bin); 0/20 ask to judge without computing. checked: compare_expressions n=12: every item says evaluate each side (symbol MC or true/false bins); 0/12 compare-by-structure. inequalities checked: numeric true/false only.",
       "proposal": "compare_sentences",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
@@ -188,7 +188,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "zero",
-      "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS).",
+      "note": "Checked count_objects, count_sequence, number_seq_fill, ten-frame skills (n=12 each in pass 2): none show an empty set or answer 0. Normal priority (CCSS). checked: count_objects n=12: 0/12 empty sets (counts 2-15). Proposal zero = WRM_EXTENSIONS.zero (K.CC.A.3, write 0 for an empty set), matches the row.",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; kept because K.CC.A.3 (write 0 for no objects) is in MAP's blueprint"
@@ -202,7 +202,7 @@
       "status": "missing",
       "skills": [],
       "proposal": "ordinal",
-      "note": "LOW PRIORITY: ordinals are not CCSS. Checked skills.tsv for ordinal/first/position: no skill.",
+      "note": "LOW PRIORITY: ordinals are not CCSS. Checked skills.tsv for ordinal/first/position: no skill. checked: grep skills.tsv ordinal/first/position: no skill.",
       "evidence": {
         "url": null,
         "says": "not found in public NWEA material; not a CCSS standard, kept low priority for K-1 position language"
@@ -365,7 +365,7 @@
       "skills": [
         "placevalue:pv_digit_drag"
       ],
-      "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table.",
+      "note": "pv_digit_drag re-sampled n=20: chart to 7 digits at most in expanded prompts; no million-band table. checked: nearest_million (rounding only), pv_digit_drag (5 digits), unit_form (3 digits), base10_build_hundreds (to 999): none name places in 7-digit numbers.",
       "proposal": "vis_pv_bands_millions",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -431,7 +431,7 @@
       "skills": [
         "number_sense:place_on_number_line"
       ],
-      "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only.",
+      "note": "Re-sampled n=20: place_on_number_line 20/20 \"Tap # on the number line\", 0-100 lines only. checked: place_on_number_line n=12: 12/12 \"Tap N\" on 0-100; integer_nl_drag integers only. Re-grade stands.",
       "proposal": "nl_20",
       "evidence": {
         "url": null,
@@ -447,7 +447,7 @@
       "skills": [
         "number_sense:place_on_number_line"
       ],
-      "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only). Checked integers:number_line_int n=12: \"What integer is shown\" reads a point but on −20..20 integer lines only; place_on_number_line is tap-to-place.",
+      "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only). Checked integers:number_line_int n=12: \"What integer is shown\" reads a point but on −20..20 integer lines only; place_on_number_line is tap-to-place. checked: number_line_int (integers only), rounding_visual (rounds, does not read), number_line_add/sub (equations).",
       "proposal": "nl_20",
       "evidence": {
         "url": null,
@@ -605,7 +605,7 @@
       "skills": [
         "addition:comparison_word"
       ],
-      "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown.",
+      "note": "Re-sampled n=20: comparison_word 20/20 ask the difference (how many more/fewer); 0/20 bigger/smaller unknown. checked: comparison_word n=12: 12/12 difference-unknown (how many more/fewer); word_problems_mixed n=8 one \"26 more than\" bigger-unknown item, no smaller-unknown; status kept missing for a dedicated form.",
       "proposal": "map_compare_bigger_unknown",
       "evidence": {
         "url": null,
@@ -697,7 +697,7 @@
       "source": "strand-walk",
       "status": "missing",
       "skills": [],
-      "note": "No skill asks which equation shows the same sum, or names a property.",
+      "note": "No skill asks which equation shows the same sum, or names a property. checked: mult_properties n=12: zero/one/commutative/distributive number entry, × only; add_three, distributive_expr: none name or match + properties.",
       "proposal": "map_properties_equivalent",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_200.pdf",
@@ -821,7 +821,7 @@
       "skills": [
         "algebra:write_expression"
       ],
-      "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets.",
+      "note": "Re-sampled n=20: write_expression deals variable expressions (text + multi-select); 0/20 numeric expressions with brackets. checked: write_expression n=12: variable expressions (n + 47), 0/12 numeric with brackets; build_expr_* write equations, no brackets; compare_expressions evaluates.",
       "proposal": "write_numeric_expression",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
@@ -852,7 +852,7 @@
       "skills": [
         "algebra:inequalities"
       ],
-      "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words.",
+      "note": "Re-sampled n=20: inequalities deals true/false, drag-to-bins, drag marker on line; 0/20 write inequality from words. checked: inequalities n=12: 12/12 numeric true/false choice; no solution sets or line graph. Residual kept on inequality_write_graph.",
       "proposal": "inequality_write_graph",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M6_OAT_230.pdf",
@@ -884,7 +884,7 @@
         "addition:add_sub_10s",
         "addition:add_sub_100s"
       ],
-      "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited.",
+      "note": "Re-sampled n=20: add_sub_10s/100s bare \"# ± # = ?\" only; any-multiple-of-10 range limited. checked: add_sub_10s n=12: 12/12 ±10 only (90 + 10), not any multiple of 10 (tens_any residual stands).",
       "proposal": "tens_any",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_200.pdf",
@@ -916,7 +916,7 @@
       "skills": [
         "addition:add_5_pictures"
       ],
-      "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture.",
+      "note": "Re-sampled n=20: add_5_pictures 20/20 \"How many in all? # + # = ?\"; 0/20 choose/write the equation for the picture. checked: add_5_pictures n=12: pictures with the equation given (answer the total); 0/12 write or pick the equation for the picture; sub_5_pictures same.",
       "proposal": "pictures_to_sentence",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_180.pdf",
@@ -933,7 +933,7 @@
         "placevalue:place_value_disks",
         "composing:base10_build"
       ],
-      "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items.",
+      "note": "Re-sampled n=20: place_value_disks reads, base10_build builds; 0 multi-pair matching items. checked: place_value_disks n=12 model→number entry; base10_build_hundreds n=12 number→build (both directions exist); residual is the MAP select-the-matching-model form, kept partial.",
       "proposal": "map_match_model_number",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -967,7 +967,7 @@
       "skills": [
         "number_sense:place_on_number_line"
       ],
-      "note": "Re-sampled n=20: place_on_number_line place only; read direction missing.",
+      "note": "Re-sampled n=20: place_on_number_line place only; read direction missing. checked: same candidates as the read-a-number-line row; tap-to-place exists, reading at an arrow only for integers.",
       "proposal": "nl_20",
       "evidence": {
         "url": null,
@@ -1051,7 +1051,7 @@
         "composing:make_ten"
       ],
       "proposal": "map_another_way_to_make",
-      "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items.",
+      "note": "Sampled n=20: number_bonds 20/20 missing-part (one answer); make_ten fixed to 10; 0 open \"a different way\" items. checked: make_ten n=12: how many more make 10 (one answer); number_bonds one missing part; 0/12 build a second decomposition.",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
         "says": "RIT chart K-2 151-160: domino shows one way to make 5; move dots to show a different way."
@@ -1099,7 +1099,7 @@
         "placevalue:combine"
       ],
       "proposal": "map_units_to_number",
-      "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place.",
+      "note": "Sampled n=20: unit_form 20/20 number → hundreds/tens/ones blanks; combine is expanded addition; 0/40 units words → number with a zero place. checked: unit_form n=12: 12/12 number → units (887 = _ hundreds …), not units → number; combine checked: expanded → standard only.",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
         "says": "RIT chart K-2 above 191: \"6 hundreds and 5 ones. Write the number\" with digit tiles; DesCartes 171-200 place value terms."
