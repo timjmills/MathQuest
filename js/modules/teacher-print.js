@@ -663,7 +663,10 @@ function renderSetup() {
     const box = root.querySelector('#tvSetup');
     const pages = last ? last.pages.length : 0;
     const sheets = last && pr.key && last.newSheet && last.docPages ? Math.ceil(last.docPages / 2) : 0;
-    const printLabel = pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}${pr.key ? ' + key' : ''}${sheets ? ` on ${sheets} sheet${sheets === 1 ? '' : 's'}, double-sided` : ''}` : `Print pupil pages${pr.key ? ' + key' : ''}`;
+    // critic r4 (R4-1): the label stays short so it fits the one-line button at 1366; the sheet count is a caption under it.
+    // On the narrow 1366 column the label breaks only before "+ key", never inside "Print 2 pupil pages".
+    const printLabel = `<span class="tv-print-l">${pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}` : 'Print pupil pages'}</span>${pr.key ? ' <span class="tv-print-l">+ key</span>' : ''}`;
+    const sheetCap = sheets ? `On ${sheets} sheet${sheets === 1 ? '' : 's'}, double-sided.` : '';
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
@@ -687,7 +690,8 @@ function renderSetup() {
     </div>${pr.key ? keyOptionsHTML() : ''}
   </div>
   <div style="padding:16px 24px 24px;border-top:1px solid var(--tv-rule);display:flex;flex-direction:column;gap:8px;">
-    <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>${printLabel}</span></button>
+    <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}${sheetCap ? ' aria-describedby="tvPrintSheets"' : ''}>${icon('print', 18)}<span>${printLabel}</span></button>${sheetCap ? `
+    <p class="tv-cap tv-print-sheets" id="tvPrintSheets">${sheetCap}</p>` : ''}
     <button type="button" class="tv-btn tv-btn-block" data-act="open-tab"${pages ? '' : ' aria-disabled="true"'}>${icon('external', 18)}<span>Open in a new tab</span></button>
     <button type="button" class="tv-btn tv-btn-ghost" data-act="new-numbers" style="align-self:center;">${icon('reset', 16)}<span>New numbers</span></button>
   </div>

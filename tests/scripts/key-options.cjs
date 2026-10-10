@@ -17,6 +17,7 @@
 //      answer data, and fits fewer pages than the facsimile.
 //   5. The colour token: the key ink is #c2410c on key answers only; no pupil page paints it;
 //      contrast on white >= 4.5:1.
+//   11. The teacher Print button label is never clipped at 1366x768 / 1280x720 / 1024 (critic r4, R4-1).
 //   6. Old codes: the skill / settings codes do not carry key settings, so they decode unchanged
 //      (ws-code-snapshot is the full gate); the teacher-print request carries {on, placement, style}.
 const fs = require('fs');
@@ -474,6 +475,59 @@ print(len(d))
                 log(`  align ${role}: ${Math.min(ch + 20, list.length)}/${list.length}`);
             }
         }
+
+        // ---- 11. the Print button on the teacher print screen (critic r4, R4-1): at the owner's Chromebook sizes
+        //          (1366x768, 1280x720) and at 1024, with "Start each key on a new sheet" off and on, with More Practice A/B and every letter
+        //          and with a long count, the button's label is never clipped (text scrollWidth <= clientWidth,
+        //          the label inside the button), and with new sheet on the sheet count is shown under it.
+        await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_print_defaults'); } catch (e) { /* */ } window.setUserRole('teacher'); });
+        await page.waitForFunction(() => document.body.classList.contains('teacher-mode'), { timeout: 10000 });
+        await page.evaluate(() => window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_facts' }]));
+        const settle = () => new Promise((r) => setTimeout(r, 2500));
+        await settle();
+        const uiClick = (sel) => page.evaluate((sel) => { const b = document.querySelector(sel); if (b) b.click(); return !!b; }, sel);
+        const btnProbe = (fake) => page.evaluate((fake) => {
+            const b = document.querySelector('#tvSetup [data-act="print"]');
+            if (!b) return { missing: true };
+            const sp = b.querySelector('span'), cap = document.querySelector('#tvPrintSheets');
+            if (fake) { sp.innerHTML = fake[0]; if (cap) cap.textContent = fake[1]; }
+            const br = b.getBoundingClientRect(), sr = sp.getBoundingClientRect();
+            const capOk = !cap || (cap.scrollWidth <= cap.clientWidth + 1 && cap.getBoundingClientRect().width > 0);
+            return {
+                label: sp.textContent.trim(), cap: cap ? cap.textContent.trim() : '',
+                btnClip: b.scrollWidth > b.clientWidth + 1, spanClip: sp.scrollWidth > sp.clientWidth + 1,
+                outside: sr.left < br.left - 0.5 || sr.right > br.right + 0.5 || sr.top < br.top - 0.5 || sr.bottom > br.bottom + 0.5,
+                capOk, h: Math.round(br.height),
+            };
+        }, fake || null);
+        await uiClick('[data-act="key-place"][data-v="after-page"]'); await settle();
+        for (const vp of [{ width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
+            await page.setViewport(Object.assign({ deviceScaleFactor: 1 }, vp)); await settle();
+            for (const pages of ['A/B', 'all']) {
+                // More Practice: the default A and B, then every letter (the most pupil pages one section prints)
+                await page.evaluate((all) => {
+                    const chips = [...document.querySelectorAll('[data-act="letter"][data-sec="0"]')];
+                    if (all) chips.filter((c) => c.getAttribute('aria-pressed') !== 'true').forEach((c) => c.click());
+                    else chips.filter((c) => c.getAttribute('aria-pressed') === 'true' && !/^[AB]$/.test(c.dataset.letter)).forEach((c) => c.click());
+                }, pages === 'all'); await settle();
+                for (const ns of [false, true]) {
+                    const on = await page.evaluate(() => { const c = document.querySelector('[data-act="key-newsheet"]'); return c && c.getAttribute('aria-checked') === 'true'; });
+                    if (on !== ns) { await uiClick('[data-act="key-newsheet"]'); await settle(); }
+                    const tag = `print button ${vp.width}x${vp.height} ${pages}p new-sheet ${ns ? 'on' : 'off'}`;
+                    const r = await btnProbe();
+                    check(!r.missing && !r.btnClip && !r.spanClip && !r.outside && r.capOk && r.h >= 48, `${tag}: label clipped ${JSON.stringify(r)}`);
+                    check(ns ? /^On \d+ sheets?, double-sided\.$/.test(r.cap) : r.cap === '', `${tag}: sheet caption "${r.cap}"`);
+                    if (ns && pages === 'all') {
+                        // a long count, as a multi-section printout would show it
+                        const l = await btnProbe(['<span class="tv-print-l">Print 12 pupil pages</span> <span class="tv-print-l">+ key</span>', 'On 26 sheets, double-sided.']);
+                        check(!l.btnClip && !l.spanClip && !l.outside && l.capOk, `${tag} long count: label clipped ${JSON.stringify(l)}`);
+                        await uiClick('[data-act="key-newsheet"]'); await settle(); await uiClick('[data-act="key-newsheet"]'); await settle();
+                    }
+                    log(`  ${tag}: "${r.label}" | "${r.cap}" h ${r.h}`);
+                }
+            }
+        }
+        await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 2 });
 
         // ---- 6. the teacher print request and an old saved printout
         const old = await page.evaluate(async () => {
