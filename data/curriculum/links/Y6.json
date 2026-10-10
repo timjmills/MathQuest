@@ -3216,6 +3216,589 @@
    ],
    "note": ""
   },
+  "Y6.B7.S1": {
+   "title": "1-step function machines",
+   "direct": [
+    {
+     "key": "algebra:function_table_easy",
+     "opts": {
+      "ftRules": [
+       "+",
+       "-",
+       "x",
+       "/"
+      ]
+     }
+    },
+    {
+     "key": "algebra:function_table_hard",
+     "opts": {
+      "ftRules": [
+       "+",
+       "-",
+       "x",
+       "/"
+      ],
+      "ftTask": "inputs"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W11/W12)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y4.B5.S7 Related facts, multiplication and division (prior learning; the mapped mult_zeros covers it only in part)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families, addition and subtraction (prior learning wk W12)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 / Y2.B2.S21 Missing number problems (prior learning)"
+    },
+    {
+     "key": "addition:equal_sign",
+     "why": "Y2.B2.S20 Compare number sentences (prior learning wk W11)"
+    },
+    {
+     "key": "algebra:build_expr_addsub",
+     "why": "5.OA.A.2 build the expression for a one-step rule"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:pattern_relationship",
+     "why": "two related sequences, the rule between them"
+    },
+    {
+     "key": "algebra:build_expr_multdiv",
+     "why": "the rule written as an expression"
+    },
+    {
+     "key": "patterns:number_patterns_rule",
+     "why": "finding the rule of a sequence"
+    }
+   ],
+   "note": "function_table_easy with every one-step rule ticked gives the outputs; function_table_hard with the same rules and task \"Find the missing In numbers\" works the machine backwards; task \"Find the rule\" is the third WRM question type. The kit cell draws the In → [rule] → Out machine above the table, so the function_machine proposal is mostly met by options already."
+  },
+  "Y6.B7.S2": {
+   "title": "2-step function machines",
+   "direct": [
+    {
+     "key": "algebra:function_table_hard",
+     "opts": {
+      "ftRules": [
+       "x+",
+       "x-",
+       "/+",
+       "/-"
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "algebra:function_table_easy",
+     "why": "Y6.B7.S1 1-step function machines (previous step)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W11/W12)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y4.B5.S7 Related facts, multiplication and division (prior learning; the mapped mult_zeros covers it only in part)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W11)"
+    },
+    {
+     "key": "order_of_operations:two_ops_no_paren",
+     "why": "two operations done in order"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:solve_eq_twostep",
+     "why": "undoing two steps is solving a 2-step equation (Y6.B7.S8)"
+    },
+    {
+     "key": "algebra:evaluate_expression_hard",
+     "why": "the machine as an expression 2n + 1"
+    },
+    {
+     "key": "patterns:pattern_relationship",
+     "why": "related sequences"
+    }
+   ],
+   "note": "Was tagged partial (\"two operations in sequence and working backwards\"). The rebuilt function tables deal two-step rules (× then ±, ÷ then ±) and, with task \"Find the missing In numbers\", the backwards direction, so the step is full; the two-step order is fixed (× or ÷ first), which matches WRM machines."
+  },
+  "Y6.B7.S3": {
+   "title": "Form expressions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "algebra:write_expression",
+     "missing": "one operation from words only (n + 7, n × 4); no two-step expressions (2n + 3), no forming from a machine or bar model, no algebraic convention (3n for 3 × n)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "forming two-operation expressions with a letter (2a + 3, 4(b − 1)) from words, function machines and bar models, written in algebraic notation",
+   "build": [
+    "expr_two_ops"
+   ],
+   "pre": [
+    {
+     "key": "algebra:function_table_hard",
+     "why": "Y6.B7.S2 2-step function machines (previous step)"
+    },
+    {
+     "key": "algebra:build_expr_addsub",
+     "why": "5.OA.A.2 building a number expression"
+    },
+    {
+     "key": "algebra:build_expr_multdiv",
+     "why": "5.OA.A.2 building a × / ÷ expression"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 / Y5.B2.S8 Missing number problems (prior learning)"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step problems with a bar model (prior learning wk W11/W12)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:evaluate_expression",
+     "why": "the next step: substitute into it"
+    },
+    {
+     "key": "algebra:write_equation",
+     "why": "an expression set equal to a value"
+    },
+    {
+     "key": "algebra:combine_like_terms",
+     "why": "a + a + a = 3a"
+    }
+   ],
+   "note": "The existing proposal named on this step (two_variables, 6.EE.C.9 dependent variables) does not close it; expr_two_ops does."
+  },
+  "Y6.B7.S4": {
+   "title": "Substitution",
+   "direct": [
+    {
+     "key": "algebra:evaluate_expression",
+     "opts": {}
+    },
+    {
+     "key": "algebra:evaluate_expression_hard",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "algebra:write_expression",
+     "why": "Y6.B7.S3 Form expressions (previous step)"
+    },
+    {
+     "key": "order_of_operations:two_ops_no_paren",
+     "why": "× before + when 3n + 2 is evaluated"
+    },
+    {
+     "key": "order_of_operations:oop_easy",
+     "why": "order of operations"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:function_table_easy",
+     "why": "substituting In numbers into a rule"
+    },
+    {
+     "key": "order_of_operations:oop_hard",
+     "why": "brackets and powers"
+    },
+    {
+     "key": "algebra:solve_unknown",
+     "why": "the inverse: find the value that makes it true"
+    }
+   ],
+   "note": "Full: the easy skill substitutes one value into one-operation, power and division expressions; the hard one into multi-step expressions. Two-letter expressions (a + b with a = 3, b = 4) are rare in the generator; acceptable at Y6."
+  },
+  "Y6.B7.S5": {
+   "title": "Formulae",
+   "direct": [],
+   "partial": [
+    {
+     "key": "algebra:evaluate_expression_hard",
+     "missing": "substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "using a formula given in words and in letters (perimeter, area, cost) by substituting values and naming what the result means",
+   "build": [
+    "formulae"
+   ],
+   "pre": [
+    {
+     "key": "algebra:evaluate_expression",
+     "why": "Y6.B7.S4 Substitution (previous step)"
+    },
+    {
+     "key": "area_perimeter:perimeter",
+     "why": "Y5.B8.S1 perimeter of rectangles"
+    },
+    {
+     "key": "area_perimeter:area",
+     "why": "Y5.B8.S4 area of rectangles"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families, addition and subtraction (prior learning wk W12)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W11/W12)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W11)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W12)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:function_table_hard",
+     "why": "a formula as a two-step machine"
+    },
+    {
+     "key": "order_of_operations:oop_hard",
+     "why": "brackets in P = 2(l + w)"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B7.S6": {
+   "title": "Form equations",
+   "direct": [
+    {
+     "key": "algebra:write_equation",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "algebra:write_expression",
+     "why": "Y6.B7.S3 Form expressions"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 / Y5.B2.S8 Missing number problems (prior learning)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 / Y2.B2.S21 Missing number problems (prior learning)"
+    },
+    {
+     "key": "algebra:tape_diagram",
+     "why": "Y5.B2.S6 Multi-step problems with a bar model (prior learning wk W11/W12)"
+    },
+    {
+     "key": "addition:add_5_pictures",
+     "why": "Y1.B2.S3 Write number sentences (prior learning wk W35)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:solve_eq_addsub",
+     "why": "the next step: solve it"
+    },
+    {
+     "key": "algebra:balance_addsub",
+     "why": "an equation as a balance"
+    },
+    {
+     "key": "algebra:algebra_word_mixed",
+     "why": "stories to equations"
+    }
+   ],
+   "note": "write_equation deals the sentence and story forms (a number plus 5 is 12; twice a number minus 3; giving away; earning per hour), which is what WRM forms. WRM also forms equations from a pictured balance; balance_addsub is related, not direct."
+  },
+  "Y6.B7.S7": {
+   "title": "Solve 1-step equations",
+   "direct": [
+    {
+     "key": "algebra:solve_eq_addsub",
+     "opts": {}
+    },
+    {
+     "key": "algebra:solve_eq_multdiv",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "algebra:write_equation",
+     "why": "Y6.B7.S6 Form equations (previous step)"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W11/W12)"
+    },
+    {
+     "key": "addition:add_sub_fact_family",
+     "why": "Y2.B2.S2 Fact families, addition and subtraction (prior learning wk W12)"
+    },
+    {
+     "key": "multiplication:mult_div_fact_family",
+     "why": "Y4.B5.S7 Related facts, multiplication and division (prior learning; the mapped mult_zeros covers it only in part)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (prior learning wk W12)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y1.B5.S10 / Y2.B2.S21 Missing number problems (prior learning)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:solve_unknown",
+     "why": "the same equations, mixed"
+    },
+    {
+     "key": "algebra:balance_addsub",
+     "why": "balance with a blank"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "why": "missing factor facts"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B7.S8": {
+   "title": "Solve 2-step equations",
+   "direct": [
+    {
+     "key": "algebra:solve_eq_twostep",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "algebra:solve_eq_addsub",
+     "why": "Y6.B7.S7 Solve 1-step equations (previous step)"
+    },
+    {
+     "key": "algebra:solve_eq_multdiv",
+     "why": "Y6.B7.S7 Solve 1-step equations (previous step)"
+    },
+    {
+     "key": "algebra:function_table_hard",
+     "why": "Y6.B7.S2 working a 2-step machine backwards"
+    },
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (prior learning wk W11/W12)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W11)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:algebra_word_mixed",
+     "why": "two-step stories (3.OA.D.8)"
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "why": "two-step stories without pictures"
+    },
+    {
+     "key": "algebra:write_equation",
+     "why": "form the equation first"
+    }
+   ],
+   "note": "The v3 crosswalk tags this 3.OA.D.8; the content is 6.EE.B.7-style two-step equations, which solve_eq_twostep deals in four forms."
+  },
+  "Y6.B7.S9": {
+   "title": "Find pairs of values",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "missing": "lists the factor pairs of a number (a × b = 24) systematically; never pairs for a + b = n or 2a + b = n written with letters"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding every whole-number pair that satisfies an equation with two letters (a + b = 8, 2a + b = 10), listed systematically in a table",
+   "build": [
+    "pairs_values"
+   ],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 / Y1.B2.S6 number bonds to 10, systematically (prior learning wk W13)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "R.B11.S8 Bonds to 10 (prior learning wk W13)"
+    },
+    {
+     "key": "addition:add_facts",
+     "why": "Y3.B2.S1 Apply number bonds (prior learning wk W13)"
+    },
+    {
+     "key": "number_theory:factor_tchart_easy",
+     "why": "4.OA.B.4 factor pairs, the × version of the same list"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    },
+    {
+     "key": "algebra:evaluate_expression",
+     "why": "Y6.B7.S4 Substitution: test a pair"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_theory:factor_links_medium",
+     "why": "factor pairs as links"
+    },
+    {
+     "key": "algebra:solve_eq_twostep",
+     "why": "one unknown once the other is fixed"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "plotting the pairs (Y4.B14 / Y5.B11 prior learning)"
+    }
+   ],
+   "note": ""
+  },
+  "Y6.B7.S10": {
+   "title": "Solve problems with two unknowns",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "solving problems with two unknowns (two items cost 13 together and one costs 3 more) by listing pairs or with a bar model",
+   "build": [
+    "pairs_values"
+   ],
+   "pre": [
+    {
+     "key": "algebra:tape_diagram",
+     "why": "bar models of two parts"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S8 Bonds to 10 (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W13)"
+    },
+    {
+     "key": "coordinates:coordinate_q1",
+     "why": "Y4.B14.S1-S2 / Y5.B11.S1 coordinates (prior learning wk W13)"
+    },
+    {
+     "key": "number_theory:factor_tchart_medium",
+     "why": "Y6.B7.S9 Find pairs of values (previous step, partial)"
+    },
+    {
+     "key": "number_ops_mixed:missing_factor_or_addend",
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W11/W12/W35)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:algebra_word_mixed",
+     "why": "word problems with one unknown"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "two-step stories"
+    },
+    {
+     "key": "algebra:write_equation",
+     "why": "an equation for each condition"
+    }
+   ],
+   "note": ""
+  },
   "Y6.B10.S1": {
    "title": "Shapes - same area",
    "direct": [],
@@ -4869,6 +5452,41 @@
    "why": "bar_graph shows one data set; no key with two bars per category.",
    "reused": true
   },
+  "expr_two_ops": {
+   "kind": "option",
+   "skill": "algebra:write_expression",
+   "name": "Form Expressions With Two Operations (option)",
+   "teaches": "forming expressions with a letter and two operations (2a + 3, 4(b − 1)) from words, a function machine or a bar model, in algebraic notation (3n, not 3 × n)",
+   "representation": "a boxed cell with a drawn 2-box function machine (In → × 2 → + 3 → Out, the In is a letter) or a bar model; write the expression in the box; word bank of \"add, double, times\"",
+   "family": "algebra",
+   "steps": [
+    "Y6.B7.S3"
+   ],
+   "ccss": [
+    "6.EE.A.2a",
+    "5.OA.A.2"
+   ],
+   "why": "write_expression is one operation from words only",
+   "reused": false,
+   "option": "form \"two operations\" (machine, bar model, words) and notation \"algebraic convention\""
+  },
+  "formulae": {
+   "kind": "new",
+   "skill": "algebra:use_formulae",
+   "name": "Formulae",
+   "teaches": "using a formula in words and in letters (perimeter = 2 × (l + w)) by substitution",
+   "representation": "a formula card and values; write the result",
+   "family": "algebra",
+   "steps": [
+    "Y6.B7.S5"
+   ],
+   "ccss": [
+    "6.EE.A.2c",
+    "5.OA.A.2"
+   ],
+   "why": "no skill substitutes into a formula for a real quantity",
+   "reused": true
+  },
   "four_quadrants": {
    "kind": "option",
    "skill": "coordinates:coordinate_all",
@@ -5255,6 +5873,25 @@
     "Y6.B1.S5"
    ],
    "reused": false
+  },
+  "pairs_values": {
+   "kind": "new",
+   "skill": "algebra:pairs_of_values",
+   "name": "Pairs of Values and Two Unknowns",
+   "teaches": "finding all whole-number pairs that satisfy an equation (a + b = 8, 2a + b = 10) and solving simple problems with two unknowns",
+   "representation": "a two-column table to list pairs systematically; option: a bar model problem",
+   "family": "algebra",
+   "steps": [
+    "Y6.B7.S9",
+    "Y6.B7.S10"
+   ],
+   "ccss": [
+    "6.EE.B.6",
+    "4.OA.B.4",
+    "3.OA.D.8"
+   ],
+   "why": "no skill lists solution pairs of a two-letter equation or solves two-unknown problems",
+   "reused": true
   },
   "parallelogram": {
    "kind": "new",
@@ -5952,6 +6589,36 @@
    "step": "Y6.B6.S1",
    "action": "add",
    "why": "partial cover: multiplicative side only"
+  },
+  {
+   "key": "algebra:function_table_hard",
+   "step": "Y6.B7.S2",
+   "action": "add",
+   "why": "now full (was partial): ftRules two-step and ftTask \"Find the missing In numbers\" cover both clauses"
+  },
+  {
+   "key": "algebra:function_table_hard",
+   "step": "Y6.B7.S1",
+   "action": "add",
+   "why": "one-step rules with ftTask \"inputs\" give the backwards machine"
+  },
+  {
+   "key": "algebra:write_expression",
+   "step": "Y6.B7.S3",
+   "action": "partial",
+   "why": "one operation from words only"
+  },
+  {
+   "key": "algebra:evaluate_expression_hard",
+   "step": "Y6.B7.S5",
+   "action": "add",
+   "why": "partial cover: substitution without a real formula"
+  },
+  {
+   "key": "number_theory:factor_tchart_medium",
+   "step": "Y6.B7.S9",
+   "action": "add",
+   "why": "partial cover: pairs that multiply to n"
   }
  ]
 }
