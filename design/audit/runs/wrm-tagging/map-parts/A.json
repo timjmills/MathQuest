@@ -26,7 +26,7 @@
         "decimals:order_decimals",
         "placevalue:order_least_to_greatest"
       ],
-      "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets.",
+      "note": "Re-sampled n=20: order_decimals decimal-only sets (ordering + drag); order_least_to_greatest whole numbers only; 0/40 mixed whole+decimal sets. Checked order_decimals n=12: 12/12 decimal-only sets; order_least_to_greatest whole only.",
       "proposal": "map_order_whole_decimal_mixed",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_220.pdf",
@@ -315,7 +315,7 @@
       "skills": [
         "placevalue:value"
       ],
-      "note": "value only asks the worth of one digit.",
+      "note": "value only asks the worth of one digit. Checked place_value_10x n=12: ×/÷ 10,100,1000 computations, 0/12 compare two digit values; value, identify — single digit worth.",
       "proposal": "value_ten_times",
       "evidence": {
         "url": null,
@@ -381,7 +381,7 @@
       "skills": [
         "placevalue:compare"
       ],
-      "note": "compare starts at 3 digits in sampling.",
+      "note": "compare starts at 3 digits in sampling. Checked compare_groups n=12: more/fewer/same picture groups with no numerals or symbols; placevalue:compare symbol entry without pictures.",
       "proposal": "compare_small",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_NO_180.pdf",
@@ -447,7 +447,7 @@
       "skills": [
         "number_sense:place_on_number_line"
       ],
-      "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only).",
+      "note": "Re-sampled n=20: place_on_number_line 0/20 read-the-point items (place only). Checked integers:number_line_int n=12: \"What integer is shown\" reads a point but on −20..20 integer lines only; place_on_number_line is tap-to-place.",
       "proposal": "nl_20",
       "evidence": {
         "url": null,
@@ -621,7 +621,7 @@
       "skills": [
         "composing:number_bonds"
       ],
-      "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\".",
+      "note": "Re-sampled n=20: number_bonds 20/20 missing-part bond within 10; no open \"show another way to make 5\". Checked composing:number_bonds n=12: missing part or whole, one answer each; 0/12 list all ways.",
       "proposal": "part_whole",
       "evidence": {
         "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
@@ -653,7 +653,7 @@
       "skills": [
         "addition:equal_sign"
       ],
-      "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items.",
+      "note": "Re-sampled n=20: equal_sign (labelled True/False) deals \"# + # = ?\" column addition 20/20; 0/20 true/false items. Checked addition:equal_sign n=12: 12/12 \"19 + 5 = ?\" column add (label says True/False — a bug); balance_addsub is the open-number form only.",
       "proposal": "equal_sign_repair",
       "evidence": {
         "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
@@ -1135,8 +1135,8 @@
       "proposal": "multi_step_four_ops",
       "note": "multi_step_word n=8: 8/8 two-step + and − only; word_problems_mixed n=8: one-step +−×÷; algebra_word_mixed_plain n=12: +/− only; write_equation: one-step letters, no story steps; solve_eq_twostep: bare equations. None combine ×/÷ steps with a letter equation.",
       "evidence": {
-        "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_210.pdf",
-        "says": "DesCartes 201-220: solves multi-step real-world problems using the four operations."
+        "url": null,
+        "says": "not found in public NWEA material (DesCartes OAT_210 lists rules/function tables, not multi-step); kept because 4.OA.A.3 is in MAP blueprint"
       }
     }
   ],
