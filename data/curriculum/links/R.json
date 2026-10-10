@@ -4346,6 +4346,335 @@
     }
    ],
    "note": ""
+  },
+  "R.B17.S1": {
+   "title": "Identify units of repeating patterns",
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:shape_pattern",
+     "opts": {},
+     "missing": "circling the unit that repeats"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "identifying the repeating unit",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S2": {
+   "title": "Create own pattern rules",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "creating a pattern rule of one's own",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "continue a given pattern"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S3": {
+   "title": "Explore own pattern rules",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "explaining one's own pattern rule",
+   "build": [
+    "pattern_make"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "continue a given pattern"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S4": {
+   "title": "Replicate and build scenes and constructions",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "replicating a scene or construction from a model",
+   "build": [
+    "scenes"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "pattern_make"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "why": "combine shapes"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S5": {
+   "title": "Visualise from different positions",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "visualising objects from different positions",
+   "build": [
+    "scenes"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "pattern_make"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "next step: R.B17.S6 Describe positions"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S6": {
+   "title": "Describe positions",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {},
+     "missing": "in front, behind, between, next to"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the full position vocabulary",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S7": {
+   "title": "Give instructions to build",
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:shape_positions",
+     "opts": {},
+     "missing": "giving instructions to build (first, next, on top of)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "giving instructions using position words",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [
+    "scenes"
+   ],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S8": {
+   "title": "Explore mapping",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "exploring simple maps",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B17.S7 Give instructions to build (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S9": {
+   "title": "Represent maps with models",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "representing a map with models",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B17.S7 Give instructions to build (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S10": {
+   "title": "Create own maps from familiar places",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "creating a map of a familiar place",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B17.S7 Give instructions to build (earlier in this block)"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
+  },
+  "R.B17.S11": {
+   "title": "Create own maps and plans from story situations",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "creating maps and plans from a story",
+   "build": [
+    "position_map"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "R.B17.S7 Give instructions to build (earlier in this block)"
+    },
+    {
+     "key": "patterns:shape_pattern",
+     "why": "R.B17.S1 Identify units of repeating patterns (earlier in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "same block: R.B17.S1 Identify units of repeating patterns"
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "same block: R.B17.S6 Describe positions"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -4441,7 +4770,10 @@
    "steps": [
     "R.B2.S4",
     "R.B2.S6",
-    "R.B12.S7"
+    "R.B12.S7",
+    "R.B17.S1",
+    "R.B17.S2",
+    "R.B17.S3"
    ],
    "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -4514,7 +4846,13 @@
    "representation": "a simple picture map on a square grid; answer where-is questions or follow arrows",
    "family": "geometry",
    "steps": [
-    "R.B4.S4"
+    "R.B4.S4",
+    "R.B17.S6",
+    "R.B17.S7",
+    "R.B17.S8",
+    "R.B17.S9",
+    "R.B17.S10",
+    "R.B17.S11"
    ],
    "ccss": [
     "K.G.A.1"
@@ -4727,9 +5065,12 @@
    "steps": [
     "R.B15.S4",
     "R.B15.S6",
-    "R.B15.S7"
+    "R.B15.S7",
+    "R.B17.S4",
+    "R.B17.S5"
    ],
    "ccss": [
+    "K.G.B.5",
     "K.G.B.6"
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
@@ -4772,6 +5113,12 @@
    "step": "R.B16.S6",
    "action": "partial",
    "why": "building doubles with objects"
+  },
+  {
+   "key": "shapes_early:shape_positions",
+   "step": "R.B17.S6",
+   "action": "partial",
+   "why": "in front, behind, between, next to"
   }
  ]
 }
