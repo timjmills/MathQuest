@@ -4681,6 +4681,159 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B7.S1": {
+   "title": "Compare lengths and heights",
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "why": "R.B1.S4 Sort objects to a type (prior learning wk W23)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "R.B11.S7 Composition to 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B11.S9 Make arrangements of 10 (prior learning wk W23)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "composing:ten_frame_build_teen",
+     "why": "R.B13.S1 Build numbers beyond 10 (10 -13) (prior learning wk W23)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S2 Find a balance (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "next step: Y1.B7.S2 Measure length using objects"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "same CCSS K.MD.A.1 in Y1.B7.S3 Measure length in centimetres"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same CCSS K.MD.A.2 in Y1.B8.S1 Heavier and lighter"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B7.S2": {
+   "title": "Measure length using objects",
+   "direct": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W24)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "compare_size"
+   ],
+   "related": [
+    {
+     "key": "measurement:reading_ruler",
+     "why": "next step: Y1.B7.S3 Measure length in centimetres"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: Y1.B7.S1 Compare lengths and heights"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "same block: Y1.B7.S1 Compare lengths and heights"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B7.S3": {
+   "title": "Measure length in centimetres",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:reading_ruler",
+     "opts": {},
+     "missing": "a centimetre ruler (the skill reads inches only)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring in centimetres",
+   "build": [
+    "ruler_cm"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W25)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S1 Compare mass (prior learning wk W25)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "balance",
+    "compare_size"
+   ],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "same block: Y1.B7.S1 Compare lengths and heights"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "same block: Y1.B7.S1 Compare lengths and heights"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "same block: Y1.B7.S2 Measure length using objects"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5051,6 +5204,48 @@
     "1.NBT.A.1",
     "K.NBT.A.1"
    ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "compare_size": {
+   "kind": "new",
+   "skill": "comparing:compare_size",
+   "name": "Big and Small",
+   "teaches": "comparing overall size (big, bigger, small, smaller) of two or three objects",
+   "representation": "pairs of the same object drawn at different sizes; circle the bigger or the smaller",
+   "family": "measurement",
+   "steps": [],
+   "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "ruler_cm": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "centimetres and millimetres",
+   "name": "Read a Centimetre Ruler (option)",
+   "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
+   "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture",
+   "family": "measurement",
+   "steps": [
+    "Y1.B7.S3"
+   ],
+   "ccss": [
+    "2.MD.A.1",
+    "K.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "balance": {
+   "kind": "new",
+   "skill": "measurement:balance_scales",
+   "name": "Balanced or Not?",
+   "teaches": "a balance scale shows heavier, lighter or equal (balanced) mass",
+   "representation": "a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced",
+   "family": "measurement",
+   "steps": [],
+   "ccss": [],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
