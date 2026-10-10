@@ -4834,6 +4834,299 @@
     }
    ],
    "note": ""
+  },
+  "Y1.B8.S1": {
+   "title": "Heavier and lighter",
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S2 Compare length (prior learning wk W25)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "balance",
+    "compare_size"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y1.B8.S2": {
+   "title": "Measure mass",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "measuring mass with cubes on a balance",
+   "build": [
+    "nonstandard_mass"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S1 Compare mass (prior learning wk W26)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W26)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.1, K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "balance",
+    "capacity_early",
+    "compare_size"
+   ],
+   "related": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "the same idea for length"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "next step: Y1.B8.S3 Compare mass"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B8.S3": {
+   "title": "Compare mass",
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {},
+     "missing": "comparing masses by the number of units"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two masses measured in cubes",
+   "build": [
+    "nonstandard_mass"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W26)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "balance",
+    "capacity_early",
+    "compare_size"
+   ],
+   "related": [],
+   "note": ""
+  },
+  "Y1.B8.S4": {
+   "title": "Full and empty",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "full, empty, half full",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B8.S1 Compare mass (prior learning wk W26)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W26)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.1, earlier)"
+    }
+   ],
+   "preBuild": [
+    "balance",
+    "compare_size",
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: Y1.B8.S1 Heavier and lighter"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B8.S5": {
+   "title": "Compare volume",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing volume in containers",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W27)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (the step before in this block)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "compare_size",
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: Y1.B8.S1 Heavier and lighter"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B8.S6": {
+   "title": "Measure capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "measuring capacity with cups or scoops",
+   "build": [
+    "nonstandard_capacity"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W27)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (same CCSS K.MD.A.2, earlier)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y1.B7.S3 Measure length in centimetres (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (same CCSS K.MD.A.1, earlier)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.1, K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "compare_size",
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: Y1.B8.S1 Heavier and lighter"
+    }
+   ],
+   "note": ""
+  },
+  "Y1.B8.S7": {
+   "title": "Compare capacity",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing capacities measured in cups",
+   "build": [
+    "nonstandard_capacity"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B2.S1 Compare size (prior learning wk W27)"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "R.B11.S2 Compare numbers to 10 (prior learning wk W27)"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "Y1.B8.S3 Compare mass (same CCSS K.MD.A.2, earlier)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y1.B7.S1 Compare lengths and heights (same CCSS K.MD.A.2, earlier)"
+    }
+   ],
+   "preBuild": [
+    "capacity_early",
+    "compare_size",
+    "nonstandard_mass"
+   ],
+   "related": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "same block: Y1.B8.S1 Heavier and lighter"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -5246,6 +5539,60 @@
    "family": "measurement",
    "steps": [],
    "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "nonstandard_mass": {
+   "kind": "new",
+   "skill": "measurement:measure_mass_cubes",
+   "name": "Measure Mass with Cubes",
+   "teaches": "measuring mass with non-standard units (cubes, marbles) on a balance, and comparing masses by the count",
+   "representation": "a drawn balance with an object in one pan and cubes in the other; write how many cubes",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S2",
+    "Y1.B8.S3"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "capacity_early": {
+   "kind": "new",
+   "skill": "comparing:compare_capacity",
+   "name": "Full, Empty, Holds More",
+   "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+   "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S4",
+    "Y1.B8.S5"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "nonstandard_capacity": {
+   "kind": "new",
+   "skill": "measurement:measure_capacity_cups",
+   "name": "Measure Capacity with Cups",
+   "teaches": "measuring capacity and volume with non-standard units (cups, spoons) and comparing",
+   "representation": "containers with a count of cups drawn beside them; write how many cups; circle the one that holds more",
+   "family": "measurement",
+   "steps": [
+    "Y1.B8.S6",
+    "Y1.B8.S7"
+   ],
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
