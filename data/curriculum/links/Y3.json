@@ -1,0 +1,1291 @@
+{
+ "year": "Y3",
+ "generatedBy": "wave2-tagging",
+ "steps": {
+  "Y3.B1.S1": {
+   "title": "Represent numbers to 100",
+   "direct": [
+    {
+     "key": "composing:base10_build",
+     "opts": {}
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 99
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group",
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.1: Build 3-Digit Numbers with Flats"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "same standard 2.NBT.A.1: Read Place-Value Disks"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S2": {
+   "title": "Partition numbers to 100",
+   "direct": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 99
+     }
+    }
+   ],
+   "partial": [
+    {
+     "key": "composing:base10_build",
+     "missing": "partitioning in more than one way"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S1 Represent numbers to 100 (step before in the block)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "Y1.B4.S2 Understand 10 (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group",
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.1: Build 3-Digit Numbers with Flats"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "same standard 2.NBT.A.1: Read Place-Value Disks"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S3": {
+   "title": "Number line to 100",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "a whole 0-100 line counted in tens then ones (the skill's line spans one ten)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a whole 0-100 line counted in tens then ones (the skill's line spans one ten)",
+   "build": [
+    "nl_20",
+    "regroup_hundreds"
+   ],
+   "pre": [
+    {
+     "key": "composing:base10_build",
+     "why": "Y3.B1.S2 Partition numbers to 100 (step before in the block)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S2 Partition numbers to 100 (step before in the block)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W13)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W13)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "lower-grade skill on 1.NBT.A.1 (same domain as 2.NBT.A.1)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S4 Hundreds (next step)"
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "same standard 2.MD.B.6: Addition Number Line (Visual)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same standard 2.MD.B.6: Number Line Addition (B&W)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same standard 2.MD.B.6: Subtraction Number Line (Visual)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same standard 2.MD.B.6: Number Line Subtraction (B&W)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "same standard 2.MD.B.6: Temperature (°C/°F)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "same standard 2.NBT.A.1: Read Place-Value Disks"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S4": {
+   "title": "Hundreds",
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "missing": "counting in hundreds; 100 as ten tens"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting in hundreds; 100 as ten tens",
+   "build": [
+    "count_50s"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S3 Number line to 100 (step before in the block)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group",
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (next step)"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S5": {
+   "title": "Represent numbers to 1,000",
+   "direct": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "opts": {}
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W01)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y1.B12.S3 Partition into tens and ones (prior learning wk W01)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y1.B6.S3 Count by making groups of tens (prior learning wk W01)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S10 10s and 1s on the number line to 100 (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)"
+    }
+   ],
+   "preBuild": [
+    "tens_ones_group",
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same standard 2.NBT.A.3: Number Word Form"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "same standard 2.NBT.A.3: Choose the Word Name"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S6": {
+   "title": "Partition numbers to 1,000",
+   "direct": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "Y3.B1.S5 Represent numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same standard 2.NBT.A.3: Number Word Form"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "same standard 2.NBT.A.3: Choose the Word Name"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S7": {
+   "title": "Flexible partitioning of numbers to 1,000",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models",
+   "build": [
+    "flex_partition"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S6 Partition numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.3: Build 3-Digit Numbers with Flats"
+    },
+    {
+     "key": "composing:number_word_form",
+     "why": "same standard 2.NBT.A.3: Number Word Form"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.3: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "placevalue:number_word_names",
+     "why": "same standard 2.NBT.A.3: Choose the Word Name"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S8": {
+   "title": "Hundreds, tens and ones",
+   "direct": [
+    {
+     "key": "placevalue:identify",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W02)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W02)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B12.S2 Tens to 100 (prior learning wk W02)"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "Y1.B4.S7 1 more and 1 less (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (next step)"
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.1: Build 3-Digit Numbers with Flats"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "same standard 2.NBT.A.1: Read Place-Value Disks"
+    },
+    {
+     "key": "placevalue:pv_disks_build",
+     "why": "same standard 2.NBT.A.1: Draw Place-Value Disks for a Number"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S9": {
+   "title": "Find 1, 10 or 100 more or less",
+   "direct": [
+    {
+     "key": "placevalue:more_less_100",
+     "opts": {
+      "note": "1, 10 and 100"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:identify",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (step before in the block)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (step before in the block)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y3.B1.S8 Hundreds, tens and ones (step before in the block)"
+    },
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:compare",
+     "why": "Y2.B1.S13 Compare numbers (prior learning wk W02)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.8: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same cluster 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same cluster 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same cluster 2.NBT.B.7: Add within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S10": {
+   "title": "Number line to 1,000",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "missing": "a 0-1,000 line (the skill's lines are to 100)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a 0-1,000 line (the skill's lines are to 100)",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (step before in the block)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W13)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W13)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "lower-grade skill on 1.NBT.A.1 (same domain as 2.NBT.A.1)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "lower-grade skill on 1.NBT.B.2b (same domain as 2.NBT.A.1)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "addition:nl_add",
+     "why": "same standard 2.MD.B.6: Addition Number Line (Visual)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same standard 2.MD.B.6: Number Line Addition (B&W)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same standard 2.MD.B.6: Subtraction Number Line (Visual)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same standard 2.MD.B.6: Number Line Subtraction (B&W)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "same standard 2.MD.B.6: Temperature (°C/°F)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same standard 2.NBT.A.1: Build a Number with Base-10 Blocks"
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.1: Build 3-Digit Numbers with Flats"
+    },
+    {
+     "key": "placevalue:place_value_disks",
+     "why": "same standard 2.NBT.A.1: Read Place-Value Disks"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S11": {
+   "title": "Estimate on a number line to 1,000",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled",
+   "build": [
+    "nl_20"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y3.B1.S10 Number line to 1,000 (step before in the block)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y2.B6.S1 Measure in centimetres (prior learning wk W13)"
+    },
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (prior learning wk W13)"
+    },
+    {
+     "key": "comparing:compare_objects",
+     "why": "R.B10.S1 Explore length (prior learning wk W13)"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "R.B13.S6 Verbal counting patterns (prior learning wk W13)"
+    },
+    {
+     "key": "composing:hundreds_chart_fill",
+     "why": "lower-grade skill on 1.NBT.A.1 (same domain as 2.NBT.A.1)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "why": "lower-grade skill on 1.NBT.B.2b (same domain as 2.NBT.A.1)"
+    }
+   ],
+   "preBuild": [
+    "metres",
+    "nl_20"
+   ],
+   "related": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (next step)"
+    },
+    {
+     "key": "addition:nl_add",
+     "why": "same standard 2.MD.B.6: Addition Number Line (Visual)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "same standard 2.MD.B.6: Number Line Addition (B&W)"
+    },
+    {
+     "key": "subtraction:nl_sub",
+     "why": "same standard 2.MD.B.6: Subtraction Number Line (Visual)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "same standard 2.MD.B.6: Number Line Subtraction (B&W)"
+    },
+    {
+     "key": "measurement:temperature",
+     "why": "same standard 2.MD.B.6: Temperature (°C/°F)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "same standard 2.NBT.A.1: Build a Number with Base-10 Blocks"
+    },
+    {
+     "key": "composing:base10_build_hundreds",
+     "why": "same standard 2.NBT.A.1: Build 3-Digit Numbers with Flats"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S12": {
+   "title": "Compare numbers to 1,000",
+   "direct": [
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:expand",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:combine",
+     "why": "Y2.B1.S8 Write numbers to 100 in expanded form (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W02)"
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W02)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step)"
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (next step)"
+    },
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "same cluster 2.NBT.A.2: Count by 2s"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S13": {
+   "title": "Order numbers to 1,000",
+   "direct": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "opts": {
+      "band": 999
+     }
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "opts": {
+      "band": 999
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "placevalue:compare",
+     "why": "Y3.B1.S12 Compare numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W03)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B12.S4 The number line to 100 (prior learning wk W03)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same cluster 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same cluster 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same cluster 2.NBT.A.2: Count-By Fill-In (1-12)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B1.S14": {
+   "title": "Count in 50s",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "counting forwards and backwards in 50s, 100s and 1,000s, and seeing 10 hundreds as 1,000",
+   "build": [
+    "count_50s"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "Y3.B1.S13 Order numbers to 1,000 (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W03)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W03)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B12.S4 The number line to 100 (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "why": "same standard 2.NBT.A.2: Number Chart - Find the Missing Number (to 1,000 and beyond)"
+    },
+    {
+     "key": "measurement:time_fives_ring",
+     "why": "same standard 2.NBT.A.2: Count the Minutes by Fives"
+    },
+    {
+     "key": "patterns:count_by_fill",
+     "why": "same standard 2.NBT.A.2: Count-By Fill-In (1-12)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "why": "same standard 2.NBT.A.2: Skip Counting Number Line (Visual)"
+    },
+    {
+     "key": "patterns:skip_count_grid",
+     "why": "same standard 2.NBT.A.2: Skip Counting Grid (Visual)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "why": "same standard 2.NBT.A.2: Count Up by Step (Grid)"
+    },
+    {
+     "key": "patterns:count_by_step_down",
+     "why": "same standard 2.NBT.A.2: Count Down by Step (Grid)"
+    },
+    {
+     "key": "patterns:count_by_powers_of_10",
+     "why": "same standard 2.NBT.A.2: Count by Powers of 10 (Grid)"
+    }
+   ],
+   "note": ""
+  }
+ },
+ "proposals": {
+  "tens_ones_group": {
+   "kind": "new",
+   "skill": "composing:count_in_tens_groups",
+   "name": "Count by Making Tens",
+   "teaches": "counting a large set by circling groups of ten, then counting tens and ones",
+   "representation": "a scattered set of 20-50 objects; circle tens, write ___ tens ___ ones = ___",
+   "family": "counting",
+   "steps": [
+    "Y1.B6.S3",
+    "Y2.B1.S2"
+   ],
+   "ccss": [
+    "K.NBT.A.1",
+    "1.NBT.A.1",
+    "1.NBT.B.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "flex_partition": {
+   "kind": "new",
+   "skill": "placevalue:flexible_partition",
+   "name": "Partition Numbers Flexibly",
+   "teaches": "partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models",
+   "representation": "a part-whole diagram with one part given; base-10 picture beside it; write the other part",
+   "family": "placevalue",
+   "steps": [
+    "Y2.B1.S7",
+    "Y3.B1.S7",
+    "Y4.B1.S7"
+   ],
+   "ccss": [
+    "1.NBT.B.2",
+    "2.NBT.A.3",
+    "4.NBT.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "metres": {
+   "kind": "option",
+   "skill": "measurement:reading_ruler",
+   "option": "metres",
+   "name": "Measure in Metres (option)",
+   "teaches": "measuring and comparing lengths in metres, choosing cm or m",
+   "representation": "a metre stick picture; unit choice cm/m",
+   "family": "measurement",
+   "steps": [
+    "Y2.B6.S2"
+   ],
+   "ccss": [
+    "1.MD.A.2",
+    "2.MD.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "nl_20": {
+   "kind": "new",
+   "skill": "number_sense:number_line_scales",
+   "name": "Numbers on a Number Line (any scale)",
+   "teaches": "the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled",
+   "representation": "a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked",
+   "family": "placevalue",
+   "steps": [
+    "Y1.B1.S15",
+    "Y1.B4.S8",
+    "Y1.B4.S9",
+    "Y1.B4.S10",
+    "Y1.B6.S6",
+    "Y1.B6.S7",
+    "Y1.B12.S4",
+    "Y2.B1.S9",
+    "Y2.B1.S10",
+    "Y2.B1.S11",
+    "Y3.B1.S3",
+    "Y3.B1.S10",
+    "Y3.B1.S11",
+    "Y4.B1.S3",
+    "Y4.B1.S9",
+    "Y4.B1.S10",
+    "Y5.B1.S9"
+   ],
+   "ccss": [
+    "K.CC.A.2",
+    "K.CC.A.3",
+    "1.NBT.A.1",
+    "2.MD.B.6",
+    "2.NBT.A.1",
+    "3.NBT.A.1",
+    "4.NBT.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "regroup_hundreds": {
+   "kind": "option",
+   "skill": "composing:base10_regroup",
+   "option": "band 999: trade 1 hundred for 10 tens",
+   "name": "A Hundred Is Ten Tens (option)",
+   "teaches": "100 as a bundle of ten tens: build, trade a flat for ten rods, and back",
+   "representation": "base10; build or write the number of tens",
+   "family": "placevalue",
+   "steps": [
+    "Y3.B1.S3"
+   ],
+   "ccss": [
+    "2.NBT.A.1a"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "count_50s": {
+   "kind": "option",
+   "skill": "patterns:count_by_step_up",
+   "option": "steps 50, 100, 1,000",
+   "name": "Count in 50s, 100s and 1,000s (option)",
+   "teaches": "counting forwards and backwards in 50s, 100s and 1,000s, and seeing 10 hundreds as 1,000",
+   "representation": "step values 50, 100 and 1,000 on count_by_step_up / skip_count_line with a base-10 picture support",
+   "family": "algebra",
+   "steps": [
+    "Y3.B1.S4",
+    "Y3.B1.S14",
+    "Y4.B1.S4"
+   ],
+   "ccss": [
+    "2.NBT.A.1",
+    "2.NBT.A.2",
+    "4.NBT.A.1",
+    "4.NBT.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  }
+ },
+ "tagFixes": []
+}
