@@ -1149,6 +1149,1873 @@
     }
    ],
    "note": ""
+  },
+  "Y3.B2.S1": {
+   "title": "Apply number bonds within 10",
+   "direct": [
+    {
+     "key": "addition:add_facts",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_facts",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add_10_no_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add_10_mixed",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add_20_no_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    },
+    {
+     "key": "addition:add_20_regroup",
+     "why": "lower-grade skill on 1.OA.C.6 (same domain as 2.OA.B.2)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y3.B2.S2 Add and subtract 1s (next step)"
+    },
+    {
+     "key": "addition:add_20_mixed",
+     "why": "same standard 2.OA.B.2: Add within 20"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "same standard 2.OA.B.2: Pick the Missing Addends"
+    },
+    {
+     "key": "subtraction:sub_20_no_regroup",
+     "why": "same standard 2.OA.B.2: Subtract within 20 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_20_regroup",
+     "why": "same standard 2.OA.B.2: Subtract within 20 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_20_mixed",
+     "why": "same standard 2.OA.B.2: Subtract within 20"
+    },
+    {
+     "key": "subtraction:mixed_add_sub",
+     "why": "same standard 2.OA.B.2: Mixed Addition & Subtraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S2": {
+   "title": "Add and subtract 1s",
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "missing": "adding and subtracting only ones to a 2- or 3-digit number mentally"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding and subtracting only ones to a 2- or 3-digit number mentally",
+   "build": [
+    "add_sub_patterns",
+    "explain_strategy"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B2.S3 Add and subtract 10s (next step)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S3": {
+   "title": "Add and subtract 10s",
+   "direct": [
+    {
+     "key": "addition:add_sub_10s",
+     "opts": {}
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "opts": {
+      "note": "10 more, 10 less"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y3.B2.S2 Add and subtract 1s (step before in the block)"
+    },
+    {
+     "key": "patterns:seq_2",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_5",
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:order_least_to_greatest",
+     "why": "Y2.B1.S14 Order objects and numbers (prior learning wk W03)"
+    },
+    {
+     "key": "placevalue:order_greatest_to_least",
+     "why": "Y2.B1.S14 Order objects and numbers (prior learning wk W03)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y1.B12.S4 The number line to 100 (prior learning wk W03)"
+    },
+    {
+     "key": "patterns:seq_10",
+     "why": "Y1.B9.S2 Count in 10s (prior learning wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (next step)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S4": {
+   "title": "Add and subtract 100s",
+   "direct": [
+    {
+     "key": "addition:add_sub_100s",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y3.B2.S3 Add and subtract 10s (step before in the block)"
+    },
+    {
+     "key": "placevalue:more_less_100",
+     "why": "Y3.B2.S3 Add and subtract 10s (step before in the block)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y2.B2.S6 Add by making 10 (prior learning wk W04)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S5": {
+   "title": "Spot the pattern",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same; explaining why an addition or subtraction strategy works using place value and the properties of operations (reasons chosen from a bank)",
+   "build": [
+    "add_sub_patterns",
+    "explain_strategy"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (step before in the block)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y2.B2.S6 Add by making 10 (prior learning wk W04)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    },
+    {
+     "key": "subtraction:sub_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Subtract within 50 (No Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S6": {
+   "title": "Add 1s across a 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:make_a_ten",
+     "missing": "adding ones across a ten in a 2- or 3-digit number (68 + 5)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding ones across a ten in a 2- or 3-digit number (68 + 5)",
+   "build": [
+    "add_next_10"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)"
+    },
+    {
+     "key": "addition:add_10_regroup",
+     "why": "Y2.B2.S6 Add by making 10 (prior learning wk W04)"
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)"
+    },
+    {
+     "key": "subtraction:number_line_sub",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W04)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W04)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    },
+    {
+     "key": "subtraction:sub_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Subtract within 50 (No Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S7": {
+   "title": "Add 10s across a 100",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40)",
+   "build": [
+    "cross_100"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y3.B2.S6 Add 1s across a 10 (step before in the block)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S8": {
+   "title": "Subtract 1s across a 10",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "missing": "subtracting ones across a ten mentally (43 − 5)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "subtracting ones across a ten mentally (43 − 5)",
+   "build": [
+    "add_next_10"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    },
+    {
+     "key": "subtraction:sub_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Subtract within 50 (No Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S9": {
+   "title": "Subtract 10s across a 100",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40)",
+   "build": [
+    "cross_100"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (step before in the block)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "number_sense:compensation",
+     "why": "Y3.B2.S10 Make connections (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S10": {
+   "title": "Make connections",
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:compensation",
+     "missing": "explaining links between facts, place value and the column method (2.NBT.B.9)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "explaining links between facts, place value and the column method (2.NBT.B.9)",
+   "build": [
+    "add_sub_patterns"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)"
+    },
+    {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    },
+    {
+     "key": "addition:fact_family_sort",
+     "why": "Y2.B2.S3 Related facts (prior learning wk W05)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "Y3.B2.S11 Add two numbers (no exchange) (next step)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S11": {
+   "title": "Add two numbers (no exchange)",
+   "direct": [
+    {
+     "key": "addition:add_1k_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "number_sense:compensation",
+     "why": "Y3.B2.S10 Make connections (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S12": {
+   "title": "Subtract two numbers (no exchange)",
+   "direct": [
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "Y3.B2.S11 Add two numbers (no exchange) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S13 Add two numbers (across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    },
+    {
+     "key": "subtraction:sub_wp_1k",
+     "why": "same standard 2.NBT.B.7: Subtraction Word Problems (within 1,000)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S13": {
+   "title": "Add two numbers (across a 10)",
+   "direct": [
+    {
+     "key": "addition:add_1k_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    },
+    {
+     "key": "subtraction:sub_wp_1k",
+     "why": "same standard 2.NBT.B.7: Subtraction Word Problems (within 1,000)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S14": {
+   "title": "Add two numbers (across a 100)",
+   "direct": [
+    {
+     "key": "addition:add_1k_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_no_regroup",
+     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S15": {
+   "title": "Subtract two numbers (across a 10)",
+   "direct": [
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_across_zeros",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S16": {
+   "title": "Subtract two numbers (across a 100)",
+   "direct": [
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "opts": {}
+    },
+    {
+     "key": "subtraction:sub_across_zeros",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y1.B5.S6 Subtract ones using number bonds (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S17": {
+   "title": "Add 2-digit and 3-digit numbers",
+   "direct": [
+    {
+     "key": "addition:add_1k_mixed",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_across_zeros",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "Y3.B2.S18 Subtract a 2-digit number from a 3-digit number (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_wp_1k",
+     "why": "same standard 2.NBT.B.7: Subtraction Word Problems (within 1,000)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S18": {
+   "title": "Subtract a 2-digit number from a 3-digit number",
+   "direct": [
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)"
+    },
+    {
+     "key": "subtraction:sub_10_regroup",
+     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)"
+    }
+   ],
+   "preBuild": [
+    "flex_partition"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_wp_1k",
+     "why": "same standard 2.NBT.B.7: Subtraction Word Problems (within 1,000)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S19": {
+   "title": "Complements to 100",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10",
+   "build": [
+    "bonds_100"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_1k_mixed",
+     "why": "Y3.B2.S18 Subtract a 2-digit number from a 3-digit number (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "Y3.B2.S20 Estimate answers (next step)"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y3.B2.S20 Estimate answers (next step)"
+    },
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S20": {
+   "title": "Estimate answers",
+   "direct": [
+    {
+     "key": "number_sense:estimate_sum",
+     "opts": {}
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W08)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (next step)"
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S21": {
+   "title": "Inverse operations",
+   "direct": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "missing": "checking an addition by subtracting, and finding a missing number with the inverse (the skill only checks a subtraction by adding)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "checking an addition by subtracting, and finding a missing number with the inverse (the skill only checks a subtraction by adding)",
+   "build": [
+    "inverse_check"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sum",
+     "why": "Y3.B2.S20 Estimate answers (step before in the block)"
+    },
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "Y3.B2.S20 Estimate answers (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add_sub_100s",
+     "why": "same standard 2.NBT.B.7: Add & Subtract by 100s"
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Add within 1,000 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "same standard 2.NBT.B.7: Add within 1,000"
+    },
+    {
+     "key": "addition:add_wp_1k",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000)"
+    },
+    {
+     "key": "addition:add_wp_1k_plain",
+     "why": "same standard 2.NBT.B.7: Addition Word Problems (within 1,000, No Pictures)"
+    },
+    {
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (No Regrouping)"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "same standard 2.NBT.B.7: Subtract within 1,000 (With Regrouping)"
+    }
+   ],
+   "note": ""
+  },
+  "Y3.B2.S22": {
+   "title": "Make decisions",
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "choosing a mental strategy or the column method for a calculation, and explaining the choice",
+   "build": [
+    "make_decisions"
+   ],
+   "pre": [
+    {
+     "key": "subtraction:sub_check_by_adding",
+     "why": "Y3.B2.S21 Inverse operations (step before in the block)"
+    },
+    {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)"
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S11 Estimate numbers on a number line (prior learning wk W08)"
+    },
+    {
+     "key": "addition:cloze_addition",
+     "why": "Y2.B2.S21 Missing number problems (prior learning wk W08)"
+    }
+   ],
+   "preBuild": [
+    "add_next_10"
+   ],
+   "related": [
+    {
+     "key": "addition:add",
+     "why": "same standard 2.NBT.B.5: Basic Addition"
+    },
+    {
+     "key": "addition:add_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 50 (With Regrouping)"
+    },
+    {
+     "key": "addition:add_50_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 50"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "why": "same standard 2.NBT.B.5: Add within 100 (No Regrouping)"
+    },
+    {
+     "key": "addition:add_100_mixed",
+     "why": "same standard 2.NBT.B.5: Add within 100"
+    },
+    {
+     "key": "subtraction:subtract",
+     "why": "same standard 2.NBT.B.5: Basic Subtraction"
+    },
+    {
+     "key": "subtraction:sub_50_no_regroup",
+     "why": "same standard 2.NBT.B.5: Subtract within 50 (No Regrouping)"
+    }
+   ],
+   "note": ""
   }
  },
  "proposals": {
@@ -1285,7 +3152,147 @@
    ],
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true
+  },
+  "add_sub_patterns": {
+   "kind": "new",
+   "skill": "addition:add_sub_patterns",
+   "name": "Spot the Pattern (+/−)",
+   "teaches": "using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same",
+   "representation": "a three-row fact ladder with the first row done; complete the others",
+   "family": "operations",
+   "steps": [
+    "Y3.B2.S2",
+    "Y3.B2.S5",
+    "Y3.B2.S10",
+    "Y4.B2.S1"
+   ],
+   "ccss": [
+    "2.NBT.B.5",
+    "2.NBT.B.8",
+    "2.NBT.B.9",
+    "3.NBT.A.2"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "explain_strategy": {
+   "kind": "new",
+   "skill": "number_sense:why_it_works",
+   "name": "Why Does It Work?",
+   "teaches": "explaining why an addition or subtraction strategy works using place value and the properties of operations (reasons chosen from a bank)",
+   "representation": "equation, stack; tick a reason from a bank of 3 (Say: frame on the model)",
+   "family": "operations",
+   "steps": [
+    "Y3.B2.S2",
+    "Y3.B2.S5"
+   ],
+   "ccss": [
+    "2.NBT.B.9"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "add_next_10": {
+   "kind": "new",
+   "skill": "addition:bridge_to_next_ten",
+   "name": "To the Next Ten",
+   "teaches": "adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3)",
+   "representation": "a number line with the ten marked; write the jump to the ten and then the rest",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S8",
+    "Y2.B2.S11",
+    "Y3.B2.S6",
+    "Y3.B2.S8"
+   ],
+   "ccss": [
+    "1.NBT.C.4",
+    "1.OA.C.6",
+    "2.NBT.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "cross_100": {
+   "kind": "option",
+   "skill": "addition:add_sub_100s",
+   "option": "tens across 100",
+   "name": "Add and Subtract 10s Across 100 (option)",
+   "teaches": "adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40)",
+   "representation": "a band option \"tens across 100\" with a number line support",
+   "family": "operations",
+   "steps": [
+    "Y3.B2.S7",
+    "Y3.B2.S9"
+   ],
+   "ccss": [
+    "2.NBT.B.7"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "bonds_100": {
+   "kind": "new",
+   "skill": "addition:bonds_to_100",
+   "name": "Bonds to 100",
+   "teaches": "pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10",
+   "representation": "a hundred square or bead string with part shaded; part-whole diagram; write the missing part",
+   "family": "operations",
+   "steps": [
+    "Y2.B2.S4",
+    "Y3.B2.S19"
+   ],
+   "ccss": [
+    "1.NBT.B.2",
+    "1.NBT.C.4",
+    "K.OA.A.4",
+    "2.NBT.B.5"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "inverse_check": {
+   "kind": "option",
+   "skill": "subtraction:sub_check_by_adding",
+   "option": "large numbers and addition",
+   "name": "Inverse Operations (option)",
+   "teaches": "using the inverse to check and to find missing numbers in addition and subtraction with 5- and 6-digit numbers",
+   "representation": "band option to 1,000,000 and an \"addition checked by subtracting\" variant",
+   "family": "operations",
+   "steps": [
+    "Y5.B2.S5",
+    "Y3.B2.S21"
+   ],
+   "ccss": [
+    "4.NBT.B.4"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
+  },
+  "make_decisions": {
+   "kind": "new",
+   "skill": "addition:choose_a_method",
+   "name": "Mental or Written?",
+   "teaches": "choosing a mental strategy or the column method for a calculation, and explaining the choice",
+   "representation": "a list of calculations; tick mental or written, then solve",
+   "family": "operations",
+   "steps": [
+    "Y3.B2.S22"
+   ],
+   "ccss": [
+    "2.NBT.B.5",
+    "2.NBT.B.7"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true
   }
  },
- "tagFixes": []
+ "tagFixes": [
+  {
+   "key": "subtraction:sub_check_by_adding",
+   "step": "Y3.B2.S21",
+   "action": "partial",
+   "why": "checking an addition by subtracting, and finding a missing number with the inverse (the skill only checks a subtraction by adding)"
+  }
+ ]
 }
