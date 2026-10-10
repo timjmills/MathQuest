@@ -82,7 +82,15 @@ function wrapRows(n, rows0, boxW, gap, avail) {
     return { rows: n, perRow: 1 };
 }
 /** The one-page sheet's air above and below a row; none where the role sizes the cell to the row (opener, critic r2 N4). */
-const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 1.2 : Number(p.vpad) > 0 ? Number(p.vpad) : 0);
+const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 0 : Number(p.vpad) > 0 ? Number(p.vpad) : 0);
+/**
+ * critic r5 N13 / N14: where the role sizes the cell to the row (the Opener), the problem letter "a." (top 1 mm, left 1.5 mm of
+ * the cell) must clear the step tab's top-left corner. r5 bought that with 1.2 mm of air above and below every row, which made each
+ * row 2.4 mm taller and cost whole rows; and the one-page row (its cell trims its top pad to 1.5 mm) still touched. The row instead
+ * starts 1.5 mm in from the left: no height, and the one-page line, which fills its cell, gives the 1.5 mm out of its width.
+ */
+const INSET_MM = 1.5;
+const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
 const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
@@ -128,7 +136,7 @@ function geom(p, ctx) {
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
     // owner 2026-10-03: the arcs are gone, so the one-page sheet gives their 3 mm to the boxes (the page stays as full as before)
     const baseH = S(ctx).writeMm + (p.compact ? 6.4 : 2.5);
-    const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM : LIVE_MM);
+    const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM - insetOf(ctx) : LIVE_MM);
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
@@ -499,13 +507,13 @@ register('count-row', {
                 + `<span class="k2-keys-type">After each number, press Space.</span><span class="k2-keys-touch">After each number, tap the next box.</span></div>`
             : '';
         const align = g.tab ? 'left' : 'center';
-        const vp = vpadOf(p, ctx);
+        const vp = vpadOf(p, ctx), inset = insetOf(ctx);
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
             + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
-            { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}` });
+            { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : ''}` });
     },
     answerKey(p) {
         const parts = keyParts(p);
@@ -516,7 +524,7 @@ register('count-row', {
     },
     footprint(p, ctx) {
         const g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
-        const w = g.tab + g.perRow * g.pitch - g.gap + 4;
+        const w = g.tab + g.perRow * g.pitch - g.gap + 4 + insetOf(ctx);
         const h = g.rows * (g.arcH + g.h + g.lblH) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
