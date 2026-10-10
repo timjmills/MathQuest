@@ -408,6 +408,237 @@
     }
    ],
    "note": ""
+  },
+  "R.B3.S1": {
+   "title": "Find 1, 2 and 3",
+   "direct": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "pictures"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same CCSS K.CC.B.5 in R.B3.S3 Represent 1, 2 and 3"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same CCSS K.CC.B.4 in R.B3.S4 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B3.S6 Composition of 1, 2 and 3"
+    }
+   ],
+   "note": "Find a group of 1, 2 or 3 among pictures; band 5 deals to 5 (no 3-only band)."
+  },
+  "R.B3.S2": {
+   "title": "Subitise 1, 2 and 3",
+   "direct": [],
+   "partial": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5,
+      "objects": "dice"
+     },
+     "missing": "recognising 1-3 at a glance (the skill counts one by one)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "perceptual subitising of 1, 2 and 3 (seen, not counted)",
+   "build": [
+    "subitise"
+   ],
+   "pre": [],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "next step: R.B3.S3 Represent 1, 2 and 3"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B3.S4 1 more"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B3.S6 Composition of 1, 2 and 3"
+    }
+   ],
+   "note": ""
+  },
+  "R.B3.S3": {
+   "title": "Represent 1, 2 and 3",
+   "direct": [
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_objects",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_sequence",
+     "why": "next step: R.B3.S4 1 more"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.5 in R.B5.S1 Find 4 and 5"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B3.S6 Composition of 1, 2 and 3"
+    }
+   ],
+   "note": "Represent with counters on a frame; fingers and marks are oral."
+  },
+  "R.B3.S4": {
+   "title": "1 more",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "forward"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B3.S2 Subitise 1, 2 and 3 (the step before in this block)"
+    }
+   ],
+   "preBuild": [
+    "subitise"
+   ],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B5.S1 Find 4 and 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B3.S3 Represent 1, 2 and 3"
+    },
+    {
+     "key": "composing:number_bonds",
+     "why": "same block: R.B3.S6 Composition of 1, 2 and 3"
+    }
+   ],
+   "note": "One more to 3; band 10 is the smallest."
+  },
+  "R.B3.S5": {
+   "title": "1 less",
+   "direct": [
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:ten_frame_build",
+     "why": "R.B3.S3 Represent 1, 2 and 3 (the step before in this block)"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "R.B3.S1 Find 1, 2 and 3 (same CCSS K.CC.B.4, earlier)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_bonds",
+     "why": "next step: R.B3.S6 Composition of 1, 2 and 3"
+    },
+    {
+     "key": "counting:count_objects",
+     "why": "same CCSS K.CC.B.4 in R.B5.S1 Find 4 and 5"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B3.S3 Represent 1, 2 and 3"
+    }
+   ],
+   "note": ""
+  },
+  "R.B3.S6": {
+   "title": "Composition of 1, 2 and 3",
+   "direct": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 5
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "counting:count_sequence",
+     "why": "R.B3.S5 1 less (the step before in this block)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "why": "same block: R.B3.S1 Find 1, 2 and 3"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "why": "same block: R.B3.S3 Represent 1, 2 and 3"
+    },
+    {
+     "key": "counting:count_sequence",
+     "why": "same block: R.B3.S4 1 more"
+    }
+   ],
+   "note": "Wholes up to 5; 3 = 2 + 1 lies inside the band."
   }
  },
  "proposals": {
@@ -502,6 +733,22 @@
     "R.B2.S6"
    ],
    "ccss": [],
+   "why": "existing WRM_PROPOSALS entry; covers these steps",
+   "reused": true
+  },
+  "subitise": {
+   "kind": "new",
+   "skill": "counting:subitise",
+   "name": "Say How Many Without Counting",
+   "teaches": "perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5)",
+   "representation": "standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts",
+   "family": "counting",
+   "steps": [
+    "R.B3.S2"
+   ],
+   "ccss": [
+    "K.CC.B.5"
+   ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "reused": true
   }
