@@ -1,4 +1,4 @@
-# Wave 2 tagging: Y4 (Grade 3) report, round 5
+# Wave 2 tagging: Y4 (Grade 3) report, round 6
 
 Output: `data/curriculum/links/Y4.json`. It is built by `python3 tests/scripts/wrm-tagging/build.py` from the hand-written
 specs `tests/scripts/wrm-tagging/spec*.py`, plus `wrm-steps.json` and two generated inputs (`keys.mjs` makes the live
@@ -16,8 +16,8 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 | Gap | 23 | 21 | **21** |
 | Proposals used | 68 (17 new, 51 reused) | 68 (20 new, 48 reused) | **71 (23 new, 48 reused)** |
 | Tag fixes | 76 (hand list) | 151, derived | **155, derived** (add 45, full 36, opts 31, partial 32, remove 11) |
-| Pre / related entries | 528 / — | 570 / 319 | **565 / 308** (round 5); every step has at least 3 pre and 1 related; 0 keys in both |
-| Option checks | — | — | Round 5: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 873 links too big for their own step** (`linkfit.mjs`, step-relative; per-step result in `Y4-linkfit.txt`) |
+| Pre / related entries | 528 / — | 570 / 319 | **548 / 275** (round 6); every step has at least 3 pre and 1 related; 0 keys in both |
+| Option checks | — | — | Round 6: 355 opts entries, 0 schema problems (`optcheck.mjs`); 0 non-default values that change nothing (`optchange.mjs`); **0 of 823 links misfit, on size or content** (`linkfit.mjs`, the critic's definitions; per-step result in `Y4-linkfit.txt`) |
 
 **New proposals (20).** All are options on live skills, except `roman_numerals`, which is one new skill.
 - `regroup_thousands`, `more_less_all`, `roman_numerals`, `add_sub_place_units`
@@ -29,6 +29,95 @@ keys, proposals and tags; `prior.mjs` makes the Grade 3 xlsx prior-learning list
 **Dropped as already built:** `dec_compare_2dp`, `dec_order_2dp` (the `decimals` option is 1 or 2) and `time_convert`
 (`unit_conversion_word {units:[0]}`). **Replaced** by `roman_numerals`: `roman_100` and `roman_12` (and `roman_1000`
 for Y5).
+
+## Changes in round 6 (after critic r5: FAIL on the extended rule 18; links only)
+All changes are in `spec_zz_w_r6.py`. The 48 new or changed links are generated at the end of `Y4-items.md`.
+
+**`linkfit.mjs` rewritten to the critic's definitions.**
+- **Related links** must fit 1.5 × the step's own ceiling: the largest number its direct and partial items deal (decoys
+  excluded) or its title names.
+- **Pre links** must fit 1.5 × max(own ceiling, the ceiling of the step the `why` cites).
+  - A cited Y4 step counts only if the school teaches it in or before this step's week.
+  - A cited lower-grade step counts with its title's range, or its year's range (R 20, Y1/Y2 100, Y3 1,000).
+- There is no block ceiling and no cross-strand "earlier week" maximum.
+- **Content and layout checks on every link:**
+  - negative numbers;
+  - coordinates past 10;
+  - customary units (in the text, the answer or the visual);
+  - decimals before W29 (money is exempt);
+  - a fraction compare with neither a common numerator nor a common denominator;
+  - degrees;
+  - a column (stack) 3-digit × before W36, any column ÷, or a long-division layout.
+- Money payloads are in cents, so they are not read as numbers. Clock-time skills are exempt from the size check.
+
+**Result.**
+- `linkfit.mjs`: 0 of 823 links misfit (0 size, 0 content/layout).
+- The critic's own `content.mjs` + `cscan.py`, re-run on round 6, flag one link: B5.S9's related `mult_missing_digit`, a
+  2-digit × 1-digit column. The critic judged that acceptable in round 5: it is Y3 work, and B5.S9 is itself 2-digit ×
+  1-digit.
+
+**The critic's §3 (8 links).**
+- `missing_mult_div` dropped on B4.S2, S4 and S7.
+- `seq_10` on B5.S4 → Max Number 1,000.
+- `div_check_by_multiplying` → Max Number 100 (B5.S11, S12).
+- `div_zero_in_quotient` dropped on B5.S13.
+- On B6.S2: `multiply {tiles:21}`, `double_num_line` dropped, and the `expand` label fixed.
+- B9.S5's `compare` → `{band:99}`, citing Y2.
+
+**The critic's §4 (34 links).**
+- **C1:** `coordinate_graph` dropped on 4 steps.
+- **C2:** `coord_polygon` and `coord_distance_q1` → Max Number 10.
+- **C3:**
+  - `unit_conversions` and `unit_conversion_word` dropped on B6.S1, S2, B11.S1 and S2;
+  - `perimeter {forms:[0], band:20}` on B6.S3;
+  - B6.S4: the perimeter story dropped, and `area {forms:[0], band:10}`;
+  - `mixed_area_perimeter` dropped;
+  - inch-ruler and feet pre-skills dropped on B6.S1, S4 and S5.
+- **C4:** every decimal link before W29 dropped (B7.S4, B7.S5, B7.S10, B10.S2–S5). The B10 money steps no longer cite
+  later decimal steps.
+- **C5:** unlike-fraction compares dropped (B7.S5 pre, B9.S5, and `mixed_fractions` on B7.S6 and S7).
+- **C6:** `inequalities` dropped on B1.S11.
+
+**Found by the new check.**
+- `measure_angles` (protractor degrees) dropped on B12.S1–S3, and `compose_from_attributes` (prints 90°) on B12.S4 and
+  S6.
+- Inch line plots dropped (B13.S1, S2), and cups dropped (B7.S15).
+- Size held:
+  - `number_word_form {range:100}` (B1.S13);
+  - `seq_10 @100` and `sub_check_by_adding {range:100}` (B2.S8);
+  - `div_word_problems {range:100}` (B4.S3);
+  - `mult_div_fact_family @100`;
+  - `mult_facts {constant:[10], band:100}` (B5.S2);
+  - `tape_diagram {band:50}`;
+  - `value {band:99}` (B8.S2, S8);
+  - `place_value_disks` and `expand {band:99}` (B8.S3, S9, B9.S3);
+  - `add_100_regroup` (B10.S5);
+  - `word_problems_mixed_plain @100`.
+- Dropped where nothing holds the link:
+  - `nearest_1000` (B1.S15);
+  - `area_model_mult` (B5.S2, S15);
+  - `multiply {tiles:21}` (B5.S11, S15);
+  - `estimate_products`;
+  - `estimate_sums_diffs` (B9.S7);
+  - the long-division `divide {}` (B5.S5);
+  - `place_value_10x` on B8.S3, S5 and S6 (whole-number ÷ 10 is taught in W35).
+- Top-ups kept every step at 3 or more pre and 1 or more related links (B5.S2, B5.S15, B6.S1, B6.S2, B7.S5, B9.S6,
+  B11.S1, B12.S1, B13.S4).
+
+**Earlier and later now come from the school week.** `build.py` derives each Y4 pre-skill's label from the xlsx week, not
+the WRM order:
+- "taught earlier this year, wk W05"
+- "taught the same school week, W30"
+- "step before in the block, wk …"
+- "taught later this year, wk W38; the building block this step uses, so meet it first"
+
+Ten pre links that cited a step the school teaches later now cite the earlier learning the pupil has met (Y3 steps, with
+3-digit bands). Three keep an honest "taught later" label: B12.S6 ← B12.S5, one week later, and B13.S4 and B14.S3 ←
+B14.S2 plotting.
+
+**Defect for the lead (display).** `unit_conversion_word {units:[0]}` and `{units:[1]}` deal metric or time items, but
+the visual key still lists customary units ("1 lb = 16 oz", "1 ft = 12 in"). That is why those links are dropped and
+not held with `units`.
 
 ## Changes in round 5 (after critic r4: mean 8.06, FAIL on rule 18)
 Round 5 is mechanical: it changes links only, with no verdict, build or proposal change. The changes are in

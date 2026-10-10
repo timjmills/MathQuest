@@ -47,7 +47,17 @@ def why_for(sid, ref, kind):
     if ref in steps and kind in ('B', 'L', 'X'):
         # say exactly where the pre-skill sits relative to this step
         if ref.startswith('Y4.'):
+            # earlier / later is the SCHOOL's order (xlsx week), not the WRM order
+            wko = ns.get('WK_OVERRIDE', {})
+            wr, ws = wko.get(ref) or prior.get(ref, {}).get('wk'), wko.get(sid) or prior.get(sid, {}).get('wk')
             same_block = ref.rsplit('.', 1)[0] == sid.rsplit('.', 1)[0]
+            if wr and ws:
+                if wr > ws:
+                    return f"{ref} {t} (taught later this year, wk {wr}; the building block this step uses, so meet it first)"
+                if wr == ws:
+                    return f"{ref} {t} (taught the same school week, {wr})"
+                prev = same_block and order.index(ref) == order.index(sid) - 1
+                return f"{ref} {t} ({'step before in the block' if prev else 'taught earlier this year'}, wk {wr})"
             if order.index(ref) > order.index(sid):
                 return f"{ref} {t} (a later WRM step this year: the building block this step uses, so teach it first)"
             prev = same_block and order.index(ref) == order.index(sid) - 1
