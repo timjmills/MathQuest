@@ -605,8 +605,8 @@
    ],
    "note": "Sampled 200 difference-unknown, entry. Bigger/smaller-unknown not seen.",
    "evidence": {
-    "url": "https://learnbps.bismarckschools.org/pluginfile.php/158361/mod_book/chapter/43032/M2_OAT_190.pdf",
-    "says": "DesCartes 181-200: solves real-world subtraction problems (compare situations)."
+    "url": null,
+    "says": "not found in public NWEA material (OAT_190 lists result/change/start unknown, no compare); kept because 1.OA.A.1 / 2.OA.A.1 compare situations are in MAP blueprint"
    }
   },
   {
@@ -1146,7 +1146,7 @@
    "note": "Our number entry is the production equivalent of MAP digit tiles; sampled n=20 both skills answerType number.",
    "evidence": {
     "url": "https://aarsi.ccsd.net/wp-content/uploads/2019/08/MAP-Growth-RIT-Reference-Charts.pdf",
-    "says": "RIT chart K-2 sample items answer by moving digit tiles 0-9 into boxes (e.g. 181-190 change story)."
+    "says": "RIT chart K-2 samples: \"Move the correct number to the blank line\" (drag number tiles into answer boxes)."
    }
   },
   {

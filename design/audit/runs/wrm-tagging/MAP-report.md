@@ -24,7 +24,7 @@ estimate (flagged in the note).
 
 ## Counts
 
-259 rows; 106 proposals (47 new, 59 reused: WRM_PROPOSALS 35, STANDARD_PROPOSALS 23, VISUAL_BUILDS 1). 205 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
+259 rows; 106 proposals (47 new, 59 reused: WRM_PROPOSALS 35, STANDARD_PROPOSALS 23, VISUAL_BUILDS 1). 204 rows cite public NWEA material; the rest say why they are kept (their CCSS code).
 
 | Strand | rows | exists-ok | exists-regrade | partial | missing |
 |---|---|---|---|---|---|
