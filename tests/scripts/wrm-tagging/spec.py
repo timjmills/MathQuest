@@ -515,8 +515,8 @@ NEW = {
    why='seq_2/5/10 deal 1, 3, 5 and 1, 11, 21; skip_count_line mixes 2s, 5s and 10s on one page'),
  'halves_quarters_only': dict(kind='option', skill='fractions:shade_fraction', option='denoms: halves only / quarters only (also fraction_of_set)',
    name='Halves Only / Quarters Only (option)', teaches='shade a half (or a quarter) of a shape, or find a half (quarter) of a small set',
-   representation='the skill\'s own shape or set cell, denominator 2 or 4 alone', family='fractions', ccss=['1.G.A.3'],
-   why='the denominator family 2 also deals quarters and eighths'),
+   representation='the skill\'s own shape or set cell, denominator 2 or 4 alone; the prompt names the part in words (shade a half / a quarter), no 1/2 symbol', family='fractions', ccss=['1.G.A.3'],
+   why='the denominator family 2 also deals quarters and eighths, and the prompt prints the symbol ("Show 1/2 on the model")'),
  'unitise_coins': dict(kind='option', skill='measurement:coin_value', option='task: swap (one coin = n ones)',
    name='One Coin, Many Ones (option)', teaches='match one 5-cent or 10-cent coin to the same number of 1-cent coins',
    representation='one coin on the left, rows of 1-cent coins on the right; circle the matching row', family='measurement', ccss=['2.MD.C.8'],
@@ -791,3 +791,33 @@ NEW['half_or_not'] = dict(kind='option', skill='shapes_early:partition_shapes', 
    representation='one shape per cell split equally or unequally; two tick boxes labelled with words', family='fractions', ccss=['1.G.A.3'],
    why='partition_shapes asks for typed 1/2, 1/4, 2/4, 3/4 in half its items and never shows an unequal split')
 for _s in ('Y1.B10.S1', 'Y1.B10.S5'): S[_s]['b'] = ['half_or_not']
+
+# ---------------- Round 8 (critic R-Y1 r7) ----------------
+# What a neighbouring-idea pre gives the step (N5): named, never "the same idea"
+FORM_LABEL = {HL: 'compare two objects: the compare words', COB: 'compare two objects: the compare words',
+  CS + '{"band": 10, "dir": "back"}': 'count back', CS + '{"band": 10, "dir": "forward"}': 'count on (1 more)', CS: 'the counting order',
+  TFB: 'show the amount on a frame', CO: 'count a group', CMP: 'two shapes make a new shape', NB: 'two parts make a whole', MT: 'the parts of 10 on a frame',
+  CG: 'compare two groups: more, fewer, same', NSF: 'the number track', HCF: 'the hundred square', N2D: 'name the flat shapes', N3D: 'name the solids',
+  POS: 'the position words', A5: 'two pictured groups combined', S5: 'a pictured take-away', DND: 'doubles', DBL: 'doubles', HALF: 'halving',
+  TC: 'a ten and some ones', TFT: 'a ten and some ones on two frames', TFV: 'tens as rods', B10: 'tens and ones with blocks', OE: 'pairs: odd and even',
+  SHG: 'equal groups', CC: 'count one kind in a sort', ATT: 'sides and corners', CORN: 'count the corners', MNS: 'measure with units',
+  NLA: 'jumps on a number line', NLS2: 'jumps back on a number line', A20N: 'add ones within 20', S20N: 'subtract ones within 20', MAS: 'missing numbers',
+  FF: 'the facts of a family', NFA: 'the facts of one bond', SKL: 'count in 2s, 5s and 10s', COIN: 'coin values', MON: 'count coins', ML10: '1 more, 1 less',
+  PVC: 'compare 2-digit numbers', UF: 'tens and ones'}
+S['Y1.B2.S1']['r'] += [(MT, 'the whole 10 and its two parts on a frame', {'band': 10})]
+S['Y1.B2.S2']['r'] += [(MT, 'the whole 10 and its two parts on a frame', {'band': 10})]
+prepre('Y1.B2.S5', (MT, 'R.B11.S8 bonds to 10 (2 parts)', {'band': 10}), (NFA, 'Y1.B2.S4 the facts of one bond', {'band': 10}))
+S['Y1.B2.S6']['r'] += [(MT, 'the next step on this idea: Y1.B2.S7 Number bonds to 10', {'band': 10})]
+S['Y1.B2.S11']['r'] += [(MAS, 'find a part in a number sentence (Y1.B2.S12, the same week)', {'range': 10, 'unknown': [1]})]
+prepre('Y1.B2.S12', (MT, 'R.B11.S8 find the part that makes 10', {'band': 10}))
+for _s in ('R.B9.S7', 'R.B9.S8', 'R.B11.S11', 'R.B11.S12'):
+    S[_s]['xr'] += [HALF]
+    S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + 'Halving is met as sharing at R.B16, so it is not related here.'
+for _s in ('R.B17.S5', 'R.B17.S8', 'R.B17.S9', 'R.B17.S10', 'R.B17.S11'):
+    S[_s]['p'] = [e for e in S[_s]['p'] if e[0] != CMP]; S[_s]['xp'] += [CMP]
+for _s in ('R.B17.S4', 'R.B17.S6'):
+    S[_s]['p'] = [e for e in S[_s]['p'] if e[0] != CMP] + [(CMP, 'R.B15.S5 two shapes put together make a new shape', {'shapes': [0, 1]})]
+S['Y1.B2.S12']['d'] = [d for d in S['Y1.B2.S12']['d'] if d[0] != MAS]
+RM[('Y1.B2.S12', MAS)] = '7 of 64 items ask for the whole (___ − 2 = 5, 1.OA.D.8); the step is finding a part'
+prepre('Y1.B1.S15', (NSF, 'Y1.B1.S6 the number track: a line is a track of equal steps', {'step': 1, 'dir': 'forward', 'range': 10}))
+S['R.B13.S2']['r'] = [(HCF, 'the hundred square to 10 (the step continues past 10)', {'band': 10})] + [e for e in S['R.B13.S2']['r'] if e[0] != HCF]

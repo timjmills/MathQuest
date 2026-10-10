@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA, FORM_LABEL
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -179,8 +179,8 @@ def ceil_for(step, why=''):
     return rel_c(step)
 def lcap_c(c): return max(c * 1.5, c + 2)
 # Rule 19: the first-taught Kindergarten week of each content type, read from the Kindergarten sheet (0 = taught in Reception).
-CONTENT_WEEKS = {'number lines': 5, 'tens as rods': 8, 'counting in 10s': 9, 'number sentences': 11, 'coins': 11, 'addition sentences': 14,
-                 'subtraction sentences': 14, 'equal groups': 19, 'arrays': 20, 'measuring with units': 24, 'counting in 2s and 5s': 33,
+CONTENT_WEEKS = {'number lines': 5, 'tens as rods': 8, 'counting in 10s': 9, 'number sentences': 11, 'coins': 11, 'addition sentences': 11,
+                 'subtraction sentences': 12, 'equal groups': 19, 'arrays': 20, 'measuring with units': 24, 'counting in 2s and 5s': 33,
                  'notes (bills)': 35, 'differences (how many more)': 18, 'clock time': 36, 'halves and quarters': 36, '< > symbols': 4}
 SENT = re.compile(r'^(addition:(nl_add|number_line_add|add_three|add_10_no_regroup|add_10_mixed|cloze_addition|number_families_add|add_sub_fact_family|add_20|equal_sign|add_facts)|subtraction:(nl_sub|number_line_sub|missing_add_sub|sub_10|sub_20))')
 def ctypes(k, o):
@@ -232,7 +232,14 @@ def fit_reason(k, step, why=''):
 # A related why must say what the link's items do (critic r5 N1 / N2): checked when the file is generated.
 FALSE_WHY = [(re.compile(r'which has more|one jump'), lambda k, o: True),
              (re.compile(r'rows of a picture graph'), lambda k, o: md(k, o).get('c19', {}).get('diff', 0) > 0)]
-def check_claims(step, rel):
+def form_label(k, o):
+    return FORM_LABEL.get(k + json.dumps(o or {}, sort_keys=True)) or FORM_LABEL.get(k) or label(k)
+def check_claims(step, rel, pre=(), note=''):
+    for e in list(pre) + list(rel):   # critic r7 N5: "(earlier, same idea: X)" only for the step's own sub-idea
+        m = re.search(r'earlier, same idea: ([\w:.]+)\)', e['why'])
+        assert not m or m.group(1) == topic(step), (step, e)
+    for m in re.finditer(r'every earlier step on this idea \(([^)]*)\)', note):
+        for c in re.findall(r'(?:R|Y1)\.B\d+\.S\d+', m.group(1)): assert related_topic(step, c) == 2, (step, c)
     for e in rel:
         m = re.search(r'(?:next|later) step on this idea: ((?:R|Y1)\.B\d+\.S\d+)', e['why'])
         assert not m or related_topic(step, m.group(1)) == 2, (step, e)   # a later step must be the same sub-idea
@@ -299,7 +306,9 @@ def build(step):
     cands.sort(key=lambda x: -related_topic(step, x))   # stable: nearest first inside each rank
     for x in cands:
         if len(pre) >= 6 or (related_topic(step, x) < 2 and len(pre) >= 3): break
-        for k, o in dentries(x): addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
+        for k, o in dentries(x):
+            if related_topic(step, x) == 2: addp(k, f"{fmt_step(x)} (earlier, same idea: {topic(x)})", o)
+            else: addp(k, f"{fmt_step(x)} ({form_label(k, o)}: a building block)", o)   # critic r7 N5: a neighbouring idea
     for x in [c for c in cands if related_topic(step, c) == 2][:3]:
         if S[x]['v'] == 'gap': take_builds(x)   # a needed earlier step with no live skill: its build is a pre-build
     pb = pb[:3]
@@ -372,7 +381,7 @@ def build(step):
         else:
             why = {'own': set(), 'past': set(), 'gap': []}
             dsigs = {sig(k, o) for k, o in dentries(step)}
-            for x in cands:
+            for x in [c for c in cands if related_topic(step, c) == 2]:   # "on this idea": same sub-idea only (critic r7)
                 if not S[x]['d']: why['gap'].append(x); continue
                 for k, o in dentries(x):
                     if k in {p['key'] for p in pre}: continue
@@ -383,13 +392,15 @@ def build(step):
             if why['past']: parts.append('the other earlier skills on this idea do not fit this step (' + '; '.join(sorted(why['past'])) + ')')
             gaps = [x for x in why['gap'] if related_topic(step, x) == 2][:3]
             if gaps:
-                held = all(set(S[x]['b']) & (set(pb) | set(sp['b'])) for x in gaps)
-                parts.append('the earlier steps ' + ', '.join(gaps) + ' have no live skill yet' + (' (see preBuild)' if held else ''))
+                own_b = all(set(S[x]['b']) <= set(sp['b']) for x in gaps)
+                held = all(set(S[x]['b']) & set(pb) for x in gaps)
+                parts.append('the earlier steps ' + ', '.join(gaps) + ' have no live skill yet' + (' (see build)' if own_b else ' (see preBuild)' if held else ''))
             if not parts:
-                live_c = [x for x in cands if S[x]['d']][:4]
-                parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')
+                live_c = [x for x in cands if S[x]['d'] and related_topic(step, x) == 2][:4]
+                if live_c: parts.append('every earlier step on this idea (' + ', '.join(live_c) + ') is represented by its skill above')
+                else: parts.append('earlier steps on neighbouring ideas give the building blocks above')
             add_note(f"Pre: {len(pre)} only; " + '; '.join(parts) + '.')
-    check_claims(step, rel)
+    check_claims(step, rel, pre, note)
     if not rel and 'Related:' not in note:
         rr = {k: r for k, r in rej.items() if r}
         if rr:

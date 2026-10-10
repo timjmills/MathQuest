@@ -1,4 +1,4 @@
-# R and Y1: generated items per step (wave 2 tagging, round 7)
+# R and Y1: generated items per step (wave 2 tagging, round 8)
 
 Every direct and partial skill of every step, generated with the opts the links file gives: 6 items each (seeds 9100 + 17i), the first 3 shown.
 "Max Number" is the range passed to generateQuestionFor; "not read" means the skill ignores it (its own band option sets the numbers).
@@ -829,10 +829,6 @@ Regenerate: `node tests/scripts/wrm-tagging/items.mjs --links R Y1 6 --md design
   - 4 + ? = 10 / A=6 / number / {whole:10,a:4,b:6,unknown:B}
   - 7 + ? = 8 / A=1 / number / {whole:8,a:7,b:1,unknown:B}
   - 2 + ? = 5 / A=3 / number / {whole:5,a:2,b:3,unknown:B}
-- full `subtraction:missing_add_sub` opts `{"range":10}` (6 generated; Max Number 10)
-  - 4 + 5 = ___ / A=9 / number
-  - 10 − ___ = 2 / A=8 / number
-  - 1 + ___ = 4 / A=3 / number
 
 ### Y1.B2.S13 Fact families - the eight facts — **full**
 - full `addition:add_sub_fact_family` opts `{"range":10}` (6 generated; Max Number 10)

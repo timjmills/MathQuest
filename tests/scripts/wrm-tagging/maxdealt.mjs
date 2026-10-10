@@ -17,7 +17,7 @@ const FLAGS={times:/×|÷|multipl|divid/i,parallel:/parallel|perpendicular|right
  frac:/\b(\d+)\s*\/\s*(\d+)\b|third|fifth|sixth|eighth/i,coord:/coordinate|\(\s*\d+\s*,\s*\d+\s*\)/i,word:/write the (word|name)|type the|spell/i,drag:/drag/i};
 // r19 content classes (the critic's r4 regexes): counted per item over text, answer, cell and visual
 const C19={skip25:/by 2s|by 5s|count-by-2s|count-by-5s|in 2s|in 5s/i,nline:/number.?line|numberLine|"nl/i,money:/¢|cent|penny|nickel|dime|dollar|\$/i,clock:/o'clock|half past|clock/i,
- frac:/\bhalf\b|\bhalves\b|quarter|\d\/\d/i,units:/\b(cm|inch|inches|centimet)/i,lt:/[<>]|\bis (greater|less) than\b/i,quad:/square|rectangle/i,minus:/−|-\s*\d|subtract|take away/i,array:/\barray|rows of/i,diff:/how many (more|fewer)|how many less/i};
+ frac:/\bhalf\b|\bhalves\b|quarter|\d\/\d/i,units:/\b(cm|inch|inches|centimet)/i,lt:/[<>]|\bis (greater|less) than\b/i,quad:/square|rectangle/i,minus:/−|-\s*\d|subtract|take away/i,array:/\barray|rows of/i,diff:/how many (more|fewer)\b[^?]*\bthan\b|how many less/i};
 const out={};
 for(const [key,opts] of JSON.parse(fs.readFileSync(0,'utf8'))){const [c,k]=key.split(':');const o={...opts};const range=o.range??10;delete o.range;let max=0;const flags={};const c19={};const seen=new Set();
   for(let i=0;i<24;i++){let q;try{q=g.generateQuestionFor({category:c,skill:k,opts:o,range,seed:4400+i*13,itemIndex:i,itemCount:24});}catch(e){continue;}
