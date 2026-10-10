@@ -1,6 +1,6 @@
 // node tests/scripts/wrm-tagging/wholes.mjs : checks every "wholes" claim in data/curriculum/links/{R,Y1}.json against
 // generated number_bonds items (3 seeds x 64 items per band; critic r11 M10). Prints "wholes: OK" or "wholes: FAIL".
-// Claims read: "band N (also) deals wholes A-B" / "A and B" (range = exact min-max; "and" = each appears),
+// Claims read: "band N (also) deals wholes A-B" / "A and B" (range = exact min-max; "also ... A and B" = each appears; "A and B" = exactly those),
 // "number_bonds {band:N} deals wholes A-B", "whole below N", "whole 1 ... never" and "zero part ... never" (band 5 and band 10),
 // "in 192 items whole 2 once, 3-5 in 45, 6-10 in 146" (exact counts on the same 192 items).
 import fs from 'fs';
@@ -23,10 +23,11 @@ for(const y of ['R','Y1'])walk(JSON.parse(fs.readFileSync(root+`data/curriculum/
 let n=0;const bad=[];
 const sum=(c,a,b)=>Object.entries(c).filter(([w])=>+w>=a&&+w<=b).reduce((s,[,k])=>s+k,0);
 for(const [w,t] of texts){
-  for(const m of t.matchAll(/(?:band (\d+)|number_bonds \{band:(\d+)\}) (?:also )?deals wholes (\d+)(-| and )(\d+)/g)){
-    const band=+(m[1]||m[2]),a=+m[3],b=+m[5],o=obs[band];n++;
+  for(const m of t.matchAll(/(?:band (\d+)|number_bonds \{band:(\d+)\}) (also )?deals wholes (\d+)(-| and )(\d+)/g)){
+    const band=+(m[1]||m[2]),also=!!m[3],a=+m[4],b=+m[6],o=obs[band];n++;
     if(!o){bad.push([w,m[0],'band not generated']);continue;}
-    if(m[4]==='-'?(o.min!==a||o.max!==b):!(o.c[a]&&o.c[b]))bad.push([w,m[0],`observed ${o.min}-${o.max}`]);}
+    const set=Object.keys(o.c).map(Number).sort((x,y)=>x-y).join(',');   /* "deals wholes A and B" (no "also") is the exact set (critic r12 N12-1) */
+    if(m[5]==='-'?(o.min!==a||o.max!==b):also?!(o.c[a]&&o.c[b]):set!==a+','+b)bad.push([w,m[0],`observed wholes ${set}`]);}
   for(const m of t.matchAll(/whole below (\d+)/g)){n++;const lo=Math.min(obs[5].min,obs[10].min);if(lo<+m[1])bad.push([w,m[0],`whole ${lo} dealt`]);}
   if(/whole 1[^.;)]*never|never deals whole 1/.test(t)){n++;if(obs[5].c[1]||obs[10].c[1])bad.push([w,'whole 1 never','whole 1 dealt']);}
   if(/zero part[^.;)]*never|never[^.;)]*zero part/.test(t)){n++;if(obs[5].zero||obs[10].zero)bad.push([w,'zero part never','zero part dealt']);}

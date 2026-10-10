@@ -4,7 +4,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = sys.argv[1]
 LIMIT = sys.argv[2] if len(sys.argv) > 2 else None   # e.g. "R.B5" => only blocks up to and including R.B5
 sys.path.insert(0, HERE)
-from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA, FORM_LABEL, BLOCKS, BLOCK_EXCEPT, NOLINK_WHY
+from spec import S, NEW, FORMS, RM, FIT, hi, cap, LO_STEP, R_NOLINK, NOLINK, EXTRA, FORM_LABEL, BLOCKS, BLOCK_EXCEPT, NOLINK_WHY, REJ_WHY
 dump = json.load(open(f'{HERE}/dump.json')); bl = json.load(open(f'{HERE}/bl.json'))
 LIVE = dump['skills']; TAGS = dump['tags']; WP = dump['props']
 W = json.load(open(f'{ROOT}/data/curriculum/wrm-steps.json'))
@@ -359,7 +359,7 @@ def build(step):
                 else:
                     base = None   # a neighbouring idea that is not a judged building block: not a pre (critic r8 N5r)
                 if use is not None and base and addp(k, f"{fmt_step(x)} (an earlier step; {base})", use): promoted.append(k); return
-            rej[k] = 'taught at an earlier step (' + x + '), but ' + (misfit(k, eo, step, fmt_step(x)) or 'not a building block of this step')
+            rej[k] = REJ_WHY.get((step, k)) or 'taught at an earlier step (' + x + '), but ' + (misfit(k, eo, step, fmt_step(x)) or 'not a building block of this step')
             return
         if any(idx[x] < idx[step] for x, _ in TAUGHT.get(k, [])):   # WRM-earlier but school-later: neither pre nor related
             rej[k] = 'an earlier WRM step teaches it, but the school teaches it after this week'; return

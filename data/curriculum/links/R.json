@@ -155,7 +155,7 @@
    "pre": [
     {
      "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort and count one kind (pictures)",
+     "why": "R.B1.S5 sort and count one kind (pictures)",
      "opts": {
       "band": 3,
       "objects": "pictures"
@@ -189,7 +189,7 @@
    "pre": [
     {
      "key": "comparing:classify_count",
-     "why": "R.B1.S4 sort and count one kind (pictures)",
+     "why": "R.B1.S5 sort and count one kind (pictures)",
      "opts": {
       "band": 3,
       "objects": "pictures"
@@ -661,7 +661,7 @@
      "opts": {
       "band": 5
      },
-     "missing": "wholes of 2 and 3 only (band 5 deals wholes 4 and 5)"
+     "missing": "whole 1 and a zero part never appear; band 5 deals wholes 2-5, mostly 4 and 5"
     }
    ],
    "verdict": "partial",
@@ -870,7 +870,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
+   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (band 3: counts 1-3 only, below this step's 4 and 5); count_objects (a direct skill here)."
   },
   "R.B5.S2": {
    "title": "Subitise 4 and 5",
@@ -919,7 +919,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (taught at an earlier step (R.B1.S5), but not a building block of this step); count_objects (a direct skill here)."
+   "note": "Related: none; the candidate links are ten_frame_build (a pre-skill here); classify_count (band 3: counts 1-3 only, below this step's 4 and 5); count_objects (a direct skill here)."
   },
   "R.B5.S3": {
    "title": "Represent 4 and 5",
@@ -5884,7 +5884,7 @@
    "key": "composing:number_bonds",
    "step": "R.B3.S6",
    "action": "partial",
-   "why": "wholes of 2 and 3 only (band 5 deals wholes 4 and 5)"
+   "why": "whole 1 and a zero part never appear; band 5 deals wholes 2-5, mostly 4 and 5"
   },
   {
    "key": "shapes_early:shape_attributes",

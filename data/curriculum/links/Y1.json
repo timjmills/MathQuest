@@ -5220,7 +5220,7 @@
    "pre": [
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 share into equal groups",
+     "why": "Y1.B9.S8 make equal groups (how many groups of n): equal parts",
      "opts": {
       "band": 12
      }

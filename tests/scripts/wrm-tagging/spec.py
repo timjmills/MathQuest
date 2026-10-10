@@ -78,7 +78,7 @@ st('R.B3.S4', d=[P(CS,'one more within 3 with objects; the skill is a number-nam
    m='one more than 1 and 2, shown by adding one object (the skill asks "what comes after 6?" to 10, with no objects)', b=['more_less_pictures', 'band_3'])
 st('R.B3.S5', d=[P(CS,'one less within 3 with objects; the skill is a number-name question to 10', band=10, dir='back')], v='partial',
    m='one less than 2 and 3, shown by taking one object away', b=['more_less_pictures', 'band_3'])
-st('R.B3.S6', d=[P(NB,'wholes of 2 and 3 only (band 5 deals wholes 4 and 5)', band=5)], v='partial', m='composition of 1, 2 and 3 only', b=['band_3'],
+st('R.B3.S6', d=[P(NB,'whole 1 and a zero part never appear; band 5 deals wholes 2-5, mostly 4 and 5', band=5)], v='partial', m='composition of 1, 2 and 3 only', b=['band_3'],
    p=[(CO,'R.B3.S1 count the whole group first (band 5 until band 3 exists)',{'band':5,'objects':'pictures'}),(TFB,'R.B3.S3 show the amount on a frame',{'band':5})])
 # R.B4 Circles and triangles
 st('R.B4.S1', d=[F(N2D, forms=[1], shapes=[0, 1])], r=[(M2D,'match the word to the shape'),(CORN,'count corners: a circle has none')],
@@ -668,7 +668,7 @@ for _s in ('R.B12.S5', 'R.B12.S6', 'R.B12.S7', 'R.B17.S1', 'R.B17.S2', 'R.B17.S3
     addpre(_s, (N2D, 'R.B4.S1 / R.B6.S1 name the shapes in the pattern', {'forms': [1]}))
 for _s in ('R.B8.S1', 'R.B8.S2'): addpre(_s, (COB, 'R.B2.S1 / R.B10 compare by size: the compare words', {}))
 for _s in ('R.B10.S1', 'R.B10.S2'): addpre(_s, (HL, 'R.B2.S2 / R.B8.S1 compare two objects (mass): the compare words', {}))
-for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S4 sort and count one kind (pictures)', {'band': 3, 'objects': 'pictures'}))
+for _s in ('R.B1.S6', 'R.B1.S7'): addpre(_s, (CC, 'R.B1.S5 sort and count one kind (pictures)', {'band': 3, 'objects': 'pictures'}))
 addpre('Y1.B14.S5', (CLK, 'the numbers on the clock face', {'task': 'numerals'}), (CS, 'Y1.B4.S7 the order of the numbers to 20 (1 to 12 on the clock)', {'band': 20, 'dir': 'forward'}))
 # Rule 18 content and layout: skills whose response or content no PK / K pupil meets, never a pre / related link in R or Y1
 # (they may still be a step's own direct or partial skill, with the defect named there):
@@ -697,7 +697,7 @@ addpre('Y1.B13.S4', (NSF, 'Y1.B6.S1 count on in ones to 50 (school week 8)', {'s
 addpre('Y1.B3.S5', (N2D, 'Y1.B3.S3 name the 2-D shapes in the pattern', {'forms': [1]}), (N3D, 'Y1.B3.S1 name the 3-D shapes in the pattern', {'forms': [1]}),
        (M2D, 'Y1.B3.S3 match the name to the shape', {}))
 addpre('Y1.B10.S5', (N2D, 'Y1.B3.S3 name the shape being split', {'forms': [1]}), (CMP, 'R.B15.S5 / S6 two shapes make one shape', {}))
-addpre('Y1.B10.S8', (SHG, 'Y1.B9.S9 share into equal groups', {'band': 12}))
+addpre('Y1.B10.S8', (SHG, 'Y1.B9.S8 make equal groups (how many groups of n): equal parts', {'band': 12}))
 addpre('Y1.B10.S3', (DBL, 'Y1.B9.S7 doubles: two equal groups', {'band': 20}))
 
 # ---------------- Round 4 (critic R-Y1 r3): main building blocks first (rule 14) ----------------
@@ -926,3 +926,5 @@ for _s, _r in SIB_REJECT.items():
     S[_s]['n'] = (S[_s]['n'] + ' ' if S[_s]['n'] else '') + 'Left out from the block\'s other steps: ' + _r + '.'
 # r12 M13: halve (Y1.B10.S4, W38) restored on Y1.B10.S6; the shape blocks above had pushed it out of the block tier
 S['Y1.B10.S6']['p'] += [(HALF, 'Y1.B10.S4 half of a quantity; a quarter is half of a half', {'band': 10, 'range': 10})]
+# r12 N12-3: the true reason classify_count is left out of R.B5.S1 / S2 is its size
+REJ_WHY = {('R.B5.S1', CC): "band 3: counts 1-3 only, below this step's 4 and 5", ('R.B5.S2', CC): "band 3: counts 1-3 only, below this step's 4 and 5"}
