@@ -193,3 +193,40 @@
   align independent: 140/568
   align independent: 160/568
   align independent: 180/568
+  align independent: 200/568
+  align independent: 220/568
+  align independent: 240/568
+  align independent: 260/568
+  align independent: 280/568
+  align independent: 300/568
+  align independent: 320/568
+  align independent: 340/568
+  align independent: 360/568
+  align independent: 380/568
+  align independent: 400/568
+  align independent: 420/568
+  align independent: 440/568
+  align independent: 460/568
+  align independent: 480/568
+  align independent: 500/568
+  align independent: 520/568
+  align independent: 540/568
+  align independent: 560/568
+  align independent: 568/568
+  align opener: 20/40
+  align opener: 40/40
+  align lesson: 20/40
+  align lesson: 40/40
+  print button 1366x768 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 54
+  print button 1366x768 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 54
+  print button 1366x768 allp new-sheet off: "Print 3 pupil pages + key" | "" h 54
+  print button 1366x768 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 54
+  print button 1280x720 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 48
+  print button 1280x720 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 48
+  print button 1280x720 allp new-sheet off: "Print 3 pupil pages + key" | "" h 48
+  print button 1280x720 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
+  print button 1024x768 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 48
+  print button 1024x768 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 48
+  print button 1024x768 allp new-sheet off: "Print 3 pupil pages + key" | "" h 48
+  print button 1024x768 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
+key-options: OK

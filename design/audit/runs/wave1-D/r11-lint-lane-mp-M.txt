@@ -1,0 +1,93 @@
+ws-print-lint: source kit, 16 skill(s)
+  composing:odd_even#more-practice: 4+2 pages, 0 finding(s)
+  composing:whole_as_fraction#more-practice: 4+2 pages, 0 finding(s)
+  division:div_zero_in_quotient#more-practice: 4+2 pages, 0 finding(s)
+  composing:ten_frame_build#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:dot_array_mult#more-practice: 4+2 pages, 0 finding(s)
+  addition:add_sub_10s#more-practice: 4+2 pages, 0 finding(s)
+  division:missing_mult_div#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2697700287: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2714477906: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2731255525: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2613812192: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2630589811: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2647367430: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2664145049: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2815143620: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2831921239: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@57332673: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@6999816: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@23777435: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@107665530: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@124443149: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@74110292: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@90887911: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@4201301398: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@4218079017: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@174999603: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@191777222: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@208554841: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@225332460: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@242110079: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@258887698: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@275665317: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@292442936: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@309220555: 4+2 pages, 0 finding(s)
+  division:long_div_2digit#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:mult_comparison#more-practice: 4+2 pages, 0 finding(s)
+  division:remainder_interpret#more-practice: 4+2 pages, 0 finding(s)
+  addition:number_families_add#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:number_families_mult#more-practice: 4+2 pages, 0 finding(s)
+  subtraction:missing_add_sub#more-practice: 4+2 pages, 0 finding(s)
+
+document                                                        pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+composing:odd_even#more-practice                                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:whole_as_fraction#more-practice                         4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:div_zero_in_quotient#more-practice                       4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:ten_frame_build#more-practice                           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:dot_array_mult#more-practice                       4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:add_sub_10s#more-practice                                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:missing_mult_div#more-practice                           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2697700287      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2714477906      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2731255525      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2613812192      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2630589811      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2647367430      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2664145049      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2815143620      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2831921239      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice                           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@57332673                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@6999816                   4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@23777435                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@107665530                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@124443149                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@74110292                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@90887911                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@4201301398                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@4218079017                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice                         4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@174999603               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@191777222               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@208554841               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@225332460               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@242110079               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@258887698               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@275665317               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@292442936               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@309220555               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:long_div_2digit#more-practice                            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mult_comparison#more-practice                      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:remainder_interpret#more-practice                        4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:number_families_add#more-practice                        4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:number_families_mult#more-practice                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:missing_add_sub#more-practice                         4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                                                     .     .    .    .        .     .       .    .     .       .     .    .      .       .
+wrote design/audit/runs/wave1-D/r11/r11-lane-mp-M.json
+
+ws-print-lint: OK (43 document(s), source kit; 0 finding(s) in 0 document(s))
