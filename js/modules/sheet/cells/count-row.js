@@ -284,6 +284,8 @@ function keyParts(p) {
 /** What each slot shows in this state (Error analysis: the pupil's finished work). */
 function shownValues(p, ctx) {
     const key = keyParts(p);
+    // the scripted model's frozen states (critic skip-count r1 D5): state k shows, traced, the answers written in steps 2..k
+    if (ctx.state === 'blank' && p.traceSlots) return key.map((k, i) => { const v = p.traceSlots[i < (p.blanks || []).length ? `b${i}` : 'rule']; return v === undefined || v === null ? '' : String(v); });
     if (ctx.state === 'blank') return key.map(() => '');
     if (ctx.state === 'wrong') {
         const w = ctx.wrong || {};
@@ -427,7 +429,7 @@ register('count-row', {
         const values = p.values || [];
         const blanks = (p.blanks || []).map(Number);
         const shown = shownValues(p, ctx);
-        const ink = inkOf(ctx);
+        const ink = ctx.state === 'blank' && p.traceSlots ? 'trace' : inkOf(ctx);
         const plainGiven = g.look === 'arcs' && g.shape === 'box';
         // the widest written answer, in digits (no separators): the screen box takes that many (a count by 25,000 writes 6 digits).
         const keyDigits = Math.max(4, ...blanks.map((i) => String(values[i]).replace(/\D/g, '').length));

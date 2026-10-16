@@ -36,6 +36,23 @@ function stepsFor(it) {
     return worked.length >= 3 ? worked : generalSteps(it);
 }
 
+/**
+ * What each frozen state shows written (critic skip-count r1 D5): state k carries the marks of steps 1..k, so a step that
+ * says "Write 25" shows 25 traced in its own drawing. Only a count row draws a partial state (its `traceSlots`); a
+ * provider's mark `blankN` is the row's slot `bN`. null: the default (blank states, the last one answered).
+ */
+function marksFor(it, steps) {
+    const q = it.q || {};
+    if (!q.cell || q.cell.template !== 'count-row') return null;
+    const worked = providerWorkedSteps(it, 6).filter((s) => s.text.length <= 90);
+    if (worked.length !== steps.length || !worked.some((s) => s.marks.length)) return null;
+    const acc = {};
+    return worked.map((s) => {
+        s.marks.forEach((m) => { if (m && m.slot !== undefined) acc[String(m.slot).replace(/^blank(\d+)$/, 'b$1')] = String(m.value); });
+        return Object.assign({}, acc);
+    });
+}
+
 /** PAGE_TYPES 2.2: the page IS the steps; a skill that supplies none cannot be modelled yet. */
 export function supports(items) {
     if (!items.length) return 'no items were generated';
@@ -52,19 +69,28 @@ export function plan(input = {}) {
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     const steps = stepsFor(it);
     const cols = fitsAt([it], 2, ctx) ? 2 : 1;
-    const textH = 2 * (m.pitch + 1.5) + 6;
+    let textH = 2 * (m.pitch + 1.5) + 6;
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
-    const H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
+    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
+    // critic skip-count r1 D5: a full-width state whose steps are all short (one line across the page) gives its text one
+    // line, when that is what keeps the whole model on one page (L: four count-row states and the Say band)
+    const room1 = m.budget - m.strip - m.say;
+    if (cols === 1 && Math.floor(room1 / H) < steps.length && steps.every((t) => t.length <= 48)) {
+        const H1 = hMinAt([it], 1, ctx) + (m.pitch + 1.5) + 6;
+        if (Math.floor(room1 / H1) >= steps.length) { textH = (m.pitch + 1.5) + 6; H = H1; }
+    }
     const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
     const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const ans = answerOf(it);
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    const marks = marksFor(it, steps);
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
         render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-                i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
+                marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
+                    : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
     });
     const textItem = (i) => ({
         render: () => stepText(i),
@@ -84,7 +110,7 @@ export function plan(input = {}) {
     }
     return assemble(ROLE_ID, input, frame, pages, {
         nothingToAnswer: true, scaffoldLevel: 3,
-        meta: { items: 1, scoreOutOf: 0, states: steps.length, cols, fits: [{ cols: 2, rows: steps.length, line: `Fits: ${steps.length} states, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
+        meta: { items: 1, scoreOutOf: 0, states: steps.length, cols,  fits: [{ cols: 2, rows: steps.length, line: `Fits: ${steps.length} states, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }
 
