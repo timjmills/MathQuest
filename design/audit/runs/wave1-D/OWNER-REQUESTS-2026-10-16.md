@@ -16,3 +16,10 @@ page role; defaults keep today's output so share codes and saved sheets are unch
 answer key (key ink #C2410C for the edge answers) and screen hosts (card, online worksheet, quiz with
 edge input boxes and answer checking) all honour them; research reference sites first (CLAUDE.md);
 critic >= 8 on every page type and host.
+
+**Addendum (owner, same day): every choice can be MIXED.**
+- "Numbers around the box" gets a third choice, **Mixed**: on one page some problems have the edge
+  numbers given and some have boxes for the pupil to fill (dealt from the seeded page deck, so the same
+  seed reprints the same sheet; never all one kind on a page of 4 or more).
+- "Show the problem as" gets **Mixed**: the page mixes division sign, long division and fraction.
+- Teachers can also pick several forms (multi-select) rather than one or all; the default stays today's.
