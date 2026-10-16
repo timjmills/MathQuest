@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 13
+# Wave 2 tagging: Year 3 (US Grade 2) — round 14
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,13 +6,90 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 134 | 49 | 55 | 30 | 20 | 51 | 71 | 72 |
+| 134 | 49 | 55 | 30 | 20 | 52 | 72 | 73 |
 
 Site lessons (round 12): 25 (8 full / 12 partial / 5 gap). New proposals for lessons: `nl_tens_ones_jumps`, `estimate_inches_feet`; `make_amount_notes` (Y2's) is now used here too.
 
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 14 (after critic Y2–Y3 r13, Y2 8.00 / Y3 7.93, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
+
+### Row 1: Y3.B6.S10 "Equivalent fractions as bar models" (N13)
+- Direct `fractions:equiv_frac_visual {model:['bar']}` (was `{}`, circles on every item). On fresh seeds (90001 + 307 i and
+  33331 + 211 i, 60 items each) **120 of 120 pictures are bar pairs**: 91 missing-number items, 29 = / ≠ checks; denominators
+  2–24 (halves, thirds and fifths families: 2/6 = 8/24, 2/5 ≠ 6/15, 4/6 = 8/12); 3 of 240 terms are improper (≠ checks).
+  Verdict stays **full** (the title names one representation and the option draws it). No clause; the direct carries no
+  `denoms`, so no denominator note applies.
+- The SKILL_WRM tag is already full: a new spec field `tagOpts` emits `{action:'opts', opts:{model:['bar']}}` for it, so the
+  merged tag carries the option (the merge readers already read `opts`).
+- Knock-on (build rules, not hand edits): the step's own `equiv_frac_visual {denoms:[2]}` pre is now a neighbouring rung ("…
+  fraction model: circle: a neighbouring rung of this step's skill"), and Y3.B8.S1 "Add fractions" now leads with
+  `equiv_frac_visual {model:['bar']}` citing Y3.B6.S10 (the bar picture of the bar-model add cell) instead of the Grade 1
+  halves rung.
+
+### Row 2: Y3.B6.S9 "Equivalent fractions on a number line" (N14)
+- build `['frac_nl_equiv']`: the Y4 lane's proposal, reused verbatim from `data/curriculum/links/Y4.json` (`lessons.mjs`
+  `laneProposals.frac_nl_equiv = 'Y4'`): same id, kind option on `fractions:equiv_frac_visual`, option "number lines", the same
+  name, teaches and representation; steps `Y4.B7.S9, Y4.B7.S10, Y6.B3.S2` plus `Y3.B6.S9`; `closes` for Y3.B6.S9 = the step's
+  clause "equivalent fractions shown on two number lines" (rule 16). The reused why no longer starts with a stray space.
+- `frac_count` moves to the **lead of preBuild** (new spec field `preBuildLead`): counting along a line in unit fractions is
+  the building block; preBuild is now `frac_count, fraction_parts, compare_kind`.
+- Partial clause unchanged (true: `equiv_frac_visual` has no line model; TITLEREP reads it as naming the number line).
+
+### Row 3: TITLEREP, the title is a claim (class N13 / M11, a build gate)
+- **New `tests/scripts/wrm-tagging/Y2-Y3/titlerep.mjs`**, run by `build.mjs` after DENOMCHECK on every entry (steps and site
+  lessons; 30 items per link on the build seeds) and standalone (`node titlerep.mjs Y2 Y3 [--n] [--seed] [--step] [--all]`).
+  It reads the step TITLE with every claim of `claims.mjs` (units, representations, operations, number kinds, money, story)
+  plus title-only words: part-whole, ten frame, word problem, doubling / halving, odd / even, compare, order, estimate, in
+  words, expanded form, coins, bills, cents, change, a.m. / p.m., temperature, perimeter, right angles, parallel /
+  perpendicular, symmetry, faces / edges / vertices / sides, 2-D / 3-D, tally, pictogram, bar chart, line plot, table, and
+  the numbers of "Multiply by N", "Divide by N", "the N (and M) times-table(s)", "Multiples of N", "Count in Ns" (a factor,
+  divisor or step of the items; a multiplication grid counts when a third of its blanks sit on that table).
+  - **FULL**: the union of the direct links' items must show each title claim at its share; a representation the title names
+    must be **half** the page, not a fifth.
+  - **PARTIAL / GAP**: a title claim the direct + partial items do not show must be named in the clause (the step `missing`
+    or a partial's `missing`, negated parts included: "no number line" names it).
+- **Run over every Y2 / Y3 step and lesson before the fix: 1 finding**, `TITLEREP FULL Y3.B6.S10` (bar models 0 of 40). The
+  first draft also reported 5 clause findings that were the check's own noise (a clause naming "halves and quarters" names
+  fractions; "multiples of 2 as the even numbers" names the 2s; "the bigger unit" names a comparison; "Horizontal and
+  vertical" is no column method; "times-tables" is no data table; a pictogram's `<rect>` is no bar chart): fixed in the
+  check, not in the data. Per direct (not a finding, recorded): the multi-part full titles split across their directs as
+  intended (Mixed addition and subtraction, Recognise 2-D and 3-D shapes, Doubling and halving, Length and height (compare,
+  order), Read and write numbers to 1,000 in words … and expanded form).
+- **After the fix: 0 findings** in the build (both years) and on three fresh seed sets.
+
+### Row 4: tooling (critic r13 M10)
+- **`denoms.mjs`**: a negation now runs on through a list of denominator words ("never thirds, fifths or sevenths"; "not only /
+  just / always / all" is not a negation). FAMILY reads the positive parts only (a family named only to be denied is not
+  named), and a new kind **DENIED** fails when a denominator word in a negated part is dealt by any item (judged on the
+  80 + 400-item sample). The critic's d4 now exits 1 (FAMILY and DENIED); "r13 clause + never sevenths" (d7) exits 1;
+  controls ("never sevenths" on `identify {denoms:[2]}`, "not only halves") stay silent. 0 findings on the current files.
+- **`claims.mjs`**: `negatedParts` reads "not" as a negation ("not only / just / always / all / available / dealt" excepted),
+  and the negated-unit list carries money: cents (¢, pence, `$n.nn`, the coin payload's minor-unit answer) and dollars ($).
+  X5 "not millilitres", X10 "no cents" and X11 "never dollars" are caught; "not only millilitres", "not mL" on money and
+  "a page of litres is not available" stay silent. Sweep on the current files: unchanged (a 0, a-neg 0, b 0).
+
+### Row 5: minors
+- **M6** the four Y3 inch-ruler lessons (Compare units, Record in a table, Longer by, Shorter by) cite `Y2.B6.S1` (Grade 1, the
+  school's inch ruler: its partial clause is "reads an inch ruler (whole inches) only") instead of "Y3.B5.S2 Measure in
+  millimetres". TITLECLAIM still marks it nearest live practice (the title says centimetres). `reading_ruler {}` on 60 fresh
+  items: inches 60, cm 0.
+
+### Gates (round 14)
+| Gate | Result |
+|---|---|
+| Two clean `git archive` builds (A, B: Y2 then Y3; C: links files deleted, Y3 first), `env -u WRM_TAG_DATA`, scratch `TMPDIR` | exit 0 ×6; Y2 `53f45b1f7e69975c…`, Y3 `ba0b305f988cfb63…` in A, B, C and the committed files |
+| In-build checks | specopts 0 (Y2 1,072 / Y3 1,244 links), denomcheck 0 (Y3 77 links: Y3.B8.S1's lead is no longer a denoms link), **titlerep 0** (new), mergecheck 0, optgate 0, titleclaim 0, lessons 0, bbcheck 0 |
+| `sweep.mjs Y2 Y3` | OK (a 0, a-neg 0, b 0; c 55 / 64: the one new c is Y3.B8.S1's new lead `equiv_frac_visual {model:['bar']}` reaching /24, an easier task with larger denominators, review-only) |
+| `denoms.mjs Y2 Y3` | OK on 40961 + 131 i, 61403 + 263 i and 19447 + 281 i (FAMILY 0, NAMED 0, DENIED 0) |
+| `titlerep.mjs Y2 Y3` (standalone, fresh seeds 70001 + 97 i ×40, 12007 + 389 i ×60, 55511 + 151 i ×40) | 0 findings each |
+| `linkscan.mjs Y2 Y3` | OK |
+| `mergeall.mjs` R→Y6 and `reverse` | 1,040 tags, 0 problems both orders; critic `merge13.mjs`: 0 own-step mismatches in every lane, 0 clause differences, 113 shared proposal ids with 0 skill / kind differences |
+| `ws-wrm-extract --check --site …/scratchpad/site/index.html` | exit 0 (wrm-steps.json and site-lessons.json up to date) |
+| `ws-boot-smoke` | OK |
+| Mutations (`scratchpad/r14/mut14.mjs`, output `mut14.txt`) | 22 / 22 as expected: TITLEREP t1–t10 caught, c1–c2 silent; denoms d4, d7 caught, d8–d9 silent; claims X5, X10, X11 caught, c3–c5 silent. In-build: tree `m` (Y3.B6.S10 back to `{}`) exits 1 with `TITLEREP FULL Y3.B6.S10` |
 
 ## Round 13 (after critic Y2–Y3 r12, Y2 7.96 / Y3 8.00, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
 
