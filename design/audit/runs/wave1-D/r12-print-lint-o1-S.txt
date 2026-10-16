@@ -1,0 +1,2 @@
+ws-print-lint: source kit, 4 skill(s)
+  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
