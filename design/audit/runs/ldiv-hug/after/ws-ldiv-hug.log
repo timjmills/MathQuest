@@ -1,0 +1,124 @@
+---- div_facts-long: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 div_facts-long fact 121 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 div_facts-long fact 18 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 div_facts-long fact 4 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 div_facts-long fact 48 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 54 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 55 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 16 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-long fact 33 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-1280 div_facts-long fact 121 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 div_facts-long fact 18 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 div_facts-long fact 4 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 div_facts-long fact 48 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS worksheet-1280 div_facts-long fact 54 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-long fact 55 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-long fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-long fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-long fact 16 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-long fact 33 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS quiz-1280 div_facts-long fact 33 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+---- div_facts-mix: paper (2 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 div_facts-mix fact 4 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-mix fact 54 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 div_facts-mix fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-1280 div_facts-mix fact 4 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS worksheet-1280 div_facts-mix fact 54 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 div_facts-mix fact 48 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS quiz-1280 div_facts-mix fact 33 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+---- long_div_2digit: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 long_div_2digit worked 2304 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 long_div_2digit worked 175 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 long_div_2digit worked 608 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 long_div_2digit worked 1760 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 106 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 2646 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 975 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 1220 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 2508 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 long_div_2digit worked 102 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 long_div_2digit worked 2304 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 long_div_2digit worked 175 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 long_div_2digit worked 608 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 long_div_2digit worked 1760 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 106 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 2646 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 975 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 1220 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 2508 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 long_div_2digit worked 102 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS quiz-1280 long_div_2digit worked 400 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+---- divide-facts: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 divide-facts fact 88 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 divide-facts fact 24 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 divide-facts fact 1 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-390 divide-facts fact 15 @40px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 77 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 40 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-390 divide-facts fact 33 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS card-1280 divide-facts fact 88 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 divide-facts fact 24 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 divide-facts fact 1 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS card-1280 divide-facts fact 15 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+PASS worksheet-1280 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 divide-facts fact 77 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 divide-facts fact 12 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 divide-facts fact 40 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS worksheet-1280 divide-facts fact 33 @29px: gap 0.33 over 0.12 space 0.00 box 48px centre 0.00
+PASS quiz-1280 divide-facts fact 16 @56px: gap 0.33 over 0.12 space 0.00 box 67px centre 0.00
+---- divide-21: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 divide-21 worked 54 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-21 worked 16 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-21 worked 42 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-21 worked 45 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 27 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 54 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 72 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 87 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 42 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-21 worked 24 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-21 worked 54 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-21 worked 16 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-21 worked 42 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-21 worked 45 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 27 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 54 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 72 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 87 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 42 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-21 worked 24 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS quiz-1280 divide-21 worked 16 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+---- divide-31: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS card-390 divide-31 worked 576 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-31 worked 168 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-31 worked 426 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-390 divide-31 worked 480 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 234 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 468 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 702 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 876 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 385 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-390 divide-31 worked 250 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-31 worked 576 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-31 worked 168 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-31 worked 426 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS card-1280 divide-31 worked 480 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 234 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 468 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 702 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 876 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 385 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS worksheet-1280 divide-31 worked 250 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+PASS quiz-1280 divide-31 worked 104 @57px: gap 0.54 over 0.11 space 0.22 box 44px centre 0.00
+---- divide-31-R: paper (6 brackets) gap 0.53 over 0.11 space 0.22
+PASS a 1-digit dividend was drawn in a bracket on screen
+PASS a 2-digit dividend was drawn in a bracket on screen
+PASS a 3-digit dividend was drawn in a bracket on screen
+112 brackets measured
+ws-ldiv-hug: OK

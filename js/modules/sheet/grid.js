@@ -54,7 +54,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
         const sp = relay ? `grid-column:span ${i >= cells.length - rem ? tracks / rem : tracks / cols};` : '';
-        return cell(item.html, { label: lab, cls: item.cls || '', style: sp + (item.style || '') });
+        return cell(item.html, { label: lab, cls: item.cls || '', style: sp + (item.style || ''), keyAttr: item.keyAttr || '' });
     });
     if (!relay && used < n) out.push(blankRun((used % cols) + 1));
     const r = rows || Math.ceil(cells.length / cols);

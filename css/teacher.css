@@ -895,6 +895,9 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-print-grid { grid-template-areas: "preview" "what" "setup"; }
 }
 
+/* critic r2 (R2-5): a segment whose label is longer than its share ("After each page" at 1366) wraps
+   inside its 44 px pill instead of running past it. Additive. */
+.tv-seg.tv-seg-wrap > button { white-space: normal; line-height: 16px; min-height: 44px; height: auto; padding: 2px 6px; }
 /* Owner 2026-10-03: the options popover DOCKS beside the print preview (over the settings column), so the preview page
    stays in view and updates live; at narrow widths it is a bottom sheet over the lower half. Additive. */
 .tv-sko.is-docked { border-radius: 12px; }
@@ -913,3 +916,10 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 /* critic search-terms r5 U-E (2026-10-09): the Sets search box keeps the line for its "Showing results for ..." notice
    reserved at all times, so the Level row never jumps when a correction appears or goes. Additive. */
 .tv-panel-head .tv-search:has(> #tvSkillSearch) { margin-bottom: 12px; }
+/* critic answer-key r4 (R4-1, 2026-10-10): the Print button keeps a short label; the double-sided sheet count sits as a
+   caption directly under it. If a label is ever longer than the column, it wraps inside a taller button instead of
+   being clipped at both ends. Additive. */
+.tv-print-sheets { margin: -4px 0 0; text-align: center; }
+.tv-btn.tv-btn-block[data-act="print"], #teacherApp .tv-btn.tv-btn-block[data-act="print"] { white-space: normal; height: auto; min-height: 48px; padding: 6px 16px; text-align: center; }
+.tv-btn.tv-btn-block[data-act="print"] > span { min-width: 0; overflow-wrap: anywhere; }
+.tv-btn.tv-btn-block[data-act="print"] .tv-print-l { white-space: nowrap; }

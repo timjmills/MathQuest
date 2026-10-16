@@ -1630,6 +1630,9 @@ html body .problem-card [data-mq-swiperow] .k2-tile.k2-tile.k2-tile.k2-tile.k2-t
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-back .k2-cue-long { display: none; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue > b:last-child { display: none; }
 
+/* Touch numerals floor (WORKSHEET_DESIGN_STANDARD SF-34, 2026-10-03): a grid cell holding touch
+   numerals draws its digits at 40 px, never the 29 px grid size. Additive. */
+/* (one rule with the touch-dots floor at the end of this file) */
 /* SL-3 (2026-10-03): an inline-blanks input adopted into a kit box (unit_form's "__ thousands") drew its own
    ib-cell border inside the box's border: two boxes. The box is the slot; the input fills it, borderless.
    The per-box live marks stay on the box (.mq-cellbox:has(> input.mq-live-*)). */
@@ -1731,7 +1734,22 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* Touch dots floor (design/SUPPORTS.md S1.6, owner 2026-10-04: "worksheet mode touchpoints might be too small"): a grid
    cell (online worksheet, quiz) whose digits carry touch dots draws them at 40 px, never the 29 px grid
    size, so each dot is big enough to see and touch. Additive. */
-.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td) { --mq-digit: 40px; }
+.mq-scell.mq-grid-cell:has(.ws-td), .mq-scell .mq-grid-cell:has(.ws-td),
+.mq-scell.mq-grid-cell[data-mq-touch-floor], [data-mq-touch-floor] .mq-scell.mq-grid-cell { --mq-digit: 40px; }   /* touch floor: also set from the start when the item's ladder has a touch rung, so no cell grows mid-ladder */
+
+/* Touch numerals are tappable on screen (SUPPORTS S1.8): each number is a target of at least 44 x 44 px,
+   centred on it; the running count sits under the cell, outside the B&W cell. Additive. */
+.ws-tn.mq-tn-hit { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.ws-tn.mq-tn-hit::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+.ws-tn.mq-tn-hit:focus-visible { outline: 3px solid var(--mq-focus, #1a73e8); outline-offset: 2px; border-radius: 4px; }
+.mq-tn-count { font-family: Andika, sans-serif; font-size: 16px; color: #595959; margin: 6px 0 0; display: flex; gap: 12px; align-items: center; justify-content: center; }
+.mq-tn-count .mq-tn-reset { min-height: 44px; padding: 0 14px; font: inherit; border: 1px solid #949494; border-radius: 8px; background: #fff; color: #222; cursor: pointer; }
+/* critic r4 (2026-10-09): Start again never wraps; a ladder rung's count shares the ladder message's row on the
+   practice card and the quiz (R4-5), so only that one row appears after a wrong answer. Additive. */
+.mq-tn-count .mq-tn-reset { white-space: nowrap; flex: none; }
+.mq-tn-count .mq-tn-said { min-width: 0; overflow-wrap: anywhere; }
+.mq-tn-count.mq-tn-inrow { display: inline-flex; vertical-align: middle; margin: 0 0 0 12px; gap: 10px; font-size: 16px; font-weight: 400; }
+.mq-tn-count.mq-tn-inrow .mq-tn-said:empty { display: none; }
 
 /* ---- Wave 1 lane D, critic r3 D8 (H6): the short-division ("bus stop") twin. Every quotient box is a
    >= 44 px target on every host: the drawing is set at a digit size whose 0.9-track box is >= 44 px
@@ -1797,3 +1815,17 @@ html body .online-edition .problems-grid.mq-wsgrid.mq-wsgrid.mq-wsgrid > .proble
 html body .mq-scell .k2-shape-line { overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
+/* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
+   dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
+   The quotient box no longer sizes that column (`contain: inline-size` keeps it out of the grid's
+   track sizing); it spans the dividend's width or its own height (a square, >= 48 px), whichever
+   is wider, and sits centred over the bar, overhanging both ends equally when the dividend is one narrow digit.
+   Its width still follows the dividend, never the quotient (SL-2). Additive: overrides the 64 px
+   floor of `.mq-ldiv-q .mq-slot` above. */
+.mq-scell .mq-ldiv > .mq-ldiv-q { contain: inline-size; justify-content: center; }
+.mq-scell .mq-ldiv > .mq-ldiv-q .mq-slot { min-width: max(100%, 48px, var(--ws-hw, 48px)) !important; }
+/* the remainder bracket (screen-cell.js ringCellHTML, `.mq-rembrk`): its quotient box keeps its own
+   width over the dividend's column (that column no longer stretches to the box), never shrinking
+   below the touch target (critic ldiv-hug R1 D-1). */
+.mq-scell .mq-rembrk .mq-cellbox { flex: none; }

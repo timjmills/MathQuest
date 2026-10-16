@@ -123,6 +123,7 @@ import { tvGo } from './modules/teacher-shell.js';
 import './modules/word-work-screen.js';
 // The next answer box pulses yellow on every pupil screen (owner, 2026-10-04).
 import { installActiveBox } from './modules/active-box.js';
+import { installTouchTap } from './modules/touch-tap.js';
 import { installPlayCompact, togglePlayMenu } from './modules/play-compact.js';
 
 // Layer 7: Init
@@ -565,4 +566,5 @@ document.addEventListener('click', function(e) {
 // Bootstrap the application
 bootstrap();
 installActiveBox();
+installTouchTap();
 installPlayCompact();
