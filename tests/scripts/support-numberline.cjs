@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, open, waitFor, hideOverlays } = require('../lib/ws-harness.cjs');
-const { dotsBandCases } = require('../lib/refline-dots.cjs');
+const { dotsBandCases, timedHeaderCases } = require('../lib/refline-dots.cjs');
 
 const SHOTS = process.argv.includes('--shots');
 const SHOT_DIR = path.join(ROOT, 'tests', 'compliance', 'shots', 'support-numberline');
@@ -573,6 +573,9 @@ const SAMPLES = [
         // Queue and Direct link, N10 and N20, line on and off, 1366x650 and 1280x600.
         const dotFails = await dotsBandCases(page, { log });
         dotFails.forEach((f) => check(false, f));
+        // critic nl-r7 D1: a timed session must not scroll the band under the sticky play bar.
+        const hdrFails = await timedHeaderCases(page, { log });
+        hdrFails.forEach((f) => check(false, f));
         await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 2 });
 
         if (SHOTS) await shots(h);

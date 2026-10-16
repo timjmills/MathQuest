@@ -1392,6 +1392,38 @@ export function renderQuestion() {
     // Widget hosts mount after a dynamic import; the chrome Check follows them.
     setTimeout(_syncChromeCheck, 0);
     setTimeout(_syncChromeCheck, 260);
+    // critic nl-r7 D1: the input's focus can scroll the page so the band lies under the sticky bar.
+    if (document.getElementById('mqRefLine')) {
+        _clearRefLineOfHeader();
+        setTimeout(_clearRefLineOfHeader, 300);
+    }
+}
+
+// With the number line on: when the band sits under the sticky play bar, scroll back so its top
+// clears the bar's bottom, but only while the answer box and Check still fit in the window after
+// that scroll (a problem too tall to fit keeps the box in view, as before). No band: never runs.
+function _clearRefLineOfHeader() {
+    try {
+        const band = document.getElementById('mqRefLine');
+        if (!band || !window.scrollY) return;
+        let hdr = 0;
+        const bars = document.querySelectorAll('.nav-bar > .nav-logo, #gameView > *, #myStatsBar, .mq-play-menu-btn');
+        for (const el of bars) {
+            if (el === band || getComputedStyle(el).position !== 'sticky') continue;
+            const r = el.getBoundingClientRect();
+            if (r.height > 0 && r.top < 20 && r.bottom < innerHeight / 2) hdr = Math.max(hdr, r.bottom);
+        }
+        const top = band.getBoundingClientRect().top;
+        if (top >= hdr) return;
+        const d = Math.min(window.scrollY, Math.ceil(hdr + 4 - top));
+        for (const id of ['answerInput', 'qcCheckBtn']) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            const r = el.getBoundingClientRect();
+            if (r.height > 0 && r.bottom + d > innerHeight) return;
+        }
+        window.scrollBy(0, -d);
+    } catch (e) { /* the line is a hint */ }
 }
 
 // Put #answerInput back in #answerInputArea, where every branch of the renderer expects it.

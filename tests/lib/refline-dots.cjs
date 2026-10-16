@@ -115,4 +115,67 @@ async function dotsBandCases(page, { sizes = [{ w: 1366, h: 650 }, { w: 1280, h:
     return fails;
 }
 
-module.exports = { DOTS_BAND, problems, dotsBandCases };
+// critic nl-r7 D1: a TIMED session (the queue's default timer; a link with T300) at Chromebook size.
+// The page is measured as the pupil gets it (no scrollTo): the band's top must clear the sticky play
+// bar's BOTTOM whenever the answer box and Check fit in the window with the band in view, and the box
+// and Check must always be in view.
+function HEADER_BAND() {
+    const band = document.getElementById('mqRefLine');
+    let hdr = 0;
+    for (const el of document.querySelectorAll('.nav-bar > .nav-logo, #gameView > *, #myStatsBar, .mq-play-menu-btn')) {
+        if (el === band || getComputedStyle(el).position !== 'sticky') continue;
+        const r = el.getBoundingClientRect();
+        if (r.height > 0 && r.top < 20 && r.bottom < innerHeight / 2) hdr = Math.max(hdr, r.bottom);
+    }
+    const box = (id) => { const el = document.getElementById(id); if (!el) return null; const r = el.getBoundingClientRect(); return r.height > 0 ? { top: Math.round(r.top), bottom: Math.round(r.bottom) } : null; };
+    const b = band ? band.getBoundingClientRect() : null;
+    return { scrollY: Math.round(scrollY), hdr: Math.round(hdr), band: b ? { top: Math.round(b.top), bottom: Math.round(b.bottom) } : null,
+        input: box('answerInput'), check: box('qcCheckBtn'), timed: !!(window.state && window.state.timerEnabled !== false && document.getElementById('timerContainer') && getComputedStyle(document.getElementById('timerContainer')).display !== 'none'), vh: innerHeight };
+}
+
+async function timedHeaderCases(page, { sizes = [{ w: 1280, h: 600 }, { w: 1366, h: 650 }], skills = [['subtraction', 'sub_100_regroup'], ['multiplication', 'nl_mult']], log = () => {} } = {}) {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const base = page.url().split('?')[0];
+    const fails = [];
+    for (const size of sizes) for (const [cat, skill] of skills) for (const how of ['queue', 'link']) {
+        const tag = `R7-D1 timed ${how} ${skill} ${size.w}x${size.h}`;
+        try {
+            await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });
+            await page.goto(base, { waitUntil: 'networkidle2' });
+            await page.waitForFunction(() => typeof window.playSelectedSkills === 'function' && window.UnifiedSkills && typeof window.generateSkillCode === 'function', { timeout: 30000 });
+            const code = await page.evaluate((cat, skill) => {
+                window.clearSetOptions && window.clearSetOptions({ silent: true });
+                const U = window.UnifiedSkills; U.clear();
+                U.add({ categoryId: cat, skillId: skill, skillLabel: skill, opts: { nlOn: true } });
+                return window.generateSkillCode();
+            }, cat, skill);
+            if (how === 'link') {
+                await page.goto(base + '?c=' + encodeURIComponent(`${code}|Gp-N10-T300`), { waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => window.state && window.state.landingSettings && typeof window.startFromLanding === 'function', { timeout: 30000 });
+                await page.evaluate(() => window.startFromLanding());
+            } else {
+                await page.evaluate(() => window.playSelectedSkills('practice'));
+            }
+            await sleep(1500);
+            try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
+            await sleep(300);
+            const m = await page.evaluate(HEADER_BAND);
+            const bad = [];
+            if (!m.band) bad.push('no number line');
+            const inView = (r) => !r || (r.top >= m.hdr - 0.5 && r.bottom <= m.vh + 0.5);
+            if (!inView(m.input)) bad.push(`answer box out of view ${JSON.stringify(m.input)}`);
+            if (!inView(m.check)) bad.push(`Check out of view ${JSON.stringify(m.check)}`);
+            if (m.band && m.band.top < m.hdr - 0.5) {
+                const d = Math.min(m.scrollY, m.hdr - m.band.top);
+                const fits = [m.input, m.check].every((r) => !r || r.bottom + d <= m.vh);
+                if (fits) bad.push(`band ${m.band.top}-${m.band.bottom} under the sticky bar (bottom ${m.hdr}) at scroll ${m.scrollY} though the box and Check fit`);
+            }
+            log(`  ${tag}: ${bad.length ? 'FAIL' : 'ok'} scroll ${m.scrollY} bar-bottom ${m.hdr} band ${m.band ? m.band.top + '-' + m.band.bottom : '-'} box ${m.input ? m.input.top + '-' + m.input.bottom : '-'} check ${m.check ? m.check.top + '-' + m.check.bottom : '-'}`);
+            bad.forEach((p) => fails.push(`${tag}: ${p}`));
+        } catch (e) { fails.push(`${tag}: ${e.message}`); }
+    }
+    await page.evaluate(() => { try { window.UnifiedSkills.clear(); window.clearSetOptions && window.clearSetOptions({ silent: true }); window.state.isMixedMode = false; window.showView('homeView'); } catch (e) { /* page left as is */ } });
+    return fails;
+}
+
+module.exports = { DOTS_BAND, problems, dotsBandCases, HEADER_BAND, timedHeaderCases };
