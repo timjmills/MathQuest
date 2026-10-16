@@ -603,35 +603,47 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                         st.gameMode = 'worksheet';
                         W.initWorksheet();
                         await new Promise(res => setTimeout(res, 600));
-                        const card = () => document.querySelector('#ws_card_0 .ws-skip-btn');
+                        // The card under test: the first one a typed wrong answer actually grades (its wrong-check
+                        // count moves). A sort, click or shade card is graded by its own widget, not the typed
+                        // entries, so card 0 being one says nothing about Skip; the next typed card is used.
+                        let ci = 0;
+                        const card = () => document.querySelector(`#ws_card_${ci} .ws-skip-btn`);
                         const shown = () => { const b = card(); return !!b && getComputedStyle(b).display !== 'none'; };
                         const wrong = (k) => {
-                            const q0 = st.worksheetQs[0], inp = document.getElementById('ws_input_0') || document.querySelector('#ws_card_0 input');
+                            const q0 = st.worksheetQs[ci], inp = document.getElementById(`ws_input_${ci}`) || document.querySelector(`#ws_card_${ci} input`);
                             if (!q0 || !inp) return false;
                             const n = q0._mqSlots | 0;
                             if (n > 1) {
                                 // a multi-slot card: the pupil erases the boxes and fills them again; every box feeds the
                                 // hidden card input (joined with ", ") and the card is graded the moment the LAST box is in,
                                 // so one round of entries is one wrong check (not one per box)
-                                const boxes = Array.from(document.querySelectorAll('#ws_card_0 input')).filter(e => e !== inp && !e.disabled && e.type !== 'hidden' && e.type !== 'checkbox');
+                                const boxes = Array.from(document.querySelectorAll(`#ws_card_${ci} input`)).filter(e => e !== inp && !e.disabled && e.type !== 'hidden' && e.type !== 'checkbox');
                                 const fire = (b) => b.dispatchEvent(new Event('input', { bubbles: true }));
                                 const before = q0._wrongChecks || 0;
                                 if (boxes.length >= n) { boxes.forEach(b => { b.value = ''; fire(b); }); boxes.forEach((b, j) => { b.value = String(7770 + k + j); fire(b); }); }
                                 else inp.value = Array.from({ length: n }, (_, j) => String(7770 + k + j)).join(', ');
-                                if ((q0._wrongChecks || 0) === before) W.checkWorksheetAnswer(0);
+                                if ((q0._wrongChecks || 0) === before) W.checkWorksheetAnswer(ci);
                                 return true;
                             }
-                            inp.value = String((Number(q0.ans) || 0) + 7777 + k); W.checkWorksheetAnswer(0); return true;
+                            inp.value = String((Number(q0.ans) || 0) + 7777 + k); W.checkWorksheetAnswer(ci); return true;
                         };
                         if (value === 0) { if (card()) fail('screen/worksheet', 'skipAfter 0 must render no per-card Skip'); }
                         else if (!card()) fail('screen/worksheet', 'no per-card Skip button rendered');
                         else {
-                            let ok = true; const seen = [];
-                            for (let k = 1; k <= value + 1 && ok; k++) { ok = wrong(k); if (ok) seen.push(shown()); }
-                            if (!ok) warn('screen/worksheet', 'card 0 has no plain input: worksheet per-card count not exercised');
-                            else if (seen.slice(0, value - 1).some(Boolean) || !seen[value - 1]) fail('screen/worksheet', `per-card Skip must appear at exactly ${value} wrong checks (saw ${JSON.stringify(seen)})`);
-                            const other = document.querySelector('#ws_card_1 .ws-skip-btn');
-                            if (ok && other && getComputedStyle(other).display !== 'none') fail('screen/worksheet', 'card 1 Skip showed from card 0 wrong checks');
+                            // find the card: one probing wrong check per candidate; a card it does not grade is left as is
+                            let ok = false; const seen = [];
+                            for (let i = 0; i < st.worksheetQs.length && !ok; i++) {
+                                ci = i;
+                                if (!card()) continue;
+                                const q = st.worksheetQs[i];
+                                const before = q._wrongChecks || 0;
+                                if (wrong(1) && (q._wrongChecks || 0) > before) { ok = true; seen.push(shown()); }
+                            }
+                            for (let k = 2; k <= value + 1 && ok; k++) { ok = wrong(k); if (ok) seen.push(shown()); }
+                            if (!ok) warn('screen/worksheet', 'no card is graded by a typed entry: worksheet per-card count not exercised');
+                            else if (seen.slice(0, value - 1).some(Boolean) || !seen[value - 1]) fail('screen/worksheet', `per-card Skip must appear at exactly ${value} wrong checks on card ${ci} (saw ${JSON.stringify(seen)})`);
+                            const other = document.querySelector(`#ws_card_${ci === 0 ? 1 : 0} .ws-skip-btn`);
+                            if (ok && other && getComputedStyle(other).display !== 'none') fail('screen/worksheet', `card ${ci === 0 ? 1 : 0} Skip showed from card ${ci} wrong checks`);
                         }
                     } finally { try { W.showView('homeView'); } catch (_) {} st.gameMode = 'practice'; }
                 }
