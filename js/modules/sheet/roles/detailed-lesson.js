@@ -311,13 +311,15 @@ export function wordProblemPlan(wp, frame) {
             .replace('<div class="ws-story">', '<div class="ws-story" data-item="' + esc(wp.item) + '" data-rep="story" data-row="0">'),
     };
     const parts = wp.parts.filter((v) => v !== null && v !== undefined);
-    const eqKey = { slots: Object.fromEntries([...parts.map((v, i) => [`e${i}`, { value: String(v) }]), ['eq', { value: String(wp.n) }]]) };
+    // (`signSlot`: the pupil writes the sign in a circle - the detailed lesson maker, lesson 2: a printed + gives step 3 away)
+    const eqKey = { slots: Object.fromEntries([...parts.map((v, i) => [`e${i}`, { value: String(v) }]), ['eq', { value: String(wp.n) }], ...(wp.signSlot ? [['op', { value: String(wp.op || '+') }]] : [])]) };
     const eqItem = {
         nolabel: true, drawsAnswer: true, key: eqKey,
         render: (c) => {
             const k = c.state === 'answered' ? eqKey : null;
             const box = (id, dg) => blank({ id, kind: 'number', shape: 'box', digits: dg, graded: false }, c, k);
-            return `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, Math.max(2, String(v).length))).join(`<span>${esc(wp.op || '+')}</span>`)}<span>=</span>${box('eq', Math.max(2, String(wp.n).length))}</div>`;
+            const sign = wp.signSlot ? blank({ id: 'op', kind: 'text', shape: 'circle', graded: false }, c, k) : `<span>${esc(wp.op || '+')}</span>`;
+            return `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, Math.max(2, String(v).length))).join(sign)}<span>=</span>${box('eq', Math.max(2, String(wp.n).length))}</div>`;
         },
     };
     const panelItem = { nolabel: true, q: { cell: { template: 'rcdws', payload: {} }, text: '' }, drawsAnswer: true, key: { slots: {} } };
@@ -406,6 +408,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page.ws-key .ws-band--say .ws-line[data-ws-key-ans]{display:inline-flex;justify-content:center;align-items:flex-end;width:var(--w)}
 .ws-page .dl-wordsline{flex-direction:column;align-items:flex-start;gap:1mm}
 .ws-page .dl-work{flex:1 1 auto;min-height:60mm}
+.ws-page .dl-eq .ws-input--circle{align-self:center;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
 .ws-page .dl-eq{display:flex;align-items:center;gap:5mm;font-size:28pt}
 .ws-page .dl-eq .ws-box{min-width:24mm}

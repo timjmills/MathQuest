@@ -196,8 +196,26 @@ export const CASE_TESTS = Object.freeze({
     pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
     pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
     // an edge case of numbers to 1,000: a 0 place, a teen ending, or 1,000 itself
+    // The detailed lesson maker, lesson 2 (put together / add to within 20, RESEARCH.md): two parts.
+    wpBridge: (it) => { const o = wpParts(it); return !!o && o[0] >= 2 && o[1] >= 2 && o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11; },
+    wpBridgeBigFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] > o[1]; },
+    wpBridgeSmallFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] < o[1]; },
+    // (a bridge whose whole is 14+: counting on past 10 by 4 or more - where the count slip shows)
+    wpBridgeHigh: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] + o[1] >= 14 && o[0] !== o[1]; },
+    wpEqual: (it) => { const o = wpParts(it); return !!o && o[0] === o[1] && o[0] >= 2; },
+    wpWhole20: (it) => { const o = wpParts(it); return !!o && o[0] + o[1] === 20 && o[0] >= 2 && o[1] >= 2 && o[0] !== o[1] && o[0] !== 10; },
+    wpEdge: (it) => CASE_TESTS.wpEqual(it) || CASE_TESTS.wpWhole20(it),
+    wpSixSeven: (it) => { const o = wpParts(it); return !!o && o[0] === 6 && o[1] === 7; },
+    wpNineFour: (it) => { const o = wpParts(it); return !!o && o[0] === 9 && o[1] === 4; },
+    wpAddTo: (it) => { const o = wpParts(it); return !!o && /\bmore\b/i.test(String((it && it.q && it.q.text) || '')) && o[0] > o[1] && o[0] >= 10 && o[1] >= 2 && o[1] <= 9 && o[0] !== 10; },
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
 });
+
+/** A two-part story's parts [a, b] as numbers, or null. */
+function wpParts(it) {
+    const o = operandsOf((it && it.q) || {}).map(Number);
+    return o.length >= 2 && o.every(Number.isFinite) ? o : null;
+}
 
 /** A place-value item's number (its `q.pv.n` or cell payload `n`), or null. */
 function pvNumberOf(it) {
@@ -308,6 +326,12 @@ export function pickWeDo(items, example, data, n) {
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
     let order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
         ...liked, ...same, ...rest])];
+    // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
+    if (data && Array.isArray(data.guidedWants)) {
+        const lead = [];
+        for (const w of data.guidedWants) { const t = CASE_TESTS[w]; const it = t && order.find((x) => !lead.includes(x) && t(x)); if (it) lead.push(it); }
+        order = [...lead, ...order.filter((x) => !lead.includes(x))];
+    }
     // div_facts Mix (critic R1 D7): the Guided set tries each written form - the forms the
     // example did not show first.
     if (order.length && order.every((it) => it.q && it.q.divMix)) {

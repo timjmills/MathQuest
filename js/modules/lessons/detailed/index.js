@@ -43,8 +43,9 @@
 //   prerequisites [{atom, items?, ref, lesson: {id, title}}]   P0: ONE question per Pre-requisite atom, most basic first
 //   numberSense   {A: ref, B: ref}                     P1 bands (5 items each)
 //   wordProblem   {ref, want, lines: [...], unit, say} P5: story lines with {wp.*} placeholders
-//   exit          [{case, ref, want, detects}] x 4     P6 items, one per case; `exitSay` its Say frame
-//                 `exitSayItem` k: the Say reads slip item k (its {say.*} vars and key) instead of a fresh item
+//   exit          [{case, ref, want, detects}] x 4 (3)  P6 items, one per case; `exitSay` its Say frame
+//                 `exitSayItem` k: the Say reads slip item k (its {say.*} vars and key) instead of a fresh item;
+//                 `exitCols` 1: the items print one across the half
 //   retrieval     [{ref, ask}]                         T3 spaced retrieval (mini whiteboards)
 //   t1Boxes       [{kind, title, text}] <= 3           T1 Lesson guidance (tip | language | why | watch ...)
 //   materials     [text]                               T1 check-box list
@@ -123,7 +124,8 @@ export function validateDescription(d) {
     const firstNew = (d.atoms || []).findIndex((a) => !a.prereq);
     if ((d.atoms || []).some((a, i) => a.prereq && firstNew >= 0 && i > firstNew)) errs.push('Pre-requisite atoms come first');
     if ((d.prerequisites || []).length < 3 || d.prerequisites.length > 4) errs.push('P0 needs 3-4 questions');
-    if ((d.exit || []).length !== 4) errs.push('the exit slip has 4 items');
+    // (3 when full-size items cannot fit 4 a half - the capacity rule, lesson 2's bar stories; never shrunk)
+    if (![3, 4].includes((d.exit || []).length)) errs.push('the exit slip has 4 items (3 when 4 do not fit a half)');
     if ((d.vocabulary || []).length > 3 || (d.t1Boxes || []).length > 3) errs.push('at most 3 vocabulary cards and 3 T1 boxes');
     if (d.boardOnly !== undefined) {
         if (!Array.isArray(d.boardOnly) || d.boardOnly.some((v) => !Number.isFinite(Number(v)))) errs.push('boardOnly is a list of numbers');

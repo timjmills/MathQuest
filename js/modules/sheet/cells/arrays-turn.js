@@ -29,7 +29,7 @@ import { stepMarks } from '../steps.js';
 
 const DOT = { S: 4.5, M: 5, L: 5.5 };
 const PITCH = { S: 7, M: 8, L: 9 };
-const GAP = 10;                     // mm between the array and its turn
+const GAP = 6;                      // mm between the array and its turn
 
 const N = (v) => Number(v);
 const product = (p) => (Number.isFinite(N(p.product)) ? N(p.product) : N(p.rows) * N(p.cols));
@@ -95,13 +95,12 @@ function facts(p) {
 
 function geometry(g, p) {
     const [f1, f2] = facts(p);
-    if (p.type === 'missing') {
-        const w = Math.max(factWidth(g, f1), factWidth(g, f2));
-        return { wMm: w, pictures: false };
-    }
+    const fw = Math.max(factWidth(g, f1), factWidth(g, f2));
+    if (p.type === 'missing') return { wMm: fw, pictures: false };
+    // The two arrays side by side, the two facts under them, one line each (the array first,
+    // then its turn): two facts side by side are wider than a 2-column cell at M and L.
     const a = dotsSvg(g, N(p.rows), N(p.cols), 'solid', ''), b = dotsSvg(g, N(p.cols), N(p.rows), 'solid', '');
-    const w1 = Math.max(a.wMm, factWidth(g, f1)), w2 = Math.max(b.wMm, factWidth(g, f2));
-    return { wMm: w1 + GAP + w2, w1, w2, pictures: true };
+    return { wMm: Math.max(a.wMm + GAP + b.wMm, fw), pictures: true };
 }
 
 /** Render one turn cell. `sv` = {slot: {value, ink}} from a step state, else the state's ink. */
@@ -125,12 +124,11 @@ export function turnRender(p, ctx) {
         const A = dotsSvg(g, N(p.rows), N(p.cols), inkA, `${p.rows} rows of ${p.cols} dots`);
         const B = dotsSvg(g, N(p.cols), N(p.rows), inkB, `${p.cols} rows of ${p.rows} dots`);
         const showF2 = !sv || sv.turn;
-        const half = (pic, line, wMm, shown = true) => `<div style="flex:0 0 ${g.em(wMm)};display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:${g.em(3)}">`
-            + `${pic.svg}<div style="visibility:${shown ? 'visible' : 'hidden'}">${line}</div></div>`;
-        inner = `<div style="display:flex;justify-content:center;align-items:stretch;gap:${g.em(GAP)}">`
-            + half(A, factLine(g, f1, at), geom.w1) + half(B, factLine(g, f2, at), geom.w2, showF2) + '</div>';
+        inner = `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${g.em(GAP)}">${A.svg}${B.svg}</div>`
+            + `<div style="margin-top:${g.em(3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
+            + `<div>${factLine(g, f1, at)}</div><div style="visibility:${showF2 ? 'visible' : 'hidden'}">${factLine(g, f2, at)}</div></div>`;
     }
-    return root(g, 'arrays', inner, 'text-align:center;', turnFootprint(p, ctx).wMm);
+    return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
 }
 
 export function turnAnswerKey(p) {
@@ -145,7 +143,7 @@ export function turnAnswerKey(p) {
 export function turnFootprint(p, ctx) {
     const g = geo(ctx);
     const geom = geometry(g, p);
-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: !geom.pictures, maxCols: 2 };
+    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures ? 2 : 3 };
 }
 
 export function turnInputs(p) {

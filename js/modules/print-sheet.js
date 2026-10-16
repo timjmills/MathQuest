@@ -261,12 +261,19 @@ function refAccepts(sk, cand, key, seen, kept) {
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
-export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0));
+export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart));
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
     const v = itemNumberOf(cand);
     if (sk.minNum !== undefined && !(v !== null && v >= Number(sk.minNum))) return false;
     if (sk.maxNum !== undefined && !(v !== null && v <= Number(sk.maxNum))) return false;
+    // (`partMin` / `noPart`: a two-operand item's parts - the detailed lesson maker, lesson 2: no part of 1 or 10)
+    if (sk.partMin !== undefined || Array.isArray(sk.noPart)) {
+        const o = composeOperandsOf(cand).map(Number);
+        if (o.length < 2 || !o.every(Number.isFinite)) return false;
+        if (sk.partMin !== undefined && o.some((x) => x < Number(sk.partMin))) return false;
+        if (Array.isArray(sk.noPart) && o.some((x) => sk.noPart.map(Number).includes(x))) return false;
+    }
     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
         const bo = sk.boardOnly.map(Number);
         const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
@@ -2943,7 +2950,7 @@ async function buildDetailedLesson(req = {}) {
     const eqOp = wpV.eqOp || wpV.op || '+';
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${wpV.ans}`;
     const wpPlan = wordProblemPlan({
-        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, item: String(wpD.key),
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
@@ -2964,7 +2971,8 @@ async function buildDetailedLesson(req = {}) {
     });
     for (const g of exGroups) {
         const its = g.idx.map((i) => exitItems[i]);
-        g.cols = its.every((it) => !it.measured || !it.measured[2] || it.measured[2].fits !== false) ? 2 : 1;
+        // (`exitCols` 1 - the detailed lesson maker, lesson 2: full-size bar items print one across a half)
+        g.cols = Number(d.exitCols) === 1 ? 1 : its.every((it) => !it.measured || !it.measured[2] || it.measured[2].fits !== false) ? 2 : 1;
         g.rows = Math.ceil(its.length / g.cols);
         g.own = Math.max(...its.map((it) => (it.measured && it.measured[g.cols] && Number.isFinite(it.measured[g.cols].hMm) ? it.measured[g.cols].hMm : 40)));
         if (g.cols === 1 && its.length > 1) notes.push('Exit slip: a group of items does not fit two across a 132.5 mm half; printed one across.');
@@ -3006,10 +3014,10 @@ async function buildDetailedLesson(req = {}) {
     const sayFill = (html, v) => String(html).replace(/(<span class="ws-line"[^>]*data-ws-slot="say-1"[^>]*)><\/span>/g, `$1 data-ws-key-ans>${String(v).replace(/</g, '&lt;')}</span>`);
     p5.keyPages = p5.keyPages.map((k) => sayFill(k, wpV.ans));
     // (`wordProblem.keyBar` - the detailed lesson maker, lesson 2: the pupil DRAWS the bar, so the key's Workspace
-    // shows the bar a pupil should draw, its numbers in the key ink; V22 E17: a key drawing in a Workspace is not a slot)
+    // shows the bar a pupil should draw (schematic), its numbers in the key ink; V22 E17: a key drawing in a Workspace is not a slot)
     if (d.wordProblem.keyBar && eqParts.length === 2) {
         const W = 110, A = Number(eqParts[0]), B = Number(eqParts[1]);
-        const wa = Math.max(W * 0.2, Math.min(W * 0.8, W * A / Math.max(1, A + B)));
+        const wa = A === B ? W / 2 : (A > B ? 0.6 * W : 0.4 * W);   // schematic (RP-72): stock lengths, never to scale
         const bx = (w, v, l) => `<span data-ws-key-ans style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${w.toFixed(2)}mm;height:12mm;border:0.75pt solid #000;${l ? 'border-left:none;' : ''}font-size:22pt;font-weight:700;color:var(--ws-key-ink)">${escText(String(v))}</span>`;
         const bar = `<div role="img" aria-label="bar model" style="display:flex;flex-direction:column;gap:1.5mm">${bx(W, wpV.ans)}<div style="display:flex">${bx(wa, A)}${bx(W - wa, B, true)}</div></div>`;
         p5.keyPages = p5.keyPages.map((k) => String(k).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw style="display:flex;align-items:center;justify-content:center">${bar}</div>`));

@@ -4161,7 +4161,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     let _tSet = _opt('task');
                     if (typeof _tSet === 'number') _tSet = [_tSet];
                     _tSet = Array.isArray(_tSet) ? [0, 1, 2].filter(v => _tSet.includes(v)) : [];
-                    if (!_tSet.length) _tSet = [0, 1, 2];
+                    if (!_tSet.length) _tSet = [0];
                     if (_opt('pictures') === false) _tSet = [2];
                     const type = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
                     const _band = Number(_opt('band')) === 81 ? 9 : 5;
@@ -4192,14 +4192,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.hint = `The turned array has ${b} rows of ${a}. Turning it does not change the total.`;
                         q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
                     } else {
-                        q.text = ask === 'factor' ? `${a} x ${b} = ${product}. ${b} x ? = ${product}` : `${a} x ${b} = ${product}. ${b} x ${a} = ?`;
+                        q.text = ask === 'factor' ? `${a} × ${b} = ${product}. ${b} × ? = ${product}` : `${a} × ${b} = ${product}. ${b} × ${a} = ?`;
                         q.ans = ask === 'factor' ? a : product;
                         q.answerType = 'number';
                         q.options = buildNumericOptions(q.ans);
-                        q.hint = `${b} x ${a} uses the same two numbers as ${a} x ${b}.`;
+                        q.hint = `${b} × ${a} uses the same two numbers as ${a} × ${b}.`;
                         q.visual = _kitTwin('arrays-turn', payload);
                     }
                     q.screenInstr = type === 'missing' ? 'Write the missing number.' : q.text;
+                    q.instructionKey = type === 'both' ? 'turn-facts' : type === 'known' ? 'turn-new' : 'missing';
                     q.printFormat = 'mult-properties';
                     q.skillLabel = 'Mult Properties';
                     return;

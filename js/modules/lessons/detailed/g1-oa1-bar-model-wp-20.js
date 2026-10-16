@@ -9,9 +9,9 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar' }, extra || {});
-// (The exit slip's half page holds two cells a row in ~65 mm: its bars are drawn 34 mm wide.)
-const EXIT_BAR = { barW: 34 };
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 2, noPart: [10], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar' }, extra || {});
+// (The exit slip: full-size bar items, the story beside the bar, one across a 132.5 mm half.)
+const EXIT_BAR = { beside: true, barW: 44 };
 // (`cellPayload.layout: 'bar'`: the word-work cell's compact form - story, bar, answer box with the
 // label printed; no sign row, column boxes or unit bank: the bar is the working.)
 
@@ -28,16 +28,20 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // A join story within 20 (the sum <= 20), the kit part-part-whole bar under it, all labels blank.
-    skill: WP({ maxNum: 20 }),
-    // The last row of every Practice page (★★★): the small part first (the Critical Atom's case).
-    edgeTest: 'bigSecond',
+    skill: WP({ minNum: 11, maxNum: 20 }),
+    // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
+    // (RESEARCH.md; no part of 1 or 10 anywhere: partMin / noPart on every story ref).
+    edgeTest: 'wpEdge',
+    practiceSheets: [{ edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'] } }],
     // The lesson's own placeholder names: the story's unit word and its parts.
     vars: (q, b) => {
         const p = (q && q.cell && q.cell.payload) || {};
         const st = (p.steps || [])[0] || {};
-        return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole: st.ans !== undefined ? st.ans : b.ans };
+        const whole = st.ans !== undefined ? st.ans : b.ans;
+        // (`slip`: the count slip past 10 - one less than the whole)
+        return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole, slip: Number.isFinite(Number(whole)) ? Number(whole) - 1 : '' };
     },
-    checkQuestion: { want: 'bigSecond', correct: 'D' },
+    checkQuestion: { want: 'wpNineFour', correct: 'D' },
     practicePages: 1,
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
@@ -60,22 +64,25 @@ export default {
             { icon: 'look', text: 'Find the two parts.' },
             { icon: 'write', text: 'Write the parts in the bar.' },
             { icon: 'decide', text: 'The whole is missing. Add.' },
-            { icon: 'check', text: 'Write the whole and the label.' },
+            { icon: 'check', text: 'Write the whole in the answer box.' },
         ],
         chant: 'Parts below. Whole on top. Add the parts.',
         // The chart's four panels fill the bar one step at a time (roles/lesson.js barState).
-        chartSteps: ['{a} and {b} are the parts.', 'Write {a} and {b} in the part boxes.', 'The whole is missing: {a} + {b} = {ans}.', 'Write {ans} {unit}.'],
+        chartSteps: ['{a} and {b} are the parts.', 'Write {a} and {b} in the part boxes.', 'The whole is missing: {a} + {b} = {ans}.', 'Write {ans}. Read: {ans} {unit}.'],
         guidedRows: 2,
         guidedStack: 2,
+        // (Guided: two crossing-ten stories, the small part first then the big part first)
+        guidedWants: ['wpBridgeSmallFirst', 'wpBridgeBigFirst'],
         practiceShape: [6, 2],
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'The step pupils break is step 2 (the whole in a part box); the chant names where each number goes.',
         },
         // The provider's own steps say "story"; bigSecond / bigFirst read the two operands.
-        example: { match: 'story', test: 'bigSecond' },
-        second: { test: 'bigFirst', label: 'Big part first? The whole is the same.' },
-        third: { test: 'bigSecond', label: 'Small part first? Still add the parts.' },
+        // (the chart: a crossing-ten pair such as 6 and 7, RESEARCH §E; the second example an ADD TO story, modelled on the board in I Do)
+        example: { match: 'story', test: 'wpBridge' },
+        second: { test: 'wpAddTo', label: 'Gets more? That is a part.' },
+        third: { test: 'wpEqual', label: 'Equal parts? Still add the parts.' },
         mixWith: [
             { key: 'composing:number_bonds', opts: { band: 10, unknown: 'answer' } },
             { key: 'addition:add_facts', opts: { band: 20 } },
@@ -105,22 +112,25 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, maxNum: 20 },
-        want: 'bigSecond',
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 2, noPart: [10] },
+        want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
         say: 'The answer is __ {wp.unit}.',
-        // The key's Workspace shows the bar to draw (to scale, in the key ink).
+        // The key's Workspace shows the bar to draw (schematic, its numbers in the key ink).
         keyBar: true,
+        // The pupil writes the sign (a printed + would give step 3 away).
+        signSlot: true,
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
     exit: [
-        { case: 'add to, big part first', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigFirst', detects: 'Copies a story number as the answer.' },
-        { case: 'small part first (Critical Atom)', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigSecond', detects: 'The whole written in a part box.' },
-        { case: 'put together, big part first', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigFirst', detects: 'Subtracts: the wrong sign.' },
-        { case: 'a whole past 10', ref: WP({ minNum: 11, maxNum: 20 }, EXIT_BAR), want: 'bigSecond', detects: 'Count slip past 10: one less.' },
+        // (three, not four: a full-size bar item is 36 mm tall, so a half holds three one across - the capacity rule)
+        { case: 'big part first, crossing ten', ref: WP({ minNum: 11, maxNum: 19 }, EXIT_BAR), want: 'wpBridgeBigFirst', detects: 'Copies a story number as the answer; subtracts.' },
+        { case: 'small part first (Critical Atom)', ref: WP({ minNum: 11, maxNum: 19 }, EXIT_BAR), want: 'wpBridgeSmallFirst', detects: 'The whole written in a part box.' },
+        { case: 'a whole of 14 or more, crossing ten', ref: WP({ minNum: 14, maxNum: 19 }, EXIT_BAR), want: 'wpBridgeHigh', detects: 'Count slip past 10: one less.' },
     ],
+    exitCols: 1,
     exitInstruction: 'Read the story. Fill in the bar. Solve.',
     // The Say reads slip item b (the Critical Atom's case): its own unit word, one blank.
     exitSay: 'b. The answer is __ {say.unit}.',
@@ -160,7 +170,7 @@ export default {
         { step: 'Find the two parts.', tag: 'New', check: 'Guided cell 1' },
         { step: 'Write the parts in the bar.', tag: 'New', critical: true, check: 'Check Question; exit slip b' },
         { step: 'The whole is missing. Add.', tag: 'Pre-requisite', check: 'Prerequisite Check e to h' },
-        { step: 'Write the whole and the label.', tag: 'Pre-requisite', check: 'Practice 1 a to f' },
+        { step: 'Write the whole in the answer box.', tag: 'Pre-requisite', check: 'Practice 1 a to f' },
     ],
     howToTeach: [
         'Cubes first: two trains of cubes on the bar mat, one under each part box.',
@@ -172,7 +182,7 @@ export default {
         { name: 'Whole in a part box', step: 2, looks: '{exit.1.wrong.barwholeinpart}', fix: 'Chant. Touch the top box.', option: 'A', misconception: 'bar-whole-in-part' },
         { name: 'Story number as answer', step: 4, looks: '{exit.0.wrong.barpartontop}', fix: '“Is it in the story?”', option: 'B', misconception: 'bar-part-on-top' },
         { name: 'Wrong sign', step: 3, looks: '{exit.2.wrong.wrongoperation}', fix: '“Whole missing? Add.”', option: 'C', misconception: 'wrong-operation' },
-        { name: 'Count slip past 10', step: 3, looks: 'One less than the whole', fix: 'Count on from the big part.', option: '' },
+        { name: 'Count slip past 10', step: 3, looks: '{exit.2.slip} for {exit.2.parts}', fix: 'Count on from the big part.', option: '', caught: 'Exit c' },
     ],
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
@@ -187,13 +197,13 @@ export default {
             rows: [
                 { do: 'Hand out the Number sense page. Band A first.' },
                 { say: 'Point. Say the number. Then write it.' },
-                { do: 'Early finishers go on to band B. Check together.', note: 'Band A: [[{ns.A.0.ans}]] · [[{ns.A.1.ans}]] · [[{ns.A.3.ans}]] · [[{ns.A.4.ans}]].' },
+                { do: 'Early finishers go on to band B. Check together.', note: 'Band A: [[{ns.A.0.ans}]] · [[{ns.A.1.ans}]] · [[{ns.A.2.ans}]] · [[{ns.A.3.ans}]] · [[{ns.A.4.ans}]].' },
             ] },
         { n: 3, name: 'Spaced retrieval', min: 3, page: '',
             rows: [
                 { do: 'Pupils hold mini whiteboards. Write each question on the board.' },
-                { ask: '{ret.0.ask}', note: 'Expected: [[{ret.0.n}]].' },
-                { ask: '{ret.1.ask}', note: 'Expected: [[{ret.1.n}]].' },
+                { ask: '{ret.0.ask}', note: 'Board: {ret.0.text} Expected: [[{ret.0.ans}]].' },
+                { ask: '{ret.1.ask}', note: 'Board: {ret.1.text} Expected: [[{ret.1.ans}]].' },
                 { do: 'Wrong on a board? Count on from the big number with fingers.' },
             ] },
         { n: 4, name: 'Chaining bridge', min: 2, page: '',
@@ -205,23 +215,20 @@ export default {
         { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'Whole in a part box', text: 'Model it wrong once, say “Wrong”, fix it. Never print it.' }],
             rows: [
                 { do: 'Put the anchor chart up. Read the story two times.' },
-                { say: 'Find the two parts.', note: 'Step 1. Point at each story number.' },
-                { do: 'Lay a cube train for each part under the bar mat.' },
+                { say: 'Find the two parts.', note: 'Step 1. Point at each number; lay a cube train for each.' },
                 { say: 'Parts below.', note: 'Step 2: write each part in a lower box.' },
-                { ask: 'Is the whole missing?', note: 'Expected: yes. Step 3.' },
-                { say: 'The whole is missing. Add.', note: 'Push the cubes together under the top box. Count on.' },
-                { say: 'The whole goes on top.', note: 'Step 4: write the whole and the label word.' },
-                { ask: 'How many {chart.unit} in all?', note: 'Expected: [[{chart.whole}]] {chart.unit}. Say it in a sentence.' },
-                { do: 'Swap the two cube trains on the mat: the other part first.' },
-                { ask: 'Same parts, other order. Same whole?', note: 'Expected: yes, the bar is the same length.' },
+                { say: 'The whole is missing. Add.', note: 'Step 3. Push the cubes together under the top box. Count on.' },
+                { say: 'Wrong. {chart.whole} is the whole. The whole goes on top.', note: 'First model it wrong: write {chart.whole} in a lower box. Then move it.' },
+                { ask: 'How many {chart.unit} in all?', note: 'Step 4. Expected: [[{chart.whole}]] {chart.unit}.' },
+                { do: 'Now an add-to story. Write on the board: {chart2.text}' },
+                { say: '“Gets more” is a part. “Now” asks for the whole.', note: 'Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
+                { ask: 'Swap the cube trains. Same whole?', note: 'Expected: yes, the bar is the same length.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
             rows: [
-                { do: 'Pupils open the lesson sheet at Guided Practice.' },
-                { say: 'Cell 1: the circles show the two parts.', note: 'Parts: [[{we.0.parts}]].' },
+                { say: 'Cell 1: the circles show the two parts.', note: 'Parts: [[{we.0.parts}]]. A part that “gets more” is a part too.' },
                 { ask: 'Which box is the whole?', note: 'Pupils point at the top box. Expected: [[{we.0.whole}]] {we.0.unit}.' },
                 { do: 'Pairs do cell 2: A talks, B points. Check every sheet.', note: 'Expected: [[{we.1.parts}]], whole [[{we.1.whole}]] {we.1.unit}.' },
-                { ask: 'Cell 2: is the big part first or second?', note: 'The whole is the same either way.' },
                 { say: 'Parts below. Whole on top. Add the parts.', note: 'The chant. Say it twice together.' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
@@ -231,7 +238,7 @@ export default {
                 { ask: 'Which bar is right? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}.' },
             ],
             loop: { most: 'Go on to You Do.', half: 'Redo one story on the bar mat with cubes, then two more.', fewer: 'Stop. Cubes again with two stories. Write each part under its train.' } },
-        { n: 8, name: 'You Do: Independent Practice', min: 10, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★) has the small part first. Walk there first.' }],
+        { n: 8, name: 'You Do: Independent Practice', min: 10, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★): equal parts and a whole of 20. Walk there first.' }],
             rows: [
                 { do: 'Pupils do Practice 1. The Steps are at the top of the page.' },
                 { do: 'Visit ELL and SPED pupils first, within 60 seconds.' },
@@ -240,35 +247,34 @@ export default {
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [
                 { do: 'Read the story aloud two times. Pupils tick each box.' },
-                { say: 'No bar this time. Draw the bar.', note: 'Right: two parts in either order, the whole on top.' },
+                { say: 'No bar this time. Draw the bar. Write the sign.', note: 'Any order of the parts, the whole on top. Expected: [[{wp.eq}]] {wp.unit}.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
             rows: [
                 { say: 'Parts below. Whole on top. Add the parts.', note: 'Say the chant together twice.' },
-                { do: 'Hand out the exit slip. No help. Sort the slips by the boxes ticked.', note: 'a. [[{exit.0.ans}]] · b. [[{exit.1.ans}]] · c. [[{exit.2.ans}]] · d. [[{exit.3.ans}]].' },
+                { do: 'Hand out the exit slip. No help. Sort the slips by the boxes ticked.', note: 'a. [[{exit.0.ans}]] · b. [[{exit.1.ans}]] · c. [[{exit.2.ans}]].' },
                 { ask: 'Can you solve a story with a bar? Thumbs.' },
             ] },
     ],
     transitionsMin: 4,
     // T2b: this lesson's own slots and routing ids
-    slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'line', use: 'P5: the answer, then its label word' }],
+    slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'line', use: 'P5: the answer on the story line' }],
     routeNote: 'K CC 5 Count to 20 · Y1 B2 S2 Part-whole model · G1 OA 6 Add within 20: the lessons P0 routes back to (T6).',
 
     // ------------------------------------------------------------------ T6
     accepted: [
         'The two parts in either order in the lower boxes.',
         'The equation in either order (6 + 7 or 7 + 6).',
-        'The label word is the story noun. On P5, any two-part bar with the right labels.',
+        'The label word is printed: never marked. On P5, any two-part bar, the whole on top.',
         'The answer box and the top box hold the same number. A blank part box with the right whole: ask for the parts.',
         'P5 equation: the two parts in either order, then the whole after =.',
-        'Mixed page: a fact answer needs no label word; a story answer does.',
         'Exit slip: sort by the boxes ticked; “one more day” pupils join the cube group next lesson.',
     ],
     wrongAnswers: [
         { wrote: '{exit.1.wrong.barwholeinpart} (b)', mistake: 'Whole in a part box', next: 'The chant; touch the top box.' },
         { wrote: '{exit.0.wrong.barpartontop} (a)', mistake: 'Story number as answer', next: '“Is it in the story? Then it is a part.”' },
-        { wrote: '{exit.3.wrong.barwholeinpart} (d)', mistake: 'Whole in a part box', next: 'Point: the whole goes on top.' },
-        { wrote: '{exit.3.wrong.wrongoperation} (d)', mistake: 'Wrong sign', next: 'Cubes: push the trains together.' },
+        { wrote: '{exit.2.slip} (c)', mistake: 'Count slip past 10', next: 'Count on from the big part with fingers.' },
+        { wrote: '{exit.2.wrong.barwholeinpart} (c)', mistake: 'Whole in a part box', next: 'Point: the whole goes on top.' },
         { wrote: '{exit.1.wrong.wrongoperation} (b)', mistake: 'Wrong sign', next: '“In all”: point at the top box.' },
         { wrote: '{exit.2.wrong.barpartontop} (c)', mistake: 'Story number as answer', next: 'Count both cube trains together.' },
         { wrote: '{exit.2.wrong.wrongoperation} (c)', mistake: 'Wrong sign', next: '“Is the whole missing? Add.”' },

@@ -1325,6 +1325,12 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |
+| `standard-form` | Write the number. | expanded form or a number name to a numeral (already in the kit library; recorded 2026-10-16, detailed lessons) |
+| `unit-form` | Write how many of each place. | unit form: hundreds, tens and ones (already in the kit library; recorded 2026-10-16, detailed lessons) |
+| `number-words` | Write the number in words. | numeral to number name (added 2026-10-16, detailed lessons, composing:number_word_form) |
+| `story-bar` | Read the story. Fill in the bar. Solve. | word problem with a part-whole bar to fill (added 2026-10-16, detailed lesson 2) |
+| `turn-facts` | Look at the array. Write two facts. | an array and its turn: write both multiplication facts (added 2026-10-16, mult_properties form 0) |
+| `turn-new` | Turn the array. Write the new fact. | one fact known, write the turned fact (added 2026-10-16, mult_properties form 0) |
 
 | Id | Rule |
 |---|---|
