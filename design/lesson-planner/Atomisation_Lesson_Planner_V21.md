@@ -2491,6 +2491,10 @@ Teacher band labels (teacher pages only): `Lesson guidance:` `Lesson flow:` `Mat
 - **CL-7** One idea per cell: one problem, one visual, one answer type. No skill name, level or code.
 - **CL-8** Padding 3 mm. Stacked-arithmetic cells: top pad 8 mm (room for the letter), sides 6 mm,
   bottom 4 mm.
+- **Stack geometry (site precedent).** As in the site's `stack` template, a fact stack is three tracks —
+  operator (1.35 em), tens, ones — and the 1.5 pt sum rule runs from the left edge of the `+` to the right of
+  the ones track (about 26 mm at L), with no overhang. The stack is centred in its cell; the cell is sized so
+  the empty-band test (below) passes honestly, never by stretching the rule.
 - **CL-9** In a 1-column stacked layout the stack is centred in the leftmost 62 mm; the rest is open
   working space. (No V21 page uses a 1-column stack: the exit slip is a 2 × 2 grid, §9.7.)
 - **CL-10** Quiet letter `a.` `b.` … at 10 pt, 1.5 mm from the top-left corners. Letters restart at `a.` on
@@ -2962,17 +2966,24 @@ kind when one item alone would leave an empty band (Score then counts items). Re
 - A lesson prints 1–2 Practice pages (as many as the teacher asks). Each starts its letters at `a.`.
 - Optional Mixed page: earlier skills only, the lesson skill fills at least half the items. It keeps the
   pack's I Can title (R5); the band label `Mixed Review:` names it; tab line 3 `Mixed n`.
-- Item rules for every page of the packet [LR-2, LR-5…7]: only the cases the chart teaches; **no exact
-  repeat in the packet** (chart examples included); **no turn-around pair on one page**; a chart example is
-  never dealt turned round; no near twins; **no two items on a page share an answer** (when the pool has
-  fewer distinct answers than the page has items — add 1–3 within 10 has 9 — none in one row); **the last row
-  holds only edge cases** (that is what ★★★ means); at most one or two rare-case items in the other rows. **Pool test:** count the distinct items the skill allows. When the pool is
-  smaller than the packet needs, turn-arounds may appear on later pages, and the exit slip may repeat Practice
-  items — **only as many as the pool is short**: allowed repeats = places dealt − (pool size − forbidden
-  items). Add 1–3 within 10: 41 places, 39 ordered facts, 2 forbidden (the chart examples 7 + 2 and 2 + 8
-  turned round, LR-5) → 4 repeats allowed, all on the exit slip (Appendix E24).
+- Item rules for every page of the packet [LR-2, LR-5…7]: only the cases the chart teaches; the last row
+  holds only edge cases (that is what ★★★ means); at most one or two rare-case items in the other rows.
+  - **LR-5 No repeats.** No exact repeat anywhere in the packet — chart examples, Guided, Independent, both
+    Practice pages and the exit slip included. No turn-around pair on one page. A chart example is never dealt
+    turned round.
+  - **LR-6 Variety on a page.** No number is taken away twice on a page. No two answers on a page are alike
+    (when the pool has fewer distinct answers than the page has items — add 1–3 within 10 has 9 — none alike in
+    one row). No near twins: two items whose numbers are each within 2 of the other's (51 − 44 and 53 − 45;
+    27 − 19 and 77 − 19 also fail, the same number taken away). Addition: no first addend twice in one row of a
+    grid, and never three times running (not 4 + 1, 4 + 2, 4 + 3).
+  - **Pool sizing.** Places may never exceed the usable pool (pool − forbidden items). Count the places before
+    you deal; when they are more, take whole rows off the last Practice page first, then off Practice 1. The
+    exit slip never repeats an item: its four items appear on no other pupil page. Add 1–3 within 10: pool 39
+    ordered facts, 2 forbidden (the chart examples 7 + 2 and 2 + 8 turned round) → usable 37; the pack deals
+    exactly 37 (Practice 2 is a 3 × 3 page for that reason). Write the pool as a rule (`rule`, `range`) as well
+    as a list: the self-check recomputes it from the rule (Appendix E24).
 - **The pool travels with the pack.** The builder writes the pool into `pack.html` as
-  `<script type="application/json" id="v21-pool">{"op":"+","pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
+  `<script type="application/json" id="v21-pool">{"op":"+","rule":"(a, b) => …","range":[a0,a1,b0,b1],"pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
   and marks every dealt item cell `data-item="a+b"` (or `a−b`) `data-row="r"` (the second exit-slip half is a
   copy and carries no marks). The self-check reads only these.
 
@@ -5642,11 +5653,12 @@ html, body { margin: 0; padding: 0; background: #fff; }
 .ntab.w2 { min-width: 8.4mm; }
 
 /* 8. Vertical fact stack (VA-70): 3 tracks of 0.72 em; sum rule 1.5 pt; answer row 12 mm. */
-.stk { font-size: var(--digit); line-height: 1; display: grid; grid-template-columns: .95em .72em .72em; justify-content: center; }  /* operator track 0.95 em, digit tracks 0.72 em */
+.stk { font-size: var(--digit); line-height: 1; display: grid; grid-template-columns: 1.35em .72em .72em; justify-content: center; }  /* operator track 1.35 em (the + sits at its left edge), digit tracks 0.72 em */
+.stk > .op { justify-content: flex-start; }
 .stk > span { height: 1.15em; display: flex; align-items: center; justify-content: center; position: relative; }
 .stk .op { font-weight: 700; }
-.stk .rule { grid-column: 1 / -1; height: 0; border-top: var(--heavy) solid var(--ink); margin: 1mm -2.5mm 0; }  /* the sum rule overhangs the tracks by 2.5 mm each side */
-.stk .ans { grid-column: 1 / -1; height: var(--ans); display: grid; grid-template-columns: .95em .72em .72em; }
+.stk .rule { grid-column: 1 / -1; height: 0; border-top: var(--heavy) solid var(--ink); margin: 1mm 0 0; }  /* the sum rule runs from the + to the ones track, no overhang */
+.stk .ans { grid-column: 1 / -1; height: var(--ans); display: grid; grid-template-columns: 1.35em .72em .72em; }
 .stk .ans > span { display: flex; align-items: center; justify-content: center; }
 .ring { position: absolute; left: 50%; top: 50%; width: .82em; height: 1.08em; transform: translate(-50%, -50%); border: var(--hair) solid var(--ink); border-radius: 50%; }
 .ring.g { border: var(--dot) solid var(--grey); }
@@ -6055,11 +6067,12 @@ const PICS = {
     return `<path d="${p}Z" stroke-width="${r2(S.heavy)}"/>`; },
 };
 export function counters({ n = 5, kind = 'dot', item = 12, perRow = 5 } = {}) {
+  perRow = Math.min(perRow, 5);   // RP-21: rows of at most 5
   const pitch = item + 3, rows = Math.ceil(n / perRow), cols = Math.min(n, perRow);
   const w = cols * pitch - 3, h = rows * pitch - 3;
   let s = '';
   for (let i = 0; i < n; i++) s += PICS[kind]((i % perRow) * pitch, Math.floor(i / perRow) * pitch, item);
-  return svg(w, h, s, 'v-cnt');
+  return svg(w, h, s, 'v-cnt').replace('<svg ', `<svg data-per-row="${Math.min(n, perRow)}" `);
 }
 
 // Dot tile (a die face for 1-3): rounded 1 mm (object under 8 mm side uses 1 mm), side 9 mm at L.
@@ -6093,7 +6106,8 @@ export function base10({ hundreds = 0, tens = 0, ones = 0, u = 3.5 } = {}) {
 
 // RP-31. Quick-draw: open square = hundred (8 mm), stick = ten (10 mm), open dot = one (2.4 mm). All 1.5 pt.
 // crossTens / crossOnes: how many of the drawn tens / ones are crossed out (a 0.75 pt diagonal: taken away).
-export function quickDraw({ hundreds = 0, tens = 0, ones = 0, crossTens = 0, crossOnes = 0 } = {}) {
+// key: true draws the whole picture as the pupil's answer (key colour, data-ka).
+export function quickDraw({ hundreds = 0, tens = 0, ones = 0, crossTens = 0, crossOnes = 0, key = false } = {}) {
   let s = '', x = 1; const sw = r2(S.heavy), xw = r2(S.hair);
   for (let i = 0; i < hundreds; i++, x += 10) s += `<rect x="${x}" y="1" width="8" height="8" stroke-width="${sw}"/>`;
   if (hundreds) x += 2;
@@ -6103,6 +6117,7 @@ export function quickDraw({ hundreds = 0, tens = 0, ones = 0, crossTens = 0, cro
   for (let i = 0; i < ones; i++) { const cx = x + 1.5 + (i % 5) * 3.6, cy = 3 + Math.floor(i / 5) * 5;
     s += `<circle cx="${r2(cx)}" cy="${cy}" r="1.2" stroke-width="${sw}"/>`;
     if (i >= ones - crossOnes) s += `<path d="M${r2(cx - 1.6)} ${cy + 1.6} L${r2(cx + 1.6)} ${cy - 1.6}" stroke-width="${xw}"/>`; }
+  if (key) s = s.replace(/<(path|rect|circle) /g, '<$1 data-ka ');
   return svg(x + Math.min(ones, 5) * 3.6 + 2, Math.max(11, 6 + 5 * Math.ceil(ones / 5)), s, 'v-qd');
 }
 
@@ -6164,7 +6179,10 @@ export function numberBond({ whole = null, parts = [null, null], side = 20, spre
 }
 
 // RP-100/101. Analog clock, D = 50 mm at L (hour / half hour). hands:false = draw-the-hands face.
-export function clock({ h = 3, m = 0, D = 50, hands = true } = {}) {
+// hands: false = draw-the-hands face (none printed). handsState: 'ink' (given), 'grey' (model / newest mark),
+// 'key' (the pupil's answer: key only, key colour). show: 'both' | 'hour' | 'minute' (a Guided face may print the
+// hour hand grey and leave the minute hand to the pupil).
+export function clock({ h = 3, m = 0, D = 50, hands = true, handsState = 'ink', show = 'both' } = {}) {
   const R = D / 2, c = R; let s = `<circle cx="${c}" cy="${c}" r="${R}" stroke-width="${r2(S.heavy)}"/>`;
   s += `<circle cx="${c}" cy="${c}" r="${r2(0.9 * R)}" stroke-width="${r2(S.fine)}"/>`;
   for (let i = 0; i < 60; i++) { const a = i * Math.PI / 30, five = i % 5 === 0, r1 = 0.9 * R, r2_ = (five ? 0.8 : 0.85) * R;
@@ -6173,8 +6191,9 @@ export function clock({ h = 3, m = 0, D = 50, hands = true } = {}) {
   for (let k = 1; k <= 12; k++) { const a = k * Math.PI / 6; s += txt(c + 0.66 * R * Math.sin(a), c - 0.66 * R * Math.cos(a) + fs * 0.35, k, fs, { bold: true }); }
   if (hands) {
     const ha = (30 * (h % 12) + 0.5 * m) * Math.PI / 180, ma = 6 * m * Math.PI / 180;
-    s += `<path d="M${c} ${c} L${r2(c + 0.46 * R * Math.sin(ha))} ${r2(c - 0.46 * R * Math.cos(ha))}" stroke-width="${r2(S.rule)}"/>`;
-    s += `<path d="M${c} ${c} L${r2(c + 0.78 * R * Math.sin(ma))} ${r2(c - 0.78 * R * Math.cos(ma))}" stroke-width="${r2(S.heavy)}"/>`;
+    const st = handsState === 'grey' ? ` stroke="${GREY}"` : handsState === 'key' ? ' data-ka' : '';
+    if (show !== 'minute') s += `<path d="M${c} ${c} L${r2(c + 0.46 * R * Math.sin(ha))} ${r2(c - 0.46 * R * Math.cos(ha))}" stroke-width="${r2(S.rule)}"${st}/>`;
+    if (show !== 'hour') s += `<path d="M${c} ${c} L${r2(c + 0.78 * R * Math.sin(ma))} ${r2(c - 0.78 * R * Math.cos(ma))}" stroke-width="${r2(S.heavy)}"${st}/>`;
   }
   s += `<circle cx="${c}" cy="${c}" r="1" fill="#000" stroke="none"/>`;
   return svg(D, D, s, 'v-clock');
@@ -6323,7 +6342,8 @@ export function columnStackSub({ top, bottom, op = '−', regroup = 'slot', cros
 //   lines: [{x1, y1, x2, y2, state}] partition lines in FRACTIONS of the box (0..1): state 'ink' (given, 0.75 pt),
 //          'grey' (model, 1 pt grey), 'key' (the answer: key only). An unequal partition is just an off-centre line.
 //   shade: [[x, y], ...] a polygon in fractions of the box, filled flat grey (#949494): the given shaded part.
-//   guides: [[x, y], ...] guide dots (1.2 mm, grey) where a line may start and end. A HINT scaffold: Guided cells only,
+//   Every shape in one section takes the same task (one outline weight), so the weight never hints at the answer.
+//   guides: [[x, y], ...] guide dots (2.5 mm, grey) where a line may start and end. A HINT scaffold: Guided cells only,
 //          and placed on every candidate point (all 4 side midpoints of a rectangle), never only on the answer's ends.
 let shapeIds = 0;
 export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', lines = [], shade = null, guides = [] } = {}) {
@@ -6338,7 +6358,7 @@ export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', lines = [
   if (shade) out += `<clipPath id="${id}">${clip}</clipPath><path clip-path="url(#${id})" d="M${shade.map(([x, y]) => `${X(x)} ${Y(y)}`).join(' L')} Z" fill="${GREY}" stroke="none"/>`;
   out += clip.replace('/>', ` stroke-width="${sw}"/>`);
   for (const l of lines) out += `<path d="M${X(l.x1)} ${Y(l.y1)} L${X(l.x2)} ${Y(l.y2)}" stroke="${l.state === 'grey' ? GREY : '#000'}" stroke-width="${r2(l.state === 'grey' ? S.dot : S.hair)}"${l.state === 'key' ? ' data-ka' : ''}/>`;
-  for (const [x, y] of guides) out += `<circle cx="${X(x)}" cy="${Y(y)}" r="0.6" fill="${GREY}" stroke="none"/>`;
+  for (const [x, y] of guides) out += `<circle cx="${X(x)}" cy="${Y(y)}" r="1.25" fill="${GREY}" stroke="none"/>`;   // 2.5 mm, like the match dots
   return svg(w + 2 * p, h + 2 * p, out, 'v-shape');
 }
 ```
@@ -6465,8 +6485,9 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E21 | T2 atoms | rows of T2 Section 1 and their Atom Type cells; ★ in the two atom tables | ≥ 5 atoms; types only Category / Comparative / Fact / Conceptual; no ★ |
 | E22 | Thumbnails | `.thumb` elements on T3, T4, T5 | ≥ 1 on each delivery page |
 | E23 | Fade labels | the Fade column of T6 "Answers at a glance" | every row carries ★ / ★★ / ★★★ |
-| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | every item in the pool and not forbidden; 0 repeats outside the exit slip; exit repeats ≤ places − (pool − forbidden); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
-| E24b | Last row and twin answers | `data-row` of each Practice item; answers per page (per row when the pool has fewer distinct answers than the page has items) | last Practice row all in the pool's `edge` list; no twin answers |
+| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | the pool recomputed from its `rule` over `range` equals the listed pool; places ≤ pool − forbidden; every item in the pool and not forbidden; **0 exact repeats anywhere** (exit slip included); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
+| E24b | Last row and LR-6 | `data-row` of each Practice item; the items of every pupil page | last Practice row all in the pool's `edge` list; no twin answers (per page, per row when the pool has fewer distinct answers); − : distinct numbers taken away on a page, no near twins (both numbers within 2); + : no first addend twice in a grid row or three times running |
+| E27 | Counters in fives | `svg[data-per-row]` written by `counters()` | every set of counters drawn in rows of at most 5 (§19.3) |
 | E26 | Chart panels | each `data-step-panel` cell contains a visible #949494 mark | every step panel |
 | E25 | One key per page | pupil pages vs key pages | equal, the anchor chart included |
 
@@ -6635,6 +6656,7 @@ const R = await p.evaluate((LIBRARY) => {
     // items dealt on this page (pupil pages only), with their grid row
     P.items = (teacher || key) ? [] : [...pg.querySelectorAll('[data-item]')].map((e) => ({ item: e.dataset.item, row: +e.dataset.row }));
     P.kaCount = pg.querySelectorAll('.ka, [data-ka]').length;
+    P.perRow = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => +e.dataset.perRow);
     P.panels = [...pg.querySelectorAll('[data-step-panel]')].map((c) => [...c.querySelectorAll('*')].some((e) => {
       const cs = getComputedStyle(e); if (cs.display === 'none') return false;
       return [cs.color, cs.borderTopColor, cs.fill, cs.stroke].some((v) => rgb(v) === '#949494') && (e.textContent.trim() || e instanceof SVGElement || parseFloat(cs.borderTopWidth) > 0); }));
@@ -6712,16 +6734,20 @@ const all = [...items, ...exitItems];
 let e24 = { ok: false, msg: 'no pool JSON or no items in the pack' };
 if (POOL && all.length) {
   const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, inPool = new Set(POOL.pool.map(kk)), forb = new Set(POOL.forbidden.map(kk));
-  const usable = POOL.pool.length - POOL.forbidden.length, allowed = Math.max(0, all.length - usable);
-  const seen = new Set(), rep = [], exitRep = [], bad = [];
+  const usable = POOL.pool.length - POOL.forbidden.length;
+  // the pool is recomputed from its declared rule and must equal the listed pool
+  let ruleOk = false; try { const f = new Function('return ' + POOL.rule)(), [a0, a1, b0, b1] = POOL.range, re = [];
+    for (let a = a0; a <= a1; a++) for (let b = b0; b <= b1; b++) if (f(a, b)) re.push(kk([a, b]));
+    ruleOk = re.length === inPool.size && re.every((x) => inPool.has(x)); } catch (e) { ruleOk = false; }
+  const seen = new Set(), rep = [], bad = [];
   for (const x of all) { if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
-    if (seen.has(x.item)) (x.page === 'P6' ? exitRep : rep).push(x.item); seen.add(x.item); }
+    if (seen.has(x.item)) rep.push(x.item + ' ' + x.page); seen.add(x.item); }
   const turns = []; if (op === '+') for (const p of pupil) { const s2 = new Set(p.items.map((x) => x.item));
     for (const x of p.items) { const [a, b] = x.item.split('+'); if (a !== b && +a > +b && s2.has(`${b}+${a}`)) turns.push(`${x.item} on ${p.id}`); } }
-  e24 = { ok: !bad.length && !rep.length && exitRep.length <= allowed && !turns.length,
-    msg: `${all.length} items read from the pages; pool ${POOL.pool.length} (usable ${usable}); repeats allowed ${allowed}; exit-slip repeats ${exitRep.length}; other repeats ${rep.length}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}` };
+  e24 = { ok: ruleOk && !bad.length && !rep.length && !turns.length && all.length <= usable,
+    msg: `${all.length} places, usable pool ${usable} (pool ${POOL.pool.length} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); exact repeats ${rep.length ? rep.join(', ') : 0}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}` };
 }
-row('E24', 'Item pool, read from the pack: every item in the pool and not forbidden; no exact repeat except on the exit slip and only as many as the pool is short (places − usable pool); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
+row('E24', 'Item pool, read from the pack (LR-5): pool recomputed from its declared rule; places ≤ usable pool; every item in the pool and not forbidden; ZERO exact repeats anywhere (exit slip included); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
 let e24b = { ok: false, msg: 'no pool' };
 if (POOL) { const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, edge = new Set(POOL.edge.map(kk));
   const val = (s3) => { const [a, b] = s3.split(op).map(Number); return op === '+' ? a + b : a - b; };
@@ -6730,8 +6756,17 @@ if (POOL) { const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, edge = new Set
   for (const p of pr) { const last = Math.max(...p.items.map((x) => x.row)); p.items.filter((x) => x.row === last && !edge.has(x.item)).forEach((x) => probs.push(`${x.item} not an edge case (${p.id})`)); }
   for (const p of pupil) { if (!p.items.length) continue; const whole = /^P[46]/.test(p.id) && answers >= p.items.length; const groups = whole ? [p.items] : [...new Set(p.items.map((x) => x.row))].map((r) => p.items.filter((x) => x.row === r));
     for (const g of groups) { const v = g.map((x) => val(x.item)); if (new Set(v).size !== v.length) probs.push(`twin answers on ${p.id}${whole ? '' : ' (a row)'}`); } }
-  e24b = { ok: !probs.length && pr.length > 0, msg: probs.length ? probs.join('; ') : `${pr.length} Practice pages: last rows all edge cases; no twin answers (per page, or per row when the pool has fewer answers than the page has items)` }; }
-row('E24b', 'Practice last row holds only edge cases (★★★ is true); no two items on a page share an answer', e24b.msg, e24b.ok);
+  // LR-6 (variety on a page)
+  for (const p of pupil) { if (!p.items.length) continue; const xs = p.items.map((x) => ({ ...x, n: x.item.split(op).map(Number) }));
+    if (op === '−') { const subs = xs.map((x) => x.n[1]); if (new Set(subs).size !== subs.length) probs.push(`a number taken away twice on ${p.id}`);
+      for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) { const [a, b] = xs[i].n, [c, d] = xs[j].n;
+        if (Math.abs(a - c) <= 2 && Math.abs(b - d) <= 2) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${p.id}`);
+        } }
+    if (op === '+') { for (const r of new Set(xs.map((x) => x.row))) { const g = xs.filter((x) => x.row === r).map((x) => x.n[0]);
+        if (new Set(g).size !== g.length) probs.push(`first addend repeated in a row on ${p.id}`); }
+      for (let i = 2; i < xs.length; i++) if (xs[i].n[0] === xs[i - 1].n[0] && xs[i].n[0] === xs[i - 2].n[0]) probs.push(`first addend ${xs[i].n[0]} three times in a row on ${p.id}`); } }
+  e24b = { ok: !probs.length && pr.length > 0, msg: probs.length ? probs.join('; ') : `${pr.length} Practice pages: last rows all edge cases; LR-6 holds on every pupil page; no twin answers (per page, or per row when the pool has fewer answers than the page has items)` }; }
+row('E24b', 'Practice last row holds only edge cases (★★★ is true); LR-6: no two answers alike on a page; − : no number taken away twice on a page and no near twins (both numbers within 2 of another item); + : no first addend twice in a row of the grid or three times running', e24b.msg, e24b.ok);
 const chartPages = pages.filter((p) => /^P2/.test(p.id));
 row('E17b', 'The anchor chart and its key carry no answer marks (no .ka / data-ka)', chartPages.map((p) => p.id + ': ' + p.kaCount).join(', '), chartPages.length === 2 && chartPages.every((p) => p.kaCount === 0));
 const ch = pages.find((p) => p.id === 'P2');
@@ -6739,6 +6774,8 @@ row('E26', 'Every anchor-chart step panel adds at least one grey (newest) mark',
 const t1 = pages.find((p) => p.id === 'T1'), t2n = pages.find((p) => p.id === 'T2');
 const want = t2n && t2n.newSteps >= 4 ? 'Chunked' : 'Standard';
 row('E21b', 'T1 flow word = the rule: Chunked when the T2 routine table has ≥ 4 rows tagged New, else Standard', `T2 New routine steps ${t2n ? t2n.newSteps : '?'} → ${want}; T1 says "${(t1 && t1.flow.match(/Flow: (\w+)/) || [])[1]}"`, !!t1 && new RegExp('Flow: ' + want).test(t1.flow));
+const cnt = pupil.flatMap((p) => (p.perRow || []).map((n) => p.id + ':' + n));
+row('E27', 'Counters are drawn in rows of at most 5 (RP-21, §19.3)', cnt.length ? cnt.join(', ') : 'no counters', pupil.every((p) => (p.perRow || []).every((n) => n <= 5)));
 row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === p.id + '-key')));
 
 const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
@@ -6769,7 +6806,7 @@ Level 1, Addition. Footer `add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, 
 Pictures. Flow: Standard (2 routine steps tagged New). Steps: 1 `start` Start with the big number. · 2 `count` Count on. ·
 3 `write` Write how many. Frame “__ plus __ equals __.” Chant: Big number first. Count on. Write it.
 **Cases:** big number first; big number second; same numbers; a sum of 10. **Pool:** a + b, min(a, b) ∈ 1–3,
-a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned round), 41 places → 4 repeats allowed, all on the exit slip (pool test).
+a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned round) → usable 37 = 37 places (2 Guided + 6 Independent + 12 + 9 Practice + 4 exit + 3 chart + 1 word problem). 0 repeats.
 
 | Page | Content | Answers (key) |
 |---|---|---|
@@ -6778,15 +6815,15 @@ a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned roun
 | T2b | Page ids, packet order, Score rule, fade levels, data loop, abbreviations, slot shapes, icons, band labels | — |
 | T3 | Sections 1–4 with the P0 thumbnail | ★ 8, 7, 9, 2 · band A / B · 10, 6 dots, 3 |
 | T4 | Sections 5–6 with the chart and lesson-sheet thumbnails | 9, 8 · ★ 8, 8, 4 |
-| T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 7, 9, 2, 10 |
-| P0 | a 8 triangles + square; b number track 3 4 5 6 [ ] 8 9; c 4 and 9; d bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
+| T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 8, 7, 2, 10 |
+| P0 | a 8 triangles in rows of 5 and 3 + square; b number track 3 4 5 6 [ ] 8 9; c 4 and 9; d bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
 | P1 | A: [ ] 5 [ ]; 3, 4, [ ], 6; 7 ○ 4; 6 + [ ] = 10; 9, 8, [ ], 6. B: [ ] 14 [ ]; 16, 17, [ ], 19; 12 ○ 21; 3 + [ ] = 10; 15, 14, [ ], 12. Score /10 | 4, 6 · 5 · > · 4 · 7 · 13, 15 · 18 · < · 7 · 13 |
 | P2 | Panels 7 + 2 (step 1 grey ring on 7; step 2 grey tile and hops; step 3 grey 9); `Another example:` 2 + 8 = 10 and 3 + 3 = 6, all in black; Say; Rule | key = same chart, tab Answer Key (no answer marks) |
-| P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 6 + 2 (ring grey), 1 + 6, 2 + 2 (51 mm cells) beside Steps; Independent a–f 5 + 2, 9 + 1, 1 + 5 / 3 + 4, 6 + 3, 2 + 4. Score /6 | lines · 8, 7, 4 · 7, 10, 6, 7, 9, 6 |
-| P4 Practice 1 | 3 × 4 by rows: 5+3, 5+1, 2+5 / 4+1, 4+2, 4+3 / 8+1, 2+1, 1+3 / 1+1, 3+7, 1+7 (last row ★★★: same, sum of 10, big second) | 8, 6, 7 / 5, 6, 7 / 9, 3, 4 / 2, 10, 8 (no twin in a row) |
-| P4 Practice 2 | 3 × 4 by rows: 7+1, 6+1, 3+1 / 1+4, 3+5, 1+2 / 2+3, 1+8, 7+3 / 3+6, 1+9, 2+6 (last row ★★★) | 8, 7, 4 / 5, 8, 3 / 5, 9, 10 / 9, 10, 8 |
+| P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 4 + 1 (ring grey), 3 + 7 beside Steps; Independent a–f 6 + 1, 1 + 8, 2 + 1 / 5 + 2, 7 + 1, 2 + 4. Score /6 | lines · 5, 10 · 7, 9, 3, 7, 8, 6 |
+| P4 Practice 1 | 3 × 4 by rows: 4+3, 1+2, 5+1 / 9+1, 1+7, 4+2 / 2+2, 3+5, 8+1 / 2+6, 1+3, 3+6 (last row ★★★) | 7, 3, 6 / 10, 8, 6 / 4, 8, 9 / 8, 4, 9 |
+| P4 Practice 2 | 3 × 3 (sized to the pool) by rows: 6+3, 3+1, 1+6 / 6+2, 2+3, 1+5 / 7+3, 2+5, 1+4 (last row ★★★: sum of 10, big second) | 9, 4, 7 / 8, 5, 6 / 10, 7, 5 |
 | P5 | Omar has 3 cars. He gets 2 more cars. How many …? Answer line in the story; 6-row panel; Workspace; frame | 3 + 2 = 5; 5 cars |
-| P6 | Each half: 4 + 3, 3 + 6, 1 + 1, 3 + 7 (2 × 2); Say “a. 4 plus 3 equals __.”; two check boxes; Score /4 | 7, 9, 2, 10 |
+| P6 | Each half: 5 + 3, 3 + 4, 1 + 1, 1 + 9 (2 × 2, on no other page); Say “a. 5 plus 3 equals __.”; two check boxes; Score /4 | 8, 7, 2, 10 |
 | T6 | Routing (atoms 1–4 → K-3, K-4, K-6, K-9); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
 ### F.2 Subtract within 100 with regrouping, Level 2
@@ -6810,8 +6847,8 @@ empty). Every item regroups. No exact repeats, no turn-arounds (subtraction has 
 | P2 | 2 × 3 panels on 52 − 39 (1: grey rings round 2 and 9 → 2: 4 / 12 grey with grey cross-outs → 3: 3 grey → 4: 1 grey → 5: 13 + 39 with a grey carry 1 and grey 52 in the strip); 6th panel `Another example:` 60 − 3 = 57 in black; Say; Rule | key = same chart |
 | P3 | Vocabulary rods / cubes / trade → ones · regroup · tens; Remember: 1 ten is 10 ones.; Guided 74 − 28 (regroup grey), 91 − 46, 50 − 7 (62 mm cells) beside 5 Steps; Independent a–c 83 − 36, 62 − 9, 46 − 38. Score /3 | 46, 45, 43 · 47, 53, 8 |
 | P4 Practice 1 | 2 × 3 with Check lines: 45 − 27, 63 − 47 / 85 − 29, 41 − 35 / 72 − 8, 70 − 44 (last row ★★★: one-digit, 0 ones) | 18, 16 / 56, 6 / 64, 26 |
-| P4 Practice 2 | 92 − 56, 64 − 38 / 57 − 38, 26 − 19 / 31 − 7, 80 − 52 (last row ★★★) | 36, 26 / 19, 7 / 24, 28 |
-| P5 | Ana has 42 stickers. She gives away 17 stickers. How many stickers does Ana have? | 42 − 17 = 25; 25 stickers; key drawing: 3 sticks and 12 dots (one ten traded), 1 stick and 7 dots crossed out |
+| P4 Practice 2 | 92 − 56, 64 − 38 / 57 − 28, 26 − 19 / 31 − 7, 80 − 52 (last row ★★★; six different numbers taken away) | 36, 26 / 29, 7 / 24, 28 |
+| P5 | Ana has 42 stickers. She gives away 17 stickers. How many stickers does Ana have? | 42 − 17 = 25; 25 stickers; key drawing (the pupil's picture, in the key colour): 3 sticks and 12 dots (one ten traded), 1 stick and 7 dots crossed out |
 | P6 | Each half: 43 − 27, 40 − 13, 55 − 8, 42 − 36 (2 × 2, no heads); Say “a. 43 minus 27 equals __.” | 16, 27, 47, 6 |
 | T6 | Routing (1-12, 2-3, 1-20, 2-6); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
@@ -6851,16 +6888,17 @@ const { it, LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, 
 
 // ---- items (Appendix F.1): pool a + b, min(a, b) in 1..3, a + b <= 10 ----
 const CHART = [[7, 2], [2, 8], [3, 3]];
-const GUIDED = [[6, 2], [1, 6], [2, 2]];                       // the Model's case first (big first), then big second, then same
-const INDEP = [[5, 2], [9, 1], [1, 5], [3, 4], [6, 3], [2, 4]];   // rows of 3: no two equal answers in a row
-const P1 = [[5, 3], [5, 1], [2, 5], [4, 1], [4, 2], [4, 3], [8, 1], [2, 1], [1, 3], [1, 1], [3, 7], [1, 7]];
-const P2 = [[7, 1], [6, 1], [3, 1], [1, 4], [3, 5], [1, 2], [2, 3], [1, 8], [7, 3], [3, 6], [1, 9], [2, 6]];
+const GUIDED = [[4, 1], [3, 7]];                               // the Model's case first (big first), then big second (sum of 10)
+const INDEP = [[6, 1], [1, 8], [2, 1], [5, 2], [7, 1], [2, 4]];   // rows of 3: no twin answers, no first addend twice in a row
+const P1 = [[4, 3], [1, 2], [5, 1], [9, 1], [1, 7], [4, 2], [2, 2], [3, 5], [8, 1], [2, 6], [1, 3], [3, 6]];
+const P2 = [[6, 3], [3, 1], [1, 6], [6, 2], [2, 3], [1, 5], [7, 3], [2, 5], [1, 4]];   // 3 x 3: places must not exceed the usable pool
 const STORY = [3, 2];
-const EXIT = [[4, 3], [3, 6], [1, 1], [3, 7]];                  // big first · big second count 3 · same · sum of 10
+const EXIT = [[5, 3], [3, 4], [1, 1], [1, 9]];                  // big first count 3 · big second count 3 · same · sum of 10 (all fresh)
 // The item pool, written into the pack for the self-check (E24, E24b): every a + b with min(a, b) in 1..3 and
 // a + b <= 10; forbidden = the chart examples turned round (LR-5); edge = the cases of the last Practice row.
 const POOLLIST = []; for (let a = 1; a <= 9; a++) for (let b = 1; b <= 9; b++) if (Math.min(a, b) <= 3 && a + b <= 10) POOLLIST.push([a, b]);
-const POOL = { op: '+', pool: POOLLIST, forbidden: [[2, 7], [8, 2]], edge: POOLLIST.filter(([a, b]) => a < b || a === b || a + b === 10) };
+const POOL = { op: '+', rule: '(a, b) => a >= 1 && b >= 1 && Math.min(a, b) <= 3 && a + b <= 10', range: [1, 9, 1, 9],
+  edgeRule: '(a, b) => a < b || a === b || a + b === 10', pool: POOLLIST, forbidden: [[2, 7], [8, 2]], edge: POOLLIST.filter(([a, b]) => a < b || a === b || a + b === 10) };
 
 const fact = (a, b, key, o = {}) => factStack({ top: a, bottom: b, ans: key ? a + b : null, ...o });
 const cellF = (a, b, i, key, cols = 3, copy = false) => `<div class="cell" style="padding-top:8mm"${it(a, b, '+', Math.floor(i / cols), copy)}>${lt(i)}${fact(a, b, key)}</div>`;
@@ -6870,9 +6908,9 @@ function prereq(key) {
   const s = (instr, inner, tag, fl) => `<div class="band" style="${typeof fl === 'string' ? `flex:none;height:${fl}` : `flex:${fl} 1 0`};min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
     (key ? `<span style="margin-left:auto;font-size:11pt">If missed → ${tag}</span>` : '') + `</div>` +
     `<div class="grid" style="grid-template-columns:1fr"><div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${inner}</div></div></div>`;
-  return s('Count. Write the number.', lt(0) + counters({ n: 8, kind: 'triangle', perRow: 8 }) + `<span class="sq" data-slot="sq">${k(8)}</span>`, 'Lesson K-3 Count to 10', '42mm') +
-    s('Write the missing number.', lt(1) + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', '36mm') +
-    s('Circle the bigger number.', lt(2) + `<div class="eq" style="gap:100mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', '34mm') +
+  return s('Count. Write the number.', lt(0) + counters({ n: 8, kind: 'triangle', perRow: 5 }) + `<span class="sq" data-slot="sq">${k(8)}</span>`, 'Lesson K-3 Count to 10', '46mm') +
+    s('Write the missing number.', lt(1) + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', '34mm') +
+    s('Circle the bigger number.', lt(2) + `<div class="eq" style="gap:100mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', '32mm') +
     s('Write the missing number.', lt(3) + '<span data-slot="bond"></span>' + numberBond({ whole: 7, parts: [5, { v: 2, ka: true }], spread: 110, drop: 24 }), 'Lesson K-9 Number bonds to 10', 1.55);
 }
 
@@ -6929,15 +6967,15 @@ function sheet(key) {
       tile: { at: bigAt === 'top' ? 'bottom' : 'top', n: Math.min(a, b), grey: true } })}</div></div>`; };
   const guided = `<div class="band" style="flex:none" data-section="guided"><div class="row" style="border-top:1.5pt solid #000">` +
     `<div style="flex:1;display:flex;flex-direction:column;border-right:1.5pt solid #000"><div class="strip"><b>Guided Practice:</b><span data-instr>Add.</span></div>` +
-    `<div class="grid" style="flex:none;height:51mm;grid-template-columns:repeat(3,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
+    `<div class="grid" style="flex:none;height:51mm;grid-template-columns:repeat(2,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
     `<div style="flex:0 0 66mm;display:flex;flex-direction:column"><div class="strip"><b>Steps:</b></div>${stepsList()}</div></div></div>`;
   const indep = `<div class="band grow" data-section="indep"><div class="strip"><b>Independent Practice:</b><span data-instr>Add.</span></div>` +
     `<div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)">${INDEP.map(([a, b], i) => cellF(a, b, i, key)).join('')}</div></div>`;
   return vocab + `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>` + guided + indep;
 }
 
-const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr)">` +
-  items.map(([a, b], i) => cellF(a, b, i, key)).join('') + `</div>`;
+const practice = (items, key, cols = 3) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${items.length / cols},1fr)">` +
+  items.map(([a, b], i) => cellF(a, b, i, key, cols)).join('') + `</div>`;
 
 // ---- P5 Word problem: story 58 %, routine panel 42 %, one action per check box, 13 pt (Steps-box size) ----
 function wordProblem(key) {
@@ -6967,7 +7005,7 @@ const P = [
   { id: 'P2', render: (key) => pupilPage({ id: 'P2', l3: 'Anchor chart', fields: false, body: chart(), key }) },
   { id: 'P3', render: (key) => pupilPage({ id: 'P3', l3: 'Lesson 1', score: 6, body: sheet(key), key }) },
   { id: 'P4a', render: (key) => pupilPage({ id: 'P4a', l3: 'Practice 1', score: 12, body: practice(P1, key), key }) },
-  { id: 'P4b', render: (key) => pupilPage({ id: 'P4b', l3: 'Practice 2', score: 12, body: practice(P2, key), key }) },
+  { id: 'P4b', render: (key) => pupilPage({ id: 'P4b', l3: 'Practice 2', score: 9, body: practice(P2, key, 3), key }) },
   { id: 'P5', render: (key) => pupilPage({ id: 'P5', l3: 'Word problem', score: 1, body: wordProblem(key), key }) },
   { id: 'P6', render: (key) => exitPage({ half: exitHalf, key }) },
 ];
@@ -7042,10 +7080,10 @@ const T4 = sec('Section 5 · I Do (12 min)', withThumb(tbox('watch', 'Watch:', '
       sc(3, [['Do:', 'Write 9 under the line.'], ['Say:', `“Write how many. 7 plus 2 equals 9.” ${ans('9')}`]]), pg('P2')) +
     sc(4, [['Do:', 'Repeat with 2 + 8 and 3 + 3 (chart, Another example band).'], ['Ask:', `“Which number do we start with in 2 + 8?” ${ans('8')}`]]) +
     sc(5, [['Do:', 'Pupils tell a partner why we start big (oral only).'], ['Say:', `“We start with the big number because ${blank()} .”`]])) +
-  sec('Section 6 · We Do (8 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'In cell 1 the ring is grey: pupils trace it. Every Guided cell has a grey dot tile.') +
-      sc(1, [['Do:', 'Lesson sheet, Guided Practice. Work cell 1 together: trace the ring, count on, write.'], ['Say:', `“6 plus 2. Start with 6. Count on 2: 7, 8.” ${ans('8')} ★`]]) +
-      sc(2, [['Do:', 'Pairs do cells 2 and 3; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('6, then 2')}`],
-        ['Note:', `Answers ★: ${ans('7')}, ${ans('4')}. Manipulative: counters and the 0–10 track.`]]), pg('P3')), true);
+  sec('Section 6 · We Do (8 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'In cell 1 the ring is grey: pupils trace it. Both Guided cells have a grey dot tile.') +
+      sc(1, [['Do:', 'Lesson sheet, Guided Practice. Work cell 1 together: trace the ring, count on, write.'], ['Say:', `“4 plus 1. Start with 4. Count on 1: 5.” ${ans('5')} ★`]]) +
+      sc(2, [['Do:', 'Pairs do cell 2; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('7')}`],
+        ['Note:', `Answer ★: ${ans('10')}. Manipulative: counters and the 0–10 track.`]]), pg('P3')), true);
 
 const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“6 + 3. Which is right? A: 6, 7, 8 → 8. B: 3, then 4 … 9 → 9. C: start 6, count on 7, 8, 9 → 9.”'],
       ['Note:', `${ans('C')} — the routine. <b>A</b>: Counting the start. <b>B</b>: Starting small (right answer, slow method).`]]) +
@@ -7055,7 +7093,7 @@ const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', 
       tbox('feedback', 'Feedback:', 'Name the step.', '“You started with the big number. That is step 1.” Fix: “Point to step 2. Count the dots.”'), pg('P4a'))) +
   sec('Section 9 · Word problem (in You Do, ★★)', sc(1, [['Do:', 'Read the story aloud twice. Pupils check one box per action.'], ['Note:', `Accept ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}; answer ${ans('5 cars')}.`]])) +
   sec('Section 10 · Plenary (7 min)', sc(1, [['Do:', 'Exit slip: four facts. Pupils say the frame for a, then check one box.'],
-      ['Note:', `★★ a ${ans('7')} (big first) · b ${ans('9')} (big second: catches Starting small and Counting the start → 8) · c ${ans('2')} (same) · d ${ans('10')} (sum of 10).`]]) +
+      ['Note:', `★★ a ${ans('8')} (big first) · b ${ans('7')} (big second: catches Starting small and Counting the start → 6) · c ${ans('2')} (same) · d ${ans('10')} (sum of 10). None of the four appears on any other page.`]]) +
     sc(2, [['Say:', '“Big number first. Count on. Write it.” (chant, twice)'], ['Ask:', 'Thumbs: “Can you add 1, 2 or 3?” (oral)']]), true);
 
 const sum = (items) => items.map(([a, b], i) => `${LET[i]} ${a + b}`).join(' · ');
@@ -7068,7 +7106,7 @@ const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T
     ['Prerequisite Check', ans('a 8 · b 7 · c 9 circled · d 2'), '★'], ['Number sense A', ans('1: 4, 6 · 2: 5 · 3: &gt; · 4: 4 · 5: 7'), '★'], ['Number sense B', ans('6: 13, 15 · 7: 18 · 8: &lt; · 9: 7 · 10: 13'), '★★'],
     ['Lesson 1, Guided', ans(GUIDED.map(([a, b]) => a + b).join(' · ')), '★'], ['Lesson 1, Independent', ans(sum(INDEP)), '★★'],
     ['Practice 1, a–i', ans(sum(P1.slice(0, 9))), '★★'], ['Practice 1, j–l', ans(sum(P1).split(' · ').slice(9).join(' · ')), '★★★'],
-    ['Practice 2, a–i', ans(sum(P2.slice(0, 9))), '★★'], ['Practice 2, j–l', ans(sum(P2).split(' · ').slice(9).join(' · ')), '★★★'],
+    ['Practice 2, a–f', ans(sum(P2.slice(0, 6))), '★★'], ['Practice 2, g–i', ans(sum(P2).split(' · ').slice(6).join(' · ')), '★★★'],
     ['Word problem', ans('5 cars'), '★★'], ['Exit slip', ans(sum(EXIT)), '★★']]) +
     `<h3 style="margin-top:2mm">Wrong answers to look for when marking</h3>` + table(['Pupil wrote', 'Likely mistake', 'Next step'], [
       ['one less than the key (exit b → 8)', 'Counting the start', 'Feedback: “Say the start, count the dots.”'],
@@ -7108,13 +7146,14 @@ const CHART = [[52, 39], [60, 3]];
 const GUIDED = [[74, 28], [91, 46], [50, 7]];
 const INDEP = [[83, 36], [62, 9], [46, 38]];
 const P1 = [[45, 27], [63, 47], [85, 29], [41, 35], [72, 8], [70, 44]];   // last row: one-digit, 0 ones (edge cases)
-const P2 = [[92, 56], [64, 38], [57, 38], [26, 19], [31, 7], [80, 52]];
+const P2 = [[92, 56], [64, 38], [57, 28], [26, 19], [31, 7], [80, 52]];
 const STORY = [42, 17];
 const EXIT = [[43, 27], [40, 13], [55, 8], [42, 36]];          // regroup · zero ones · one digit · tens answer 0
 // The item pool, written into the pack (E24, E24b): a two-digit, a − b >= 1, ones(a) < ones(b) (every item regroups).
 // edge = one-digit take-away, 0 in the ones of the top number, or a tens answer of 0.
 const POOLLIST = []; for (let a = 10; a <= 99; a++) for (let b = 1; b < a; b++) if (a % 10 < b % 10) POOLLIST.push([a, b]);
-const POOL = { op: '−', pool: POOLLIST, forbidden: [], edge: POOLLIST.filter(([a, b]) => b < 10 || a % 10 === 0 || a - b < 10) };
+const POOL = { op: '−', rule: '(a, b) => a >= 10 && a <= 99 && b >= 1 && b < a && a % 10 < b % 10', range: [10, 99, 1, 98],
+  edgeRule: '(a, b) => b < 10 || a % 10 === 0 || a - b < 10', pool: POOLLIST, forbidden: [], edge: POOLLIST.filter(([a, b]) => b < 10 || a % 10 === 0 || a - b < 10) };
 
 const keyStack = (a, b, key, o = {}) => columnStackSub({ top: a, bottom: b, regroup: key ? 'key' : 'slot', cross: key ? 'key' : 'none', ans: key ? 'key' : 'slot', ...o });
 const cellS = (a, b, i, key, o, cols = 2, copy = false) => `<div class="cell" style="padding-top:7mm"${it(a, b, '−', Math.floor(i / cols), copy)}>${lt(i)}${keyStack(a, b, key, o)}</div>`;
@@ -7200,7 +7239,7 @@ function wordProblem(key) {
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
       `<div data-panel-row style="display:flex;align-items:center;gap:1.5mm;font-size:13pt;line-height:1.15;white-space:nowrap"><span class="chk" data-slot="check-routine"></span>${icon(ic)}<span>${t}</span></div>`).join('')}</div></div>` +
     `<div class="band grow" style="margin-top:3mm;border-top-width:2.25pt"><div class="strip"><b>Workspace:</b></div><div style="flex:1;border-top:1.5pt solid #000;position:relative" data-work>` +
-    (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${columnStackSub({ top: 42, bottom: 17, regroup: 'key', cross: 'key', ans: 'key', heads: true })}${quickDraw({ tens: 3, ones: 12, crossTens: 1, crossOnes: 7 })}</div>` : '') + `</div></div>` +
+    (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${columnStackSub({ top: 42, bottom: 17, regroup: 'key', cross: 'key', ans: 'key', heads: true })}${quickDraw({ tens: 3, ones: 12, crossTens: 1, crossOnes: 7, key: true })}</div>` : '') + `</div></div>` +
     `<div class="band" style="flex:none"><div class="row" style="border-top:0;align-items:center;justify-content:center;height:24mm">` +
     `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(42)}</span><span class="circ" data-slot="circle">${k('−')}</span><span class="ln" data-slot="line" style="--w:17mm">${k(17)}</span><span class="o">=</span><span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span></div></div></div>` +
     `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“The answer is ${blank()} stickers.”</span></div></div>`;
@@ -7350,6 +7389,13 @@ console.log('pages', doc.pages.length);
   Guided cells only — none on Independent, Practice or the exit slip (§8.12.5). The cell is a draw cell (E11
   exempt). Vocabulary mini-diagram for "half": a square with one half shaded and a 0.75 pt middle line; for
   "equal parts": a circle cut into 2 by a line through the centre.
+- **One task per section.** Every shape in a section takes the same task, so one outline weight serves the
+  section (0.75 pt for partition, 1.5 pt for identify); never mix tasks or weights in one grid.
+- **Clocks and the written time form.** `clock({h, m, hands, handsState, show})`: `handsState` `'ink'` (read
+  the time), `'grey'` (the model's newest step) or `'key'` (draw-the-hands answers, key colour only); `show`
+  `'both'`, `'hour'` or `'minute'` fades one hand at a time. Time answers are written in the digital slot
+  (`3:30`, `7:00`); "o'clock" and "half past" are said in the oral frame only (`Say: “It is half past 3.”`),
+  never written by the pupil.
 - **Items with many right answers (any halving line, any drawing).** Draw one correct answer in the key colour
   on the key; list "also accept …" on T6 under `Accepted answers:`.
 - **More slot shapes (WDS 6).** Number + label (faded word problem v2): a line B(n), then a 52 mm line for the
