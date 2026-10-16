@@ -39,7 +39,8 @@ export const lessonProposals = {
 };
 // proposals reused from a passed lane's links file (the same id = the same spec, copied as written there)
 export const laneProposals = { map_change_unknown_story: 'MAP', map_compare_smaller_unknown: 'MAP', map_compose_solids: 'MAP', doubles_pictured: 'R',
-  frac_nl_equiv: 'Y4' };   // r14 (critic r13 N14): Y3.B6.S9 reuses the Y4 lane's option for the same clause (Y4.B7.S9), verbatim
+  frac_nl_equiv: 'Y4',   // r14 (critic r13 N14): Y3.B6.S9 reuses the Y4 lane's option for the same clause (Y4.B7.S9), verbatim
+  teen_structure: 'Y1', half_or_not: 'Y1' };   // r15: Y2.B1.S1 (20 as two tens) and Y2.B8.S3 / S5 (a half or not, a quarter or not) reuse the Y1 lane's options
 
 // ───────────────────────── Y2 (school Grade 1) ─────────────────────────
 const G1 = 'G1|-|';

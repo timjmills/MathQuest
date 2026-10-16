@@ -17,6 +17,8 @@ export const TITLE_CLAIMS = [
   { n: 'part-whole model', c: /part[- ]whole/i, i: /part[- ]?whole|"whole"|cherry|pw-|"parts"|"part"|bar[- ]model|"bars"|tape/i, s: 0.5, all: true },
   { n: 'ten frame', c: /\bten[- ]frames?|\btens? frames?\b/i, i: /ten[- ]?frame|tenframe|tf-|"frames?"/i, s: 0.5, all: true },
   { n: 'word problem', c: /\bword problems?\b|\bproblem solving\b/i, i: null, s: 0.3 },
+  // r15 (critic r14 M12, the verb class): "Solve problems with time" asks for problems told in a context, not a bare time line
+  { n: 'problems in context', c: /\bsolve (?!(?:\S+ )*word )(?:\S+ ){0,3}problems\b|\bproblems with\b/i, i: null, s: 0.3 },
   // the operation or idea a title names (r14: "Doubling and halving", "Odd and even", "Compare", "Order" …)
   { n: 'doubles', c: /\bdoubl(?:e|es|ing)\b/i, i: /doubl|\btwice\b/i, s: 0.2, w: true },
   { n: 'halves (halving)', c: /\bhalving\b/i, i: /\bhalv|\bhalf\b/i, s: 0.2, w: true },
@@ -26,7 +28,8 @@ export const TITLE_CLAIMS = [
   { n: 'estimates', c: /\bestimat/i, i: /estimat|about|roughly|closest|nearest|approximately/i, s: 0.3, w: true },
   { n: 'in words', c: /\bin words\b/i, i: /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)\b/i, s: 0.2, w: true },
   { n: 'expanded form', c: /expanded form/i, i: /expanded|\d+\s*\+\s*\d+\s*\+\s*\d+|\d0\s*\+\s*\d\b/i, s: 0.2, w: true },
-  { n: 'coins', c: /\bcoins\b/i, i: /coin|¢|penn(?:y|ies)|nickel|dime|quarter|"coins"/i, s: 0.2, w: true, pay: true },
+  // r15: the cell template is named "coins" and a bills-only payload carries "coins":[]: neither is a coin (coinStr strips them)
+  { n: 'coins', c: /\bcoins\b/i, i: /coin|¢|penn(?:y|ies)|nickel|dime|quarter|"coins":\[\d/i, s: 0.2, w: true, pay: true, str: 'coin' },
   { n: 'bills', c: /\bbills\b/i, i: /\bbills?\b|"bills?"|"notes?"|"kind":"(?:bill|note)"|\$\s?(?:1|5|10|20|50|100)\b(?![.,]\d)/i, s: 0.2, w: true, pay: true },
   { n: 'cents', c: /\bcents\b|\bpence\b/i, i: /¢|\bcents?\b|\$\s?\d+\.\d\d/i, s: 0.2, w: true, pay: true },
   { n: 'change', c: /\bfind change\b|\bchange\b$/i, i: /\bchange\b/i, s: 0.3, w: true },
@@ -68,7 +71,9 @@ export const TITLE_SHARE = 0.5;
 const TITLE_SKIP = /\(US[^)]*\)/gi;
 const story = i => (i.text || '').split(/\s+/).length >= 9 && /\?/.test(i.text || '') && /[a-z]\.\s+[A-Z]|\b(?:has|had|have|buys|bought|needs|makes|ran|runs|puts|shares|gets|weighs|holds|uses|costs|biked|walked|is|was)\b/.test(i.text || '') && !/^(?:Find|Convert|What is|Write|Click|Round|Compare|Order|Drag|Estimate|Sort)\b/.test(i.text || '');
 // the UK money words of a title are the school's US money (as build.mjs usTitle)
-export const usTitle = t => String(t).replace(TITLE_SKIP, ' ').replace(/\bpounds\b/gi, 'dollars').replace(/\bpound\b/gi, 'dollar').replace(/\bpence\b/gi, 'cents').replace(/\bnotes\b/gi, 'bills').replace(/£/g, '$');
+// r15: "pounds (notes and coins)" counts whole pounds: at the school whole dollars are bills ($1, $5, $10, $20; the step's
+// usAdaptation lists $1 with the bills), so the pound coins of the UK title are dollar bills, not cent coins
+export const usTitle = t => String(t).replace(TITLE_SKIP, ' ').replace(/\bpounds \(notes and coins\)/gi, 'dollars (bills)').replace(/\bpounds\b/gi, 'dollars').replace(/\bpound\b/gi, 'dollar').replace(/\bpence\b/gi, 'cents').replace(/\bnotes\b/gi, 'bills').replace(/£/g, '$');
 
 // a multiplication grid (mult-grid payload rows / cols / blanks): every blank is a fact of the table n
 const gridHit = (i, n) => { if (n == null || i.tpl !== 'mult-grid') return false; try { const p = JSON.parse(i.pay), b = p.blanks || []; return b.length > 0 && b.filter(([r, c]) => p.rows[r] === n || p.cols[c] === n).length >= Math.ceil(b.length / 3); } catch { return false; } };
@@ -83,7 +88,8 @@ export function titleClaims(title, items) {
   }
   for (const cl of TITLE_CLAIMS) {
     if (!cl.c.test(t)) continue;
-    const str = i => cl.w ? `${CL.itemWords(i)} ¦ ${CL.repStr(i)}` : CL.repStr(i);   // repStr carries the payload (coins, bills)
+    const str0 = i => cl.w ? `${CL.itemWords(i)} ¦ ${CL.repStr(i)}` : CL.repStr(i);   // repStr carries the payload (coins, bills)
+    const str = cl.str === 'coin' ? i => str0({ ...i, tpl: '', pay: String(i.pay || '').replace(/"coins":\[\]/g, '') }).replace(/"coins":\[\]/g, '') : str0;
     const hit = cl.i ? items.filter(i => cl.i.test(str(i))).length : items.filter(story).length;
     out.push({ claim: cl.n, word: (t.match(cl.c) || [''])[0], hit, n: N, ok: hit >= cl.s * N, need: cl.s });
   }
@@ -91,6 +97,53 @@ export function titleClaims(title, items) {
     const hit = items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`) || gridHit(i, tc.num)).length;
     out.push({ claim: tc.n, word: tc.word, hit, n: N, ok: hit >= tc.s * N, need: tc.s, re: tc.re });
   }
+  for (const vc of verbClaims(t)) {
+    const hit = items.filter(vc.test).length;
+    out.push({ claim: vc.n, word: vc.word, hit, n: N, ok: hit >= vc.s * N, need: vc.s, re: vc.named });
+  }
+  return out;
+}
+
+// ---- r15 (critic r14 M12 / N15 / N16): the title's VERB and its CLOCK PRECISION are claims too ----
+// VERB: a title that starts with a production verb (make, build, draw, record, write, complete) asks the pupil to PRODUCE the
+// thing it names. An item is production when it is not a check (yes / no, true / false, "= or ≠", "Check one box") and not a
+// pick of one given answer (the answer is one of the item's options). When the object is a chart (tally chart, pictogram,
+// bar chart, table, graph), production means constructing it: the item tells the pupil to make / draw / build / record /
+// complete / tally / plot (or the response is a built graph): reading a drawn chart ("How many chose running?") is not.
+// MEASURE: a title that starts with "Measure" shows a measuring tool (ruler, scale, cylinder, jug, thermometer, grid).
+// READ ... DIGITAL: the item shows a digital time to read (a digital clock reading in the stimulus, not only in the answer).
+// CLOCK PRECISION: o'clock (:00), half past (:30), quarter past (:15), quarter to (:45), to 5 minutes (a 5-minute time that
+// is not a quarter), to the minute (not a multiple of 5) must each be dealt at their share.
+export const PROD_VERB = /^(make|build|draw|record|write|complete)\b/i;
+const CHART = /\btally|pictogram|picture graph|bar chart|bar graph|\btables?\b|\bgraph|\bchart/i;
+const CONSTRUCT = /^(?:make|draw|build|record|complete|fill in|tally|colou?r|shade|plot|show|mark|draw)\b|\b(?:make|draw|build|complete|fill in|record) (?:a|the|your)\b/i;
+export const isCheck = i => /^(?:yes|no|true|false|=|≠|correct|wrong)$/i.test(String(i.a || '').trim()) || /check one box|yes or no|true or false|answer = or ≠|\bis (?:it|this) (?:a|an|the)\b.*\?$/i.test(i.text || '');
+// a pick: the response type is a choice (the item generators record answerType as `at`); without one, the answer is one of the
+// options (generators also attach numeric options to typed items as a fallback, so `at` decides when it is there)
+export const isPick = i => { if (i.at != null) return /^(?:multiple-choice|choice|multi-select-check|hot-spot|odd-even-select|symbol|clock-choice)$/.test(i.at);
+  const a = String(i.a || '').trim(); if (!a || !i.x) return false; const xs = String(i.x).split(' ; ').map(x => x.trim()); return xs.length >= 2 && xs.includes(a); };
+export const isProduction = i => !isCheck(i) && !isPick(i);
+export const isConstruct = i => !isCheck(i) && (CONSTRUCT.test((i.text || '').trim()) || /graph-built|"built"/i.test(i.a || ''));
+const TOOL = /square side = 1 unit|count the (?:outside )?edges|ruler|\bscale\b|cylinder|\bjug\b|beaker|thermometer|grid|measur|"kind":"(?:ruler|scale|cylinder|jug)|measuring/i;
+// the clock time of an item: the payload's h / m, else an h:mm in the answer
+export const timeOf = i => { try { const p = JSON.parse(i.pay || 'null'); if (p && Number.isFinite(p.m) && Number.isFinite(p.h)) return { h: p.h, m: p.m }; } catch { /* no payload */ }
+  const m = String(i.a || '').match(/\b(\d{1,2}):(\d\d)\b/); return m ? { h: +m[1], m: +m[2] } : null; };
+export const shownDigital = i => /"stimulus":"digital"/.test(i.pay || '') || /\b\d{1,2}:\d\d\b/.test(`${i.text || ''} ${i.vis || ''}`);
+export function verbClaims(title) {
+  const t = String(title), out = [];
+  const v = (t.match(PROD_VERB) || [])[1];
+  if (v && !/^make decisions\b/i.test(t)) {   // "Make decisions" chooses a strategy: there is no object to produce
+    const obj = t.slice(v.length);
+    const chart = CHART.test(obj) && !/times-table/i.test(obj);
+    out.push({ n: chart ? `${v.toLowerCase()} (construct the chart)` : `${v.toLowerCase()} (production, not a check or a pick)`, word: v, s: 0.5,
+      test: chart ? isConstruct : isProduction,
+      named: new RegExp(`\\b(?:${v.toLowerCase().replace(/e$/, '')}(?:e|es|ed|ing)?|${{ make: 'made', build: 'built', draw: 'drawn|drew', write: 'written|wrote', record: 'recorded', complete: 'completed' }[v.toLowerCase()]})\\b`, 'i') });
+  }
+  if (/^measure\b/i.test(t)) out.push({ n: 'measure (a measuring tool shown)', word: 'Measure', s: 0.5, test: i => TOOL.test(CL.repStr(i)), named: /\bmeasur/i });
+  if (/\bdigital\b/i.test(t) && /\bread\b/i.test(t)) out.push({ n: 'reads a digital time', word: 'digital', s: 0.3, test: shownDigital, named: /\bdigital\b/i });
+  const CK = [[/o'clock/i, "o'clock", m => m === 0, 0.2], [/half past/i, 'half past', m => m === 30, 0.2], [/quarter past/i, 'quarter past', m => m === 15, 0.2],
+    [/quarter to\b/i, 'quarter to', m => m === 45, 0.2], [/to 5 minutes|to five minutes/i, 'to 5 minutes', m => m % 5 === 0 && m % 15 !== 0, 0.3], [/to the minute/i, 'to the minute', m => m % 5 !== 0, 0.3]];
+  for (const [re, w, ok, s] of CK) if (re.test(t)) out.push({ n: `clock: ${w}`, word: w, s, test: i => { const tm = timeOf(i); return !!tm && ok(tm.m); }, named: new RegExp(w.replace(/ /g, '\\s+'), 'i') });
   return out;
 }
 // does the clause name the claim (as missing, or as what is dealt instead)? the claim's own regex on the whole clause,
@@ -101,7 +154,7 @@ const named = (h, clause) => {
   if (h.re) return h.re.test(t) || t.toLowerCase().includes(String(h.word).toLowerCase());
   if (cl && cl.c.test(t)) return true;
   if (cl && cl.i && (cl.n === 'fractions' || cl.n === 'compares' || cl.n === 'orders') && cl.i.test(t)) return true;   // "halves and quarters" names fractions; "the bigger unit" a comparison
-  if (h.claim === 'word problem' || h.claim === 'story') return /\bstor(?:y|ies)\b|word problems?|context/i.test(t);
+  if (h.claim === 'word problem' || h.claim === 'story' || h.claim === 'problems in context') return /\bstor(?:y|ies)\b|word problems?|context/i.test(t);
   if (h.claim === 'part-whole model') return /part[- ]whole|parts? and (?:the )?whole/i.test(t);
   return t.toLowerCase().includes(h.claim.toLowerCase());
 };
@@ -160,7 +213,7 @@ export function itemGen(generateQuestionFor, N, SEED, STEP) {
     const [c, k] = key.split(':'), out = [];
     for (let i = 0; i < N; i++) { let q; try { q = generateQuestionFor({ category: c, skill: k, opts: opts || {}, seed: SEED + i * STEP, itemIndex: i % 20, itemCount: 20 }); } catch { continue; }
       if (!q) continue;
-      out.push({ text: st(q.text), a: st(typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans), x: st([...(q.options || []), ...(q.tiles || []), ...(q.bins || []), ...(q.items || [])].map(lb).join(' ; ')),
+      out.push({ at: q.answerType || '', text: st(q.text), a: st(typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans), x: st([...(q.options || []), ...(q.tiles || []), ...(q.bins || []), ...(q.items || [])].map(lb).join(' ; ')),
         vis: st(q.visual), raw: String(q.visual || '').toLowerCase().slice(0, 6000), tpl: q.cell ? q.cell.template : '', pay: q.cell ? JSON.stringify(q.cell.payload) : '' }); }
     cache.set(id, out); return out;
   };

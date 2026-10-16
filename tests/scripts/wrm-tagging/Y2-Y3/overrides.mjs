@@ -1424,3 +1424,126 @@ relR3['Y2.B3.S12'] = relR3['Y2.B3.S12'].map(r => r.key === 'patterns:number_patt
 // half the items are nickels or dimes (80 items: 1¢ ×14, 5¢ ×13, 10¢ ×26, 25¢ ×27)
 relR3['Y2.B5.S17'] = relR3['Y2.B5.S17'].map(r => r.key === 'measurement:money_count' ? R(r.key, 'counting coins of one kind (1¢, 5¢, 10¢ or 25¢ coins, one kind an item): the 5¢ and 10¢ coins are counted in 5s and 10s', r.opts) : r);
 extraRelated['Y2.B5.S17'] = extraRelated['Y2.B5.S17'].map(r => r.key === 'measurement:money_count' ? R(r.key, 'counting coins of one kind (1¢, 5¢, 10¢ or 25¢ coins, one kind an item): the 5¢ and 10¢ coins are counted in 5s and 10s', r.opts) : r);
+// ======================= round 15 (critic r14: N15 Y2.B10.S1, N16 Y2.B4.S5, N17 Y3.B5.S4; the full audit by hand) =======================
+// Every FULL step and lesson of both years was re-read on fresh items (52817 + 431 i, 30 per direct; the audit table is in
+// Y2-report.md / Y3-report.md, round 15) against every clause of its title and the CCSS clause the title teaches, at the
+// step's range. A full that fell short was demoted with a true clause and the proposal that closes it, unless a live option
+// delivers the missing clause (then the option goes on the step and it stays full).
+// --- N15: "Make tally charts" reads a drawn chart on every item (how many, most / fewest, in all, how many more)
+r3['Y2.B10.S1'] = { ...(r3['Y2.B10.S1'] || {}), partials: [P('graphs:tally_chart', 'reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt')],
+  build: ['collect_data'], note: 'every tally_chart item reads a chart that is already drawn (the option schema has only the four reading kinds); the Y3 lesson "Record results using tally marks" says the same of the same skill' };
+// --- N16: "Make the same amount" is a yes / no check of one coin set
+r3['Y2.B4.S5'] = { ...(r3['Y2.B4.S5'] || {}), partials: [P('measurement:equiv_coin_sets', 'checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt', USD)],
+  build: ['make_amount_notes'] };
+// --- N17: "Metres, centimetres and millimetres" converts whole units to 12,000 mm (Grade 2 numbers go to 1,000)
+r3['Y3.B5.S4'] = { ...(r3['Y3.B5.S4'] || {}), partials: [P('measurement:length_metric', 'whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt', { forms: [0, 1, 2] })],
+  build: ['mm_cm_m', 'length_band_1000'], note: 'forms 0-2 = mm/cm, cm/m, mm/m; form 3 (m in km) is above the step. The m-to-mm form deals 1-12 m (to 12,000 mm), past the Grade 2 range: no band option keeps the answers within 1,000' };
+extendSteps.mm_cm_m.push('Y3.B5.S4');
+extendSteps.collect_data = ['Y2.B10.S1'];
+// --- audit: "Numbers to 20" never deals 20 (teen_compose and base10_build {band:20} deal 11-19 only: 400 items)
+r3['Y2.B1.S1'] = { ...(r3['Y2.B1.S1'] || {}), partials: [P('composing:teen_compose', '11 to 19 as ten and some more ones; 20 as two tens is never dealt'), P('composing:base10_build', 'builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt', { band: 20 })],
+  build: ['teen_structure'] };
+// --- audit (RANGECHECK): "Count in 2s, 5s and 10s" (W4) counts a row of 12 numbers from 0, so every 10s row ends at 110
+r3['Y2.B1.S15'] = { ...(r3['Y2.B1.S15'] || {}), partials: [P('multiplication:count_by_tables', 'counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available', { rows: [{ step: 2, start: 'zero', dir: 'up' }, { step: 5, start: 'zero', dir: 'up' }, { step: 10, start: 'zero', dir: 'up' }] }),
+  ...(steps['Y2.B1.S15'].partials || []), ...(r3['Y2.B1.S15']?.partials || [])].filter((p, i, a) => a.findIndex(q => q.key === p.key) === i), build: ['count_row_end'] };
+// --- audit (RANGECHECK): "Measure in millilitres" reads cylinders to 900 mL at Grade 1 (about half the readings pass 120)
+r3['Y2.B7.S6'] = { ...(r3['Y2.B7.S6'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available', { forms: [0] })],
+  build: ['scale_band_100'] };
+// --- audit (answer given away): "Recognise a half / a quarter / a third" deal shapes that are ALWAYS split into equal parts:
+// half the items ask "how many equal parts?" (always 2, 4 or 3), and a half page answers only 2 or 1/2 (200 items)
+r3['Y2.B8.S3'] = { ...(r3['Y2.B8.S3'] || {}), partials: [P('shapes_early:partition_shapes', 'names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt', { parts: [0] })],
+  build: ['half_or_not'] };
+r3['Y2.B8.S5'] = { ...(r3['Y2.B8.S5'] || {}), partials: [P('shapes_early:partition_shapes', 'counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt', { parts: [2] })],
+  build: ['half_or_not'] };
+r3['Y2.B8.S7'] = { ...(r3['Y2.B8.S7'] || {}), partials: [P('shapes_early:partition_shapes', 'counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt', { parts: [1] })],
+  build: ['fraction_parts'] };
+// --- audit: "Inverse operations" checks a subtraction by adding, 2-digit numbers only (197 of 200 minuends; 3 are 100)
+r3['Y3.B2.S21'] = { ...(r3['Y3.B2.S21'] || {}), partials: [P('subtraction:sub_check_by_adding', 'checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt')],
+  build: ['inverse_check_1000'] };
+// --- audit (VERB "measure"): "Measure perimeter" counts unit edges on squared paper (about 2 in 3 items) or adds side lengths
+// written on the shape (about 1 in 3, which is Y3.B5.S12); no item measures a side with a ruler
+r3['Y3.B5.S11'] = { ...(r3['Y3.B5.S11'] || {}), partials: [P('area_perimeter:perimeter_grid', 'counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt')],
+  build: ['perimeter_measure'] };
+// --- audit (VERB "solve problems"): "Solve problems with time" finds a duration or a start time on a drawn time line
+r3['Y3.B10.S12'] = { ...(r3['Y3.B10.S12'] || {}), partials: [P('measurement:elapsed_find_duration', 'finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt'),
+  P('measurement:elapsed_find_start', 'finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt')], build: ['time_stories'] };
+// --- audit, kept FULL with a live option that delivers the missing clause:
+// "Multiplication sentences": arrays_groups writes "3 groups of 5 make 15" in words; nl_mult {response:'sentence'} reads the hops
+// and writes the multiplication sentence __ × __ = __ (40 fresh items: 2s, 5s, 10s, products to 50)
+r3['Y2.B5.S5'] = { ...(r3['Y2.B5.S5'] || {}), direct: [D('multiplication:arrays_groups'), D('multiplication:nl_mult', { response: 'sentence', constant: [2, 5, 10], band: 50 })],
+  note: 'arrays_groups writes the sentence in words (3 groups of 5 make 15); nl_mult {response:sentence} writes it with × and = from a picture (hops of 2, 5 or 10)' };
+// M15: "Quarter past and quarter to": the clock items write 2:15 / 9:45; the words-past stimulus reads "quarter to ten" → 9:45
+r3['Y2.B9.S2'] = { ...(r3['Y2.B9.S2'] || {}), direct: [D('measurement:time_quarter'), D('measurement:time_quarter', { stimulus: 'words-past' })],
+  note: 'the clock items write the digital time (:15 and :45); stimulus words-past reads "quarter past four" / "quarter to ten" and writes it (the language of the title)' };
+// rule 7: "Interpret pictograms (2, 5 and 10)": Max Number 20 keeps every value at most 20, so "in all" totals stay within 90
+// (400 items; range 50 dealt totals to 210); keys of 2, 5 and 10 all dealt
+r3['Y2.B10.S7'] = { ...(r3['Y2.B10.S7'] || {}), direct: [D('graphs:pictograph', { range: 20, scale: [0, 1, 2] })],
+  note: 'pictograph {range:20, scale:[0,1,2]}: keys of 2, 5 and 10, each row at most 20, so "in all" totals stay within 90 (range 50 dealt totals to 210, above the Grade 1 range)' };
+// "Divide a 2-digit number by a 1-digit number - with remainders": div_remainders rings counters to 24 (quotients 2-6);
+// box_division_easy {regroup:'always'} divides a 2-digit number with a remainder in the box (35 ÷ 2 = 17 R 1, 95 ÷ 8 = 11 R 7)
+r3['Y3.B4.S9'] = { ...r3['Y3.B4.S9'], direct: [D('division:div_remainders', { constant: [2, 3, 4, 5, 8] }), D('division:box_division_easy', { regroup: 'always', constant: [2, 3, 4, 5, 8] })],
+  note: 'div_remainders rings counters (dividends to 24); box_division_easy {regroup always} is the 2-digit dividend with a remainder (95 ÷ 8 = 11 R 7). Divisors 2, 3, 4, 5, 8: the Grade 2 tables' };
+// M16: "Read time on a digital clock": dir to-analog shows the digital time and the pupil checks the clock that shows it
+r3['Y3.B10.S4'] = { ...(r3['Y3.B10.S4'] || {}), direct: [D('measurement:time_analog_digital'), D('measurement:time_analog_digital', { dir: 'to-analog' })],
+  note: 'to-digital writes the time a clock shows; to-analog reads a digital time (3:40) and checks the clock that shows it' };
+// --- RANGECHECK on partial clauses: a partial whose items pass the ceiling says so
+r3['Y2.B7.S3'] = { ...r3['Y2.B7.S3'], partials: r3['Y2.B7.S3'].partials.map(p => ({ ...p, missing: p.missing + '; the gram dials read up to 1,800 g, past the Grade 1 range' })) };
+r3['Y2.B7.S7'] = { ...(r3['Y2.B7.S7'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt', { forms: [0] })] };
+r3['Y3.B5.S1'] = { ...(r3['Y3.B5.S1'] || {}), partials: [P('measurement:length_metric', 'converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt', { forms: [1] })] };
+r3['Y3.B5.S5'] = { ...(r3['Y3.B5.S5'] || {}), partials: [P('measurement:length_metric', 'whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt', { forms: [1] })] };
+for (const id of ['Y3.B7.S1', 'Y3.B7.S2', 'Y3.B7.S3']) r3[id] = { ...r3[id], partials: r3[id].partials.map(p => ({ ...p, missing: p.missing + '; some gram dials read past 1,000 g (1,200 g to 1,800 g)' })) };
+// --- minors
+// M17: Y3.B8.S1 "Add fractions": the building block of adding like fractions is a non-unit fraction as a count of unit fractions
+// (2/3 is two thirds: Y2.B8.S11), not equivalence; it leads the pre list
+r3['Y3.B8.S1'] = { ...r3['Y3.B8.S1'], core: [C('fractions:write_fraction', 'Y2.B8.S11 Non-unit fractions: a non-unit fraction counts unit fractions (2/3 is two thirds; the count used to add like fractions)', { denoms: [2, 3] }), ...((r3['Y3.B8.S1'] || {}).core || [])] };
+// M18: Y2.B4.S6: add_wp_10 and add_wp_10_plain deal the same stories (one with pictures): one pre slot, not two
+r3['Y2.B4.S6'] = { ...(r3['Y2.B4.S6'] || {}), dropPre: [...((r3['Y2.B4.S6'] || {}).dropPre || []), 'addition:add_wp_10_plain'] };
+// M19: tally_chart reads drawn charts (N15): the whys say so
+r3['Y3.B12.S5'] = { ...r3['Y3.B12.S5'], core: [C('graphs:tally_chart', 'Y2.B10.S1 Make tally charts: reading the counts of a tally chart (how many, most, in all), the chart this step makes from the data')] };
+r3['Y3.B12.S6'] = { ...r3['Y3.B12.S6'], core: [C('graphs:tally_chart', 'Y2.B10.S1 Make tally charts: reading a chart of counts (how many in each row and in all), the counts a two-way table holds')] };
+// --- the round-15 proposals (lane options; each closes the clause above)
+Object.assign(proposals, {
+  count_row_end: { kind: 'option', skill: 'multiplication:count_by_tables', option: 'row end: the row stops at a chosen number (100), so a count in 10s from 0 ends at 100', name: 'Count-By Row That Stops at 100 (option)',
+    teaches: 'counting in 2s, 5s and 10s from 0 up to 100 and no further (0, 10, 20 … 100), the numbers the first weeks of Grade 1 work in',
+    representation: 'the existing count-by row of boxes, cut at the chosen end number', family: 'number', steps: ['Y2.B1.S15'], ccss: ['1.NBT.A.1', '2.NBT.A.2'],
+    why: 'count_by_tables rows run 12 or 15 numbers, so a 10s row from 0 always reaches 110 or 140; no option ends a row at 100' },
+  scale_band_100: { kind: 'option', skill: 'measurement:mass_volume_liquid', option: 'readings to 100: a cylinder to 100 mL with marks in 10s (or 5s)', name: 'Read a Millilitre Scale to 100 (option)',
+    teaches: 'reading the millilitres in a container on a scale to 100 mL, counting the marks in 10s or 5s',
+    representation: 'the existing graduated-cylinder cell drawn to 100 mL; answer box with mL printed', family: 'measurement', steps: ['Y2.B7.S6'], ccss: ['3.MD.A.2'],
+    why: 'mass_volume_liquid {forms:[0]} draws cylinders to 1,000 mL: about half the readings pass 120 at Grade 1' },
+  inverse_check_1000: { kind: 'option', skill: 'subtraction:sub_check_by_adding', option: 'numbers within 1,000 (3-digit) and the other way round: check an addition by subtracting', name: 'Check With the Inverse Within 1,000 (option)',
+    teaches: 'checking a 3-digit addition by subtracting and a 3-digit subtraction by adding (456 + 237 = 693, so 693 − 237 = 456), and fixing a wrong answer',
+    representation: 'the existing check cell: the calculation, the inverse calculation under it, Correct / Fix it', family: 'operations', steps: ['Y3.B2.S21'], ccss: ['2.NBT.B.7'],
+    why: 'sub_check_by_adding checks only subtractions, with 2-digit numbers; the Y4 lane\'s inverse_check is for 5- and 6-digit numbers' },
+  length_band_1000: { kind: 'option', skill: 'measurement:length_metric', option: 'answers within 1,000: cm ↔ mm to 100 cm, m ↔ cm to 10 m, and only 1 m = 1,000 mm', name: 'Metric Lengths Within 1,000 (option)',
+    teaches: 'converting between millimetres, centimetres and metres with answers that stay within 1,000 (6 m = 600 cm, 45 cm = 450 mm, 1 m = 1,000 mm)',
+    representation: 'the existing conversion cell; a metre stick in cm and mm as the structural support', family: 'measurement', steps: ['Y3.B5.S4'], ccss: ['2.MD.A.1', '4.MD.A.1'],
+    why: 'length_metric deals m to mm for 1-12 m (to 12,000 mm): no option holds the answers to the Grade 2 range' },
+  perimeter_measure: { kind: 'option', skill: 'area_perimeter:perimeter_grid', option: 'task "measure": the shape is drawn at real size with no side lengths; measure each side with a cm ruler, then add', name: 'Measure the Sides to Find the Perimeter (option)',
+    teaches: 'measuring each side of a drawn shape with a centimetre ruler, writing the lengths and adding them to find the perimeter',
+    representation: 'a shape drawn to scale (whole cm sides) with a cm ruler under one side; boxes for each side length and the total', family: 'measurement', steps: ['Y3.B5.S11'], ccss: ['2.MD.A.1', '3.MD.D.8'],
+    why: 'perimeter_grid counts unit edges on squared paper or adds lengths written on the shape; no item measures a side' },
+  time_stories: { kind: 'option', skill: 'measurement:elapsed_find_duration', skills: ['measurement:elapsed_find_duration', 'measurement:elapsed_find_start', 'measurement:elapsed_mixed'], option: 'stimulus "story": a context sentence gives the start, the end or the duration (a film, a bus journey, a lesson); the time line stays as the support', name: 'Time Problems in Context (option)',
+    teaches: 'solving a time problem told as a short story (the film starts at 3:15 and ends at 4:45: how long is it?), finding the duration, the start or the end time',
+    representation: 'one story sentence over the existing time-line cell; answer boxes (h, min or a time)', family: 'measurement', steps: ['Y3.B10.S12'], ccss: ['3.MD.A.1'],
+    why: 'the elapsed-time skills read a drawn time line with no context: no item is a problem told in words' },
+});
+// r15: Y2.B9.S2 now also lists time_quarter {stimulus:'words-past'} (M15), so a related that cites Y2.B9.S2 takes those opts as
+// its spec; the approved marker fix (quarter past is first met after these steps: half past instead) is the same change
+markerFixOk.push(...['Y2.B8.S10', 'Y2.B8.S12', 'Y2.B11.S3', 'Y2.B11.S4'].map(id => `${id}|measurement:time_quarter|{"stimulus":"words-past"}->measurement:time_half_hour|{}`));
+// the demoted steps list no direct (the round-2 `steps` entry named them direct)
+for (const id of ['Y2.B1.S1', 'Y2.B1.S15', 'Y2.B4.S5', 'Y2.B7.S6', 'Y2.B8.S3', 'Y2.B8.S5', 'Y2.B8.S7', 'Y2.B10.S1', 'Y3.B2.S21', 'Y3.B5.S4', 'Y3.B5.S11', 'Y3.B10.S12']) r3[id] = { ...r3[id], direct: [] };
+// r15 cascade of the audit, kept as it was before it:
+//  - nl_mult is now a direct of Y2.B5.S5 (Grade 1 multiplication sentences, hops of 2, 5, 10): rule 14 would make the ×3 / ×4 hop
+//    lines of the Y3 table steps pre-skills citing that step; they are the same table shown as jumps (related), as before
+for (const id of ['Y3.B3.S6', 'Y3.B3.S8', 'Y3.B3.S9', 'Y3.B3.S11']) r3[id] = { ...(r3[id] || {}), dropPre: [...((r3[id] || {}).dropPre || []), 'multiplication:nl_mult'] };
+//  - box_division_easy is now a direct of Y3.B4.S9 (with remainders): its no-exchange rung (Y3.B4.S7) stays the building block
+r3['Y3.B4.S9'] = { ...r3['Y3.B4.S9'], core: [...(r3['Y3.B4.S9'].core || []), { key: 'division:box_division_easy', why: 'Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (taught earlier, W32): the same box with no remainder', opts: { regroup: 'none', constant: [2, 3, 4, 5, 8] }, keep: true }] };
+//  - Y2.B7.S6 and S7 both list the millilitre cylinder as a partial now: the cylinder is cited at "Measure in millilitres"
+{ const ML = '|{"forms":[0]}', S6 = 'Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)';
+  Object.assign(whyFix, {
+    'Y3.B7.S1': { ...(whyFix['Y3.B7.S1'] || {}), ['measurement:mass_volume_liquid' + ML]: 'this step\'s skill as it was met then (what the items ask: read the cylinder (mL)) — ' + S6 },
+    'Y3.B7.S2': { ...(whyFix['Y3.B7.S2'] || {}), ['measurement:mass_volume_liquid' + ML]: 'what the items ask: read the cylinder (mL): the same scale reading in another measure — ' + S6 },
+    'Y3.B7.S3': { ...(whyFix['Y3.B7.S3'] || {}), ['measurement:mass_volume_liquid' + ML]: 'what the items ask: read the cylinder (mL): the same scale reading in another measure — ' + S6 },
+    'Y3.B7.S9': { ...(whyFix['Y3.B7.S9'] || {}), ['measurement:mass_volume_liquid' + ML]: 'reading a scale (a cylinder in mL) — ' + S6 },
+    'Y3.B7.S11': { ...(whyFix['Y3.B7.S11'] || {}), ['measurement:mass_volume_liquid' + ML]: 'reading a scale (a cylinder in mL) — ' + S6 } }); }

@@ -5,22 +5,25 @@
  "steps": {
   "Y2.B1.S1": {
    "title": "Numbers to 20",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "composing:teen_compose",
-     "opts": {}
+     "missing": "11 to 19 as ten and some more ones; 20 as two tens is never dealt"
     },
     {
      "key": "composing:base10_build",
+     "missing": "builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt",
      "opts": {
       "band": 20
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "11 to 19 as ten and some more ones; 20 as two tens is never dealt; builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt",
+   "build": [
+    "teen_structure"
+   ],
    "pre": [
     {
      "key": "composing:teen_compose",
@@ -1248,9 +1251,11 @@
   },
   "Y2.B1.S15": {
    "title": "Count in 2s, 5s and 10s",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "multiplication:count_by_tables",
+     "missing": "counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available",
      "opts": {
       "rows": [
        {
@@ -1270,9 +1275,7 @@
        }
       ]
      }
-    }
-   ],
-   "partial": [
+    },
     {
      "key": "patterns:count_by_step_up",
      "missing": "counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)",
@@ -1283,9 +1286,11 @@
      }
     }
    ],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available; counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)",
+   "build": [
+    "count_row_end"
+   ],
    "pre": [
     {
      "key": "patterns:skip_count_line",
@@ -4540,18 +4545,21 @@
   },
   "Y2.B4.S5": {
    "title": "Make the same amount",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:equiv_coin_sets",
+     "missing": "checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt",
      "opts": {
       "currency": "usd"
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt",
+   "build": [
+    "make_amount_notes"
+   ],
    "pre": [
     {
      "key": "measurement:money_count",
@@ -4657,13 +4665,6 @@
     },
     {
      "key": "addition:add_wp_10",
-     "why": "Y1.B2.S10 Addition problems (prior learning wk W08)",
-     "opts": {
-      "band": 10
-     }
-    },
-    {
-     "key": "addition:add_wp_10_plain",
      "why": "Y1.B2.S10 Addition problems (prior learning wk W08)",
      "opts": {
       "band": 10
@@ -5317,10 +5318,16 @@
      }
     },
     {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y2.B5.S6 Use arrays (next step, W29: the same idea one step further)",
+     "key": "multiplication:nl_mult",
+     "why": "Y2.B5.S5 Multiplication sentences (next step, W28: the same idea one step further)",
      "opts": {
-      "band": 25
+      "response": "sentence",
+      "constant": [
+       2,
+       5,
+       10
+      ],
+      "band": 50
      }
     }
    ],
@@ -5419,19 +5426,16 @@
      }
     },
     {
-     "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S6 Use arrays (next step, W29: the same idea one step further)",
+     "key": "multiplication:nl_mult",
+     "why": "Y2.B5.S5 Multiplication sentences (next step, W28: the same idea one step further)",
      "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
-     "key": "multiplication:dot_array_mult",
-     "why": "Y2.B5.S6 Use arrays (next step, W29: the same idea one step further)",
-     "opts": {
-      "band": 25
+      "response": "sentence",
+      "constant": [
+       2,
+       5,
+       10
+      ],
+      "band": 50
      }
     }
    ],
@@ -5443,6 +5447,18 @@
     {
      "key": "multiplication:arrays_groups",
      "opts": {}
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "opts": {
+      "response": "sentence",
+      "constant": [
+       2,
+       5,
+       10
+      ],
+      "band": 50
+     }
     }
    ],
    "partial": [],
@@ -5537,7 +5553,7 @@
      }
     }
    ],
-   "note": ""
+   "note": "arrays_groups writes the sentence in words (3 groups of 5 make 15); nl_mult {response:sentence} writes it with × and = from a picture (hops of 2, 5 or 10)"
   },
   "Y2.B5.S6": {
    "title": "Use arrays",
@@ -5569,6 +5585,19 @@
       "forms": [
        1
       ]
+     }
+    },
+    {
+     "key": "multiplication:nl_mult",
+     "why": "Y2.B5.S5 Multiplication sentences (taught before this step in the block)",
+     "opts": {
+      "response": "sentence",
+      "constant": [
+       2,
+       5,
+       10
+      ],
+      "band": 50
      }
     },
     {
@@ -7114,7 +7143,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
+     "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt; the gram dials read up to 1,800 g, past the Grade 1 range",
      "opts": {
       "forms": [
        1
@@ -7123,7 +7152,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
+   "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt; the gram dials read up to 1,800 g, past the Grade 1 range",
    "build": [
     "mass_scales"
    ],
@@ -7294,9 +7323,11 @@
   },
   "Y2.B7.S6": {
    "title": "Measure in millilitres",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:mass_volume_liquid",
+     "missing": "reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available",
      "opts": {
       "forms": [
        0
@@ -7304,10 +7335,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available",
+   "build": [
+    "scale_band_100"
+   ],
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
@@ -7360,7 +7392,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads millilitres only; reading a jug in litres is not dealt",
+     "missing": "reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt",
      "opts": {
       "forms": [
        0
@@ -7369,7 +7401,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads millilitres only; reading a jug in litres is not dealt",
+   "missing": "reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7626,9 +7658,11 @@
   },
   "Y2.B8.S3": {
    "title": "Recognise a half",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:partition_shapes",
+     "missing": "names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt",
      "opts": {
       "parts": [
        0
@@ -7636,10 +7670,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt",
+   "build": [
+    "half_or_not"
+   ],
    "pre": [
     {
      "key": "patterns:halve",
@@ -7742,9 +7777,11 @@
   },
   "Y2.B8.S5": {
    "title": "Recognise a quarter",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:partition_shapes",
+     "missing": "counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt",
      "opts": {
       "parts": [
        2
@@ -7752,10 +7789,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt",
+   "build": [
+    "half_or_not"
+   ],
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
@@ -7849,9 +7887,11 @@
   },
   "Y2.B8.S7": {
    "title": "Recognise a third",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:partition_shapes",
+     "missing": "counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt",
      "opts": {
       "parts": [
        1
@@ -7859,10 +7899,11 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt",
+   "build": [
+    "fraction_parts"
+   ],
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
@@ -8120,7 +8161,7 @@
     },
     {
      "key": "patterns:halve",
-     "why": "halving — Y2.B8.S4 Find a half",
+     "why": "halving — Y2.B5.S11 Doubling and halving",
      "opts": {
       "band": 20
      }
@@ -8143,7 +8184,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "note": ""
@@ -8303,7 +8346,7 @@
     },
     {
      "key": "patterns:halve",
-     "why": "halving — Y2.B8.S4 Find a half",
+     "why": "halving — Y2.B5.S11 Doubling and halving",
      "opts": {
       "band": 20
      }
@@ -8321,7 +8364,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "note": ""
@@ -8362,7 +8407,7 @@
     },
     {
      "key": "patterns:halve",
-     "why": "halving — Y2.B8.S4 Find a half",
+     "why": "halving — Y2.B5.S11 Doubling and halving",
      "opts": {
       "band": 20
      }
@@ -8380,7 +8425,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_half_hour",
@@ -8458,6 +8505,12 @@
     {
      "key": "measurement:time_quarter",
      "opts": {}
+    },
+    {
+     "key": "measurement:time_quarter",
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "partial": [],
@@ -8502,7 +8555,7 @@
      "opts": {}
     }
    ],
-   "note": ""
+   "note": "the clock items write the digital time (:15 and :45); stimulus words-past reads \"quarter past four\" / \"quarter to ten\" and writes it (the language of the title)"
   },
   "Y2.B9.S3": {
    "title": "Tell time past the hour",
@@ -8525,7 +8578,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (taught before this step in the block)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_half_hour",
@@ -8595,7 +8650,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (taught earlier, W36)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "preBuild": [
@@ -8661,7 +8718,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (taught earlier, W36)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "preBuild": [
@@ -8759,16 +8818,18 @@
   },
   "Y2.B10.S1": {
    "title": "Make tally charts",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "graphs:tally_chart",
-     "opts": {}
+     "missing": "reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt",
+   "build": [
+    "collect_data"
+   ],
    "pre": [
     {
      "key": "counting:count_objects",
@@ -8826,7 +8887,7 @@
      "opts": {}
     }
    ],
-   "note": ""
+   "note": "every tally_chart item reads a chart that is already drawn (the option schema has only the four reading kinds); the Y3 lesson \"Record results using tally marks\" says the same of the same skill"
   },
   "Y2.B10.S2": {
    "title": "Tables",
@@ -9166,7 +9227,7 @@
     {
      "key": "graphs:pictograph",
      "opts": {
-      "range": 50,
+      "range": 20,
       "scale": [
        0,
        1,
@@ -9234,7 +9295,7 @@
      "opts": {}
     }
    ],
-   "note": "pictograph {range:50, scale:[0,1,2]} reads keys of 2, 5 and 10; about 1 \"in all\" question in 16 totals more than 120 (up to 200), above the Grade 1 range: the skill has no option that caps the total"
+   "note": "pictograph {range:20, scale:[0,1,2]}: keys of 2, 5 and 10, each row at most 20, so \"in all\" totals stay within 90 (range 50 dealt totals to 210, above the Grade 1 range)"
   },
   "Y2.B11.S1": {
    "title": "Language of position",
@@ -10320,6 +10381,31 @@
   }
  },
  "proposals": {
+  "teen_structure": {
+   "kind": "option",
+   "skill": "composing:teen_compose",
+   "option": "10 and 20",
+   "name": "Understand 10 and 20 (option)",
+   "teaches": "10 as one ten and 20 as two tens (the skill covers 11-19)",
+   "representation": "band values \"exactly 10\" and \"20\" on teen_compose with one and two full ten frames",
+   "family": "counting",
+   "steps": [
+    "Y1.B4.S2",
+    "Y1.B4.S6",
+    "Y2.B1.S1"
+   ],
+   "ccss": [
+    "K.CC.A.3",
+    "K.NBT.A.1"
+   ],
+   "why": "existing WRM_PROPOSALS entry; covers these steps (reused from the Y1 lane's links file: the same id is the same spec)",
+   "reused": true,
+   "source": "Y1.json",
+   "closes": {
+    "Y2.B1.S1": "11 to 19 as ten and some more ones; 20 as two tens is never dealt; builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt"
+   },
+   "kindText": "option on composing:teen_compose"
+  },
   "tens_ones_group": {
    "kind": "new",
    "skill": "composing:count_in_tens_groups",
@@ -10471,6 +10557,28 @@
     "Y2.B1.S14": "orders numerals only; ordering objects or base-10 pictures of numbers is not dealt"
    },
    "kindText": "option on placevalue:order_least_to_greatest, placevalue:order_greatest_to_least"
+  },
+  "count_row_end": {
+   "kind": "option",
+   "skill": "multiplication:count_by_tables",
+   "option": "row end: the row stops at a chosen number (100), so a count in 10s from 0 ends at 100",
+   "name": "Count-By Row That Stops at 100 (option)",
+   "teaches": "counting in 2s, 5s and 10s from 0 up to 100 and no further (0, 10, 20 … 100), the numbers the first weeks of Grade 1 work in",
+   "representation": "the existing count-by row of boxes, cut at the chosen end number",
+   "family": "number",
+   "steps": [
+    "Y2.B1.S15"
+   ],
+   "ccss": [
+    "1.NBT.A.1",
+    "2.NBT.A.2"
+   ],
+   "why": "count_by_tables rows run 12 or 15 numbers, so a 10s row from 0 always reaches 110 or 140; no option ends a row at 100",
+   "reused": false,
+   "closes": {
+    "Y2.B1.S15": "counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available; counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)"
+   },
+   "kindText": "option on multiplication:count_by_tables"
   },
   "bonds_100": {
    "kind": "new",
@@ -10754,7 +10862,8 @@
    "representation": "the amount in a box; a bank of drawn bills and coins to ring or tally; answer: tally boxes under each value",
    "family": "measurement",
    "steps": [
-    "Y2.B4.S4"
+    "Y2.B4.S4",
+    "Y2.B4.S5"
    ],
    "ccss": [
     "2.MD.C.8"
@@ -10766,6 +10875,7 @@
    ],
    "closes": {
     "Y2.B4.S4": "coins only and always the FEWEST coins; choosing bills and coins to make an amount (any way) is not dealt",
+    "Y2.B4.S5": "checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt",
     "G1|-|selectmoneyusdollarscents": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)"
    },
    "kindText": "option on measurement:equiv_coin_sets"
@@ -11049,8 +11159,8 @@
    "reused": true,
    "closes": {
     "Y2.B7.S2": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt",
-    "Y2.B7.S3": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
-    "Y2.B7.S7": "reads millilitres only; reading a jug in litres is not dealt"
+    "Y2.B7.S3": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt; the gram dials read up to 1,800 g, past the Grade 1 range",
+    "Y2.B7.S7": "reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt"
    },
    "kindText": "new skill"
   },
@@ -11139,6 +11249,27 @@
    },
    "kindText": "new skill"
   },
+  "scale_band_100": {
+   "kind": "option",
+   "skill": "measurement:mass_volume_liquid",
+   "option": "readings to 100: a cylinder to 100 mL with marks in 10s (or 5s)",
+   "name": "Read a Millilitre Scale to 100 (option)",
+   "teaches": "reading the millilitres in a container on a scale to 100 mL, counting the marks in 10s or 5s",
+   "representation": "the existing graduated-cylinder cell drawn to 100 mL; answer box with mL printed",
+   "family": "measurement",
+   "steps": [
+    "Y2.B7.S6"
+   ],
+   "ccss": [
+    "3.MD.A.2"
+   ],
+   "why": "mass_volume_liquid {forms:[0]} draws cylinders to 1,000 mL: about half the readings pass 120 at Grade 1",
+   "reused": false,
+   "closes": {
+    "Y2.B7.S6": "reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available"
+   },
+   "kindText": "option on measurement:mass_volume_liquid"
+  },
   "fraction_parts": {
    "kind": "new",
    "skill": "fractions:equal_parts",
@@ -11149,7 +11280,8 @@
    "steps": [
     "Y2.B8.S1",
     "Y2.B8.S2",
-    "Y2.B8.S9"
+    "Y2.B8.S9",
+    "Y2.B8.S7"
    ],
    "ccss": [
     "1.G.A.3"
@@ -11159,9 +11291,36 @@
    "closes": {
     "Y2.B8.S1": "naming the parts and the whole of an object, shape or quantity in a part-whole picture, before any fraction is named",
     "Y2.B8.S2": "deciding whether a shape is split into equal or unequal parts",
+    "Y2.B8.S7": "counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt",
     "Y2.B8.S9": "finding the whole from a given part (half of the cubes is 4: how many cubes in the whole?)"
    },
    "kindText": "new skill"
+  },
+  "half_or_not": {
+   "kind": "option",
+   "skill": "shapes_early:partition_shapes",
+   "option": "ask: 'is_half' (and 'is_quarter'): equal and unequal splits, tick a half / not a half",
+   "name": "Is It a Half? (option)",
+   "teaches": "look at a shape split by a line and tick \"a half\" or \"not a half\" (or \"a quarter\" / \"not a quarter\"); no fraction notation, no typed answer",
+   "representation": "one shape per cell split equally or unequally; two tick boxes labelled with words",
+   "family": "fractions",
+   "ccss": [
+    "1.G.A.3"
+   ],
+   "why": "partition_shapes asks for typed 1/2, 1/4, 2/4, 3/4 in half its items and never shows an unequal split (reused from the Y1 lane's links file: the same id is the same spec)",
+   "steps": [
+    "Y1.B10.S1",
+    "Y1.B10.S5",
+    "Y2.B8.S3",
+    "Y2.B8.S5"
+   ],
+   "reused": true,
+   "source": "Y1.json",
+   "closes": {
+    "Y2.B8.S3": "names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt",
+    "Y2.B8.S5": "counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt"
+   },
+   "kindText": "option on shapes_early:partition_shapes"
   },
   "single_fraction": {
    "kind": "option",
@@ -11335,6 +11494,27 @@
    "closes": {
     "Y2.B9.S6": "knowing that an hour has 60 minutes and using it (half an hour = 30 minutes; minutes in 2 hours)",
     "Y2.B9.S7": "knowing that a day has 24 hours and using it to compare durations (more or less than a day)"
+   },
+   "kindText": "new skill"
+  },
+  "collect_data": {
+   "kind": "new",
+   "skill": "graphs:collect_and_represent",
+   "name": "Collect and Represent Data",
+   "teaches": "collecting data into a tally, then choosing a table, pictogram or bar chart to show it",
+   "representation": "a list of raw data; tally it, then draw the chart on a grid",
+   "family": "data",
+   "steps": [
+    "Y3.B12.S5",
+    "Y2.B10.S1"
+   ],
+   "ccss": [
+    "2.MD.D.10"
+   ],
+   "why": "existing WRM_PROPOSALS entry; reused",
+   "reused": true,
+   "closes": {
+    "Y2.B10.S1": "reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt"
    },
    "kindText": "new skill"
   },
@@ -11725,6 +11905,23 @@
  },
  "tagFixes": [
   {
+   "key": "composing:teen_compose",
+   "step": "Y2.B1.S1",
+   "action": "partial",
+   "why": "11 to 19 as ten and some more ones; 20 as two tens is never dealt",
+   "partial": "11 to 19 as ten and some more ones; 20 as two tens is never dealt"
+  },
+  {
+   "key": "composing:base10_build",
+   "step": "Y2.B1.S1",
+   "action": "partial",
+   "opts": {
+    "band": 20
+   },
+   "why": "builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt",
+   "partial": "builds 11 to 19 with one ten rod and ones; 20 (two tens) is never dealt"
+  },
+  {
    "key": "composing:base10_build",
    "step": "Y2.B1.S2",
    "action": "partial",
@@ -11808,7 +12005,7 @@
   {
    "key": "multiplication:count_by_tables",
    "step": "Y2.B1.S15",
-   "action": "add",
+   "action": "partial",
    "opts": {
     "rows": [
      {
@@ -11828,7 +12025,8 @@
      }
     ]
    },
-   "why": "teaches the step with opts {\"rows\":[{\"step\":2,\"start\":\"zero\",\"dir\":\"up\"},{\"step\":5,\"start\":\"zero\",\"dir\":\"up\"},{\"step\":10,\"start\":\"zero\",\"dir\":\"up\"}]}"
+   "why": "counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available",
+   "partial": "counts in 2s, 5s and 10s from 0 along a row of 12 numbers, so every 10s row ends at 110, past the numbers to 100 of this W4 step; a 10s count that stops at 100 is not available"
   },
   {
    "key": "patterns:count_by_step_up",
@@ -12029,6 +12227,16 @@
    "partial": "coins only and always the FEWEST coins; choosing bills and coins to make an amount (any way) is not dealt"
   },
   {
+   "key": "measurement:equiv_coin_sets",
+   "step": "Y2.B4.S5",
+   "action": "partial",
+   "opts": {
+    "currency": "usd"
+   },
+   "why": "checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt",
+   "partial": "checks whether one set of coins makes an amount (yes / no); making an amount with coins, and making the same amount in two different ways, are not dealt"
+  },
+  {
    "key": "measurement:money",
    "step": "Y2.B4.S7",
    "action": "partial",
@@ -12054,6 +12262,21 @@
    },
    "why": "checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked",
    "partial": "checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked"
+  },
+  {
+   "key": "multiplication:nl_mult",
+   "step": "Y2.B5.S5",
+   "action": "add",
+   "opts": {
+    "response": "sentence",
+    "constant": [
+     2,
+     5,
+     10
+    ],
+    "band": 50
+   },
+   "why": "teaches the step with opts {\"response\":\"sentence\",\"constant\":[2,5,10],\"band\":50}"
   },
   {
    "key": "measurement:reading_ruler",
@@ -12111,8 +12334,20 @@
      1
     ]
    },
-   "why": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
-   "partial": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt"
+   "why": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt; the gram dials read up to 1,800 g, past the Grade 1 range",
+   "partial": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt; the gram dials read up to 1,800 g, past the Grade 1 range"
+  },
+  {
+   "key": "measurement:mass_volume_liquid",
+   "step": "Y2.B7.S6",
+   "action": "partial",
+   "opts": {
+    "forms": [
+     0
+    ]
+   },
+   "why": "reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available",
+   "partial": "reads millilitres on a graduated cylinder, but about half the readings pass 120 (140 mL up to 900 mL), above the Grade 1 range; a cylinder within 100 mL is not available"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -12123,8 +12358,20 @@
      0
     ]
    },
-   "why": "reads millilitres only; reading a jug in litres is not dealt",
-   "partial": "reads millilitres only; reading a jug in litres is not dealt"
+   "why": "reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt",
+   "partial": "reads millilitres only, and about half the readings pass 120 (to 900 mL); reading a jug in litres is not dealt"
+  },
+  {
+   "key": "shapes_early:partition_shapes",
+   "step": "Y2.B8.S3",
+   "action": "partial",
+   "opts": {
+    "parts": [
+     0
+    ]
+   },
+   "why": "names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt",
+   "partial": "names the shaded part (1/2) and counts the equal parts of shapes that are always split into halves, so every answer is 2 or 1/2; deciding whether a shape is split in half (equal or unequal parts) is not dealt"
   },
   {
    "key": "fractions:shade_fraction",
@@ -12148,6 +12395,18 @@
    "why": "teaches the step with opts {\"band\":20}"
   },
   {
+   "key": "shapes_early:partition_shapes",
+   "step": "Y2.B8.S5",
+   "action": "partial",
+   "opts": {
+    "parts": [
+     2
+    ]
+   },
+   "why": "counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt",
+   "partial": "counts the equal parts of shapes that are always split into quarters (that answer is always 4) and names the shaded fraction, which is 1/4 in only a quarter of those items (the rest are 2/4 and 3/4, later steps); deciding whether a shape is split into quarters (equal or unequal parts) is not dealt"
+  },
+  {
    "key": "fractions:shade_fraction",
    "step": "Y2.B8.S6",
    "action": "partial",
@@ -12164,6 +12423,18 @@
    "step": "Y2.B8.S6",
    "action": "remove",
    "why": "ignores denoms in missing-numerator items (bug)"
+  },
+  {
+   "key": "shapes_early:partition_shapes",
+   "step": "Y2.B8.S7",
+   "action": "partial",
+   "opts": {
+    "parts": [
+     1
+    ]
+   },
+   "why": "counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt",
+   "partial": "counts the equal parts of shapes that are always split into thirds (that answer is always 3) and names the shaded fraction (1/3 or 2/3); deciding whether a shape is split into thirds (equal or unequal parts) is not dealt"
   },
   {
    "key": "fractions:shade_fraction",
@@ -12314,6 +12585,13 @@
    },
    "why": "words-past mixes \"past\" and \"to\"; reading a clock and saying it as minutes TO the next hour is not dealt",
    "partial": "words-past mixes \"past\" and \"to\"; reading a clock and saying it as minutes TO the next hour is not dealt"
+  },
+  {
+   "key": "graphs:tally_chart",
+   "step": "Y2.B10.S1",
+   "action": "partial",
+   "why": "reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt",
+   "partial": "reads a given tally chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt"
   },
   {
    "key": "measurement:bar_graph_intro",

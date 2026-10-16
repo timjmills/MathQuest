@@ -131,10 +131,10 @@ function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividi
   if(k==='measurement:mass_volume_liquid'&&o.forms)t.push(o.forms.map(f=>['a cylinder in mL','a scale in g or kg','sorting by unit'][f]).join(', '));
   if(k==='measurement:estimate_length'&&o.forms)t.push('about how long is it? a sensible length in metric units');return t.join('; ');}
 // r8 (A3): the earlier step (this year or an earlier grade) that owns key k with opts closest to o: exact opts first, then
-// opts whose rows / tables / parts contain the link's, then any use of the key; ties go to the latest step
+// opts whose rows / tables / parts contain the link's, then any use of the key; ties go to the step taught latest
 function bestOwner(k,sid,o){const want=JSON.stringify(o||{});const set=x=>(x?.rows||[]).map(r=>r.step).concat(x?.constant||[],x?.parts||[]);const ws=set(o);let best=null,bs=-1;
   for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;
-    const so=stepOptsFor(id,k);const ss=set(so);const sc=(JSON.stringify(so||{})===want?3:(ws.length&&ws.every(v=>ss.includes(v)))?2:1)*2+(directAt(id,k)?1:0);if(sc>=bs){bs=sc;best=id;}}return best;}
+    const so=stepOptsFor(id,k);const ss=set(so);const sc=(JSON.stringify(so||{})===want?3:(ws.length&&ws.every(v=>ss.includes(v)))?2:1)*2+(directAt(id,k)?1:0);if(sc>bs||(sc===bs&&taughtBefore(best,id))){bs=sc;best=id;}}return best;}   // r15: a tie goes to the step taught LATEST (school week), not the latest in WRM order
 function taughtAt(k,sid,o){if(o&&Object.keys(o).length){const b=bestOwner(k,sid,o);if(b)return b;}if(o&&Object.keys(o).length){let b2=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(JSON.stringify(stepOptsFor(id,k))===JSON.stringify(o))b2=id;}if(b2)return b2;}
   let best=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(!best||taughtBefore(best,id))best=id;}return best;}
 // r8 (A2): the rebuilt why says what the skill does in words (whyText; else the catalogue label without its "(Visual)"
@@ -286,7 +286,7 @@ const _ci=new Map();const _st=x=>String(x??'').replace(/<style[\s\S]*?<\/style>/
 const _lb=x=>x==null?'':typeof x==='object'?(x.label??x.text??x.html??JSON.stringify(x)):String(x);
 const claimItems=(k,o)=>{const id=k+JSON.stringify(o||{});if(_ci.has(id))return _ci.get(id);const [c,sk]=k.split(':');const out=[];
   for(let i=0;i<30;i++){let q;try{q=generateQuestionFor({category:c,skill:sk,opts:o||{},seed:61331+i*73,itemIndex:i%20,itemCount:20});}catch(_){continue;}if(!q)continue;
-    out.push({text:_st(q.text),a:_st(typeof q.ans==='object'?JSON.stringify(q.ans):q.ans),x:_st([...(q.options||[]),...(q.tiles||[]),...(q.bins||[]),...(q.items||[])].map(_lb).join(' ; ')),vis:_st(q.visual),raw:String(q.visual||'').toLowerCase().slice(0,6000),tpl:q.cell?q.cell.template:'',pay:q.cell?JSON.stringify(q.cell.payload):''});}
+    out.push({at:q.answerType||'',text:_st(q.text),a:_st(typeof q.ans==='object'?JSON.stringify(q.ans):q.ans),x:_st([...(q.options||[]),...(q.tiles||[]),...(q.bins||[]),...(q.items||[])].map(_lb).join(' ; ')),vis:_st(q.visual),raw:String(q.visual||'').toLowerCase().slice(0,6000),tpl:q.cell?q.cell.template:'',pay:q.cell?JSON.stringify(q.cell.payload):''});}
   _ci.set(id,out);return out;};
   // r12 TITLECLAIM (the cited title is a claim, Y5 critic r6 H'): a why that cites a step claims that step's title. When the
   // title names what the link's items never deal: an "add and subtract" title on a one-operation skill gets the half marker
@@ -539,7 +539,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
       pre[j]=setRule({key:sw.key,opts:sw.opts,why:sw.why,...(e.hand?{hand:e.hand}:{})},'brokenLink',e);for(let r=related.length-1;r>=0;r--)if(related[r].key===sw.key)related.splice(r,1);continue;}
     if(bl.why?.[s.id])e.why=bl.why[s.id];else if(!e.why.includes(bl.note))e.why+=bl.note;}
   // r12: OV.whyFix[stepId][key] = the why of that pre link, written for this step (applied last, after every rewrite)
-  for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}
+  for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key+'|'+JSON.stringify(e.opts||{})]??OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}   // r15: a key|opts entry names one of two links with the same key
   for(const e of related){const w=OV.relWhyFix?.[s.id]?.[e.key];if(w)e.why=w;}
   denomNotePass([pre,related]);
   titleClaimPass(s.id,[['pre',pre],['related',related]]);
@@ -693,6 +693,12 @@ fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 const TR=await import(HERE+'titlerep.mjs');
 {const {rows,finds}=TR.titleRepFinds(out,claimItems);for(const f of finds)console.error('TITLEREP',f.kind,f.id,'|',f.title,'|',f.msg);if(finds.length)process.exitCode=1;
   console.error(`titlerep ${YEAR}: ${rows.length} entries, ${rows.filter(r=>r.claims.length).length} with a title claim, ${rows.filter(r=>r.verdict==='full'&&r.claims.length).length} of them full; ${finds.length} problems`);}
+// r15 RANGECHECK (critic r14 M13 / N17, rule 7): every number a full entry's direct items deal is within the entry's ceiling
+// (the title's own bound, else the grade band at the school week); a partial or gap entry's clause names any overshoot of its
+// linked items (rangegate.mjs). The title's verb and clock precision are TITLEREP claims (titlerep.mjs verbClaims)
+const RG=await import(HERE+'rangegate.mjs');
+{const {rows,finds}=RG.rangeFinds(out,claimItems,YEAR,id=>SWK[id]===999?null:(SWK[id]??null));for(const f of finds)console.error('RANGECHECK',f.kind,f.id,'|',f.title,'|',f.msg);if(finds.length)process.exitCode=1;
+  console.error(`rangecheck ${YEAR}: ${rows.length} direct / partial links, ${rows.filter(r=>r.over).length} pass their ceiling, ${finds.length} problems`);}
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
 console.error(`optgate ${YEAR}: ${optStats.n} links, ${optStats.spec} at their spec opts, changed by a named rule ${JSON.stringify(optStats.rule)}, ${optStats.bad} problems`);

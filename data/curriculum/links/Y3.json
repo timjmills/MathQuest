@@ -2713,16 +2713,18 @@
   },
   "Y3.B2.S21": {
    "title": "Inverse operations",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "subtraction:sub_check_by_adding",
-     "opts": {}
+     "missing": "checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt",
+   "build": [
+    "inverse_check_1000"
+   ],
    "pre": [
     {
      "key": "addition:add_sub_fact_family",
@@ -5109,6 +5111,20 @@
        8
       ]
      }
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (next step, W32: the same idea one step further)",
+     "opts": {
+      "regroup": "always",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
+     }
     }
    ],
    "note": ""
@@ -5244,6 +5260,19 @@
        8
       ]
      }
+    },
+    {
+     "key": "division:box_division_easy",
+     "opts": {
+      "regroup": "always",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
+     }
     }
    ],
    "partial": [],
@@ -5258,6 +5287,20 @@
       "constant": [
        3,
        4,
+       8
+      ]
+     }
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (taught earlier, W32): the same box with no remainder",
+     "opts": {
+      "regroup": "none",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
        8
       ]
      }
@@ -5286,20 +5329,6 @@
      "key": "division:share_into_groups",
      "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {}
-    },
-    {
-     "key": "division:box_division_easy",
-     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (taught earlier, W32)",
-     "opts": {
-      "regroup": "none",
-      "constant": [
-       2,
-       3,
-       4,
-       5,
-       8
-      ]
-     }
     },
     {
      "key": "patterns:double",
@@ -5335,7 +5364,7 @@
     "props_tables"
    ],
    "related": [],
-   "note": "no related skill: the later-taught steps of the block are Y3.B4.S4 (W33): multiply deals tablesBeyond content first taught in a later grade (rule 19); area_model_mult deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S5 (W33): multiply deals tablesBeyond content first taught in a later grade (rule 19); area_model_mult deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S6 (W33): missing_mult_div deals tablesBeyond content first taught in a later grade (rule 19); mult_div_fact_family deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S10 (W33): mult_comparison deals tablesBeyond content first taught in a later grade (rule 19)"
+   "note": "div_remainders rings counters (dividends to 24); box_division_easy {regroup always} is the 2-digit dividend with a remainder (95 ÷ 8 = 11 R 7). Divisors 2, 3, 4, 5, 8: the Grade 2 tables. no related skill: the later-taught steps of the block are Y3.B4.S4 (W33): multiply deals tablesBeyond content first taught in a later grade (rule 19); area_model_mult deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S5 (W33): multiply deals tablesBeyond content first taught in a later grade (rule 19); area_model_mult deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S6 (W33): missing_mult_div deals tablesBeyond content first taught in a later grade (rule 19); mult_div_fact_family deals tablesBeyond content first taught in a later grade (rule 19) | Y3.B4.S10 (W33): mult_comparison deals tablesBeyond content first taught in a later grade (rule 19)"
   },
   "Y3.B4.S10": {
    "title": "Scaling",
@@ -5491,7 +5520,7 @@
    "partial": [
     {
      "key": "measurement:length_metric",
-     "missing": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+     "missing": "converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
      "opts": {
       "forms": [
        1
@@ -5500,7 +5529,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+   "missing": "converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
    "build": [
     "mm_cm_m"
    ],
@@ -5669,9 +5698,11 @@
   },
   "Y3.B5.S4": {
    "title": "Metres, centimetres and millimetres",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:length_metric",
+     "missing": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt",
      "opts": {
       "forms": [
        0,
@@ -5681,10 +5712,12 @@
      }
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt",
+   "build": [
+    "mm_cm_m",
+    "length_band_1000"
+   ],
    "pre": [
     {
      "key": "measurement:length_metric",
@@ -5721,7 +5754,7 @@
      }
     }
    ],
-   "note": "forms 0-2 = mm/cm, cm/m, mm/m; form 3 (m in km) is above the step"
+   "note": "forms 0-2 = mm/cm, cm/m, mm/m; form 3 (m in km) is above the step. The m-to-mm form deals 1-12 m (to 12,000 mm), past the Grade 2 range: no band option keeps the answers within 1,000"
   },
   "Y3.B5.S5": {
    "title": "Equivalent lengths (metres and centimetres)",
@@ -5729,7 +5762,7 @@
    "partial": [
     {
      "key": "measurement:length_metric",
-     "missing": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
+     "missing": "whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt",
      "opts": {
       "forms": [
        1
@@ -5738,7 +5771,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
+   "missing": "whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt",
    "build": [
     "mm_cm_m"
    ],
@@ -6115,16 +6148,18 @@
   },
   "Y3.B5.S11": {
    "title": "Measure perimeter",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "area_perimeter:perimeter_grid",
-     "opts": {}
+     "missing": "counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt",
+   "build": [
+    "perimeter_measure"
+   ],
    "pre": [
     {
      "key": "area_perimeter:perimeter_intro",
@@ -7011,7 +7046,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
+     "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
      "opts": {
       "forms": [
        0,
@@ -7021,14 +7056,14 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
+   "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
    "build": [
     "mass_scales"
    ],
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "this step's skill as it was met then (what the items ask: read the cylinder (mL)) — Y2.B7.S6 Measure in millilitres (Grade 1)",
+     "why": "this step's skill as it was met then (what the items ask: read the cylinder (mL)) — Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)",
      "opts": {
       "forms": [
        0
@@ -7069,7 +7104,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
+     "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
      "opts": {
       "forms": [
        1
@@ -7078,7 +7113,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
+   "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
    "build": [
     "mass_scales"
    ],
@@ -7108,7 +7143,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1)",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)",
      "opts": {
       "forms": [
        0
@@ -7149,7 +7184,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
+     "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
      "opts": {
       "forms": [
        1
@@ -7158,7 +7193,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
+   "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
    "build": [
     "mass_scales"
    ],
@@ -7183,7 +7218,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1)",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)",
      "opts": {
       "forms": [
        0
@@ -7513,7 +7548,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)",
      "opts": {
       "forms": [
        0
@@ -7604,7 +7639,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres (Grade 1; a partial skill there: its readings pass 120)",
      "opts": {
       "forms": [
        0
@@ -7665,21 +7700,21 @@
    ],
    "pre": [
     {
+     "key": "fractions:write_fraction",
+     "why": "Y2.B8.S11 Non-unit fractions: a non-unit fraction counts unit fractions (2/3 is two thirds; the count used to add like fractions)",
+     "opts": {
+      "denoms": [
+       2,
+       3
+      ]
+     }
+    },
+    {
      "key": "fractions:equiv_frac_visual",
      "why": "Y3.B6.S10 Equivalent fractions as bar models (taught before this step)",
      "opts": {
       "model": [
        "bar"
-      ]
-     }
-    },
-    {
-     "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (prior learning wk W37)",
-     "opts": {
-      "denoms": [
-       2,
-       3
       ]
      }
     },
@@ -8708,7 +8743,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W20)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_hour",
@@ -8731,7 +8768,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (a later step, W21: the same idea one step further)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     }
    ],
    "note": "beyond CCSS (owner ruling: keep); roman_12 is the clock band of the one roman_numerals skill (wrm.js roman_100 / roman_1000)"
@@ -8764,7 +8803,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W20)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_hour",
@@ -8787,7 +8828,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (a later step, W21: the same idea one step further)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     }
    ],
    "note": ""
@@ -8818,7 +8861,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W20)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_hour",
@@ -8836,7 +8881,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (next step, W21: the same idea one step further)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_sense",
@@ -8852,6 +8899,12 @@
     {
      "key": "measurement:time_analog_digital",
      "opts": {}
+    },
+    {
+     "key": "measurement:time_analog_digital",
+     "opts": {
+      "dir": "to-analog"
+     }
     }
    ],
    "partial": [],
@@ -8877,7 +8930,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W21)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     }
    ],
    "preBuild": [
@@ -8900,7 +8955,7 @@
      "opts": {}
     }
    ],
-   "note": ""
+   "note": "to-digital writes the time a clock shows; to-analog reads a digital time (3:40) and checks the clock that shows it"
   },
   "Y3.B10.S5": {
    "title": "Use a.m. and p.m",
@@ -8918,7 +8973,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (taught before this step in the block)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_5min",
@@ -8933,7 +8990,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W21)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_1min",
@@ -8986,12 +9045,16 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W21)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (taught earlier, W21)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_1min",
@@ -9039,7 +9102,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 Quarter past and quarter to (prior learning wk W21)",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "measurement:time_sense",
@@ -9049,7 +9114,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (taught earlier, W21)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_1min",
@@ -9098,7 +9165,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "reading the start and end times (earlier step this builds on: Y3.B10.S4 Read time on a digital clock)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_5min",
@@ -9158,7 +9227,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "reading the start and end times (earlier step this builds on: Y3.B10.S4 Read time on a digital clock)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     },
     {
      "key": "measurement:time_5min",
@@ -9241,7 +9312,9 @@
     {
      "key": "measurement:time_analog_digital",
      "why": "Y3.B10.S4 Read time on a digital clock (taught earlier, W21)",
-     "opts": {}
+     "opts": {
+      "dir": "to-analog"
+     }
     }
    ],
    "preBuild": [
@@ -9301,20 +9374,22 @@
   },
   "Y3.B10.S12": {
    "title": "Solve problems with time",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "measurement:elapsed_find_duration",
-     "opts": {}
+     "missing": "finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt"
     },
     {
      "key": "measurement:elapsed_find_start",
-     "opts": {}
+     "missing": "finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt; finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt",
+   "build": [
+    "time_stories"
+   ],
    "pre": [
     {
      "key": "measurement:elapsed_mixed",
@@ -9380,7 +9455,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 quarter past and quarter to (Grade 1): the minute hand makes a quarter turn",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "shapes_early:shape_positions",
@@ -9450,7 +9527,9 @@
     {
      "key": "measurement:time_quarter",
      "why": "Y2.B9.S2 quarter past and quarter to (Grade 1): a quarter turn of the minute hand, the turn a right angle measures",
-     "opts": {}
+     "opts": {
+      "stimulus": "words-past"
+     }
     },
     {
      "key": "shapes_early:shape_corners_count",
@@ -10004,9 +10083,9 @@
    "pre": [
     {
      "key": "graphs:pictograph",
-     "why": "this step's skill as it was met then (max number: up to 50) — Y2.B10.S7 Interpret pictograms (2, 5 and 10) (Grade 1)",
+     "why": "this step's skill as it was met then (max number: up to 20) — Y2.B10.S7 Interpret pictograms (2, 5 and 10) (Grade 1)",
      "opts": {
-      "range": 50,
+      "range": 20,
       "scale": [
        0,
        1,
@@ -10169,7 +10248,7 @@
      "key": "graphs:pictograph",
      "why": "reading a picture graph with a key — Y2.B10.S7 Interpret pictograms (2, 5 and 10)",
      "opts": {
-      "range": 50,
+      "range": 20,
       "scale": [
        0,
        1,
@@ -10292,7 +10371,7 @@
    "pre": [
     {
      "key": "graphs:tally_chart",
-     "why": "Y2.B10.S1 tally charts: collecting the data",
+     "why": "Y2.B10.S1 Make tally charts: reading the counts of a tally chart (how many, most, in all), the chart this step makes from the data",
      "opts": {}
     },
     {
@@ -10349,7 +10428,7 @@
    "pre": [
     {
      "key": "graphs:tally_chart",
-     "why": "Y2.B10.S1 tally charts and Y2.B10.S2 tables: a table of counts",
+     "why": "Y2.B10.S1 Make tally charts: reading a chart of counts (how many in each row and in all), the counts a two-way table holds",
      "opts": {}
     },
     {
@@ -12681,6 +12760,27 @@
    },
    "kindText": "option on number_sense:estimate_sum, number_sense:estimate_sums_diffs"
   },
+  "inverse_check_1000": {
+   "kind": "option",
+   "skill": "subtraction:sub_check_by_adding",
+   "option": "numbers within 1,000 (3-digit) and the other way round: check an addition by subtracting",
+   "name": "Check With the Inverse Within 1,000 (option)",
+   "teaches": "checking a 3-digit addition by subtracting and a 3-digit subtraction by adding (456 + 237 = 693, so 693 − 237 = 456), and fixing a wrong answer",
+   "representation": "the existing check cell: the calculation, the inverse calculation under it, Correct / Fix it",
+   "family": "operations",
+   "steps": [
+    "Y3.B2.S21"
+   ],
+   "ccss": [
+    "2.NBT.B.7"
+   ],
+   "why": "sub_check_by_adding checks only subtractions, with 2-digit numbers; the Y4 lane's inverse_check is for 5- and 6-digit numbers",
+   "reused": false,
+   "closes": {
+    "Y3.B2.S21": "checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt"
+   },
+   "kindText": "option on subtraction:sub_check_by_adding"
+  },
   "make_decisions": {
    "kind": "new",
    "skill": "addition:choose_a_method",
@@ -12992,7 +13092,8 @@
     "Y3.B5.S1",
     "Y3.B5.S3",
     "Y3.B5.S5",
-    "Y3.B5.S6"
+    "Y3.B5.S6",
+    "Y3.B5.S4"
    ],
    "ccss": [
     "2.MD.A.1",
@@ -13002,10 +13103,33 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y3.B5.S1": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+    "Y3.B5.S1": "converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
     "Y3.B5.S3": "measuring a length on a ruler in cm and mm (4 cm 5 mm)",
-    "Y3.B5.S5": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
+    "Y3.B5.S4": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt",
+    "Y3.B5.S5": "whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt",
     "Y3.B5.S6": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt"
+   },
+   "kindText": "option on measurement:length_metric"
+  },
+  "length_band_1000": {
+   "kind": "option",
+   "skill": "measurement:length_metric",
+   "option": "answers within 1,000: cm ↔ mm to 100 cm, m ↔ cm to 10 m, and only 1 m = 1,000 mm",
+   "name": "Metric Lengths Within 1,000 (option)",
+   "teaches": "converting between millimetres, centimetres and metres with answers that stay within 1,000 (6 m = 600 cm, 45 cm = 450 mm, 1 m = 1,000 mm)",
+   "representation": "the existing conversion cell; a metre stick in cm and mm as the structural support",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S4"
+   ],
+   "ccss": [
+    "2.MD.A.1",
+    "4.MD.A.1"
+   ],
+   "why": "length_metric deals m to mm for 1-12 m (to 12,000 mm): no option holds the answers to the Grade 2 range",
+   "reused": false,
+   "closes": {
+    "Y3.B5.S4": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt"
    },
    "kindText": "option on measurement:length_metric"
   },
@@ -13087,6 +13211,28 @@
     "G2|-|solveshorterbyproblemsusingbarmodels": "stories that compare two lengths in the same unit (how much shorter?) solved with a bar model, within 100"
    },
    "kindText": "new skill"
+  },
+  "perimeter_measure": {
+   "kind": "option",
+   "skill": "area_perimeter:perimeter_grid",
+   "option": "task \"measure\": the shape is drawn at real size with no side lengths; measure each side with a cm ruler, then add",
+   "name": "Measure the Sides to Find the Perimeter (option)",
+   "teaches": "measuring each side of a drawn shape with a centimetre ruler, writing the lengths and adding them to find the perimeter",
+   "representation": "a shape drawn to scale (whole cm sides) with a cm ruler under one side; boxes for each side length and the total",
+   "family": "measurement",
+   "steps": [
+    "Y3.B5.S11"
+   ],
+   "ccss": [
+    "2.MD.A.1",
+    "3.MD.D.8"
+   ],
+   "why": "perimeter_grid counts unit edges on squared paper or adds lengths written on the shape; no item measures a side",
+   "reused": false,
+   "closes": {
+    "Y3.B5.S11": "counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt"
+   },
+   "kindText": "option on area_perimeter:perimeter_grid"
   },
   "fraction_parts": {
    "kind": "new",
@@ -13322,9 +13468,9 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y3.B7.S1": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
-    "Y3.B7.S2": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
-    "Y3.B7.S3": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
+    "Y3.B7.S1": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
+    "Y3.B7.S2": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
+    "Y3.B7.S3": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
     "Y3.B7.S8": "millilitres only; mixed l and ml readings are not dealt"
    },
    "kindText": "new skill",
@@ -13700,6 +13846,32 @@
    },
    "kindText": "new skill"
   },
+  "time_stories": {
+   "kind": "option",
+   "skill": "measurement:elapsed_find_duration",
+   "skills": [
+    "measurement:elapsed_find_duration",
+    "measurement:elapsed_find_start",
+    "measurement:elapsed_mixed"
+   ],
+   "option": "stimulus \"story\": a context sentence gives the start, the end or the duration (a film, a bus journey, a lesson); the time line stays as the support",
+   "name": "Time Problems in Context (option)",
+   "teaches": "solving a time problem told as a short story (the film starts at 3:15 and ends at 4:45: how long is it?), finding the duration, the start or the end time",
+   "representation": "one story sentence over the existing time-line cell; answer boxes (h, min or a time)",
+   "family": "measurement",
+   "steps": [
+    "Y3.B10.S12"
+   ],
+   "ccss": [
+    "3.MD.A.1"
+   ],
+   "why": "the elapsed-time skills read a drawn time line with no context: no item is a problem told in words",
+   "reused": false,
+   "closes": {
+    "Y3.B10.S12": "finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt; finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt"
+   },
+   "kindText": "option on measurement:elapsed_find_duration, measurement:elapsed_find_start, measurement:elapsed_mixed"
+  },
   "turns_angles": {
    "kind": "new",
    "skill": "angles_lines:turns_and_angles",
@@ -13920,7 +14092,8 @@
    "representation": "a list of raw data; tally it, then draw the chart on a grid",
    "family": "data",
    "steps": [
-    "Y3.B12.S5"
+    "Y3.B12.S5",
+    "Y2.B10.S1"
    ],
    "ccss": [
     "2.MD.D.10"
@@ -14507,6 +14680,13 @@
    "partial": "the same: 2-digit only at place 10"
   },
   {
+   "key": "subtraction:sub_check_by_adding",
+   "step": "Y3.B2.S21",
+   "action": "partial",
+   "why": "checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt",
+   "partial": "checks a subtraction by adding, with 2-digit numbers (64 − 56 = 12: correct, or fix it); checking an addition by subtracting, and 3-digit calculations within 1,000, are not dealt"
+  },
+  {
    "key": "number_theory:multiples",
    "step": "Y3.B3.S3",
    "action": "partial",
@@ -14664,6 +14844,22 @@
    "why": "partitions with an exchange (65 ÷ 5 = 50 ÷ 5 + 15 ÷ 5): that is Y3.B4.S8"
   },
   {
+   "key": "division:box_division_easy",
+   "step": "Y3.B4.S9",
+   "action": "add",
+   "opts": {
+    "regroup": "always",
+    "constant": [
+     2,
+     3,
+     4,
+     5,
+     8
+    ]
+   },
+   "why": "teaches the step with opts {\"regroup\":\"always\",\"constant\":[2,3,4,5,8]}"
+  },
+  {
    "key": "multiplication:mult_comparison",
    "step": "Y3.B4.S10",
    "action": "partial",
@@ -14679,8 +14875,8 @@
      1
     ]
    },
-   "why": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
-   "partial": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt"
+   "why": "converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+   "partial": "converts whole metres to cm (to 12 m = 1,200 cm, past 1,000 in a few items); measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt"
   },
   {
    "key": "measurement:reading_ruler",
@@ -14691,6 +14887,20 @@
   },
   {
    "key": "measurement:length_metric",
+   "step": "Y3.B5.S4",
+   "action": "partial",
+   "opts": {
+    "forms": [
+     0,
+     1,
+     2
+    ]
+   },
+   "why": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt",
+   "partial": "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and recording a length in m, cm and mm is not dealt"
+  },
+  {
+   "key": "measurement:length_metric",
    "step": "Y3.B5.S5",
    "action": "partial",
    "opts": {
@@ -14698,8 +14908,8 @@
      1
     ]
    },
-   "why": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
-   "partial": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt"
+   "why": "whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt",
+   "partial": "whole metres to cm only (3 m = 300 cm; up to 12 m = 1,200 cm, past 1,000 in a few items); mixed units (1 m 20 cm = 120 cm) are not dealt"
   },
   {
    "key": "measurement:length_metric",
@@ -14712,6 +14922,13 @@
    },
    "why": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt",
    "partial": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt"
+  },
+  {
+   "key": "area_perimeter:perimeter_grid",
+   "step": "Y3.B5.S11",
+   "action": "partial",
+   "why": "counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt",
+   "partial": "counts the unit edges of a shape on squared paper in about two thirds of the items, and adds side lengths already written on the shape in the rest; measuring the sides with a ruler (cm) to find the perimeter is not dealt"
   },
   {
    "key": "fractions:identify",
@@ -14786,8 +15003,8 @@
      1
     ]
    },
-   "why": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
-   "partial": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt"
+   "why": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
+   "partial": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -14798,8 +15015,8 @@
      1
     ]
    },
-   "why": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
-   "partial": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt"
+   "why": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
+   "partial": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -14810,8 +15027,8 @@
      1
     ]
    },
-   "why": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
-   "partial": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt"
+   "why": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)",
+   "partial": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt; some gram dials read past 1,000 g (1,200 g to 1,800 g)"
   },
   {
    "key": "measurement:unit_conversions",
@@ -14946,6 +15163,20 @@
    },
    "why": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt",
    "partial": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt"
+  },
+  {
+   "key": "measurement:elapsed_find_duration",
+   "step": "Y3.B10.S12",
+   "action": "partial",
+   "why": "finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt",
+   "partial": "finds how long from a start and an end time on a drawn time line (quarter-hour times); a time problem told as a story (a film, a bus journey, a lesson) is not dealt"
+  },
+  {
+   "key": "measurement:elapsed_find_start",
+   "step": "Y3.B10.S12",
+   "action": "partial",
+   "why": "finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt",
+   "partial": "finds a start time from an end time and a duration on a drawn time line; a time problem told as a story is not dealt"
   },
   {
    "key": "angles_lines:identify_angles",
