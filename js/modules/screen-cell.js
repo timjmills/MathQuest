@@ -1623,7 +1623,7 @@ function wireSwipeRows(cellEl) {
         const level = () => {
             if (!col) return;
             const lines = w.querySelectorAll('.k2-countrow-line');
-            const swipes = frame && frame.hasAttribute('data-mq-swipes');
+            const swipes = frame && (frame.hasAttribute('data-mq-swipes') || frame.hasAttribute('data-mq-tabtop'));
             col.querySelectorAll('[data-mq-tabfor]').forEach((t) => {
                 const ln = lines[Number(t.getAttribute('data-mq-tabfor'))];
                 if (!ln) return;
@@ -1666,58 +1666,200 @@ function wireSwipeRows(cellEl) {
                 cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
             }
         };
-        // owner ruling 2026-10-09: at Chromebook width (a window 1024 px or wider: 1366 / 1280 with three worksheet cards per row)
-        // a row too wide for its cell WRAPS inside the cell, so the whole row shows with no "Swipe -> for more boxes"; a phone
-        // (narrower window) keeps the swipe. The jump arrow before a wrapped line's first box stays, pointing on from the line above.
-        const wrapRow = () => {
-            const conts = [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')];
-            const was = w.hasAttribute('data-mq-wrapfit');
+        // ONE state machine (critic skip-count r1 D1-D3, 2026-10-16), run at load, on every resize and after the late fit:
+        // (1) clear the wrap, (2) clear the swipe, (3) measure the row against the cell, (4) choose: whole / tab above /
+        // wrapped (Chromebook, not a number line) / swipe. So a resize in either direction ends as a fresh load does.
+        const conts = () => [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')];
+        // fitTwinRows' generic pass may not wrap the frame (it would drop the step tab onto a line of its own, centred: the band)
+        if (frame) { if (frame.dataset.mqOrigStyle === undefined) frame.dataset.mqOrigStyle = frame.getAttribute('style') || ''; frame.dataset.mqWrapped = '1'; }
+        const isAxis = !!w.querySelector('.k2-countrow-axis');
+        const cellInner = () => {
+            const c = w.closest('.mq-scell');
+            if (!c) return 0;
+            const cr = c.getBoundingClientRect(), cs = getComputedStyle(c);
+            return cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
+        };
+        const twin = w.closest('.k2-twin');
+        // every inline style this machine changes is kept as it was rendered, and put back verbatim at step (1)
+        const keep = (e) => { if (e.dataset.mqOrigStyle === undefined) e.dataset.mqOrigStyle = e.getAttribute('style') || ''; };
+        const restore = (e) => { if (e.dataset.mqOrigStyle !== undefined) e.setAttribute('style', e.dataset.mqOrigStyle); };
+        const clearAll = () => {
+            // (1) the wrap, the phone gap and the drawing's scale, back as rendered
             w.removeAttribute('data-mq-wrapfit');
-            // restore the row's own inline style verbatim (rewriting it would turn "display:flex" into "display: flex;" and drop the
-            // worksheet's no-wrap rule, which matches the attribute text)
-            if (was) { conts.forEach((c) => { if (c.dataset.mqWrapStyle !== undefined) c.setAttribute('style', c.dataset.mqWrapStyle); }); w.style.overflowX = 'auto'; }
-            if (window.innerWidth < 1024) return false;
-            const cellEl2 = w.closest('.mq-scell');
-            if (!cellEl2 || !conts.length) return false;
-            if (frame) { frame.removeAttribute('data-mq-swipes'); frame.style.minWidth = ''; }
-            w.style.width = ''; w.style.maxWidth = '';
-            const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2);
-            const inner = cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
-            const colW = col ? col.getBoundingClientRect().width : 0;
-            if (w.scrollWidth + colW <= inner + 1) return false;
-            w.setAttribute('data-mq-wrapfit', '');
-            w.setAttribute('data-mq-end', '');
+            conts().forEach((c) => { restore(c); delete c.dataset.mqWrapStyle; });
+            w.querySelectorAll('.k2-jump, .k2-countrow-axis, .k2-countrow-arcsvg').forEach((e) => {
+                restore(e);
+                if (e.dataset.mqVb !== undefined) { e.setAttribute('viewBox', e.dataset.mqVb); e.removeAttribute('preserveAspectRatio'); e.querySelectorAll('path, polygon').forEach((pe) => pe.setAttribute(pe.tagName.toLowerCase() === 'polygon' ? 'points' : 'd', pe.dataset.mqD)); }
+            });
+            w.querySelectorAll('[data-mq-leadin]').forEach((e) => e.removeAttribute('data-mq-leadin'));
+            if (twin) {
+                if (twin.dataset.mqK2Orig === undefined) twin.dataset.mqK2Orig = twin.style.getPropertyValue('--mq-k2') || '';
+                if (twin.dataset.mqK2Orig) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Orig); else twin.style.removeProperty('--mq-k2');
+                delete twin.dataset.mqK2Base; delete twin.dataset.mqFitW;
+            }
+            // (2) the swipe
+            if (frame) { frame.removeAttribute('data-mq-swipes'); frame.removeAttribute('data-mq-tabtop'); frame.setAttribute('style', frame.dataset.mqOrigStyle); }
+            w.style.width = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto';
+            if (body) body.style.paddingRight = '0px';
+            const cues = w.querySelector('.k2-swipe-cues');
+            if (cues) cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((c) => { c.style.fontSize = ''; });
+        };
+        // TY-10b (critic phone29), now a layout step rather than a second drawing (skip-count r2 D3): on a phone the worksheet's
+        // and the quiz's gap between columns is capped at 24 px, and each jump arrow takes the gap it gets
+        const phoneGap = () => {
+            if (window.innerWidth > 480 || w.closest('#questionCard')) return;
+            conts().forEach((c) => {
+                const g = parseFloat(getComputedStyle(c).columnGap) || 0;
+                if (g <= 24.5) return;
+                // the attribute text is edited, never re-serialised: the cards' no-wrap rule matches "display:flex" as written
+                keep(c); c.setAttribute('style', c.dataset.mqOrigStyle.replace(/gap:[^;]*;?/, 'gap:24px;'));
+                c.querySelectorAll('.k2-jump').forEach((j) => { keep(j); j.setAttribute('style', j.dataset.mqOrigStyle.replace(/(^|;)width:[^;]*;?/, '$1width:24px;')); });
+            });
+        };
+        // a number line's ticks and hop arcs stand straight over the numbers as the screen lays them out (the boxes keep a
+        // 44 px floor and the gap may be capped, so the drawn pitch is not the screen's): every x of the two drawings is mapped,
+        // piecewise, from its drawn tick to the centre of its number
+        const alignAxis = () => {
+            if (!isAxis) return;
+            w.querySelectorAll('.k2-countrow-line').forEach((ln) => {
+                const ax = ln.querySelector('.k2-countrow-axis'), inner = ln.querySelector('[data-mq-wrapped]');
+                if (!ax || !inner) return;
+                const arc = ax.previousElementSibling && ax.previousElementSibling.tagName.toLowerCase() === 'svg' ? ax.previousElementSibling : null;
+                if (arc) arc.classList.add('k2-countrow-arcsvg');
+                const svgs = arc ? [arc, ax] : [ax];
+                svgs.forEach((sv) => {
+                    keep(sv);
+                    if (sv.dataset.mqVb === undefined) { sv.dataset.mqVb = sv.getAttribute('viewBox'); sv.querySelectorAll('path, polygon').forEach((pe) => { pe.dataset.mqD = pe.getAttribute('d') || pe.getAttribute('points') || ''; }); }
+                    // from the drawing as rendered every time (idempotent: a second pass never maps a mapped drawing)
+                    restore(sv); sv.setAttribute('viewBox', sv.dataset.mqVb); sv.removeAttribute('preserveAspectRatio');
+                    sv.querySelectorAll('path, polygon').forEach((pe) => pe.setAttribute(pe.tagName.toLowerCase() === 'polygon' ? 'points' : 'd', pe.dataset.mqD));
+                });
+                const vb = ax.dataset.mqVb.split(/\s+/).map(Number);
+                ax.style.maxWidth = 'none'; ax.style.flex = 'none';           // measured unclamped: its width is the drawing's own mm
+                const ar = ax.getBoundingClientRect();
+                if (!ar.width || !vb[2]) return;
+                const k = ar.width / vb[2];                                      // px per drawn unit
+                const ticks = [...ax.querySelector('path').dataset.mqD.matchAll(/M(-?[\d.]+) -?[\d.]+ V/g)].map((m) => Number(m[1]));
+                const its = [...inner.children];
+                if (ticks.length !== its.length || ticks.length < 1) return;
+                const cs = its.map((e) => { const r = e.getBoundingClientRect(); return ((r.left + r.right) / 2 - ar.left) / k; });
+                const f = (x) => {
+                    if (ticks.length === 1) return x + cs[0] - ticks[0];
+                    let i = 0;
+                    while (i < ticks.length - 2 && x > ticks[i + 1]) i++;
+                    return cs[i] + (x - ticks[i]) * (cs[i + 1] - cs[i]) / (ticks[i + 1] - ticks[i]);
+                };
+                const mapD = (d) => {
+                    let cmd = '', idx = 0;
+                    return d.replace(/([MLHVQZmlhvqz])|(-?[\d.]+)/g, (t, c, num) => {
+                        if (c) { cmd = c; idx = 0; return c; }
+                        const n = Number(num); const i = idx++;
+                        const isX = cmd === 'H' || ((cmd === 'M' || cmd === 'L' || cmd === 'Q') && i % 2 === 0);
+                        return isX ? String(Math.round(f(n) * 100) / 100) : num;
+                    });
+                };
+                const mapPts = (pts) => pts.replace(/(-?[\d.]+),(-?[\d.]+)/g, (t, x, y) => `${Math.round(f(Number(x)) * 100) / 100},${y}`);
+                svgs.forEach((sv) => {
+                    const v = sv.dataset.mqVb.split(/\s+/).map(Number);
+                    const wNew = Math.max(v[2], f(v[2]));
+                    sv.setAttribute('viewBox', `${v[0]} ${v[1]} ${Math.round(wNew * 100) / 100} ${v[3]}`);
+                    sv.setAttribute('preserveAspectRatio', 'none');
+                    sv.style.width = `${wNew * k}px`; sv.style.maxWidth = 'none'; sv.style.flex = 'none';
+                    sv.querySelectorAll('path, polygon').forEach((pe) => { if (pe.tagName.toLowerCase() === 'polygon') pe.setAttribute('points', mapPts(pe.dataset.mqD)); else pe.setAttribute('d', mapD(pe.dataset.mqD)); });
+                });
+            });
+        };
+        // a line of the row wraps into equal parts (6 -> 3 + 3, never 4 + 2): the fewest parts whose width fits the room
+        const wrapRow = (inner) => {
+            let its = items();
+            if (isAxis || window.innerWidth < 1024 || its.length < 2 || !body) return false;
+            const geo = () => {
+                its = items();
+                const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
+                const exitW = Math.max(0, ...[...w.querySelectorAll('.k2-countrow-line')].map((ln) => { const x = ln.lastElementChild; return x && !x.querySelector('[data-mq-wrapped]') && x !== ln.firstElementChild ? x.getBoundingClientRect().width + parseFloat(getComputedStyle(x).marginLeft || 0) : 0; }));
+                const slot = w.querySelector('.k2-tile-slot'); const sr = slot ? slot.getBoundingClientRect() : null;
+                return { pitch: b.left - a.left, gap: b.left - a.right, room: inner - exitW - 2, small: sr ? Math.min(sr.width, sr.height) : 0 };
+            };
+            let g = geo();
+            const per = its.length;
+            let k = 0;
+            const cur = twin ? parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 0 : 0;
+            for (let parts = 2; parts <= per && !k; parts++) {
+                const kk = Math.ceil(per / parts);
+                const need = kk * g.pitch - g.gap;
+                if (need <= g.room) { k = kk; break; }
+                // the drawing may shrink a little for the fewer parts (3 + 3 before 2 + 2 + 2), never below a 44 px box
+                const s = g.room / need * 0.995;
+                if (cur && g.small > 0 && g.small * s >= 44) {
+                    twin.style.setProperty('--mq-k2', `${(cur * s).toFixed(3)}px`);
+                    const g2 = geo();
+                    if (kk * g2.pitch - g2.gap <= g2.room) { g = g2; k = kk; break; }
+                    if (twin.dataset.mqK2Orig) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Orig); else twin.style.removeProperty('--mq-k2');
+                    g = geo();
+                }
+            }
+            const pitch = g.pitch, gap = g.gap;
+            if (!k || k >= per) return false;
+            w.setAttribute('data-mq-wrapfit', ''); w.setAttribute('data-mq-end', '');
+            if (frame) frame.setAttribute('data-mq-tabtop', '');
             w.style.overflowX = 'visible';
-            const room = Math.max(120, inner - colW - 14);
-            conts.forEach((c) => { if (c.dataset.mqWrapStyle === undefined) c.dataset.mqWrapStyle = c.getAttribute('style') || ''; c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.floor(room)}px`; });
+            conts().forEach((c) => {
+                keep(c); c.dataset.mqWrapStyle = '1';
+                c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.ceil(k * pitch - gap + 1)}px`;
+                [...c.children].forEach((x, i) => { if (i && i % k === 0) x.setAttribute('data-mq-leadin', ''); });
+            });
             level();
             return true;
         };
-        const mode = () => {
-            if (wrapRow()) return;
-            if (!frame || !body) return;
-            frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
+        const mode = () => { layout(); alignAxis(); };
+        const layout = () => {
+            clearAll();
+            // the phone draws ~29 px digits (fitTwinRows' phone rule reads the fonts only), then caps the gap
+            if (twin && window.innerWidth <= 480) { try { fitTwinRows(twin); } catch (e) { /* keep the drawing as rendered */ } }
+            phoneGap();
+            level();
+            // (3) measure: the room is the cell's inner width WITHOUT the row in it (a grid track may otherwise grow to the row)
             const its = items();
-            const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
-            if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
+            if (!body || its.length < 2) return;
+            const room = () => { w.style.width = '0px'; const r = cellInner(); w.style.width = ''; return r; };
+            const inner = room();
+            if (!inner) return;
+            const colW = () => (col ? col.getBoundingClientRect().width : 0);
+            const fits = () => body.getBoundingClientRect().width + colW() <= inner + 1;
+            // (4) choose: the row fits beside its step tab
+            if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+            // ... or it fits once the drawing shrinks, never below a 44 px box (SP-10): a wider-than-phone window only
+            if (twin && window.innerWidth > 480) {
+                const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+                const slot = w.querySelector('.k2-tile-slot');
+                const r = slot ? slot.getBoundingClientRect() : null;
+                const small = r ? Math.min(r.width, r.height) : 0;
+                const floorK = small > 0 ? cur * 44 / small : cur * 0.75;
+                const bw = body.getBoundingClientRect().width;
+                const k = Math.max(Math.min(cur, floorK), cur * (inner - colW()) / bw * 0.995);
+                if (k < cur - 0.01) {
+                    twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
+                    if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+                    // still too wide: at Chromebook width the row wraps at its full size; narrower, it swipes at the floor
+                    if (window.innerWidth >= 1024) { if (twin.dataset.mqK2Orig) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Orig); else twin.style.removeProperty('--mq-k2'); }
+                }
+            }
+            if (wrapRow(inner)) return;
+            if (twin && !isAxis && window.innerWidth >= 1024 && window.innerWidth > 480) {
+                // a row that could not wrap either: the floor scale, then the swipe
+                const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+                const slot = w.querySelector('.k2-tile-slot'); const r = slot ? slot.getBoundingClientRect() : null;
+                const small = r ? Math.min(r.width, r.height) : 0;
+                if (small > 44) twin.style.setProperty('--mq-k2', `${(cur * 44 / small).toFixed(2)}px`);
+            }
+            if (!frame) return;
             frame.setAttribute('data-mq-swipes', '');
             level();
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
-            // critic C2 r8 (a): the room is measured from the CELL's inner box (from the frame's left edge to the cell's inner right
-            // edge), not from the frame, which may hug a narrower drawing; as many whole columns as fit there
-            const fr = frame.getBoundingClientRect();
-            let avail = fr.width;
-            const cellEl2 = frame.closest('.mq-scell');
-            if (cellEl2) {
-                const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2);
-                // the drawing is centred in the cell, so the room is the cell's whole inner width (it widens, still centred)
-                const inner = cr.width - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0);
-                if (inner > avail) avail = inner;
-            }
+            const avail = inner;
             const n = Math.max(1, Math.floor((avail + gap + 0.5) / pitch));
-            // critic C2 r7: when every column of a line fits, the window takes the full width and the row does not scroll at all
-            // (a line's turn arrow may reach past the last column; it is drawn, never scrolled to)
+            // critic C2 r7: when every column of a line fits (the tab above), the window takes the full width and does not scroll
             if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
             const win = Math.min(avail, n * pitch - gap + 3);
             w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
@@ -1726,7 +1868,17 @@ function wireSwipeRows(cellEl) {
             fitCue(win);
         };
         mode();
-        window.addEventListener('resize', mode);
+        // on a resize: now, and again once the host has laid its grid out for the new width (the worksheet re-lays its
+        // columns 150 ms after the last resize), so the row is measured in the cell it will live in
+        let modeT = 0;
+        window.addEventListener('resize', () => { w.scrollLeft = 0; mode(); clearTimeout(modeT); modeT = setTimeout(() => { if (w.isConnected) { mode(); upd(); setTimeout(() => { if (w.isConnected && !w.scrollLeft) { mode(); upd(); } }, 700); } }, 340); });
+        // the host's late fit (fonts, fitTwinRows) moves the numbers after the layout: the number line follows them
+        if (isAxis && typeof ResizeObserver !== 'undefined' && body) {
+            const ro = new ResizeObserver(() => { if (!w.isConnected) { ro.disconnect(); return; } alignAxis(); });
+            ro.observe(body);
+            const first = w.querySelector('.k2-countrow-line [data-mq-wrapped] > *');
+            if (first) ro.observe(first);
+        }
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
@@ -3022,7 +3174,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
     // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
     // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
-    if (q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
+    // skip-count r2 (critic r1 D3): the cap is now applied at layout time by wireSwipeRows (phoneGap), so a row drawn at any
+    // width and then resized ends as a fresh load does; the second drawing is kept off here
+    if (false && q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
         && /class="k2-twin"/.test(String(q.visual || ''))) {
         try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
     }

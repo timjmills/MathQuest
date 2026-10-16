@@ -1784,3 +1784,11 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
    width over the dividend's column (that column no longer stretches to the box), never shrinking
    below the touch target (critic ldiv-hug R1 D-1). */
 .mq-scell .mq-rembrk .mq-cellbox { flex: none; }
+
+/* skip-count r2 (critic r1 D1-D3, 2026-10-16): a count row WRAPPED at Chromebook width puts its step tab once ABOVE line 1, as the
+   phone swipe does (no tab column beside it, so no empty band beside or above the numbers), and the jump arrow that would lead
+   into a wrapped part-line's first box hides (it would sit outside the cell, alone). Additive. */
+.mq-scell .k2-countrow-frame[data-mq-tabtop] { flex-direction: column; }
+.mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor]:not([data-mq-tabfor="0"]) { display: none !important; }
+.mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor="0"] { height: auto !important; margin: 0 0 4px 0 !important; }
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-jumpcell[data-mq-leadin] > .k2-jump { visibility: hidden; }
