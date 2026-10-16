@@ -81,11 +81,11 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 11, maxNum: 20 },
+        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 17, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
         { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' } },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 20 },
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16 },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
@@ -140,14 +140,14 @@ export default {
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: 'Count a set: the last number said tells how many', notes: 'Prerequisite Check {pre.0.letters}.' },
-        { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters} (number bond, the whole blank).' },
+        { type: 'Fact', prereq: true, skill: 'Count a set: the last number is how many', notes: 'Prerequisite Check {pre.0.letters}.' },
+        { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters}.' },
         { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check {pre.2.letters}.' },
-        { type: 'Category', prereq: true, skill: 'Missing whole: when the whole is missing, add', notes: 'From number bonds. Checked again at step 3.' },
-        { type: 'Category', skill: 'Story numbers are parts: “has … has …” gives two parts', notes: 'Show a story with one number too: no bar yet.' },
-        { type: 'Conceptual', critical: true, skill: 'Bar = part-whole: the top box is the whole, the lower boxes the parts', notes: 'Cubes on the mat first.' },
-        { type: 'Category', skill: 'In all / now: the question asks for the whole', notes: '“In all” and “now” both point at the top box.' },
-        { type: 'Comparative', skill: 'Same parts, same whole: 6 and 7 or 7 and 6', notes: 'The bar has the same length (EE .b). The other examples.' },
+        { type: 'Category', prereq: true, skill: 'Missing whole: then add', notes: 'Checked again at step 3.' },
+        { type: 'Category', skill: 'Story numbers are parts', notes: 'Point at each number.' },
+        { type: 'Conceptual', critical: true, skill: 'Bar: whole on top, parts below', notes: 'Cubes on the mat first.' },
+        { type: 'Category', skill: '“In all” and “now” ask for the whole', notes: 'Point at the top box.' },
+        { type: 'Comparative', skill: 'Same parts, same whole', notes: 'The other examples (EE .b).' },
     ],
     routine: [
         { step: 'Find the two parts.', tag: 'New', check: 'Guided cell 1' },
@@ -162,10 +162,10 @@ export default {
         'Do not bold or hunt key words: point at the box the question asks for.',
     ],
     mistakes: [
-        { name: 'Whole in a part box', step: 2, looks: 'The sum written in a lower box', fix: 'Chant. Touch the top box: “whole”.', option: 'A', misconception: 'bar-whole-in-part' },
-        { name: 'Story number as answer', step: 4, looks: '“in all”: writes a part', fix: 'Point at the top box. Is it in the story?', option: 'B', misconception: 'bar-part-on-top' },
-        { name: 'Wrong sign', step: 3, looks: 'The difference of the parts', fix: '“Is the whole missing? Add.”', option: 'C', misconception: 'wrong-operation' },
-        { name: 'Count slip past 10', step: 3, looks: 'One less than the whole', fix: 'Count on from the big part with fingers.', option: '' },
+        { name: 'Whole in a part box', step: 2, looks: 'The sum in a part box', fix: 'Chant. Touch the top box.', option: 'A', misconception: 'bar-whole-in-part' },
+        { name: 'Story number as answer', step: 4, looks: 'A part as the answer', fix: '“Is it in the story?”', option: 'B', misconception: 'bar-part-on-top' },
+        { name: 'Wrong sign', step: 3, looks: 'The parts subtracted', fix: '“Whole missing? Add.”', option: 'C', misconception: 'wrong-operation' },
+        { name: 'Count slip past 10', step: 3, looks: 'One less than the whole', fix: 'Count on from the big part.', option: '' },
     ],
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
@@ -223,16 +223,14 @@ export default {
             loop: { most: 'Go on to You Do.', half: 'Redo one story on the bar mat with cubes, then two more.', fewer: 'Stop. Cubes again with two stories. Write each part under its train.' } },
         { n: 8, name: 'You Do: Independent Practice', min: 10, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★) has the small part first. Walk there first.' }],
             rows: [
-                { do: 'Pupils finish Independent Practice (★★), then Practice 1.' },
-                { say: 'Use the Steps at the top of the page.' },
+                { do: 'Pupils do Practice 1. The Steps are at the top of the page.' },
                 { do: 'Visit ELL and SPED pupils first, within 60 seconds.' },
                 { ask: 'Point to the parts. Point to the whole.', note: 'Praise: “You put the parts below. That is step 2.”' },
             ] },
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [
-                { do: 'Read the story aloud two times. Pupils tick each box.' },
-                { say: 'No bar this time. Draw the bar.', note: 'Any two-part bar with the right labels is right.' },
-                { ask: 'Which box is the whole?', note: 'Expected: the top box. Either order of the parts.' },
+                { do: 'Read the story aloud two times.' },
+                { say: 'No bar this time. Draw the bar.', note: 'Right: two parts in either order, the whole on top.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
             rows: [

@@ -2488,7 +2488,8 @@ async function buildLesson(n, metaOf) {
     const reflow = (c) => mainIts.some((it) => it.template === 'equation' && it.measured && it.measured[1] && it.measured[c]
         && Number.isFinite(it.measured[1].hMm) && Number.isFinite(it.measured[c].hMm) && it.measured[c].hMm > it.measured[1].hMm * 1.25);
     const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: divFactsOnly ? 16 : 15 }, ...(besideCap < 4 ? { maxCols: besideCap } : {}) } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: divFactsOnly ? 16 : 15 }, ...(besideCap < 4 ? { maxCols: besideCap } : {}) } : { skills: [practiceSk], count: 0, columns: 2, noCap: true, ...(practiceSk.instructionKey ? { instructionKey: practiceSk.instructionKey } : {}) };
+    // (a ref's `instructionKey` - the detailed lesson maker, lesson 2 - heads its Practice section too)
     // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     // `practiceShape` (lesson data; the detailed lesson maker): a one-line item too wide for two
