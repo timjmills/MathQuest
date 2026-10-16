@@ -6843,7 +6843,7 @@
    "verdict": "partial",
    "missing": "equivalent fractions shown on two number lines",
    "build": [
-    "frac_count"
+    "frac_nl_equiv"
    ],
    "pre": [
     {
@@ -6892,6 +6892,7 @@
     }
    ],
    "preBuild": [
+    "frac_count",
     "fraction_parts",
     "compare_kind"
    ],
@@ -6918,7 +6919,11 @@
    "direct": [
     {
      "key": "fractions:equiv_frac_visual",
-     "opts": {}
+     "opts": {
+      "model": [
+       "bar"
+      ]
+     }
     }
    ],
    "partial": [],
@@ -6928,7 +6933,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "this step's skill as it was met then (denominators option: the halves family) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
+     "why": "denominators option: the halves family; fraction model: circle: a neighbouring rung of this step's skill, not the step itself — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -6998,7 +7003,7 @@
      }
     }
    ],
-   "note": ""
+   "note": "model bar: every item is a pair of fraction bars (the default draws circles); the build check TITLEREP holds the title's \"bar models\" to the items"
   },
   "Y3.B7.S1": {
    "title": "Use scales",
@@ -7661,10 +7666,10 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (taught before this step) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
+     "why": "Y3.B6.S10 Equivalent fractions as bar models (taught before this step)",
      "opts": {
-      "denoms": [
-       2
+      "model": [
+       "bar"
       ]
      }
     },
@@ -10905,7 +10910,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading a length in whole inches on a ruler (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
+     "why": "Y2.B6.S1 Measure in centimetres (Grade 1): reading a length in whole inches on a ruler (nearest live practice: Y2.B6.S1 has it as a partial skill, and these items never use centimetres)"
     },
     {
      "key": "shapes_early:measure_nonstandard",
@@ -11119,7 +11124,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): one length read in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
+     "why": "Y2.B6.S1 Measure in centimetres (Grade 1): one length read in whole inches (nearest live practice: Y2.B6.S1 has it as a partial skill, and these items never use centimetres)"
     },
     {
      "key": "graphs:pictograph",
@@ -11277,7 +11282,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
+     "why": "Y2.B6.S1 Measure in centimetres (Grade 1): reading one length in whole inches (nearest live practice: Y2.B6.S1 has it as a partial skill, and these items never use centimetres)"
     }
    ],
    "preBuild": [],
@@ -11347,7 +11352,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
+     "why": "Y2.B6.S1 Measure in centimetres (Grade 1): reading one length in whole inches (nearest live practice: Y2.B6.S1 has it as a partial skill, and these items never use centimetres)"
     }
    ],
    "preBuild": [],
@@ -13195,7 +13200,7 @@
     "Y3.B6.S5": "(prerequisite of this step)",
     "Y3.B6.S6": "(prerequisite of this step)",
     "Y3.B6.S8": "counting on and back in unit fractions along a number line, past one whole (3/4, 4/4, 5/4)",
-    "Y3.B6.S9": "equivalent fractions shown on two number lines",
+    "Y3.B6.S9": "(prerequisite of this step)",
     "Y3.B6.S10": "(prerequisite of this step)",
     "Y3.B8.S1": "(prerequisite of this step)",
     "Y3.B8.S2": "(prerequisite of this step)"
@@ -13271,6 +13276,28 @@
     "Y3.B6.S6": "reading a value on a scale or number line split into halves, quarters, fifths or tenths of a unit"
    },
    "kindText": "new skill"
+  },
+  "frac_nl_equiv": {
+   "kind": "option",
+   "skill": "fractions:equiv_frac_visual",
+   "option": "number lines",
+   "name": "Equivalent Fractions on a Number Line (option)",
+   "teaches": "equivalent fractions shown on stacked number lines",
+   "representation": "a double number-line representation option",
+   "family": "fractions",
+   "steps": [
+    "Y4.B7.S9",
+    "Y4.B7.S10",
+    "Y6.B3.S2",
+    "Y3.B6.S9"
+   ],
+   "source": "Y4.json",
+   "why": "(reused from the Y4 lane's links file: the same id is the same spec)",
+   "reused": true,
+   "closes": {
+    "Y3.B6.S9": "equivalent fractions shown on two number lines"
+   },
+   "kindText": "option on fractions:equiv_frac_visual"
   },
   "mass_scales": {
    "kind": "new",
@@ -14737,6 +14764,17 @@
    "action": "partial",
    "why": "mixed denominators",
    "partial": "mixed denominators"
+  },
+  {
+   "key": "fractions:equiv_frac_visual",
+   "step": "Y3.B6.S10",
+   "action": "opts",
+   "opts": {
+    "model": [
+     "bar"
+    ]
+   },
+   "why": "tag unchanged; record the option that makes the items bar models (the default model draws circles)"
   },
   {
    "key": "measurement:mass_volume_liquid",

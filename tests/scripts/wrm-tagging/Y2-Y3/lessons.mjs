@@ -38,7 +38,8 @@ export const lessonProposals = {
     why: 'estimate_length deals cm and m only ("About how long is a textbook? 28 cm"); reading_ruler reads whole inches but never feet and never estimates' },
 };
 // proposals reused from a passed lane's links file (the same id = the same spec, copied as written there)
-export const laneProposals = { map_change_unknown_story: 'MAP', map_compare_smaller_unknown: 'MAP', map_compose_solids: 'MAP', doubles_pictured: 'R' };
+export const laneProposals = { map_change_unknown_story: 'MAP', map_compare_smaller_unknown: 'MAP', map_compose_solids: 'MAP', doubles_pictured: 'R',
+  frac_nl_equiv: 'Y4' };   // r14 (critic r13 N14): Y3.B6.S9 reuses the Y4 lane's option for the same clause (Y4.B7.S9), verbatim
 
 // ───────────────────────── Y2 (school Grade 1) ─────────────────────────
 const G1 = 'G1|-|';
@@ -226,7 +227,7 @@ lesson(G2 + 'compareunitsinchesfeetyardsandcentimetres', {
   customaryOk: 'the school teaches inches and feet in these W17-W19 Awsaj measurement lessons (2.MD.A.2, A.3, B.5, D.9); the xlsx Grade 2 sheet has no customary step, so the inch ruler is this unit\'s own content',
   verdict: 'gap', missing: 'measuring one length in two units (inches and centimetres, feet and yards) and saying the bigger unit gives the smaller number',
   build: ['measure_two_units'],
-  pre: [['measurement:reading_ruler', {}, 'Y3.B5.S2', 'reading a length in whole inches on a ruler'],
+  pre: [['measurement:reading_ruler', {}, 'Y2.B6.S1', 'reading a length in whole inches on a ruler'],
         ['shapes_early:measure_nonstandard', {}, 'Y1.B7.S2', 'measuring a length with cubes and paper clips: two units give two counts'],
         ['measurement:length_metric', { forms: [1] }, 'Y3.B5.S5', 'metres and centimetres: 1 m is 100 cm, a big unit and a small one']],
   related: [['measurement:estimate_length', { forms: [0] }, 'estimating a length in cm or m from a benchmark: the metric units of the comparison']],
@@ -259,7 +260,7 @@ lesson(G2 + 'recordthemeasurementdatainatable', {
   verdict: 'gap', missing: 'recording measurements in a table and reading it (object, length in inches)',
   build: ['table_data'],
   pre: [['graphs:tally_chart', { most: 10 }, 'Y2.B10.S1', 'a tally chart: data in rows'],
-        ['measurement:reading_ruler', {}, 'Y3.B5.S2', 'one length read in whole inches'],
+        ['measurement:reading_ruler', {}, 'Y2.B6.S1', 'one length read in whole inches'],
         ['graphs:pictograph', { range: 50, scale: [0, 1, 2] }, 'Y2.B10.S7', 'reading a picture graph with a key of 2, 5 or 10']],
   related: [['graphs:line_plot_g2', {}, 'the same data shown on a line plot (the next lesson)']],
   note: 'Awsaj supplement lesson in Y3.B5, W17 and W18 (2.MD.D.9). No skill makes or reads a table of measurements; Y2.B10.S2 Tables (Grade 1) is a gap for the same reason.',
@@ -282,7 +283,7 @@ lesson(G2 + 'solvelongerbyproblemsusingbarmodels', {
   pre: [['addition:comparison_word', { range: 10 }, 'Y1.B5.S8', 'how many more / fewer stories within 10: finding the difference'],
         ['subtraction:sub_wp_100', {}, 'Y2.B2.S19', 'take-away stories within 100'],
         ['subtraction:sub_1k_no_regroup', {}, 'Y3.B2.S12', 'the subtraction that finds the difference'],
-        ['measurement:reading_ruler', {}, 'Y3.B5.S2', 'reading one length in whole inches']],
+        ['measurement:reading_ruler', {}, 'Y2.B6.S1', 'reading one length in whole inches']],
   related: [['subtraction:sub_wp_100', BAR, 'take-away stories on a bar within 100: the same bar for a subtraction']],
   note: 'Awsaj supplement lesson in Y3.B5, W18 and W19; closes 2.MD.B.5 (comparing lengths). Y3.B5.S7 Compare lengths and S9 Subtract lengths are gaps for the same reason.',
 });
@@ -293,7 +294,7 @@ lesson(G2 + 'solveshorterbyproblemsusingbarmodels', {
   pre: [['addition:comparison_word', { range: 10 }, 'Y1.B5.S8', 'how many more / fewer stories within 10: finding the difference'],
         ['subtraction:sub_wp_100', {}, 'Y2.B2.S19', 'take-away stories within 100'],
         ['subtraction:sub_1k_no_regroup', {}, 'Y3.B2.S12', 'the subtraction that finds the difference'],
-        ['measurement:reading_ruler', {}, 'Y3.B5.S2', 'reading one length in whole inches']],
+        ['measurement:reading_ruler', {}, 'Y2.B6.S1', 'reading one length in whole inches']],
   related: [['subtraction:sub_wp_100', BAR, 'take-away stories on a bar within 100: the same bar for a subtraction']],
   note: 'Awsaj supplement lesson in Y3.B5, W18 and W19; closes 2.MD.B.5 (shorter by). The pair to "longer by": the same bar, the smaller length unknown.',
 });

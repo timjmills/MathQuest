@@ -4125,7 +4125,7 @@
    "related": [
     {
      "key": "patterns:number_pattern",
-     "why": "a repeating pattern of numbers: the same rule-spotting",
+     "why": "finding the rule of a number pattern and continuing it (fill the missing numbers, or put numbers in counting order): the same what-comes-next reasoning, with numbers instead of shapes",
      "opts": {
       "band": 50
      }
@@ -6695,7 +6695,7 @@
    "related": [
     {
      "key": "measurement:money_count",
-     "why": "counting coins: 5-cent and 10-cent coins counted in 5s and 10s",
+     "why": "counting coins of one kind (1¢, 5¢, 10¢ or 25¢ coins, one kind an item): the 5¢ and 10¢ coins are counted in 5s and 10s",
      "opts": {
       "currency": "usd"
      }

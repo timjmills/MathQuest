@@ -339,6 +339,8 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   for(const d of direct)if(!T.find(t=>resolve(t.key)===d.key&&!t.partial)){
     for(const t of T.filter(t=>resolve(t.key)===d.key&&t.partial))out.tagFixes.push({key:t.key,step:s.id,action:'remove',why:'drop the partial tag: the skill teaches the step in full with these opts, re-added full by the next fix'});
     out.tagFixes.push({key:d.key,step:s.id,action:'add',...(d.opts&&Object.keys(d.opts).length?{opts:d.opts}:{}),why:why[d.key]||('teaches the step with opts '+JSON.stringify(d.opts))});}
+  // r14 (critic r13 N13): an existing FULL tag whose direct now carries options records them (action 'opts'), when the spec asks
+  if(o.tagOpts)for(const d of direct)if(Object.keys(d.opts||{}).length&&T.find(t=>resolve(t.key)===d.key&&!t.partial))out.tagFixes.push({key:d.key,step:s.id,action:'opts',opts:d.opts,why:o.tagOpts});
   for(const p of partial)if(!direct.find(d=>d.key===p.key)&&!T.find(t=>resolve(t.key)===p.key))out.tagFixes.push({key:p.key,step:s.id,action:'partial',...(p.opts&&Object.keys(p.opts).length?{opts:p.opts}:{}),why:p.missing,partial:p.missing});
   let build=o.build?[...o.build]:[...(propsOf[s.id]||[])];
   const verdict=o.verdict||(direct.length&&!build.length?'full':(direct.length||partial.length)?'partial':'gap');
@@ -444,6 +446,8 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     take();}
   if(pre.length<3){for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(cands.find(c=>c.key===k))continue;cand(k,l.why+' (topic ladder)',7,l.opts);take();if(pre.length>=3)break;}}
   for(const pid of o.preBuild||[])addPB(pid);
+  // r14: a hand building block that leads the preBuild list (the nearest rung first; the list keeps at most 3)
+  for(const pid of [...(o.preBuildLead||[])].reverse())if(!build.includes(pid)){const i=preBuild.indexOf(pid);if(i>=0)preBuild.splice(i,1);preBuild.unshift(pid);usedProps.add(pid);if(preBuild.length>3)preBuild.length=3;}
   if(pre.length<3&&!o.thinPreNote)console.error('THINPRE',s.id,s.title,pre.length);
   // ---- related (rule 5 / 14): the same idea in another form, the inverse, the NEXT step. Never an earlier step of
   // the block (that is pre), never a pre key. ----
@@ -649,7 +653,7 @@ for(const id of usedProps){
   if(own){out.proposals[id]={...own,reused:false};continue;}
   if(LS.lessonProposals?.[id]){out.proposals[id]={...LS.lessonProposals[id],steps:[],reused:false};continue;}
   if(LS.laneProposals?.[id]){const y=LS.laneProposals[id];const q=laneProp(y,id);if(!q)throw new Error('lane proposal '+id+' not in '+y+'.json');
-    const {closes,lessons,reused,dropSteps,kindText,...rest}=q;out.proposals[id]={...rest,steps:[...(q.steps||[])],why:(q.why||'')+` (reused from the ${y} lane's links file: the same id is the same spec)`,reused:true,source:y+'.json'};continue;}
+    const {closes,lessons,reused,dropSteps,kindText,...rest}=q;out.proposals[id]={...rest,steps:[...(q.steps||[])],why:(q.why?q.why+' ':'')+`(reused from the ${y} lane's links file: the same id is the same spec)`,reused:true,source:y+'.json'};continue;}
   const p=WRM_PROPOSALS[id];
   if(p){const ccss=[...new Set(p.steps.flatMap(s=>stepById[s]?.ccss||[]))];
     out.proposals[id]={kind:p.kind,skill:p.skill,...(p.option?{option:p.option}:{}),name:p.name,teaches:p.teaches,representation:p.representation,family:p.family,steps:[...p.steps],ccss:p.ccss||ccss,why:'existing WRM_PROPOSALS entry; reused',reused:true};
@@ -684,6 +688,11 @@ fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 // r13 DENOMCHECK (critic r12 N12): every denoms link, clause and why against its items, fractions read from the payload too
 {const {rows,finds}=DN.denomFinds(out,DNOPT);for(const f of finds)console.error('DENOMCHECK',f.kind,f.sid,f.role,f.key,JSON.stringify(f.opts),'|',f.msg);if(finds.length)process.exitCode=1;
   console.error(`denomcheck ${YEAR}: ${rows.length} denoms links, ${DNOPT.n} items each; ${rows.filter(r=>r.off).length} deal an off-family fraction; ${finds.length} problems`);}
+// r14 TITLEREP (critic r13 N13 / M11): the TITLE is a claim. A full entry's direct items show every representation, operation,
+// unit and context its title names; a partial or gap entry's clause names any the linked items do not show (titlerep.mjs)
+const TR=await import(HERE+'titlerep.mjs');
+{const {rows,finds}=TR.titleRepFinds(out,claimItems);for(const f of finds)console.error('TITLEREP',f.kind,f.id,'|',f.title,'|',f.msg);if(finds.length)process.exitCode=1;
+  console.error(`titlerep ${YEAR}: ${rows.length} entries, ${rows.filter(r=>r.claims.length).length} with a title claim, ${rows.filter(r=>r.verdict==='full'&&r.claims.length).length} of them full; ${finds.length} problems`);}
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
 console.error(`optgate ${YEAR}: ${optStats.n} links, ${optStats.spec} at their spec opts, changed by a named rule ${JSON.stringify(optStats.rule)}, ${optStats.bad} problems`);

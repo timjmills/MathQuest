@@ -101,7 +101,8 @@ export function positive(t) {
     .replace(/\b(?:the next step|next step|the step after|the Grade \d step|later|then|beside|after it|before it)\b[^;,.:()]*/gi, ' ');
 }
 export function negatedParts(t) {
-  return [...String(t || '').matchAll(/\b(?:never|no|without)\b([^;,.:()]*)/gi)].map(m => m[1].trim()).filter(Boolean);
+  // r14 (critic r13 M10 X5): "not X" is a negation too ("not millilitres"); "not only / not just / not all" is not
+  return [...String(t || '').matchAll(/\b(?:never|no|not(?!\s+(?:only|just|always|all|available|dealt)\b)|without)\b([^;,.:()]*)/gi)].map(m => m[1].trim()).filter(Boolean);
 }
 const story = i => (i.text || '').split(/\s+/).length >= 9 && /\?/.test(i.text || '') && /[a-z]\.\s+[A-Z]|\b(?:has|had|have|buys|bought|needs|makes|ran|runs|puts|shares|gets|weighs|holds|uses|costs|biked|walked|is|was)\b/.test(i.text || '') && !/^(?:Find|Convert|What is|Write|Click|Round|Compare|Order|Drag|Estimate|Sort)\b/.test(i.text || '');
 // GATE (critic r7 N): the claims linkfit enforces on every build: the rules, every representation claim (picture only) and every
@@ -136,7 +137,7 @@ const OPS = [['adds', /^(?:a |an )?(?:add(?:s|ing|ition)?|sums?)\b|^\+(?!\s*\d)/
 const PAYOP = { adds: /"op":"\+"/, subtracts: /"op":"[-−]"/, multiplies: /"op":"[×x*]"/, divides: /"op":"[÷/]"/ };
 const STORYOP = { adds: /\b(?:in all|altogether|how many (?:\w+ )*(?:now|in total)|gets? \d+ more|more (?:come|join))\b/i,
   subtracts: /\b(?:left|take[sn]? (?:away|out)|gives? (?:away )?\d|gave|ate|eats|fly away|flew away|how many fewer|how many more)\b/i };
-const UNITNEG = /^(?:any |the |a |an |in )?((?:(?:mL|ml|millilit(?:re|er)s?|lit(?:re|er)s?|L|kg|kilograms?|grams?|g|km|kilomet(?:re|er)s?|cm|centimet(?:re|er)s?|mm|millimet(?:re|er)s?|met(?:re|er)s?|m|inch(?:es)?|feet|foot|yards?|miles?|ounces?|oz|pounds?|lbs?|cups?|pints?|quarts?|gallons?)(?:\s*(?:,|or|and|nor)\s*)?)+)(?:\s+(?:at all|anywhere|items?|scales?|dials?|is dealt|are dealt|appear))?\s*$/i;
+const UNITNEG = /^(?:any |the |a |an |in )?((?:(?:mL|ml|millilit(?:re|er)s?|lit(?:re|er)s?|L|kg|kilograms?|grams?|g|km|kilomet(?:re|er)s?|cm|centimet(?:re|er)s?|mm|millimet(?:re|er)s?|met(?:re|er)s?|m|inch(?:es)?|feet|foot|yards?|miles?|ounces?|oz|pounds?|lbs?|cups?|pints?|quarts?|gallons?|cents?|pence|¢|dollars?|\$)(?:\s*(?:,|or|and|nor)\s*)?)+)(?:\s+(?:at all|anywhere|items?|scales?|dials?|is dealt|are dealt|appear))?\s*$/i;
 // one unit at a time (the CLAIMS unit groups join inches / feet / yards: "never feet" on an inch ruler is true)
 const NEGU = [['millilitres', /\b(?:mL|ml|millilit\w*)\b/i, /\bml\b|millilit/i], ['litres', /(?:^|[^\w-])(?:L|lit(?:re|er)s?)\b/, /\d\s*L\b|\bL\b|\blit(?:re|er)s?\b/],
   ['kilograms', /\b(?:kg|kilograms?)\b/i, /\bkg\b|kilogram/i], ['grams', /\b(?:g|grams?)\b/i, /\d\s*g\b|\bgrams?\b/i],
@@ -144,7 +145,9 @@ const NEGU = [['millilitres', /\b(?:mL|ml|millilit\w*)\b/i, /\bml\b|millilit/i],
   ['millimetres', /\b(?:mm|millimet\w*)\b/i, /\bmm\b|millimet/i], ['metres', /\b(?:m|met(?:re|er)s?)\b/i, /\d\s*m\b|\bmet(?:re|er)s?\b/i],
   ['inches', /\binch(?:es)?\b/i, /\binch|\bin\./i], ['feet', /\b(?:feet|foot)\b/i, /\bfeet\b|\bfoot\b|\bft\b/i], ['yards', /\byards?\b/i, /\byards?\b|\byd\b/i],
   ['miles', /\bmiles?\b/i, /\bmiles?\b/i], ['ounces', /\b(?:ounces?|oz)\b/i, /\bounces?\b|\boz\b/i], ['pounds', /\b(?:pounds?|lbs?)\b/i, /\bpounds?\b|\blbs?\b/i],
-  ['cups', /\bcups?\b/i, /\bcups?\b/i], ['pints', /\bpints?\b/i, /\bpints?\b/i], ['quarts', /\bquarts?\b/i, /\bquarts?\b/i], ['gallons', /\bgallons?\b/i, /\bgallons?\b/i]];
+  ['cups', /\bcups?\b/i, /\bcups?\b/i],
+  // r14 (critic r13 M10 X10): money words are units too ("no cents" on a change page that deals 35¢ is false)
+  ['cents', /\b(?:cents?|pence)\b|¢/i, /¢|\bcents?\b|\$\s?\d+\.\d\d|"minor"/i], ['dollars', /\bdollars?\b|\$/i, /\$|\bdollars?\b/i], ['pints', /\bpints?\b/i, /\bpints?\b/i], ['quarts', /\bquarts?\b/i, /\bquarts?\b/i], ['gallons', /\bgallons?\b/i, /\bgallons?\b/i]];
 export function negatedHits(text, items) {
   const out = [], N = items.length || 1;
   for (const part of negatedParts(text)) {
@@ -156,7 +159,7 @@ export function negatedHits(text, items) {
     const u = UNITNEG.exec(part.trim());
     if (u) for (const [name, w, re] of NEGU) {
       if (!w.test(u[1])) continue;
-      const hit = items.filter(i => re.test(itemWords(i))).length;
+      const hit = items.filter(i => re.test(itemWords(i) + (name === 'cents' || name === 'dollars' ? ' ¦ ' + (i.pay || '') : ''))).length;
       out.push({ claim: 'no ' + name, part, hit, n: N, ok: hit <= N * 0.05 });
     }
   }

@@ -1404,3 +1404,23 @@ relR3['Y2.B11.S2'] = relR3['Y2.B11.S2'].filter(r => r.key !== 'number_sense:plac
 relR3['Y2.B11.S4'] = relR3['Y2.B11.S4'].filter(r => r.key !== 'number_sense:place_on_number_line');
 // M5: money_compare rings the set with more money by default; response 'sign' writes <, > or = between the two amounts
 relR3['Y3.B7.S10'] = relR3['Y3.B7.S10'].map(r => r.key === 'measurement:money_compare' ? R(r.key, 'two amounts of coins compared with <, > or =: the same signs, between amounts in cents', { response: 'sign' }) : r);
+// ======================= round 14 (critic r13: N13 Y3.B6.S10, N14 Y3.B6.S9, minors M6, M8, M9) =======================
+// N13: Y3.B6.S10 "Equivalent fractions as bar models" was full on the default model, which draws circles on every item. The
+// skill's `model` option (skill-options.js: circle / bar / area) set to bar draws every item as a pair of bars: 120 of 120
+// pictures on two fresh seed sets (90001 + 307i, 33331 + 211i; 60 items each: 91 missing-number, 29 = / ≠), denominators 2-24
+// with the halves, thirds and fifths families; 3 of 120 terms improper (≠ checks). Full with the option. tagOpts records the
+// option on the existing full SKILL_WRM tag (action 'opts'), so the merged tag carries it
+r3['Y3.B6.S10'] = { ...(r3['Y3.B6.S10'] || {}), direct: [D('fractions:equiv_frac_visual', { model: ['bar'] })],
+  tagOpts: 'tag unchanged; record the option that makes the items bar models (the default model draws circles)',
+  note: 'model bar: every item is a pair of fraction bars (the default draws circles); the build check TITLEREP holds the title\'s "bar models" to the items' };
+// N14: Y3.B6.S9 "Equivalent fractions on a number line" built frac_count (counting along one line), which does not close
+// "two number lines". frac_nl_equiv is the Y4 lane's proposal for the same clause (Y4.B7.S9): reused verbatim from Y4.json
+// (lessons.mjs laneProposals). frac_count, counting along a line in unit fractions, is the building block: preBuild, first
+r3['Y3.B6.S9'] = { ...(r3['Y3.B6.S9'] || {}), build: ['frac_nl_equiv'], preBuildLead: ['frac_count'] };
+// M8: number_pattern {band:50} deals growing number patterns ("Find the rule": +3, +7, +9 to 55) and counting-order drags,
+// not a repeating pattern (the Y2.B11.S5 wording, r13 M3)
+relR3['Y2.B3.S12'] = relR3['Y2.B3.S12'].map(r => r.key === 'patterns:number_pattern' ? R(r.key, 'finding the rule of a number pattern and continuing it (fill the missing numbers, or put numbers in counting order): the same what-comes-next reasoning, with numbers instead of shapes', r.opts) : r);
+// M9: money_count {currency:'usd'} counts coins of ONE kind per item (kind 'like'): 1¢, 5¢, 10¢ or 25¢ ("quarters" would read as a fraction to whyContentBad); about
+// half the items are nickels or dimes (80 items: 1¢ ×14, 5¢ ×13, 10¢ ×26, 25¢ ×27)
+relR3['Y2.B5.S17'] = relR3['Y2.B5.S17'].map(r => r.key === 'measurement:money_count' ? R(r.key, 'counting coins of one kind (1¢, 5¢, 10¢ or 25¢ coins, one kind an item): the 5¢ and 10¢ coins are counted in 5s and 10s', r.opts) : r);
+extraRelated['Y2.B5.S17'] = extraRelated['Y2.B5.S17'].map(r => r.key === 'measurement:money_count' ? R(r.key, 'counting coins of one kind (1¢, 5¢, 10¢ or 25¢ coins, one kind an item): the 5¢ and 10¢ coins are counted in 5s and 10s', r.opts) : r);
