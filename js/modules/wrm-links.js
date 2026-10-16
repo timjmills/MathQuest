@@ -352,7 +352,12 @@ function skillReason(key, lesson, group) {
     const codes = (SKILL_STANDARDS[key] || {}).ccss || [];
     const shared = codes.filter((x) => (lesson.ccss || []).includes(x));
     if (shared.length) return `Same standard as this lesson: ${uniqBy(shared).slice(0, 2).join(', ')}.`;
-    if (codes.length) return `${group === 'prereq' ? 'Earlier standard' : 'Linked standard'}: ${codes.slice(0, 2).join(', ')}.`;
+    // "Earlier standard" only for a code of a lower grade than the lesson's own codes
+    const gradeOf = (c) => { const m = /^(K|\d)\./.exec(c); return !m ? 99 : m[1] === 'K' ? 0 : +m[1]; };
+    const lessonGrade = Math.min(...(lesson.ccss || []).map(gradeOf), 99);
+    const earlier = codes.filter((c) => gradeOf(c) < lessonGrade);
+    if (group === 'prereq' && earlier.length) return `Earlier standard: ${earlier.slice(0, 2).join(', ')}.`;
+    if (codes.length) return `Linked standard: ${codes.slice(0, 2).join(', ')}.`;
     return group === 'prereq' ? 'Earlier learning this lesson builds on.' : 'The same idea in another form.';
 }
 
