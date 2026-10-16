@@ -1,0 +1,2 @@
+  ok   clean fixture: 0 findings
+  ok   coloured fill: L-INK INK-1 fired - background #3b82f6 is not ink #000, paper #fff or grey #949494 (INK-1)
