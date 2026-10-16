@@ -2991,6 +2991,11 @@ kind when one item alone would leave an empty band (Score then counts items). Re
     as a list: the self-check recomputes it from the rule (Appendix E24). The rule is DATA, not code, so a
     self-check in any language can read it: `"decl":{"op":"+","small":[1,3],"maxSum":10,"noZero":true}` or
     `{"op":"−","top":[10,99],"minDiff":1,"regroup":true}`. A code form may be kept as a note; never evaluate it.
+    The forms: `{"op":"+","small":[lo,hi],"maxSum":n,"noZero":true}` (facts with a small addend) ·
+    `{"op":"+","sum":10,"zero":true}` (exact sum / number bonds, make 10) · `{"op":"−","top":[lo,hi],"minDiff":1,
+    "regroup":true}` · `{"kind":"time","h":[1,12],"m":[0,30]}` (keys `h:mm`) · `{"kind":"list","items":[…]}` (any
+    other skill: list every key). Then E24 keys a repeat on **(fact, representation)** anywhere, and on (fact, page):
+    the same fact in another representation is allowed only on another page and only while usable < 12.
   - **A shortened Practice page** keeps the section's cell size; its freed rows are one unruled trailing area
     inside the frame (§8.12.4, PG-15). Add 1–3: Practice 2 is 3 rows of Practice 1's cells and one blank row.
   - **Small pool (usable pool < 12, one Practice page's worth).** Print **one** Practice page. Then, in this
@@ -2998,13 +3003,15 @@ kind when one item alone would leave an empty band (Score then counts items). Re
     OTHER pages are allowed (soft, LR-5), never on the same page; (3) the same fact in a different representation
     (ten frame, bond, equation) is a different item only on a different page. Never an exact repeat in one
     representation. The exit slip takes items not on Practice, using a turn-around or another representation
-    when the pool is spent. Example, make 10: 11 ordered facts (0 + 10 … 10 + 0), 2 chart examples → usable 9:
-    Guided 2 + Independent 3 = 5 used; one Practice page of 2 rows of 3: the 4 facts left plus 2 turn-arounds of
-    Independent items (soft: another page); exit slip 4: Guided and Independent facts drawn as ten frames
-    (another representation, another page).
+    when the pool is spent. Example, make 10: 11 ordered facts (0 + 10 … 10 + 0); the 2 chart examples (7 + 3, 4 + 6)
+    are places and their turn-arounds (3 + 7, 6 + 4) are forbidden → **7 facts left for the pages**. Lesson sheet 4
+    (1 + 9, 2 + 8, 5 + 5, 0 + 10) as equations; one Practice page: the 3 facts left (9 + 1, 8 + 2, 10 + 0) as
+    equations plus 5 + 5 as a bond (another representation, another page); exit slip: 1 + 9, 2 + 8, 0 + 10 and
+    7 + 3 as ten frames. Its E24 run is Appendix F.3.
 - **The pool travels with the pack.** The builder writes the pool into `pack.html` as
   `<script type="application/json" id="v21-pool">{"op":"+","decl":{"op":"+","small":[1,3],"maxSum":10,"noZero":true},"pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
-  and marks every dealt item cell `data-item="a+b"` (or `a−b`) `data-row="r"` (the second exit-slip half is a
+  and marks every dealt item cell `data-item="a+b"` (or `a−b`, or the list / time key such as `3:30`),
+  `data-rep="stack|tenframe|bond|clock|story|…"` (its representation) and `data-row="r"` (the second exit-slip half is a
   copy and carries no marks). The self-check reads only these.
 
 ### 9.6 P5 Word problem (RCDWS panel) [AUD C-13, Owner default Q5]
@@ -6220,12 +6227,12 @@ export function clock({ h = 3, m = 0, D = 50, hands = true, handsState = 'ink', 
   return svg(D, D, s, 'v-clock');
 }
 
-// Time slot (Appendix H): hours box 20 x 12 mm, a printed colon in a 4 mm gap, minutes box 20 x 12 mm.
+// Time slot (Appendix H): hours box 20 x 12 mm, a printed colon in a 5 mm gap, minutes box 20 x 12 mm.
 // The pupil writes digits only ("3" and "30"); "half past" is said, never written. key: the answer in key colour.
 export function timeSlot({ h = null, m = null, key = false } = {}) {
   const v = (x) => (key && x !== null ? `<b class="ka">${x}</b>` : '');
   return `<span class="eq" style="gap:0;align-items:center"><span class="bx" data-slot="box" style="--w:20mm;height:12mm">${v(h)}</span>` +
-    `<span style="width:4mm;text-align:center">:</span><span class="bx" data-slot="box" style="--w:20mm;height:12mm">${v(m === null ? null : String(m).padStart(2, '0'))}</span></span>`;
+    `<span style="width:5mm;text-align:center">:</span><span class="bx" data-slot="box" style="--w:20mm;height:12mm">${v(m === null ? null : String(m).padStart(2, '0'))}</span></span>`;
 }
 
 // RP-90. Fraction bar 56 x 18 mm at L: outline 1.5 pt, dividers 0.75 pt, shading flat grey from the left.
@@ -6424,8 +6431,9 @@ export function makeKit(L, R) {
   const stepIcons = (i) => `<span class="num" data-accent>${i + 1}</span>${icon(L.steps[i][0])}`;
   const stepsStrip = () => `<div class="sstrip"><b>Steps:</b><ol>${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol></div>`;
   const stepsList = () => `<ol class="steps" style="flex:1;padding:2mm 3mm 3mm">${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol>`;
-  // every dealt item carries data-item="a+b" (or a−b) and its grid row, so the self-check reads items from the page
-  const it = (a, b, op, row = 0, copy = false) => copy ? '' : ` data-item="${a}${op}${b}" data-row="${row}"`;
+  // every dealt item carries data-item="a+b" (or a−b, or a list / time key), its representation data-rep
+  // (stack · tenframe · bond · clock · story …) and its grid row, so the self-check reads items from the page (E24)
+  const it = (a, b, op, row = 0, copy = false, rep = 'stack') => copy ? '' : ` data-item="${b === null ? a : `${a}${op}${b}`}" data-rep="${rep}" data-row="${row}"`;
   const k = (v) => `<b class="ka">${v}</b>`;                     // an answer: shown only on the key
   const lt = (i) => `<span class="lt">${LET[i]}.</span>`;
   // ---- teacher parts ----
@@ -6514,7 +6522,7 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E21 | T2 atoms | rows of T2 Section 1 and their Atom Type cells; ★ in the two atom tables | ≥ 5 atoms; types only Category / Comparative / Fact / Conceptual; no ★ |
 | E22 | Thumbnails | `.thumb` elements on T3, T4, T5 | ≥ 1 on each delivery page |
 | E23 | Fade labels | the Fade column of T6 "Answers at a glance" | every row carries ★ / ★★ / ★★★ |
-| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | the pool recomputed from its `decl` (data, no eval) equals the listed pool; places ≤ pool − forbidden; every item in the pool and not forbidden; **0 exact repeats anywhere** (exit slip included); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
+| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | the pool recomputed from its `decl` (any form of §9.5: small-addend, exact sum, range −, time, list; data, no eval) equals the listed pool; every item carries `data-rep`; **0 repeats of (fact, rep) anywhere** and no fact twice on one page; another representation on another page only while usable < 12; places ≤ pool − forbidden when usable ≥ 12; every item in the pool and not forbidden; 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
 | E24b | Last row and LR-6 | `data-row` of each Practice item; the items of every pupil page | last Practice row all in the pool's `edge` list; no twin answers (per page, per row when the pool has fewer distinct answers); − : distinct numbers taken away on a page, no near twins (both numbers within 2); + : no first addend twice in a grid row or three times running |
 | E28 | No extra bands on Practice | the bold band labels of every P4 page and key | no `Say:`, `Rule:` or `Remember:`; freed rows are one unruled trailing area (§8.12.4) |
 | E27 | Counters in fives | `svg[data-per-row]` written by `counters()` | every set of counters drawn in rows of at most 5 (§19.3) |
@@ -6536,6 +6544,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 const [OUT0, V21MD, BROWSER] = process.argv.slice(2);
+// Fixture mode (Appendix F.3): node selfcheck.mjs --fixture <fixture.json> runs E24 alone on {pool, pages:[{id, items:[{item, rep, row}]}]}
+if (OUT0 === '--fixture') { const fx = JSON.parse(fs.readFileSync(V21MD, 'utf8')); const r = poolCheck(fx.pool, fx.pages);
+  console.log(`E24 ${r.ok ? 'PASS' : 'FAIL'} ${r.msg}`); process.exit(r.ok ? 0 : 1); }
 const OUT = path.resolve(OUT0);
 // the instruction library = every string in Appendix C.1 of V21 (column 2 of its table)
 const md = fs.readFileSync(V21MD, 'utf8'); const c1 = md.slice(md.indexOf('### C.1'), md.indexOf('### C.2'));
@@ -6686,7 +6697,7 @@ const R = await p.evaluate((LIBRARY) => {
       (slotW[s] = slotW[s] || new Set()).add(Math.round(e.getBoundingClientRect().width / MM * 2) / 2); });
     P.slotWidths = Object.fromEntries(Object.entries(slotW).map(([k, v]) => [k, [...v]]));
     // items dealt on this page (pupil pages only), with their grid row
-    P.items = (teacher || key) ? [] : [...pg.querySelectorAll('[data-item]')].map((e) => ({ item: e.dataset.item, row: +e.dataset.row }));
+    P.items = (teacher || key) ? [] : [...pg.querySelectorAll('[data-item]')].map((e) => ({ item: e.dataset.item, rep: e.dataset.rep || '', row: +e.dataset.row }));
     P.kaCount = pg.querySelectorAll('.ka, [data-ka]').length;
     P.perRow = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => +e.dataset.perRow);
     P.panels = [...pg.querySelectorAll('[data-step-panel]')].map((c) => [...c.querySelectorAll('*')].some((e) => {
@@ -6767,27 +6778,8 @@ row('E23', 'Every row of T6 "Answers at a glance" carries a fade label ★ / ★
 const POOL = R.pool, items = pupil.filter((p) => p.id !== 'P6').flatMap((p) => p.items.map((x) => ({ ...x, page: p.id })));
 const exitItems = (pupil.find((p) => p.id === 'P6') || { items: [] }).items.map((x) => ({ ...x, page: 'P6' }));
 const all = [...items, ...exitItems];
-let e24 = { ok: false, msg: 'no pool JSON or no items in the pack' };
-if (POOL && all.length) {
-  const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, inPool = new Set(POOL.pool.map(kk)), forb = new Set(POOL.forbidden.map(kk));
-  const usable = POOL.pool.length - POOL.forbidden.length;
-  // the pool is recomputed from its declared rule and must equal the listed pool
-  // recomputed from the declared rule as DATA (no eval): + {small:[lo,hi], maxSum, noZero} · − {top:[lo,hi], minDiff, regroup}
-  let ruleOk = false; const d = POOL.decl, re = [];
-  if (d && d.op === '+') { for (let a = d.noZero ? 1 : 0; a <= d.maxSum; a++) for (let b = d.noZero ? 1 : 0; a + b <= d.maxSum; b++)
-      if (Math.min(a, b) >= d.small[0] && Math.min(a, b) <= d.small[1]) re.push(kk([a, b])); }
-  else if (d && d.op === '−') { for (let a = d.top[0]; a <= d.top[1]; a++) for (let b = 1; a - b >= d.minDiff; b++)
-      if (!d.regroup || a % 10 < b % 10) re.push(kk([a, b])); }
-  ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
-  const seen = new Set(), rep = [], bad = [];
-  for (const x of all) { if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
-    if (seen.has(x.item)) rep.push(x.item + ' ' + x.page); seen.add(x.item); }
-  const turns = []; if (op === '+') for (const p of pupil) { const s2 = new Set(p.items.map((x) => x.item));
-    for (const x of p.items) { const [a, b] = x.item.split('+'); if (a !== b && +a > +b && s2.has(`${b}+${a}`)) turns.push(`${x.item} on ${p.id}`); } }
-  e24 = { ok: ruleOk && !bad.length && !rep.length && !turns.length && all.length <= usable,
-    msg: `${all.length} places, usable pool ${usable} (pool ${POOL.pool.length} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); exact repeats ${rep.length ? rep.join(', ') : 0}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}` };
-}
-row('E24', 'Item pool, read from the pack (LR-5): pool recomputed from its declared rule (data, no eval); places ≤ usable pool; every item in the pool and not forbidden; ZERO exact repeats anywhere (exit slip included); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
+const e24 = poolCheck(POOL, pupil);
+row('E24', 'Item pool, read from the pack (LR-5, §9.5): pool recomputed from its declared rule (data, no eval); every item in the pool and not forbidden; ZERO repeats of (fact, representation) anywhere; a fact never twice on one page; the same fact in another representation on another page only while usable < 12; places ≤ usable pool when usable ≥ 12; no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
 let e24b = { ok: false, msg: 'no pool' };
 if (POOL) { const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, edge = new Set(POOL.edge.map(kk));
   const val = (s3) => { const [a, b] = s3.split(op).map(Number); return op === '+' ? a + b : a - b; };
@@ -6828,6 +6820,37 @@ const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
 fs.writeFileSync(OUT + '/SELF-CHECK.md', md2 + '\n');
 console.log(rows.map((r) => `${r.id} ${r.pass ? 'PASS' : 'FAIL'} ${r.measured}`).join('\n'));
 if (process.argv.includes('--debug')) console.log(JSON.stringify(pages.map((p) => ({ id: p.id, bad: p.badPaints, cells: p.cells })), null, 1).slice(0, 6000));
+
+// ---- E24 as a pure function (also run on the Appendix F.3 fixtures). pool = the v21-pool JSON; pages = [{id, items:[{item, rep, row}]}]
+// decl forms (data, never code): {op:'+', small:[lo,hi], maxSum, noZero} · {op:'+', sum, zero} · {op:'−', top:[lo,hi], minDiff, regroup}
+// · {kind:'time', h:[lo,hi], m:[…minutes]} · {kind:'list', items:[…keys]}
+function poolCheck(POOL, pages) {
+  const all = (pages || []).flatMap((p) => (p.items || []).map((x) => ({ ...x, page: p.id })));
+  if (!POOL || !all.length) return { ok: false, msg: 'no pool JSON or no items in the pack' };
+  const d = POOL.decl || {}, op = d.op || POOL.op || '', key = (x) => (typeof x === 'string' ? x : `${x[0]}${op}${x[1]}`);
+  const inPool = new Set(POOL.pool.map(key)), forb = new Set((POOL.forbidden || []).map(key)), re = [];
+  if (d.kind === 'list') re.push(...d.items.map(key));
+  else if (d.kind === 'time') { for (let h = d.h[0]; h <= d.h[1]; h++) for (const m of d.m) re.push(`${h}:${String(m).padStart(2, '0')}`); }
+  else if (op === '+' && d.sum !== undefined) { for (let a = d.zero ? 0 : 1; a <= d.sum - (d.zero ? 0 : 1); a++) re.push(key([a, d.sum - a])); }
+  else if (op === '+') { for (let a = d.noZero ? 1 : 0; a <= d.maxSum; a++) for (let b = d.noZero ? 1 : 0; a + b <= d.maxSum; b++)
+      if (Math.min(a, b) >= d.small[0] && Math.min(a, b) <= d.small[1]) re.push(key([a, b])); }
+  else if (op === '−') { for (let a = d.top[0]; a <= d.top[1]; a++) for (let b = 1; a - b >= d.minDiff; b++) if (!d.regroup || a % 10 < b % 10) re.push(key([a, b])); }
+  const ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
+  const usable = inPool.size - forb.size, small = usable < 12;
+  const seenRep = new Set(), seenPage = new Set(), firstPage = new Map(), rep = [], soft = [], bad = [], noRep = [];
+  for (const x of all) {
+    if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
+    if (!x.rep) noRep.push(x.item + ' ' + x.page);
+    const kr = x.item + '|' + x.rep, kp = x.item + '|' + x.page;
+    if (seenRep.has(kr) || seenPage.has(kp)) rep.push(`${x.item} (${x.rep}) ${x.page}`);
+    else if (firstPage.has(x.item)) (small ? soft : rep).push(`${x.item} (${x.rep}) ${x.page}`);
+    seenRep.add(kr); seenPage.add(kp); if (!firstPage.has(x.item)) firstPage.set(x.item, x.page); }
+  const turns = []; if (op === '+') for (const p of pages) { const s2 = new Set((p.items || []).map((x) => x.item));
+    for (const x of p.items || []) { const [a, b] = x.item.split('+'); if (a !== b && +a > +b && s2.has(`${b}+${a}`)) turns.push(`${x.item} on ${p.id}`); } }
+  const distinct = firstPage.size;
+  return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !turns.length && (small || all.length <= usable),
+    msg: `${all.length} places (${distinct} facts), usable pool ${usable}${small ? ' (small pool: another representation on another page allowed)' : ''} (pool ${inPool.size} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; other-representation repeats on other pages ${soft.length}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without data-rep ${noRep.length}` };
+}
 ```
 
 ---
@@ -6893,6 +6916,18 @@ empty). Every item regroups. No exact repeats, no turn-arounds (subtraction has 
 | T6 | Routing (1-12, 2-3, 1-20, 2-6); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
 ---
+
+### F.3 E24 on two small fixtures (make 10, time to the half hour)
+
+Committed beside the packs in `design/lesson-planner/fixtures/` and run with
+`node selfcheck.mjs --fixture <file.json>` (the same `poolCheck()` that E24 runs on a pack):
+
+| Fixture | Declaration | Expected E24 |
+|---|---|---|
+| `make10.json` | `{"op":"+","sum":10,"zero":true}`, forbidden 3 + 7, 6 + 4; pages as in §9.5's example (5 + 5 also a bond on Practice; 4 exit items as ten frames) | **PASS**: 14 places, 9 facts, usable 9 (small pool); 5 other-representation repeats on other pages, 0 repeats |
+| `make10-repeat.json` | the same, exit item d replaced by 1 + 9 as an equation (already on the lesson sheet as an equation) | **FAIL**: repeat 1+9 (stack) P6 |
+| `time.json` | `{"kind":"time","h":[1,12],"m":[0,30]}`, 24 keys; chart 3:00, 3:30; 21 places, clocks; Practice last row 12:30, 6:30, 12:00 | **PASS**: 21 places, usable 24, 0 repeats |
+| `time-repeat.json` | the same, exit item d = 7:30 (on the lesson sheet) | **FAIL**: repeat 7:30 (clock) P6 |
 
 ## Appendix G — Reference builders for the worked examples (optional)
 
@@ -7024,7 +7059,7 @@ const practice = (items, key, cols = 3) => stepsStrip() + `<div class="instr" da
 function wordProblem(key) {
   const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
   return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
-    `<div class="grid" data-section="wp"${it(3, 2, '+')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="grid" data-section="wp"${it(3, 2, '+', 0, false, 'story')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
     `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Omar has 3 cars.</p><p>He gets 2 more cars.</p><p>How many cars does Omar have now?</p>` +
     `<p style="display:flex;align-items:flex-end;gap:2mm">Omar has <span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span> cars.</p></div></div>` +
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
@@ -7276,7 +7311,7 @@ const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>S
 function wordProblem(key) {
   const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
   return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
-    `<div class="grid" data-section="wp"${it(42, 17, '−')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="grid" data-section="wp"${it(42, 17, '−', 0, false, 'story')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
     `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Ana has 42 stickers.</p><p>She gives away 17 stickers.</p><p>How many stickers does Ana have?</p>` +
     `<p style="display:flex;align-items:flex-end;gap:2mm">Ana has <span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span> stickers.</p></div></div>` +
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
