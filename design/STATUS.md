@@ -231,6 +231,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 12: builder escalated to Opus medium (the ceiling) - the pre-skill lead / ordering defect (rule 14: lead pre not the nearest building block) survived critic rounds 10 and 11 (r11 N11, Y2.B2.S15 = 7).
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 13: builder still at Opus medium (the ceiling) - critic r12 failed narrowly (Y2 steps 7.96: N12, `equiv_frac_visual {denoms:[2]}` deals off-family = / ≠ items the lane's denominator check could not see, because their fractions live only in the cell payload).
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 14: builder still at Opus medium (the ceiling) - critic r13 failed narrowly (Y3 steps 7.93: N13 Y3.B6.S10 full on circles, N14 Y3.B6.S9 built the wrong proposal); root-cause gate TITLEREP added.
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 15: builder still at Opus medium (the ceiling) - critic r14 failed narrowly (Y2 7.93 / Y3 7.96: N15 / N16 / N17, false FULL verdicts in a fresh sample for the 4th round running); class gates added (TITLEREP title verbs, clock precision, digital, solve problems; RANGECHECK rule 7) and every full step / lesson re-audited by hand: 12 fulls demoted (Y2 63->55, Y3 49->45), 5 kept full with a live option.
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 

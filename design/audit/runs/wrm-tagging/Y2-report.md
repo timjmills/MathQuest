@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 14
+# Wave 2 tagging: Year 2 (US Grade 1) — round 15
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,11 +6,215 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 124 | 63 | 36 | 25 | 10 | 41 | 66 | 76 |
+| 124 | 55 | 44 | 25 | 12 | 44 | 75 | 78 |
 
 Site lessons (round 12): 11 (6 full / 5 partial / 0 gap). Proposals reused include 5 that only lessons use.
 
-New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+New proposals: round 15 `count_row_end`, `scale_band_100`; `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 15 (after critic Y2–Y3 r14, Y2 7.93 / Y3 7.96, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
+
+The critic's fresh sample found new false FULL verdicts for the fourth round running. This round ends the class with two new
+build gates and an audit by hand of every full step and lesson. The Y3 rows (N17, M16, M17, M19, M20) are in `Y3-report.md`.
+
+### Rows N15 and N16
+- **N15 Y2.B10.S1 "Make tally charts" → partial.** `graphs:tally_chart {}` reads a chart that is already drawn on every item
+  (how many, most / fewest, in all, how many more; the option schema has only these four kinds). Clause: "reads a given tally
+  chart (how many, most / fewest, in all, how many more); recording data as tally marks to make the chart is not dealt".
+  Build: `collect_data` (the WRM_PROPOSALS entry; its representation is "a list of raw data; tally it"), with Y2.B10.S1 added
+  to its steps and `closes`.
+- **N16 Y2.B4.S5 "Make the same amount" → partial.** `equiv_coin_sets {currency:'usd'}` is "Do the coins make the amount?
+  Check one box." on every item. Clause: "checks whether one set of coins makes an amount (yes / no); making an amount with
+  coins, and making the same amount in two different ways, are not dealt". Build: `make_amount_notes` (the lane's own
+  option: "choosing bills and coins to make an amount … and finding more than one way"), now closing Y2.B4.S4 and S5.
+
+### The class gates (critic r14 M12, M13)
+**TITLEREP reads the title's verb and clock precision** (`titlerep.mjs`, `verbClaims`; a build gate, both years, steps and
+lessons):
+- A title that starts with **make, build, draw, record, write or complete** asks for production. In half the direct items
+  the pupil must produce. A check (yes / no, true / false, "= or ≠", "Check one box") does not count, and neither does a pick
+  of one given answer (the response type is a choice). When the object is a chart (tally chart, pictogram, bar chart, table,
+  graph), the item must construct it ("make / draw / build / record / complete / tally / plot …", or a built graph). Reading
+  a drawn chart does not count. "Make decisions" names no object and is left out.
+- **Measure …** shows a measuring tool (ruler, scale, cylinder, jug, thermometer, squared paper with unit edges).
+- **Read … digital** shows a digital time in the stimulus, not only in the answer.
+- **Clock precision**: o'clock (:00), half past (:30), quarter past (:15) and quarter to (:45) each need a fifth of the
+  items. "To 5 minutes" (a 5-minute time that is not a quarter) and "to the minute" (not a multiple of 5) each need 30%.
+  Times are read from the payload's `h` / `m` or from an h:mm answer.
+- **Solve … problems / problems with** needs problems told in words (30% stories). "Missing number problems" is not this
+  claim.
+- A partial or gap entry's clause must name a claim its linked items miss, as for every other title claim. The clause
+  check reads the verb's word family ("making", "recording", "drawn" …).
+- Two false passes were fixed on the way:
+  - The `coins` claim was satisfied by the cell template's name (`coins`) and by a bills-only payload's `"coins":[]`.
+  - "pounds (notes and coins)" now reads as "dollars (bills)". Whole pounds are whole dollars, which are bills at the
+    school; the step's usAdaptation lists $1 with the bills.
+
+**RANGECHECK** (new `rangegate.mjs`, a build gate, also standalone: `node rangegate.mjs Y2 Y3 [--n] [--seed] [--step] [--all]`):
+- **What is checked.** Every number in an item's question and answer is held to the entry's ceiling: operands, readings,
+  conversions and totals. A list answer counts as several numbers, and clock times are not numbers.
+- **The ceiling** is the title's own bound when it names one ("Numbers to 20", "within 20", "to 1,000"). Otherwise it is
+  the grade band at the school week:
+  - Grade 1: 100 before W08, 120 from W08.
+  - Grade 2: 1,000.
+- **Exempt**: money (cents), clock and elapsed time, angles and shapes (fixed domains).
+- **Full**: any direct item above the ceiling fails.
+- **Partial or gap**: a linked item above the ceiling must be said in the clause, as a number above the ceiling or with
+  pass / above / beyond / over.
+
+Before the data fixes, on the current files:
+- TITLEREP found Y2.B4.S5, Y2.B10.S1, Y3.B5.S11, Y3.B10.S4 and Y3.B10.S12.
+- RANGECHECK found Y2.B1.S15, Y2.B7.S6 and Y3.B5.S4, plus 7 partial clauses that left an overshoot unsaid: Y2.B7.S3, S7,
+  Y3.B5.S1, S5, Y3.B7.S1–S3.
+
+**Mutations** (`scratchpad/r15/mut15.mjs`, in-memory copies, fresh seed 83003 + 211 i ×40): **36 / 36 as expected**.
+
+| # | Gate | Mutation | Result |
+|---|---|---|---|
+| v1–v4 | TITLEREP verb | Make tally charts on `tally_chart`; Make the same amount on `equiv_coin_sets`; Draw pictograms on `pictograph_intro`; Draw bar charts on `bar_graph` | caught (0 of 40 production / construction) |
+| v5, v6 | TITLEREP | Make equal groups on `fact_family_sort` (yes / no); Write numbers in words on `identify` (pick) | caught (the equal-groups and in-words claims fire first) |
+| v7 | TITLEREP clause | Y2.B10.S1 partial with a clause that never says recording is missing | caught (CLAUSE) |
+| k1–k5 | TITLEREP clock / digital | to 5 minutes on `time_hour` + `time_half_hour` (critic m7); o'clock and half past on `time_hour` (m13); quarter past and to on `{quarters:['past']}`; to the minute on `time_5min`; digital clock on to-digital only | caught |
+| p1, m1 | TITLEREP | Solve problems with time on the time-line skills; Measure perimeter on `perimeter` (labelled sides) | caught |
+| r1–r8 | RANGECHECK | Y3.B5.S4 full again (12,000); Y2.B10.S7 `{range:50}` (150); Y2.B7.S6 full (900 mL); Y2.B1.S13 `compare {band:999}`; Y3.B2.S11 `add_10k`; Y3.B5.S5 clause without "1,200"; Y2.B1.S1 `base10_build {band:99}` (title bound 20); Y2.B1.S15 full (110 at W4) | caught |
+| controls (13) | both | every step above as it is now; Make equal groups (rings counters); Draw pictograms / bar charts; the two-step word-problem lesson; Y3.B12.S1 pictograms to 1,000; Add money (exempt); the 10 times-table to 120 at W26; the r15 clauses | silent |
+
+In-build: a clean tree with N15 and N17 undone exits 1 in both years. The output is `TITLEREP FULL Y2.B10.S1` and
+`RANGECHECK FULL Y3.B5.S4` (7 of 30 items above 1,000).
+
+### The full audit by hand (Y2: 63 full steps, 6 full lessons)
+**Method.**
+- For every full step and full lesson, `scratchpad/r15/audit.mjs` generated 30 items of each direct on a fresh seed
+  (52817 + 431 i). It printed the title, the CCSS descriptor text, the response types, the item shapes, samples and the
+  largest number.
+- I read every entry against every clause of its WRM title and against the CCSS clause the title teaches, at the step's
+  range. A CCSS standard spans many small steps, so a step is not held to clauses that belong to its neighbours.
+- A full that falls short is demoted, with a true clause and the proposal that closes it, unless a live option delivers the
+  missing clause. In that case the option goes on the step and the step stays full.
+- Focused probes (200–400 items) checked each demotion's numbers.
+
+**Result.**
+- **Y2: 8 of 63 full steps demoted; 3 kept full with an added option; 0 of 6 lessons changed.**
+- Y2 steps: 63 full → **55 full**, 36 → 44 partial.
+
+| Step | Before | After | Evidence (30 fresh items per direct; probes as stated) |
+|---|---|---|---|
+| Y2.B1.S1 Numbers to 20 | full | **partial** | teen_compose and base10_build {band:20} deal 11-19 only (400 items): 20 as two tens never dealt (rule 7 "to 20 includes 20"). Build teen_structure (Y1 lane) |
+| Y2.B1.S3 Recognise tens and ones | full | full | how many tens (rods) + build 13-96 with tens and ones |
+| Y2.B1.S4 Use a place value chart | full | full | digits under T / O: name the place, say its value (to 99) |
+| Y2.B1.S5 Partition numbers to 100 | full | full | expanded form and tens-and-ones form of 2-digit numbers (47 = 40 + 7 = 4 tens 7 ones) |
+| Y2.B1.S6 Write numbers to 100 in words | full | full | numeral → words and words → numeral, to 95 |
+| Y2.B1.S8 Write numbers to 100 in expanded form | full | full | write in expanded form; combine 40 + 7 |
+| Y2.B1.S13 Compare numbers | full | full | 2-digit pairs with <, >, = (1.NBT.B.3) |
+| Y2.B1.S15 Count in 2s, 5s and 10s | full | **partial** | RANGECHECK: the 10s row of 12 numbers from 0 ends at 110 at W4 (5 of 40 items pass 100). Build count_row_end |
+| Y2.B1.S16 Count in 3s | full | full | count in 3s from 0 to 33 |
+| Y2.B2.S1 Bonds to 10 | full | full | ten frame: how many more make 10 |
+| Y2.B2.S2 Fact families - addition and subtraction bonds within 20 | full | full | fact families within 20 (both skills complete all four facts) |
+| Y2.B2.S3 Related facts | full | full | complete the related facts; is it a fact family? |
+| Y2.B2.S6 Add by making 10 | full | full | make-a-ten strategy items (split 7 into 3 + 4) and bridging facts within 20 |
+| Y2.B2.S7 Add three 1-digit numbers | full | full | three 1-digit addends, sums to 20, with pictures |
+| Y2.B2.S10 Subtract across 10 | full | full | teen minus 1-digit across 10 (13 − 8) |
+| Y2.B2.S13 10 more, 10 less | full | full | 10 more / 10 less within 100 |
+| Y2.B2.S15 Add two 2-digit numbers (not across a 10) | full | full | 2-digit + 2-digit, no regrouping, sums to 95 |
+| Y2.B2.S16 Add two 2-digit numbers (across a 10) | full | full | 2-digit + 1- or 2-digit across a ten, to 95 |
+| Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) | full | full | 2-digit − 2-digit, no exchange |
+| Y2.B2.S18 Subtract two 2-digit numbers (across a 10) | full | full | 2-digit − 1- or 2-digit across a ten |
+| Y2.B2.S19 Mixed addition and subtraction | full | full | add and subtract stories within 100 (both operations on the page) |
+| Y2.B2.S21 Missing number problems | full | full | missing numbers in every position of + and − within 20 |
+| Y2.B3.S1 Recognise 2-D and 3-D shapes | full | full | name 2-D shapes and 3-D shapes (pick, click all) |
+| Y2.B3.S2 Count sides on 2-D shapes | full | full | how many sides (3-10 sides) |
+| Y2.B3.S3 Count vertices on 2-D shapes | full | full | how many corners / vertices |
+| Y2.B3.S8 Count faces on 3-D shapes | full | full | faces of 3-D shapes (owner question on the cylinder stands) |
+| Y2.B3.S9 Count edges on 3-D shapes | full | full | edges of 3-D shapes |
+| Y2.B3.S10 Count vertices on 3-D shapes | full | full | vertices of 3-D shapes |
+| Y2.B4.S1 Count money - pence | full | full | count coins of one kind to 100¢; circle coins of a value |
+| Y2.B4.S2 Count money - pounds (notes and coins) | full | full | count bills ($1-$100) in whole dollars: the UK pound coins are dollar bills at the school (usAdaptation) |
+| Y2.B4.S3 Count money - pounds and pence | full | full | count the bills, then the coins: dollars and cents |
+| Y2.B4.S5 Make the same amount | full | **partial** | N16: every item is "Do the coins make the amount? Check one box" (yes / no). TITLEREP verb "make". Build make_amount_notes |
+| Y2.B4.S6 Compare amounts of money | full | full | which set has more money (two coin sets) |
+| Y2.B4.S9 Find change | full | full | change from a bill within $20 (subtract in columns) |
+| Y2.B5.S1 Recognise equal groups | full | full | equal or unequal groups: write multiply or add |
+| Y2.B5.S3 Add equal groups | full | full | groups of ... make ... in all; repeated addition = × with groups to 5 |
+| Y2.B5.S4 Introduce the multiplication symbol | full | full | repeated addition written with the × symbol |
+| Y2.B5.S5 Multiplication sentences | full | **full (option added)** | arrays_groups writes the sentence in words only (3 groups of 5 make 15): + nl_mult {response:sentence} writes __ × __ = __ from hops of 2, 5, 10. Kept full with the option |
+| Y2.B5.S6 Use arrays | full | full | rows of ... make ... in all; count the array rows × columns |
+| Y2.B5.S7 Make equal groups – grouping | full | full | loose counters: make groups of n (ring them), how many groups |
+| Y2.B5.S9 The 2 times-table | full | full | ×2 facts and the 2s count from 0 |
+| Y2.B5.S10 Divide by 2 | full | full | ÷2 facts |
+| Y2.B5.S11 Doubling and halving | full | full | double and half to 20 with bars |
+| Y2.B5.S12 Odd and even numbers | full | full | odd or even: say, pick, click all |
+| Y2.B5.S13 The 10 times-table | full | full | ×10 facts and the 10s count from 0 (to 120, W26) |
+| Y2.B5.S14 Divide by 10 | full | full | ÷10 facts (to 120) |
+| Y2.B5.S15 The 5 times-table | full | full | ×5 facts and the 5s count from 0 |
+| Y2.B5.S16 Divide by 5 | full | full | ÷5 facts |
+| Y2.B5.S17 The 5 and 10 times-tables | full | full | ×5 and ×10 facts and the chart rows |
+| Y2.B7.S6 Measure in millilitres | full | **partial** | RANGECHECK: cylinder readings to 900 mL at Grade 1, about half pass 120. Build scale_band_100 |
+| Y2.B7.S9 Temperature | full | full | thermometer in °C to 38 |
+| Y2.B8.S3 Recognise a half | full | **partial** | answer given away: shapes are always halves, every answer is 2 or 1/2 (200 items); "is it a half?" never asked. Build half_or_not (Y1 lane) |
+| Y2.B8.S4 Find a half | full | full | half of a number to 20 with a bar |
+| Y2.B8.S5 Recognise a quarter | full | **partial** | "how many equal parts" is always 4; the shaded fraction is 1/4 in a quarter of the items (2/4, 3/4 are later steps). Build half_or_not |
+| Y2.B8.S7 Recognise a third | full | **partial** | "how many equal parts" is always 3; 1/3 or 2/3 shaded; "is it thirds?" never asked. Build fraction_parts |
+| Y2.B9.S1 O'clock and half past | full | full | o'clock 30 / 30 and half past 30 / 30 (clock precision claims hold) |
+| Y2.B9.S2 Quarter past and quarter to | full | **full (option added)** | :15 and :45 both dealt; + time_quarter {stimulus:words-past} reads "quarter to ten" (M15). Kept full |
+| Y2.B9.S5 Tell the time to 5 minutes | full | full | 5-minute times (not quarters) and the minutes ring in 5s |
+| Y2.B10.S1 Make tally charts | full | **partial** | N15: every item reads a drawn tally chart; none records tally marks. TITLEREP verb "make" (construct). Build collect_data |
+| Y2.B10.S4 Draw pictograms (1-1) | full | full | build a pictograph from given counts (1 picture = 1) |
+| Y2.B10.S5 Interpret pictograms (1-1) | full | full | read a 1-1 pictogram: how many, how many more |
+| Y2.B10.S7 Interpret pictograms (2, 5 and 10) | full | **full (option added)** | RANGECHECK: {range:50} dealt "in all" totals to 210; {range:20} keeps totals within 90 with keys of 2, 5, 10 (400 items). Kept full with the option |
+| Y2.B11.S1 Language of position | full | full | above / below / beside / between (pick) |
+
+| Lesson (Grade 1) | Before | After | Evidence |
+|---|---|---|---|
+| Bonds to 10 (explore combinations that make 10) | full | full | how many more make 10 on a ten frame |
+| Compare mass (1) | full | full | which is heavier / lighter (pictures) |
+| Compare mass (2) | full | full | which is heavier / lighter (pictures) |
+| Count money - notes and coins (US: dollars & cents) | full | full | count the bills, then the coins |
+| Find the total (US: dollars & cents) | full | full | add two prices (money, exempt from the band) |
+| Length and height (compare, order) | full | full | longer / shorter, taller / shorter, order three by length |
+
+**The demotions' builds:**
+- `teen_structure` (Y1 lane, reused verbatim through `laneProposals`).
+- `count_row_end` (new: a count-by row that stops at 100).
+- `make_amount_notes`.
+- `scale_band_100` (new: a millilitre cylinder to 100).
+- `half_or_not` (Y1 lane: is it a half / a quarter?).
+- `fraction_parts` (deciding whether parts are equal).
+- `collect_data`.
+
+Each proposal's `closes` is the step's own clause (rule 16).
+
+**Kept full with a live option:**
+- **Y2.B5.S5** adds `nl_mult {response:'sentence', constant:[2,5,10], band:50}`. The pupil writes __ × __ = __ from hops.
+  `arrays_groups` writes the sentence only in words.
+- **Y2.B9.S2** adds `time_quarter {stimulus:'words-past'}` (M15). "Quarter to ten" → 9:45.
+- **Y2.B10.S7** changes `pictograph {range:50}` to `{range:20}`. Totals now stay within 90, where they reached 210, and the
+  keys of 2, 5 and 10 are all dealt.
+
+### Minors
+- **M15** above (Y2.B9.S2).
+- **M18** Y2.B4.S6: `add_wp_10_plain {band:10}` dropped from the pres (`dropPre`). It dealt the same stories as
+  `add_wp_10`.
+- **Knock-on of the audit**, each checked by hand in the diff against r14:
+  - The why-owner tie now goes to the step taught LATEST by school week (`bestOwner`), not the latest in WRM order. With
+    Y2.B8.S7 no longer direct, the `partition_shapes {parts:[0,1,2]}` pres still cite Y2.B8.S7 (W31), not Y2.B8.S13 (W17).
+  - The `halve` pres of Y2.B8.S11 / S14 / S15 now cite Y2.B5.S11 "Doubling and halving" (W30).
+  - The four relateds that cite Y2.B9.S2 take its words-past opts as their spec. The approved marker fix is the same change
+    (`markerFixOk`), so the written links are unchanged.
+  - Y2.B5.S3 / S4 relate to the new Y2.B5.S5 sentence skill (next step).
+
+### Counts and gates (round 15)
+| Gate | Result |
+|---|---|
+| Two clean `git archive` builds (A, B: Y2 then Y3; C: links files deleted, Y3 first), `env -u WRM_TAG_DATA`, scratch `TMPDIR` | exit 0 ×6; Y2 `d4b5a0bffc07c9c9…`, Y3 `e9ee695df13baf17…` in A, B, C and the committed files |
+| In-build checks | specopts 0 (Y2 1,073 / Y3 1,247 links), denomcheck 0, titlerep 0 (verbs, clock, digital and problems added), **rangecheck 0** (new; Y2 107 / Y3 140 direct and partial links, 7 / 8 pass their ceiling and every one is said in its clause), mergecheck 0, optgate 0, titleclaim 0, lessons 0, bbcheck 0 |
+| `sweep.mjs Y2 Y3` | OK (a 0, a-neg 0, b 0; c 56 / 63, review-only) |
+| `denoms.mjs Y2 Y3` | OK (FAMILY 0, NAMED 0, DENIED 0) |
+| `titlerep.mjs Y2 Y3` and `rangegate.mjs Y2 Y3` standalone, fresh seeds 41077 + 433 i ×40 | 0 findings each |
+| `linkscan.mjs Y2 Y3` | OK |
+| `mergeall.mjs` R→Y6 and `reverse` | 1,042 tags, 0 problems both orders. Critic `merge14.mjs`: identical both orders, 0 real conflicts (one shared key\|step, same outcome), own-step mismatches 0, partial clauses verbatim (Y2 54 / 54, Y3 74 / 74) |
+| Mutations | 36 / 36 (above); in-build tree `m` exits 1 in both years |
+| `ws-wrm-extract --check --site …/scratchpad/site/index.html` | exit 0 |
+| `ws-boot-smoke` | OK |
 
 ## Round 14 (after critic Y2–Y3 r13, Y2 8.00 / Y3 7.93, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
 

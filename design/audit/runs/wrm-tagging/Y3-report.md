@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 14
+# Wave 2 tagging: Year 3 (US Grade 2) — round 15
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,13 +6,140 @@ Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 134 | 49 | 55 | 30 | 20 | 52 | 72 | 73 |
+| 134 | 45 | 59 | 30 | 24 | 52 | 78 | 75 |
 
 Site lessons (round 12): 25 (8 full / 12 partial / 5 gap). New proposals for lessons: `nl_tens_ones_jumps`, `estimate_inches_feet`; `make_amount_notes` (Y2's) is now used here too.
 
-New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
+New proposals: round 15 `inverse_check_1000`, `length_band_1000`, `perimeter_measure`, `time_stories`; `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 15 (after critic Y2–Y3 r14, Y2 7.93 / Y3 7.96, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
+
+The new gates (TITLEREP verbs, clock precision, digital and "solve problems"; RANGECHECK), their 36 mutations, the method of
+the full audit and the gate table are in `Y2-report.md` (round 15). This section has the Y3 rows.
+
+### Row N17: Y3.B5.S4 "Metres, centimetres and millimetres" → partial
+- `length_metric {forms:[0,1,2]}` deals whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm,
+  up to 12,000; 14–16 of 40 on fresh seeds; the critic counted 35 of 80). Grade 2 numbers go to 1,000.
+- Clause: "whole-unit conversions only, and about 2 in 5 answers pass 1,000 (10 m = 10,000 mm; up to 12,000); measuring and
+  recording a length in m, cm and mm is not dealt".
+- Build:
+  - `mm_cm_m`: the WRM_PROPOSALS option, already built for S1, S3, S5 and S6; Y3.B5.S4 is added to its steps.
+  - `length_band_1000` (new): an option that keeps `length_metric` answers within 1,000. No band exists today.
+- RANGECHECK now fails the build on this step if it is ever full again (in-build tree `m`).
+
+### The full audit by hand (Y3: 49 full steps, 8 full lessons)
+**Result.**
+- **4 of 49 full steps demoted; 2 kept full with an added option; 0 of 8 lessons changed.**
+- Y3 steps: 49 full → **45 full**, 55 → 59 partial.
+
+| Step | Before | After | Evidence (30 fresh items per direct, 52817 + 431 i; probes as stated) |
+|---|---|---|---|
+| Y3.B1.S1 Represent numbers to 100 | full | full | build 2-digit numbers with base 10; tens-and-ones form |
+| Y3.B1.S2 Partition numbers to 100 | full | full | 2-digit numbers in expanded form (flexible partitioning is its own step, B1.S7) |
+| Y3.B1.S5 Represent numbers to 1,000 | full | full | build 3-digit numbers with flats, rods, units; read place-value disks |
+| Y3.B1.S6 Partition numbers to 1,000 | full | full | 3-digit expanded form and hundreds-tens-ones form |
+| Y3.B1.S8 Hundreds, tens and ones | full | full | H T O: name the place, its value, the unit form |
+| Y3.B1.S12 Compare numbers to 1,000 | full | full | 3-digit pairs with <, >, = |
+| Y3.B1.S13 Order numbers to 1,000 | full | full | order three 3-digit numbers both ways |
+| Y3.B1.S14 Count in 50s | full | full | count in 50s from 0 to 550 |
+| Y3.B2.S11 Add two numbers (no exchange) | full | full | 3-digit + 3- or 2-digit, no exchange, in columns |
+| Y3.B2.S12 Subtract two numbers (no exchange) | full | full | 3-digit − 3- or 2-digit, no exchange |
+| Y3.B2.S21 Inverse operations | full | **partial** | checks a subtraction by adding only, 2-digit minuends (197 of 200; 3 are 100); checking an addition by subtracting and 3-digit work are missing. Build inverse_check_1000 |
+| Y3.B3.S1 Multiplication - equal groups | full | full | equal groups sentence; repeated addition as × (groups to 6) |
+| Y3.B3.S2 Use arrays | full | full | rows of ... make ... in all; count arrays |
+| Y3.B3.S6 Multiply by 3 | full | full | ×3 facts |
+| Y3.B3.S7 Divide by 3 | full | full | ÷3 facts |
+| Y3.B3.S8 The 3 times-table | full | full | ×3 facts and the 3s count from 0 |
+| Y3.B3.S9 Multiply by 4 | full | full | ×4 facts |
+| Y3.B3.S10 Divide by 4 | full | full | ÷4 facts |
+| Y3.B3.S11 The 4 times-table | full | full | ×4 facts and the 4s count from 0 |
+| Y3.B3.S12 Multiply by 8 | full | full | ×8 facts |
+| Y3.B3.S13 Divide by 8 | full | full | ÷8 facts |
+| Y3.B3.S14 The 8 times-table | full | full | ×8 facts and the 8s count from 0 |
+| Y3.B4.S1 Multiples of 10 | full | full | n × 10 and the 10s count from 0 |
+| Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning | full | full | area model: 2-digit ÷ 2, 3, 4, 5, 8 by partitioning |
+| Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders | full | **full (option added)** | div_remainders rings counters to 24 only (quotients 2-6, some 1-digit dividends): + box_division_easy {regroup:always} 2-digit ÷ 1-digit with a remainder (95 ÷ 8 = 11 R 7). Kept full with the option |
+| Y3.B5.S4 Metres, centimetres and millimetres | full | **partial** | N17: whole-unit conversions only; 14-16 of 40 answers pass 1,000 (to 12,000 mm). RANGECHECK. Build mm_cm_m + length_band_1000 |
+| Y3.B5.S10 What is perimeter | full | full | perimeter of drawn shapes with labelled sides (m, cm) |
+| Y3.B5.S11 Measure perimeter | full | **partial** | counts unit edges on squared paper (2 in 3) or adds written side lengths (1 in 3); no side is measured with a ruler. Build perimeter_measure |
+| Y3.B5.S12 Calculate perimeter | full | full | perimeter from given sides; a missing side from the perimeter |
+| Y3.B6.S3 Understand the numerators of non-unit fractions | full | full | write and shade non-unit fractions (2/6, 6/8) |
+| Y3.B6.S7 Fractions on a number line | full | full | fractions on a number line: read, place, choose |
+| Y3.B6.S10 Equivalent fractions as bar models | full | full | bar models only (model bar), equivalent pairs |
+| Y3.B7.S7 Measure capacity and volume in millilitres | full | full | cylinder readings in mL (within 1,000) |
+| Y3.B9.S1 Pounds and pence | full | full | count bills then coins; write the amount with the point |
+| Y3.B9.S3 Add money | full | full | add two prices in dollars and cents |
+| Y3.B9.S5 Find change | full | full | change from $1 / $5 in dollars and cents |
+| Y3.B10.S2 Tell the time to 5 minutes | full | full | 5-minute times (clock precision claim holds) |
+| Y3.B10.S3 Tell the time to the minute | full | full | times to the minute (not multiples of 5) |
+| Y3.B10.S4 Read time on a digital clock | full | **full (option added)** | the default writes the time a clock shows and never shows a digital clock: + {dir:to-analog} reads a digital time and checks the clock (M16). Kept full |
+| Y3.B10.S5 Use a.m. and p.m | full | full | a.m. or p.m. for daily events |
+| Y3.B10.S8 Hours and minutes - use start and end times | full | full | end time, duration and start time on a time line |
+| Y3.B10.S9 Hours and minutes - use durations | full | full | end time and duration on a time line |
+| Y3.B10.S12 Solve problems with time | full | **partial** | duration or start time on a drawn time line, no context; "Solve problems" asks for problems told in words. Build time_stories |
+| Y3.B11.S6 Parallel and perpendicular | full | full | parallel / perpendicular / intersecting: name, click |
+| Y3.B11.S7 Recognise and describe 2-D shapes | full | full | name 2-D shapes; count sides and vertices |
+| Y3.B11.S9 Recognise and describe 3-D shapes | full | full | name 3-D shapes; count faces, edges, vertices |
+| Y3.B12.S1 Interpret pictograms | full | full | pictograms with keys of 2, 5, 10 (totals within 1,000) |
+| Y3.B12.S3 Interpret bar charts | full | full | read bar charts: how many, how many more, most |
+| Y3.B12.S4 Draw bar charts | full | full | build a bar graph from given counts |
+
+| Lesson (Grade 2) | Before | After | Evidence |
+|---|---|---|---|
+| Read and write numbers to 1,000 in words, numerals and expanded form | full | full | numerals ↔ words to 1,000; expanded form |
+| Add up to four two-digit numbers | full | full | three or four 2-digit addends in a column |
+| Solve two-step word problems identifying both operations | full | full | two-step add-then-subtract stories within 50 |
+| Compare mass (1) | full | full | which is heavier / lighter (pictures) |
+| Compare mass (2) | full | full | which is heavier / lighter (pictures) |
+| Count money - notes and coins | full | full | count the bills, then the coins |
+| Find the total | full | full | add two prices (money) |
+| Group equally | full | full | loose counters: make groups of n, how many groups |
+
+**The demotions' builds** (each `closes` is the step's own clause):
+- `inverse_check_1000` (new): check an addition by subtracting and a subtraction by adding, within 1,000. The Y4 lane's
+  `inverse_check` is for 5- and 6-digit numbers.
+- `mm_cm_m` + `length_band_1000`.
+- `perimeter_measure` (new): measure each side with a cm ruler, then add.
+- `time_stories` (new): a time problem told as a story over the existing time line.
+
+**Kept full with a live option:**
+- **Y3.B4.S9** adds `box_division_easy {regroup:'always', constant:[2,3,4,5,8]}`.
+  - Before: `div_remainders` rang counters to 24 only, with quotients 2–6 and some 1-digit dividends.
+  - Now the box deals 2-digit ÷ 1-digit with a remainder: 35 ÷ 2 = 17 R 1, 95 ÷ 8 = 11 R 7.
+  - The no-exchange box (Y3.B4.S7) stays the second pre, through a `keep` core entry.
+- **Y3.B10.S4** (M16) adds `time_analog_digital {dir:'to-analog'}`.
+  - The default writes the time a clock shows and never shows a digital clock.
+  - to-analog reads a digital time (3:40) and checks the clock that shows it.
+  - TITLEREP's "reads a digital time" claim holds this.
+
+### Minors
+- **M16** above.
+- **M17** Y3.B8.S1 "Add fractions": the lead pre is now `write_fraction {denoms:[2,3]}`, "Y2.B8.S11 Non-unit fractions: a
+  non-unit fraction counts unit fractions (2/3 is two thirds; the count used to add like fractions)". It was the
+  equivalence bar model, which is now second.
+- **M19** Y3.B12.S5 / S6: the `tally_chart` pre whys now say what the skill does:
+  - S5: "Y2.B10.S1 Make tally charts: reading the counts of a tally chart (how many, most, in all), the chart this step
+    makes from the data".
+  - S6: "… reading a chart of counts (how many in each row and in all), the counts a two-way table holds".
+  - Y2.B10.S1 is partial for this skill now, which the why reflects.
+- **M20 (generator, recorded, not fixed; owner bug list `GENERATOR-FIXES-2026-10-16.md` §3).**
+  - Where: `equiv_frac_nv`'s yes / no items, `js/modules/gen-fractions.js` ≈ l.4372–4377.
+  - What goes wrong: the "only the top number changed" distractor is clamped to `d − 1`, and the `+1` retry gives the base
+    fraction back. The item is then keyed "no".
+  - On 200 fresh items, 13 of 65 yes / no items with `{denoms:[2]}` ask "Are 1/2 and 1/2 equivalent?" or "Are 3/4 and 3/4
+    equivalent?" and key "no". With `{denoms:[2,3]}` it is 13 of 74 (also 2/3 and 5/6).
+  - The lane links the skill only as a related link, on Y3.B6.S9 and S10. The why there is "the same amount as two
+    fractions without a picture", which stays true of the items, and no clause or why claims the key is right.
+- **Knock-on of the audit**, each read in the diff against r14:
+  - `nl_mult` is now a direct of Y2.B5.S5. The ×3 / ×4 hop lines of Y3.B3.S6 / S8 / S9 / S11 stay related, as before
+    (`dropPre`), rather than becoming pres that cite a Grade 1 step for another table.
+  - The millilitre cylinder pres of Y3.B7.S1–S3 / S9 / S11 still cite "Y2.B7.S6 Measure in millilitres". The cite now says
+    "a partial skill there: its readings pass 120". `whyFix` takes a key|opts entry, so the gram link of the same key is
+    untouched.
+  - The partial clauses of Y3.B5.S1 / S5 now say the m-to-cm answers reach 1,200. The clauses of Y3.B7.S1–S3 say some gram
+    dials read 1,200–1,800 g (RANGECHECK CLAUSE).
 
 ## Round 14 (after critic Y2–Y3 r13, Y2 8.00 / Y3 7.93, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
 
