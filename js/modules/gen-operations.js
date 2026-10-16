@@ -2299,6 +2299,38 @@ function _familyPair(key, lo, hi) {
 // untouched skill takes its old branch and draws the same random numbers as before.
 /** A SET option the teacher CHANGED from its default: the ticked values, else null (untouched,
  *  or none ticked, which means "no restriction"). */
+// ---- r12 area-model options (owner 2026-10-16): amEdges (given / blank / mixed), amForm (a set) ----
+// Mixed choices are dealt from the seeded page deck in aligned blocks of n (a seeded shuffle of the
+// n choices per block), so the same seed reprints the same page and any 2n - 1 items in a row hold
+// every choice: a page of 4 or more is never all given or all blank. At the defaults nothing here
+// draws a random number, so the untouched skill deals exactly what it dealt before.
+const _amCursors = new Map();
+function _amDeal(key, n) {
+    let at;
+    if (Number.isFinite(state.itemIndex)) at = Math.max(0, Math.floor(state.itemIndex));
+    else { at = _amCursors.get(key) || 0; _amCursors.set(key, at + 1); }
+    return blockPermutation(key, n, Math.floor(at / n))[at % n];
+}
+/** 'given' | 'blank' for this item. */
+function _amEdges(skill) {
+    const v = _opt('amEdges');
+    if (v === 'blank') return 'blank';
+    if (v !== 'mixed') return 'given';
+    return _amDeal(`amEdges:${skill}`, 2) === 0 ? 'given' : 'blank';
+}
+/** 'sign' | 'long' | 'fraction' for this item: one ticked form, or the ticked forms dealt down the page. */
+function _amForm(skill) {
+    const legal = ['sign', 'long', 'fraction'];
+    let t = _opt('amForm');
+    if (typeof t === 'string') t = [t];
+    t = Array.isArray(t) ? legal.filter((v) => t.includes(v)) : [];
+    if (!t.length) return 'sign';
+    if (t.length === 1) return t[0];
+    return t[_amDeal(`amForm:${skill}`, t.length)];
+}
+/** True when an area-model option asks for the kit drawing (anything but today's defaults). */
+function _amKit(edges, form) { return edges !== 'given' || form !== 'sign' || _opt('amEdges') === 'mixed'; }
+
 function _p12Narrowed(id) {
     const def = _optDef(id);
     if (!def || def.type !== 'set') return null;
@@ -4788,6 +4820,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // and one for the total, all keyed. The screen twin keeps the
                 // `area-model-input` / `area-model-total` inputs the checkers read.
                 const _amPayload = { multiplier, parts: parts.map(p => p.value), product, uid: `am${multiplier}x${multiplicand}` };
+                // r12: "Numbers around the box: Pupil writes them" - the edge parts become boxes.
+                if (_amEdges('area_model_mult') === 'blank') _amPayload.edges = 'blank';
                 q.cell = { template: 'area-model', v: 1, payload: _amPayload };
                 q.visual = _kitTwin('area-model', _amPayload);
                 q.options = [];
@@ -4859,6 +4893,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
                 
+                // r12: any edges choice but Given draws the kit's grid (black line art, every box keyed);
+                // Given keeps today's sheet byte for byte.
+                const _amhE = _amEdges('area_model_mult_hard');
+                if (_amKit(_amhE, 'sign')) {
+                    const _amhPayload = { multiplier: num1, rows: rowParts.slice(), parts: colParts.slice(), product, uid: `amh${num1}x${num2}` };
+                    if (_amhE === 'blank') _amhPayload.edges = 'blank';
+                    q.cell = { template: 'area-model', v: 1, payload: _amhPayload };
+                    q.visual = _kitTwin('area-model', _amhPayload);
+                    q.options = [];
+                    return;
+                }
                 const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
                 const baseBoxWidth = 120; // bumped from 85
                 const baseBoxHeight = 105; // bumped from 75
@@ -4969,6 +5014,30 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = "area-model-div";
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
                 q.printFormat = "area-model-div";
+                // r12: the edges / form options draw the kit's division area model (black line art,
+                // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.
+                {
+                    const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
+                    const _amdE = _amEdges(_amdSk);
+                    const _amdF = _amForm(_amdSk);
+                    if (_amKit(_amdE, _amdF)) {
+                        // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
+                        // at the largest multiple of ten times the divisor below the dividend, else in half.
+                        let _amdParts = parts.map(p => p.value);
+                        if (_amdParts.some(v => v <= 0)) {
+                            const _q = dividend / divisor;
+                            let _a = divisor * 10 * Math.floor(_q / 10);
+                            if (!(_a > 0 && _a < dividend)) _a = divisor * Math.floor(_q / 2);
+                            _amdParts = [_a, dividend - _a];
+                            q.hint = `Break ${dividend} into parts: ${_amdParts[0]} + ${_amdParts[1]}. Find what times ${divisor} equals each part, then add.`;
+                        }
+                        const _amdPayload = { dividend, divisor, parts: _amdParts, form: _amdF, edges: _amdE, uid: `amd${dividend}d${divisor}` };
+                        q.cell = { template: 'area-model-div', v: 1, payload: _amdPayload };
+                        q.visual = _kitTwin('area-model-div', _amdPayload);
+                        q.options = [];
+                        return;
+                    }
+                }
                 
                 // Visual with area model for division
                 q.visual = `<div class="area-model-container" style="text-align:center;">
@@ -5067,6 +5136,30 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = "area-model-div";
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
                 q.printFormat = "area-model-div";
+                // r12: the edges / form options draw the kit's division area model (black line art,
+                // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.
+                {
+                    const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
+                    const _amdE = _amEdges(_amdSk);
+                    const _amdF = _amForm(_amdSk);
+                    if (_amKit(_amdE, _amdF)) {
+                        // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
+                        // at the largest multiple of ten times the divisor below the dividend, else in half.
+                        let _amdParts = parts.map(p => p.value);
+                        if (_amdParts.some(v => v <= 0)) {
+                            const _q = dividend / divisor;
+                            let _a = divisor * 10 * Math.floor(_q / 10);
+                            if (!(_a > 0 && _a < dividend)) _a = divisor * Math.floor(_q / 2);
+                            _amdParts = [_a, dividend - _a];
+                            q.hint = `Break ${dividend} into parts: ${_amdParts[0]} + ${_amdParts[1]}. Find what times ${divisor} equals each part, then add.`;
+                        }
+                        const _amdPayload = { dividend, divisor, parts: _amdParts, form: _amdF, edges: _amdE, uid: `amd${dividend}d${divisor}` };
+                        q.cell = { template: 'area-model-div', v: 1, payload: _amdPayload };
+                        q.visual = _kitTwin('area-model-div', _amdPayload);
+                        q.options = [];
+                        return;
+                    }
+                }
                 
                 // Visual with area model for division
                 q.visual = `<div class="area-model-container" style="text-align:center;">

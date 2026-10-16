@@ -104,12 +104,13 @@ export {
 // chart window, arrays, remainder, number line, fact family, cloze bank).
 export { divisionSteps } from './cells/long-division.js';
 import './cells/area-model.js';
+import './cells/area-model-div.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';
 import './cells/number-line.js';
 import './cells/family.js';
 export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'area-model-div'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,

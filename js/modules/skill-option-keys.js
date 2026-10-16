@@ -198,7 +198,9 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     divForm: '5N',       // div_facts: standard / long division / fraction / vertical / mix (2026-10-03)
-    // NEXT FREE IN BLOCK 5: 5P.
+    amEdges: '5P',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
+    amForm: '5Q',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
+    // NEXT FREE IN BLOCK 5: 5R.
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
@@ -319,6 +321,8 @@ export const VALUE_TOKENS = Object.freeze({
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
+    amEdges: Object.freeze({ given: 'G', blank: 'B', mixed: 'M' }),
+    amForm: Object.freeze({ sign: 'S', long: 'L', fraction: 'F' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),

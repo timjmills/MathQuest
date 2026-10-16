@@ -1997,6 +1997,21 @@ const _p12DivBy = (lo, hi, dflt, help) => {
     };
 };
 const _p12Enum = (id, label, values, dflt, help, group = 'difficulty') => ({ id, label, type: 'enum', group, default: dflt, values, help });
+// Area models (owner 2026-10-16, design/audit/runs/wave1-D/OWNER-REQUESTS-2026-10-16.md). Given is
+// today's sheet; the other choices draw the kit's area-model cells with the edge numbers as boxes.
+// Mixed deals given / blank down the page from the seeded deck (a page of 4+ always has both).
+const _amEdgesOpt = (div = false) => _p12Enum('amEdges', 'Numbers around the box', [
+    { v: 'given', l: div ? 'Given: the divisor is printed on the side' : 'Given: the parts are printed on the edges' },
+    { v: 'blank', l: div ? 'Pupil writes them: the divisor is a box too' : 'Pupil writes them: the edge parts are boxes (30 | 6 and 4)' },
+    { v: 'mixed', l: 'Mixed: some problems given, some to write' }], 'given',
+div ? 'The quotient\'s parts are always the pupil\'s to find. Pupil writes them also leaves the divisor on the side for the pupil to copy in.'
+    : 'Given prints the expanded parts on the edges. Pupil writes them makes the pupil split the numbers first, then find the areas.', 'support');
+const _amFormOpt = () => ({
+    id: 'amForm', label: 'Show the problem as', type: 'set', group: 'layout', default: ['sign'],
+    values: [{ v: 'sign', l: 'Division sign  (84 ÷ 4)' }, { v: 'long', l: 'Long division  (the bracket)' }, { v: 'fraction', l: 'Fraction  (84 over 4)' }],
+    allLabel: 'All three, mixed',
+    help: 'Tick one form for the whole page, or several to mix them down the page.',
+});
 
 const P12_OPTIONS = {
     // ======================= × and ÷ ladder steps (gen-operations.js, gen-counting.js) =========
@@ -2014,10 +2029,10 @@ const P12_OPTIONS = {
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
-    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).')],
+    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).'), _amEdgesOpt()],
     'multiplication:area_model_mult_hard': [_p12Enum('tiles', 'Digits × digits', [
         { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '2-digit × 3-digit (a 2 × 3 grid)' }],
-    null, 'The grid the pupil fills: four partial products, or six.')],
+    null, 'The grid the pupil fills: four partial products, or six.'), _amEdgesOpt()],
     'multiplication:repeated_add_to_mult': [
         _opsBand([25, 36, 100], 36, { label: 'Groups and group size to', labels: { 25: '5', 36: '6', 100: '10' },
             help: 'The most groups and the most in a group: the product is at most 25, 36 or 100.' }),
@@ -2049,8 +2064,8 @@ const P12_OPTIONS = {
         { ..._opsRegroup('mixed'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
             help: 'A remainder is written R in the last box: 437 ÷ 4 = 109 R 1.' },
     ],
-    'division:area_model_div_2by1': [_p12DivBy(2, 9)],
-    'division:area_model_div_3by1': [_p12DivBy(2, 9)],
+    'division:area_model_div_2by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
+    'division:area_model_div_3by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
     'division:share_into_groups': [_opsBand([12, 24], 24, { label: 'Counters to', help: 'The most counters in the picture. 12 keeps it to 2 to 4 groups.' })],
     'division:div_equation_parts': [
         formsOption([{ v: 0, l: 'How many in all' }, { v: 1, l: 'How many in each group' }, { v: 2, l: 'How many groups' }],
