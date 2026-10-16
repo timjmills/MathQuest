@@ -145,6 +145,14 @@ function _fDenPool(pool, min = 2, wider = [2, 3, 4, 5, 6, 8, 9, 10, 12]) {
     const b = wider.filter(d => denomAllowed(d, fams));
     return b.length >= min ? b : pool;
 }
+// A list of fractions narrowed to the ticked families (`getD` reads the denominator); fewer than
+// `min` left -> the list unchanged, so the item still has enough choices.
+function _fDenFilter(list, getD, min = 1) {
+    const fams = _fChanged('denoms');
+    if (!fams) return list;
+    const ok = list.filter(x => denomAllowed(getD(x), fams));
+    return ok.length >= min ? ok : list;
+}
 // The same for a list of denominator pairs ({d1, d2} or [d1, d2]): both must be in a ticked family.
 function _fDenPairs(pairs) {
     const fams = _fChanged('denoms');
@@ -4400,7 +4408,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "order_fractions" && Math.random() < 0.30) {
                 // Phase 4.5 batch 2: dnd-order modernization of legacy "interactive ordering"
                 const count = pick([4, 5]);
-                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denPool = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 const fracs = [];
                 const usedValues = new Set();
                 let attempts = 0;
@@ -4433,7 +4441,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "order_fractions") {
                 // Grade 4: Interactive click-to-order 3-6 fractions least-to-greatest or greatest-to-least
                 const count = randInt(3, 6);
-                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denPool = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 const fracs = [];
                 const usedValues = new Set();
                 let attempts = 0;
@@ -4810,7 +4818,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "compare_frac_lcd" && Math.random() < 0.30) {
                 // Phase 4.5 batch 2: dnd-order modernization — order 3-4 fractions with unlike denominators
                 const count = pick([3, 4]);
-                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denPool = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 const fracs = [];
                 const usedValues = new Set();
                 let attempts = 0;
@@ -4842,7 +4850,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "compare_frac_lcd") {
                 // Grade 4: Find LCD, convert fractions, compare with >, <, =
-                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denPool = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 const d1 = pick(denPool);
                 let d2 = pick(denPool);
                 while (d2 === d1) d2 = pick(denPool);
@@ -5224,18 +5232,20 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // equivalent to 1/3"). Uses simple base fractions; distractors include
                 // common student errors (added same value to top/bottom, etc.).
                 const sefBaseDens = [2, 3, 4, 5, 6, 8];
-                const sefBaseDen = pick(sefBaseDens);
+                const sefBaseDen = pick(_fDenPool(sefBaseDens, 1));
                 const sefBaseNum = rng(1, sefBaseDen - 1);
                 const sefBaseGcd = (function gcd(a, b){ return b === 0 ? a : gcd(b, a % b); })(sefBaseNum, sefBaseDen);
                 const sefRedNum = sefBaseNum / sefBaseGcd;
                 const sefRedDen = sefBaseDen / sefBaseGcd;
                 // Build correct equivalents: x2, x3, x4, x5 of the reduced form
-                const correctSet = [];
+                let correctSet = [];
                 for (const m of [2, 3, 4, 5]) {
                     correctSet.push({ n: sefRedNum * m, d: sefRedDen * m });
                 }
+                // P12 `denoms`: only the equivalents whose denominator is in a ticked family.
+                correctSet = _fDenFilter(correctSet, f => f.d, 1);
                 // Pick 2-3 correct equivalents
-                const cCount = randInt(2, 3);
+                const cCount = Math.min(randInt(2, 3), correctSet.length);
                 const correctPick = shuffle([...correctSet]).slice(0, cCount);
                 // Build distractors: common misconceptions (each tagged with msg)
                 const wrongCands = [
@@ -5250,6 +5260,21 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     return (f.n / f.d) !== (sefRedNum / sefRedDen);
                 });
                 const wCount = 6 - correctPick.length;
+                // P12 `denoms`: keep the misconceptions that stay in a ticked family; top up with
+                // "the bottom was multiplied, the top was not" errors, which keep the family.
+                if (_fChanged('denoms')) {
+                    const famWrong = [];
+                    for (const f of _fDenFilter(wrongCands, f => f.d, 0)) {
+                        if (!famWrong.some(w => w.n * f.d === f.n * w.d)) famWrong.push(f);
+                    }
+                    for (const m of [2, 4, 3, 5]) {
+                        for (const dn of [-1, 1, 2]) {
+                            const f = { n: sefRedNum * m + dn, d: sefRedDen * m, msg: "The bottom was multiplied, but the top was not multiplied by the same number. Multiply the top AND the bottom by the same number." };
+                            if (f.n > 0 && f.n < f.d && !famWrong.some(w => w.n * f.d === f.n * w.d)) famWrong.push(f);
+                        }
+                    }
+                    wrongCands.splice(0, wrongCands.length, ..._fDenFilter(famWrong, f => f.d, wCount));
+                }
                 const wrongPick = shuffle(wrongCands).slice(0, wCount);
                 // Tag each wrong fraction option with its misconception message so
                 // students see specific feedback when they pick a known-bad equiv.
@@ -5282,9 +5307,11 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     : pick(['standard', 'yesNoEquiv', 'multiSelectHalf']);
                 if (eqVariant === 'yesNoEquiv') {
                     // Yes/no: are these two fractions equivalent?
-                    const baseDen = pick([2, 3, 4, 5, 6]);
+                    const baseDen = pick(_fDenPool([2, 3, 4, 5, 6], 1));
                     const baseNum = rng(1, baseDen - 1);
                     const isEquiv = Math.random() < 0.5;
+                    // P12 `denoms`: a changed numerator keeps the family; a denominator + 1 would leave it.
+                    const _eqTopOnly = !!_fChanged('denoms');
                     let n2, d2;
                     if (isEquiv) {
                         const m = rng(2, 4);
@@ -5293,7 +5320,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     } else {
                         // Make a non-equivalent: tweak numerator or denominator
                         const m = rng(2, 4);
-                        if (Math.random() < 0.5) {
+                        if (Math.random() < 0.5 || _eqTopOnly) {
                             n2 = baseNum * m + 1;
                             d2 = baseDen * m;
                         } else {
@@ -5314,7 +5341,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.skillLabel = 'Equivalent Fractions';
                     return;
                 }
-                if (eqVariant === 'multiSelectHalf') {
+                // P12 `denoms`: "equivalent to 1/2" needs halves; without them the item is the standard one
+                // (the variant rotation would deal it again on every redraw).
+                const _eqFams = _fChanged('denoms');
+                if (eqVariant === 'multiSelectHalf' && !(_eqFams && !_eqFams.includes(2))) {
                     // Click ALL fractions equivalent to 1/2
                     const halfPool = [
                         { n: 2, d: 4 }, { n: 3, d: 6 }, { n: 4, d: 8 }, { n: 5, d: 10 },
@@ -5327,8 +5357,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     ];
                     const cCount = randInt(2, 3);
                     const wCount = 5 - cCount;
-                    const chosenC = shuffle(halfPool.slice()).slice(0, cCount);
-                    const chosenW = shuffle(notHalfPool.slice()).slice(0, wCount);
+                    // P12 `denoms`: halves of a ticked family only, with extra near-halves to choose from.
+                    const famHalf = _fDenFilter(halfPool, f => f.d, cCount);
+                    const famNot = _fChanged('denoms')
+                        ? _fDenFilter([...notHalfPool, { n: 1, d: 4 }, { n: 3, d: 4 }, { n: 5, d: 8 }, { n: 7, d: 16 }, { n: 9, d: 16 }], f => f.d, wCount)
+                        : notHalfPool;
+                    const chosenC = shuffle(famHalf.slice()).slice(0, cCount);
+                    const chosenW = shuffle(famNot.slice()).slice(0, wCount);
                     const all = shuffle([
                         ...chosenC.map(f => ({ ...f, correct: true })),
                         ...chosenW.map(f => ({ ...f, correct: false }))
@@ -5345,7 +5380,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     return;
                 }
                 // Level 1: Equivalent fractions
-                const simpleDen = pick([2, 3, 4, 5]);
+                const simpleDen = pick(_fDenPool([2, 3, 4, 5], 1));
                 const simpleNum = rng(1, simpleDen - 1);
                 const multiplier = rng(2, 4);
                 const expandedNum = simpleNum * multiplier;
