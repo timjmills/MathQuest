@@ -1,0 +1,29 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+fraction_operations:add_fractions_like 1366x650 card ok box 417(paper)/650 go 472 | worksheet ok box 551/650 go 54 cards 0 | quiz ok box 512/587 go 642
+fraction_operations:sub_fractions_like 1366x650 card ok box 428(paper)/650 go 483 | worksheet ok box 437/650 go 54 cards 3 | quiz ok box 470/587 go 642
+fraction_operations:add_frac_unlike 1366x650 card ok box 541/594 go 645 | worksheet ok box 471/650 go 54 cards 3 | quiz ok box 512/587 go 642
+composing:mixed_composing 1366x650           card ok box 266(paper)/650 go 321 | worksheet ok box 325/650 go 54 cards 1 | quiz ok box 240/650 go 512
+fractions:fraction_of_set 1366x650           card tall box 606/594 go 645 | worksheet ok box 294(paper)/650 go 54 cards 1 | quiz ok box 328(paper)/650 go 405
+fraction_operations:add_fractions_like 1280x600 card ok box 417(paper)/600 go 472 | worksheet ok box 551/600 go 54 cards 0 | quiz ok box 512/537 go 592
+fraction_operations:sub_fractions_like 1280x600 card ok box 428(paper)/600 go 483 | worksheet ok box 437/600 go 54 cards 3 | quiz ok box 470/537 go 592
+fraction_operations:add_frac_unlike 1280x600 card ok box 541/544 go 595 | worksheet ok box 471/600 go 54 cards 3 | quiz ok box 512/537 go 592
+composing:mixed_composing 1280x600           card ok box 266(paper)/600 go 321 | worksheet ok box 325/600 go 54 cards 1 | quiz ok box 240/600 go 512
+fractions:fraction_of_set 1280x600           card tall box 587/544 go 595 | worksheet ok box 294(paper)/600 go 54 cards 1 | quiz ok box 328(paper)/600 go 405
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+
+Genuinely tall items (may scroll; active-box brings the box into view):
+  fractions:fraction_of_set 1366x650 card: problem 486 px; box 606 > fold 594; on load in view
+  fractions:fraction_of_set 1280x600 card: problem 467 px; box 587 > fold 544; on load in view
+ws-chromebook-fit: OK

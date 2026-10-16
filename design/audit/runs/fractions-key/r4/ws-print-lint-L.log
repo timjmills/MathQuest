@@ -1,0 +1,37 @@
+ws-print-lint: source kit, 5 skill(s)
+fraction_operations:add_fractions_like                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#more-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#guided              4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#test                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#mixed-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#opener              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#more-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#guided              4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review              2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+fraction_operations:sub_fractions_like#test                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#mixed-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#opener              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike                        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#more-practice          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#guided                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review                 2+1k    .     .   12    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fraction_operations:add_frac_unlike#test                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#mixed-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#opener                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing                                  2+1k    .     .    4    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#more-practice                    2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#guided                           2+1k   10     .    4    .        .     .       .    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#review                           2+1k    .     .   19    .        .     .       .    1     .       .     .    .      .       .  FAIL
+composing:mixed_composing#test                             2+1k    .     .    4    .        .     .       2    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#mixed-practice                   2+1k    .     .    4    .        .     .       .    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#opener                           2+1k    .     .    4    .        .     .       2    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set                                  2+1k   14     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#more-practice                    2+1k   22     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#guided                           6+3k   26     .   15    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#review                           2+1k   12     .    8    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#test                             2+1k   14     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#mixed-practice                   2+1k   14     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#opener                           2+1k   20     .    4    .        8     2       .    .     .       .     .    .      .       .  FAIL
+ws-print-lint: WOULD FAIL - 35 document(s), source kit; 230 finding(s) in 16 document(s) [report-only, exit 0]

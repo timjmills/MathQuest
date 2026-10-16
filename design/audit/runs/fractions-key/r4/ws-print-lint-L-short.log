@@ -1,0 +1,12 @@
+ws-print-lint: source kit, 5 skill(s)
+fraction_operations:add_fractions_like                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#more-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#more-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#more-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing                                 2+1k    .     .    2    .        .     .       1    .     .       .     .    .      .       .  FAIL
+composing:mixed_composing#more-practice                   2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set                                 2+1k    7     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#more-practice                   2+1k   11     .    .    .        .     .       .    .     .       .     .    .      .       .  FAIL
+ws-print-lint: WOULD FAIL - 10 document(s), source kit; 22 finding(s) in 4 document(s) [report-only, exit 0]
